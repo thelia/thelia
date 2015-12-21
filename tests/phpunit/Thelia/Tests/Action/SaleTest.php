@@ -30,7 +30,7 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
 /**
  * Class SaleTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SaleTest extends TestCaseWithURLToolSetup
 {

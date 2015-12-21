@@ -40,6 +40,12 @@
                             {/loop}
 
 	                        </caption>
+                            <colgroup>
+                                <col />
+                                <col />
+                                <col width="250" />
+                                <col />
+                            </colgroup>
 
                           <thead>
   	                        <tr>
@@ -109,19 +115,22 @@
 
   	                                <td class="actions">
   	                                    {if ! $SECURED}
-  		                                    <div class="btn-group">
-                                                 <a class="btn btn-default btn-xs cancel-edit" id="cancel_edit_btn_{$ID}" data-id="{$ID}" title="{intl l='Cancel changes and revert to original value'}" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                 <a class="cancel-edit" id="cancel_edit_btn_{$ID}" data-id="{$ID}" title="{intl l='Cancel changes and revert to original value'}" href="#"><span class="glyphicon glyphicon-remove"></span></a>
 
                                                  {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.variable" access="UPDATE"}
-                                                     <a class="btn btn-default btn-xs config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                     <a class="config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                                  {/loop}
 
                                                  {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.variable" access="DELETE"}
-                                                     <a class="btn btn-default btn-xs config-delete" title="{intl l='Delete this variable'}" href="#delete_variable_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                     <a class="config-delete" title="{intl l='Delete this variable'}" href="#delete_variable_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                  {/loop}
   		                                    </div>
   		                                {else}
-  		                                    <i title="{intl l='This variable could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
+  		                                    <span title="{intl l='This variable could not be changed.'}" class="glyphicon glyphicon-ban-circle"></span>
   	                                    {/if}
   	                                </td>
   	                            </tr>
@@ -148,38 +157,38 @@
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
 
-			{form_hidden_fields form=$form}
+			{form_hidden_fields}
 
-			{form_field form=$form field='success_url'}
+			{form_field field='success_url'}
 			{* on success, redirect to the edition page, _ID_ is replaced with the created variable ID, see controller  *}
 			<input type="hidden" name="{$name}" value="{url path='/admin/configuration/variables/update' variable_id='_ID_'}" />
 			{/form_field}
 
 			{* We do not allow users to create hidden or secured variables from here *}
 
-			{form_field form=$form field='hidden'}
+			{form_field field='hidden'}
 			<input type="hidden" name="{$name}" value="0" />
 			{/form_field}
 
-			{form_field form=$form field='secured'}
+			{form_field field='secured'}
 			<input type="hidden" name="{$name}" value="0" />
 			{/form_field}
 
-		    {form_field form=$form field='name'}
+		    {form_field field='name'}
 		    <div class="form-group {if $error}has-error{/if}">
 		        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 		        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 		    </div>
 		    {/form_field}
 
-		    {form_field form=$form field='value'}
+		    {form_field field='value'}
 		    <div class="form-group {if $error}has-error{/if}">
 		        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 		        <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{intl l='Variable value'}" placeholder="{intl l='Variable value'}" class="form-control">
 		    </div>
 		    {/form_field}
 
-		    {form_field form=$form field='title'}
+		    {form_field field='title'}
 		    <div class="form-group {if $error}has-error{/if}">
 		        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -195,7 +204,7 @@
 
 		            <div class="help-block">{intl l='Enter here the category name in the default language (%title)' title={$TITLE}}</div>
 
-		            {form_field form=$form field='locale'}
+		            {form_field field='locale'}
 		              <input type="hidden" name="{$name}" value="{$LOCALE}" />
 		            {/form_field}
 		        {/loop}
@@ -216,7 +225,7 @@
 	        dialog_ok_label     = {intl l="Create this variable"}
 
 	        form_action        = {url path='/admin/configuration/variables/create'}
-	        form_enctype       = {form_enctype form=$form}
+	        form_enctype       = {form_enctype}
 	        form_error_message = $form_error_message
 	    }
     {/form}

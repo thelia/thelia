@@ -19,7 +19,7 @@ use Thelia\Tests\ApiTestCase;
  * Class TitleControllerTest
  * @package Thelia\Tests\Api
  * @author Benjamin Perche <bperche@openstudio.fr>
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TitleControllerTest extends ApiTestCase
 {
@@ -149,7 +149,7 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'POST',
-            '/api/title?sign='.$this->getSignParameter($requestContent),
+            '/api/title?lang=en_US&sign='.$this->getSignParameter($requestContent),
             [],
             [],
             $servers,
@@ -197,7 +197,7 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'PUT',
-            '/api/title?no-cache=yes&sign='.$this->getSignParameter($requestContent),
+            '/api/title?lang=en_US&no-cache=yes&sign='.$this->getSignParameter($requestContent),
             [],
             [],
             $servers,

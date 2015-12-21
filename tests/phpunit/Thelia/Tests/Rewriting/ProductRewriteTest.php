@@ -17,7 +17,7 @@ use Thelia\Model\Product;
 /**
  * Class ProductRewriteTest
  * @package Thelia\Tests\Rewriting
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProductRewriteTest extends BaseRewritingObject
 {
@@ -26,6 +26,9 @@ class ProductRewriteTest extends BaseRewritingObject
      */
     public function getObject()
     {
-        return new Product();
+        $product = new Product();
+        $product->setRef(uniqid());
+
+        return $product;
     }
 }

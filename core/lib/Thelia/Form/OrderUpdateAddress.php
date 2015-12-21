@@ -132,6 +132,12 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "phone_update",
                 ),
             ))
+            ->add("cellphone", "text", array(
+                "label" => Translator::getInstance()->trans("Cellphone"),
+                "label_attr" => array(
+                    "for" => "cellphone_update",
+                ),
+            ))
             ->add("company", "text", array(
                 "label" => Translator::getInstance()->trans("Compagny"),
                 "label_attr" => array(

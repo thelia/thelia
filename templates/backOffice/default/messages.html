@@ -71,17 +71,20 @@
 
         	                                <td class="actions">
         	                                    {if ! $SECURED}
-        		                                    <div class="btn-group">
+                                                    <div class="btn-toolbar btn toolbar-primary">
+                                                        <span class="glyphicon glyphicon-cog"></span>
+                                                    </div>
+                                                    <div class="toolbar-options hidden">
                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
-                                                           <a class="btn btn-default btn-xs message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                                        {/loop}
 
                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.message" access="DELETE"}
-                                                           <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                           <a class="message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                        {/loop}
         		                                    </div>
         		                                {else}
-        		                                    <i title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
+        		                                    <span title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></span>
         	                                    {/if}
         	                                </td>
         	                            </tr>
@@ -116,24 +119,24 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
-		    {form_hidden_fields form=$form exclude="secured,success_url"}
+		    {form_hidden_fields exclude="secured,success_url"}
 
-            {render_form_field form=$form field="success_url" value={url path='/admin/configuration/messages/update' message_id='_ID_'}}
+            {render_form_field field="success_url" value={url path='/admin/configuration/messages/update' message_id='_ID_'}}
 
 		    {* We do not allow users to create secured messages from here *}
-            {render_form_field form=$form field='secured' value='0'}
+            {render_form_field field='secured' value='0'}
 
-            {render_form_field form=$form field='name'}
+            {render_form_field field='name'}
 
-            {custom_render_form_field form=$form field="title"}
+            {custom_render_form_field field="title"}
                 {loop type="lang" name="default-lang" default_only="1"}
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {render_form_field form=$form field="locale" value=$LOCALE}
+                    {render_form_field field="locale" value=$LOCALE}
 
                     <div class="input-group">
-                        <input type="text" {form_field_attributes form=$form field="title"}>
+                        <input type="text" {form_field_attributes field="title"}>
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
@@ -153,7 +156,7 @@
             dialog_ok_label     = {intl l="Create this mailing template"}
 
             form_action        = {url path='/admin/configuration/messages/create'}
-            form_enctype       = {form_enctype form=$form}
+            form_enctype       = {form_enctype}
             form_error_message = $form_error_message
         }
     {/form}

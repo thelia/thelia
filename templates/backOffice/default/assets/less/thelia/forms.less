@@ -9,29 +9,15 @@
 // Form controls
 // -------------------------
 
-// Everything else
-textarea,
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
-.uneditable-input {
+.form-control {
+    &,
+    &:focus {
+        .box-shadow(none);
+    }
 
-  // Focus state
-  &:focus {
-    border-color: #E9730F;
-    .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px #E9730F");
-  }
+    &:focus {
+        background: #fcfcfc;
+    }
 }
 
 label {
@@ -79,7 +65,7 @@ form .info {
 
 	.search-query {
 		outline: none;
-        border-radius: 0;
+        border-radius: @border-radius-base;
 
 		&:focus {
 			box-shadow: none;
@@ -163,7 +149,7 @@ form .info {
 
         img {
             border: 2px solid white;
-            border-radius: 4px 4px 4px 4px;
+            border-radius: @border-radius-base;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 

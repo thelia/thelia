@@ -24,7 +24,7 @@ use Thelia\Model\CustomerQuery;
  *
  * Class AddressTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressTest extends \PHPUnit_Framework_TestCase
 {

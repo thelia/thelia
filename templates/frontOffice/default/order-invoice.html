@@ -31,13 +31,13 @@
 
             {form name="thelia.order.coupon"}
 
-            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype form=$form}>
+            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype}>
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                <table class="table table-cart">
+                <table class="table table-cart table-bordered">
                     <colgroup>
                         <col width="150">
                         <col>
@@ -82,7 +82,7 @@
                                 {/loop}
                             {/ifloop}
                             {elseloop rel="product-image"}
-                                {images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}
+                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$cart_count}">
                             {/elseloop}
                             </a>
                         </td>
@@ -110,27 +110,29 @@
                         <td class="unitprice">
                             <div class="secondary-price">
                             {if $IS_PROMO == 1}
-                                <small><span class="price">{format_money number=$PROMO_PRICE symbol={currency attr="symbol"}}</span></small>
+                                <small><span class="price">{format_money number=$PROMO_PRICE}</span></small>
                             {else}
-                                <small><span class="price">{format_money number=$PRICE symbol={currency attr="symbol"}}</span></small>
+                                <small><span class="price">{format_money number=$PRICE}</span></small>
                             {/if}
                             </div>
                         </td>
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
+                                {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
+                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                {assign "real_total_price" $TOTAL_TAXED_PRICE}
+                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
                             {/if}
                         </td>
                         <td class="qty">
                             <span class="price">{$QUANTITY}</span>
                         </td>
                         <td class="subprice">
-                            <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
+                            <span class="price">{format_money number=$real_total_price}</span>
                         </td>
                     </tr>
 
@@ -141,7 +143,7 @@
 
                 <div class="row">
                     <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
-                        <table class="table table-cart table-cart-total">
+                        <table class="table table-cart table-bordered table-cart-total">
                             <tfoot>
                             {$discount={order attr="discount"}}
                             {if $discount}
@@ -149,7 +151,7 @@
                                 <th class="discount">{intl l="Discount"}</th>
                                 <td class="shipping">
                                     <div class="shipping-price">
-                                        <span class="price">{format_money number=$discount symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number=$discount}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -157,16 +159,16 @@
                             <tr>
                                 <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                                 <td class="coupon">
-                                    {form_field form=$form field='success_url'}
+                                    {form_field field='success_url'}
                                     <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
                                     {/form_field}
-                                    {form_field form=$form field='coupon-code'}
+                                    {form_field field='coupon-code'}
                                     <div class="{if $error}has-error{/if}">
                                         <div class="input-group">
                                             <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
                                             <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
                                             <span class="input-group-btn">
-                                                <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
+                                                <button type="submit" class="btn btn-default">{intl l="Ok"}</button>
                                             </span>
                                         </div>
                                         {if $error}<span class="help-block">{$message}</span>{/if}
@@ -180,7 +182,7 @@
                                 <th class="shipping">{intl l="Shipping Tax"}</th>
                                 <td class="shipping">
                                     <div class="shipping-price">
-                                        <span class="price">{format_money number={order attr="postage"} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={order attr="postage"}}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -189,7 +191,7 @@
                                 <th>{intl l="Total excl. taxes"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}}}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -197,7 +199,7 @@
                                 <th class="total">{intl l="Total incl. taxes"}</th>
                                 <td class="total">
                                     <div class="total-price">
-                                        <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}}}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -210,19 +212,19 @@
             
             {form name="thelia.order.payment"}
             {assign var="isPost" value=$smarty.post|count}
-            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype form=$form}>
+            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype}>
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                <div id="cart-address">
+                <div id="cart-address" class="row">
                     {ifhook rel="order-invoice.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
+                        {hook name="order-invoice.delivery-address" module={order attr="delivery_module"}}
                     {/ifhook}
                     {elsehook rel="order-invoice.delivery-address"}
-                    <div class="panel">
+                    <div class="panel panel-default col-sm-6">
                         {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
                         <div class="panel-heading">{intl l="Delivery address"}</div>
                         <div class="panel-body">
@@ -244,12 +246,12 @@
                     </div>
                     {/elsehook}
 
-                    {form_field form=$form field='invoice-address'}
-                    <div class="panel">
+                    {form_field field='invoice-address'}
+                    <div class="panel panel-default col-sm-6">
                         <div class="panel-heading">{intl l="Billing address"}</div>
 
                         {if $error}
-                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                            <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
                         {/if}
 
                         <div class="panel-body">
@@ -286,7 +288,7 @@
                             </div>
                         {/loop}
 
-                            <a href="#" class="btn btn-change-address hidden">{intl l="Change address"}</a>
+                            <a href="#" class="btn btn-change-address btn-link hidden"><i class="fa fa-pencil"></i> {intl l="Change address"}</a>
                         </div>
 
                     </div>
@@ -294,13 +296,13 @@
 
                 {/form_field}
 
-                {form_field form=$form field='payment-module'}
+                {form_field field='payment-module'}
 
-                <div id="payment-method" class="panel">
+                <div id="payment-method" class="panel panel-default">
                     <div class="panel-heading">{intl l="Choose your payment method"}</div>
 
                     {if $error}
-                        <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                        <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
                     {/if}
 
                     <div class="panel-body">
@@ -315,7 +317,7 @@
                                         {/loop}
                                         {$TITLE}
                                     </label>
-                                    {hook name="order-invoice.payment-extra" module="{$paymentModuleId}"}
+                                    {hook name="order-invoice.payment-extra" module={$paymentModuleId}}
                                 </li>
                             {/loop}
                         </ul>
@@ -323,7 +325,7 @@
                 </div>
                 {/form_field}
 
-                {form_field form=$form field="agreed"}
+                {form_field field="agreed"}
                 <div class="well">
                     <div class="form-group group-agreed{if $error} has-error{/if}">
                         <div class="control-input">
@@ -336,7 +338,7 @@
                                             {$termsAndConditionsUrl=$URL}
                                         {/loop}
                                     {/if}
-                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="{$termsAndConditionsUrl nofilter}"}.
+                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link={$termsAndConditionsUrl nofilter}}.
                                 </label>
                                 {if $error }
                                     <span class="help-block">{$message}</span>
@@ -347,8 +349,8 @@
                 </div>
                 {/form_field}
 
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Order Payment"}</span></button>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Back"}</a>
+                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Next Step"}</button>
             </form>
             {/form}
             {hook name="order-invoice.bottom"}

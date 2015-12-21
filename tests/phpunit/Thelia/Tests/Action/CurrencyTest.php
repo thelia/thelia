@@ -26,7 +26,7 @@ use Thelia\Tests\ContainerAwareTestCase;
 /**
  * Class CurrencyTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CurrencyTest extends ContainerAwareTestCase
 {
@@ -48,6 +48,7 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setRate('1.35')
             ->setLocale('en_US')
             ->setSymbol('ù')
+            ->setFormat('%n %c')
             ->setDispatcher($this->dispatcher)
         ;
 
@@ -64,12 +65,15 @@ class CurrencyTest extends ContainerAwareTestCase
         $this->assertEquals('1.35', $createdCurrency->getRate());
         $this->assertEquals('en_US', $createdCurrency->getLocale());
         $this->assertEquals('ù', $createdCurrency->getSymbol());
+        $this->assertEquals('%n %c', $createdCurrency->getFormat());
 
         return $createdCurrency;
     }
 
     /**
+     * @param CurrencyModel $currency
      * @depends testCreate
+     * @return CurrencyModel
      */
     public function testUpdate(CurrencyModel $currency)
     {
@@ -81,6 +85,7 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setRate('2.35')
             ->setLocale('en_US')
             ->setSymbol('ù')
+            ->setFormat('%n %c')
             ->setDispatcher($this->dispatcher)
             ;
 
@@ -95,6 +100,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $this->assertEquals('2.35', $updatedCurrency->getRate());
         $this->assertEquals('en_US', $updatedCurrency->getLocale());
         $this->assertEquals('ù', $updatedCurrency->getSymbol());
+        $this->assertEquals('%n %c', $updatedCurrency->getFormat());
 
         return $updatedCurrency;
     }
@@ -102,6 +108,7 @@ class CurrencyTest extends ContainerAwareTestCase
     /**
      * @param CurrencyModel $currency
      * @depends testUpdate
+     * @return CurrencyModel
      */
     public function testSetDefault(CurrencyModel $currency)
     {

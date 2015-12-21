@@ -15,10 +15,20 @@ include("header.php");
 
 ?>
 					<div class="well">
-                        <div class="clearfix">
-                            <a href="?lang=fr_FR"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('French'); ?></a>
-                            <a href="?lang=en_US"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('English'); ?></a>
-                        </div>
+						<div class="clearfix text-center">
+							<a href="?lang=fr_FR">
+								Français
+							</a>
+							<span>&nbsp;<strong>|</strong>&nbsp;</span>
+							<a href="?lang=en_US">
+								English
+							</a>
+							<span>&nbsp;<strong>|</strong>&nbsp;</span>
+							<a href="?lang=de_DE">
+								Deutsch
+							</a>
+						</div>
+						<br />
 
 						<p class="lead text-center">
 <?php echo $trans->trans('Welcome in the Thelia installation wizard.'); ?>

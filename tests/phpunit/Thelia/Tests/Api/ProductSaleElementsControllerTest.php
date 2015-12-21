@@ -445,7 +445,7 @@ class ProductSaleElementsControllerTest extends ApiTestCase
 
     protected function getCurrency()
     {
-        $product = CurrencyQuery::create()->findOne();
+        $product = CurrencyQuery::create()->findOneByCode("EUR");
 
         if (null === $product) {
             $this->markTestSkipped("You must have at least one currency to run this test");

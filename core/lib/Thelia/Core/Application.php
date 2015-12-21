@@ -54,6 +54,10 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
+        /** @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->setDispatcher($eventDispatcher);
+
         return parent::doRun($input, $output);
     }
 

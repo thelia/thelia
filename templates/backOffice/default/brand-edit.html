@@ -1,9 +1,7 @@
 {extends file="admin-layout.tpl"}
 
 {block name="after-admin-css"}
-    {stylesheets file='assets/js/image-picker/image-picker.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/image-picker/image-picker.css'}">
 {/block}
 
 {block name="no-return-functions"}
@@ -29,12 +27,32 @@
                 </ul>
             </nav>
 
+            {hook name="brand-edit.top" brand_id=$brand_id}
+
             <div class="row">
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
                         <div class="col-md-7 title">
                             {intl l='Edit brand %title' title={$TITLE}}
                         </div>
+
+                        <div class="col-md-5 actions">
+
+                            {if $HAS_PREVIOUS != 0}
+                                <a href="{url path="/admin/brand/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous brand'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                            {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                            {/if}
+
+                            <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview brand page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+
+                            {if $HAS_NEXT != 0}
+                                <a href="{url path="/admin/brand/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next brand'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                            {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                            {/if}
+                        </div>
+
                     </div>
 
                     <div class="row">
@@ -86,7 +104,7 @@
 
                                         {form name="thelia.admin.brand.modification"}
 
-                                            <form method="POST" action="{url path="/admin/brand/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
+                                            <form method="POST" action="{url path="/admin/brand/save/%id" id=$ID}" {form_enctype} class="clearfix">
 
                                                 {include file="includes/inner-form-toolbar.html" close_url={url path='/admin/brand'}}
 
@@ -95,10 +113,10 @@
                                                 {* Be sure to get the currency ID, even if the form could not be validated *}
                                                 <input type="hidden" name="brand_id" value="{$ID}" />
 
-                                                {form_hidden_fields form=$form}
+                                                {form_hidden_fields}
 
-                                                {render_form_field form=$form field="success_url" value={url path="/admin/brand"}}
-                                                {render_form_field form=$form field="locale" value={$edit_language_locale}}
+                                                {render_form_field field="success_url" value={url path="/admin/brand"}}
+                                                {render_form_field field="locale" value={$edit_language_locale}}
 
                                                 {if $form_error}
                                                     <div class="alert alert-danger">{$form_error_message}</div>
@@ -110,10 +128,12 @@
                                                     </div>
 
                                                     <div class="col-md-4">
-                                                        {render_form_field form=$form field="visible"}
+                                                        {hook name="brand.modification.form-right.top" brand_id=$brand_id}
 
-                                                        {custom_render_form_field form=$form field='logo_image_id'}
-                                                            <select {form_field_attributes form=$form field='logo_image_id' extra_class='brand-image-selector'} >
+                                                        {render_form_field field="visible"}
+
+                                                        {custom_render_form_field field='logo_image_id'}
+                                                            <select {form_field_attributes field='logo_image_id' extra_class='brand-image-selector'} >
                                                                 <option value="">{intl l="No logo image"}</option>
 
                                                                 {loop name="brand-images" type="image" brand=$ID width="90" height="90" resize_mode="crop"}
@@ -121,6 +141,8 @@
                                                                 {/loop}
                                                             </select>
                                                         {/custom_render_form_field}
+
+                                                        {hook name="brand.modification.form-right.bottom" brand_id=$brand_id}
                                                     </div>
                                                 </div>
 
@@ -141,15 +163,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="seo">
-                                    {form name="thelia.admin.seo"}
-                                        {include
-                                            file       = "includes/seo-tab.html"
-                                            form       = $form
-                                            formAction = {url path='/admin/brand/seo/save'}
-                                            closeUrl   = {url path='/admin/brand'}
-                                            current_id = $brand_id
-                                        }
-                                    {/form}
+                                    {include file = "includes/seo-tab.html"
+                                        formAction = {url path='/admin/brand/seo/save'}
+                                        pageUrl    = "{url path='/admin/brand/update'}/$brand_id"
+                                        closeUrl   = {url path='/admin/brand'}
+                                        current_id = $brand_id
+                                        seoType    = 'brand'
+                                        parentId   = $brand_id
+                                    }
                                 </div>
 
                                  <div class="tab-pane fade" id="images">
@@ -180,6 +201,9 @@
                     </div>
                 </div>
             </div>
+
+            {hook name="brand-edit.bottom" brand_id=$brand_id}
+
             {/loop}
         </div>
     </div>

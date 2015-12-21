@@ -17,11 +17,9 @@ use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
@@ -29,6 +27,7 @@ use Thelia\Model\Map\TaxTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\TaxRuleCountryQuery;
+use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
 
 /**
  *
@@ -38,6 +37,11 @@ use Thelia\Model\TaxRuleCountryQuery;
  * Class TaxRuleCountry
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getCountry()
+ * @method int getTaxRule()
+ * @method string getAsk()
  */
 class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -70,7 +74,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         $ask = $this->getAsk();
 
         $country = $this->getCountry();
-        $taxRule = $this->getTax_rule();
+        $taxRule = $this->getTaxRule();
 
         if ($ask === 'countries') {
             $this->taxCountForOriginCountry = TaxRuleCountryQuery::create()->filterByCountryId($country)->count();
@@ -134,6 +138,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TaxRuleCountryModel $taxRuleCountry */
         foreach ($loopResult->getResultDataCollection() as $taxRuleCountry) {
             $loopResultRow = new LoopResultRow($taxRuleCountry);
 

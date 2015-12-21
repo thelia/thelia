@@ -53,6 +53,7 @@
 			                                        <option value="bo" {if $item_to_translate=='bo'}selected="selected"{/if}>{intl l='Back-office templates'}</option>
                                                     <option value="mo" {if $item_to_translate=='mo'}selected="selected"{/if}>{intl l='Modules'}</option>
                                                     <option value="co" {if $item_to_translate=='co'}selected="selected"{/if}>{intl l='Thelia core'}</option>
+                                                    <option value="in" {if $item_to_translate=='in'}selected="selected"{/if}>{intl l='Thelia Installation'}</option>
 												</select>
 			                                </div>
 		                                </div>
@@ -171,12 +172,72 @@
                                         {/if}
 	                                </div>
 
+                                    {if $is_writable === false}
+                                        <div class="alert alert-danger">
+                                            {intl l='The directory local/I18n does not exist or is not writable. Please fix this issue before.' }
+                                        </div>
+                                    {/if}
+
+                                    <div class="alert alert-help">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <p>
+                                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                                {intl l='This page allows you to translate each <strong>resources</strong> of your website : Thelia, modules, templates.<br>'}
+                                                {intl l='Keep attention that in translating you can override the resource translations.<br>'}
+                                                {intl l='This is not a problem as long as you <strong>do not update</strong> this resources (Thelia, module, template).<br>'}
+                                                {intl l='If your aim is just to translate text for your website, please use the user mode.<br>'}
+                                                {intl l='There is 2 kind of translations :'}
+                                                </p>
+                                                <ul class="list-unstyled">
+                                                    <li>
+                                                        <span class="glyphicon glyphicon-play"></span>
+                                                        {intl l='Redefine the text only for this resource.'}
+                                                    </li>
+                                                    <li>
+                                                        <span class="glyphicon glyphicon-forward"></span>
+                                                        {intl l='Redefine the text globally. Every text will be translated with this translation, except if there is a translation for this resource.'}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <p>
+                                                    {intl l='Please select your editing mode :'}
+                                                </p>
+
+                                                <ul>
+                                                    <li>{intl l='<strong>User</strong> : to redefine the translations for your website'}
+                                                    <li>{intl l='<strong>Developer</strong> : to change the translations of the resource'}
+                                                </ul>
+
+                                                <div class="btn-group toggle-translation-mode">
+                                                    <button type="button" id="translation-mode-user" class="btn btn-primary active">{intl l='User mode'}</button>
+                                                    <button type="button" id="translation-mode-developer" class="btn btn-primary">{intl l='Developer mode'}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="row">
+                                        {if $edit_language_locale != 'en_US'}
+                                        <div class="col-md-12">
+                                            <div class="translation-mode-developer alert alert-warning hidden">
+                                                {intl l="If you want to translate core components of Thelia : core, install, default modules or templates."} <br>
+                                                {intl l="It's strongly recommended to use our translation platform"}
+                                                ({intl l="on"} <a href="https://crowdin.com/" target="_blank">Crowdin</a>) :
+                                                <a href="http://translate.thelia.net" target="_blank">http://translate.thelia.net</a>
+                                                <br>
+                                                {intl l="That way, Thelia community will benefit of your translations"}.
+                                            </div>
+                                        </div>
+                                        {/if}
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="checkbox control-label">
                                                     <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations.'}
+                                                    (<a class="copy-all" href="#" title="{intl l='Copy all missing translations.'}">{intl l='Copy all translations.'}</a>)
                                                 </label>
+
                                             </div>
                                         </div>
                                     </div>
@@ -254,9 +315,35 @@
 		                                    </td>
 
 	                                        <td class="col-md-6" >
-	                                            <div class="input-group {if $not_translated}has-error{/if}">
-												    <span class="input-group-addon"><a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
-												    <input type="text" id="translation_{$idx}" class="translation_field form-control" name="translation[]" value="{$info.translation}" />
+	                                            <div class="input-group input-group-default {if $not_translated}has-error{/if}">
+												    <span class="input-group-addon">
+												        <a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}">
+												            <span class="glyphicon glyphicon-chevron-right"></span>
+												        </a>
+                                                    </span>
+												    <input type="text" name="translation[]" id="translation_{$idx}"
+												        class="translation_field translation_field_default form-control" value="{$info.translation}"
+                                                    />
+												</div>
+												<div class="input-group input-group-custom">
+												    <span class="input-group-addon">
+												        <a href="#" data-text-num="{$idx}" class="copy-translation-custom" title="{intl l='Copy source text in input field'}">
+												            <span class="glyphicon glyphicon-play"></span>
+												        </a>
+                                                    </span>
+												    <input type="text" name="translation_custom[]" id="translation_custom_{$idx}"
+												        class="translation_field translation_field_custom form-control" value="{$info.custom_fallback}"
+												        placeholder="specific redefinition" />
+												</div>
+												<div class="input-group input-group-global">
+												    <span class="input-group-addon">
+												        <a href="#" data-text-num="{$idx}" class="copy-translation-global" title="{intl l='Copy source text in input field'}">
+												            <span class="glyphicon glyphicon-forward"></span>
+                                                        </a>
+                                                    </span>
+												    <input type="text" name="translation_global[]" id="translation_global_{$idx}"
+												        class="translation_field translation_field_global form-control" value="{$info.global_fallback}"
+												        placeholder="global redefinition" />
 												</div>
 	                                        </td>
 	                                    </tr>
@@ -310,67 +397,146 @@
 {/block}
 
 {block name="javascript-initialization"}
-<script>
-    $(function() {
+    <script src="{javascript file='assets/js/bootstrap-switch/bootstrap-switch.js'}"></script>
 
-        var translation_changed = false;
-
-        $('#item_to_translate').change(function() {
-            $('#item-id').val('');
-            $('#item_name').val('');
-            $('.item-id-selector').hide();
-        });
-
-        $('#item_name').change(function() {
-            $('#module_part').val('');
-        });
-
-
-        $('.submit-on-change').change(function() {
-            $('#translation_form').submit();
-        });
-
-        $('input.translation_field').change(function() { translation_changed = true; });
-
-        $('.copy-translation').click(function(ev) {
-        	var num = $(this).data('text-num');
-
-        	$('#translation_' + num).val($('#text_' + num).val());
-
-        	translation_changed = true;
-
-        	ev.preventDefault();
-        });
-
-        $('#translation_form').submit(function(ev) {
-
-            if (translation_changed
-                &&
-                ! confirm("{intl l='Some of your translations are not saved. Continue anyway ?'}") ) {
-
-            	ev.preventDefault();
-            }
-        });
-
-     // Intercept language changes, to reload string when changing language
-        $('.form-submit-button').click(function(ev) {
-            // For a submit throught the save buttons, do not show the change warning.
-            translation_changed = false;
-        });
-
-        // Intercept language changes, to reload string when changing language
-        $('.language-change-button').click(function(ev) {
-
-        	$('input[name=edit_language_id]').val($(this).data('language-id'));
-
-        	$('#translation_form').submit();
-
-        	ev.preventDefault();
-        });
-    });
-</script>
+    {javascripts file='assets/js/cookie.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 {/block}
 
 {block name="javascript-last-call"}
+    <script>
+        $(function() {
+
+            var translation_changed = false;
+            var userMode = null;
+
+            $('#item_to_translate').change(function() {
+                $('#item-id').val('');
+                $('#item_name').val('');
+                $('.item-id-selector').hide();
+            });
+
+            $('#item_name').change(function() {
+                $('#module_part').val('');
+            });
+
+
+            $('.submit-on-change').change(function() {
+                $('#translation_form').submit();
+            });
+
+            $('input.translation_field').change(function() { translation_changed = true; });
+
+            var toggleMode = function toggleMode() {
+                if (userMode === null) {
+                    userMode = docCookies.getItem('translation_userMode');
+                    userMode = (userMode === null) || (userMode === "1");
+                } else {
+                    userMode = !userMode;
+                }
+
+                if (userMode) {
+                    $('.translation_field_default').prop('readonly', true);
+                    $('.input-group-custom, .input-group-global, .translation-mode-user').removeClass('hidden');
+                    $('.translation-mode-developer').addClass('hidden');
+                    $('#translation-mode-user').addClass('active');
+                    $('#translation-mode-developer').removeClass('active');
+                    //$('.input-group-custom, .input-group-global').removeClass('hidden');
+                } else {
+                    $('.translation_field_default').prop('readonly', false);
+                    $('.input-group-custom, .input-group-global, .translation-mode-user').addClass('hidden');
+                    $('.translation-mode-developer').removeClass('hidden');
+                    $('#translation-mode-developer').addClass('active');
+                    $('#translation-mode-user').removeClass('active');
+                    //$('.toggle-translation-mode').text($('.toggle-translation-mode').data('text-developer'));
+                }
+
+                docCookies.setItem('translation_userMode', userMode ? '1' : '0');
+                
+                return false;
+            };
+
+            $('.toggle-translation-mode > button').click(function() {
+                if (!$(this).hasClass('active')) {
+                    toggleMode();
+                }
+                return false;
+            });
+            toggleMode();
+
+            var copyTranslation = function copyTranslation($field) {
+                var num = $field.data('text-num');
+                var $dest = null;
+                var text = '';
+
+                if ($field.hasClass('copy-translation-custom')) {
+                    $dest = $('#translation_custom_' + num);
+
+                } else if ($field.hasClass('copy-translation-global')) {
+                    $dest = $('#translation_global_' + num);
+                } else {
+                    $dest = $('#translation_' + num);
+                }
+
+                if ($dest.val() == "") {
+                    if (!$field.hasClass('copy-translation')) {
+                        text = $('#translation_' + num).val();
+                    }
+                    if (text == '') {
+                        text = $('#text_' + num).val();
+                    }
+
+                    $dest.val(text);
+                }
+
+                translation_changed = true;
+            };
+
+            $('.copy-translation, .copy-translation-custom, .copy-translation-global').click(function(ev) {
+                copyTranslation($(this));
+                ev.preventDefault();
+            });
+
+            $('.copy-all').click(function(ev) {
+
+                $('.copy-translation').each(
+                        function(){
+                            copyTranslation($(this));
+                        }
+                );
+
+                ev.preventDefault();
+            });
+
+            $('#translation_form').submit(function(ev) {
+
+                if (translation_changed
+                        &&
+                        ! confirm("{intl l='Some of your translations are not saved. Continue anyway ?'}") ) {
+
+                    ev.preventDefault();
+                }
+            });
+
+            // Intercept language changes, to reload string when changing language
+            $('.form-submit-button').click(function(ev) {
+                // For a submit throught the save buttons, do not show the change warning.
+                translation_changed = false;
+            });
+
+            // Intercept language changes, to reload string when changing language
+            $('.language-change-button').click(function(ev) {
+
+                $('input[name=edit_language_id]').val($(this).data('language-id'));
+
+                $('#translation_form').submit();
+
+                ev.preventDefault();
+            });
+        });
+    </script>
+
     {hook name="translations.js" location="translations-js" }
 {/block}
+

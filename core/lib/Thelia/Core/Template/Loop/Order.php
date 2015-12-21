@@ -20,7 +20,6 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
@@ -35,6 +34,15 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string getCustomer()
+ * @method string[] getStatus()
+ * @method int[] getExcludeStatus()
+ * @method string[] getStatusCode()
+ * @method string[] getExcludeStatusCode()
+ * @method string[] getOrder()
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
@@ -61,6 +69,15 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     new Type\EnumType(array('*'))
                 )
             ),
+            Argument::createIntListTypeArgument('exclude_status'),
+            new Argument(
+                'status_code',
+                new TypeCollection(
+                    new Type\AnyListType(),
+                    new Type\EnumType(array('*'))
+                )
+            ),
+            Argument::createAnyListTypeArgument('exclude_status_code'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -163,6 +180,28 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             $search->filterByStatusId($status, Criteria::IN);
         }
 
+        if (null !== $excludeStatus = $this->getExcludeStatus()) {
+            $search->filterByStatusId($excludeStatus, Criteria::NOT_IN);
+        }
+
+        $statusCode = $this->getStatusCode();
+
+        if (null !== $statusCode && $statusCode != '*') {
+            $search
+                ->useOrderStatusQuery()
+                ->filterByCode($statusCode, Criteria::IN)
+                ->endUse()
+            ;
+        }
+
+        if (null !== $excludeStatusCode = $this->getExcludeStatusCode()) {
+            $search
+                ->useOrderStatusQuery()
+                ->filterByCode($excludeStatusCode, Criteria::NOT_IN)
+                ->endUse()
+            ;
+        }
+
         $orderers = $this->getOrder();
 
         foreach ($orderers as $orderer) {
@@ -217,7 +256,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                         ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
                         ->orderBy('lastname', Criteria::ASC)
                         ->orderBy('firstname', Criteria::ASC)
-                        ;
+                    ;
                     break;
                 case 'customer-name-reverse':
                     $search
@@ -263,13 +302,15 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('PAYMENT_MODULE', $order->getPaymentModuleId())
                 ->set('DELIVERY_MODULE', $order->getDeliveryModuleId())
                 ->set('STATUS', $order->getStatusId())
+                ->set('STATUS_CODE', $order->getOrderStatus()->getCode())
                 ->set('LANG', $order->getLangId())
                 ->set('DISCOUNT', $order->getDiscount())
                 ->set('TOTAL_TAX', $tax)
                 ->set('TOTAL_AMOUNT', $amount - $tax)
                 ->set('TOTAL_TAXED_AMOUNT', $amount)
-                ->set('HAS_PAID_STATUS', $order->isPaid(true))
-                ->set('IS_PAID', $order->isPaid())
+                ->set('WEIGHT', $order->getWeight())
+                ->set('HAS_PAID_STATUS', $order->isPaid())
+                ->set('IS_PAID', $order->isPaid(false))
                 ->set('IS_CANCELED', $order->isCancelled())
                 ->set('IS_NOT_PAID', $order->isNotPaid())
                 ->set('IS_SENT', $order->isSent())

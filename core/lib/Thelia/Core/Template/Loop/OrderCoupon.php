@@ -13,7 +13,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -33,6 +32,9 @@ use Thelia\Model\OrderQuery;
  * Class OrderCoupon
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method string[] getOrder()
  */
 class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 {

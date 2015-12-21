@@ -104,7 +104,7 @@
 
                                             <td>
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.brand" access="UPDATE"}
-                                                    <a title="{intl l='Change this brand'}" href="{url path="/admin/brand/update/$ID"}">{$TITLE}</a>
+                                                    <a title="{intl l='Change this brand'}" href="{url path="/admin/brand/update/%id" id=$ID}">{$TITLE}</a>
                                                 {/loop}
                                                 {elseloop rel="can_change"}
                                                     {$TITLE}
@@ -140,15 +140,18 @@
                                             {hook name='brands.table-row' location='brands_table_row' brand_id={$ID}}
 
                                             <td class="actions">
-                                                <div class="btn-group">
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.brand" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs brand-change" title="{intl l='Change this brand'}" href="{url path="/admin/brand/update/$ID"}">
+                                                        <a class="brand-change" title="{intl l='Change this brand'}" href="{url path="/admin/brand/update/%id" id=$ID}">
                                                             <span class="glyphicon glyphicon-edit"></span>
                                                         </a>
                                                     {/loop}
 
                                                     {loop type="auth" name="can_delete" role="ADMIN" resource="admin.brand" access="DELETE"}
-                                                        <a class="btn btn-default btn-xs brand-delete" title="{intl l='Delete this brand'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <a class="brand-delete" title="{intl l='Delete this brand'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                             <span class="glyphicon glyphicon-trash"></span>
                                                         </a>
                                                     {/loop}
@@ -184,32 +187,27 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
-			{form_hidden_fields form=$form}
+			{form_hidden_fields exclude="locale"}
 
-            {loop type="lang" name="default-lang" default_only="1"}
-                {* Switch edition to the current locale *}
-                <input type="hidden" name="edit_language_id" value="{$ID}" />
+            {render_form_field field="success_url" value={url path='/admin/brand/update/_ID_'}}
 
-                {render_form_field form=$form field="locale" value=$LOCALE}
-            {/loop}
-
-            {render_form_field form=$form field="success_url" value={url path='/admin/brand/update/_ID_'}}
-
-            {custom_render_form_field form=$form field="title"}
+            {custom_render_form_field field="title"}
                 {loop type="lang" name="default-lang" default_only="1"}
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {render_form_field form=$form field="locale" value=$LOCALE}
+                    {render_form_field field="locale" value=$LOCALE}
 
                     <div class="input-group">
-                        <input type="text" {form_field_attributes form=$form field="title"}>
+                        <input type="text" {form_field_attributes field="title"}>
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
             {/custom_render_form_field}
 
-            {render_form_field form=$form field="visible"}
+            {custom_render_form_field field="visible"}
+                <input type="checkbox" checked {form_field_attributes field="visible"}> {$label}
+            {/custom_render_form_field}
 
             {hook name='brand.create-form' location='brand_create_form'}
 
@@ -225,7 +223,7 @@
             dialog_ok_label     = {intl l="Create this brand"}
 
             form_action        = {url path='/admin/brand/create'}
-            form_enctype       = {form_enctype form=$form}
+            form_enctype       = {form_enctype}
             form_error_message = $form_error_message
         }
     {/form}

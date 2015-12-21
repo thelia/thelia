@@ -16,7 +16,7 @@ namespace Thelia\Core\Event;
  *
  * This class contains all Thelia events identifiers used by Thelia Core
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 final class TheliaEvents
@@ -279,10 +279,20 @@ final class TheliaEvents
     // -- END PRODUCT EVENTS ---------------------------------------------------------
 
 
+    // -- CLONE EVENTS ------------------------------------------------------------
+
+    const PRODUCT_CLONE = "action.cloneProduct";
+    const FILE_CLONE = "action.cloneFile";
+    const PSE_CLONE = "action.clonePSE";
+
+    // -- END CLONE EVENTS ------------------------------------------------------------
+
+
     // -- SHIPPING ZONE MANAGEMENT
 
     const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
     const SHIPPING_ZONE_REMOVE_AREA = 'action.shippingZone.removeArea';
+
     // -- END SHIPPING ZONE MANAGEMENT
 
 
@@ -332,6 +342,9 @@ final class TheliaEvents
     const BEFORE_UPDATEFEATURE_PRODUCT = "action.before_updateFeatureProduct";
     const AFTER_UPDATEFEATURE_PRODUCT  = "action.after_updateFeatureProduct";
 
+    /** Persist a cart */
+    const CART_PERSIST = "cart.persist";
+
     /** Restore a current cart in the session, either by reloading it from the database, or creating a new one */
     const CART_RESTORE_CURRENT = "cart.restore.current";
 
@@ -349,6 +362,11 @@ final class TheliaEvents
      * sent when a new item is added to current cart
      */
     const AFTER_CARTADDITEM = "cart.after.addItem";
+
+    /**
+     * sent for searching an item in the cart
+     */
+    const CART_FINDITEM = "cart.findItem";
 
     /**
      * sent when a cart item is modify
@@ -411,6 +429,28 @@ final class TheliaEvents
     const IMAGE_POSTPROCESSING = "action.postProcessImage";
 
     /**
+     * Sent on image cache clear request
+     */
+    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_SAVE = "action.saveImages";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_UPDATE = "action.updateImages";
+    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
+    const IMAGE_TOGGLE_VISIBILITY = "action.toggleImageVisibility";
+
+    /**
+     * Delete given image
+     */
+    const IMAGE_DELETE = "action.deleteImage";
+
+    /**
      * Sent on document processing
      */
     const DOCUMENT_PROCESS = "action.processDocument";
@@ -436,28 +476,6 @@ final class TheliaEvents
      * Delete given document
      */
     const DOCUMENT_DELETE = "action.deleteDocument";
-
-    /**
-     * Sent on image cache clear request
-     */
-    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
-
-    /**
-     * Save given images
-     */
-    const IMAGE_SAVE = "action.saveImages";
-
-    /**
-     * Save given images
-     */
-    const IMAGE_UPDATE = "action.updateImages";
-    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
-    const IMAGE_TOGGLE_VISIBILITY = "action.toggleImageVisibility";
-
-    /**
-     * Delete given image
-     */
-    const IMAGE_DELETE = "action.deleteImage";
 
     /**
      * Sent when creating a Coupon
@@ -529,6 +547,27 @@ final class TheliaEvents
      */
     const AFTER_COUPON_CONDITION_UPDATE    = "action.after_update_coupon_condition";
 
+    // -- Loop ---------------------------------------------
+
+    const LOOP_EXTENDS_ARG_DEFINITIONS = "loop.extends.arg_definitions";
+    const LOOP_EXTENDS_INITIALIZE_ARGS = "loop.extends.initialize_args";
+    const LOOP_EXTENDS_BUILD_MODEL_CRITERIA = "loop.extends.build_model_criteria";
+    const LOOP_EXTENDS_BUILD_ARRAY = "loop.extends.build_array";
+    const LOOP_EXTENDS_PARSE_RESULTS = "loop.extends.parse_results";
+
+    /**
+     * Generate the event name for a specific loop
+     *
+     * @param string $eventName the event name
+     * @param string $loopName the loop name
+     *
+     * @return string the event name for the loop
+     */
+    public static function getLoopExtendsEvent($eventName, $loopName)
+    {
+        return sprintf("%s.%s", $eventName, $loopName);
+    }
+
     // -- Configuration management ---------------------------------------------
 
     const CONFIG_CREATE   = "action.createConfig";
@@ -566,6 +605,7 @@ final class TheliaEvents
     const CURRENCY_UPDATE          = "action.updateCurrency";
     const CURRENCY_DELETE          = "action.deleteCurrency";
     const CURRENCY_SET_DEFAULT     = "action.setDefaultCurrency";
+    const CURRENCY_SET_VISIBLE     = "action.setVisibleCurrency";
     const CURRENCY_UPDATE_RATES    = "action.updateCurrencyRates";
     const CURRENCY_UPDATE_POSITION = "action.updateCurrencyPosition";
 
@@ -789,6 +829,8 @@ final class TheliaEvents
     const LANG_DEFAULTBEHAVIOR                  = 'action.lang.defaultBehavior';
     const LANG_URL                              = 'action.lang.url';
 
+    const LANG_FIX_MISSING_FLAG                 = 'action.lang.fix_missing_flag';
+
     const LANG_TOGGLEDEFAULT                    = 'action.lang.toggleDefault';
 
     const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
@@ -879,4 +921,9 @@ final class TheliaEvents
     const CUSTOMER_TITLE_AFTER_UPDATE = "action.title.after_update";
 
     const CUSTOMER_TITLE_DELETE = "action.title.delete";
+
+    // -- Translation -------------------------------------------
+
+    const TRANSLATION_GET_STRINGS = 'action.translation.get_strings';
+    const TRANSLATION_WRITE_FILE = 'action.translation.write_file';
 }

@@ -16,12 +16,13 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Model\TemplateQuery;
 use Thelia\Tests\ApiTestCase;
 
 /**
  * Class ProductControllerTest
  * @package Thelia\Tests\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProductControllerTest extends ApiTestCase
 {
@@ -146,6 +147,57 @@ class ProductControllerTest extends ApiTestCase
         $this->assertEquals('en_US', $content[0]['LOCALE']);
 
         return $content['0']['ID'];
+    }
+
+    public function testCreateWithOptionalParametersAction()
+    {
+        $client  = static::createClient();
+
+        $category = CategoryQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
+        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $taxRule = TaxRuleQuery::create()->findOneByIsDefault(1);
+        $templateId = $category->getDefaultTemplateId();
+
+        if (null === $templateId) {
+            $templateId = TemplateQuery::create()->addAscendingOrderByColumn('RAND()')->findOne()->getId();
+        }
+
+        $product = [
+            'ref' => uniqid('testCreateProduct'),
+            'locale' => 'en_US',
+            'title' => 'product create from api',
+            'description' => 'product description from api',
+            'default_category' => $category->getId(),
+            'visible' => 1,
+            'price' => '10',
+            'currency' => $defaultCurrency->getId(),
+            'tax_rule' => $taxRule->getId(),
+            'weight' => 10,
+            'brand_id' => 0,
+            'quantity' => 10,
+            'template_id' => $templateId
+        ];
+
+        $requestContent = json_encode($product);
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'POST',
+            '/api/products?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'Http status code must be 201');
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals('en_US', $content[0]['LOCALE']);
+
+        $this->assertEquals(10, $content[0]['QUANTITY']);
+        $this->assertEquals($templateId, $content[0]['TEMPLATE']);
     }
 
     /**

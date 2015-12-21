@@ -19,12 +19,13 @@ use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Model\Area as AreaModel;
+use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\CountryQuery;
 
 /**
  * Class AreaTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaTest extends \PHPUnit_Framework_TestCase
 {
@@ -87,10 +88,10 @@ class AreaTest extends \PHPUnit_Framework_TestCase
 
         $updatedArea = $event->getArea();
 
-        $updatedCountry = CountryQuery::create()->findOneByAreaId($updatedArea->getId());
+        $updatedCountry = CountryAreaQuery::create()->findOneByAreaId($updatedArea->getId());
 
         $this->assertInstanceOf('Thelia\Model\Area', $updatedArea);
-        $this->assertEquals($country->getId(), $updatedCountry->getId());
+        $this->assertEquals($country->getId(), $updatedCountry->getCountryId());
 
         return $updatedArea;
     }
@@ -109,11 +110,15 @@ class AreaTest extends \PHPUnit_Framework_TestCase
         $areaAction = new Area();
         $areaAction->removeCountry($event);
 
-        $updatedCountry = CountryQuery::create()->findPk($country->getId());
+        $updatedCountry = CountryAreaQuery::create()
+            ->filterByCountryId($country->getId())
+            ->filterByAreaId($area->getId())
+            ->findOne();
+
         $updatedArea = $event->getArea();
 
         $this->assertInstanceOf('Thelia\Model\Area', $updatedArea);
-        $this->assertNull($updatedCountry->getAreaId());
+        $this->assertNull($updatedCountry);
 
         return $event->getArea();
     }

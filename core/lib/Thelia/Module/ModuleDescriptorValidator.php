@@ -19,13 +19,14 @@ use Thelia\Module\Exception\InvalidXmlDocumentException;
 /**
  * Class ModuleDescriptorValidator
  * @package Thelia\Module
- * @author  Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleDescriptorValidator
 {
     protected static $versions = [
         '1' => 'module.xsd',
-        '2' => 'module-2_1.xsd'
+        '2' => 'module-2_1.xsd',
+        '3' => 'module-2_2.xsd'
     ];
 
     /** @var Finder */

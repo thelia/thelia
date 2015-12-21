@@ -3,7 +3,7 @@
 	left: 0;
 	padding: 4px;
 	margin-top: 1px;
-    border-radius: 4px;
+    border-radius: @border-radius-base;
 	&:before {
 		content: '';
 		display: inline-block;
@@ -37,7 +37,7 @@
 		text-align: center;
 		width: 20px;
 		height: 20px;
-        border-radius: 4px;
+        border-radius: @border-radius-base;
 	}
 	td {
 		&.day:hover {
@@ -65,7 +65,7 @@
 			float: left;
 			margin: 2px;
 			cursor: pointer;
-            border-radius: 4px;
+            border-radius: @border-radius-base;
 			&:hover {
 				background: @gray-lighter;
 			}

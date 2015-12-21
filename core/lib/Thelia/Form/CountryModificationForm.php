@@ -23,7 +23,7 @@ class CountryModificationForm extends CountryCreationForm
         parent::buildForm(true);
 
         $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add('id', 'hidden', array('constraints' => array(new GreaterThan(array('value' => 0)))))
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class

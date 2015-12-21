@@ -269,7 +269,7 @@ class ModuleValidator
                         "The module %name requires Thelia %version or newer",
                         [
                             '%name' => $this->moduleDirName,
-                            '%version' => $this->moduleDefinition->getVersion()
+                            '%version' => $this->moduleDefinition->getTheliaVersion()
                         ]
                     )
                 );
@@ -386,6 +386,21 @@ class ModuleValidator
         return $dependantModules;
     }
 
+    public function getCurrentModuleDependencies()
+    {
+        $dependencies = [];
+        if (0 !== count($this->moduleDescriptor->required)) {
+            foreach ($this->moduleDescriptor->required->module as $dependency) {
+                $dependencies[] = [
+                   "code" => (string)$dependency,
+                   "version" => (string)$dependency['version'],
+                ];
+            }
+        }
+
+        return $dependencies;
+    }
+
     /**
      * @param ModuleDefinition $moduleDefinition
      */
@@ -449,7 +464,27 @@ class ModuleValidator
                     (string)$author->website
                 ];
             }
+        } else {
+            $authors = $this->getModuleAuthors22($moduleDefinition);
         }
         $moduleDefinition->setAuthors($authors);
+    }
+
+    protected function getModuleAuthors22(ModuleDefinition $moduleDefinition)
+    {
+        $authors = [];
+
+        if (0 !== count($this->moduleDescriptor->authors->author)) {
+            foreach ($this->moduleDescriptor->authors->author as $author) {
+                $authors[] = [
+                    (string)$author->name,
+                    (string)$author->company,
+                    (string)$author->email,
+                    (string)$author->website
+                ];
+            }
+        }
+
+        return $authors;
     }
 }

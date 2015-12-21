@@ -16,14 +16,13 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\OrderProductAttributeCombinationQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Model\OrderProductAttributeCombination as OrderProductAttributeCombinationModel;
 
 /**
  *
@@ -32,6 +31,11 @@ use Thelia\Type;
  * Class OrderProductAttributeCombination
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getOrderProduct()
+ * @method string[] getOrder()
+ * @method bool getVirtual()
  */
 class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -58,7 +62,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
     {
         $search = OrderProductAttributeCombinationQuery::create();
 
-        $orderProduct = $this->getOrder_product();
+        $orderProduct = $this->getOrderProduct();
 
         $search->filterByOrderProductId($orderProduct, Criteria::EQUAL);
 
@@ -80,6 +84,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var OrderProductAttributeCombinationModel $orderAttributeCombination */
         foreach ($loopResult->getResultDataCollection() as $orderAttributeCombination) {
             $loopResultRow = new LoopResultRow($orderAttributeCombination);
 

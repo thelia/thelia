@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Module;
 /**
  * Class ModuleToggleActivationEvent
  * @package Thelia\Core\Event\Module
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleToggleActivationEvent extends ModuleEvent
 {
@@ -28,6 +28,12 @@ class ModuleToggleActivationEvent extends ModuleEvent
      * @var bool
      */
     protected $noCheck;
+
+    /**
+     * @var bool
+     */
+    protected $recursive;
+
 
     /**
      * @param int $module_id
@@ -73,6 +79,24 @@ class ModuleToggleActivationEvent extends ModuleEvent
     {
         $this->noCheck = $noCheck;
 
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isRecursive()
+    {
+        return $this->recursive;
+    }
+
+    /**
+     * @param boolean $recursive
+     * @return $this;
+     */
+    public function setRecursive($recursive)
+    {
+        $this->recursive = $recursive;
         return $this;
     }
 }

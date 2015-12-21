@@ -58,7 +58,7 @@ class CategoryVersionTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class CategoryVersionTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -89,6 +89,11 @@ class CategoryVersionTableMap extends TableMap
      * the column name for the POSITION field
      */
     const POSITION = 'category_version.POSITION';
+
+    /**
+     * the column name for the DEFAULT_TEMPLATE_ID field
+     */
+    const DEFAULT_TEMPLATE_ID = 'category_version.DEFAULT_TEMPLATE_ID';
 
     /**
      * the column name for the CREATED_AT field
@@ -127,12 +132,12 @@ class CategoryVersionTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Parent', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'parent', 'visible', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(CategoryVersionTableMap::ID, CategoryVersionTableMap::PARENT, CategoryVersionTableMap::VISIBLE, CategoryVersionTableMap::POSITION, CategoryVersionTableMap::CREATED_AT, CategoryVersionTableMap::UPDATED_AT, CategoryVersionTableMap::VERSION, CategoryVersionTableMap::VERSION_CREATED_AT, CategoryVersionTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PARENT', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'parent', 'visible', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Parent', 'Visible', 'Position', 'DefaultTemplateId', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'parent', 'visible', 'position', 'defaultTemplateId', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        self::TYPE_COLNAME       => array(CategoryVersionTableMap::ID, CategoryVersionTableMap::PARENT, CategoryVersionTableMap::VISIBLE, CategoryVersionTableMap::POSITION, CategoryVersionTableMap::DEFAULT_TEMPLATE_ID, CategoryVersionTableMap::CREATED_AT, CategoryVersionTableMap::UPDATED_AT, CategoryVersionTableMap::VERSION, CategoryVersionTableMap::VERSION_CREATED_AT, CategoryVersionTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PARENT', 'VISIBLE', 'POSITION', 'DEFAULT_TEMPLATE_ID', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        self::TYPE_FIELDNAME     => array('id', 'parent', 'visible', 'position', 'default_template_id', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -142,12 +147,12 @@ class CategoryVersionTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Parent' => 1, 'Visible' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Version' => 6, 'VersionCreatedAt' => 7, 'VersionCreatedBy' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'version' => 6, 'versionCreatedAt' => 7, 'versionCreatedBy' => 8, ),
-        self::TYPE_COLNAME       => array(CategoryVersionTableMap::ID => 0, CategoryVersionTableMap::PARENT => 1, CategoryVersionTableMap::VISIBLE => 2, CategoryVersionTableMap::POSITION => 3, CategoryVersionTableMap::CREATED_AT => 4, CategoryVersionTableMap::UPDATED_AT => 5, CategoryVersionTableMap::VERSION => 6, CategoryVersionTableMap::VERSION_CREATED_AT => 7, CategoryVersionTableMap::VERSION_CREATED_BY => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PARENT' => 1, 'VISIBLE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, 'VERSION' => 6, 'VERSION_CREATED_AT' => 7, 'VERSION_CREATED_BY' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, 'version' => 6, 'version_created_at' => 7, 'version_created_by' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Parent' => 1, 'Visible' => 2, 'Position' => 3, 'DefaultTemplateId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Version' => 7, 'VersionCreatedAt' => 8, 'VersionCreatedBy' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'defaultTemplateId' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'version' => 7, 'versionCreatedAt' => 8, 'versionCreatedBy' => 9, ),
+        self::TYPE_COLNAME       => array(CategoryVersionTableMap::ID => 0, CategoryVersionTableMap::PARENT => 1, CategoryVersionTableMap::VISIBLE => 2, CategoryVersionTableMap::POSITION => 3, CategoryVersionTableMap::DEFAULT_TEMPLATE_ID => 4, CategoryVersionTableMap::CREATED_AT => 5, CategoryVersionTableMap::UPDATED_AT => 6, CategoryVersionTableMap::VERSION => 7, CategoryVersionTableMap::VERSION_CREATED_AT => 8, CategoryVersionTableMap::VERSION_CREATED_BY => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PARENT' => 1, 'VISIBLE' => 2, 'POSITION' => 3, 'DEFAULT_TEMPLATE_ID' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, 'VERSION' => 7, 'VERSION_CREATED_AT' => 8, 'VERSION_CREATED_BY' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'default_template_id' => 4, 'created_at' => 5, 'updated_at' => 6, 'version' => 7, 'version_created_at' => 8, 'version_created_by' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -170,6 +175,7 @@ class CategoryVersionTableMap extends TableMap
         $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, 0);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('DEFAULT_TEMPLATE_ID', 'DefaultTemplateId', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
@@ -252,11 +258,11 @@ class CategoryVersionTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -376,6 +382,7 @@ class CategoryVersionTableMap extends TableMap
             $criteria->addSelectColumn(CategoryVersionTableMap::PARENT);
             $criteria->addSelectColumn(CategoryVersionTableMap::VISIBLE);
             $criteria->addSelectColumn(CategoryVersionTableMap::POSITION);
+            $criteria->addSelectColumn(CategoryVersionTableMap::DEFAULT_TEMPLATE_ID);
             $criteria->addSelectColumn(CategoryVersionTableMap::CREATED_AT);
             $criteria->addSelectColumn(CategoryVersionTableMap::UPDATED_AT);
             $criteria->addSelectColumn(CategoryVersionTableMap::VERSION);
@@ -386,6 +393,7 @@ class CategoryVersionTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.PARENT');
             $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.DEFAULT_TEMPLATE_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
             $criteria->addSelectColumn($alias . '.VERSION');

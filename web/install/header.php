@@ -13,7 +13,7 @@
 ini_set('display_errors', '1');
 
 set_time_limit(0);
-
+ob_start();
 session_start();
 
 include 'bootstrap.php';
@@ -64,10 +64,15 @@ if ($context == "install" && $step == 1) {
             echo $trans->trans('Update');
         }
     ?></title>
-    <link rel="shortcut icon" href="fd33fd0-6fda040.ico" />
+    <link rel="shortcut icon" href="../favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        <?php
+        // because the installation folder is deleted after the update
+        echo file_get_contents('styles.css');
+        ?>
+    </style>
 </head>
 <body>
 
@@ -123,3 +128,4 @@ if ($context == "install") { ?>
                     </div>
 <?php
 }
+

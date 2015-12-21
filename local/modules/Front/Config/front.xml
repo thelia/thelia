@@ -131,6 +131,11 @@
         <requirement key="address_id">\d+</requirement>
     </route>
 
+    <route id="address.make.default" path="/address/default/{addressId}" methods="get">
+        <default key="_controller">Front:Address:makeAddressDefault</default>
+        <requirement key="addressId">\d+</requirement>
+    </route>
+
     <!-- end customer address routes -->
 
     <!-- cart routes -->

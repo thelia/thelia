@@ -1,0 +1,82 @@
+// Thelia : Category
+
+// Category
+.products-content > ul {
+    .item {
+        .product-info {
+            .short-description {
+                display: block;
+                margin-bottom: 5px;
+            }
+        }
+
+        .product-price {
+            .price-container {
+                display: block;
+                margin-bottom: 5px;
+            }
+        }
+    }
+}
+
+.grid {
+    .products-content > ul {
+        .item {
+            margin-bottom: @line-height-computed;
+
+            > article {
+                margin: 0;
+
+                .product-image {
+                    padding: 0;
+                }
+
+                .name {
+                    margin: 4px 0;
+                }
+
+                .product-image,
+                .product-info,
+                .product-price {
+                    width: 100%;
+                    float: none;
+                }
+            }
+
+            .description {
+                .visible-xs;
+            }
+
+            .product-price {
+                padding: 0;
+            }
+        }
+    }
+}
+
+.list {
+    .products-content > ul {
+        .item {
+            width: 100%;
+            float: none;
+
+            + .item {
+                padding-top: 15px;
+            }
+            > article {
+                margin-left: 0;
+
+                .product-image {
+                    margin-bottom: 15px;
+                    padding: 0;
+                }
+
+                .product-info {
+                    .name {
+                        margin-top: 0;
+                    }
+                }
+            }
+        }
+    }
+}

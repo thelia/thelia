@@ -25,15 +25,6 @@ use Thelia\Model\LangQuery;
  */
 class ExportForm extends BaseForm
 {
-    protected $translator;
-
-    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
-    {
-        $this->translator = Translator::getInstance();
-
-        parent::__construct($request, $type, $data, $options);
-    }
-
     protected function buildForm()
     {
         $this->formBuilder
@@ -61,6 +52,26 @@ class ExportForm extends BaseForm
                 "label" => $this->translator->trans("Include documents"),
                 "label_attr" => ["for" => "with_documents"],
                 "required" => false,
+            ))
+            ->add("range_date_start", "date", array(
+                "label" => $this->translator->trans("Range date Start"),
+                "label_attr" => ["for" => "for_range_date_start"],
+                "required" => false,
+                'years' => range(date('Y'), date('Y')-5),
+                'input' => 'array',
+                'widget' => 'choice',
+                'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
+                'format' => 'yyyy-MM-d',
+            ))
+            ->add("range_date_end", "date", array(
+                "label" => $this->translator->trans("Range date End"),
+                "label_attr" => ["for" => "for_range_date_end"],
+                "required" => false,
+                'years' => range(date('Y'), date('Y')-5),
+                'input' => 'array',
+                'widget' => 'choice',
+                'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
+                'format' => 'yyyy-MM-d',
             ))
             ->add("language", "integer", array(
                 "label" => $this->translator->trans("Language"),

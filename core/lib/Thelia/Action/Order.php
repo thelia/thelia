@@ -199,6 +199,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setZipcode($deliveryAddress->getZipcode())
             ->setCity($deliveryAddress->getCity())
             ->setPhone($deliveryAddress->getPhone())
+            ->setCellphone($deliveryAddress->getCellphone())
             ->setCountryId($deliveryAddress->getCountryId())
             ->save($con)
         ;
@@ -215,6 +216,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setZipcode($invoiceAddress->getZipcode())
             ->setCity($invoiceAddress->getCity())
             ->setPhone($invoiceAddress->getPhone())
+            ->setCellphone($invoiceAddress->getCellphone())
             ->setCountryId($invoiceAddress->getCountryId())
             ->save($con)
         ;
@@ -226,7 +228,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             OrderStatusQuery::getNotPaidStatus()->getId()
         );
 
-        $placedOrder->setCart($cart);
+        $placedOrder->setCartId($cart->getId());
 
         /* memorize discount */
         $placedOrder->setDiscount(
@@ -315,7 +317,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setTaxRuleTitle($taxRuleI18n->getTitle())
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
                 ->setEanCode($pse->getEanCode())
-                ->setCartIemId($cartItem->getId())
+                ->setCartItemId($cartItem->getId())
                 ->setDispatcher($dispatcher)
                 ->save($con)
             ;
@@ -360,6 +362,11 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function createManual(OrderManualEvent $event)
     {
+        $paymentModule = ModuleQuery::create()->findPk($event->getOrder()->getPaymentModuleId());
+
+        /** @var \Thelia\Module\PaymentModuleInterface $paymentModuleInstance */
+        $paymentModuleInstance = $paymentModule->createInstance();
+
         $event->setPlacedOrder(
             $this->createOrder(
                 $event->getDispatcher(),
@@ -368,7 +375,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getLang(),
                 $event->getCart(),
                 $event->getCustomer(),
-                true
+                $paymentModuleInstance->manageStockOnCreation()
             )
         );
 
@@ -422,9 +429,9 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function orderBeforePayment(OrderEvent $event)
     {
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
 
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, $event);
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, clone $event);
     }
 
     /**
@@ -610,6 +617,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setCity($event->getCity())
             ->setCountryId($event->getCountry())
             ->setPhone($event->getPhone())
+            ->setCellphone($event->getCellphone())
         ;
         $orderAddress->save();
 

@@ -12,8 +12,8 @@
 
 namespace Carousel\Loop;
 
-use Carousel\Carousel;
 use Carousel\Model\CarouselQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
@@ -71,7 +71,6 @@ class CarouselLoop extends Image
      */
     public function parseResults(LoopResult $loopResult)
     {
-        $carousel = new Carousel();
         /** @var \Carousel\Model\Carousel $carousel */
         foreach ($loopResult->getResultDataCollection() as $carousel) {
             $loopResultRow = new LoopResultRow($carousel);

@@ -35,6 +35,7 @@ final class AdminForm
     const CATEGORY_DOCUMENT_MODIFICATION = 'thelia.admin.category.document.modification';
 
     const PRODUCT_CREATION = 'thelia.admin.product.creation';
+    const PRODUCT_CLONE = 'thelia.admin.product.clone';
     const PRODUCT_MODIFICATION = 'thelia.admin.product.modification';
     const PRODUCT_DETAILS_MODIFICATION = 'thelia.admin.product.details.modification';
     const PRODUCT_IMAGE_MODIFICATION = 'thelia.admin.product.image.modification';
@@ -117,6 +118,7 @@ final class AdminForm
     const AREA_CREATE = 'thelia.admin.area.create';
     const AREA_MODIFICATION = 'thelia.admin.area.modification';
     const AREA_COUNTRY = 'thelia.admin.area.country';
+    const AREA_DELETE_COUNTRY = 'thelia.admin.area.delete.country';
     const AREA_POSTAGE = 'thelia.admin.area.postage';
 
     const SHIPPING_ZONE_ADD_AREA = 'thelia.shopping_zone_area';
@@ -124,7 +126,7 @@ final class AdminForm
 
     const LANG_UPDATE = 'thelia.lang.update';
     const LANG_CREATE = 'thelia.lang.create';
-    const LANG_DEFAULT_BEHAVIOR = 'thelia.lang.default_BEHAVIOR';
+    const LANG_DEFAULT_BEHAVIOR = 'thelia.lang.defaultBehavior';
     const LANG_URL = 'thelia.lang.url';
 
     const CONFIG_STORE = 'thelia.configuration.store';

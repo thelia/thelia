@@ -16,14 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\HookQuery;
-
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -31,6 +28,14 @@ use Thelia\Type\TypeCollection;
  * Class Hook
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string[] getCode()
+ * @method string[] getHook_type()
+ * @method bool|string getActive()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
 {

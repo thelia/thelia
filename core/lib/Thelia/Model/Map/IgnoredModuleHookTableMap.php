@@ -58,7 +58,7 @@ class IgnoredModuleHookTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class IgnoredModuleHookTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the MODULE_ID field
@@ -91,6 +91,16 @@ class IgnoredModuleHookTableMap extends TableMap
     const CLASSNAME = 'ignored_module_hook.CLASSNAME';
 
     /**
+     * the column name for the CREATED_AT field
+     */
+    const CREATED_AT = 'ignored_module_hook.CREATED_AT';
+
+    /**
+     * the column name for the UPDATED_AT field
+     */
+    const UPDATED_AT = 'ignored_module_hook.UPDATED_AT';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -102,12 +112,12 @@ class IgnoredModuleHookTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ModuleId', 'HookId', 'Method', 'Classname', ),
-        self::TYPE_STUDLYPHPNAME => array('moduleId', 'hookId', 'method', 'classname', ),
-        self::TYPE_COLNAME       => array(IgnoredModuleHookTableMap::MODULE_ID, IgnoredModuleHookTableMap::HOOK_ID, IgnoredModuleHookTableMap::METHOD, IgnoredModuleHookTableMap::CLASSNAME, ),
-        self::TYPE_RAW_COLNAME   => array('MODULE_ID', 'HOOK_ID', 'METHOD', 'CLASSNAME', ),
-        self::TYPE_FIELDNAME     => array('module_id', 'hook_id', 'method', 'classname', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('ModuleId', 'HookId', 'Method', 'Classname', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('moduleId', 'hookId', 'method', 'classname', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(IgnoredModuleHookTableMap::MODULE_ID, IgnoredModuleHookTableMap::HOOK_ID, IgnoredModuleHookTableMap::METHOD, IgnoredModuleHookTableMap::CLASSNAME, IgnoredModuleHookTableMap::CREATED_AT, IgnoredModuleHookTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('MODULE_ID', 'HOOK_ID', 'METHOD', 'CLASSNAME', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('module_id', 'hook_id', 'method', 'classname', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -117,12 +127,12 @@ class IgnoredModuleHookTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ModuleId' => 0, 'HookId' => 1, 'Method' => 2, 'Classname' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('moduleId' => 0, 'hookId' => 1, 'method' => 2, 'classname' => 3, ),
-        self::TYPE_COLNAME       => array(IgnoredModuleHookTableMap::MODULE_ID => 0, IgnoredModuleHookTableMap::HOOK_ID => 1, IgnoredModuleHookTableMap::METHOD => 2, IgnoredModuleHookTableMap::CLASSNAME => 3, ),
-        self::TYPE_RAW_COLNAME   => array('MODULE_ID' => 0, 'HOOK_ID' => 1, 'METHOD' => 2, 'CLASSNAME' => 3, ),
-        self::TYPE_FIELDNAME     => array('module_id' => 0, 'hook_id' => 1, 'method' => 2, 'classname' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('ModuleId' => 0, 'HookId' => 1, 'Method' => 2, 'Classname' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('moduleId' => 0, 'hookId' => 1, 'method' => 2, 'classname' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(IgnoredModuleHookTableMap::MODULE_ID => 0, IgnoredModuleHookTableMap::HOOK_ID => 1, IgnoredModuleHookTableMap::METHOD => 2, IgnoredModuleHookTableMap::CLASSNAME => 3, IgnoredModuleHookTableMap::CREATED_AT => 4, IgnoredModuleHookTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('MODULE_ID' => 0, 'HOOK_ID' => 1, 'METHOD' => 2, 'CLASSNAME' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('module_id' => 0, 'hook_id' => 1, 'method' => 2, 'classname' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -146,6 +156,8 @@ class IgnoredModuleHookTableMap extends TableMap
         $this->addForeignKey('HOOK_ID', 'HookId', 'INTEGER', 'hook', 'ID', true, null, null);
         $this->addColumn('METHOD', 'Method', 'VARCHAR', false, 255, null);
         $this->addColumn('CLASSNAME', 'Classname', 'VARCHAR', false, 255, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -156,6 +168,19 @@ class IgnoredModuleHookTableMap extends TableMap
         $this->addRelation('Module', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('module_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Hook', '\\Thelia\\Model\\Hook', RelationMap::MANY_TO_ONE, array('hook_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -290,11 +315,15 @@ class IgnoredModuleHookTableMap extends TableMap
             $criteria->addSelectColumn(IgnoredModuleHookTableMap::HOOK_ID);
             $criteria->addSelectColumn(IgnoredModuleHookTableMap::METHOD);
             $criteria->addSelectColumn(IgnoredModuleHookTableMap::CLASSNAME);
+            $criteria->addSelectColumn(IgnoredModuleHookTableMap::CREATED_AT);
+            $criteria->addSelectColumn(IgnoredModuleHookTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.MODULE_ID');
             $criteria->addSelectColumn($alias . '.HOOK_ID');
             $criteria->addSelectColumn($alias . '.METHOD');
             $criteria->addSelectColumn($alias . '.CLASSNAME');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

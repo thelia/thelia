@@ -23,6 +23,8 @@
             <li>{intl l='Editing mailing template "%name"' name={$NAME}}</li>
         </ul>
 
+        {hook name="message-edit.top" message_id=$message_id}
+
 		<div class="row">
 			<div class="col-md-12 general-block-decorator">
 				<div class="row">
@@ -42,24 +44,24 @@
                                 <div class="form-container">
                                      <div class="col-md-12">
                                         {form name="thelia.admin.message.modification"}
-                                        <form method="POST" action="{url path='/admin/configuration/messages/save'}" {form_enctype form=$form}>
+                                        <form method="POST" action="{url path='/admin/configuration/messages/save'}" {form_enctype}>
 
                                             {* Be sure to get the message ID, even if the form could not be validated *}
                                             <input type="hidden" name="message_id" value="{$message_id}" />
 
                                             {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/messages'}"}
 
-                                            {form_hidden_fields form=$form exclude="success_url,locale"}
+                                            {form_hidden_fields exclude="success_url,locale"}
 
-                                            {render_form_field form=$form field='success_url' value="{url path='/admin/configuration/messages'}"}
-                                            {render_form_field form=$form field='locale' value="{$edit_language_locale}"}
+                                            {render_form_field field='success_url' value="{url path='/admin/configuration/messages'}"}
+                                            {render_form_field field='locale' value="{$edit_language_locale}"}
 
                                             {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                            {render_form_field form=$form field='name'}
-                                            {render_form_field form=$form field='secured'}
-                                            {render_form_field form=$form field='title'}
-                                            {render_form_field form=$form field='subject'}
+                                            {render_form_field field='name'}
+                                            {render_form_field field='secured'}
+                                            {render_form_field field='title'}
+                                            {render_form_field field='subject'}
 
 
                                             <div class="panel panel-default">
@@ -68,8 +70,8 @@
                                                 <div class="panel-body">
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                        {custom_render_form_field form=$form field='html_layout_file_name'}
-                                                            <select {form_field_attributes form=$form field='html_layout_file_name'}>
+                                                        {custom_render_form_field field='html_layout_file_name'}
+                                                            <select {form_field_attributes field='html_layout_file_name'}>
                                                                 <option value="">{intl l='Use default layout'}</option>
                                                                 {foreach $layout_list as $layout}
                                                                     <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
@@ -79,8 +81,8 @@
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                        {custom_render_form_field form=$form field='html_template_file_name'}
-                                                            <select data-toggle-textarea="html_message" {form_field_attributes form=$form field='html_template_file_name' extra_class="textarea-toggle"}>
+                                                        {custom_render_form_field field='html_template_file_name'}
+                                                            <select data-toggle-textarea="html_message" {form_field_attributes field='html_template_file_name' extra_class="textarea-toggle"}>
                                                                 <option value="">{intl l='Use HTML message defined below'}</option>
                                                                 {foreach $html_template_list as $template}
                                                                     <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
@@ -93,9 +95,9 @@
 
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            {custom_render_form_field form=$form field='html_message'}
-                                                                <textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
-                                                                <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                            {custom_render_form_field field='html_message'}
+                                                                <textarea {$disable_html} {form_field_attributes field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+                                                                <div id="{$name}" style="height: 500px;"></div>
                                                             {/custom_render_form_field}
                                                         </div>
                                                     </div>
@@ -108,8 +110,8 @@
                                                 <div class="panel-body">
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                        {custom_render_form_field form=$form field='text_layout_file_name'}
-                                                            <select {form_field_attributes form=$form field='text_layout_file_name'}>
+                                                        {custom_render_form_field field='text_layout_file_name'}
+                                                            <select {form_field_attributes field='text_layout_file_name'}>
                                                                 <option value="">{intl l='Use default layout'}</option>
                                                                 {foreach $layout_list as $layout}
                                                                     <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
@@ -119,8 +121,8 @@
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                            {custom_render_form_field form=$form field='text_template_file_name'}
-                                                                <select data-toggle-textarea="text_message" {form_field_attributes form=$form field='text_template_file_name' extra_class='textarea-toggle'}>
+                                                            {custom_render_form_field field='text_template_file_name'}
+                                                                <select data-toggle-textarea="text_message" {form_field_attributes field='text_template_file_name' extra_class='textarea-toggle'}>
                                                                     <option value="">{intl l='Use Text message defined below'}</option>
                                                                     {foreach $text_template_list as $template}
                                                                         <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
@@ -133,9 +135,9 @@
 
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            {custom_render_form_field form=$form field='text_message'}
-                                                            <textarea {$disable_html} {form_field_attributes form=$form field='text_message' extra_class="fixedfont"}>{$value}</textarea>
-                                                            <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                            {custom_render_form_field field='text_message'}
+                                                            <textarea {$disable_html} {form_field_attributes field='text_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+                                                            <div id="{$name}" style="height: 500px;"></div>
                                                         </div>
                                                         {/custom_render_form_field}
                                                     </div>
@@ -158,11 +160,11 @@
                                 <br/>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button class="btn btn-default btn-primary preview-button" data-url="{url path='/admin/message/preview/'}{$ID}">
+                                        <button class="btn btn-default btn-primary preview-button" data-url="{url path='/admin/message/preview/%id' id=$ID}">
                                             {intl l="Preview HTML"}
                                         </button>
 
-                                        <button class="btn btn-default preview-button" data-url="{url path='/admin/message/preview/text/'}{$ID}">
+                                        <button class="btn btn-default preview-button" data-url="{url path='/admin/message/preview/text/%id' id=$ID}">
                                             {intl l="Preview text"}
                                         </button>
                                     </div>
@@ -232,6 +234,9 @@
 			</div>
 
 		</div>
+
+        {hook name="message-edit.bottom" message_id=$message_id}
+
 		{/loop}
 
         {elseloop rel="message_edit"}
@@ -263,7 +268,7 @@
 {/block}
 
 {block name="javascript-initialization"}
-<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js"></script>
 <script>
     (function($) {
 
@@ -276,8 +281,10 @@
             var aceEditor = editor[$(this).data('toggle-textarea')];
             if ($(this).val() != '') {
                 aceEditor.setReadOnly(true);
+                $(this).parents(".row").next().slideUp()
             } else {
                 aceEditor.setReadOnly(false);
+                $(this).parents(".row").next().slideDown()
             }
         });
 
@@ -288,12 +295,12 @@
 
             editor[value].setTheme("ace/theme/monokai");
             editor[value].getSession().setMode("ace/mode/smarty");
+            editor[value].setValue(textarea.text());
+            editor[value].getSelection().clearSelection();
 
             editor[value].getSession().on("change", function () {
-                textarea.val(editor[value].getSession().getValue());
+                textarea.text(editor[value].getSession().getValue());
             });
-
-            textarea.val(editor[value].getSession().getValue());
         });
 
         $('select.textarea-toggle').change();

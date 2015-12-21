@@ -161,7 +161,7 @@ class Calculator
                 $currentPosition = $position;
             }
 
-            $taxAmount = round($taxType->calculate($this->product, $taxedPrice), 2);
+            $taxAmount = $taxType->calculate($this->product, $taxedPrice);
             $currentTax += $taxAmount;
 
             if (null !== $taxCollection) {

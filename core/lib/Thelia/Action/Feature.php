@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\Feature as FeatureModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;

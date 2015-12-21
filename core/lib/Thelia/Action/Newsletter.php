@@ -15,14 +15,13 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Newsletter as NewsletterModel;
 
 /**
  * Class Newsletter
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Newsletter extends BaseAction implements EventSubscriberInterface
 {

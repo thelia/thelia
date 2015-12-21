@@ -26,7 +26,7 @@ use Thelia\Form\Definition\ApiForm;
 /**
  * Class CategoryController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CategoryController extends AbstractCrudApiController
 {
@@ -120,7 +120,8 @@ class CategoryController extends AbstractCrudApiController
             ->setVisible($data['visible'])
             ->setChapo($data['chapo'])
             ->setDescription($data['description'])
-            ->setPostscriptum($data['postscriptum']);
+            ->setPostscriptum($data['postscriptum'])
+            ->setDefaultTemplateId($data['default_template_id'])
         ;
 
         $this->setLocaleIntoQuery($data["locale"]);

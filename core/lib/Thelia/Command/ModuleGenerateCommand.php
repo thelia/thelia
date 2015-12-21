@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateCommand extends BaseModuleGenerate
 {
@@ -49,7 +49,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . DIRECTORY_SEPARATOR . $this->module;
+        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
 
         try {
             $this->verifyExistingModule();
@@ -61,7 +61,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
         $this->createDirectories();
         $this->createFiles();
-        if (method_exists($this, "renderBlock")) {
+        if (method_exists($output, "renderBlock")) {
             // impossible to change output class in CommandTester...
             $output->renderBlock(array(
                 '',
@@ -176,6 +176,14 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
                 $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
+                $schemaContent = str_replace(
+                    '%%XSD_LOCATION%%',
+                    $fs->makePathRelative(
+                        THELIA_VENDOR . 'propel/propel/resources/xsd/',
+                        $this->moduleDirectory
+                    ) . 'database.xsd',
+                    $schemaContent
+                );
 
                 file_put_contents($filename, $schemaContent);
             }

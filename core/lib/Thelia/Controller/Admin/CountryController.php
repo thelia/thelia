@@ -26,7 +26,7 @@ use Thelia\Model\CountryQuery;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryController extends AbstractCrudController
 {
@@ -110,7 +110,6 @@ class CountryController extends AbstractCrudController
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
-            ->setArea($formData['area'])
         ;
 
         return $event;

@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
@@ -40,7 +41,7 @@ use Thelia\Tools\TokenProvider;
  *
  * Class Cart
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
@@ -62,6 +63,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $this->tokenProvider = $tokenProvider;
     }
 
+    public function persistCart(CartPersistEvent $event)
+    {
+        $cart = $event->getCart();
+
+        if ($cart->isNew()) {
+            $cart
+                ->setToken($this->generateCartCookieIdentifier())
+                ->save();
+            $this->session->setSessionCart($cart);
+        }
+    }
+
     /**
      *
      * add an article in the current cart
@@ -77,6 +90,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $customer = $cart->getCustomer();
         $discount = 0;
 
+        if ($cart->isNew()) {
+            $persistEvent = new CartPersistEvent($cart);
+            $event->getDispatcher()->dispatch(TheliaEvents::CART_PERSIST, $persistEvent);
+        }
+
         if (null !== $customer && $customer->getDiscount() > 0) {
             $discount = $customer->getDiscount();
         }
@@ -84,7 +102,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
 
-        $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
+        // Search for an identical item in the cart
+        $event->getDispatcher()->dispatch(TheliaEvents::CART_FINDITEM, $event);
+
+        $cartItem = $event->getCartItem();
 
         if ($cartItem === null || $newness) {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
@@ -256,6 +277,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @param  int           $productId
      * @param  int           $productSaleElementsId
      * @return CartItem
+     *
+     * @deprecated this method is deprecated. Dispatch a TheliaEvents::CART_FINDITEM instead
      */
     protected function findItem($cartId, $productId, $productSaleElementsId)
     {
@@ -264,6 +287,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByProductId($productId)
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
+    }
+
+    /**
+     * Find a specific record in CartItem table using the current CartEvent
+     *
+     * @param CartEvent $event the cart event
+     */
+    public function findCartItem(CartEvent $event)
+    {
+        if (null !== $foundItem = CartItemQuery::create()
+            ->filterByCartId($event->getCart()->getId())
+            ->filterByProductId($event->getProduct())
+            ->filterByProductSaleElementsId($event->getProductSaleElementsId())
+            ->findOne()) {
+            $event->setCartItem($foundItem);
+        }
     }
 
     /**
@@ -396,16 +435,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = new CartModel();
 
-        $cart
-            ->setToken($this->generateCartCookieIdentifier())
-            ->setCurrency($this->session->getCurrency(true))
-        ;
+        $cart->setCurrency($this->session->getCurrency(true));
 
         if (null !== $customer = $this->session->getCustomerUser()) {
             $cart->setCustomer(CustomerQuery::create()->findPk($customer->getId()));
         }
-
-        $cart->save();
 
         $cartCreateEvent->setCart($cart);
     }
@@ -459,9 +493,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
+            TheliaEvents::CART_PERSIST => array("persistCart", 128),
             TheliaEvents::CART_RESTORE_CURRENT => array("restoreCurrentCart", 128),
             TheliaEvents::CART_CREATE_NEW => array("createEmptyCart", 128),
             TheliaEvents::CART_ADDITEM => array("addItem", 128),
+            TheliaEvents::CART_FINDITEM => array("findCartItem", 128),
             TheliaEvents::CART_DELETEITEM => array("deleteItem", 128),
             TheliaEvents::CART_UPDATEITEM => array("changeItem", 128),
             TheliaEvents::CART_CLEAR => array("clear", 128),

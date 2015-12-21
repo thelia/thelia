@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="../../../../core/vendor/propel/propel/resources/xsd/database.xsd" >
+          xsi:noNamespaceSchemaLocation="%%XSD_LOCATION%%" >
     <!--
     See propel documentation on http://propelorm.org for all information about schema file
 

@@ -27,7 +27,7 @@
             {hook name="cart.top"}
 
             <div class="table-responsive">
-                <table class="table table-cart">
+                <table class="table table-cart table-bordered">
                     <colgroup>
                         <col width="150">
                         <col>
@@ -82,22 +82,24 @@
                                         {/if}
                                         <dt>{intl l="No."}</dt>
                                         <dd>{$REF}</dd>
-                                        {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
+                                        {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID" order="manual"}
                                             <dt>{$ATTRIBUTE_TITLE}</dt>
                                             <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                         {/loop}
                                     </dl>
                                 </div>
-                                <a href="{token_url path="/cart/delete/$ITEM_ID" success_url={url path='/cart'}}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
+                                <a href="{token_url path="/cart/delete/%item_id" item_id=$ITEM_ID success_url={url path='/cart'}}" class="btn btn-link"><i class="fa fa-trash"></i> {intl l="Remove"}</a>
                             </td>
                             <td class="unitprice">
                                 {if $IS_PROMO == 1}
                                     {assign "real_price" $PROMO_TAXED_PRICE}
-                                    <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
-                                    <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
+                                    {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
+                                    <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
+                                    <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
                                 {else}
                                     {assign "real_price" $TAXED_PRICE}
-                                    <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                    {assign "real_total_price" $TOTAL_TAXED_PRICE}
+                                    <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
                                 {/if}
                             </td>
                             <td class="qty">
@@ -116,12 +118,12 @@
                                                 <input name="quantity" class="form-control" type="number" min="1" max="{$STOCK}" value ="{$QUANTITY}">
                                             {/if}
                                         </div>
-                                        <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-cart-update">{intl l="+"}</button>
+                                        <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-primary sr-only">{intl l="+"}</button>
                                     </form>
                                 </div>
                             </td>
                             <td class="subprice">
-                                <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
+                                <span class="price">{format_money number=$real_total_price}</span>
                             </td>
                         </tr>
                         {/loop}
@@ -147,7 +149,7 @@
                                             <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
                                         {/loop}
                                         </select>
-                                        <a class="btn btn-change-country" href="#"><i class="icon-refresh"></i> {intl l="update"}</a>
+                                        <a class="btn btn-link btn-change-country" href="#"><i class="fa fa-refresh"></i> {intl l="update"}</a>
                                     </div>
                                     {/if}
                                     {if $delivery_id != 0 }
@@ -161,9 +163,9 @@
                                     {/if}
                                 </form>
                             </td>
-                            <td class="unitprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
+                            <td class="unitprice">{format_money number=$postage}</td>
                             <td class="qty">-</td>
-                            <td class="subprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
+                            <td class="subprice">{format_money number=$postage}</td>
                         </tr>
                         {/postage}
                         {else}
@@ -177,7 +179,7 @@
                         <td class="total">
                             <div class="total-price">
                                 {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
-                                <span class="price">{format_money number=$totalAmount symbol={currency attr="symbol"}}</span>
+                                <span class="price">{format_money number=$totalAmount}</span>
                             </div>
                         </td>
                     </tr>
@@ -185,12 +187,12 @@
                 </table>
             </div>
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping"><span>{intl l="Continue Shopping"}</span></a>
-            <a href="{url path="/order/delivery"}" class="btn btn-checkout">{intl l="Proceed checkout"}</a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Continue Shopping"}</a>
+            <a href="{url path="/order/delivery"}" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Proceed checkout"}</a>
 
             {/ifloop}
             {elseloop rel="cartloop"}
-                <div class="cart-warning">
+                <div class="cart-warning alert alert-warning">
                     <strong>{intl l="Warning"}!</strong> {intl l="You have no items in your shopping cart."}
                 </div>
             {/elseloop}
@@ -200,15 +202,15 @@
         </article>
 
         {ifloop rel="product_upsell"}
-            <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
+            <aside id="products-upsell" class="grid" role="complementary" aria-labelledby="products-upsell-label">
                 <div class="products-heading">
                     <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
                 </div>
 
                 <div class="products-content">
-                    <ul class="products-grid product-col-5 hover-effect">
+                    <ul class="products-grid list-unstyled row">
                         {loop name="product_upsell" type="product" promo="yes" limit="5"}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
+                            {include file="includes/single-product.html" colClass="col-md-2" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
                         {/loop}
                     </ul>
                 </div>

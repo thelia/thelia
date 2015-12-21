@@ -102,7 +102,14 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      */
     public function getUploadDir()
     {
-        return THELIA_LOCAL_DIR . 'media'.DS.'documents'.DS.'folder';
+        $uploadDir = ConfigQuery::read('documents_library_path');
+        if ($uploadDir === null) {
+            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+        } else {
+            $uploadDir = THELIA_ROOT . $uploadDir;
+        }
+
+        return $uploadDir . DS . 'folder';
     }
 
     /**
@@ -111,7 +118,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      */
     public function getRedirectionUrl()
     {
-        return '/admin/folder/update/' . $this->getFolderId();
+        return '/admin/folders/update/' . $this->getFolderId();
     }
 
     /**

@@ -19,7 +19,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
@@ -73,7 +73,9 @@ class BaseFacade implements FacadeInterface
     public function getDeliveryAddress()
     {
         try {
-            return AddressQuery::create()->findPk($this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress());
+            return AddressQuery::create()->findPk(
+                $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
+            );
         } catch (\Exception $ex) {
             throw new \LogicException("Failed to get delivery address (" . $ex->getMessage() . ")");
         }
@@ -187,11 +189,23 @@ class BaseFacade implements FacadeInterface
         if (null === $couponCodes) {
             return array();
         }
+        /** @var CouponFactory $couponFactory */
         $couponFactory = $this->container->get('thelia.coupon.factory');
 
-        $coupons = array();
+        $coupons = [];
+
         foreach ($couponCodes as $couponCode) {
-            $coupons[] = $couponFactory->buildCouponFromCode($couponCode);
+            // Only valid coupons are returned
+            try {
+                if (false !== $couponInterface = $couponFactory->buildCouponFromCode($couponCode)) {
+                    $coupons[] = $couponInterface;
+                }
+            } catch (\Exception $ex) {
+                // Just ignore the coupon and log the problem, just in case someone realize it.
+                Tlog::getInstance()->warning(
+                    sprintf("Coupon %s ignored, exception occurred: %s", $couponCode, $ex->getMessage())
+                );
+            }
         }
 
         return $coupons;
@@ -242,7 +256,9 @@ class BaseFacade implements FacadeInterface
             $this->parser = $this->container->get('thelia.parser');
 
             // Define the current back-office template that should be used
-            $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+            $this->parser->setTemplateDefinition(
+                $this->parser->getTemplateHelper()->getActiveAdminTemplate()
+            );
         }
 
         return $this->parser;

@@ -4,33 +4,9 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <loops>
-        <!-- sample definition
-        <loop name="MySuperLoop" class="HookCurrency\Loop\MySuperLoop" />
-        -->
-    </loops>
-
-    <forms>
-        <!--
-        <form name="MyFormName" class="HookCurrency\Form\MySuperForm" />
-        -->
-    </forms>
-
-    <commands>
-        <!--
-        <command class="HookCurrency\Command\MySuperCommand" />
-        -->
-    </commands>
-
-    <!--
-    <services>
-
-    </services>
-    -->
-
     <hooks>
-        <hook id="hookcurrency.hook.front" class="HookCurrency\Hook\FrontHook" scope="request">
-            <tag name="hook.event_listener" event="main.navbar-secondary" />
+        <hook id="hookcurrency.hook.front">
+            <tag name="hook.event_listener" event="main.navbar-secondary" templates="render:main-navbar-secondary.html"/>
         </hook>
     </hooks>
 

@@ -18,7 +18,7 @@ use Thelia\Model\Content;
 /**
  * Class ContentEvent
  * @package Thelia\Core\Event\Content
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentEvent extends ActionEvent
 {

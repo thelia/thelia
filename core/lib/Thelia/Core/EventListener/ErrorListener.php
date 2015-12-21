@@ -16,12 +16,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\TheliaKernelEvents;
 use Thelia\Model\ConfigQuery;
 
@@ -44,8 +43,11 @@ class ErrorListener implements EventSubscriberInterface
 
     protected $env;
 
-    public function __construct($env, ParserInterface $parser, SecurityContext $securityContext)
-    {
+    public function __construct(
+        $env,
+        ParserInterface $parser,
+        SecurityContext $securityContext
+    ) {
         $this->env = $env;
 
         $this->parser = $parser;
@@ -60,8 +62,8 @@ class ErrorListener implements EventSubscriberInterface
 
         $this->parser->setTemplateDefinition(
             $this->securityContext->hasAdminUser() ?
-            TemplateHelper::getInstance()->getActiveAdminTemplate() :
-            TemplateHelper::getInstance()->getActiveFrontTemplate()
+            $this->parser->getTemplateHelper()->getActiveAdminTemplate() :
+            $this->parser->getTemplateHelper()->getActiveFrontTemplate()
         );
 
         $response = new Response(

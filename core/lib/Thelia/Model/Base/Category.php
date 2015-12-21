@@ -96,6 +96,12 @@ abstract class Category implements ActiveRecordInterface
     protected $position;
 
     /**
+     * The value for the default_template_id field.
+     * @var        int
+     */
+    protected $default_template_id;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -556,6 +562,17 @@ abstract class Category implements ActiveRecordInterface
     }
 
     /**
+     * Get the [default_template_id] column value.
+     *
+     * @return   int
+     */
+    public function getDefaultTemplateId()
+    {
+
+        return $this->default_template_id;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -722,6 +739,27 @@ abstract class Category implements ActiveRecordInterface
     } // setPosition()
 
     /**
+     * Set the value of [default_template_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     */
+    public function setDefaultTemplateId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->default_template_id !== $v) {
+            $this->default_template_id = $v;
+            $this->modifiedColumns[CategoryTableMap::DEFAULT_TEMPLATE_ID] = true;
+        }
+
+
+        return $this;
+    } // setDefaultTemplateId()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -883,28 +921,31 @@ abstract class Category implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CategoryTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CategoryTableMap::translateFieldName('DefaultTemplateId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->default_template_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CategoryTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CategoryTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CategoryTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CategoryTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CategoryTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CategoryTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -914,7 +955,7 @@ abstract class Category implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = CategoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = CategoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Category object", 0, $e);
@@ -1300,6 +1341,9 @@ abstract class Category implements ActiveRecordInterface
         if ($this->isColumnModified(CategoryTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
         }
+        if ($this->isColumnModified(CategoryTableMap::DEFAULT_TEMPLATE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`DEFAULT_TEMPLATE_ID`';
+        }
         if ($this->isColumnModified(CategoryTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1337,6 +1381,9 @@ abstract class Category implements ActiveRecordInterface
                         break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
+                        break;
+                    case '`DEFAULT_TEMPLATE_ID`':
+                        $stmt->bindValue($identifier, $this->default_template_id, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1428,18 +1475,21 @@ abstract class Category implements ActiveRecordInterface
                 return $this->getPosition();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getDefaultTemplateId();
                 break;
             case 5:
-                return $this->getUpdatedAt();
+                return $this->getCreatedAt();
                 break;
             case 6:
-                return $this->getVersion();
+                return $this->getUpdatedAt();
                 break;
             case 7:
-                return $this->getVersionCreatedAt();
+                return $this->getVersion();
                 break;
             case 8:
+                return $this->getVersionCreatedAt();
+                break;
+            case 9:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1475,11 +1525,12 @@ abstract class Category implements ActiveRecordInterface
             $keys[1] => $this->getParent(),
             $keys[2] => $this->getVisible(),
             $keys[3] => $this->getPosition(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
-            $keys[6] => $this->getVersion(),
-            $keys[7] => $this->getVersionCreatedAt(),
-            $keys[8] => $this->getVersionCreatedBy(),
+            $keys[4] => $this->getDefaultTemplateId(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
+            $keys[7] => $this->getVersion(),
+            $keys[8] => $this->getVersionCreatedAt(),
+            $keys[9] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1552,18 +1603,21 @@ abstract class Category implements ActiveRecordInterface
                 $this->setPosition($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setDefaultTemplateId($value);
                 break;
             case 5:
-                $this->setUpdatedAt($value);
+                $this->setCreatedAt($value);
                 break;
             case 6:
-                $this->setVersion($value);
+                $this->setUpdatedAt($value);
                 break;
             case 7:
-                $this->setVersionCreatedAt($value);
+                $this->setVersion($value);
                 break;
             case 8:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 9:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -1594,11 +1648,12 @@ abstract class Category implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setParent($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setVisible($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setVersion($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedBy($arr[$keys[8]]);
+        if (array_key_exists($keys[4], $arr)) $this->setDefaultTemplateId($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedBy($arr[$keys[9]]);
     }
 
     /**
@@ -1614,6 +1669,7 @@ abstract class Category implements ActiveRecordInterface
         if ($this->isColumnModified(CategoryTableMap::PARENT)) $criteria->add(CategoryTableMap::PARENT, $this->parent);
         if ($this->isColumnModified(CategoryTableMap::VISIBLE)) $criteria->add(CategoryTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(CategoryTableMap::POSITION)) $criteria->add(CategoryTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(CategoryTableMap::DEFAULT_TEMPLATE_ID)) $criteria->add(CategoryTableMap::DEFAULT_TEMPLATE_ID, $this->default_template_id);
         if ($this->isColumnModified(CategoryTableMap::CREATED_AT)) $criteria->add(CategoryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CategoryTableMap::UPDATED_AT)) $criteria->add(CategoryTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(CategoryTableMap::VERSION)) $criteria->add(CategoryTableMap::VERSION, $this->version);
@@ -1685,6 +1741,7 @@ abstract class Category implements ActiveRecordInterface
         $copyObj->setParent($this->getParent());
         $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
+        $copyObj->setDefaultTemplateId($this->getDefaultTemplateId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -3356,6 +3413,7 @@ abstract class Category implements ActiveRecordInterface
         $this->parent = null;
         $this->visible = null;
         $this->position = null;
+        $this->default_template_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;
@@ -3760,6 +3818,7 @@ abstract class Category implements ActiveRecordInterface
         $version->setParent($this->getParent());
         $version->setVisible($this->getVisible());
         $version->setPosition($this->getPosition());
+        $version->setDefaultTemplateId($this->getDefaultTemplateId());
         $version->setCreatedAt($this->getCreatedAt());
         $version->setUpdatedAt($this->getUpdatedAt());
         $version->setVersion($this->getVersion());
@@ -3806,6 +3865,7 @@ abstract class Category implements ActiveRecordInterface
         $this->setParent($version->getParent());
         $this->setVisible($version->getVisible());
         $this->setPosition($version->getPosition());
+        $this->setDefaultTemplateId($version->getDefaultTemplateId());
         $this->setCreatedAt($version->getCreatedAt());
         $this->setUpdatedAt($version->getUpdatedAt());
         $this->setVersion($version->getVersion());

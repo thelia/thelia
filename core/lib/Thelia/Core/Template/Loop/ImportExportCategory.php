@@ -27,6 +27,10 @@ use Thelia\Type\TypeCollection;
  * Class ImportExportCategory
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string[] getOrder()
  */
 abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -99,27 +103,6 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
     }
 
     /**
-     * Definition of loop arguments
-     *
-     * example :
-     *
-     * public function getArgDefinitions()
-     * {
-     *  return new ArgumentCollection(
-     *
-     *       Argument::createIntListTypeArgument('id'),
-     *           new Argument(
-     *           'ref',
-     *           new TypeCollection(
-     *               new Type\AlphaNumStringListType()
-     *           )
-     *       ),
-     *       Argument::createIntListTypeArgument('category'),
-     *       Argument::createBooleanTypeArgument('new'),
-     *       ...
-     *   );
-     * }
-     *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     protected function getArgDefinitions()

@@ -25,6 +25,18 @@
             <div class="row">
                 <div class="col-md-12">
 
+                    {if ! empty($undefined_rates)}
+                        <div class="alert alert-warning">
+                            {$currencyList = ''}
+                            {loop type="currency" name="err-currencies" id={","|implode:$undefined_rates}}
+                                {$currencyList = "$currencyList, $NAME ($ISOCODE)"}
+                            {/loop}
+
+                            {intl l="<strong>Warning</strong>, an exchange rate was not found for at least one currency: %list" list=$currencyList|ltrim:', '}
+
+                        </div>
+                    {/if}
+
                     <form action="{url path='/admin/configuration/currencies/update-rates'}" method="post">
 
                         <div class="general-block-decorator">
@@ -97,6 +109,16 @@
                                         <th class="text-center">
                                             {admin_sortable_header
                                             current_order=$order
+                                            order='visible'
+                                            reverse_order='visible_reverse'
+                                            path='/admin/configuration/currencies'
+                                            label="{intl l="Visible"}"
+                                            }
+                                        </th>
+
+                                        <th class="text-center">
+                                            {admin_sortable_header
+                                            current_order=$order
                                             order='manual'
                                             reverse_order='manual_reverse'
                                             path='/admin/configuration/currencies'
@@ -121,7 +143,7 @@
                                     </thead>
 
                                     <tbody>
-                                    {loop name="currencies" type="currency" backend_context="1" lang=$lang_id order=$order}
+                                    {loop name="currencies" type="currency" backend_context="1" visible="*" lang=$lang_id order=$order}
                                         <tr>
                                             <td>{$ID}</td>
 
@@ -139,6 +161,12 @@
                                             <td class="text-center">{$SYMBOL}</td>
 
                                             <td class="text-center">{format_number number="$RATE" decimals="4"}</td>
+
+                                            <td class="text-center">
+                                                <div class="make-switch switch-small change-visible" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" name="visible" value="{$ID}" {if $VISIBLE}checked="checked"{/if}/>
+                                                </div>
+                                            </td>
 
                                             <td class="text-center">
                                                 {admin_position_block
@@ -161,15 +189,18 @@
                                             {hook name="currencies.table-row" location="currencies_table_row" currency_id={$ID} }
 
                                             <td class="actions">
-                                                <div class="btn-group">
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.currency" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
+                                                        <a class="currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
                                                             <span class="glyphicon glyphicon-edit"></span>
                                                         </a>
                                                     {/loop}
                                                     {if !$IS_DEFAULT}
                                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.currency" access="DELETE"}
-                                                            <a class="btn btn-default btn-xs currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                            <a class="currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                                 <span class="glyphicon glyphicon-trash"></span>
                                                             </a>
                                                         {/loop}
@@ -180,7 +211,7 @@
                                     {/loop}
                                     {elseloop rel="currencies"}
                                         <tr>
-                                            <td colspan="8">
+                                            <td colspan="9">
                                                 <div class="alert alert-info">
                                                     {intl l="No currency has been created yet. Click the + button to create one."}
                                                 </div>
@@ -210,14 +241,14 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
             {* on success, redirect to the edition page, _ID_ is replaced with the created currency ID, see controller  *}
             <input type="hidden" name="{$name}" value="{url path='/admin/configuration/currencies/update' currency_id='_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='name'}
+        {form_field field='name'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -232,14 +263,14 @@
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {form_field form=$form field='locale'}
+                {form_field field='locale'}
                     <input type="hidden" name="{$name}" value="{$LOCALE}" />
                 {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='code'}
+        {form_field field='code'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='ISO 4217 code'}" placeholder="{intl l='Code'}">
@@ -247,14 +278,14 @@
             </div>
         {/form_field}
 
-        {form_field form=$form field='symbol'}
+        {form_field field='symbol'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}">
             </div>
         {/form_field}
 
-        {form_field form=$form field='rate'}
+        {form_field field='rate'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency rate'}" placeholder="{intl l='Rate'}">
@@ -276,7 +307,7 @@
     dialog_ok_label     = {intl l="Create this currency"}
 
     form_action        = {url path='/admin/configuration/currencies/create'}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = $form_error_message
     }
     {/form}
@@ -352,13 +383,21 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
             {* Change default status *}
 
             $('.change-default').on("switch-change", function(event, data) {
-                var $loader = $('<div class="loader"></div>');
-                $('body').append($loader);
-                $loader.show();
-                var url = "{url path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
+                var url = "{url noamp='1' path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
 
                 // Perform ID subtitutions
                 url = url.replace('__ID__', $("input", this).val());
+
+                // Reload the page
+                location.href = url;
+            });
+
+            $('.change-visible').on("switch-change", function(event, data) {
+                var url = "{url noamp='1' path='/admin/configuration/currencies/set-visible' currency_id='__ID__' visible='__VISIBLE__'}";
+
+                url = url.replace('__ID__', $("input", this).val());
+
+                url = url.replace('__VISIBLE__', $("input", this).is(':checked') ? 1 : 0);
 
                 // Reload the page
                 location.href = url;

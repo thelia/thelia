@@ -12,11 +12,9 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-
 use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
-
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Form\Exception\FormValidationException;
 
@@ -87,7 +85,7 @@ class BaseAction
      * Toggle visibility for an object
      *
      * @param ModelCriteria               $query
-     * @param UpdateToggleVisibilityEvent $event
+     * @param ToggleVisibilityEvent $event
      *
      * @return mixed
      */
@@ -97,9 +95,7 @@ class BaseAction
             $newVisibility = !$object->getVisible();
             $object
                 ->setDispatcher($event->getDispatcher())
-
                 ->setVisible($newVisibility)
-
                 ->save()
             ;
 

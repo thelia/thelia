@@ -27,6 +27,7 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
 
 $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
 
+$updateError = null;
 ?>
     <div class="well">
 
@@ -46,7 +47,6 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
 
         <?php } else {
 
-            $updateError = null;
             $continue = true;
 
             // Backup
@@ -64,13 +64,14 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
                         );
                         ?></p>
                     </div><?php
-                } catch (\Exception $e) {
+                } catch (\Exception $ex) {
                     $continue = false ;
+                    $updateError = $ex;
                     ?>
                     <div class="alert alert-danger">
                     <p><?php
                         echo $trans->trans(
-                            'Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage()
+                            'Sorry, your database can\'t be backed up. Reason : ' . $ex->getMessage()
                         );
                         ?></p>
                     </div><?php
@@ -174,7 +175,10 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
                                 ?></li>
                         <?php } ?>
                     </ul>
-                <?php
+
+                 </div><?php
+                include("footer.php");
+
                 } else {
 
                     $finder = new Finder();
@@ -200,28 +204,31 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
                         <div class="alert alert-success"><p><?php
                             echo $trans->trans('Cache directory has been cleared');
                             ?></p></div>
-                    <?php } ?>
+                    <?php }
 
-                    <div class="alert alert-success"><p><?php
-                        echo $trans->trans('The update wizard directory will be removed');
-                    ?></p></div><?php
+                    ob_start();
+                    ?>
+                    </div>
+                    <?php
 
+                    include('footer.php');
+                    $footerContent = ob_get_clean();
+
+                    // Remove the update wizard
+                    try {
+                        $fs->remove(THELIA_WEB_DIR . DS . 'install');
+                        ?>
+                        <div class="alert alert-success"><p><?php
+                            echo $trans->trans('The update wizard directory will be removed');
+                        ?></p></div><?php
+                    } catch (\Symfony\Component\Filesystem\Exception\IOException $ex) {
+                        ?>
+                        <div class="alert alert-success"><p><?php
+                        echo $trans->trans('Don\'t forget to delete the web/install directory.');
+                        ?></p></div><?php
+                    }
+
+                    echo $footerContent;
                 }
-
             }
         }
-        ?>
-
-    </div>
-<?php
-
-include("footer.php");
-
-// Remove the update wizard
-if (null === $updateError) {
-    try {
-        $fs->remove(THELIA_WEB_DIR . DS . 'install');
-    } catch (\Symfony\Component\Filesystem\Exception\IOException $ex) {
-        ;
-    }
-}

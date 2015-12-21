@@ -36,6 +36,11 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method bool|string  getIsEnabled()
+ * @method bool getInUse()
+ * @method string[] getOrder()
  */
 class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 {

@@ -12,12 +12,15 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
@@ -31,6 +34,21 @@ use Thelia\Log\Tlog;
  * The document loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method bool|string getVisible()
+ * @method int getLang()
+ * @method int getCategory()
+ * @method int getProduct()
+ * @method int getFolder()
+ * @method int getContent()
+ * @method string getSource()
+ * @method int getSourceId()
+ * @method bool getNewsletter()
+ * @method string getQueryNamespace()
+ * @method string[] getOrder()
  */
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -191,6 +209,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         // Select the proper query to use, and get the object type
         $this->objectType = $this->objectId = null;
 
+        /** @var ProductDocumentQuery $search */
         $search = $this->getSearchQuery($this->objectType, $this->objectId);
 
         /* manage translations */
@@ -217,20 +236,27 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        $baseSourceFilePath = ConfigQuery::read('documents_library_path');
+        if ($baseSourceFilePath === null) {
+            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+        } else {
+            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+        }
+
+        /** @var ProductDocument $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Create document processing event
             $event = new DocumentEvent($this->request);
 
             // Put source document file path
-            $source_filepath = sprintf(
-                "%s%s/%s/%s",
-                THELIA_ROOT,
-                ConfigQuery::read('documents_library_path', 'local/media/documents'),
+            $sourceFilePath = sprintf(
+                '%s/%s/%s',
+                $baseSourceFilePath,
                 $this->objectType,
                 $result->getFile()
             );
 
-            $event->setSourceFilepath($source_filepath);
+            $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory($this->objectType);
 
             try {
@@ -245,7 +271,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("DOCUMENT_FILE", $result->getFile())
                     ->set("DOCUMENT_URL", $event->getDocumentUrl())
                     ->set("DOCUMENT_PATH", $event->getDocumentPath())
-                    ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
+                    ->set("ORIGINAL_DOCUMENT_PATH", $sourceFilePath)
                     ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
                     ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
                     ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))

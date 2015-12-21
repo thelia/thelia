@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class LangUrlEvent
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUrlEvent extends ActionEvent
 {

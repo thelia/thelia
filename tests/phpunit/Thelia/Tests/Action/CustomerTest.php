@@ -18,14 +18,13 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerTest
  * @package Thelia\Tests\Action\ImageTest
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerTest extends \PHPUnit_Framework_TestCase
 {

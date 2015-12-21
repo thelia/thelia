@@ -1,0 +1,40 @@
+// Thelia : Panels
+
+.panel-heading {
+    text-transform: uppercase;
+}
+
+// Account Page
+#account {
+
+    // Make heading clickable
+    .panel-heading {
+        padding: 0;
+        // Title
+        .panel-title {
+            > a {
+                background: @panel-primary-heading-bg;
+                color: @panel-primary-text;
+                display: block;
+                padding: 12px 15px;
+                text-decoration: none;
+
+                &.collapsed {
+                    background: none;
+                    color: inherit;
+
+                    &:hover,
+                    &:focus {
+                        background: @panel-primary-heading-bg;
+                        color: @panel-primary-text;
+                    }
+                }
+            }
+        }
+    }
+
+    .panel-body {
+        padding: 25px;
+    }
+
+}

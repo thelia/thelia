@@ -13,10 +13,14 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Lang;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Core\Event\Lang\LangCreateEvent;
@@ -25,13 +29,15 @@ use Thelia\Tests\ContainerAwareTestCase;
 /**
  * Class LangTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangTest extends ContainerAwareTestCase
 {
     protected $dispatcher;
 
     protected static $defaultId;
+
+    protected $request;
 
     public static function setUpBeforeClass()
     {
@@ -46,6 +52,11 @@ class LangTest extends ContainerAwareTestCase
     {
         parent::setUp();
         $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+        $session = new Session(new MockArraySessionStorage());
+
+        $this->request = new Request();
+        $this->request->setSession($session);
     }
 
     public function testCreate()
@@ -64,7 +75,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
         $action->create($event);
 
         $createdLang = $event->getLang();
@@ -106,7 +117,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
         $action->update($event);
 
         $updatedLang = $event->getLang();
@@ -135,7 +146,7 @@ class LangTest extends ContainerAwareTestCase
         $event = new LangToggleDefaultEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
         $action->toggleDefault($event);
 
         $updatedLang = $event->getLang();
@@ -158,10 +169,12 @@ class LangTest extends ContainerAwareTestCase
         $lang->setByDefault(0)
             ->save();
 
+        self::tearDownAfterClass();
+
         $event = new LangDeleteEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
         $action->delete($event);
 
         $deletedLang = $event->getLang();
@@ -177,13 +190,12 @@ class LangTest extends ContainerAwareTestCase
      */
     public function testDeleteDefault()
     {
-        self::tearDownAfterClass();
         $lang = LangQuery::create()->findOneByByDefault(1);
 
         $event = new LangDeleteEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
         $action->delete($event);
     }
 
@@ -196,8 +208,8 @@ class LangTest extends ContainerAwareTestCase
 
     protected function tearDown()
     {
-        @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TEST.png");
-        @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TES.png");
+        @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TEST.png");
+        @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TES.png");
     }
 
     /**

@@ -16,15 +16,14 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\Content as ContentModel;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -37,6 +36,20 @@ use Thelia\Type\BooleanOrBothType;
  * Class Content
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getFolder()
+ * @method int[] getFolderDefault()
+ * @method bool getCurrent()
+ * @method bool getCurrentFolder()
+ * @method bool getWithPrevNextInfo()
+ * @method int getDepth()
+ * @method bool|string getVisible()
+ * @method string getTitle()
+ * @method string[] getOrder()
+ * @method int[] getExclude()
+ * @method int[] getExcludeFolder()
  */
 class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -95,6 +108,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         ];
     }
 
+    /**
+     * @param ContentQuery $search
+     * @param string $searchTerm
+     * @param string $searchIn
+     * @param string $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
@@ -128,7 +147,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
 
             $foldersIds = array_merge($foldersIds, $folder, $folderDefault);
-            $folders =FolderQuery::create()->filterById($foldersIds, Criteria::IN)->find();
+            $folders = FolderQuery::create()->filterById($foldersIds, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
@@ -152,7 +171,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterById($this->request->get("content_id"), Criteria::NOT_IN);
         }
 
-        $current_folder = $this->getCurrent_folder();
+        $current_folder = $this->getCurrentFolder();
 
         if ($current_folder === true) {
             $current = ContentQuery::create()->findPk($this->request->get("content_id"));
@@ -239,7 +258,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $exclude_folder = $this->getExclude_folder();
+        $exclude_folder = $this->getExcludeFolder();
 
         if (!is_null($exclude_folder)) {
             $search->filterByFolder(
@@ -253,7 +272,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function parseResults(LoopResult $loopResult)
     {
-        /** @var \Thelia\Model\Content $content */
+        /** @var ContentModel $content */
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
             $defaultFolderId = $content->getDefaultFolderId();
@@ -288,20 +307,36 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     private function findNextPrev(LoopResultRow $loopResultRow, \Thelia\Model\Content $content, $defaultFolderId)
     {
-        if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+        $isBackendContext = $this->getBackendContext();
+
+        if ($isBackendContext || $this->getWithPrevNextInfo()) {
             // Find previous and next category
-            $previous = ContentQuery::create()
+            $previousQuery = ContentQuery::create()
                 ->joinContentFolder()
                 ->where('ContentFolder.folder_id = ?', $defaultFolderId)
                 ->filterByPosition($content->getPosition(), Criteria::LESS_THAN)
+            ;
+
+            if (! $isBackendContext) {
+                $previousQuery->filterByVisible(true);
+            }
+
+            $previous = $previousQuery
                 ->orderByPosition(Criteria::DESC)
                 ->findOne()
             ;
 
-            $next = ContentQuery::create()
+            $nextQuery = ContentQuery::create()
                 ->joinContentFolder()
                 ->where('ContentFolder.folder_id = ?', $defaultFolderId)
                 ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN)
+            ;
+
+            if (! $isBackendContext) {
+                $nextQuery->filterByVisible(true);
+            }
+
+            $next = $nextQuery
                 ->orderByPosition(Criteria::ASC)
                 ->findOne()
             ;

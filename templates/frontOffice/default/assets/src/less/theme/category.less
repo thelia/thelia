@@ -1,0 +1,46 @@
+// Thelia : Category
+
+// Category
+.grid {
+    .btn-grid {
+        cursor: default;
+        pointer-events: none; // Future-proof disabling of clicks
+        .opacity(.65);
+        .box-shadow(none);
+    }
+
+    .item {
+        .product-image {
+            > img {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.list {
+    .btn-list {
+        cursor: default;
+        pointer-events: none; // Future-proof disabling of clicks
+        .opacity(.65);
+        .box-shadow(none);
+    }
+
+    .item {
+        + .item {
+            border-top: 1px solid #ededed;
+        }
+        > article {
+
+            .product-image {
+                > img {
+                    width: 100%;
+                }
+            }
+
+            .product-price {
+                text-align: right;
+            }
+        }
+    }
+}

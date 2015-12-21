@@ -16,12 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\OrderProductTaxQuery;
+use Thelia\Model\OrderProductTax as OrderProductTaxModel;
 
 /**
  *
@@ -31,6 +30,9 @@ use Thelia\Model\OrderProductTaxQuery;
  * Class OrderProductTax
  * @package Thelia\Core\Template\Loop
  * @author Zzuutt
+ *
+ * {@inheritdoc}
+ * @method int getOrderProduct()
  */
 class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -50,7 +52,7 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
     {
         $search = OrderProductTaxQuery::create();
 
-        $orderProduct = $this->getOrder_product();
+        $orderProduct = $this->getOrderProduct();
 
         $search->filterByOrderProductId($orderProduct, Criteria::EQUAL);
 
@@ -59,6 +61,7 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var OrderProductTaxModel $orderProductTax */
         foreach ($loopResult->getResultDataCollection() as $orderProductTax) {
             $loopResultRow = new LoopResultRow($orderProductTax);
             $loopResultRow->set("ID", $orderProductTax->getId())

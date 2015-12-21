@@ -16,10 +16,8 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CategoryQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -33,16 +31,14 @@ use Thelia\Type\BooleanOrBothType;
  * - level is the exact level to return. Example: if level = 2 and the path is c1 -> c2 -> c3 -> c4, the loop will return c2
  * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
  *
- * example :
- *
- * <THELIA_cat type="category-path" category="3">
- *      <a href="#URL">#TITLE</a>
- * </THELIA_cat>
- *
- *
  * Class CategoryPath
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getCategory()
+ * @method int getDepth()
+ * @method bool|string getVisible()
  */
 class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -68,7 +64,7 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
-        if ($visible != BooleanOrBothType::ANY) {
+        if ($visible !== BooleanOrBothType::ANY) {
             $search->filterByVisible($visible);
         }
 

@@ -30,6 +30,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHookQuery orderByHookActive($order = Criteria::ASC) Order by the hook_active column
  * @method     ChildModuleHookQuery orderByModuleActive($order = Criteria::ASC) Order by the module_active column
  * @method     ChildModuleHookQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildModuleHookQuery orderByTemplates($order = Criteria::ASC) Order by the templates column
  *
  * @method     ChildModuleHookQuery groupById() Group by the id column
  * @method     ChildModuleHookQuery groupByModuleId() Group by the module_id column
@@ -40,6 +41,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHookQuery groupByHookActive() Group by the hook_active column
  * @method     ChildModuleHookQuery groupByModuleActive() Group by the module_active column
  * @method     ChildModuleHookQuery groupByPosition() Group by the position column
+ * @method     ChildModuleHookQuery groupByTemplates() Group by the templates column
  *
  * @method     ChildModuleHookQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildModuleHookQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -65,6 +67,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     ChildModuleHook findOneByHookActive(boolean $hook_active) Return the first ChildModuleHook filtered by the hook_active column
  * @method     ChildModuleHook findOneByModuleActive(boolean $module_active) Return the first ChildModuleHook filtered by the module_active column
  * @method     ChildModuleHook findOneByPosition(int $position) Return the first ChildModuleHook filtered by the position column
+ * @method     ChildModuleHook findOneByTemplates(string $templates) Return the first ChildModuleHook filtered by the templates column
  *
  * @method     array findById(int $id) Return ChildModuleHook objects filtered by the id column
  * @method     array findByModuleId(int $module_id) Return ChildModuleHook objects filtered by the module_id column
@@ -75,6 +78,7 @@ use Thelia\Model\Map\ModuleHookTableMap;
  * @method     array findByHookActive(boolean $hook_active) Return ChildModuleHook objects filtered by the hook_active column
  * @method     array findByModuleActive(boolean $module_active) Return ChildModuleHook objects filtered by the module_active column
  * @method     array findByPosition(int $position) Return ChildModuleHook objects filtered by the position column
+ * @method     array findByTemplates(string $templates) Return ChildModuleHook objects filtered by the templates column
  *
  */
 abstract class ModuleHookQuery extends ModelCriteria
@@ -163,7 +167,7 @@ abstract class ModuleHookQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `MODULE_ID`, `HOOK_ID`, `CLASSNAME`, `METHOD`, `ACTIVE`, `HOOK_ACTIVE`, `MODULE_ACTIVE`, `POSITION` FROM `module_hook` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `MODULE_ID`, `HOOK_ID`, `CLASSNAME`, `METHOD`, `ACTIVE`, `HOOK_ACTIVE`, `MODULE_ACTIVE`, `POSITION`, `TEMPLATES` FROM `module_hook` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -557,6 +561,35 @@ abstract class ModuleHookQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ModuleHookTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
+     * Filter the query on the templates column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTemplates('fooValue');   // WHERE templates = 'fooValue'
+     * $query->filterByTemplates('%fooValue%'); // WHERE templates LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $templates The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleHookQuery The current query, for fluid interface
+     */
+    public function filterByTemplates($templates = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($templates)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $templates)) {
+                $templates = str_replace('*', '%', $templates);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ModuleHookTableMap::TEMPLATES, $templates, $comparison);
     }
 
     /**

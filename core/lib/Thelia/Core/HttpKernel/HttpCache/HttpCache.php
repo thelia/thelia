@@ -17,13 +17,12 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
  * Class HttpCache
  * @package Thelia\Core\HttpKernel\HttpCache
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class HttpCache extends BaseHttpCache implements HttpKernelInterface
 {

@@ -17,8 +17,6 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Cart as ChildCart;
-use Thelia\Model\CartQuery as ChildCartQuery;
 use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
@@ -145,20 +143,22 @@ abstract class Order implements ActiveRecordInterface
 
     /**
      * The value for the discount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $discount;
 
     /**
      * The value for the postage field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $postage;
 
     /**
      * The value for the postage_tax field.
-     * Note: this column has a database default value of: 0
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $postage_tax;
 
@@ -270,11 +270,6 @@ abstract class Order implements ActiveRecordInterface
     protected $aLang;
 
     /**
-     * @var        Cart
-     */
-    protected $aCart;
-
-    /**
      * @var        ObjectCollection|ChildOrderProduct[] Collection to store aggregation of ChildOrderProduct objects.
      */
     protected $collOrderProducts;
@@ -334,7 +329,9 @@ abstract class Order implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->postage_tax = 0;
+        $this->discount = '0.000000';
+        $this->postage = '0.000000';
+        $this->postage_tax = '0.000000';
         $this->version = 0;
     }
 
@@ -731,7 +728,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getDiscount()
     {
@@ -742,7 +739,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [postage] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPostage()
     {
@@ -753,7 +750,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [postage_tax] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPostageTax()
     {
@@ -1159,13 +1156,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->discount !== $v) {
@@ -1180,13 +1177,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [postage] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPostage($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->postage !== $v) {
@@ -1201,13 +1198,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [postage_tax] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPostageTax($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->postage_tax !== $v) {
@@ -1357,10 +1354,6 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::CART_ID] = true;
         }
 
-        if ($this->aCart !== null && $this->aCart->getId() !== $v) {
-            $this->aCart = null;
-        }
-
 
         return $this;
     } // setCartId()
@@ -1480,7 +1473,15 @@ abstract class Order implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->postage_tax !== 0) {
+            if ($this->discount !== '0.000000') {
+                return false;
+            }
+
+            if ($this->postage !== '0.000000') {
+                return false;
+            }
+
+            if ($this->postage_tax !== '0.000000') {
                 return false;
             }
 
@@ -1552,13 +1553,13 @@ abstract class Order implements ActiveRecordInterface
             $this->invoice_ref = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->discount = (null !== $col) ? (double) $col : null;
+            $this->discount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postage = (null !== $col) ? (double) $col : null;
+            $this->postage = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PostageTax', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postage_tax = (null !== $col) ? (double) $col : null;
+            $this->postage_tax = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('PostageTaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postage_tax_rule_title = (null !== $col) ? (string) $col : null;
@@ -1655,9 +1656,6 @@ abstract class Order implements ActiveRecordInterface
         if ($this->aLang !== null && $this->lang_id !== $this->aLang->getId()) {
             $this->aLang = null;
         }
-        if ($this->aCart !== null && $this->cart_id !== $this->aCart->getId()) {
-            $this->aCart = null;
-        }
     } // ensureConsistency
 
     /**
@@ -1705,7 +1703,6 @@ abstract class Order implements ActiveRecordInterface
             $this->aModuleRelatedByPaymentModuleId = null;
             $this->aModuleRelatedByDeliveryModuleId = null;
             $this->aLang = null;
-            $this->aCart = null;
             $this->collOrderProducts = null;
 
             $this->collOrderCoupons = null;
@@ -1905,13 +1902,6 @@ abstract class Order implements ActiveRecordInterface
                     $affectedRows += $this->aLang->save($con);
                 }
                 $this->setLang($this->aLang);
-            }
-
-            if ($this->aCart !== null) {
-                if ($this->aCart->isModified() || $this->aCart->isNew()) {
-                    $affectedRows += $this->aCart->save($con);
-                }
-                $this->setCart($this->aCart);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -2384,9 +2374,6 @@ abstract class Order implements ActiveRecordInterface
             }
             if (null !== $this->aLang) {
                 $result['Lang'] = $this->aLang->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aCart) {
-                $result['Cart'] = $this->aCart->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collOrderProducts) {
                 $result['OrderProducts'] = $this->collOrderProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -3138,57 +3125,6 @@ abstract class Order implements ActiveRecordInterface
         }
 
         return $this->aLang;
-    }
-
-    /**
-     * Declares an association between this object and a ChildCart object.
-     *
-     * @param                  ChildCart $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCart(ChildCart $v = null)
-    {
-        if ($v === null) {
-            $this->setCartId(NULL);
-        } else {
-            $this->setCartId($v->getId());
-        }
-
-        $this->aCart = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCart object, it will not be re-added.
-        if ($v !== null) {
-            $v->addOrder($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildCart object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCart The associated ChildCart object.
-     * @throws PropelException
-     */
-    public function getCart(ConnectionInterface $con = null)
-    {
-        if ($this->aCart === null && ($this->cart_id !== null)) {
-            $this->aCart = ChildCartQuery::create()->findPk($this->cart_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aCart->addOrders($this);
-             */
-        }
-
-        return $this->aCart;
     }
 
 
@@ -3948,7 +3884,6 @@ abstract class Order implements ActiveRecordInterface
         $this->aModuleRelatedByPaymentModuleId = null;
         $this->aModuleRelatedByDeliveryModuleId = null;
         $this->aLang = null;
-        $this->aCart = null;
     }
 
     /**

@@ -25,6 +25,8 @@ class ProductCreateEvent extends ProductEvent
     protected $baseWeight;
     protected $taxRuleId;
     protected $currencyId;
+    protected $baseQuantity;
+    protected $templateId;
 
     public function getRef()
     {
@@ -174,7 +176,7 @@ class ProductCreateEvent extends ProductEvent
      * This method is an alias of setCurrencyId and used by the event when binding a form
      *
      * @param $currencyId
-     * @return mixed
+     * @return $this
      * @see setCurrencyId
      */
     public function setCurrency($currencyId)
@@ -183,14 +185,62 @@ class ProductCreateEvent extends ProductEvent
     }
 
     /**
-     * This method is an alias of setCurrencyId and used by the event when binding a form
+     * This method is an alias of setTaxRuleId and used by the event when binding a form
      *
      * @param $taxRuleId
-     * @return ProductCreateEvent
+     * @return $this
      * @see setTaxRuleId
      */
     public function setTaxRule($taxRuleId)
     {
         return $this->setTaxRuleId($taxRuleId);
+    }
+
+    /**
+     * @return integer
+     */
+    public function getBaseQuantity()
+    {
+        return $this->baseQuantity;
+    }
+
+    /**
+     * @param integer $baseQuantity
+     * @return $this
+     */
+    public function setBaseQuantity($baseQuantity)
+    {
+        $this->baseQuantity = $baseQuantity;
+        return $this;
+    }
+
+    /**
+     * This method is an alias of setBaseQuantity and used by the event when binding a form
+     *
+     * @param integer $quantity quantity for this new product
+     * @return $this
+     * @see setBaseQuantity
+     */
+    public function setQuantity($quantity)
+    {
+        return $this->setBaseQuantity($quantity);
+    }
+
+    /**
+     * @return integer
+     */
+    public function getTemplateId()
+    {
+        return $this->templateId;
+    }
+
+    /**
+     * @param integer $templateId
+     * @return $this
+     */
+    public function setTemplateId($templateId)
+    {
+        $this->templateId = $templateId;
+        return $this;
     }
 }

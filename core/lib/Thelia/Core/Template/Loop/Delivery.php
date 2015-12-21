@@ -26,8 +26,11 @@ use Thelia\Module\Exception\DeliveryException;
 /**
  * Class Delivery
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@gmail.com>
+ *
+ * {@inheritdoc}
+ * @method int getCountry()
  */
 class Delivery extends BaseSpecificModule
 {
@@ -85,6 +88,7 @@ class Delivery extends BaseSpecificModule
 
                     $loopResultRow
                         ->set('ID', $deliveryModule->getId())
+                        ->set('CODE', $deliveryModule->getCode())
                         ->set('TITLE', $deliveryModule->getVirtualColumn('i18n_TITLE'))
                         ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
                         ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))

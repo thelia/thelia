@@ -104,7 +104,14 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      */
     public function getUploadDir()
     {
-        return THELIA_LOCAL_DIR . 'media'.DS.'documents'.DS.'category';
+        $uploadDir = ConfigQuery::read('documents_library_path');
+        if ($uploadDir === null) {
+            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+        } else {
+            $uploadDir = THELIA_ROOT . $uploadDir;
+        }
+
+        return $uploadDir . DS . 'category';
     }
 
     /**

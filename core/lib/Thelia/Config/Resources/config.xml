@@ -32,6 +32,8 @@
 
             <parameter key="document.brand">Thelia\Model\BrandDocument</parameter>
             <parameter key="image.brand">Thelia\Model\BrandImage</parameter>
+
+            <parameter key="image.module">Thelia\Model\ModuleImage</parameter>
         </parameter>
 
         <parameter key="import.base_url">/admin/import</parameter>
@@ -39,10 +41,16 @@
 
         <parameter key="thelia.token_id">thelia.token_provider</parameter>
         <parameter key="thelia.validator.translation_domain">validators</parameter>
+
+        <!-- Thelia logger class -->
+        <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
     </parameters>
 
 
     <services>
+
+        <!-- Thelia template helper -->
+        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" />
 
         <!--  URL maganement -->
         <service id="thelia.url.manager" class="Thelia\Tools\URL">
@@ -79,11 +87,43 @@
             <argument>%kernel.debug%</argument>
         </service>
 
-		<!--
-		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
-		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
-		We use it here to inject the service container in the admin base controller.
-		-->
+        <!-- The asset filters -->
+        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+            <tag name="thelia.asset.filter" key="less" />
+            <tag name="kernel.event_subscriber"/>
+            <argument>%kernel.environment%</argument>
+        </service>
+
+        <service id="less_legacy.assetic.filter" class="Assetic\Filter\LessphpFilter">
+            <argument key="identifier">less_legacy</argument>
+            <tag name="thelia.asset.filter" key="less_legacy" />
+        </service>
+
+        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
+            <tag name="thelia.asset.filter" key="sass"  />
+        </service>
+
+        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">
+            <tag name="thelia.asset.filter" key="cssembed" />
+        </service>
+
+        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">
+            <tag name="thelia.asset.filter" key="cssrewrite"/>
+        </service>
+
+        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">
+            <tag name="thelia.asset.filter" key="cssimport"/>
+        </service>
+
+        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">
+            <tag name="thelia.asset.filter" key="compass"/>
+        </service>
+
+        <!--
+        A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
+        thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
+        We use it here to inject the service container in the admin base controller.
+        -->
         <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
         	<argument type="service" id="service_container"/>
         </service>
@@ -108,6 +148,8 @@
 
         <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
             <argument type="service" id="request" />
+            <argument type="service" id="thelia.form_factory" />
+            <argument type="service" id="thelia.form_validator" />
         </service>
 
 
@@ -253,5 +295,8 @@
         <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">
             <tag name="currency.converter.provider" priority="0" />
         </service>
+
+        <!-- Thelia logger -->
+        <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
     </services>
 </config>

@@ -65,6 +65,8 @@ class OrderExport extends ExportHandler
     {
         $locale = $lang->getLocale();
 
+
+
         $query = OrderQuery::create()
             ->useCurrencyQuery()
                 ->addAsColumn("currency_CODE", CurrencyTableMap::CODE)
@@ -247,6 +249,16 @@ class OrderExport extends ExportHandler
             OrderStatusI18nTableMap::LOCALE,
             $locale
         );
+
+
+        if ($this->rangeDate !== null) {
+            $start_date = \DateTime::createFromFormat("Y-n-d", $this->rangeDate["start"]["year"]."-".$this->rangeDate["start"]["month"]."-".$this->rangeDate["start"]["day"]);
+            $end_date = \DateTime::createFromFormat("Y-n-d", $this->rangeDate["end"]["year"]."-".$this->rangeDate["end"]["month"]."-".$this->rangeDate["start"]["day"]);
+
+            $query
+                ->filterByCreatedAt(sprintf("%s 00:00:00", $start_date->format('Y-m-d')), Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt(sprintf("%s 23:59:59", $end_date->format('Y-m-d')), Criteria::LESS_EQUAL);
+        }
 
         return $query;
     }

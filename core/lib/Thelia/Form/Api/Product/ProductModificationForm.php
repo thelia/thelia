@@ -17,7 +17,7 @@ use Thelia\Form\ProductModificationForm as BaseProductModificationForm;
 /**
  * Class ProductModificationForm
  * @package Thelia\Form\Api\Product
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ProductModificationForm extends BaseProductModificationForm
 {

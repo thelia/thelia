@@ -2,13 +2,12 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Template\Exception\ResourceNotFoundException;
-use Thelia\Model\Base\Message as BaseMessage;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Message\MessageEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Model\Base\Message as BaseMessage;
 
 class Message extends BaseMessage
 {
@@ -137,10 +136,22 @@ class Message extends BaseMessage
     /**
      * Add a subject and a body (TEXT, HTML or both, depending on the message
      * configuration.
+     *
+     * @param  ParserInterface $parser
+     * @param  \Swift_Message  $messageInstance
+     * @param  bool            $useFallbackTemplate When we send mail from a module and don't use the `default` email
+     *                                              template, if the file (html/txt) is not found in the template then
+     *                                              the template file located in the module under
+     *                                              `templates/email/default/' directory is used if
+     *                                              `$useFallbackTemplate` is set to `true`.
      */
-    public function buildMessage($parser, \Swift_Message $messageInstance)
+    public function buildMessage(ParserInterface $parser, \Swift_Message $messageInstance, $useFallbackTemplate = true)
     {
-        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveMailTemplate());
+        $parser->setTemplateDefinition(
+            $parser->getTemplateHelper()->getActiveMailTemplate(),
+            $useFallbackTemplate
+        );
+
         $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);

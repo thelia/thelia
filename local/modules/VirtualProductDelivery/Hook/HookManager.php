@@ -14,7 +14,6 @@ namespace VirtualProductDelivery\Hook;
 
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Class HookManager
@@ -23,25 +22,6 @@ use Thelia\Core\Translation\Translator;
  */
 class HookManager extends BaseHook
 {
-
-    public function onDeliveryAddress(HookRenderEvent $event)
-    {
-        $event->add(
-            $this->render("delivery-address.html")
-        );
-    }
-
-    public function displayVirtualProducts(HookRenderEvent $event)
-    {
-        $orderId = $event->getArgument('order_id');
-
-        if (null !== $orderId) {
-            $event->add(
-                $this->render('virtual-products-list.html', ['order_id' => $orderId])
-            );
-        }
-    }
-
     public function onAccountOrderAfterProducts(HookRenderEvent $event)
     {
         $orderId = $event->getArgument('order');

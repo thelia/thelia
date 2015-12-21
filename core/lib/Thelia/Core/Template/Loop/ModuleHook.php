@@ -13,14 +13,14 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
+use Thelia\Model\LangQuery;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -30,8 +30,18 @@ use Thelia\Type\TypeCollection;
  * Class ModuleHook
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getHook()
+ * @method int getModule()
+ * @method int[] getExclude()
+ * @method bool|string getModuleActive()
+ * @method bool|string getHookActive()
+ * @method bool|string getActive()
+ * @method string[] getOrder()
  */
-class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
+class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = false;
 
@@ -62,6 +72,8 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
     {
         $search = ModuleHookQuery::create();
 
+        $this->configureI18nProcessing($search, []);
+
         $id = $this->getId();
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
@@ -87,12 +99,12 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
             $search->filterByActive($active, Criteria::EQUAL);
         }
 
-        $hookActive = $this->getHook_active();
+        $hookActive = $this->getHookActive();
         if ($hookActive !== Type\BooleanOrBothType::ANY) {
             $search->filterByHookActive($hookActive, Criteria::EQUAL);
         }
 
-        $moduleActive = $this->getModule_active();
+        $moduleActive = $this->getModuleActive();
         if ($moduleActive !== Type\BooleanOrBothType::ANY) {
             $search->filterByModuleActive($moduleActive, Criteria::EQUAL);
         }
@@ -142,13 +154,15 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                     ->set("ID", $moduleHook->getId())
                     ->set("HOOK_ID", $moduleHook->getHookId())
                     ->set("MODULE_ID", $moduleHook->getModuleId())
-                    ->set("MODULE_TITLE", $moduleHook->getModule()->getTitle())
+                    ->set("MODULE_TITLE", $moduleHook->getModule()->setLocale($this->locale)->getTitle())
+                    ->set("MODULE_CODE", $moduleHook->getModule()->getCode())
                     ->set("CLASSNAME", $moduleHook->getClassname())
                     ->set("METHOD", $moduleHook->getMethod())
                     ->set("ACTIVE", $moduleHook->getActive())
                     ->set("HOOK_ACTIVE", $moduleHook->getHookActive())
                     ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())
                     ->set("POSITION", $moduleHook->getPosition())
+                    ->set("TEMPLATES", $moduleHook->getTemplates())
                 ;
 
                 $loopResult->addRow($loopResultRow);

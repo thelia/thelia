@@ -16,7 +16,7 @@ use Thelia\Core\Template\TemplateDefinition;
 
 /**
  * Class ParserFallback
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ParserFallback implements ParserInterface
 {
@@ -97,6 +97,14 @@ class ParserFallback implements ParserInterface
      * @param mixed $value the value of the variable
      */
     public function assign($variable, $value)
+    {
+        $this->throwException();
+    }
+
+    /**
+     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     */
+    public function getTemplateHelper()
     {
         $this->throwException();
     }

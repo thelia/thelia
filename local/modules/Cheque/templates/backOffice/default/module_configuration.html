@@ -1,0 +1,55 @@
+{if isset($smarty.get.errmes) && !empty($smarty.get.errmes)}
+     <div class="alert alert-danger">
+         {$smarty.get.errmes}
+     </div>
+{/if}
+
+<div class="row">
+    <div class="col-md-12 general-block-decorator">
+
+        <div class="row">
+            <div class="col-md-12 title title-without-tabs">
+                {intl d='cheque.bo.default' l="Cheque instructions configuration"}
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="row">
+                <div class="col-md-12">
+
+                    {form name="cheque.instructions.configure"}
+
+                        <form action="{url path="/admin/cheque/configure"}" method="post">
+
+                            {include
+                                file = "includes/inner-form-toolbar.html"
+                                hide_submit_buttons = false
+
+                                page_url  = {url path="/admin/module/Cheque"}
+                                close_url = {url path="/admin/modules"}
+                            }
+
+                            {form_hidden_fields}
+
+                            {if $form_error}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-danger">{$form_error_message}</div>
+                                    </div>
+                                </div>
+                            {/if}
+
+                            {loop type="module-config" name="get-payable-to" module="Cheque" variable="payable_to"}
+                                {render_form_field field="payable_to" value=$VALUE}
+                            {/loop}
+
+                            {loop type="module-config" name="get-instruction" module="Cheque" variable="instructions" locale=$edit_language_locale}
+                                {render_form_field field="instructions" extra_class="wysiwyg" value=$VALUE}
+                            {/loop}
+                         </form>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

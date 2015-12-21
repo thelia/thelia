@@ -15,7 +15,7 @@ namespace Thelia\Files\Exception;
 /**
  * Class ProcessFileException
  * @package Thelia\Files\Exception
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ProcessFileException extends \RuntimeException
 {

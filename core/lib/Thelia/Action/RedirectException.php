@@ -21,7 +21,7 @@ use Thelia\Tools\URL;
 /**
  * Class RedirectException
  * @package Thelia\Action
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {

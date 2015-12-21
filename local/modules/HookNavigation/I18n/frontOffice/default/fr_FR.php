@@ -1,8 +1,8 @@
 <?php
 
 return array(
-    'Categories' => 'Catégories',
+    'Categories' => 'Rubriques',
     'Home' => 'Accueil',
-    'No articles currently' => 'Encore aucun article',
-    'Toggle navigation' => 'Afficher/Masquer le menu',
+    'No articles currently' => 'Aucun article pour le moment',
+    'Toggle navigation' => 'Basculer la navigation',
 );

@@ -35,7 +35,7 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Class Export
  * @package Colissimo\Controller
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Export extends BaseAdminController
 {
@@ -130,9 +130,10 @@ class Export extends BaseAdminController
             }
 
             return Response::create(
-                $export,
+                utf8_decode($export),
                 200,
                 array(
+                    "Content-Encoding"=>"ISO-8889-1",
                     "Content-Type"=>"application/csv-tab-delimited-table",
                     "Content-disposition"=>"filename=export.csv"
                 )

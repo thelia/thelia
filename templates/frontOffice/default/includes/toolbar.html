@@ -1,16 +1,16 @@
 <div class="toolbar toolbar-{$toolbar}" role="toolbar">
     {if $toolbar == "top" }
-    <div class="sorter-container">
+    <div class="sorter-container clearfix">
         <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
 
             <span class="limiter">
                 <label for="limit-top">{intl l="Show"}</label>
                 <select id="limit-top" name="limit">
-                    <option value="{url path={navigate to="current"} limit="4"}" {if $limit==4}selected{/if}>4</option>
-                    <option value="{url path={navigate to="current"} limit="8"}" {if $limit==8}selected{/if}>8</option>
-                    <option value="{url path={navigate to="current"} limit="12"}" {if $limit==12}selected{/if}>12</option>
-                    <option value="{url path={navigate to="current"} limit="50"}"{if $limit==50}selected{/if}>50</option>
-                    <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
+                    <option value="{url current="1" limit="4"}" {if $limit==4}selected{/if}>4</option>
+                    <option value="{url current="1" limit="8"}" {if $limit==8}selected{/if}>8</option>
+                    <option value="{url current="1" limit="12"}" {if $limit==12}selected{/if}>12</option>
+                    <option value="{url current="1" limit="50"}"{if $limit==50}selected{/if}>50</option>
+                    <option value="{url current="1" limit="100000"}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
                 </select>
                 <span class="per-page">{intl l="per page"}</span>
             </span><!-- /.limiter -->
@@ -19,50 +19,50 @@
                 <label for="sortby-top">{intl l="Sort By"}</label>
                 <select id="sortby-top" name="sortby">
                     {*<option value="{url path="{category attr="url"}" order="manual"}">{intl l="Position"}</option>*}
-                    <option value="{url path={navigate to="current"} limit=$limit order="alpha"}" {if $order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
-                    <option value="{url path={navigate to="current"} limit=$limit order="alpha_reverse"}" {if $order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
-                    <option value="{url path={navigate to="current"} limit=$limit order="min_price"}" {if $order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
-                    <option value="{url path={navigate to="current"} limit=$limit order="max_price"}" {if $order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
+                    <option value="{url current="1" limit=$limit order="alpha"}" {if $order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
+                    <option value="{url current="1" limit=$limit order="alpha_reverse"}" {if $order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
+                    <option value="{url current="1" limit=$limit order="min_price"}" {if $order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
+                    <option value="{url current="1" limit=$limit order="max_price"}" {if $order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
                     {*<option value="{url path="{category attr="url"}" order="rating"}">{intl l="Rating"}</option>*}
                 </select>
             </span><!-- /.sort-by -->
 
             <span class="view-mode">
-                <span class="view-mode-label">{intl l="View as"}:</span>
+                <span class="view-mode-label sr-only">{intl l="View as"}:</span>
                 <span class="view-mode-btn">
-                    <a href="{url path="{navigate to="current"}" mode="grid"}" data-toggle="view" role="button" title="{intl l="Grid"}" rel="nofollow" class="btn btn-grid"><i class="icon-grid"></i></a>
-                    <a href="{url path="{navigate to="current"}" mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="icon-list"></i></a>
+                    <a href="{url current="1" mode="grid"}" data-toggle="view" role="button" title="{intl l="Grid"}" rel="nofollow" class="btn btn-default"><i class="fa fa-th"></i></a>
+                    <a href="{url current="1" mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-default"><i class="fa fa-th-list"></i></a>
                 </span>
             </span><!-- /.view-mode -->
 
     </div><!-- /.sorter -->
     {else}
         {if $amount > $limit}
-        <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}">
-            <strong id="pagination-label-{$toolbar}" class="pagination-label">{intl l="Pagination"}</strong>
-            <ul class="pagination">
+        <div class="pagination-container clearfix" role="pagination" aria-labelledby="pagination-label-{$toolbar}">
+            <strong id="pagination-label-{$toolbar}" class="pagination-label sr-only">{intl l="Pagination"}</strong>
+            <ul class="pagination pagination-sm">
                 {if $product_page le 1}
                     <li class="disabled">
-                        <span class="prev"><i class="icon-prev"></i></span>
+                        <span class="prev"><i class="fa fa-caret-left"></i></span>
                     </li>
                 {else}
                     <li>
-                        <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a>
+                        <a href="{url current="1" page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
                     </li>
                 {/if}
 
                 {pageloop rel="product_list"}
                     <li{if $PAGE eq $CURRENT} class="active"{/if}>
-                        <a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a>
+                        <a href="{url current="1" page=$PAGE }"> {$PAGE} </a>
                     </li>
                     {if $PAGE eq $LAST}
                         {if $CURRENT eq $LAST}
                             <li class="disabled">
-                                <span class="next"><i class="icon-next"></i></span>
+                                <span class="next"><i class="fa fa-caret-right"></i></span>
                             </li>
                         {else}
                             <li>
-                                <a href="{url path={navigate to="current"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a>
+                                <a href="{url current="1" page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="fa fa-caret-right"></i></a>
                             </li>
                         {/if}
                     {/if}

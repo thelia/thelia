@@ -109,10 +109,6 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery rightJoinLang($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Lang relation
  * @method     ChildOrderQuery innerJoinLang($relationAlias = null) Adds a INNER JOIN clause to the query using the Lang relation
  *
- * @method     ChildOrderQuery leftJoinCart($relationAlias = null) Adds a LEFT JOIN clause to the query using the Cart relation
- * @method     ChildOrderQuery rightJoinCart($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Cart relation
- * @method     ChildOrderQuery innerJoinCart($relationAlias = null) Adds a INNER JOIN clause to the query using the Cart relation
- *
  * @method     ChildOrderQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
  * @method     ChildOrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
  * @method     ChildOrderQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
@@ -139,9 +135,9 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneByTransactionRef(string $transaction_ref) Return the first ChildOrder filtered by the transaction_ref column
  * @method     ChildOrder findOneByDeliveryRef(string $delivery_ref) Return the first ChildOrder filtered by the delivery_ref column
  * @method     ChildOrder findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrder filtered by the invoice_ref column
- * @method     ChildOrder findOneByDiscount(double $discount) Return the first ChildOrder filtered by the discount column
- * @method     ChildOrder findOneByPostage(double $postage) Return the first ChildOrder filtered by the postage column
- * @method     ChildOrder findOneByPostageTax(double $postage_tax) Return the first ChildOrder filtered by the postage_tax column
+ * @method     ChildOrder findOneByDiscount(string $discount) Return the first ChildOrder filtered by the discount column
+ * @method     ChildOrder findOneByPostage(string $postage) Return the first ChildOrder filtered by the postage column
+ * @method     ChildOrder findOneByPostageTax(string $postage_tax) Return the first ChildOrder filtered by the postage_tax column
  * @method     ChildOrder findOneByPostageTaxRuleTitle(string $postage_tax_rule_title) Return the first ChildOrder filtered by the postage_tax_rule_title column
  * @method     ChildOrder findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrder filtered by the payment_module_id column
  * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
@@ -165,9 +161,9 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     array findByTransactionRef(string $transaction_ref) Return ChildOrder objects filtered by the transaction_ref column
  * @method     array findByDeliveryRef(string $delivery_ref) Return ChildOrder objects filtered by the delivery_ref column
  * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrder objects filtered by the invoice_ref column
- * @method     array findByDiscount(double $discount) Return ChildOrder objects filtered by the discount column
- * @method     array findByPostage(double $postage) Return ChildOrder objects filtered by the postage column
- * @method     array findByPostageTax(double $postage_tax) Return ChildOrder objects filtered by the postage_tax column
+ * @method     array findByDiscount(string $discount) Return ChildOrder objects filtered by the discount column
+ * @method     array findByPostage(string $postage) Return ChildOrder objects filtered by the postage column
+ * @method     array findByPostageTax(string $postage_tax) Return ChildOrder objects filtered by the postage_tax column
  * @method     array findByPostageTaxRuleTitle(string $postage_tax_rule_title) Return ChildOrder objects filtered by the postage_tax_rule_title column
  * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrder objects filtered by the payment_module_id column
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
@@ -1110,8 +1106,6 @@ abstract class OrderQuery extends ModelCriteria
      * $query->filterByCartId(array('min' => 12)); // WHERE cart_id > 12
      * </code>
      *
-     * @see       filterByCart()
-     *
      * @param     mixed $cartId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -1940,81 +1934,6 @@ abstract class OrderQuery extends ModelCriteria
         return $this
             ->joinLang($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Lang', '\Thelia\Model\LangQuery');
-    }
-
-    /**
-     * Filter the query by a related \Thelia\Model\Cart object
-     *
-     * @param \Thelia\Model\Cart|ObjectCollection $cart The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildOrderQuery The current query, for fluid interface
-     */
-    public function filterByCart($cart, $comparison = null)
-    {
-        if ($cart instanceof \Thelia\Model\Cart) {
-            return $this
-                ->addUsingAlias(OrderTableMap::CART_ID, $cart->getId(), $comparison);
-        } elseif ($cart instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(OrderTableMap::CART_ID, $cart->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByCart() only accepts arguments of type \Thelia\Model\Cart or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Cart relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildOrderQuery The current query, for fluid interface
-     */
-    public function joinCart($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Cart');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Cart');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Cart relation Cart object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
-     */
-    public function useCartQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCart($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Cart', '\Thelia\Model\CartQuery');
     }
 
     /**

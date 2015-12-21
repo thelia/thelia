@@ -4,19 +4,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <loops>
-    </loops>
-
-    <forms>
-    </forms>
-
-    <commands>
-    </commands>
-
     <hooks>
-        <hook id="hookcart.hook.front" class="HookCart\Hook\FrontHook" scope="request">
-            <tag name="hook.event_listener" event="main.head-bottom" />
-            <tag name="hook.event_listener" event="main.navbar-secondary" />
+        <hook id="hookcart.hook.front">
+            <tag name="hook.event_listener" event="main.head-bottom" templates="css:assets/css/styles.css"/>
+            <tag name="hook.event_listener" event="main.navbar-secondary" templates="main-navbar-secondary.html"/>
+            <tag name="hook.event_listener" event="mini-cart" templates="render:mini-cart.html"/>
         </hook>
     </hooks>
 

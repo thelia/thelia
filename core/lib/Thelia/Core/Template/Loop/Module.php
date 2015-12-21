@@ -18,15 +18,12 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
-
 use Thelia\Module\BaseModule;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -39,6 +36,17 @@ use Thelia\Type\TypeCollection;
  * Class Module
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getProfile()
+ * @method int[] getArea()
+ * @method string[] getCode()
+ * @method string[] getModuleType()
+ * @method string[] getModuleCategory()
+ * @method int[] getExclude()
+ * @method bool|string getActive()
+ * @method string[] getOrder()
  */
 class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -52,6 +60,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('profile'),
+            Argument::createIntListTypeArgument('area'),
             new Argument(
                 'code',
                 new Type\TypeCollection(
@@ -120,19 +129,29 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->withColumn('profile_module.access', 'access');
         }
 
+
+        $area = $this->getArea();
+
+        if (null !== $area) {
+            $search
+                ->useAreaDeliveryModuleQuery()
+                ->filterByAreaId($area, Criteria::IN)
+                ->endUse();
+        }
+
         $code = $this->getCode();
 
         if (null !== $code) {
             $search->filterByCode($code, Criteria::IN);
         }
 
-        $moduleType = $this->getModule_type();
+        $moduleType = $this->getModuleType();
 
         if (null !== $moduleType) {
             $search->filterByType($moduleType, Criteria::IN);
         }
 
-        $moduleCategory = $this->getModule_category();
+        $moduleCategory = $this->getModuleCategory();
 
         if (null !== $moduleCategory) {
             $search->filterByCategory($moduleCategory, Criteria::IN);
@@ -268,7 +287,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
                     $hasConfigurationInterface = $configContent &&
-                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false
+                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1
                     ;
 
                     if (false === $hasConfigurationInterface) {

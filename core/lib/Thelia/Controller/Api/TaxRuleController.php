@@ -28,7 +28,7 @@ use Thelia\Model\TaxRuleQuery;
  * Class TaxRuleController
  * @package Thelia\Controller\Api
  * @author Benjamin Perche <bperche@openstudio.fr>
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class TaxRuleController extends AbstractCrudApiController
 {

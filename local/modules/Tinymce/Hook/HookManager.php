@@ -21,11 +21,11 @@ use Thelia\Core\Hook\BaseHook;
  * @package Tinymce\Hook
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class HookManager extends BaseHook {
-
+class HookManager extends BaseHook
+{
     public function onJsWysiwyg(HookRenderEvent $event)
     {
         $content = $this->render("tinymce_init.tpl");
         $event->add($content);
     }
-} 
+}

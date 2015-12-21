@@ -29,7 +29,7 @@
 {* Feeds *}
 {block name="feeds"}
 {if $category_id}
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All products in'} {category attr='title'}" href="{url path="/feed/catalog/{lang attr="locale"}/{category attr="id"}"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All products in'} {category attr='title'}" href="{url path="/feed/catalog/%lang/%category_id" lang={lang attr="locale"} category_id={category attr="id"}}" />
 {/if}
 {/block}
 
@@ -52,11 +52,11 @@
 
 {hook name="category.top" category="$category_id"}
 
-    <div class="main layout-col-2-left">
+    <div class="main row">
 
         {hook name="category.main-top" category="$category_id"}
 
-        <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
+        <article class="col-main col-md-9 col-md-push-3 {$smarty.get.mode|default:"grid"}" role="main">
 
             {hook name="category.content-top" category="$category_id"}
 
@@ -89,7 +89,7 @@
                         <ul>
                             {loop name="subcategories" type="category" parent=$category_id}
                                 <li>
-                                    <a href="{url path={navigate to="current"} category_id=$ID }">{$TITLE}</a>
+                                    <a href="{$URL}">{$TITLE}</a>
                                 </li>
                             {/loop}
                         </ul>
@@ -99,19 +99,19 @@
             {/if}
 
             {ifloop rel="product_list"}
-                {assign var="amount" value="{count type="product" category=$category_id}"}
+                {$amount={count type="product" category=$category_id}}
                 <div class="toolbar toolbar-top" role="toolbar">
-                    <div class="sorter-container">
+                    <div class="sorter-container clearfix">
                     <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
 
                     <span class="limiter">
                         <label for="limit-top">{intl l="Show"}</label>
                         <select id="limit-top" name="limit">
-                            <option value="{url path={navigate to="current"} limit="4"}" {if $limit==4}selected{/if}>4</option>
-                            <option value="{url path={navigate to="current"} limit="8"}" {if $limit==8}selected{/if}>8</option>
-                            <option value="{url path={navigate to="current"} limit="12"}" {if $limit==12}selected{/if}>12</option>
-                            <option value="{url path={navigate to="current"} limit="50"}"{if $limit==50}selected{/if}>50</option>
-                            <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
+                            <option value="{url current="1" page=1 limit="4"}" {if $limit==4}selected{/if}>4</option>
+                            <option value="{url current="1" page=1 limit="8"}" {if $limit==8}selected{/if}>8</option>
+                            <option value="{url current="1" page=1 limit="12"}" {if $limit==12}selected{/if}>12</option>
+                            <option value="{url current="1" page=1 limit="50"}"{if $limit==50}selected{/if}>50</option>
+                            <option value="{url current="1" page=1 limit="100000"}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
                         </select>
                         <span class="per-page">{intl l="per page"}</span>
                     </span><!-- /.limiter -->
@@ -120,18 +120,18 @@
                         <label for="sortby-top">{intl l="Sort By"}</label>
                         <select id="sortby-top" name="sortby">
                             {*<option value="{url path="{category attr="url"}" order="manual"}">{intl l="Position"}</option>*}
-                            <option value="{url path={navigate to="current"} limit=$limit order="alpha"}" {if $product_order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
-                            <option value="{url path={navigate to="current"} limit=$limit order="alpha_reverse"}" {if $product_order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
-                            <option value="{url path={navigate to="current"} limit=$limit order="min_price"}" {if $product_order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
-                            <option value="{url path={navigate to="current"} limit=$limit order="max_price"}" {if $product_order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
+                            <option value="{url current="1" limit=$limit order="alpha"}" {if $product_order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
+                            <option value="{url current="1" limit=$limit order="alpha_reverse"}" {if $product_order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
+                            <option value="{url current="1" limit=$limit order="min_price"}" {if $product_order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
+                            <option value="{url current="1" limit=$limit order="max_price"}" {if $product_order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
                         </select>
                     </span><!-- /.sort-by -->
 
                     <span class="view-mode">
-                        <span class="view-mode-label">{intl l="View as"}:</span>
+                        <span class="view-mode-label sr-only">{intl l="View as"}:</span>
                         <span class="view-mode-btn">
-                            <a href="{url path={navigate to="current"} mode="grid"}" data-toggle="view" role="button" title="{intl l="Grid"}" rel="nofollow" class="btn btn-grid"><i class="icon-grid"></i></a>
-                            <a href="{url path={navigate to="current"} mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="icon-list"></i></a>
+                            <a href="{url current="1" mode="grid"}" data-toggle="view" role="button" title="{intl l="Grid"}" rel="nofollow" class="btn btn-default"><i class="fa fa-th"></i></a>
+                            <a href="{url current="1" mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-default"><i class="fa fa-th-list"></i></a>
                         </span>
                     </span><!-- /.view-mode -->
 
@@ -139,7 +139,7 @@
             </div>
             <div id="category-products">
                 <div class="products-content">
-                    <ul class="product-col-4">
+                    <ul class="list-unstyled row">
                         {loop type="product" name="product_list" category=$category_id limit=$limit page=$product_page order=$product_order}
                             {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
                         {/loop}
@@ -148,31 +148,31 @@
             </div><!-- /#category-products -->
             <div class="toolbar toolbar-bottom" role="toolbar">
                 {if $amount > $limit}
-                    <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
-                        <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
-                        <ul class="pagination">
+                    <div class="pagination-container clearfix" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
+                        <strong id="pagination-label-{$toolbar}}" class="pagination-label sr-only">{intl l="Pagination"}</strong>
+                        <ul class="pagination pagination-sm">
                             {if $product_page le 1}
                                 <li class="disabled">
-                                    <span class="prev"><i class="icon-prev"></i></span>
+                                    <span class="prev"><i class="fa fa-caret-left"></i></span>
                                 </li>
                             {else}
                                 <li>
-                                    <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a>
+                                    <a href="{url current="1" page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
                                 </li>
                             {/if}
 
                             {pageloop rel="product_list"}
                                 <li{if $PAGE eq $CURRENT} class="active"{/if}>
-                                    <a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a>
+                                    <a href="{url current="1" page=$PAGE }"> {$PAGE} </a>
                                 </li>
                                 {if $PAGE eq $LAST}
                                     {if $CURRENT eq $LAST}
                                         <li class="disabled">
-                                            <span class="next"><i class="icon-next"></i></span>
+                                            <span class="next"><i class="fa fa-caret-right"></i></span>
                                         </li>
                                     {else}
                                         <li>
-                                            <a href="{url path={navigate to="current"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a>
+                                            <a href="{url current="1" page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="fa fa-caret-right"></i></a>
                                         </li>
                                     {/if}
                                 {/if}
@@ -183,7 +183,7 @@
             </div><!-- /.toolbar toolbar-bottom -->
             {/ifloop}
             {elseloop rel="product_list"}
-                <div class="address-warning">
+                <div class="alert alert-warning">
                     {intl l="No products available in this category"}
                 </div>
             {/elseloop}
@@ -192,7 +192,7 @@
 
         </article>
 
-        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+        <aside class="col-left col-md-3 col-md-pull-9" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/menu.html"}
         </aside>
 

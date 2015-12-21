@@ -1,0 +1,81 @@
+.transition(@transition) {
+    -webkit-transition: @transition;
+    -o-transition: @transition;
+    transition: @transition;
+}
+
+.menu-links() {
+    > li {
+
+        &,
+        > ul > li {
+            border-top: 1px solid lighten(@navbar-default-border, 10%);
+            border-bottom: 1px solid @navbar-default-border;
+            .transition(border-top-color 0.3s ease-in-out);
+            
+            &.active,
+            &:active,
+            &:hover {
+                border-top-color: @navbar-default-border;
+            }
+
+            &.sidebar-search {
+                &.active,
+                &:active,
+                &:hover {
+                    border-top-color: lighten(@navbar-default-border, 10%);
+                }
+            }
+
+            > a {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                display: block;
+                color: @navbar-default-link-color;
+                .transition(all 0.3s ease-in-out);
+
+                &:hover,
+                &:focus {
+                    color: @brand-primary;
+                    background-color: @navbar-default-link-hover-bg;
+                }
+
+                .item-text {
+                    margin-left: 35px;
+                }
+
+            }
+
+            &.active {
+                > a {
+                    color: @brand-primary;
+                    background-color: @navbar-default-link-hover-bg;
+                }
+            }
+        }
+
+        > ul {
+            padding-left: 0;
+            background: lighten(@navbar-default-bg, 3%);
+            .box-shadow(inset 0px 15px 15px -15px #000);
+
+            > li {
+                display: block;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                > a {
+                    padding: 8px 15px;
+
+                    &:hover,
+                    &:focus {
+                        text-decoration: none;
+                        background-color: lighten(@navbar-default-link-hover-bg, 3%);
+                    }
+                }
+            }
+        }
+    }
+}

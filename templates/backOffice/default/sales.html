@@ -108,7 +108,7 @@
 
                                             <td>
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
-                                                    <a title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/$ID"}">{$TITLE}</a>
+                                                    <a title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/%id" id=$ID}">{$TITLE}</a>
                                                 {/loop}
                                                 {elseloop rel="can_change"}
                                                     {$TITLE}
@@ -148,15 +148,18 @@
                                             {hook name="sales.table-row" location="sales_table_row" sale_id={$ID} }
 
                                             <td class="actions">
-                                                <div class="btn-group">
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs sale-change" title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/$ID"}">
+                                                        <a class="sale-change" title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/%id" id=$ID}">
                                                             <span class="glyphicon glyphicon-edit"></span>
                                                         </a>
                                                     {/loop}
 
                                                     {loop type="auth" name="can_delete" role="ADMIN" resource="admin.sales" access="DELETE"}
-                                                        <a class="btn btn-default btn-xs sale-delete" title="{intl l='Delete this sale'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <a class="sale-delete" title="{intl l='Delete this sale'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                             <span class="glyphicon glyphicon-trash"></span>
                                                         </a>
                                                     {/loop}
@@ -192,35 +195,35 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
-			{form_hidden_fields form=$form}
+			{form_hidden_fields}
 
             {loop type="lang" name="default-lang" default_only="1"}
                 {* Switch edition to the current locale *}
                 <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {render_form_field form=$form field="locale" value=$LOCALE}
+                {render_form_field field="locale" value=$LOCALE}
             {/loop}
 
-            {render_form_field form=$form field="success_url" value={url path='/admin/sale/update/_ID_'}}
+            {render_form_field field="success_url" value={url path='/admin/sale/update/_ID_'}}
 
-            {custom_render_form_field form=$form field="title"}
+            {custom_render_form_field field="title"}
             {loop type="lang" name="default-lang" default_only="1"}
                 {* Switch edition to the current locale *}
                 <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {render_form_field form=$form field="locale" value=$LOCALE}
+                {render_form_field field="locale" value=$LOCALE}
 
                 <div class="input-group">
-                    <input type="text" {form_field_attributes form=$form field="title"}>
+                    <input type="text" {form_field_attributes field="title"}>
                     <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                 </div>
             {/loop}
             {/custom_render_form_field}
 
-            {custom_render_form_field form=$form field="label"}
+            {custom_render_form_field field="label"}
                 {loop type="lang" name="default-lang" default_only="1"}
                     <div class="input-group">
-                        <input type="text" {form_field_attributes form=$form field="label"}>
+                        <input type="text" {form_field_attributes field="label"}>
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
@@ -240,7 +243,7 @@
             dialog_ok_label     = {intl l="Create this sale"}
 
             form_action        = {url path='/admin/sale/create'}
-            form_enctype       = {form_enctype form=$form}
+            form_enctype       = {form_enctype}
             form_error_message = $form_error_message
         }
     {/form}

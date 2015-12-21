@@ -13,6 +13,9 @@
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Controller\Api\BaseApiController;
+use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -20,10 +23,34 @@ use Thelia\Model\ConfigQuery;
  *
  * Class Request
  * @package Thelia\Core\HttpFoundation
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Request extends BaseRequest
 {
+    /** @var string Path info without trailing slash */
+    private $resolvedPathInfo;
+
+    /** @var string */
+    protected $controllerType = null;
+
+    /**
+     * @
+     * {@inheritdoc} Including Thelia request properties
+     */
+    public function initialize(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
+        parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
+
+        $this->resolvedPathInfo = null;
+    }
+
     /**
      * Filter PathInfo to allow slash ending uri
      *
@@ -35,11 +62,22 @@ class Request extends BaseRequest
         $pathInfo = parent::getPathInfo();
         $pathLength = strlen($pathInfo);
 
-        if ($pathInfo !== "/" && $pathInfo[$pathLength - 1] === "/" && (bool) ConfigQuery::read("allow_slash_ended_uri", false)) {
-            $this->pathInfo = $pathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
+        if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
+            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+        ) {
+            if (null === $this->resolvedPathInfo) {
+                $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
+            }
+
+            $pathInfo = $this->resolvedPathInfo;
         }
 
         return $pathInfo;
+    }
+
+    public function getRealPathInfo()
+    {
+        return parent::getPathInfo();
     }
 
     public function getProductId()
@@ -64,27 +102,71 @@ class Request extends BaseRequest
         return $uri . $additionalQs;
     }
 
-    /**
-     * Gets the Session.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session The session
-     * @api
-     */
-    public function getSession()
-    {
-        return parent::getSession();
-    }
-
     public function toString($withContent = true)
     {
         $string =
-            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
-            $this->headers."\r\n";
+            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
+            . "\r\n" . $this->headers . "\r\n"
+        ;
 
         if (true === $withContent) {
             $string .= $this->getContent();
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $controllerType
+     */
+    public function setControllerType($controllerType)
+    {
+        $this->controllerType = $controllerType;
+    }
+
+    /**
+     * Detects where does the request
+     *
+     * <code>
+     * // Detect if the request comes from the api
+     * if ($request->fromControllerType(BaseApiController::CONTROLLER_TYPE)) {...}
+     * </code>
+     *
+     * @param $controllerType
+     * @return bool
+     */
+    public function fromControllerType($controllerType)
+    {
+        return $this->controllerType === $controllerType;
+    }
+
+    /**
+     * Detect if the request comes from the api
+     *
+     * @return bool
+     */
+    public function fromApi()
+    {
+        return $this->controllerType === BaseApiController::CONTROLLER_TYPE;
+    }
+
+    /**
+     * Detect if the request comes from the admin
+     *
+     * @return bool
+     */
+    public function fromAdmin()
+    {
+        return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
+    }
+
+    /**
+     * Detect if the request comes from the front
+     *
+     * @return bool
+     */
+    public function fromFront()
+    {
+        return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
 }

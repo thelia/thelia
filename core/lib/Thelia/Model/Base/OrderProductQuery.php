@@ -98,7 +98,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProduct findOneByDescription(string $description) Return the first ChildOrderProduct filtered by the description column
  * @method     ChildOrderProduct findOneByPostscriptum(string $postscriptum) Return the first ChildOrderProduct filtered by the postscriptum column
  * @method     ChildOrderProduct findOneByQuantity(double $quantity) Return the first ChildOrderProduct filtered by the quantity column
- * @method     ChildOrderProduct findOneByPrice(double $price) Return the first ChildOrderProduct filtered by the price column
+ * @method     ChildOrderProduct findOneByPrice(string $price) Return the first ChildOrderProduct filtered by the price column
  * @method     ChildOrderProduct findOneByPromoPrice(string $promo_price) Return the first ChildOrderProduct filtered by the promo_price column
  * @method     ChildOrderProduct findOneByWasNew(int $was_new) Return the first ChildOrderProduct filtered by the was_new column
  * @method     ChildOrderProduct findOneByWasInPromo(int $was_in_promo) Return the first ChildOrderProduct filtered by the was_in_promo column
@@ -122,7 +122,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     array findByDescription(string $description) Return ChildOrderProduct objects filtered by the description column
  * @method     array findByPostscriptum(string $postscriptum) Return ChildOrderProduct objects filtered by the postscriptum column
  * @method     array findByQuantity(double $quantity) Return ChildOrderProduct objects filtered by the quantity column
- * @method     array findByPrice(double $price) Return ChildOrderProduct objects filtered by the price column
+ * @method     array findByPrice(string $price) Return ChildOrderProduct objects filtered by the price column
  * @method     array findByPromoPrice(string $promo_price) Return ChildOrderProduct objects filtered by the promo_price column
  * @method     array findByWasNew(int $was_new) Return ChildOrderProduct objects filtered by the was_new column
  * @method     array findByWasInPromo(int $was_in_promo) Return ChildOrderProduct objects filtered by the was_in_promo column
@@ -698,24 +698,36 @@ abstract class OrderProductQuery extends ModelCriteria
      *
      * Example usage:
      * <code>
-     * $query->filterByPromoPrice('fooValue');   // WHERE promo_price = 'fooValue'
-     * $query->filterByPromoPrice('%fooValue%'); // WHERE promo_price LIKE '%fooValue%'
+     * $query->filterByPromoPrice(1234); // WHERE promo_price = 1234
+     * $query->filterByPromoPrice(array(12, 34)); // WHERE promo_price IN (12, 34)
+     * $query->filterByPromoPrice(array('min' => 12)); // WHERE promo_price > 12
      * </code>
      *
-     * @param     string $promoPrice The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     mixed $promoPrice The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderProductQuery The current query, for fluid interface
      */
     public function filterByPromoPrice($promoPrice = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($promoPrice)) {
+        if (is_array($promoPrice)) {
+            $useMinMax = false;
+            if (isset($promoPrice['min'])) {
+                $this->addUsingAlias(OrderProductTableMap::PROMO_PRICE, $promoPrice['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($promoPrice['max'])) {
+                $this->addUsingAlias(OrderProductTableMap::PROMO_PRICE, $promoPrice['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $promoPrice)) {
-                $promoPrice = str_replace('*', '%', $promoPrice);
-                $comparison = Criteria::LIKE;
             }
         }
 

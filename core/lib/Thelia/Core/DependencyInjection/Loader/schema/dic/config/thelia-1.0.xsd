@@ -199,6 +199,7 @@
         <xsd:attribute name="method" type="xsd:string" />
         <xsd:attribute name="type" type="hook_type" />
         <xsd:attribute name="active" type="hook_active" />
+        <xsd:attribute name="templates" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:simpleType name="hook_type">

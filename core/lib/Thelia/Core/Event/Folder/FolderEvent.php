@@ -18,7 +18,7 @@ use Thelia\Model\Folder;
 /**
  * Class FolderEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderEvent extends ActionEvent
 {

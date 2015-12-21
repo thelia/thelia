@@ -29,6 +29,9 @@ use Thelia\ImportExport\AbstractHandler;
  */
 abstract class ExportHandler extends AbstractHandler
 {
+    /** @var string Default filename. */
+    const DEFAULT_FILENAME = "data";
+
     protected $locale;
 
     /** @var  array */
@@ -37,6 +40,8 @@ abstract class ExportHandler extends AbstractHandler
     protected $isImageExport = false;
 
     protected $isDocumentExport = false;
+
+    protected $rangeDate = null;
 
     /**
      * @return array
@@ -82,6 +87,31 @@ abstract class ExportHandler extends AbstractHandler
     {
         $this->order = $order;
 
+        return $this;
+    }
+
+    /**
+     * @return array
+     *
+     * Use this method to access the range date.
+     *
+     */
+    public function getRangeDate()
+    {
+        return $this->rangeDate;
+    }
+
+    /**
+     * Use this method to set the range date
+     *
+     * @param array $rangeDate
+     * @return $this
+     */
+    public function setRangeDate(array $rangeDate)
+    {
+        if (isset($rangeDate["start"]) && isset($rangeDate["end"])) {
+            $this->rangeDate = $rangeDate;
+        }
         return $this;
     }
 
@@ -195,6 +225,16 @@ abstract class ExportHandler extends AbstractHandler
     public function isImageExport()
     {
         return $this->isImageExport;
+    }
+
+    /**
+     * Get filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return static::DEFAULT_FILENAME;
     }
 
     /**

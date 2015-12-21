@@ -23,16 +23,13 @@
         </nav>
 
         {form name="thelia.admin.coupon.creation"}
-            {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noConditions=false title={intl l='Editing coupon "%title"' title={$couponCode}}}
+            {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=false title={intl l='Editing coupon "%title"' title={$couponCode}}}
         {/form}
     </div> <!-- #wrapper -->
 </div>
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
 
     {javascripts file='assets/js/json2.js'}
         <script src="{$asset_url}"></script>

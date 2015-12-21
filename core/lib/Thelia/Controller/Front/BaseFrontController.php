@@ -17,13 +17,13 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 
 class BaseFrontController extends BaseController
 {
+    const CONTROLLER_TYPE = 'front';
+
     protected $currentRouter = "router.front";
 
     public function checkAuth()
@@ -31,6 +31,14 @@ class BaseFrontController extends BaseController
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
             throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
     }
 
     protected function checkCartNotEmpty()
@@ -84,7 +92,7 @@ class BaseFrontController extends BaseController
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
-            $template ?: TemplateHelper::getInstance()->getActiveFrontTemplate(),
+            $template ?: $this->getTemplateHelper()->getActiveFrontTemplate(),
             $this->useFallbackTemplate
         );
 

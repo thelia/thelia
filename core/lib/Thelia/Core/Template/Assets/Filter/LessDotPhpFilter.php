@@ -14,7 +14,9 @@ namespace Thelia\Core\Template\Assets\Filter;
 
 use Assetic\Asset\AssetInterface;
 use Assetic\Filter\LessphpFilter;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 
 /**
@@ -26,15 +28,15 @@ use Thelia\Log\Tlog;
  * @author Kris Wallsmith <kris.wallsmith@gmail.com>
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class LessDotPhpFilter extends LessphpFilter
+class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 {
     /** @var string the compiler cache directory */
     private $cacheDir;
 
-    public function __construct()
+    public function __construct($environment = 'prod')
     {
         // Assign and create the cache directory, if required.
-        $this->cacheDir = THELIA_CACHE_DIR . DS . 'less.php';
+        $this->cacheDir = THELIA_CACHE_DIR . $environment . DS . 'less.php';
 
         if (! is_dir($this->cacheDir)) {
             $fs = new Filesystem();
@@ -68,8 +70,30 @@ class LessDotPhpFilter extends LessphpFilter
 
         $css_file_name = \Less_Cache::Get([$filePath => ''], $options);
 
-        $asset->setContent(file_get_contents($this->cacheDir . DS . $css_file_name));
+        $content = @file_get_contents($this->cacheDir . DS . $css_file_name);
+
+        if ($content === false) {
+            $content = '';
+
+            Tlog::getInstance()->warning("Compilation of $filePath did not generate an output file.");
+        }
+
+        $asset->setContent($content);
 
         Tlog::getInstance()->addDebug("CSS processing done.");
+    }
+
+    public function clearCacheDir()
+    {
+        $fs = new Filesystem();
+
+        $fs->remove($this->cacheDir);
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return [
+            TheliaEvents::CACHE_CLEAR => array("clearCacheDir", 128),
+        ];
     }
 }

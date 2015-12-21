@@ -15,9 +15,9 @@ namespace Thelia\Tools;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
-
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -53,6 +53,15 @@ class URL
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
+    }
+
+    /**
+     * @param RequestContext $requestContext
+     * @since Version 2.2
+     */
+    public function setRequestContext(RequestContext $requestContext)
+    {
+        $this->requestContext = $requestContext;
     }
 
     /**
@@ -157,13 +166,15 @@ class URL
             $base = $path;
         }
 
+        $base = str_replace('&amp;', '&', $base);
+
         $queryString = '';
         $anchor      = '';
 
         if (! is_null($parameters)) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
-                $base = preg_replace('/([?&])'.$name.'=([^&])*(&|$)/', '$1', $base);
+                $base = preg_replace('/([?&])'.$name.'=(?:[^&]*)(?:&|$)/', '$1', $base);
 
                 $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
             }
@@ -232,7 +243,7 @@ class URL
             $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
         } else {
             $allParametersWithoutView = array();
-            $allParametersWithoutView['locale'] = $viewLocale;
+            $allParametersWithoutView['lang'] = $viewLocale;
             if (null !== $viewId) {
                 $allParametersWithoutView[$view . '_id'] = $viewId;
             }
@@ -254,7 +265,9 @@ class URL
     {
         if (ConfigQuery::isRewritingEnable()) {
             $view = $request->attributes->get('_view', null);
-            $viewLocale = $request->query->get('locale', null);
+
+            $viewLocale = $this->getViewLocale($request);
+
             $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
             $allOtherParameters = $request->query->all();
@@ -265,6 +278,7 @@ class URL
                 }
             }
             if ($viewLocale !== null) {
+                unset($allOtherParameters['lang']);
                 unset($allOtherParameters['locale']);
             }
 
@@ -320,5 +334,22 @@ class URL
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
         return (bool) preg_match($pattern, $url);
+    }
+
+    /**
+     * Get the locale code from the lang attribute in URL.
+     *
+     * @param Request $request
+     * @return null|string
+     */
+    private function getViewLocale(Request $request)
+    {
+        $viewLocale = $request->query->get('lang', null);
+        if (null === $viewLocale) {
+            // fallback for old parameter
+            $viewLocale = $request->query->get('locale', null);
+        }
+
+        return $viewLocale;
     }
 }

@@ -19,6 +19,8 @@
             <li>{intl l='Editing hook for module "%name"' name="{$MODULE_TITLE}"}</li>
         </ul>
 
+        {hook name="module-hook-edit.top" module_hook_id=$module_hook_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
@@ -29,12 +31,12 @@
                     <div class="form-container">
                         <div class="col-md-12">
                             {form name="thelia.admin.module-hook.modification"}
-                            <form method="POST" action="{url path="/admin/module-hook/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
+                            <form method="POST" action="{url path="/admin/module-hook/save/%id" id=$ID}" {form_enctype} class="clearfix">
                                 {include
                                 file = "includes/inner-form-toolbar.html"
                                 hide_submit_buttons = false
 
-                                page_url  = {url path="/admin/module-hook/update/$ID"}
+                                page_url  = {url path="/admin/module-hook/update/%id" id=$ID}
                                 close_url = {url path="/admin/module-hooks"}
                                 }
 
@@ -43,28 +45,33 @@
                                         {* Be sure to get the hook ID, even if the form could not be validated *}
                                         <input type="hidden" name="module_hook_id" value="{$module_hook_id}" />
 
-                                        {form_hidden_fields form=$form}
+                                        {form_hidden_fields}
 
-                                        {render_form_field form=$form field="success_url" value={url path="/admin/module-hooks"}}
+                                        {render_form_field field="success_url" value={url path="/admin/module-hooks"}}
 
                                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {render_form_field form=$form field="module_id"}
-                                        {render_form_field form=$form field="hook_id"}
-                                        {render_form_field form=$form field="active"}
+                                        {render_form_field field="module_id"}
+                                        {render_form_field field="hook_id"}
+                                        {render_form_field field="active"}
                                     </div>
                                     <div class="col-md-6">
 
-                                        {custom_render_form_field form=$form field='classname'}
-                                            <select {form_field_attributes form=$form field='classname'} >
+                                        {custom_render_form_field field='classname'}
+                                            <select {form_field_attributes field='classname'} >
                                             </select>
                                         {/custom_render_form_field}
 
 
-                                        {custom_render_form_field form=$form field='method'}
-                                            <select {form_field_attributes form=$form field='method'} >
+                                        {custom_render_form_field field='method'}
+                                            <select {form_field_attributes field='method'} >
                                             </select>
                                         {/custom_render_form_field}
+                                    </div>
+                                    <div class="col-md-12">
+
+                                        {render_form_field field="templates"}
+
                                     </div>
                                 </div>
                             </form>
@@ -73,10 +80,13 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            {/loop}
+        {hook name="module-hook-edit.bottom" module_hook_id=$module_hook_id}
 
-            {elseloop rel="module_hook_edit"}
+        {/loop}
+
+        {elseloop rel="module_hook_edit"}
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-error">
@@ -84,27 +94,25 @@
                     </div>
                 </div>
             </div>
-            {/elseloop}
-
-        </div>
+        {/elseloop}
     </div>
 </div>
 {/block}
 
 {block name="javascript-initialization"}
-    <script>
-        (function($) {
-            // Declare current values for classname and method selects
-            {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
-                var currentClassname = "{$CLASSNAME}";
-                var currentMethod = "{$METHOD}";
-            {/loop}
+<script>
+(function($) {
+    // Declare current values for classname and method selects
+    {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
+        var currentClassname = "{$CLASSNAME}";
+        var currentMethod = "{$METHOD}";
+    {/loop}
 
-            {include file="includes/hook-edition.js.inc"}
+    {include file="includes/hook-edition.js.inc"}
 
-            $('#module_id').change();
-        })(jQuery);
-    </script>
+    $('#module_id').change();
+})(jQuery);
+</script>
 {/block}
 
 {block name="javascript-last-call"}

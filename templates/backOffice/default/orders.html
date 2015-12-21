@@ -11,6 +11,7 @@
 
 {block name="main-content"}
     {assign order_page {$smarty.get.page|default:1}}
+    {assign view_status {$smarty.get.status}}
     {assign status_filter {$smarty.get.status|assertType:'IntListType'}}
 <div class="orders">
 
@@ -108,10 +109,6 @@
 
                                 {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
 
-                                    {loop type="currency" name="order-currency" id=$CURRENCY}
-                                        {$orderCurrency=$SYMBOL}
-                                    {/loop}
-
                                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
                                         {assign "orderInvoiceLastName" $LASTNAME}
@@ -120,30 +117,38 @@
 
                                     {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
-                                        {assign "orderStatusLabel" "order_$CODE"}
+                                        {assign "orderStatusCode" "order_$CODE"}
+                                        {if #$orderStatusCode# == ''}
+                                            {assign "defaultLabel" "label-default"}
+                                            {assign "orderStatusLabel" $CODE}
+                                        {else}
+                                            {assign "defaultLabel" ''}
+                                            {assign "orderStatusLabel" #$orderStatusCode#}
+                                        {/if}
                                     {/loop}
 
-		                            <tr>
-
-                                        <td><a href="{url path="/admin/order/update/$ID"}">{$ID}</a></td>
-		                               	<td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
-		                               	<td>{format_date date=$CREATE_DATE}</td>
-		                               	<td>{$orderInvoiceCompany}</td>
-		                               	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-		                               	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
-		                               	<td class="text-center"><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
+                                    <tr>
+                                        <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$ID}</a></td>
+                                       	<td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
+                                       	<td>{format_date date=$CREATE_DATE}</td>
+                                       	<td>{$orderInvoiceCompany}</td>
+                                       	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                       	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</td>
+                                        <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
                                         {* *}
-		                                {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
+                                        {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
                                         <td>
-		                                    <div class="btn-group">
-
-				                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
+                                                    <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                     {if $STATUS !== 5}
-				                                        <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                        <a class="order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
                                                     {/if}
-				                                {/loop}
+                                                {/loop}
 				                            </div>
 		                                </td>
 		                            </tr>
@@ -191,6 +196,8 @@
 
 {capture "cancel_order_dialog"}
     <input type="hidden" name="order_page" value="{$order_page}">
+    <input type="hidden" name="status" value="{$view_status}">
+
     <input type="hidden" name="order_id" id="cancel_order_id" />
     <input type="hidden" name="status_id" value="5" />
 {/capture}

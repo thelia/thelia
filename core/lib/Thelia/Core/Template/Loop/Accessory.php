@@ -14,10 +14,8 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\AccessoryQuery;
 
 /**
@@ -28,6 +26,12 @@ use Thelia\Model\AccessoryQuery;
  * Class Accessory
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getProduct()
+ * @method string[] getOrder()
+ *
+ * @link http://doc.thelia.net/en/documentation/loop/accessory.html
  */
 class Accessory extends Product
 {
@@ -42,7 +46,7 @@ class Accessory extends Product
         $argumentCollection = parent::getArgDefinitions();
 
         $argumentCollection->addArgument(
-            Argument::createIntTypeArgument('product', null, true)
+            Argument::createIntListTypeArgument('product', null, true)
         );
 
         $argumentCollection->get('order')->default = "accessory";

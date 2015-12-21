@@ -15,7 +15,7 @@ namespace Thelia\Tests\Action;
 /**
  * Class BaseAction
  * @package Thelia\Tests\Action\ImageTest
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class BaseAction extends \PHPUnit_Framework_TestCase
 {

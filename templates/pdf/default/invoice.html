@@ -171,9 +171,6 @@
     {$taxes = []}
 
     {loop name="order.invoice" type="order" id=$order_id customer="*"}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-    {assign "orderCurrency" $SYMBOL}
-    {/loop}
     <table class="table-info">
         <col style="width: 100%; padding: 0mm;" />
         <tr>
@@ -209,11 +206,12 @@
                 <h3>{intl l="Delivery address"}</h3>
 				{ifhook rel="invoice.delivery-address"}
                     {* delivery module can customize the delivery address *}
-                    {hook name="invoice.delivery-address" module={order attr="delivery_module"} order=$order_id}
+                    {hook name="invoice.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                 {/ifhook}
                 {elsehook rel="invoice.delivery-address"}                
 				<p>
                     {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop} {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
@@ -226,6 +224,7 @@
                 <h3>{intl l="Invoice address"}</h3>
                 <p>
                     {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
@@ -259,10 +258,12 @@
                 {assign "realPrice" $PROMO_PRICE}
                 {assign "realTax" $PROMO_PRICE_TAX}
                 {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
             {else}
                 {assign "realPrice" $PRICE}
                 {assign "realTax" $PRICE_TAX}
                 {assign "realTaxedPrice" $TAXED_PRICE}
+                {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
             {/if}
 
             {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
@@ -276,20 +277,18 @@
                     {/loop}
                     {/ifloop}
                 </td>
-                <td><p class="align-right">{format_money number=$realPrice symbol=$orderCurrency}</p></td>
-                <td><p class="align-right">{format_money number=$realTax symbol=$orderCurrency}</p></td>
-                <td><p class="align-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
+                <td><p class="align-right">{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
+                <td><p class="align-right">{format_money number=$realTax currency_id=$CURRENCY}</p></td>
+                <td><p class="align-right">{format_money number=$realTaxedPrice currency_id=$CURRENCY}</p></td>
                 <td><p class="align-center">{$QUANTITY}</p></td>
-                <td><p class="align-right">{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
+                <td><p class="align-right">{format_money number=$realTotalPrice currency_id=$CURRENCY}</p></td>
             </tr>
+
+            {hook name="invoice.order-product" order="{$order_id}" order_product="{$ID}"}
         {/loop}
     </table>
 
 {hook name="invoice.after-products" order=$order_id}
-
-    {if $POSTAGE_TAX_RULE_TITLE}
-        {$taxes[$POSTAGE_TAX_RULE_TITLE][] = $POSTAGE_TAX}
-    {/if}
 
     <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
         <col style="width: 60%; padding: 1mm;" />
@@ -302,10 +301,15 @@
                     <span>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span>
                 </p>
 
+                {hook name="invoice.after-payment-module" order=$order_id module_id=$PAYMENT_MODULE}
+
+
                 <h3>{intl l="Delivery module"}</h3>
                 <p>
                     <span>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</span>
                 </p>
+
+                {hook name="invoice.after-delivery-module" order=$order_id module_id=$DELIVERY_MODULE}
 
             </td>
             <td>
@@ -315,12 +319,12 @@
                     {if $DISCOUNT}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Discount"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number=$DISCOUNT symbol=$orderCurrency}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
                     </tr>
                     {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total without tax"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE} symbol=$orderCurrency}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} currency_id=$CURRENCY}</p></td>
                     </tr>
                     {strip}
                         {capture name="tax"}
@@ -332,30 +336,36 @@
                                 {if $_price_taxe_ != 0}
                                 <tr>
                                     <td class="table-3-2"><p>{$name}</p></td>
-                                    <td class="table-3-2 align-right"><P>{format_money number=$_price_taxe_ symbol=$orderCurrency}</P></td>
+                                    <td class="table-3-2 align-right"><p>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</p></td>
                                 </tr>
                                 {/if}
                             {/foreach}
+                            {if $POSTAGE_TAX != 0}
+                            <tr>
+                                <td class="table-3-2"><p>{intl l="Postage"}<br>{$POSTAGE_TAX_RULE_TITLE}</p></td>
+                                <td class="table-3-2 align-right"><p>{format_money number=$POSTAGE_TAX currency_id=$CURRENCY}</p></td>
+                            </tr>
+                            {/if}
                         {/capture}
                     {/strip}
                     {if $smarty.capture.tax ne ""}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Tax"}</p></td>
-                        <td class="table-3-1 align-right"><P>{format_money number=$TOTAL_TAX symbol=$orderCurrency}</P></td>
+                        <td class="table-3-1 align-right"><p>{format_money number=$TOTAL_TAX currency_id=$CURRENCY}</p></td>
                     </tr>
                     {$smarty.capture.tax nofilter}
                     {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
-                        <td class="table-3-1 align-right"><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE_UNTAXED} symbol=$orderCurrency}</P></td>
+                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}</p></td>
                     </tr>
                     <tr>
                         <td class="table-3-1"><p>{intl l="Postage"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number=$POSTAGE symbol=$orderCurrency}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number=$POSTAGE currency_id=$CURRENCY}</p></td>
                     </tr>
                     <tr>
                         <td class="table-3-1" style="background:#f6993c;"><h3 style="color:white;">{intl l="Total"}</h3></td>
-                        <td class="table-3-1 align-right" style="background:#f6993c;"><h3 style="color:white;">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</h3></td>
+                        <td class="table-3-1 align-right" style="background:#f6993c;"><h3 style="color:white;">{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</h3></td>
                     </tr>
                 </table>
             </td>

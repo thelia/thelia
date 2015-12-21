@@ -16,12 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\ProfileQuery;
+use Thelia\Model\Profile as ProfileModel;
 
 /**
  *
@@ -31,6 +30,9 @@ use Thelia\Model\ProfileQuery;
  * Class Profile
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
  */
 class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -66,6 +68,7 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var ProfileModel $profile */
         foreach ($loopResult->getResultDataCollection() as $profile) {
             $loopResultRow = new LoopResultRow($profile);
             $loopResultRow->set("ID", $profile->getId())

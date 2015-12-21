@@ -21,10 +21,12 @@ use Thelia\Model\Api;
 /**
  * Class BaseApiController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class BaseApiController extends BaseController
 {
+    const CONTROLLER_TYPE = 'api';
+
     const EMPTY_FORM_NAME = "thelia.api.empty";
 
     protected $apiUser;
@@ -111,5 +113,13 @@ class BaseApiController extends BaseController
         );
 
         return parent::createForm($name, $type, $data, $options);
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
     }
 }

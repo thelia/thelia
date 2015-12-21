@@ -17,7 +17,7 @@ use Thelia\Tests\ApiTestCase;
 /**
  * Class IndexControllerTest
  * @package Thelia\Tests\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class IndexControllerTest extends ApiTestCase
 {

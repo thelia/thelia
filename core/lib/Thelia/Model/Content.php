@@ -8,9 +8,7 @@ use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
-
 use Thelia\Model\Map\ContentTableMap;
-
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
@@ -118,7 +116,10 @@ class Content extends BaseContent implements FileModelParentInterface
      * Here pre and post insert event are fired
      *
      * @param $defaultFolderId
+     *
      * @throws \Exception
+     *
+     * @return $this Return $this, allow chaining
      */
     public function create($defaultFolderId)
     {
@@ -147,6 +148,8 @@ class Content extends BaseContent implements FileModelParentInterface
 
             throw $ex;
         }
+
+        return $this;
     }
 
     public function preUpdate(ConnectionInterface $con = null)

@@ -17,6 +17,8 @@
 
             {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
 
+            {hook name="product-edit.top" product_id=$product_id}
+
             <div class="row">
                 {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
 
@@ -30,6 +32,9 @@
                         </div>
 
                         <div class="col-md-5 actions">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cloneProductModal">
+                                {intl l="Clone"}
+                            </button>
                             <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                             <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
                             <a {if $HAS_NEXT != 0}href="{url path='/admin/products/update' product_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
@@ -86,7 +91,7 @@
                                 <li>
                                     <a href="#images"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/image/type/product/{$ID}/form-ajax"}"
+                                       data-href="{url path="/admin/image/type/product/%id/form-ajax" id=$ID}"
                                        data-callback="$.imageUploadManager.initImageDropZone">
                                         {intl l="Images"}
                                     </a>
@@ -95,7 +100,7 @@
                                     <a href="#documents"
                                        id="tab-documents"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/document/type/product/{$ID}/form-ajax"}"
+                                       data-href="{url path="/admin/document/type/product/%id/form-ajax" id=$ID}"
                                        data-callback="$.documentUploadManager.initDocumentDropZone">
                                         {intl l="Documents"}
                                     </a>
@@ -111,16 +116,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="seo">
-                                    {form name="thelia.admin.seo"}
-                                        {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/products/seo/save'}"
-                                            pageUrl = "{url path='/admin/products/update' product_id=$ID}"
-                                            closeUrl = $close_url
-                                            current_id = $product_id
-                                            success_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}"
-                                        }
-                                    {/form}
+                                    {include file="includes/seo-tab.html"
+                                        formAction  = "{url path='/admin/products/seo/save'}"
+                                        pageUrl     = "{url path='/admin/products/update' product_id=$ID}"
+                                        closeUrl    = $close_url
+                                        current_id  = $product_id
+                                        success_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}"
+                                        seoType     = 'product'
+                                    }
                                 </div>
 
                                 <div class="tab-pane fade" id="prices">
@@ -165,9 +168,66 @@
                 </div>
                 {/loop}
             </div>
+
+            {hook name="product-edit.bottom" product_id=$product_id}
+
         </div>
     </div>
 
+    <div class="modal fade" id="template_notice" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>{intl l="warning"}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {intl l="If you change the template, all the prices will be reset and you have to configure them again."}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="ok"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {form name="thelia.admin.product.clone"}
+    <div class="modal fade{if $form_error} modal-force-show{/if}" id="cloneProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>{intl l="Clone product"}</h3>
+                </div>
+                <form method="post" action="{url path='/admin/products/clone' product_id=$product_id}" class="form-inline" role="form" {form_enctype form=$form}>
+                    <div class="modal-body">
+                        {if $form_error && $form_error_message}
+                            <div class="alert alert-danger">{$form_error_message}</div>
+                        {/if}
+
+                        {form_hidden_fields form=$form}
+
+                        {form_field form=$form field="productId"}
+                        <input type="hidden" name="{$name}" value="{product attr='id'}">
+                        {/form_field}
+
+                        <div class="form-group">
+                            {form_field form=$form field="newRef"}
+                            <label for="{$label_attr.for}">{$label}</label>
+                            <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" required >
+                            {/form_field}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">{intl l="OK"}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {/form}
 {/block}
 
 {block name="javascript-initialization"}
@@ -218,6 +278,10 @@ $(function() {
         if (triggers.length == 2) {
             $(triggers[0]).trigger(triggers[1]);
         }
+    });
+
+    $("body").on("change", "#template_id", function(){
+        $("#template_notice").modal('show');
     });
 
 
@@ -279,7 +343,7 @@ $(function() {
 
 	    if (val != "") {
 	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
+	             url      : '{url path="/admin/product/%id/attribute-values/" id=$product_id}' + $(this).val() + '.xml',
 	             type     : 'get',
 	             dataType : 'json',
 	             success  : function(json) {
@@ -321,7 +385,7 @@ $(function() {
     	$('#combination_attributes option').prop('selected', 'selected');
 
         $.ajax({
-            url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
+            url      : '{url path="/admin/product/%id/add-attribute-value-to-combination/" id=$product_id}'
                             + $('#attribute_value_id').val()
                             + '/'
                             + $('#combination_attributes').val()

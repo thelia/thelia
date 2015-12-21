@@ -33,7 +33,7 @@ class Api extends BaseApi implements UserInterface
 
     private function getKeyDir()
     {
-        return THELIA_CONF_DIR . DS . 'key';
+        return THELIA_CONF_DIR . 'key';
     }
 
     private function generateSecureKey()
@@ -46,7 +46,7 @@ class Api extends BaseApi implements UserInterface
 
         $file = $dir . DS . $this->getApiKey().".key";
         $fs->touch($file);
-        file_put_contents($file, Password::generateHexaRandom(45));
+        file_put_contents($file, Password::generateHexaRandom(48));
         $fs->chmod($file, 0600);
     }
 

@@ -597,7 +597,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->getRequest()->query->get("_token")
             );
 
-            // Get the currency id, and dispatch the delet request
+            // Get the currency id, and dispatch the delete request
             $deleteEvent = $this->getDeleteEvent();
 
             $this->dispatch($this->deleteEventIdentifier, $deleteEvent);

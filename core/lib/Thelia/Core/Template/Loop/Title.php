@@ -16,12 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CustomerTitleQuery;
+use Thelia\Model\CustomerTitle as CustomerTitleModel;
 
 /**
  *
@@ -31,6 +30,9 @@ use Thelia\Model\CustomerTitleQuery;
  * Class Title
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
  */
 class Title extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -66,6 +68,7 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var CustomerTitleModel $title */
         foreach ($loopResult->getResultDataCollection() as $title) {
             $loopResultRow = new LoopResultRow($title);
             $loopResultRow->set("ID", $title->getId())

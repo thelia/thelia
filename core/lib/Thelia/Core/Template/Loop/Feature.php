@@ -16,13 +16,12 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\FeatureI18nQuery;
 use Thelia\Model\FeatureQuery;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -30,6 +29,7 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\Map\FeatureTemplateTableMap;
+use Thelia\Model\Feature as FeatureModel;
 
 /**
  *
@@ -39,6 +39,16 @@ use Thelia\Model\Map\FeatureTemplateTableMap;
  * Class Feature
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProduct()
+ * @method int[] getTemplate()
+ * @method int[] getExcludeTemplate()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string getTitle()
+ * @method string[] getOrder()
  */
 class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -96,7 +106,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
-        $exclude_template = $this->getExcludeTemplate();
+        $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useFeaturePosition = true;
 
@@ -111,11 +121,12 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     $template = array();
                 }
 
+                /** @var ProductModel $product */
                 foreach ($products as $product) {
-                    $tpl_id = $product->getTemplateId();
+                    $tplId = $product->getTemplateId();
 
-                    if (! is_null($tpl_id)) {
-                        $template[] = $tpl_id;
+                    if (! is_null($tplId)) {
+                        $template[] = $tplId;
                     }
                 }
             }
@@ -137,11 +148,12 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             $this->useFeaturePosition = false;
         }
 
-        if (null !== $exclude_template) {
-            $exclude_features = FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find();
-
+        if (null !== $excludeTemplate) {
             $search
-                ->filterById($exclude_features, Criteria::NOT_IN)
+                ->filterById(
+                    FeatureTemplateQuery::create()->filterByTemplateId($excludeTemplate)->select('feature_id')->find(),
+                    Criteria::NOT_IN
+                )
             ;
         }
 
@@ -200,6 +212,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var FeatureModel $feature */
         foreach ($loopResult->getResultDataCollection() as $feature) {
             $loopResultRow = new LoopResultRow($feature);
             $loopResultRow->set("ID", $feature->getId())

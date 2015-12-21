@@ -18,7 +18,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 /**
  * Class LanguageController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LanguageController extends BaseAdminController
 {

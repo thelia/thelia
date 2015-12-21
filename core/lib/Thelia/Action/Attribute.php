@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\Attribute as AttributeModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;

@@ -257,15 +257,15 @@ class OrderTableMap extends TableMap
         $this->addColumn('TRANSACTION_REF', 'TransactionRef', 'VARCHAR', false, 100, null);
         $this->addColumn('DELIVERY_REF', 'DeliveryRef', 'VARCHAR', false, 100, null);
         $this->addColumn('INVOICE_REF', 'InvoiceRef', 'VARCHAR', false, 100, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, null);
-        $this->addColumn('POSTAGE', 'Postage', 'FLOAT', true, null, null);
-        $this->addColumn('POSTAGE_TAX', 'PostageTax', 'FLOAT', true, null, 0);
+        $this->addColumn('DISCOUNT', 'Discount', 'DECIMAL', false, 16, 0);
+        $this->addColumn('POSTAGE', 'Postage', 'DECIMAL', true, 16, 0);
+        $this->addColumn('POSTAGE_TAX', 'PostageTax', 'DECIMAL', true, 16, 0);
         $this->addColumn('POSTAGE_TAX_RULE_TITLE', 'PostageTaxRuleTitle', 'VARCHAR', false, 255, null);
         $this->addForeignKey('PAYMENT_MODULE_ID', 'PaymentModuleId', 'INTEGER', 'module', 'ID', true, null, null);
         $this->addForeignKey('DELIVERY_MODULE_ID', 'DeliveryModuleId', 'INTEGER', 'module', 'ID', true, null, null);
         $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', true, null, null);
         $this->addForeignKey('LANG_ID', 'LangId', 'INTEGER', 'lang', 'ID', true, null, null);
-        $this->addForeignKey('CART_ID', 'CartId', 'INTEGER', 'cart', 'ID', true, null, null);
+        $this->addColumn('CART_ID', 'CartId', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
@@ -286,7 +286,6 @@ class OrderTableMap extends TableMap
         $this->addRelation('ModuleRelatedByPaymentModuleId', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('payment_module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('ModuleRelatedByDeliveryModuleId', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('delivery_module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Lang', '\\Thelia\\Model\\Lang', RelationMap::MANY_TO_ONE, array('lang_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::MANY_TO_ONE, array('cart_id' => 'id', ), null, null);
         $this->addRelation('OrderProduct', '\\Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'OrderProducts');
         $this->addRelation('OrderCoupon', '\\Thelia\\Model\\OrderCoupon', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'OrderCoupons');
         $this->addRelation('OrderVersion', '\\Thelia\\Model\\OrderVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'OrderVersions');

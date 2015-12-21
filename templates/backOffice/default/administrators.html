@@ -45,7 +45,7 @@
                                     <th>{intl l="Last Name"}</th>
                                     <th>{intl l="Locale"}</th>
                                     <th>{intl l="Profile"}</th>
-                                    {hook name="adminisrators.header" location="administrator_list_header" }
+                                    {hook name="administrators.header" location="administrator_list_header" }
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
                             </thead>
@@ -59,7 +59,7 @@
                                     {$can_update = true}
                                 {/loop}
 
-                                <tr>
+                                <tr class="js-admin-{$ID}">
                                     <td data-field-class="js-login">
                                         {if $can_update}
                                             <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal">{$LOGIN}</a>
@@ -73,26 +73,29 @@
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                        {if $PROFILE}
                                             {loop type="profile" name="admin-profile" id={$PROFILE}}
-                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/$ID"}">{$TITLE}</a>
+                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>
                                             {/loop}
                                         {else}
                                             {intl l='Superadministrator'}
                                         {/if}
                                     </td>
                                     {hook name="administrators.row" location="administrator_list_row" admin_id={$ID}}
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {* if admin is current admin :
                                                 - can UPDATE anyway
                                                 - cannot delete himself
                                             *}
                                             {if $can_update}
-                                                <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/if}
 
                                             {if $ID != {admin attr="id"}}
                                                 {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
-                                                    <a class="btn btn-default btn-xs js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                    <a class="js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                 {/loop}
                                             {/if}
                                         </div>
@@ -127,48 +130,48 @@
 {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "administrator_create_dialog"}
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
-    {form_field form=$form field='login'}
+    {form_field field='login'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='firstname'}
+    {form_field field='firstname'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='lastname'}
+    {form_field field='lastname'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='password_confirm'}
+    {form_field field='password_confirm'}
     {$passwordError = $error}
     {/form_field}
 
-    {form_field form=$form field='password'}
+    {form_field field='password'}
         <div class="form-group {if $passwordError}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
         </div>
     {/form_field}
 
-    {form_field form=$form field='password_confirm'}
+    {form_field field='password_confirm'}
         <div class="form-group {if $passwordError}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
         </div>
     {/form_field}
 
-    {form_field form=$form field='locale'}
+    {form_field field='locale'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -181,7 +184,7 @@
         </div>
     {/form_field}
 
-    {form_field form=$form field='profile'}
+    {form_field field='profile'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -213,7 +216,7 @@
         dialog_cancel_label = {intl l="Cancel"}
 
         form_action        = {url path="/admin/configuration/administrators/add"}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 
@@ -231,48 +234,48 @@
 {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "administrator_update_dialog"}
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
-    {form_field form=$form field='login'}
+    {form_field field='login'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control js-login" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='firstname'}
+    {form_field field='firstname'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control js-firstname" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='lastname'}
+    {form_field field='lastname'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control js-lastname" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='password_confirm'}
+    {form_field field='password_confirm'}
         {$passwordError = $error}
     {/form_field}
 
-    {form_field form=$form field='password'}
+    {form_field field='password'}
         <div class="form-group {if $passwordError}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
         </div>
     {/form_field}
 
-    {form_field form=$form field='password_confirm'}
+    {form_field field='password_confirm'}
         <div class="form-group {if $passwordError}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
         </div>
     {/form_field}
 
-    {form_field form=$form field='locale'}
+    {form_field field='locale'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
@@ -285,7 +288,7 @@
         </div>
     {/form_field}
 
-    {form_field form=$form field='profile'}
+    {form_field field='profile'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -317,7 +320,7 @@
         dialog_cancel_label = {intl l="Cancel"}
 
         form_action        = {url path="/admin/configuration/administrators/save"}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 
@@ -359,10 +362,6 @@
     <script src='{$asset_url}'></script>
 {/javascripts}
 
-{javascripts file='assets/js/main.js'}
-    <script src='{$asset_url}'></script>
-{/javascripts}
-
 <script type="text/javascript">
 jQuery(function($) {
 
@@ -379,9 +378,9 @@ jQuery(function($) {
     });
 
     $(".js-update-administrator").click(function(e){
-        $('#administrator_update_id').val($(this).data('id'))
+        $('#administrator_update_id').val($(this).data('id'));
 
-        $(this).parents('tr').find('td').each(function(k, v) {
+        $('.js-admin-' + $(this).data('id')).find('td').each(function(k, v) {
             if(!$(v).data('field-class')) {
                 return true;
             }

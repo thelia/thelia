@@ -25,6 +25,7 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  * @method     ChildCategoryVersionQuery orderByParent($order = Criteria::ASC) Order by the parent column
  * @method     ChildCategoryVersionQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildCategoryVersionQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildCategoryVersionQuery orderByDefaultTemplateId($order = Criteria::ASC) Order by the default_template_id column
  * @method     ChildCategoryVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCategoryVersionQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCategoryVersionQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -35,6 +36,7 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  * @method     ChildCategoryVersionQuery groupByParent() Group by the parent column
  * @method     ChildCategoryVersionQuery groupByVisible() Group by the visible column
  * @method     ChildCategoryVersionQuery groupByPosition() Group by the position column
+ * @method     ChildCategoryVersionQuery groupByDefaultTemplateId() Group by the default_template_id column
  * @method     ChildCategoryVersionQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCategoryVersionQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCategoryVersionQuery groupByVersion() Group by the version column
@@ -56,6 +58,7 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  * @method     ChildCategoryVersion findOneByParent(int $parent) Return the first ChildCategoryVersion filtered by the parent column
  * @method     ChildCategoryVersion findOneByVisible(int $visible) Return the first ChildCategoryVersion filtered by the visible column
  * @method     ChildCategoryVersion findOneByPosition(int $position) Return the first ChildCategoryVersion filtered by the position column
+ * @method     ChildCategoryVersion findOneByDefaultTemplateId(int $default_template_id) Return the first ChildCategoryVersion filtered by the default_template_id column
  * @method     ChildCategoryVersion findOneByCreatedAt(string $created_at) Return the first ChildCategoryVersion filtered by the created_at column
  * @method     ChildCategoryVersion findOneByUpdatedAt(string $updated_at) Return the first ChildCategoryVersion filtered by the updated_at column
  * @method     ChildCategoryVersion findOneByVersion(int $version) Return the first ChildCategoryVersion filtered by the version column
@@ -66,6 +69,7 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  * @method     array findByParent(int $parent) Return ChildCategoryVersion objects filtered by the parent column
  * @method     array findByVisible(int $visible) Return ChildCategoryVersion objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildCategoryVersion objects filtered by the position column
+ * @method     array findByDefaultTemplateId(int $default_template_id) Return ChildCategoryVersion objects filtered by the default_template_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildCategoryVersion objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCategoryVersion objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCategoryVersion objects filtered by the version column
@@ -159,7 +163,7 @@ abstract class CategoryVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PARENT`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `category_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `PARENT`, `VISIBLE`, `POSITION`, `DEFAULT_TEMPLATE_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `category_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -424,6 +428,47 @@ abstract class CategoryVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CategoryVersionTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
+     * Filter the query on the default_template_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDefaultTemplateId(1234); // WHERE default_template_id = 1234
+     * $query->filterByDefaultTemplateId(array(12, 34)); // WHERE default_template_id IN (12, 34)
+     * $query->filterByDefaultTemplateId(array('min' => 12)); // WHERE default_template_id > 12
+     * </code>
+     *
+     * @param     mixed $defaultTemplateId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCategoryVersionQuery The current query, for fluid interface
+     */
+    public function filterByDefaultTemplateId($defaultTemplateId = null, $comparison = null)
+    {
+        if (is_array($defaultTemplateId)) {
+            $useMinMax = false;
+            if (isset($defaultTemplateId['min'])) {
+                $this->addUsingAlias(CategoryVersionTableMap::DEFAULT_TEMPLATE_ID, $defaultTemplateId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($defaultTemplateId['max'])) {
+                $this->addUsingAlias(CategoryVersionTableMap::DEFAULT_TEMPLATE_ID, $defaultTemplateId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CategoryVersionTableMap::DEFAULT_TEMPLATE_ID, $defaultTemplateId, $comparison);
     }
 
     /**

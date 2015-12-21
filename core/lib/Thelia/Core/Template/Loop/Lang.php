@@ -16,10 +16,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type\TypeCollection;
@@ -34,6 +32,15 @@ use Thelia\Type;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string[] getCode()
+ * @method string[] getLocale()
+ * @method int[] getExclude()
+ * @method bool getDefaultOnly()
+ * @method bool getExcludeDefault()
+ * @method string[] getOrder()
  */
 class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -45,9 +52,12 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('id', null),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createAnyListTypeArgument('code'),
+            Argument::createAnyListTypeArgument('locale'),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanTypeArgument('default_only', false),
+            Argument::createBooleanTypeArgument('exclude_default', false),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -60,21 +70,29 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
     public function buildModelCriteria()
     {
-        $id      = $this->getId();
-        $exclude = $this->getExclude();
-        $default_only = $this->getDefaultOnly();
-
         $search = LangQuery::create();
 
-        if (! is_null($id)) {
-            $search->filterById($id);
+        if (null !== $id = $this->getId()) {
+            $search->filterById($id, Criteria::IN);
         }
 
-        if ($default_only) {
+        if (null !== $code = $this->getCode()) {
+            $search->filterByCode($code, Criteria::IN);
+        }
+
+        if (null !== $locale = $this->getLocale()) {
+            $search->filterByLocale($locale, Criteria::IN);
+        }
+
+        if ($this->getDefaultOnly()) {
             $search->filterByByDefault(true);
         }
 
-        if (! is_null($exclude)) {
+        if ($this->getExcludeDefault()) {
+            $search->filterByByDefault(false);
+        }
+
+        if (null !== $exclude = $this->getExclude()) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -108,6 +126,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Lang $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
 
@@ -120,8 +139,12 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set("IS_DEFAULT", $result->getByDefault())
                 ->set("DATE_FORMAT", $result->getDateFormat())
                 ->set("TIME_FORMAT", $result->getTimeFormat())
+                ->set("DECIMAL_SEPARATOR", $result->getDecimalSeparator())
+                ->set("THOUSANDS_SEPARATOR", $result->getThousandsSeparator())
+                ->set("DECIMAL_COUNT", $result->getDecimals())
                 ->set("POSITION", $result->getPosition())
             ;
+
             $this->addOutputFields($loopResultRow, $result);
 
             $loopResult->addRow($loopResultRow);

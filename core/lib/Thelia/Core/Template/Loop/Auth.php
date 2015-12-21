@@ -17,7 +17,6 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Type\AlphaNumStringListType;
@@ -29,6 +28,12 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method string[] getRole()
+ * @method string[] getResource()
+ * @method int[] getModule()
+ * @method string[] getAccess()
  */
 class Auth extends BaseLoop implements ArraySearchLoopInterface
 {

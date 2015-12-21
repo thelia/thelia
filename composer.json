@@ -34,7 +34,7 @@
         "ptachoire/cssembed": "1.0.*",
         "doctrine/cache": "v1.3.0",
         "simplepie/simplepie": "1.3.*",
-        "imagine/imagine": "v0.5.0",
+        "imagine/imagine": "v0.6.2",
         "symfony/icu": "1.0",
         "swiftmailer/swiftmailer": "5.2.*",
         "symfony/serializer": "2.3.*",
@@ -45,16 +45,18 @@
         "symfony/form": "2.3.*",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
-        "smarty/smarty": "v3.1.19",
         "symfony/class-loader": "2.3.*",
         "maximebf/debugbar": "dev-master",
-        "oyejorge/less.php": "~1.7"
+        "oyejorge/less.php": "~1.7",
+        "michelf/php-markdown": "1.5.0",
+        "smarty/smarty": "3.1.19",
+        "ramsey/array_column": "~1.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.1.*",
-        "fzaninotto/faker": "1.5.x-dev",
-        "thelia/hooktest-module": "~1.0",
-        "thelia/hooktest-template": "~1.0"
+        "phpunit/phpunit": "4.5.*",
+        "fzaninotto/faker": "1.5.*",
+        "thelia/hooktest-module": "~1.1",
+        "thelia/hooktest-template": "~1.1"
     },
     "minimum-stability": "stable",
     "config": {
@@ -81,28 +83,5 @@
         "branch-alias": {
             "dev-master": "2.2-dev"
         }
-    },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "smarty/smarty",
-                "version": "3.1.19",
-                "dist": {
-                    "url": "http://www.smarty.net/files/Smarty-3.1.19.zip",
-                    "type": "zip"
-                },
-                "source": {
-                    "url": "http://smarty-php.googlecode.com/svn/",
-                    "type": "svn",
-                    "reference": "tags/Smarty_3_1_19/distribution/"
-                },
-                "autoload": {
-                    "classmap": [
-                        "libs/"
-                    ]
-                }
-            }
-        }
-    ]
+    }
 }

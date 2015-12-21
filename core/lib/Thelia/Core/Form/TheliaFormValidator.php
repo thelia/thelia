@@ -78,7 +78,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                         $this->getErrorMessages($form)
                     );
                 }
-
+                $aBaseForm->setError(true);
                 throw new FormValidationException($errorMessage);
             }
         } else {
@@ -110,7 +110,11 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
         /** @var Form $child */
         foreach ($form->all() as $child) {
             if (!$child->isValid()) {
-                $fieldName = $child->getConfig()->getOption('label', $child->getName());
+                $fieldName = $child->getConfig()->getOption('label', null);
+
+                if (empty($fieldName)) {
+                    $fieldName = $child->getName();
+                }
 
                 $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
             }

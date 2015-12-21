@@ -14,7 +14,6 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
 use Thelia\Core\Template\Loop\Product;
 use Propel\Runtime\ActiveQuery\Criteria;
 
@@ -43,6 +42,12 @@ class ProductTest extends BaseLoopTestor
     public function testSearchById()
     {
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
+
+        // ensure translation
+        $product->getTranslation()
+            ->setTitle("foo")
+            ->save()
+        ;
 
         if (null === $product) {
             $product = new \Thelia\Model\Product();

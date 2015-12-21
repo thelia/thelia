@@ -2,6 +2,7 @@
 
 namespace Thelia\Model\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -14,8 +15,10 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
+use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Hook as ChildHook;
 use Thelia\Model\HookQuery as ChildHookQuery;
+use Thelia\Model\IgnoredModuleHook as ChildIgnoredModuleHook;
 use Thelia\Model\IgnoredModuleHookQuery as ChildIgnoredModuleHookQuery;
 use Thelia\Model\Module as ChildModule;
 use Thelia\Model\ModuleQuery as ChildModuleQuery;
@@ -78,6 +81,18 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      * @var        string
      */
     protected $classname;
+
+    /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
 
     /**
      * @var        Module
@@ -400,6 +415,46 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     }
 
     /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
+        }
+    }
+
+    /**
      * Set the value of [module_id] column.
      *
      * @param      int $v new value
@@ -492,6 +547,48 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     } // setClassname()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($dt !== $this->created_at) {
+                $this->created_at = $dt;
+                $this->modifiedColumns[IgnoredModuleHookTableMap::CREATED_AT] = true;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($dt !== $this->updated_at) {
+                $this->updated_at = $dt;
+                $this->modifiedColumns[IgnoredModuleHookTableMap::UPDATED_AT] = true;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -539,6 +636,18 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : IgnoredModuleHookTableMap::translateFieldName('Classname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->classname = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : IgnoredModuleHookTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : IgnoredModuleHookTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -547,7 +656,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = IgnoredModuleHookTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = IgnoredModuleHookTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\IgnoredModuleHook object", 0, $e);
@@ -686,8 +795,19 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(IgnoredModuleHookTableMap::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -791,6 +911,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         if ($this->isColumnModified(IgnoredModuleHookTableMap::CLASSNAME)) {
             $modifiedColumns[':p' . $index++]  = '`CLASSNAME`';
         }
+        if ($this->isColumnModified(IgnoredModuleHookTableMap::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+        }
+        if ($this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `ignored_module_hook` (%s) VALUES (%s)',
@@ -813,6 +939,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
                         break;
                     case '`CLASSNAME`':
                         $stmt->bindValue($identifier, $this->classname, PDO::PARAM_STR);
+                        break;
+                    case '`CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case '`UPDATED_AT`':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -881,6 +1013,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             case 3:
                 return $this->getClassname();
                 break;
+            case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -914,6 +1052,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             $keys[1] => $this->getHookId(),
             $keys[2] => $this->getMethod(),
             $keys[3] => $this->getClassname(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -973,6 +1113,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             case 3:
                 $this->setClassname($value);
                 break;
+            case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -1001,6 +1147,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setHookId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setMethod($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setClassname($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1016,6 +1164,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         if ($this->isColumnModified(IgnoredModuleHookTableMap::HOOK_ID)) $criteria->add(IgnoredModuleHookTableMap::HOOK_ID, $this->hook_id);
         if ($this->isColumnModified(IgnoredModuleHookTableMap::METHOD)) $criteria->add(IgnoredModuleHookTableMap::METHOD, $this->method);
         if ($this->isColumnModified(IgnoredModuleHookTableMap::CLASSNAME)) $criteria->add(IgnoredModuleHookTableMap::CLASSNAME, $this->classname);
+        if ($this->isColumnModified(IgnoredModuleHookTableMap::CREATED_AT)) $criteria->add(IgnoredModuleHookTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) $criteria->add(IgnoredModuleHookTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1086,6 +1236,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         $copyObj->setHookId($this->getHookId());
         $copyObj->setMethod($this->getMethod());
         $copyObj->setClassname($this->getClassname());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1224,6 +1376,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         $this->hook_id = null;
         $this->method = null;
         $this->classname = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1257,6 +1411,20 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(IgnoredModuleHookTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ChildIgnoredModuleHook The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[IgnoredModuleHookTableMap::UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**

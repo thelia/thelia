@@ -1,4 +1,4 @@
-<li class="item">
+<li class="item {$colClass|default:"col-md-3"}">
     {if $PSE_COUNT > 1}
         {assign var="hasSubmit" value = false}
     {else}
@@ -8,21 +8,20 @@
 	{if not $product_id}
 	   {assign var="product_id" value=$ID}
 	{/if}
-    <article itemscope itemtype="http://schema.org/Product">
+    <article class="row" itemscope itemtype="http://schema.org/Product">
 		
 		{hook name="singleproduct.top" product="{$product_id}"}
 
-        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
+        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if} overlay col-sm-3">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
-                <img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$productTitle}">
+                <img itemprop="image" src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$productTitle}">
             {/loop}
             {elseloop rel="product_thumbnail"}
-                {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
+                <img itemprop="image" src="{image file='assets/dist/img/218x146.png'}" class="img-responsive" alt="{$productTitle}">
             {/elseloop}
-            <span class="mask"></span>
         </a>
 
-        <div class="product-info">
+        <div class="product-info col-sm-6">
             <h2 class="name"><a href="{$URL nofilter}"><span itemprop="name">{$productTitle}</span></a></h2>
             {if $hasDescription}
             <div class="description" itemprop="description">
@@ -41,8 +40,8 @@
             {/if}
         {/if}
 
-        <div class="product-price">
-            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+        <div class="product-price col-sm-3">
+            <div class="price-container row" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                 <meta itemprop="category" content="{category attr="title"}">
                 {* List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition *}
                 <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
@@ -52,18 +51,18 @@
                 {if $IS_PROMO }
 
                     {assign var="combination_count" value={count type="product_sale_elements" promo="1" product=$ID}}
-                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">
+                    <span class="special-price col-xs-6"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">
                         {if $combination_count > 1}
-                            {intl l="From %price" price={format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}}
+                            {intl l="From %price" price={format_money number=$BEST_TAXED_PRICE}}
                         {else}
-                            {format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}
+                            {format_money number=$BEST_TAXED_PRICE}
                         {/if}
                     </span></span>
                     {if $SHOW_ORIGINAL_PRICE}
-                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                    <span class="old-price col-xs-6"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE}</span></span>
                     {/if}
                 {else}
-                    <span class="regular-price"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                    <span class="regular-price col-xs-12"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE}</span></span>
                 {/if}
             </div>
 
@@ -71,37 +70,37 @@
                 {if $hasSubmit == true && $current_stock_content == "in_stock"}
                     {form name="thelia.cart.add" }
                     <form id="form-product-details{$product_id}" action="{url path="/cart/add" }" method="post" class="form-product">
-                        {form_hidden_fields form=$form}
+                        {form_hidden_fields}
                         <input type="hidden" name="view" value="product">
                         <input type="hidden" name="product_id" value="{$product_id}">
-                        {form_field form=$form field="append"}
+                        {form_field field="append"}
                             <input type="hidden" name="{$name}" value="1">
                         {/form_field}
 
                         {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
-                        {form_field form=$form field='product_sale_elements_id'}
+                        {form_field field='product_sale_elements_id'}
                             <input type="hidden" class="pse-id" name="{$name}" value="{$PRODUCT_SALE_ELEMENT}" {$attr}>
                         {/form_field}
-                        {form_field form=$form field="product"}
+                        {form_field field="product"}
                             <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$product_id}" {$attr} >
                         {/form_field}
 
                         <fieldset class="product-cart form-inline">
-                            {form_field form=$form field='quantity'}
+                            {form_field field='quantity'}
                                 <div class="form-group group-qty hide {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
                                     <label for="{$label_attr.for}">{$label}</label>
                                     <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="0" required>
                                     {if $error }
-                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                        <span class="help-block"><i class="fa fa-remove"></i> {$message}</span>
                                     {elseif $value != "" && !$error}
-                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                        <span class="help-block"><i class="fa fa"></i></span>
                                     {/if}
                                 </div>
                             {/form_field}
                             <div>
                                 <div class="product-btn">
-                                    <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
+                                    <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-shopping-cart"></i> {intl l="Add to cart"}</button>
                                 </div>
                             </div>
                         </fieldset>
@@ -110,7 +109,7 @@
                 {else}
                     <div>
                         <div class="product-btn">
-                            <a href="{$URL nofilter}" class="btn btn-cart">{intl l="View product"}</a>
+                            <a href="{$URL nofilter}" class="btn btn-primary btn-block"><i class="fa fa-eye"></i> {intl l="View product"}</a>
                         </div>
                     </div>
                 {/if}

@@ -17,7 +17,8 @@ use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use Thelia\Core\Thelia;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Config\DefinePropel;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
@@ -25,7 +26,7 @@ use Thelia\Log\Tlog;
 /**
  * Class Update
  * @package Thelia\Install
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Update
 {
@@ -47,12 +48,28 @@ class Update
         '10' => '2.0.3',
         '11' => '2.0.4',
         '12' => '2.0.5',
-        '13' => '2.1.0-alpha1',
-        '14' => '2.1.0-alpha2',
-        '15' => '2.1.0-beta1',
-        '16' => '2.1.0-beta2',
-        '17' => '2.1.0',
-        '18' => '2.1.1',
+        '13' => '2.0.6',
+        '14' => '2.0.7',
+        '15' => '2.0.8',
+        '16' => '2.0.9',
+        '17' => '2.0.10',
+        '18' => '2.1.0-alpha1',
+        '19' => '2.1.0-alpha2',
+        '20' => '2.1.0-beta1',
+        '21' => '2.1.0-beta2',
+        '22' => '2.1.0',
+        '23' => '2.1.1',
+        '24' => '2.1.2',
+        '25' => '2.1.3',
+        '26' => '2.1.4',
+        '27' => '2.1.5',
+        '28' => '2.1.6',
+        '29' => '2.2.0-alpha1',
+        '30' => '2.2.0-alpha2',
+        '31' => '2.2.0-beta1',
+        '32' => '2.2.0-beta2',
+        '33' => '2.2.0-beta3',
+        '34' => '2.2.0',
     );
 
     /** @var bool */
@@ -89,15 +106,8 @@ class Update
 
         $dbConfig = null;
 
-        $configPath = THELIA_ROOT . "/local/config/database.yml";
-
-        if (!file_exists($configPath)) {
-            throw new UpdateException("Thelia is not installed yet");
-        }
-
         try {
-            $dbConfig = Yaml::parse($configPath);
-            $dbConfig = $dbConfig['database']['connection'];
+            $dbConfig = $this->getDatabaseConfig();
         } catch (ParseException $ex) {
             throw new UpdateException("database.yml is not a valid file : " . $ex->getMessage());
         }
@@ -111,6 +121,47 @@ class Update
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
+    }
+
+    /**
+     * retrieve the database configuration
+     *
+     * @return array containing the database
+     */
+    protected function getDatabaseConfig()
+    {
+        $configPath = THELIA_CONF_DIR . "database.yml";
+
+        if (!file_exists($configPath)) {
+            throw new UpdateException("Thelia is not installed yet");
+        }
+
+        $definePropel = new DefinePropel(
+            new DatabaseConfiguration(),
+            Yaml::parse($configPath),
+            $this->getEnvParameters()
+        );
+
+        return $definePropel->getConfig();
+    }
+
+    /**
+     * Gets the environment parameters.
+     *
+     * Only the parameters starting with "SYMFONY__" are considered.
+     *
+     * @return array An array of parameters
+     */
+    protected function getEnvParameters()
+    {
+        $parameters = array();
+        foreach ($_SERVER as $key => $value) {
+            if (0 === strpos($key, 'SYMFONY__')) {
+                $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
+            }
+        }
+
+        return $parameters;
     }
 
     public function isLatestVersion($version = null)
@@ -167,15 +218,22 @@ class Update
         return $this->updatedVersions;
     }
 
-
     /**
      * Backup current DB to file local/backup/update.sql
-     *
      * @return bool if it succeeds, false otherwise
+     * @throws \Exception
      */
     public function backupDb()
     {
         $database = new Database($this->connection);
+
+        if (! $this->checkBackupIsPossible()) {
+            $message = 'Your database is too big for an automatic backup';
+
+            $this->log('error', $message);
+
+            throw new UpdateException($message);
+        }
 
         $this->backupFile = THELIA_ROOT . $this->backupDir . 'update.sql';
         $backupDir = THELIA_ROOT . $this->backupDir;
@@ -300,7 +358,7 @@ class Update
 
         if (file_exists($filename)) {
             $this->log('debug', sprintf('executing file %s', $version . '.php'));
-            include_once $filename;
+            include_once($filename);
             $this->log('debug', sprintf('end executing file %s', $version . '.php'));
         }
 
@@ -309,7 +367,9 @@ class Update
 
     public function getCurrentVersion()
     {
-        return Thelia::THELIA_VERSION;
+        $stmt = $this->connection->query("SELECT `value` FROM `config` WHERE name='thelia_version'");
+
+        return $stmt->fetchColumn();
     }
 
     public function setCurrentVersion($version)
@@ -326,6 +386,54 @@ class Update
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Returns the database size in Mo
+     * @return float
+     * @throws \Exception
+     */
+    public function getDataBaseSize()
+    {
+        $stmt = $this->connection->query(
+            "SELECT sum(data_length) / 1024 / 1024 'size' FROM information_schema.TABLES WHERE table_schema = DATABASE() GROUP BY table_schema"
+        );
+
+        if ($stmt->rowCount()) {
+            return floatval($stmt->fetch(PDO::FETCH_OBJ)->size);
+        }
+
+        throw new \Exception('Impossible to calculate the database size');
+    }
+
+
+    /**
+     * Checks whether it is possible to make a data base backup
+     *
+     * @return bool
+     */
+    public function checkBackupIsPossible()
+    {
+        $size = 0;
+        if (preg_match('/^(\d+)(.)$/', ini_get('memory_limit'), $matches)) {
+            switch (strtolower($matches[2])) {
+                case 'k':
+                    $size = $matches[1] / 1024;
+                    break;
+                case 'm':
+                    $size = $matches[1];
+                    break;
+                case 'g':
+                    $size = $matches[1] * 1024;
+                    break;
+            }
+        }
+
+        if ($this->getDataBaseSize() > ($size - 64) / 8) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getLatestVersion()

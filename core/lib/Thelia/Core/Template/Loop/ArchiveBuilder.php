@@ -25,6 +25,10 @@ use Thelia\Type\TypeCollection;
  * Class ArchiveBuilder
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method string getAllowedArchiveBuilder()
+ * @method string[] getOrder()
  */
 class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
 {
@@ -40,7 +44,7 @@ class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
 
         $rawArchiveBuilders = array_change_key_case($service->getAll());
 
-        $allowedArchiveBuilder = $this->getAllowed_archive_builder();
+        $allowedArchiveBuilder = $this->getAllowedArchiveBuilder();
         $archiveBuilders = [];
 
         if ($allowedArchiveBuilder !== null) {
@@ -93,27 +97,6 @@ class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * Definition of loop arguments
-     *
-     * example :
-     *
-     * public function getArgDefinitions()
-     * {
-     *  return new ArgumentCollection(
-     *
-     *       Argument::createIntListTypeArgument('id'),
-     *           new Argument(
-     *           'ref',
-     *           new TypeCollection(
-     *               new Type\AlphaNumStringListType()
-     *           )
-     *       ),
-     *       Argument::createIntListTypeArgument('category'),
-     *       Argument::createBooleanTypeArgument('new'),
-     *       ...
-     *   );
-     * }
-     *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     protected function getArgDefinitions()

@@ -1,0 +1,68 @@
+// Thelia: Navbars
+.navbar {
+
+    .navbar-cart, .navbar-customer {
+        @media (min-width: @grid-float-breakpoint) {
+            .dropdown > a {
+                .js .dropdown-toggle;
+                &:after {
+                    float: none;
+                }
+            }
+        }
+        .dropdown-menu {
+            @media (max-width: @grid-float-breakpoint) {
+                display: none;
+            }
+            margin: 0;
+            padding: 20px;
+            &.cart-content {
+                width: 350px;
+                > p {
+                    margin: 0;
+                }
+            }
+        }
+        .cart-not-empty .cart-content {
+            border-top: none;
+            padding: 0;
+        }
+    }
+
+    // Subnav Full width
+    .full-width {
+        position: static;
+        .dropdown-menu {
+            width: 100%;
+            left: 0;
+            right: 0;
+            .dropdown-content {
+                .dropdown-subheading {
+                    display: block;
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: @grid-float-breakpoint) {
+    .navbar-collapse .navbar-nav.navbar-right:first-child {
+        margin-right: -@navbar-padding-horizontal;
+    }
+
+    .navbar-collapse .navbar-nav.navbar-right:last-child {
+        margin-right: 0;
+    }
+}
+
+// Icons (Accordion and Dropdown)
+//.accordion-toggle,
+.js .dropdown-toggle {
+    &:after {
+        float: right;
+        padding-left: .3em;
+        @media (min-width: @screen-desktop) {
+            float: none;
+        }
+    }
+}

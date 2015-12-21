@@ -20,6 +20,7 @@ use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
@@ -55,6 +56,7 @@ use Thelia\Model\Country;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Feature;
+use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FolderQuery;
@@ -77,7 +79,6 @@ use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
-use Thelia\Tools\NumberFormat;
 use Thelia\Type\BooleanOrBothType;
 
 /**
@@ -156,6 +157,8 @@ class ProductController extends AbstractSeoCrudController
             ->setBaseWeight($formData['weight'])
             ->setCurrencyId($formData['currency'])
             ->setTaxRuleId($formData['tax_rule'])
+            ->setBaseQuantity($formData['quantity'])
+            ->setTemplateId($formData['template_id'])
         ;
 
         return $createEvent;
@@ -291,14 +294,14 @@ class ProductController extends AbstractSeoCrudController
                 $defaultPseData = array(
                     "product_sale_element_id" => $saleElement->getId(),
                     "reference"               => $saleElement->getRef(),
-                    "price"                   => $productPrice->getPrice(),
-                    "price_with_tax"          => number_format($this->computePrice($productPrice->getPrice(), 'without_tax', $object), 2, '.', ''),
+                    "price"                   => $this->formatPrice($productPrice->getPrice()),
+                    "price_with_tax"          => $this->formatPrice($this->computePrice($productPrice->getPrice(), 'without_tax', $object)),
                     "use_exchange_rate"       => $productPrice->getFromDefaultCurrency() ? 1 : 0,
                     "currency"                => $productPrice->getCurrencyId(),
                     "weight"                  => $saleElement->getWeight(),
                     "quantity"                => $saleElement->getQuantity(),
-                    "sale_price"              => $productPrice->getPromoPrice(),
-                    "sale_price_with_tax"     => number_format($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object), 2, '.', ''),
+                    "sale_price"              => $this->formatPrice($productPrice->getPromoPrice()),
+                    "sale_price_with_tax"     => $this->formatPrice($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)),
                     "onsale"                  => $saleElement->getPromo() > 0 ? 1 : 0,
                     "isnew"                   => $saleElement->getNewness() > 0 ? 1 : 0,
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
@@ -313,24 +316,25 @@ class ProductController extends AbstractSeoCrudController
 
                 $this->appendValue($combinationPseData, "product_sale_element_id", $saleElement->getId());
                 $this->appendValue($combinationPseData, "reference", $saleElement->getRef());
-                $this->appendValue($combinationPseData, "price", $productPrice->getPrice());
-                $this->appendValue($combinationPseData, "price_with_tax", number_format($this->computePrice($productPrice->getPrice(), 'without_tax', $object), 2, '.', ''));
+                $this->appendValue($combinationPseData, "price", $this->formatPrice($productPrice->getPrice()));
+                $this->appendValue($combinationPseData, "price_with_tax", $this->formatPrice($this->computePrice($productPrice->getPrice(), 'without_tax', $object)));
                 $this->appendValue($combinationPseData, "weight", $saleElement->getWeight());
                 $this->appendValue($combinationPseData, "quantity", $saleElement->getQuantity());
-                $this->appendValue($combinationPseData, "sale_price", $productPrice->getPromoPrice());
-                $this->appendValue($combinationPseData, "sale_price_with_tax", number_format($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object), 2, '.', ''));
+                $this->appendValue($combinationPseData, "sale_price", $this->formatPrice($productPrice->getPromoPrice()));
+                $this->appendValue($combinationPseData, "sale_price_with_tax", $this->formatPrice($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)));
                 $this->appendValue($combinationPseData, "onsale", $saleElement->getPromo() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "isnew", $saleElement->getNewness() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "isdefault", $saleElement->getIsDefault() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "ean_code", $saleElement->getEanCode());
             }
 
-            $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, "form", $defaultPseData);
-            $this->getParserContext()->addForm($defaultPseForm);
-
-            $combinationPseForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE, "form", $combinationPseData);
-            $this->getParserContext()->addForm($combinationPseForm);
         }
+
+        $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, "form", $defaultPseData);
+        $this->getParserContext()->addForm($defaultPseForm);
+
+        $combinationPseForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE, "form", $combinationPseData);
+        $this->getParserContext()->addForm($combinationPseForm);
 
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($object);
@@ -819,12 +823,20 @@ class ProductController extends AbstractSeoCrudController
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
 
                 foreach ($featureTextValues as $featureId => $featureValue) {
-                    // considere empty text as empty feature value (e.g., we will delete it)
-                    if (empty($featureValue)) {
+
+                    // Check if a FeatureProduct exists for this product and this feature (for another lang)
+                    $freeTextFeatureProduct = FeatureProductQuery::create()
+                        ->filterByProductId($productId)
+                        ->filterByFreeTextValue(true)
+                        ->findOneByFeatureId($featureId);
+
+                    // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing
+                    if (is_null($freeTextFeatureProduct) && empty($featureValue)) {
                         continue;
                     }
 
                     $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
+                    $event->setLocale($this->getCurrentEditionLocale());
 
                     $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
 
@@ -843,7 +855,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        // If we have to stay on the same page, do not redirect to the succesUrl,
+        // If we have to stay on the same page, do not redirect to the successUrl,
         // just redirect to the edit page again.
         if ($this->getRequest()->get('save_mode') == 'stay') {
             return $this->redirectToEditionTemplate($this->getRequest());
@@ -942,7 +954,9 @@ class ProductController extends AbstractSeoCrudController
         if ($attributeAv !== null) {
             $addIt = true;
 
-            $attribute = $attributeAv->getAttribute();
+            $attribute = AttributeQuery::create()
+                ->joinWithI18n($this->getCurrentEditionLocale())
+                ->findPk($attributeAv->getAttributeId());
 
             // Check if this attribute is not already present
             $combinationArray = explode(',', $combination);
@@ -951,16 +965,21 @@ class ProductController extends AbstractSeoCrudController
                 $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
 
                 if ($attrAv !== null) {
-                    if ($attrAv->getAttributeId() == $attribute->getId()) {
+                    if ($attrAv->getId() == $attributeAv->getId()) {
+
                         $result['error'] = $this->getTranslator()->trans(
                             'A value for attribute "%name" is already present in the combination',
-                            array('%name' => $attribute->getTitle())
+                            array('%name' => $attribute->getTitle() . " : " . $attributeAv->getTitle())
                         );
 
                         $addIt = false;
                     }
 
-                    $result[] = array('id' => $attrAv->getId(), 'title' => $attrAv->getAttribute()->getTitle() . " : " . $attrAv->getTitle());
+                    $subAttribute = AttributeQuery::create()
+                        ->joinWithI18n($this->getCurrentEditionLocale())
+                        ->findPk($attributeAv->getAttributeId());
+
+                    $result[] = array('id' => $attrAv->getId(), 'title' => $subAttribute->getTitle() . " : " . $attrAv->getTitle());
                 }
             }
 
@@ -1113,7 +1132,7 @@ class ProductController extends AbstractSeoCrudController
                 $this->processSingleProductSaleElementUpdate($data);
             }
 
-            // If we have to stay on the same page, do not redirect to the succesUrl, just redirect to the edit page again.
+            // If we have to stay on the same page, do not redirect to the successUrl, just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 return $this->redirectToEditionTemplate($this->getRequest());
             }
@@ -1271,10 +1290,10 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * Invoked through Ajax; this method calculates the taxed price from the unaxed price, and
-     * vice versa.
+     * Invoked through Ajax; this method calculates the taxed price from the untaxed price, and vice versa.
+     * @since version 2.2
      */
-    public function priceCaclulator()
+    public function priceCalculator()
     {
         $return_price = 0;
 
@@ -1297,7 +1316,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array('result' => $return_price));
+        return new JsonResponse(array('result' => $this->formatPrice($return_price)));
     }
 
     /**
@@ -1335,7 +1354,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array('result' => $return_price));
+        return new JsonResponse(array('result' => $this->formatPrice($return_price)));
     }
 
     /**
@@ -1377,10 +1396,10 @@ class ProductController extends AbstractSeoCrudController
         }
 
         return new JsonResponse(array(
-            'price_with_tax'         => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($price_with_tax),
-            'price_without_tax'      => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($price_without_tax),
-            'sale_price_with_tax'    => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($sale_price_with_tax),
-            'sale_price_without_tax' => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($sale_price_without_tax)
+            'price_with_tax'         => $this->formatPrice($price_with_tax),
+            'price_without_tax'      => $this->formatPrice($price_without_tax),
+            'sale_price_with_tax'    => $this->formatPrice($sale_price_with_tax),
+            'sale_price_without_tax' => $this->formatPrice($sale_price_without_tax)
         ));
     }
 
@@ -1414,8 +1433,7 @@ class ProductController extends AbstractSeoCrudController
             $return_price = $price * Currency::getDefaultCurrency()->getRate();
         }
 
-        // Format the number using '.', to perform further calculation
-        return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
+        return floatval($return_price);
     }
 
     /**
@@ -1803,5 +1821,59 @@ class ProductController extends AbstractSeoCrudController
         }
 
         return $status;
+    }
+
+    /**
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     */
+    public function cloneAction()
+    {
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) {
+            return $response;
+        }
+
+        // Initialize vars
+        $cloneProductForm = $this->createForm(AdminForm::PRODUCT_CLONE);
+        $lang = $this->getSession()->getLang()->getLocale();
+
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($cloneProductForm, "POST");
+
+            $originalProduct = ProductQuery::create()
+                ->findPk($form->getData()['productId']);
+
+            // Build and dispatch product clone event
+            $productCloneEvent = new ProductCloneEvent(
+                $form->getData()['newRef'],
+                $lang,
+                $originalProduct
+            );
+            $this->dispatch(TheliaEvents::PRODUCT_CLONE, $productCloneEvent);
+
+            return $this->generateRedirectFromRoute(
+                'admin.products.update',
+                array('product_id' => $productCloneEvent->getClonedProduct()->getId())
+            );
+        } catch (FormValidationException $e) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("Product clone"),
+                $e->getMessage(),
+                $cloneProductForm,
+                $e
+            );
+
+            return $this->redirectToEditionTemplate();
+        }
+    }
+
+    /**
+     * @param string $price
+     * @return float
+     */
+    protected function formatPrice($price)
+    {
+        return floatval(number_format($price, 6, '.', ''));
     }
 }

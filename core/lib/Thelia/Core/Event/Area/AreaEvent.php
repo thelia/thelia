@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class AreaEvent
  * @package Thelia\Core\Event\Shipping
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaEvent extends ActionEvent
 {

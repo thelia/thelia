@@ -12,7 +12,7 @@
 {block name='no-return-functions' append}
     {$breadcrumbs = [
         ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address/update/{$address_id}"}]
+        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address/update/%address_id" address_id=$address_id}]
     ]}
 {/block}
 
@@ -27,8 +27,8 @@
 
     {form name="thelia.front.address.update"}
     {loop name="customer.update" type="address" customer="current" id=$address_id}
-        <form id="form-address" class="form-horizontal" action="{url path="/address/update/$address_id"}" method="post">
-        {form_field form=$form field='success_url'}
+        <form id="form-address" class="form-horizontal" action="{url path="/address/update/%address_id" address_id=$address_id}" method="post">
+        {form_field field='success_url'}
             {if $value}
                 {$next_url=$value}
             {else}
@@ -37,25 +37,25 @@
             <input type="hidden" name="{$name}" value="{$next_url nofilter}" />
         {/form_field}
 
-        {form_field form=$form field='error_message'}
+        {form_field field='error_message'}
             <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}" />
         {/form_field}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-        {hook name="address-update.form-top"}
+        {hook name="address-update.form-top" address=$address_id}
 
-        <fieldset class="panel">
+        <fieldset class="panel panel-default">
             <div class="panel-heading">
                 {intl l="Address"}
             </div>
 
             <div class="panel-body">
-                {form_field form=$form field="label"}
+                {form_field field="label"}
                     <div class="form-group group-label{if $error} has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$LABEL}}" id="{$label_attr.for}" class="form-control" minlength="2" maxlength="255" placeholder="{intl l="Placeholder address label"}"{if $required} aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -68,11 +68,11 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="title"}
+                {form_field field="title"}
                     {assign var="customer_title_id" value="{$value|default:$TITLE}"}
                     <div class="form-group group-title{if $error} has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-                        <div class="control-input">
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <div class="control-input col-sm-5">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                 <option value="">-- {intl l="Select Title"} --</option>
                                 {loop type="title" name="title.list"}
@@ -87,11 +87,11 @@
                     </div><!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="firstname"}
+                {form_field field="firstname"}
                     <div class="form-group group-firstname {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$FIRSTNAME} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder firstname"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -103,11 +103,11 @@
                 {/form_field}
                 <!--/.form-group-->
 
-                {form_field form=$form field="lastname"}
+                {form_field field="lastname"}
                     <div class="form-group group-lastname {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$LASTNAME} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder lastname"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -118,10 +118,10 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="company"}
+                {form_field field="company"}
                   <div class="form-group group-company{if $error} has-error{/if}">
-                    <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-                      <div class="control-input">
+                    <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                      <div class="control-input col-sm-5">
                         <input type="text" name="{$name}" value="{$value|default:{$COMPANY} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder company"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                         {if $error }
                           <span class="help-block">{$message}</span>
@@ -131,11 +131,11 @@
                   </div><!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="address1"}
+                {form_field field="address1"}
                     <div class="form-group group-address1 {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$ADDRESS1} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address1"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -146,11 +146,11 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="address2"}
+                {form_field field="address2"}
                     <div class="form-group group-address2 {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if} </label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if} </label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$ADDRESS2} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address2"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -161,11 +161,11 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="zipcode"}
+                {form_field field="zipcode"}
                     <div class="form-group group-zipcode {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$ZIPCODE}}" id="{$label_attr.for}" class="form-control" maxlength="10" placeholder="{intl l="Placeholder zipcode"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -176,11 +176,11 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="city"}
+                {form_field field="city"}
                     <div class="form-group group-city {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$CITY} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder city"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -191,11 +191,11 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="country"}
+                {form_field field="country"}
                     {assign var="customer_country_id" value="{$value|default:$COUNTRY}"}
                     <div class="form-group group-country {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-                        <div class="control-input">
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <div class="control-input col-sm-5">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                 <option value="">-- {intl l="Select Country"} --</option>
                                 {loop type="country" name="country.list"}
@@ -210,11 +210,11 @@
                     </div><!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="phone"}
+                {form_field field="phone"}
                     <div class="form-group group-phone {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$PHONE} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="20" placeholder="{intl l="Placeholder phone"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -225,11 +225,11 @@
                     <!--/.form-group-->
                 {/form_field}
 
-                {form_field form=$form field="cellphone"}
+                {form_field field="cellphone"}
                     <div class="form-group group-cellphone {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                        <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
-                        <div class="control-input">
+                        <div class="control-input col-sm-5">
                             <input type="text" name="{$name}" value="{$value|default:{$CELLPHONE} nofilter}" id="{$label_attr.for}" class="form-control" maxlength="20" placeholder="{intl l="Placeholder cellphone"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                                 <span class="help-block">{$message}</span>
@@ -242,11 +242,11 @@
             </div>
         </fieldset>
 
-        {form_field form=$form field="is_default"}
+        {form_field field="is_default"}
             {if not $DEFAULT}
             <div class="form-group group-primary">
                 <div class="control-input">
-                    <div class="checkbox">
+                    <div class="checkbox col-sm-offset-3 col-sm-6">
                         <label class="control-label" for="{$label_attr.for}">
                             <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="1"> {$label}
                         </label>
@@ -257,18 +257,18 @@
             {/if}
         {/form_field}
 
-        {hook name="address-update.form-bottom"}
+        {hook name="address-update.form-bottom" address=$address_id}
 
         <div class="form-group group-btn">
-            <div class="control-btn">
-                <button type="submit" class="btn btn-submit">{intl l="Update"}</button>
+            <div class="control-btn col-sm-5 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Update"}</button>
             </div>
         </div>
         <!--/.form-group-->
         </form>
         {/loop}
     {/form}
-    {hook name="address-update.bottom"}
+    {hook name="address-update.bottom" address=$address_id}
     </article>
 
     </div><!-- /.layout -->
@@ -279,9 +279,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="address-update.after-javascript-include"}
+{hook name="address-update.after-javascript-include" address=$address_id}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="address-update.javascript-initialization"}
+{hook name="address-update.javascript-initialization" address=$address_id}
 {/block}

@@ -21,91 +21,133 @@
             <li>{intl l='Editing shipping zone "%name"' name="{$NAME}"}</li>
         </ul>
 
+        {hook name="shipping-configuration-edit.top" area_id=$area_id}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
 
-                    <div class="title title-without-tabs">
+                    <div class="col-md-12 title title-without-tabs">
+                        {intl l='Shipping zone "%title"' title={$NAME}}
+                    </div>
+
+                    <div class="form-container">
+
+                        {include
+                            file = "includes/inner-form-toolbar.html"
+                            hide_submit_buttons = true
+                            hide_flags = true
+
+                            page_url  = {url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}
+                            close_url = {url path="/admin/configuration/shipping_configuration"}
+                        }
+
                         <div class="row">
-                            <div class="col-md-10">
-                                {intl l='Shipping zone "%title"' title={$NAME}}
+                            <div class="col-md-4">
+
+                                {form name="thelia.admin.area.modification"}
+                                    <form method="POST" action="{url path="/admin/configuration/shipping_configuration/save/%id" id=$area_id}">
+                                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                        {form_hidden_fields exclude="area_id"}
+
+                                        <input type="hidden" name="area_id" value="{$area_id}">
+
+                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
+                                        {render_form_field field="area_id" value=$area_id}
+
+                                        {custom_render_form_field field='name'}
+                                            <div class="input-group">
+                                                <input type="text" {form_field_attributes field="name" value={$NAME}}>
+                                                <span class="input-group-btn">
+                                                    <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
+                                                </span>
+                                            </div><!-- /input-group -->
+                                        {/custom_render_form_field}
+                                    </form>
+                                {/form}
+
+                                {form name="thelia.admin.area.country"}
+                                    <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
+                                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                        {form_hidden_fields exclude="area_id"}
+
+                                        <input type="hidden" name="area_id" value="{$area_id}">
+
+                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
+                                        {render_form_field field="area_id" value=$area_id}
+
+                                        {custom_render_form_field field='country_id'}
+                                            <select multiple {form_field_attributes field="country_id"}>
+                                                {loop name="country-without-area" type="country" exclude_area=$area_id backend_context="1" lang=$lang_id}
+                                                    <option value="{$ID}">{$TITLE}</option>
+                                                {/loop}
+                                            </select>
+                                        {/custom_render_form_field}
+
+                                        <button type="submit" class="btn btn-default btn-block btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add selected countries"}</button>
+                                    </form>
+                                {/form}
                             </div>
-                            <div class="col-md-2 text-right">
-                                <a href="{url path='/admin/configuration/shipping_configuration'}" class="btn btn-sm btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
+
+                            <div class="col-md-8">
+                                {form name="thelia.admin.area.delete.country"}
+                                <form method="POST" action="{url path="/admin/configuration/shipping_configuration/countries/remove"}">
+                                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                    {form_hidden_fields exclude="area_id"}
+
+                                    {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
+                                    {render_form_field field="area_id" value=$area_id}
+
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th>{intl l="Countries assigned to this zone"}</th>
+                                                    <th class="text-center">
+                                                        {if {count type="country" area=$area_id backend_context=1} > 0}
+                                                            {intl l='Select'} <a id="select-all" href="#">{intl l='all'}</a> - <a id="select-none" href="#">{intl l='none'}</a> - <a id="select-reverse" href="#">{intl l='reverse'}</a>
+                                                        {/if}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {loop name="country-area" type="country" area=$area_id backend_context="1"}
+                                                    <tr>
+                                                        <td>{$TITLE}</td>
+                                                        <td class="text-center">
+                                                            {form_field field="country_id"}
+                                                                <input class="country-selection" type="checkbox" name="{$name}[]" value="{$ID}">
+                                                            {/form_field}
+                                                        </td>
+                                                    </tr>
+                                                {/loop}
+                                                {elseloop rel="country-area"}
+                                                    <td colspan="2">
+                                                        {intl l="This shipping zone does not contains any country."}
+                                                    </td>
+                                                {/elseloop}
+                                            </tbody>
+                                            {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
+                                        </table>
+
+                                        {ifloop rel="country-area"}
+                                            <button type="submit" class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-remove"></span> {intl l="Delete selected countries"}</button>
+                                        {/ifloop}
+                                    </div>
+                                </form>
+                                {/form}
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-container clearfix">
-                        <div class="col-md-4">
-                            
-                            {ifloop rel="country-without-area"}
-                            {form name="thelia.admin.area.country"}
-                            <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
-
-                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
-                                {form_hidden_fields form=$form exclude="area_id"}
-
-                                <input type="hidden" name="area_id" value="{$area_id}">
-
-                                {render_form_field form=$form field="success_url" value={url path="/admin/configuration/shipping_configuration/update/{$area_id}"}}
-                                {render_form_field form=$form field="area_id" value=$area_id}
-
-                                {custom_render_form_field form=$form field='country_id'}
-                                    <select multiple {form_field_attributes form=$form field="country_id"}>
-                                        {loop name="country-without-area" type="country" with_area="0"  backend_context="1" lang=$lang_id}
-                                            <option value="{$ID}">{$TITLE}</option>
-                                        {/loop}
-                                    </select>
-                                {/custom_render_form_field}
-
-                                <button type="submit" class="btn btn-default btn-block btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add selected countries"}</button>
-                            </form>
-                            {/form}
-                            {/ifloop}
-                            {elseloop rel="country-without-area"}
-                                <div class="alert alert-info">
-                                    {intl l="All countries are assigned to a shipping zone."}
-                                </div>
-                            {/elseloop}
-                        </div>
-
-                        <div class="col-md-8">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-condensed">
-                                    <thead>
-                                        <tr>
-                                            <th>{intl l="Countries assigned to this zone"}</th>
-                                            <th class="text-center">{intl l="Actions"}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {loop name="country-area" type="country" area=$area_id backend_context="1"}
-                                        <tr>
-                                            <td>{$TITLE}</td>
-                                            <td class="text-center">
-                                                <a class="btn btn-default btn-xs btn-delete-country" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {/loop}
-                                        {elseloop rel="country-area"}
-                                            <td colspan="2">
-                                                {intl l="This shipping zone does not contains any country."}
-                                            </td>
-                                        {/elseloop}
-                                    </tbody>
-                                    {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
             </div>
         </div>
+
+        {hook name="shipping-configuration-edit.bottom" area_id=$area_id}
+
         {/loop}
 
         {elseloop rel="area-edit"}
@@ -140,9 +182,6 @@
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>        
-    {/javascripts}
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>        
     {/javascripts}
@@ -152,6 +191,23 @@
             $(".btn-delete-country").click(function(e){
                 $("#delete-country-id").val($(this).data("id"));
             });
+
+            $('#select-all').click(function(ev) {
+                $('.country-selection').prop("checked", true);
+                ev.preventDefault();
+            });
+
+            $('#select-none').click(function(ev) {
+                $('.country-selection').prop("checked", false);
+                ev.preventDefault();
+            })
+
+            $('#select-reverse').click(function(ev) {
+                $('.country-selection').each(function() {
+                    $(this).prop("checked", ! $(this).prop('checked'));
+                });
+                ev.preventDefault();
+            })
         });
     </script>
 {/block}

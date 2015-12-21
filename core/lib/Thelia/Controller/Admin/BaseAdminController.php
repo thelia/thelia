@@ -20,7 +20,6 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -32,6 +31,8 @@ use Thelia\Tools\URL;
 
 class BaseAdminController extends BaseController
 {
+    const CONTROLLER_TYPE = 'admin';
+
     const TEMPLATE_404 = "404";
 
     /**
@@ -84,6 +85,14 @@ class BaseAdminController extends BaseController
     }
 
     /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
+    }
+
+    /**
      * Return a 404 error
      *
      * @return \Thelia\Core\HttpFoundation\Response
@@ -96,7 +105,7 @@ class BaseAdminController extends BaseController
     /**
      * Return a general error page
      *
-     * @param string $message a message string, or an exception instance
+     * @param \Exception|string $message a message string, or an exception instance
      * @param int    $status  the HTTP status (default is 500)
      *
      * @return \Thelia\Core\HttpFoundation\Response
@@ -104,7 +113,16 @@ class BaseAdminController extends BaseController
     protected function errorPage($message, $status = 500)
     {
         if ($message instanceof \Exception) {
-            $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
+            $strMessage = $this->getTranslator()->trans(
+                "Sorry, an error occured: %msg",
+                [ '%msg' => $message->getMessage() ]
+            );
+
+            Tlog::getInstance()->addError($strMessage.": ".$message->getTraceAsString());
+
+            $message = $strMessage;
+        } else {
+            Tlog::getInstance()->addError($message);
         }
 
         return $this->render(
@@ -202,7 +220,7 @@ class BaseAdminController extends BaseController
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
-            $template ?: TemplateHelper::getInstance()->getActiveAdminTemplate(),
+            $template ?: $this->getTemplateHelper()->getActiveAdminTemplate(),
             $this->useFallbackTemplate
         );
 
@@ -275,7 +293,7 @@ class BaseAdminController extends BaseController
     protected function getUrlLanguage($locale = null)
     {
         // Check if the functionality is activated
-        if (!ConfigQuery::read("one_domain_foreach_lang", false)) {
+        if (!ConfigQuery::isMultiDomainActivated()) {
             return null;
         }
 

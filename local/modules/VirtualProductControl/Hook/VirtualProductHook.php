@@ -23,7 +23,7 @@ use Thelia\Model\ProductQuery;
 /**
  * Class VirtualProductHook
  * @package VirtualProductHook\Hook
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class VirtualProductHook extends BaseHook
 {

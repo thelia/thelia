@@ -16,10 +16,5 @@ use Thelia\Module\BaseModule;
 
 class VirtualProductControl extends BaseModule
 {
-    /*
-     * You may now override BaseModuleInterface methods, such as:
-     * install, destroy, preActivation, postActivation, preDeactivation, postDeactivation
-     *
-     * Have fun !
-     */
+
 }

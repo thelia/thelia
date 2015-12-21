@@ -23,7 +23,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class CacheController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdvancedConfigurationController extends BaseAdminController
 {
@@ -84,10 +84,20 @@ class AdvancedConfigurationController extends BaseAdminController
         try {
             $this->validateForm($form);
 
-            $event = new CacheEvent(THELIA_WEB_DIR . ConfigQuery::read('image_cache_dir_from_web_root', 'cache'));
+            $event = new CacheEvent(
+                THELIA_WEB_DIR . ConfigQuery::read(
+                    'image_cache_dir_from_web_root',
+                    'cache' . DS . 'images'
+                )
+            );
             $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
 
-            $event = new CacheEvent(THELIA_WEB_DIR . ConfigQuery::read('document_cache_dir_from_web_root', 'cache'));
+            $event = new CacheEvent(
+                THELIA_WEB_DIR . ConfigQuery::read(
+                    'document_cache_dir_from_web_root',
+                    'cache' . DS . 'documents'
+                )
+            );
             $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
         } catch (\Exception $e) {
             Tlog::getInstance()->addError(sprintf("Flush images and document error: %s", $e->getMessage()));

@@ -13,8 +13,12 @@
 namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
@@ -37,8 +41,11 @@ use Thelia\Tools\URL;
  */
 class Session extends BaseSession
 {
+    /** @var Cart|null $transientCart */
+    protected static $transientCart = null;
+
     /**
-     * @param bool $forceDefault
+     * @param bool $forceDefault if true, the default language will be returned if no current language is defined.
      *
      * @return \Thelia\Model\Lang|null
      */
@@ -67,7 +74,7 @@ class Session extends BaseSession
     /**
      * Return current currency
      *
-     * @param bool $forceDefault If default currency forced
+     * @param bool $forceDefault if true, the default currency will be returned if no current currency is defined.
      *
      * @return Currency
      */
@@ -102,6 +109,9 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return Lang the current edition language in the back-office
+     */
     public function getAdminEditionLang()
     {
         $lang = $this->get('thelia.admin.edition.lang');
@@ -113,7 +123,11 @@ class Session extends BaseSession
         return $lang;
     }
 
-    public function setAdminEditionLang($lang)
+    /**
+     * @param Lang $lang the current edition language to set in the back-office
+     * @return $this
+     */
+    public function setAdminEditionLang(Lang $lang)
     {
         $this->set('thelia.admin.edition.lang', $lang);
 
@@ -182,11 +196,31 @@ class Session extends BaseSession
     // -- Cart ------------------------------------------------------------------
 
     /**
+     * Set the cart to store in the current session.
+     *
+     * @param Cart|null The cart to store in session
+     *
+     * @return $this
+     */
+    public function setSessionCart(Cart $cart = null)
+    {
+        if (null === $cart || $cart->isNew()) {
+            self::$transientCart = $cart;
+        } else {
+            self::$transientCart = null;
+            $this->set("thelia.cart_id", $cart->getId());
+        }
+
+        return $this;
+    }
+
+
+    /**
      * Return the cart stored in the current session
      *
      * @param EventDispatcherInterface $dispatcher the event dispatcher, required if no cart is currently stored in the session
      *
-     * @return Cart The cart in the current session .
+     * @return Cart The cart in the current session.
      */
     public function getSessionCart(EventDispatcherInterface $dispatcher = null)
     {
@@ -194,7 +228,7 @@ class Session extends BaseSession
         if (null !== $cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
         } else {
-            $cart = null;
+            $cart = self::$transientCart;
         }
 
         // If we do not have a cart, or if the current cart is nor valid
@@ -225,8 +259,8 @@ class Session extends BaseSession
                 );
             }
 
-            // Store the cart ID.
-            $this->set("thelia.cart_id", $cart->getId());
+            // Store the cart.
+            $this->setSessionCart($cart);
         }
 
         return $cart;
@@ -249,8 +283,8 @@ class Session extends BaseSession
             );
         }
 
-        // Store the cart ID.
-        $this->set("thelia.cart_id", $cart->getId());
+        // Store the cart
+        $this->setSessionCart($cart);
     }
 
     /**
@@ -331,5 +365,28 @@ class Session extends BaseSession
     public function getConsumedCoupons()
     {
         return $this->get('thelia.consumed_coupons', array());
+    }
+
+    /**
+     * Get saved errored forms information
+     *
+     * @return array
+     */
+    public function getFormErrorInformation()
+    {
+        return $this->get('thelia.form-errors', []);
+    }
+
+    /**
+     * Save errored forms information
+     *
+     * @param array $formInformation
+     * @return mixed
+     */
+    public function setFormErrorInformation($formInformation)
+    {
+        $this->set('thelia.form-errors', $formInformation);
+
+        return $this;
     }
 }

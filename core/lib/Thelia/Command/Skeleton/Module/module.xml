@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module xmlns="http://thelia.net/schema/dic/module"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_1.xsd">
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
     <fullnamespace>%%NAMESPACE%%\%%CLASSNAME%%</fullnamespace>
     <descriptive locale="en_US">
         <title>Automatically generated module - please update module.xml file</title>
@@ -12,7 +12,7 @@
         -->
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Module généré autromatiquement - editez le fichier module.xml</title>
+        <title>Module généré automatiquement - éditez le fichier module.xml</title>
     </descriptive>
     <!-- <logo></logo> -->
     <!--<images-folder>images</images-folder>-->
@@ -21,10 +21,12 @@
         <language>fr_FR</language>
     </languages>
     <version></version>
-    <author>
-        <name></name>
-        <email></email>
-    </author>
+    <authors>
+        <author>
+            <name></name>
+            <email></email>
+        </author>
+    </authors>
     <type>classic</type>
     <!--
     module dependencies
@@ -34,6 +36,6 @@
         <module version="&gt;0.2">HookSearch</module>
     </required>
     -->
-    <thelia>2.1.0</thelia>
+    <thelia>2.2.0</thelia>
     <stability>other</stability>
 </module>

@@ -12,13 +12,12 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
-use Thelia\Core\Template\Smarty\Plugins\an;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
+use Thelia\Model\ConfigQuery;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Assets\SmartyAssetsManager;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\Assets\AssetManagerInterface;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Assets extends AbstractSmartyPlugin
 {
@@ -28,7 +27,12 @@ class Assets extends AbstractSmartyPlugin
     {
         $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
-        $this->assetManager = new SmartyAssetsManager($assetsManager, $assetsResolver, THELIA_WEB_DIR, $asset_dir_from_web_root);
+        $this->assetManager = new SmartyAssetsManager(
+            $assetsManager,
+            $assetsResolver,
+            THELIA_WEB_DIR,
+            $asset_dir_from_web_root
+        );
     }
 
     public function declareAssets($params, \Smarty_Internal_Template $template)
@@ -49,7 +53,9 @@ class Assets extends AbstractSmartyPlugin
 
     public function blockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        return $this->assetManager->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
+        return $this
+            ->assetManager
+            ->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
     }
 
     public function blockStylesheets($params, $content, \Smarty_Internal_Template $template, &$repeat)
@@ -62,10 +68,25 @@ class Assets extends AbstractSmartyPlugin
         return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template);
     }
 
+    public function functionAsset($params, \Smarty_Internal_Template $template)
+    {
+        return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template, false);
+    }
+
+    public function functionJavascript($params, \Smarty_Internal_Template $template)
+    {
+        return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template);
+    }
+
+    public function functionStylesheet($params, \Smarty_Internal_Template $template)
+    {
+        return $this->assetManager->computeAssetUrl('css', $params, $template);
+    }
+
     /**
      * Define the various smarty plugins hendled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
@@ -73,7 +94,12 @@ class Assets extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('block', 'stylesheets', $this, 'blockStylesheets'),
             new SmartyPluginDescriptor('block', 'javascripts', $this, 'blockJavascripts'),
             new SmartyPluginDescriptor('block', 'images', $this, 'blockImages'),
+
+            new SmartyPluginDescriptor('function', 'asset', $this, 'functionAsset'),
             new SmartyPluginDescriptor('function', 'image', $this, 'functionImage'),
+            new SmartyPluginDescriptor('function', 'javascript', $this, 'functionJavascript'),
+            new SmartyPluginDescriptor('function', 'stylesheet', $this, 'functionStylesheet'),
+
             new SmartyPluginDescriptor('function', 'declare_assets', $this, 'declareAssets')
         );
     }

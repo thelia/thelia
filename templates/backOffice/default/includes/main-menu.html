@@ -1,0 +1,293 @@
+{hook name="main.before-top-menu" location="before_top_menu" }
+<ul class="nav in" id="side-menu">
+    <li class="sidebar-search">
+        {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
+            <form action="{url path='/admin/search'}">                                        
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}" value="{trim($smarty.get.search_term)}">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                    </span>
+                </div>
+            </form>
+        {/loop}
+        <!-- /input-group -->
+    </li>
+
+    <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
+        <a href="{url path='/admin/home'}" title="{intl l="Home"}"><span class="icon-home"></span> <span class="item-text">{intl l="Home"}</span></a>
+    </li>
+
+    {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
+        {ifhook rel="main.top-menu-customer"}
+            {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
+                <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
+
+                    <a title="{intl l="Customers"}" href="#collapse-customer" {if $admin_current_location == 'customer'}class="open"{/if}>
+                        <span class="icon-customers"></span>
+                        <span class="item-text">{intl l="Customers"} <span class="caret"></span></span>
+                    </a>
+
+                    <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
+                        <li role="menuitem" id="customers_menu">
+                            <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
+                                {intl l="Customers"}
+                            </a>
+                        </li>
+                        {forhook rel="main.top-menu-customer"}
+                            <li role="menuitem">
+                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                    {$title}
+                                </a>
+                            </li>
+                        {/forhook}
+                    </ul>
+                </li>
+            {/hookblock}
+        {/ifhook}
+        {elsehook rel="main.top-menu-customer"}
+            <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
+                <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
+                    <span class="icon-customers"></span>
+                    <span class="item-text">{intl l="Customers"}</span>
+                </a>
+            </li>
+        {/elsehook}
+    {/loop}
+
+    {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
+    <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
+
+        <a title="{intl l="Orders"}" href="#collapse-orders" {if $admin_current_location == 'order'}class="open"{/if}>
+            <span class="icon-orders"></span>
+            <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
+        </a>
+
+        <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
+
+            <li role="menuitem">
+                <a class="clearfix" href="{url path='admin/orders'}">
+                    <span class="pull-left">{intl l="All orders"}</span>
+                    <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
+                </a>
+            </li>
+
+            {loop name="order-status-list" type="order-status"}
+                {assign "orderStatusCode" "order_$CODE"}
+                {if #$orderStatusCode# == ''}
+                    {assign "defaultLabel" "label-default"}
+                    {assign "orderStatusLabel" $CODE}
+                {else}
+                    {assign "defaultLabel" ''}
+                    {assign "orderStatusLabel" #$orderStatusCode#}
+                {/if}
+                <li role="menuitem">
+                    <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
+                        <span class="pull-left">{$TITLE}</span>
+                        <span class="label {$defaultLabel} label-{$orderStatusLabel} pull-right">{count type="order" customer="*" backend_context="1" status={$ID}}</span>
+                    </a>
+                </li>
+            {/loop}
+            {hookblock name="main.top-menu-order" fields="id,class,url,title"}
+                {forhook rel="main.top-menu-order"}
+                    <li role="menuitem">
+                        <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                            {$title}
+                        </a>
+                    </li>
+                {/forhook}
+            {/hookblock}
+        </ul>
+    </li>
+    {/loop}
+
+    {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
+        {ifhook rel="main.top-menu-catalog"}
+            {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
+            <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+
+                <a title="{intl l="Catalog"}" href="#collapse-catalog" {if $admin_current_location == 'catalog'}class="open"{/if}>
+                    <span class="icon-catalog"></span>
+                    <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
+                </a>
+
+                <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
+                    <li role="menuitem" id="catalog_menu">
+                        <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
+                            {intl l="Catalog"}
+                        </a>
+                    </li>
+                    {forhook rel="main.top-menu-catalog"}
+                        <li role="menuitem">
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                    {/forhook}
+                </ul>
+            </li>
+            {/hookblock}
+        {/ifhook}
+        {elsehook rel="main.top-menu-catalog"}
+            <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+                <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
+                    <span class="icon-catalog"></span>
+                    <span class="item-text">{intl l="Catalog"}</span>
+                </a>
+            </li>
+        {/elsehook}
+    {/loop}
+
+    {loop name="menu-auth-content" type="auth" role="ADMIN" resource="admin.folder"  access="VIEW"}
+        {ifhook rel="main.top-menu-content"}
+            {hookblock name="main.top-menu-content" fields="id,class,url,title"}
+                <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
+
+                    <a title="{intl l="Folders"}" href="#collapse-content" {if $admin_current_location == 'content'}class="open"{/if}>
+                        <span class="icon-records"></span>
+                        <span class="item-text">{intl l="Folders"} <span class="caret"></span></span>
+                    </a>
+
+                    <ul id="collapse-content" class="collapse {if $admin_current_location == 'content'}in{/if}" role="menu">
+                        <li role="menuitem" id="contents_menu">
+                            <a title="{intl l="Folders"}" href="{url path='/admin/folders'}">
+                                {intl l="Folders"}
+                            </a>
+                        </li>
+                        {forhook rel="main.top-menu-content"}
+                        <li role="menuitem">
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                        {/forhook}
+                    </ul>
+                </li>
+            {/hookblock}
+        {/ifhook}
+        {elsehook rel="main.top-menu-content"}
+            <li class="{if $admin_current_location == 'folder'}active{/if}" id="contents_menu">
+                <a title="{intl l="Folders"}" href="{url path='/admin/folders'}">
+                    <span class="icon-records"></span>
+                    <span class="item-text">{intl l="Folders"}</span>
+                </a>
+            </li>
+        {/elsehook}
+    {/loop}
+
+    {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
+        <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
+            <a title="{intl l="Tools"}" href="#collapse-tools" {if $admin_current_location == 'tools'}class="open"{/if}>
+                <span class="icon-tools"></span>
+                <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
+            </a>
+
+            <ul id="collapse-tools" class="collapse {if $admin_current_location == 'tools'}in{/if}" role="menu">
+                {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
+                    <li role="menuitem"><a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a></li>
+                {/loop}
+
+                {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales"  access="VIEW"}
+                    <li role="menuitem"><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
+                {/loop}
+
+                {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand"  access="VIEW"}
+                    <li role="menuitem"><a href="{url path='/admin/brand'}">{intl l="Brands"}</a></li>
+                {/loop}
+
+                {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export"  access="VIEW"}
+                    <li role="menuitem"><a href="{url path='/admin/export'}">{intl l="Export"}</a></li>
+                {/loop}
+
+                {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
+                    <li role="menuitem"><a href="{url path='/admin/import'}">{intl l="Import"}</a></li>
+                {/loop}
+
+                {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
+                    {forhook rel="main.top-menu-tools"}
+                        <li role="menuitem">
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                    {/forhook}
+                {/hookblock}
+            </ul>
+        </li>
+    {/loop}
+
+    {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
+        {ifhook rel="main.top-menu-modules"}
+            {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
+            <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                <a title="{intl l="Modules"}" href="#collapse-modules" {if $admin_current_location == 'modules'}class="open"{/if}>
+                    <span class="icon-modules"></span>
+                    <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
+                </a>
+
+                <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
+                    <li role="menuitem" id="modules_menu">
+                        <a title="{intl l="Modules"}" href="{url path='/admin/modules'}">
+                            {intl l="Modules"}
+                        </a>
+                    </li>
+                    {forhook rel="main.top-menu-modules"}
+                        <li role="menuitem">
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                    {/forhook}
+                </ul>
+            </li>
+            {/hookblock}
+        {/ifhook}
+        {elsehook rel="main.top-menu-modules"}
+            <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                <a title="{intl l="Modules"}" href="{url path='/admin/modules'}">
+                    <span class="icon-modules"></span>
+                    <span class="item-text">{intl l="Modules"}</span>
+                </a>
+            </li>
+        {/elsehook}
+    {/loop}
+
+    {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration"  access="VIEW"}
+        {ifhook rel="main.top-menu-configuration"}
+            {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
+                <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
+                    <a title="{intl l="Configuration"}" href="#collapse-configuration" {if $admin_current_location == 'configuration'}class="open"{/if}>
+                        <span class="icon-configuration"></span>
+                        <span class="item-text">{intl l="Configuration"}<span class="caret"></span></span>
+                    </a>
+
+                    <ul id="collapse-configuration" class="collapse {if $admin_current_location == 'configuration'}in{/if}" role="menu">
+                        {forhook rel="main.top-menu-configuration"}
+                            <li role="menuitem">
+                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                    {$title}
+                                </a>
+                            </li>
+                        {/forhook}
+                    </ul>
+                </li>
+            {/hookblock}
+        {/ifhook}
+        {elsehook rel="main.top-menu-configuration"}
+            <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
+                <a title="{intl l="Configuration"}" href="{url path='/admin/configuration'}">
+                    <span class="icon-configuration"></span>
+                    <span class="item-text">{intl l="Configuration"}</span>
+                </a>
+            </li>
+        {/elsehook}
+    {/loop}
+
+
+    {hook name="main.in-top-menu-items" location="in_top_menu_items" }
+                                               
+</ul>
+
+{hook name="main.topbar-bottom" } 
+
+{hook name="main.after-top-menu" location="after_top_menu" }

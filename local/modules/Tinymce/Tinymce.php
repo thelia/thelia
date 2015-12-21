@@ -26,20 +26,32 @@ class Tinymce extends BaseModule
     private $jsPath;
     private $webJsPath;
     private $webMediaPath;
+    private $webMediaEnvPath;
 
     public function __construct()
     {
-        $this->jsPath = __DIR__ . DS .'Resources' . DS . 'js' . DS . 'tinymce';
+        $this->jsPath = __DIR__.DS.'Resources'.DS.'js'.DS.'tinymce';
 
-        $this->webJsPath = THELIA_WEB_DIR . 'tinymce';
-        $this->webMediaPath = THELIA_WEB_DIR . 'media';
+        $this->webJsPath = THELIA_WEB_DIR.'tinymce';
+        $this->webMediaPath = THELIA_WEB_DIR.'media';
     }
+
     /**
      * @inheritdoc
      */
     public function postActivation(ConnectionInterface $con = null)
     {
         $fileSystem = new Filesystem();
+
+        //Check for environment
+        if ($env = $this->getContainer()->getParameter('kernel.environment')) {
+            //Check for backward compatibility
+            if ($env !== "prod" && $env !== "dev") {
+                //Remove separtion between dev and prod in particular environment
+                $env = str_replace('_dev', '', $env);
+                $this->webMediaEnvPath = $this->webMediaPath.DS.$env;
+            }
+        }
 
         // Create symbolic links or hard copy in the web directory
         // (according to \Thelia\Action\Document::CONFIG_DELIVERY_MODE),
@@ -52,10 +64,17 @@ class Tinymce extends BaseModule
             }
         }
 
-        // Create the media directory in the web root, if required
-        if (false === $fileSystem->exists($this->webMediaPath)) {
-            $fileSystem->mkdir($this->webMediaPath . DS . 'upload');
-            $fileSystem->mkdir($this->webMediaPath . DS . 'thumbs');
+        // Create the media directory in the web root , if required
+        if (null !== $this->webMediaEnvPath) {
+            if (false === $fileSystem->exists($this->webMediaEnvPath)) {
+                $fileSystem->mkdir($this->webMediaEnvPath.DS.'upload');
+                $fileSystem->mkdir($this->webMediaEnvPath.DS.'thumbs');
+            }
+        } else {
+            if (false === $fileSystem->exists($this->webMediaPath)) {
+                $fileSystem->mkdir($this->webMediaPath.DS.'upload');
+                $fileSystem->mkdir($this->webMediaPath.DS.'thumbs');
+            }
         }
     }
 

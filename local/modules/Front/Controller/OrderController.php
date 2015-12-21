@@ -33,9 +33,8 @@ use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\OrderDelivery;
-use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -133,7 +132,7 @@ class OrderController extends BaseFrontController
 
         $message = false;
 
-        $orderDelivery = new OrderDelivery($this->getRequest());
+        $orderDelivery = $this->createForm(FrontForm::ORDER_DELIVER);
 
         try {
             $form = $this->validateForm($orderDelivery, "post");
@@ -155,10 +154,10 @@ class OrderController extends BaseFrontController
             }
 
             /* check that the delivery module fetches the delivery address area */
-            if (AreaDeliveryModuleQuery::create()
-                ->filterByAreaId($deliveryAddress->getCountry()->getAreaId())
-                ->filterByDeliveryModuleId($deliveryModuleId)
-                ->count() == 0) {
+            if (null === AreaDeliveryModuleQuery::create()->findByCountryAndModule(
+                $deliveryAddress->getCountry(),
+                $deliveryModule
+            )) {
                 throw new \Exception(
                     $this->getTranslator()->trans(
                         "Delivery module cannot be use with selected delivery address",
@@ -231,7 +230,7 @@ class OrderController extends BaseFrontController
 
         $message = false;
 
-        $orderPayment = new OrderPayment($this->getRequest());
+        $orderPayment = $this->createForm(FrontForm::ORDER_PAYMENT);
 
         try {
             $form = $this->validateForm($orderPayment, "post");
@@ -454,7 +453,7 @@ class OrderController extends BaseFrontController
         if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)) {
             $order = $orderProduct->getOrder();
 
-            if ($order->isPaid()) {
+            if ($order->isPaid(false)) {
                 // check customer
                 $this->checkOrderCustomer($order->getId());
 
@@ -502,13 +501,28 @@ class OrderController extends BaseFrontController
 
     public function getDeliveryModuleListAjaxAction()
     {
+        $this->checkXmlHttpRequest();
+
         $country = $this->getRequest()->get(
             'country_id',
             $this->container->get('thelia.taxEngine')->getDeliveryCountry()->getId()
         );
 
-        $this->checkXmlHttpRequest();
-        $args = array('country' => $country);
+        // Change the delivery address if customer has changed it
+        $session = $this->getSession();
+        $addressId = $this->getRequest()->get('address_id', null);
+        if (null !== $addressId && $addressId !== $session->getOrder()->getChoosenDeliveryAddress()) {
+            $address = AddressQuery::create()->findPk($addressId);
+            if (null !== $address && $address->getCustomerId() === $session->getCustomerUser()->getId()) {
+                $session->getOrder()->setChoosenDeliveryAddress($addressId);
+                $args["address"] = $addressId;
+            }
+        }
+
+        $args = array(
+            'country' => $country,
+            'address' => $session->getOrder()->getChoosenDeliveryAddress()
+        );
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }

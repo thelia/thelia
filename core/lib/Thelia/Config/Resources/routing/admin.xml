@@ -16,10 +16,6 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.latestVersion" path="/admin/latest-thelia-version">
-        <default key="_controller">Thelia\Controller\Admin\HomeController::getLatestTheliaVersion</default>
-    </route>
-
     <route id="admin.home.stats" path="/admin/home/stats">
         <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
     </route>
@@ -214,13 +210,17 @@
         <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
     </route>
 
-    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}">
+    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}/{browser}">
         <default key="_controller">Thelia\Controller\Admin\OrderController::generateInvoicePdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1]</requirement>
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <route id="admin.order.pdf.delivery" path="/admin/order/pdf/delivery/{order_id}">
+    <route id="admin.order.pdf.delivery" path="/admin/order/pdf/delivery/{order_id}/{browser}">
         <default key="_controller">Thelia\Controller\Admin\OrderController::generateDeliveryPdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1]</requirement>
         <requirement key="order_id">\d+</requirement>
     </route>
 
@@ -277,11 +277,6 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
-    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
-        <requirement key="_format">xml|json</requirement>
-    </route>
-
     <!--  Product Management -->
 
     <route id="admin.products.default" path="/admin/products">
@@ -290,6 +285,10 @@
 
     <route id="admin.products.create" path="/admin/products/create">
         <default key="_controller">Thelia\Controller\Admin\ProductController::createAction</default>
+    </route>
+
+    <route id="admin.products.clone" path="/admin/products/clone">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::cloneAction</default>
     </route>
 
     <route id="admin.products.update" path="/admin/products/update">
@@ -314,11 +313,6 @@
 
     <route id="admin.products.update-position" path="/admin/products/update-position">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
-    </route>
-
-
-    <route id="admin.products.general.tab" path="/admin/products/general/tab">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
     </route>
 
     <!-- Product categories, content and accessories -->
@@ -357,7 +351,7 @@
     </route>
 
     <route id="admin.product.calculate-price" path="/admin/product/calculate-price">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCalculator</default>
     </route>
 
     <route id="admin.product.calculate-raw-price" path="/admin/product/calculate-raw-price">
@@ -570,10 +564,6 @@
         <requirement key="couponId">\d+</requirement>
         <requirement key="conditionIndex">\d+</requirement>
     </route>
-    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
-        <requirement key="couponCode">.*</requirement>
-    </route>
 
     <!-- Routes to the Config (system variables) controller -->
 
@@ -670,6 +660,10 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.currencies.set-visible" path="/admin/configuration/currencies/set-visible">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::setVisibleAction</default>
+    </route>
+
     <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
@@ -680,10 +674,6 @@
 
     <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
-    </route>
-
-    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
-        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
 
 
@@ -830,8 +820,13 @@
         <default key="_controller">Thelia\Controller\Admin\AreaController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}" methods="get">
+    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}">
         <default key="_controller">Thelia\Controller\Admin\AreaController::updateAction</default>
+        <requirement key="area_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.save" path="/admin/configuration/shipping_configuration/save/{area_id}">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::processUpdateAction</default>
         <requirement key="area_id">\d+</requirement>
     </route>
 
@@ -854,6 +849,10 @@
 
     <route id="admin.configuration.shipping-configuration.country.remove" path="/admin/configuration/shipping_configuration/country/remove" methods="post">
         <default key="_controller">Thelia\Controller\Admin\AreaController::removeCountry</default>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.countries.remove" path="/admin/configuration/shipping_configuration/countries/remove" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::removeCountries</default>
     </route>
 
     <!-- end shipping routes management -->
@@ -1100,6 +1099,16 @@
 
     <route id="admin.module.install" path="/admin/module/install" methods="post">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::installAction</default>
+    </route>
+
+    <route id="admin.module.information" path="/admin/module/information/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::informationAction</default>
+        <requirement key="module_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module.documentation" path="/admin/module/documentation/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::documentationAction</default>
+        <requirement key="module_id">\d+</requirement>
     </route>
 
     <!--

@@ -27,7 +27,7 @@ use Thelia\Tools\TokenProvider;
  *
  * Class SessionTest
  * @package Thelia\Tests\Core\HttpFoundation\Session
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +50,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->request = new Request();
 
         $this->session = new Session(new MockArraySessionStorage());
+
+        $this->session->setSessionCart(null);
 
         $this->request->setSession($this->session);
 

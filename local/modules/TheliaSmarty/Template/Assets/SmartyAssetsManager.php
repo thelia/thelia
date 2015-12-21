@@ -128,19 +128,19 @@ class SmartyAssetsManager
     /**
      * Retrieve asset URL
      *
-     * @param string                    $assetType js|css|image
-     * @param array                     $params    Parameters
+     * @param string $assetType js|css|image
+     * @param array $params Parameters
      *                                             - file File path in the default template
      *                                             - source module asset
      *                                             - filters filter to apply
      *                                             - debug
      *                                             - template if you want to load asset from another template
-     * @param \Smarty_Internal_Template $template  Smarty Template
+     * @param \Smarty_Internal_Template $template Smarty Template
      *
+     * @param bool $allowFilters if false, the 'filters' parameter is ignored
      * @return string
-     * @throws \Exception
      */
-    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
+    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template, $allowFilters = true)
     {
         $assetUrl = "";
 
@@ -154,9 +154,10 @@ class SmartyAssetsManager
         }
 
         $assetOrigin  = isset($params['source']) ? $params['source'] : SmartyParser::TEMPLATE_ASSETS_KEY;
-        $filters      = isset($params['filters']) ? $params['filters'] : '';
+        $filters      = $allowFilters && isset($params['filters']) ? $params['filters'] : '';
         $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $templateName = isset($params['template']) ? $params['template'] : false;
+        $failsafe     = isset($params['failsafe']) ? $params['failsafe'] : false;
 
         Tlog::getInstance()->debug("Searching asset $file in source $assetOrigin, with template $templateName");
 
@@ -202,7 +203,12 @@ class SmartyAssetsManager
             );
         } else {
             // Log the problem
-            throw new TheliaProcessException("Failed to find asset source file " . $params['file']);
+            if ($failsafe) {
+                // The asset URL will be ''
+                Tlog::getInstance()->addWarning("Failed to find asset source file " . $params['file']);
+            } else {
+                throw new TheliaProcessException("Failed to find asset source file " . $params['file']);
+            }
         }
 
         return $assetUrl;
@@ -217,8 +223,15 @@ class SmartyAssetsManager
     ) {
         // Opening tag (first call only)
         if ($repeat) {
+            $isfailsafe = false;
+
             $url = '';
             try {
+                // Check if we're in failsafe mode
+                if (isset($params['failsafe'])) {
+                    $isfailsafe = $params['failsafe'];
+                }
+
                 $url = $this->computeAssetUrl($assetType, $params, $template);
 
                 if (empty($url)) {
@@ -227,7 +240,7 @@ class SmartyAssetsManager
                     Tlog::getInstance()->addWarning($message);
 
                     // In debug mode, throw exception
-                    if ($this->assetsManager->isDebugMode()) {
+                    if ($this->assetsManager->isDebugMode() && ! $isfailsafe) {
                         throw new TheliaProcessException($message);
                     }
                 }
@@ -241,7 +254,7 @@ class SmartyAssetsManager
                 );
 
                 // If we're in development mode, just retrow the exception, so that it will be displayed
-                if ($this->assetsManager->isDebugMode()) {
+                if ($this->assetsManager->isDebugMode() && ! $isfailsafe) {
                     throw $ex;
                 }
             }

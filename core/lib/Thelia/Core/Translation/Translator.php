@@ -17,6 +17,10 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 
 class Translator extends BaseTranslator
 {
+    const GLOBAL_FALLBACK_DOMAIN = 'global';
+
+    const GLOBAL_FALLBACK_KEY = '%s.%s';
+
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
@@ -65,14 +69,34 @@ class Translator extends BaseTranslator
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = 'core', $locale = null, $return_default_if_not_available = true)
-    {
+    public function trans(
+        $id,
+        array $parameters = array(),
+        $domain = 'core',
+        $locale = null,
+        $return_default_if_not_available = true,
+        $useFallback = true
+    ) {
         if (null === $locale) {
             $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {
             $this->loadCatalogue($locale);
+        }
+
+        // global translations
+        if ($useFallback) {
+            $fallbackId = sprintf(self::GLOBAL_FALLBACK_KEY, $domain, (string) $id);
+
+            if ($this->catalogues[$locale]->has($fallbackId, self::GLOBAL_FALLBACK_DOMAIN)) {
+                return parent::trans($fallbackId, $parameters, self::GLOBAL_FALLBACK_DOMAIN, $locale);
+            }
+
+            if ($this->catalogues[$locale]->has($id, self::GLOBAL_FALLBACK_DOMAIN)) {
+                // global translations
+                return parent::trans($id, $parameters, self::GLOBAL_FALLBACK_DOMAIN, $locale);
+            }
         }
 
         if ($this->catalogues[$locale]->has((string) $id, $domain)) {

@@ -43,6 +43,7 @@
                                     <th class="col-md-1">{intl l="Code"}</th>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-4">{intl l="Description"}</th>
+                                    {hook name="profile.table-header"}
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
                             </thead>
@@ -58,7 +59,7 @@
                                 <tr>
                                     <td>
                                         {if $can_change}
-                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}">
+                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">
                                                 {$CODE}
                                             </a>
                                         {else}
@@ -67,7 +68,7 @@
                                     </td>
                                     <td>
                                         {if $can_change}
-                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}">
+                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">
                                                  {$TITLE}
                                             </a>
                                         {else}
@@ -75,10 +76,11 @@
                                         {/if}
                                     </td>
                                     <td>{$DESCRIPTION}</td>
+                                    {hook name="profile.table-row" profile_id=$ID}
                                     <td>
                                         <div class="btn-group">
                                             {if $can_change}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/if}
 
                                             {assign linkedAdminCount {count name="linked-admin" type="admin" profile=$ID}}
@@ -91,6 +93,16 @@
                                 </tr>
 
                                 {/loop}
+
+                                {elseloop rel="profiles"}
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="alert alert-info">
+                                                {intl l="No administration profile defined yet. Click the + button to create one."}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
 
                             </tbody>                            
                         </table>
@@ -118,7 +130,7 @@
 {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "profile_create_dialog"}
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
     {loop type="lang" name="current-edit-lang" default_only="1"}
         <div class="text-center well well-sm">
@@ -126,33 +138,33 @@
             {intl l="Enter information in the default language (%title)" title={$TITLE}}
         </div>
 
-        {form_field form=$form field='locale'}
+        {form_field field='locale'}
             <input type="hidden" name="{$name}" value="{$LOCALE}" />
         {/form_field}
     {/loop}
 
-    {form_field form=$form field='code'}
+    {form_field field='code'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Profile code'}" placeholder="{intl l='Profile code'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='title'}
+    {form_field field='title'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='chapo'}
+    {form_field field='chapo'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Short description'}" placeholder="{intl l='Short description'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='description'}
+    {form_field field='description'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">
                 {$label} :
@@ -163,7 +175,7 @@
         </div>
     {/form_field}
 
-    {form_field form=$form field='postscriptum'}
+    {form_field field='postscriptum'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Postscriptum'}" placeholder="{intl l='Postscriptum'}" class="form-control" value="{if $form_error}{$value}{/if}">
@@ -183,7 +195,7 @@
         dialog_cancel_label = {intl l="Cancel"}
 
         form_action        = {url path="/admin/configuration/profiles/add"}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 
@@ -225,10 +237,6 @@
     <script src='{$asset_url}'></script>
 {/javascripts}
 
-{javascripts file='assets/js/main.js'}
-    <script src='{$asset_url}'></script>
-{/javascripts}
-
 <script type="text/javascript">
 jQuery(function($) {
 
@@ -246,4 +254,5 @@ jQuery(function($) {
 
 {block name="javascript-last-call"}
     {hook name="profiles.js" location="profiles-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-profiles-js" }
 {/block}

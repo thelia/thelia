@@ -106,7 +106,7 @@
 
                                     {hook name="coupon.table-header" location="coupon_table_header" }
 
-                                    <th>&nbsp;</th>
+                                    <th>{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -114,7 +114,7 @@
                                     <tr>
                                         <td>
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}">{$CODE}</a>
+                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}">{$CODE}</a>
                                             {/loop}
                                             {elseloop rel="can_change"}
                                                 {$CODE}
@@ -153,18 +153,32 @@
 
                                         {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
 
-                                        <td class="btn-group">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                            {/loop}
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
-                                                <a title="{intl l='Delete this coupon'}" class="btn btn-default btn-xs delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
-                                                    <i class="glyphicon glyphicon-trash"></i>
-                                                </a>
-                                            {/loop}
+                                        <td class="actions">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
+                                                    <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
+                                                    <a title="{intl l='Delete this coupon'}" class="delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                    </a>
+                                                {/loop}
+                                            </div>
                                         </td>
                                     </tr>
                                 {/loop}
+                                {elseloop rel="list_coupon"}
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="alert alert-info text-center">
+                                                <p>{intl l="No coupon is currently defined. Please use the (+) button above to create your first coupon."}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
                             </tbody>
                         </table>
                     </div>
@@ -218,10 +232,6 @@
     {/javascripts}
 
     {javascripts file='assets/js/tablesorter/jquery.tablesorter.widgets-filter-formatter.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-    {javascripts file='assets/js/main.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
 

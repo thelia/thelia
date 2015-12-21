@@ -4,9 +4,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
-
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
@@ -65,17 +63,17 @@ class OrderQuery extends BaseOrderQuery
 
         $stats = array();
         for ($day=1; $day<=$numberOfDay; $day++) {
-            $dayOrdersQuery = self::create('matching_order')
+            $dayOrdersQuery = self::create()
                 ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
                 ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
 
             $otherOrderJoin = new Join();
-            $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'matching_order', OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
+            $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', null, OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
             $otherOrderJoin->setJoinType(Criteria::LEFT_JOIN);
 
             $dayOrdersQuery->addJoinObject($otherOrderJoin, 'other_order_join')
-                ->addJoinCondition('other_order_join', '`matching_order`.`ID` <>  `other_order`.`ID`')
-                ->addJoinCondition('other_order_join', '`matching_order`.`CREATED_AT` >  `other_order`.`CREATED_AT`');
+                ->addJoinCondition('other_order_join', '`order`.`ID` <>  `other_order`.`ID`')
+                ->addJoinCondition('other_order_join', '`order`.`CREATED_AT` >  `other_order`.`CREATED_AT`');
 
             $dayOrdersQuery->where('ISNULL(`other_order`.`ID`)');
 
@@ -97,15 +95,35 @@ class OrderQuery extends BaseOrderQuery
     {
         $orderTaxJoin = new Join();
         $orderTaxJoin->addExplicitCondition(OrderProductTableMap::TABLE_NAME, 'ID', null, OrderProductTaxTableMap::TABLE_NAME, 'ORDER_PRODUCT_ID', null);
-        $orderTaxJoin->setJoinType(Criteria::INNER_JOIN);
+        $orderTaxJoin->setJoinType(Criteria::LEFT_JOIN);
 
         $query = self::baseSaleStats($startDate, $endDate, 'o')
             ->innerJoinOrderProduct()
             ->addJoinObject($orderTaxJoin)
-            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)))", 'TOTAL')
-            ->select('TOTAL')
+            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))", 'TOTAL')
+            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))", 'TAX')
+            ->select(['TOTAL', 'TAX'])
         ;
-        $amount = $query->findOne();
+        $arrayAmount = $query->findOne();
+
+        $amount = $arrayAmount['TOTAL'] + $arrayAmount['TAX'];
+
+        if (null === $amount) {
+            $amount = 0;
+        }
+
+        $discountQuery = self::baseSaleStats($startDate, $endDate)
+            ->withColumn("SUM(`order`.discount)", 'DISCOUNT')
+            ->select('DISCOUNT')
+        ;
+
+        $discount = $discountQuery->findOne();
+
+        if (null === $discount) {
+            $discount = 0;
+        }
+
+        $amount = $amount - $discount;
 
         if ($includeShipping) {
             $query = self::baseSaleStats($startDate, $endDate)

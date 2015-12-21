@@ -31,6 +31,7 @@
         <form name="thelia.admin.category.document.modification" class="Thelia\Form\CategoryDocumentModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.clone" class="Thelia\Form\ProductCloneForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
         <form name="thelia.admin.product.details.modification" class="Thelia\Form\ProductDetailsModificationForm"/>
         <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
@@ -114,9 +115,12 @@
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
         <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>
+        <form name="thelia.admin.area.delete.country" class="Thelia\Form\Area\AreaDeleteCountryForm"/>
         <form name="thelia.admin.area.postage" class="Thelia\Form\Area\AreaPostageForm"/>
 
+        <!-- thelia.shopping_zone_area is a typo, and will be removed in a future version -->
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
+        <form name="thelia.shipping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
 
         <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>
@@ -128,6 +132,7 @@
         <form name="thelia.system-logs.configuration" class="Thelia\Form\SystemLogConfigurationForm"/>
 
         <form name="thelia.admin.module.modification" class="Thelia\Form\ModuleModificationForm"/>
+        <form name="thelia.admin.module.image.modification" class="Thelia\Form\ModuleImageModification"/>
         <form name="thelia.admin.module.install" class="Thelia\Form\ModuleInstallForm"/>
 
         <form name="thelia.admin.hook.creation" class="Thelia\Form\HookCreationForm"/>

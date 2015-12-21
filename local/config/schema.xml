@@ -10,6 +10,7 @@
     <column defaultValue="0" name="parent" required="true" type="INTEGER" />
     <column name="visible" required="true" type="TINYINT" />
     <column name="position" required="true" type="INTEGER" />
+    <column name="default_template_id" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -102,7 +103,6 @@
   </table>
   <table name="country" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="area_id" type="INTEGER" />
     <column name="isocode" required="true" size="4" type="VARCHAR" />
     <column name="isoalpha2" size="2" type="VARCHAR" />
     <column name="isoalpha3" size="4" type="VARCHAR" />
@@ -112,12 +112,6 @@
     <column name="postscriptum" type="LONGVARCHAR" />
     <column defaultValue="0" name="by_default" type="TINYINT" />
     <column defaultValue="0" name="shop_country" required="true" type="BOOLEAN" />
-    <foreign-key foreignTable="area" name="fk_country_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
-      <reference foreign="id" local="area_id" />
-    </foreign-key>
-    <index name="idx_country_area_id">
-      <index-column name="area_id" />
-    </index>
     <index name="idx_country_by_default">
       <index-column name="by_default" />
     </index>
@@ -249,7 +243,7 @@
     <foreign-key foreignTable="feature" name="fk_feature_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="feature_id" />
     </foreign-key>
-    <foreign-key foreignTable="template" name="fk_feature_template">
+    <foreign-key foreignTable="template" name="fk_feature_template" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="template_id" />
     </foreign-key>
     <index name="idx_feature_template_id">
@@ -353,7 +347,7 @@
     <foreign-key foreignTable="attribute" name="fk_attribute_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
-    <foreign-key foreignTable="template" name="fk_attribute_template">
+    <foreign-key foreignTable="template" name="fk_attribute_template" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="template_id" />
     </foreign-key>
     <index name="idx_attribute_template_id">
@@ -394,7 +388,7 @@
     <column name="reseller" type="TINYINT" />
     <column name="lang" size="10" type="VARCHAR" />
     <column name="sponsor" size="50" type="VARCHAR" />
-    <column name="discount" type="FLOAT" />
+    <column defaultValue="0.000000" name="discount" type="DECIMAL" size="16" scale="6" />
     <column name="remember_me_token" size="255" type="VARCHAR" />
     <column name="remember_me_serial" size="255" type="VARCHAR" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
@@ -578,9 +572,9 @@
     <column description="transaction reference - usually use to identify a transaction with banking modules" name="transaction_ref" size="100" type="VARCHAR" />
     <column description="delivery reference - usually use to identify a delivery progress on a distant delivery tracker website" name="delivery_ref" size="100" type="VARCHAR" />
     <column description="the invoice reference" name="invoice_ref" size="100" type="VARCHAR" />
-    <column name="discount" type="FLOAT" />
-    <column name="postage" required="true" type="FLOAT" />
-    <column defaultValue="0" name="postage_tax" required="true" type="FLOAT" />
+    <column defaultValue="0.000000" name="discount" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="postage" required="true" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="postage_tax" required="true" type="DECIMAL" size="16" scale="6" />
     <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
     <column name="payment_module_id" required="true" type="INTEGER" />
     <column name="delivery_module_id" required="true" type="INTEGER" />
@@ -610,9 +604,6 @@
     </foreign-key>
     <foreign-key foreignTable="lang" name="fk_order_lang_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="lang_id" />
-    </foreign-key>
-    <foreign-key foreignTable="cart" name="fk_order_cart_id">
-      <reference foreign="id" local="cart_id" />
     </foreign-key>
     <index name="idx_order_currency_id">
       <index-column name="currency_id" />
@@ -655,9 +646,11 @@
     <column name="name" size="45" type="VARCHAR" />
     <column name="code" size="45" type="VARCHAR" />
     <column name="symbol" size="45" type="VARCHAR" />
+    <column name="format" size="10" type="CHAR" />
     <column name="rate" type="FLOAT" />
+    <column defaultValue="0" name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
-    <column name="by_default" type="TINYINT" />
+    <column defaultValue="0" name="by_default" type="TINYINT" />
     <index name="idx_currency_by_default">
       <index-column name="by_default" />
     </index>
@@ -681,6 +674,7 @@
     <column name="zipcode" required="true" size="10" type="VARCHAR" />
     <column name="city" required="true" size="255" type="VARCHAR" />
     <column name="phone" size="20" type="VARCHAR" />
+    <column name="cellphone" size="20" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_title_id" />
@@ -707,8 +701,8 @@
     <column name="description" type="CLOB" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
-    <column name="price" required="true" type="FLOAT" />
-    <column name="promo_price" size="45" type="VARCHAR" />
+    <column defaultValue="0.000000" name="price" required="true" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="promo_price" type="DECIMAL" size="16" scale="6" />
     <column name="was_new" required="true" type="TINYINT" />
     <column name="was_in_promo" required="true" type="TINYINT" />
     <column name="weight" size="45" type="VARCHAR" />
@@ -1037,7 +1031,7 @@
     <column name="address_delivery_id" type="INTEGER" />
     <column name="address_invoice_id" type="INTEGER" />
     <column name="currency_id" type="INTEGER" />
-    <column defaultValue="0" name="discount" type="FLOAT" />
+    <column defaultValue="0.000000" name="discount" type="DECIMAL" size="16" scale="6" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -1073,8 +1067,8 @@
     <column name="product_id" required="true" type="INTEGER" />
     <column defaultValue="1" name="quantity" type="FLOAT" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
-    <column name="price" type="FLOAT" />
-    <column name="promo_price" type="FLOAT" />
+    <column defaultValue="0.000000" name="price" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="promo_price" type="DECIMAL" size="16" scale="6" />
     <column name="price_end_of_life" type="TIMESTAMP" />
     <column name="promo" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -1100,8 +1094,8 @@
   <table name="product_price" namespace="Thelia\Model">
     <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
-    <column defaultValue="0" name="price" required="true" type="FLOAT" />
-    <column defaultValue="0" name="promo_price" required="true" type="FLOAT" />
+    <column defaultValue="0.000000" name="price" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="promo_price" type="DECIMAL" size="16" scale="6" />
     <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
     <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id" onDelete="CASCADE">
       <reference foreign="id" local="product_sale_elements_id" />
@@ -1295,7 +1289,7 @@
   </table>
   <table name="rewriting_url" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" required="true" size="255" type="VARCHAR" />
+    <column name="url" required="true" size="255" type="VARCHAR" sqlType="VARBINARY(255)" />
     <column name="view" size="255" type="VARCHAR" />
     <column name="view_id" size="255" type="VARCHAR" />
     <column name="view_locale" size="255" type="VARCHAR" />
@@ -1307,6 +1301,12 @@
       <unique-column name="url" />
     </unique>
     <index name="idx_rewriting_url_redirected">
+      <index-column name="redirected" />
+    </index>
+    <index name="idx_rewriting_url">
+      <index-column name="view_locale" />
+      <index-column name="view" />
+      <index-column name="view_id" />
       <index-column name="redirected" />
     </index>
     <behavior name="timestampable" />
@@ -1361,8 +1361,8 @@
     <column name="order_product_id" required="true" type="INTEGER" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
-    <column name="amount" required="true" type="FLOAT" />
-    <column name="promo_amount" type="FLOAT" />
+    <column defaultValue="0.000000" name="amount" required="true" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="promo_amount" type="DECIMAL" size="16" scale="6" />
     <foreign-key foreignTable="order_product" name="fk_ order_product_tax_order_product_id0" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_product_id" />
     </foreign-key>
@@ -1387,7 +1387,7 @@
     <column name="order_id" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
-    <column name="amount" required="true" type="FLOAT" />
+    <column defaultValue="0.000000" name="amount" required="true" type="DECIMAL" size="16" scale="6" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
@@ -1690,10 +1690,10 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column name="product_image_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_image_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_image_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_image" name="fk_pse_product_image_product_image_id">
+    <foreign-key foreignTable="product_image" name="fk_pse_product_image_product_image_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_image_id" />
     </foreign-key>
     <index name="fk_pse_product_image_product_image_id_idx">
@@ -1707,10 +1707,10 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column name="product_document_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_document_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_document_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_document" name="fk_pse_product_document_product_document_id">
+    <foreign-key foreignTable="product_document" name="fk_pse_product_document_product_document_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_document_id" />
     </foreign-key>
     <index name="fk_pse_product_document_product_document__idx">
@@ -1754,6 +1754,7 @@
     <column name="hook_active" required="true" type="BOOLEAN" />
     <column name="module_active" required="true" type="BOOLEAN" />
     <column name="position" required="true" type="INTEGER" />
+    <column name="templates" type="LONGVARCHAR" />
     <foreign-key foreignTable="module" name="fk_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="module_id" />
     </foreign-key>
@@ -1814,6 +1815,23 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table isCrossRef="true" name="country_area" namespace="Thelia\Model">
+    <column name="country_id" required="true" type="INTEGER" />
+    <column name="area_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="area" name="fk_country_area_area_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="area_id" />
+    </foreign-key>
+    <foreign-key foreignTable="country" name="fk_country_area_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <index name="country_area_area_id_idx">
+      <index-column name="area_id" />
+    </index>
+    <index name="fk_country_area_country_id_idx">
+      <index-column name="country_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <table isCrossRef="true" name="ignored_module_hook" namespace="Thelia\Model">
     <column name="module_id" required="true" type="INTEGER" />
     <column name="hook_id" required="true" type="INTEGER" />
@@ -1831,5 +1849,6 @@
     <index name="fk_deleted_module_hook_hook_id_idx">
       <index-column name="hook_id" />
     </index>
+    <behavior name="timestampable" />
   </table>
 </database>

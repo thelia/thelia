@@ -21,12 +21,8 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\OrderAddressQuery;
-use Thelia\Model\OrderProductQuery;
-use Thelia\Model\OrderQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CurrencyQuery;
@@ -34,6 +30,9 @@ use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order as OrderModel;
+use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductQuery;
@@ -546,7 +545,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $title = $orderAddress->getCustomerTitleId() == 3 ? 1 : 3;
         $country = $orderAddress->getCountryId() == 64 ? 1 : 64;
         $orderAddressEvent = new OrderAddressEvent(
-            $title, 'B', 'C', 'D', 'E', 'F', 'G', 'H', $country, 'J', 'K'
+            $title, 'B', 'C', 'D', 'E', 'F', 'G', 'H', $country, 'J', 'K', '0102030405'
         );
         $orderAddressEvent->setOrderAddress($orderAddress);
         $orderAddressEvent->setOrder($order);
@@ -565,6 +564,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('H', $orderAddressEvent->getOrderAddress()->getCity());
         $this->assertEquals($country, $orderAddressEvent->getOrderAddress()->getCountryId());
         $this->assertEquals('J', $orderAddressEvent->getOrderAddress()->getPhone());
+        $this->assertEquals('0102030405', $orderAddressEvent->getOrderAddress()->getCellphone());
         $this->assertEquals('K', $orderAddressEvent->getOrderAddress()->getCompany());
 
         $this->assertEquals($title, $newOrderAddress->getCustomerTitleId());

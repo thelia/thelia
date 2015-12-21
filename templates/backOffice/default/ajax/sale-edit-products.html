@@ -33,14 +33,14 @@
                 </td>
 
                 <td class="text-center">
-                   <input {if $selected}checked {/if}data-product-id="{$ID}" type="checkbox" {form_field_attributes form=$form field="products" value=$ID value_key=$ID extra_class="product-selector-checkbox"}>
+                   <input {if $selected}checked {/if}data-product-id="{$ID}" type="checkbox" {form_field_attributes field="products" value=$ID value_key=$ID extra_class="product-selector-checkbox"}>
                 </td>
 
                 <td>{$TITLE}</td>
 
                 <td><a target="_blank" title="{intl l='View this product in a new page'}" href="{url path="/admin/products/update" product_id=$ID current_tab=prices}">{$REF}</a></td>
 
-                <td class="text-right">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</td>
+                <td class="text-right">{format_money number=$BEST_TAXED_PRICE}</td>
 
                 <td class="text-center">
                     {$has_combinations = false}
@@ -51,10 +51,10 @@
                     {/loop}
                     {if $has_combinations}
                         <button {if ! $selected}disabled="disabled"{/if} title="{intl l='Product\'s attributes included in this sale operation'}" class="btn btn-primary btn-xs product-attribute-selector" data-product-id="{$ID}">{intl l='All'}</button>
-                        <input data-product-id="{$ID}" type="hidden" {form_field_attributes form=$form field="product_attributes" value="" value_key=$ID extra_class="product-selected-attributes-ids"}>
+                        <input data-product-id="{$ID}" type="hidden" {form_field_attributes field="product_attributes" value="" value_key=$ID extra_class="product-selected-attributes-ids"}>
                     {else}
                         {intl l="No attributes."}
-                        <input type="hidden" {form_field_attributes form=$form field="product_attributes" value='' value_key=$ID}>
+                        <input type="hidden" {form_field_attributes field="product_attributes" value='' value_key=$ID}>
                     {/if}
                 </td>
             </tr>

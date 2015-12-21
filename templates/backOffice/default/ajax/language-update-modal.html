@@ -8,16 +8,16 @@
 {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "edit_lang_dialog"}
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
-    {form_field form=$form field='title'}
+    {form_field field='title'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l={$label}} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l={$label} }" placeholder="{intl l='Label'}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='code'}
+    {form_field field='code'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l={$label}} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l={$label}}" placeholder="{intl l='Company'}">
@@ -25,14 +25,14 @@
         </div>
     {/form_field}
 
-    {form_field form=$form field='locale'}
+    {form_field field='locale'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l={$label}} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l={$label}}" placeholder="{intl l='Company'}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='date_format'}
+    {form_field field='date_format'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l={$label}} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l={$label}}" placeholder="{intl l='Company'}">
@@ -40,28 +40,28 @@
         </div>
     {/form_field}
 
-    {form_field form=$form field='time_format'}
+    {form_field field='time_format'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{intl l={$label}} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l={$label}}" placeholder="{intl l='Company'}">
             <span class="help-block">{intl l='The syntax used is identical to the PHP <a href="http://www.php.net/date" target="_other">date()</a> function'}</span>
         </div>
     {/form_field}
-    {form_field form=$form field='decimal_separator'}
+    {form_field field='decimal_separator'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='eg: . or ,'}">
             <span class="help-block">{intl l='Sets the separator for the decimal point'}</span>
         </div>
     {/form_field}
-    {form_field form=$form field='thousands_separator'}
+    {form_field field='thousands_separator'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
             <span class="help-block">{intl l='Sets the thousands separator.'}</span>
         </div>
     {/form_field}
-    {form_field form=$form field='decimals'}
+    {form_field field='decimals'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="2">
@@ -83,8 +83,8 @@
 dialog_ok_label     = {intl l="Save changes"}
 dialog_cancel_label = {intl l="Cancel"}
 
-form_action        = {url path="/admin/configuration/languages/save/{$lang_id}"}
-form_enctype       = {form_enctype form=$form}
+form_action        = {url path="/admin/configuration/languages/save/%id" id=$lang_id}
+form_enctype       = {form_enctype}
 form_error_message = $form_error_message
 }
 

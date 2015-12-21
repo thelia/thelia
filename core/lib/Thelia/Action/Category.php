@@ -12,14 +12,15 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Model\CategoryDocumentQuery;
+use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Category as CategoryModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
@@ -29,6 +30,7 @@ use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
 use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\CategoryAssociatedContentQuery;
+use Thelia\Model\Map\CategoryTableMap;
 
 class Category extends BaseAction implements EventSubscriberInterface
 {
@@ -65,7 +67,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $category
                 ->setDispatcher($event->getDispatcher())
-
+                ->setDefaultTemplateId($event->getDefaultTemplateId() == 0 ? null : $event->getDefaultTemplateId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -101,12 +103,39 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function delete(CategoryDeleteEvent $event)
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
-            $category
-                ->setDispatcher($event->getDispatcher())
-                ->delete()
-            ;
+            $con = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
+            $con->beginTransaction();
 
-            $event->setCategory($category);
+            try {
+                // Get category's files to delete after category deletion
+                $fileList['images']['list'] = CategoryImageQuery::create()
+                    ->findByCategoryId($event->getCategoryId());
+                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+                $fileList['documentList']['list'] = CategoryDocumentQuery::create()
+                    ->findByCategoryId($event->getCategoryId());
+                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+                // Delete category
+                $category
+                    ->setDispatcher($event->getDispatcher())
+                    ->delete($con);
+
+                $event->setCategory($category);
+
+                // Dispatch delete category's files event
+                foreach ($fileList as $fileTypeList) {
+                    foreach ($fileTypeList['list'] as $fileToDelete) {
+                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                    }
+                }
+
+                $con->commit();
+            } catch (\Exception $e) {
+                $con->rollback();
+                throw $e;
+            }
         }
     }
 

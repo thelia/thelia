@@ -14,7 +14,7 @@ namespace Thelia\Core\Template;
 
 /**
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  *
  */
 
@@ -77,4 +77,9 @@ interface ParserInterface
      * @param mixed  $value    the value of the variable
      */
     public function assign($variable, $value);
+
+    /**
+     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     */
+    public function getTemplateHelper();
 }

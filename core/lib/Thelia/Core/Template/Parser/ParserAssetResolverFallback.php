@@ -18,7 +18,7 @@ use Thelia\Core\Template\ParserInterface;
 /**
  * Class ParserAssetResolverFallback
  * @package Thelia\Core\Template\Parser
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ParserAssetResolverFallback implements AssetResolverInterface
 {

@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Thelia\ImportExport\Import\Type\ProductPricesImport;
 use Thelia\Model\Lang;
 
-
 /**
  * Class ExportPriceThenImportItTest
  * @package Thelia\Tests\ImportExport

@@ -11,10 +11,9 @@
 /*************************************************************************************/
 
 namespace HookNewsletter\Hook;
-use Thelia\Core\Event\Hook\HookRenderBlockEvent;
-use Thelia\Core\Event\Hook\HookRenderEvent;
-use Thelia\Core\Hook\BaseHook;
 
+use Thelia\Core\Event\Hook\HookRenderBlockEvent;
+use Thelia\Core\Hook\BaseHook;
 
 /**
  * Class FrontHook
@@ -35,5 +34,4 @@ class FrontHook extends BaseHook {
             ));
         }
     }
-
 } 

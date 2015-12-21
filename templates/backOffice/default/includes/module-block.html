@@ -16,11 +16,14 @@
                    label="{intl l='ID'}"
                 }
                 </th>
+
+                <th>&nbsp;</th>
+
                 <th>
                 {admin_sortable_header
                    current_order=$module_order
-                   order='alpha'
-                   reverse_order='alpha_reverse'
+                   order='title'
+                   reverse_order='title_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
                    label="{intl l='Name'}"
@@ -39,17 +42,6 @@
                 </th>
 
                 <th>{intl l="version"}</th>
-
-                <th>
-                {admin_sortable_header
-                   current_order=$module_order
-                   order='title'
-                   reverse_order='title_reverse'
-                   path={url path='/admin/modules'}
-                   request_parameter_name='module_order'
-                   label="{intl l='Description'}"
-                }
-                </th>
 
                 <th class="text-center">
                 {admin_sortable_header
@@ -84,10 +76,13 @@
                 {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
                 <tr id="module-{$ID}" {if ! $EXISTS}class="warning"{/if}>
                     <td>{$ID}</td>
+                    <td nowrap>
+                        <a href="#" class="module-information text-info" data-id="{$ID}" title="{intl l='Get more information about this module'}"><span class="glyphicon glyphicon-question-sign"></span></a>
+                        <a href="#" class="module-documentation text-primary" data-id="{$ID}" title="{intl l='Read module documentation'}"><span class="glyphicon glyphicon-book"></span></a>
+                    </td>
                     <td>{$TITLE}</td>
                     <td>{$CODE}</td>
                     <td>{$VERSION}</td>
-                    <td>{$CHAPO}</td>
 
                     {if $EXISTS}
                         <td class="text-center">
@@ -96,9 +91,9 @@
                             </div>
                             <noscript>
                                 {if $ACTIVE}
-                                    <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                                    <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="deactivation"}</a>
                                 {else}
-                                    <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                                    <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
                                 {/if}
                             </noscript>
                         </td>
@@ -123,7 +118,7 @@
 
                     {hook name="modules.table-row" location="modules_table_row" }
 
-                    <td class="text-right">
+                    <td class="actions">
                         {if $module_type == 2}
                             {ifloop rel="area-attached"}
                                 {$zones=""}
@@ -141,43 +136,46 @@
                                 {$btnstyle="btn-danger"}
                             {/elseloop}
 
-                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
-                        <div class="btn-group">
+                        <div class="separate-from-left btn-toolbar btn toolbar-primary">
+                            <span class="glyphicon glyphicon-cog"></span>
+                        </div>
+                        <div class="toolbar-options hidden">
                             {if $EXISTS}
 
-                                {if $CONFIGURABLE == 1}
+                                {if $CONFIGURABLE == 1 && $ACTIVE}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
+                                        <a class="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
                                     {/loop}
                                 {/if}
 
-                                {if $HOOKABLE}
+                                {if $HOOKABLE && $ACTIVE}
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
-                                <a class="{if ! $ACTIVE}disabled {/if} btn btn-default btn-xs" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
-                            {/loop}
+                                    <a id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-indent-left"></span></a>
+                                {/loop}
                                 {/if}
 
                                 {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"></a>
+                                    <a title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"></a>
                                 {/loop*}
 
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                    <a title="{intl l='Edit this module'}" href="{url path="/admin/module/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                 {/loop}
                             {/if}
 
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
-                                <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                <a class="module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}
                         </div>
                     </td>
                 </tr>
                 {/loop}
             {/loop}
-            {elseloop rel="module.{$module_type}"}
+            {elseloop rel="module.`$module_type`"}
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     <br />
                     <div class="alert alert-info">
                         {intl l="No module of this type was found."}

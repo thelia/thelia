@@ -1,15 +1,13 @@
 {default_translation_domain domain='email.default'}
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
-{loop name="currency.order" type="currency" id=$CURRENCY}
-    {assign "orderCurrencySymbol" $SYMBOL}
-{/loop}
 {intl l="Hello,"}
 
 {intl l="Here is the details of your order %ref placed on %date" ref={$REF} date={format_date date=$INVOICE_DATE}}
 
 {intl l="Your delivery address"}
-{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
-{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+{if $COMPANY != ""}{$COMPANY}
+{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
@@ -17,7 +15,8 @@
 
 {intl l="Your billing address"}
 {loop type="order_address" name="billing_address" id=$INVOICE_ADDRESS}
-{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{if $COMPANY != ""}{$COMPANY}
+{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
@@ -43,12 +42,12 @@
     {/loop}
 {/ifloop}
     {intl l="Quantity : %qty" qty=$QUANTITY}
-    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice} symbol=$orderCurrencySymbol}
+    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice} currency_id=$CURRENCY}
 {/loop}
 -----------------------------------------
-{intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrencySymbol}}
-{intl l="Shipping    : %amount" amount={format_money number=$POSTAGE symbol=$orderCurrencySymbol}}
-{intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}}
+{intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}}
+{intl l="Shipping    : %amount" amount={format_money number=$POSTAGE currency_id=$CURRENCY}}
+{intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}}
 ==================================
 
 {intl l="Your invoice is available in your customer account at %url" url={config key="url_site"}}

@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\ShippingZone;
 /**
  * Class ShippingZoneRemoveAreaEvent
  * @package Thelia\Core\Event\ShippingZone
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ShippingZoneRemoveAreaEvent extends ShippingZoneAddAreaEvent
 {

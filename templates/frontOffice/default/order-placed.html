@@ -26,16 +26,13 @@
             {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="placed-order" id=$placed_order_id}
-                {loop type="currency" name="order-currency" id=$CURRENCY}
-                    {$orderCurrency=$SYMBOL}
-                {/loop}
             {ifhook rel="order-placed.body"}
                 {hook name="order-placed.body" module="$PAYMENT_MODULE"}
             {/ifhook}
             {elsehook rel="order-placed.body"}
-                <div id="payment-success" class="panel">
+                <div id="payment-success" class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                        <h3 class="panel-title">{intl l="You choose"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
                     </div>
                     <div class="panel-body">
                         <h3>{intl l="Thank you for the trust you place in us."}</h3>
@@ -47,7 +44,7 @@
                             <dt>{intl l="Date"} : </dt>
                             <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                             <dt>{intl l="Total"} : </dt>
-                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} symbol={$orderCurrency}}</dd>
+                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} currency_id=$CURRENCY}</dd>
                         </dl>
 
                         {block name='additional-payment-info'}{/block}
@@ -58,7 +55,7 @@
             {/elsehook}
             {/loop}
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-default">{intl l="Go home"}</a>
 
         </article>
 

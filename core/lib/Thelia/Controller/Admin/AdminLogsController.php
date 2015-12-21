@@ -43,7 +43,7 @@ class AdminLogsController extends BaseAdminController
         ) as $entry) {
             $entries[] = array(
                 "head" => sprintf(
-                    "[%s][%s][%s:%s%s]",
+                    "%s|%s|%s:%s%s",
                     date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
                     $entry->getAdminLogin(),
                     $entry->getResource(),

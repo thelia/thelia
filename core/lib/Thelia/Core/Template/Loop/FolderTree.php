@@ -16,10 +16,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\FolderQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -35,6 +33,12 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getFolder()
+ * @method int getDepth()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
  */
 class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -52,9 +56,9 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
     }
 
     // changement de rubrique
-    protected function buildFolderTree($parent, $visible, $level, $max_level, $exclude, &$resultsList)
+    protected function buildFolderTree($parent, $visible, $level, $maxLevel, $exclude, &$resultsList)
     {
-        if ($level > $max_level) {
+        if ($level > $maxLevel) {
             return;
         }
 
@@ -89,7 +93,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
                 'CHILD_COUNT' => $result->countChild(),
             );
 
-            $this->buildFolderTree($result->getId(), $visible, 1 + $level, $max_level, $exclude, $resultsList);
+            $this->buildFolderTree($result->getId(), $visible, 1 + $level, $maxLevel, $exclude, $resultsList);
         }
     }
 

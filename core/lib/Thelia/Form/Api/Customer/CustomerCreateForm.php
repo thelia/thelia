@@ -18,7 +18,7 @@ use Thelia\Form\CustomerCreateForm as BaseCustomerCreateForm;
 /**
  * Class CustomerCreateForm
  * @package Thelia\Form\Api\Customer
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class CustomerCreateForm extends BaseCustomerCreateForm
 {

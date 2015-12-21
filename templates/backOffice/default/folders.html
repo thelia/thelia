@@ -143,15 +143,18 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-group">
-                                            <a class="btn btn-default btn-xs" title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
+                                            <a title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
 
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
-                                                <a class="btn btn-default btn-xs folder-delete" title="{intl l='Delete this folder and all its contents'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="folder-delete" title="{intl l='Delete this folder and all its contents'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -265,12 +268,12 @@
 
                                     <td>
                                         {loop type="image" name="folder_image" source="content" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path="admin/content/update/$OBJECT_ID"}" title="{intl l='Edit this content'}">
+                                            <a href="{url path="admin/content/update/%id" id=$OBJECT_ID}" title="{intl l='Edit this content'}">
                                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                             </a>
                                         {/loop}
 
-                                    <td class="object-title"><a href="{url path="/admin/content/update/$ID"}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
+                                    <td class="object-title"><a href="{url path="/admin/content/update/%id" id=$ID}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
 
                                     {hook name="contents.row" location="content_list_row" }
 
@@ -300,14 +303,17 @@
                                         }
                                     </td>
 
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="admin/content/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this content'}" href="{url path="admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
-                                                <a class="btn btn-default btn-xs content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -347,18 +353,18 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "folder_creation_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
         {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
             <input type="hidden" name="{$name}" value="{url path='/admin/folders/update/_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='parent'}
+        {form_field field='parent'}
             <input type="hidden" name="{$name}" value="{$parent}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 {loop type="lang" name="default-lang" default_only="1"}
@@ -372,14 +378,14 @@
                 {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {form_field form=$form field='locale'}
+                {form_field field='locale'}
                     <input type="hidden" name="{$name}" value="{$LOCALE}" />
                 {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='visible'}
+        {form_field field='visible'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox">
                     <label>
@@ -404,7 +410,7 @@
     dialog_ok_label     = {intl l="Create this folder"}
 
     form_action        = {url path='/admin/folders/create'}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = $form_error_message
     }
     {/form}
@@ -416,21 +422,21 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "content_creation_dialog"}
 
-{form_hidden_fields form=$form}
+{form_hidden_fields}
 
 {* Be sure to get the folder_id, even if the form could not be validated *}
 <input type="hidden" name="parent" value="{$parent}" />
 
-    {form_field form=$form field='success_url'}
+    {form_field field='success_url'}
     {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
         <input type="hidden" name="{$name}" value="{url path='/admin/content/update/_ID_' }" />
     {/form_field}
 
-    {form_field form=$form field='default_folder'}
+    {form_field field='default_folder'}
         <input type="hidden" name="{$name}" value="{$parent}" />
     {/form_field}
 
-    {form_field form=$form field='title'}
+    {form_field field='title'}
 <div class="form-group {if $error}has-error{/if}">
     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
     {loop type="lang" name="default-lang" default_only="1"}
@@ -444,14 +450,14 @@
                             {* Switch edition to the current locale *}
                             <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='visible'}
+        {form_field field='visible'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox">
                     <label>
@@ -476,7 +482,7 @@
                             dialog_ok_label     = {intl l="Create this content"}
 
                             form_action        = {url path='/admin/content/create'}
-                            form_enctype       = {form_enctype form=$form}
+                            form_enctype       = {form_enctype}
                             form_error_message = $form_error_message
                             }
 {/form}

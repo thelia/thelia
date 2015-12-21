@@ -1,0 +1,25 @@
+// Thelia : Brand
+
+#brands {
+    .brands > ul {
+
+        .item {
+            + .item {
+                border-top: 1px solid #ededed;
+            }
+            > article {
+
+                .brand-image {
+                    &.overlay {
+                        &:after {
+                            display: none;
+                        }
+                    }
+                    > img {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}

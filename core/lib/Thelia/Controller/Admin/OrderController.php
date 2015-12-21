@@ -26,7 +26,7 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Class OrderController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class OrderController extends BaseAdminController
 {
@@ -88,9 +88,15 @@ class OrderController extends BaseAdminController
         }
 
         $browsedPage = $this->getRequest()->get("order_page");
+        $currentStatus = $this->getRequest()->get("status");
 
         if ($browsedPage) {
             $params["order_page"] = $browsedPage;
+
+            if (null !== $currentStatus) {
+                $params["status"] = $currentStatus;
+            }
+
             $response = $this->generateRedirectFromRoute("admin.order.list", $params);
         } else {
             $params["tab"] = $this->getRequest()->get("tab", 'cart');
@@ -177,7 +183,8 @@ class OrderController extends BaseAdminController
                 $form->get("city")->getData(),
                 $form->get("country")->getData(),
                 $form->get("phone")->getData(),
-                $form->get("company")->getData()
+                $form->get("company")->getData(),
+                $form->get("cellphone")->getData()
             );
             $event->setOrderAddress($orderAddress);
             $event->setOrder($order);
@@ -202,25 +209,25 @@ class OrderController extends BaseAdminController
         );
     }
 
-    public function generateInvoicePdf($order_id)
+    public function generateInvoicePdf($order_id, $browser)
     {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
             return $response;
         }
-        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), $browser);
     }
 
-    public function generateDeliveryPdf($order_id)
+    public function generateDeliveryPdf($order_id, $browser)
     {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
             return $response;
         }
-        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser);
     }
 
-    private function generateBackOfficeOrderPdf($order_id, $fileName)
+    private function generateBackOfficeOrderPdf($order_id, $fileName, $browser)
     {
-        if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
+        if (null === $response = $this->generateOrderPdf($order_id, $fileName, true, true, $browser)) {
             return $this->generateRedirectFromRoute(
                 "admin.order.update.view",
                 [],

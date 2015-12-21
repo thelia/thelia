@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Action\Cache;
 use Thelia\Core\Application;
 use Thelia\Command\CacheClear;
-
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Tests\ContainerAwareTestCase;
 
@@ -27,7 +26,7 @@ use Thelia\Tests\ContainerAwareTestCase;
  *
  * Class CacheClearTest
  * @package Thelia\Tests\Command
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CacheClearTest extends ContainerAwareTestCase
 {

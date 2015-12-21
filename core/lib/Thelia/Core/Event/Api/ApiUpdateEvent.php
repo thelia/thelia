@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class ApiUpdateEvent
  * @package Thelia\Core\Event\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ApiUpdateEvent extends ActionEvent
 {

@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="after-bootstrap-css"}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}">
+{/block}
+
 {block name="no-return-functions"}
     {$admin_current_location = 'home'}
 {/block}
@@ -7,21 +11,73 @@
 {block name="page-title"}{intl l='Back-office home'}{/block}
 
 {block name="main-content"}
-	<div class="homepage">
-	      <div id="wrapper" class="container">
+    <div class="homepage">
+        <div id="wrapper" class="container">
 
-		    {hook name="home.top" location="home_top" }
+            {hook name="home.top" location="home_top" }
+
+            {* Do not display shop information block if user none of the required authorizations *}
+
+            {capture name="shop_information_block_content"}
+                {loop type="auth" name="can_view" role="ADMIN" resource="admin.customer" access="VIEW"}
+                    <div class="stats col-md-2 col-xs-4">
+                        <h2>{count type="customer" current="false" backend_context="1"}</h2>
+                        <p>{intl l="Customers"}</p>
+                    </div>
+                {/loop}
+
+                {loop type="auth" name="can_view" role="ADMIN" resource="admin.category" access="VIEW"}
+                    <div class="stats col-md-2 col-xs-4">
+                        <h2>{count type="category" visible="*" backend_context="1"}</h2>
+                        <p>{intl l="Categories"}</p>
+                    </div>
+                {/loop}
+
+                {loop type="auth" name="can_view" role="ADMIN" resource="admin.product" access="VIEW"}
+                    <div class="stats col-md-2 col-xs-4">
+                        <h2>{count type="product" visible="*" backend_context="1"}</h2>
+                        <p>{intl l="Products"}</p>
+                    </div>
+                    <div class="stats col-md-2 col-xs-4">
+                        <h2>{count type="product" visible="true" backend_context="1"}</h2>
+                        <p>{intl l="Online products"}</p>
+                    </div>
+                    <div class="stats col-md-2 col-xs-4">
+                        <h2>{count type="product" visible="false" backend_context="1"}</h2>
+                        <p>{intl l="Offline products"}</p>
+                    </div>
+                {/loop}
+
+                {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
+                    <div class="stats col-md-2 col-xs-4">
+                        <h2>{count type="order" status="*" customer="*" backend_context="1"}</h2>
+                        <p>{intl l="Orders"}</p>
+                    </div>
+                {/loop}
+            {/capture}
+
+            {if trim($smarty.capture.shop_information_block_content) ne ""}
+            <div class="general-block-decorator">
+                <div class="row">
+                    {$smarty.capture.shop_information_block_content nofilter}
+                </div>
+            </div>
+            {/if}
 
             {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
 			<div class="general-block-decorator dashboard">
 
 				<div class="title title-without-tabs clearfix">
 					{intl l='Dashboard'}
-                    <div class="btn-group pull-right">
-						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
-						<button type="button" class="btn btn-default" disabled><span class="glyphicon glyphicon-calendar"></span></button>
-						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
-					</div>
+                    <div class="col-sm-2 input-group pull-right">
+                        <span id="span-calendar" class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                        <input type="text" class="form-control" id="date-picker">
+                        <span class="input-group-btn">
+                            <button type="button" class="form-control btn btn-default js-stats-refresh" data-month-offset="0"><span class="glyphicon glyphicon-refresh"></span></button>
+                        </span>
+                    </div>
 				</div>
 
 				<div class="text-center clearfix">
@@ -43,90 +99,22 @@
  			</div>
             {/loop}
 
-	 		<div class="grid-container">
-
-                {* Do not display shop information block if user none of the required authorizations *}
-
-                {capture name="shop_information_block_content"}
-                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.customer" access="VIEW"}
-                        <tr>
-                            <th>{intl l="Customers"}</th>
-                            <td>
-                                {count type="customer" current="false" backend_context="1"}
-                            </td>
-                        </tr>
-                    {/loop}
-
-                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.category" access="VIEW"}
-                        <tr>
-                            <th>{intl l="Categories"}</th>
-                            <td>
-                                {count type="category" visible="*" backend_context="1"}
-                            </td>
-                        </tr>
-                    {/loop}
-
-                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.product" access="VIEW"}
-                        <tr>
-                            <th>{intl l="Products"}</th>
-                            <td>
-                                {count type="product" visible="*" backend_context="1"}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{intl l="Online products"}</th>
-                            <td>
-                                {count type="product" visible="true" backend_context="1"}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{intl l="Offline products"}</th>
-                            <td>
-                                {count type="product" visible="false" backend_context="1"}
-                            </td>
-                        </tr>
-                    {/loop}
-
-                    {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
-                        <tr>
-                            <th>{intl l="Orders"}</th>
-                            <td>
-                                {count type="order" status="*" customer="*" backend_context="1"}
-                            </td>
-                        </tr>
-                    {/loop}
-                {/capture}
-
-                {if trim($smarty.capture.shop_information_block_content) ne ""}
-                    <div class="grid-box">
-                        <div class="general-block-decorator">
-                            <div class="title title-without-tabs">{intl l="Shop Informations"}</div>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <tbody>
-                                    {$smarty.capture.shop_information_block_content nofilter}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
-
+            <div class="row">
                 {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
-				<div class="grid-box">
-					<div class="general-block-decorator">
-						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
+                <div class="col-md-4">
+                    <div class="general-block-decorator">
+                        <div class="title title-without-tabs">{intl l="Sales statistics"}</div>
 
-						<ul class="nav nav-tabs">
-							<li class="active"><a href="#statjour" data-toggle="tab">{intl l="Today"}</a></li>
-							<li><a href="#statmois" data-toggle="tab">{intl l="This month"}</a></li>
-							<li><a href="#statannee" data-toggle="tab">{intl l="This year"}</a></li>
-						</ul>
+                        <ul class="nav nav-tabs nav-justified">
+                            <li class="active"><a href="#statjour" data-toggle="tab">{intl l="Today"}</a></li>
+                            <li><a href="#statmois" data-toggle="tab">{intl l="This month"}</a></li>
+                            <li><a href="#statannee" data-toggle="tab">{intl l="This year"}</a></li>
+                        </ul>
 
                         {capture assign=defaultCurrency}
-                            {loop type="currency" name="default-currency" default_only="1"}
-                                {$SYMBOL}
-                            {/loop}
+                        {loop type="currency" name="default-currency" default_only="1"}
+                        {$SYMBOL}
+                        {/loop}
                         {/capture}
 
                         <div class="tab-content">
@@ -160,9 +148,9 @@
                                             <th>{intl l="Average cart"}</th>
                                             <td>
                                                 {if $orderCount == 0}
-                                                    0 {$defaultCurrency}
+                                                0 {$defaultCurrency}
                                                 {else}
-                                                    {($salesNoShipping/$orderCount)|round:"2"} {$defaultCurrency}
+                                                {($salesNoShipping/$orderCount)|round:"2"} {$defaultCurrency}
                                                 {/if}
                                             </td>
                                         </tr>
@@ -200,9 +188,9 @@
                                             <th>{intl l="Average cart"}</th>
                                             <td>
                                                 {if $orderCount == 0}
-                                                    0 {$defaultCurrency}
+                                                0 {$defaultCurrency}
                                                 {else}
-                                                    {($salesNoShipping/$orderCount)|round:"2"} {$defaultCurrency}
+                                                {($salesNoShipping/$orderCount)|round:"2"} {$defaultCurrency}
                                                 {/if}
                                             </td>
                                         </tr>
@@ -240,9 +228,9 @@
                                             <th>{intl l="Average cart"}</th>
                                             <td>
                                                 {if $orderCount == 0}
-                                                    0 {$defaultCurrency}
+                                                0 {$defaultCurrency}
                                                 {else}
-                                                    {($salesNoShipping/$orderCount)|round:"2"} {$defaultCurrency}
+                                                {($salesNoShipping/$orderCount)|round:"2"} {$defaultCurrency}
                                                 {/if}
                                             </td>
                                         </tr>
@@ -255,24 +243,30 @@
                 </div>
                 {/loop}
 
-                <div class="grid-box">
+                <div class="col-md-4">
+                    <div class="feed-list">
+                        <div class="alert alert-info">{intl l="Loading Thelia lastest news..."}</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
                     <div class="general-block-decorator">
                         <div class="title title-without-tabs">{intl l="Thelia informations"}</div>
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <tbody>
-                                    <tr>
-                                        <th>{intl l="Current version"}</th>
-                                        <td>{$THELIA_VERSION}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>{intl l="Latest version available"}</th>
-                                        <td><a href="http://thelia.net/#download" id="latest-thelia-version">{intl l="Loading..."}</a></td>
-                                    </tr>
-                                    <tr>
-                                        <th>{intl l="News"}</th>
-                                        <td><a href="http://thelia.net/blog" target="_blank">{intl l="Click here"}</a></td>
-                                    </tr>
+                                <tr>
+                                    <th>{intl l="Current version"}</th>
+                                    <td>{$THELIA_VERSION}</td>
+                                </tr>
+                                <tr>
+                                    <th>{intl l="Latest version available"}</th>
+                                    <td><a href="http://thelia.net/#download" id="latest-thelia-version">{intl l="Loading..."}</a></td>
+                                </tr>
+                                <tr>
+                                    <th>{intl l="News"}</th>
+                                    <td><a href="http://thelia.net/blog" target="_blank">{intl l="Click here"}</a></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -280,18 +274,16 @@
                 </div>
 
                 {hookblock name="home.block" fields="id,title,content"}
-                    {forhook rel="home.block"}
-                        <div class="grid-box">
-                            <div {if $id}id="{$id}"{/if} class="general-block-decorator">
-                                {if $title}<div class="title title-without-tabs">{$title}</div>{/if}
-                                {$content}
-                            </div>
-                        </div>
-                    {/forhook}
+                {forhook rel="home.block"}
+                <div class="col-md-4">
+                    <div {if $id}id="{$id}"{/if} class="general-block-decorator">
+                        {if $title}<div class="title title-without-tabs">{$title}</div>{/if}
+                        {$content}
+                    </div>
+                </div>
+                {/forhook}
                 {/hookblock}
-
-
-           </div>
+            </div>
 
 			{hook name="home.bottom" location="home_bottom" }
 		</div>
@@ -312,16 +304,52 @@
     {javascripts file='assets/js/jqplot/plugins/jqplot.pieRenderer.min.js'}
         <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
-    {javascripts file='assets/js/blocksit.min.js'}
-        <script type="text/javascript" src="{$asset_url}"></script>
+    {javascripts file='assets/js/moment-with-locales.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}
+        <script src="{$asset_url}"></script>
     {/javascripts}
 
 <script>
 
 jQuery(function($){
+    {$langcode = {lang attr="code"}|substr:0:2}
 
-    var jQplotDate = new Date();
-    jQplotDate.setDate(1); // Set day to 1 so we can add month without 30/31 days of month troubles.
+    var jQplotDate = moment();
+
+    $('#date-picker').val(moment().format('MM/YYYY'));
+
+    $('#date-picker').datetimepicker( {
+        locale: "{$langcode}",
+        viewMode: 'months',
+        format: 'MM/YYYY'
+    }).on('dp.change',function (e) {
+        // e.date is a moment.js date
+        jQplotDate = e.date;
+
+        statInputActive(true);
+
+        retrieveJQPlotJson(
+                jQplotDate,
+                function() {
+                    statInputActive(false);
+                },
+                0
+        );
+    });
+
+    $("#span-calendar").click(function(e){
+        $('#date-picker').focus();
+    });
+
+    function statInputActive(type) {
+        $('#date-picker').attr('readonly', type);
+        $('.js-stats-refresh').attr('disabled', type)
+    }
+
+    $(".feed-list").load("{admin_viewurl view='ajax/thelia_news_feed'}");
+
     var url = "{url path='/admin/home/stats'}";
     var jQplotData; // json data
     var jQPlotInstance; // global instance
@@ -367,7 +395,7 @@ jQuery(function($){
     {literal}
 
     // Get initial data Json
-    retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear());
+    retrieveJQPlotJson(jQplotDate);
 
     $('[data-toggle="jqplot"]').click(function(){
 
@@ -376,16 +404,29 @@ jQuery(function($){
 
     });
 
-    $('.js-stats-change-month').click(function(e){
-        $('.js-stats-change-month').attr('disabled', true);
-        jQplotDate.setMonth(parseInt(jQplotDate.getMonth()) + parseInt($(this).data('month-offset')));
-        retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear(), function(){$('.js-stats-change-month').attr('disabled', false);});
+    $('.js-stats-refresh').click(function(e){
+        statInputActive(true);
 
+        retrieveJQPlotJson(
+                jQplotDate,
+                function(){statInputActive(false);},
+                1
+        );
     });
 
-    function retrieveJQPlotJson(month, year, callback) {
+    /**
+     * @param {moment} moment date
+     * @param {function=} callback
+     * @param {number=} flush
+     */
+    function retrieveJQPlotJson(moment, callback, flush) {
 
-        $.getJSON(url, {month: month, year: year})
+        if (typeof flush === "undefined") {
+            flush = 0;
+        }
+
+        // JS month range is [0..11], the url requires a PHP month range [1..12]
+        $.getJSON(url, {month: moment.month() + 1, year: moment.year(), flush: flush})
             .done(function(data) {
                 jQplotData = data;
                 jsonSuccessLoad();
@@ -441,47 +482,23 @@ jQuery(function($){
 
         $(window).bind('resize', function(event, ui) {
             jQPlotInstance.replot( { resetAxes: true } );
-        });
+        });        
 
     }
     {/literal}
 
     // Get the latest Thelia version
-    $('#latest-thelia-version').load("{url path='/admin/latest-thelia-version'}", function(response, status, xhr) {
-        if (status == "error")
-            $('#latest-thelia-version').text("Unavailable");
-    });
-
-    // Grid setup
-    var currentGridNbCol = 0;
-
-    function refreshGrid() {
-        var winWidth = $(window).width();
-        var gridNbCol = 0;
-
-        if(winWidth < 480) {
-            gridNbCol = 1
-        } else if(winWidth < 768) {
-            gridNbCol = 2
-        } else {
-            gridNbCol = 3;
-        }
-
-        currentGridNbCol = gridNbCol;
-
-        $('.grid-container').BlocksIt({
-            numOfCol: gridNbCol,
-            offsetX: 5,
-            offsetY: 5,
-            blockElement: '.grid-box'
-        });
-
-    }
-
-    $(window).resize(function() {
-        refreshGrid();
-    });
-    refreshGrid();
+    $.ajax({
+        url: "http://thelia.net/version.php",
+        beforeSend: function (jqXHR) {
+            jqXHR.setRequestHeader("Thelia-Version", "{$THELIA_VERSION}");
+        },
+        crossDomain: true
+    }).done(function(data) {
+        $('#latest-thelia-version').text(data);
+    }).fail(function() {
+        $('#latest-thelia-version').text("Unavailable");
+    });    
 
 });
 

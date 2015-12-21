@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
-
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;

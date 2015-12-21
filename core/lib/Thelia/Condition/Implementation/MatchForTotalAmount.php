@@ -164,7 +164,7 @@ class MatchForTotalAmount extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        $currencies = CurrencyQuery::create()->find();
+        $currencies = CurrencyQuery::create()->filterByVisible(true)->find();
 
         $cleanedCurrencies = [];
 

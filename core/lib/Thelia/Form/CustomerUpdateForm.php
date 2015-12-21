@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class CustomerUpdateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerUpdateForm extends BaseForm
 {
@@ -97,7 +97,7 @@ class CustomerUpdateForm extends BaseForm
             ->add("password", "text", array(
                 "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array(
-                    "for" => "email",
+                    "for" => "password",
                 ),
             ))
             ->add("address1", "text", array(

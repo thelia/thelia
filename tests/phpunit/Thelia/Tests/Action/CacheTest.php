@@ -19,7 +19,7 @@ use Thelia\Core\Event\Cache\CacheEvent;
 /**
  * Class CacheTest
  * @package Thelia\Tests\Action\assets
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CacheTest extends \PHPUnit_Framework_TestCase
 {

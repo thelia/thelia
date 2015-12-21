@@ -34,7 +34,7 @@ use Thelia\Model\ProductQuery;
 /**
  * Class ImageController
  * @package Thelia\Controller\Api
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ImageController extends BaseApiController
 {

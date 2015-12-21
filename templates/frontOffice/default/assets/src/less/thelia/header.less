@@ -1,0 +1,42 @@
+// header
+header {
+    .header {
+        margin-bottom: @line-height-computed;
+
+        .logo {
+            margin-top: 0;
+        }
+
+        .language-container {
+            text-align: right;
+
+            .search-container {
+                margin-bottom: @line-height-computed/2;
+                .form-control {
+                    width: auto;
+                }
+            }
+
+            .language-switch,
+            .currency-switch {
+                display: inline-block;
+                position: relative;
+                .dropdown-label {
+                    display: inline-block;
+                    float: left;
+                    margin-left: 1em;
+                    margin-right: .4em;
+                }
+                .current {
+                    display: inline-block;
+                    float: left;
+                    position: relative;
+                }
+                .select {
+                    left: auto;
+                    right: 0;
+                }
+            }
+        }
+    }
+}

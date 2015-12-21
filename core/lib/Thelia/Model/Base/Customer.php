@@ -140,7 +140,8 @@ abstract class Customer implements ActiveRecordInterface
 
     /**
      * The value for the discount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $discount;
 
@@ -287,6 +288,7 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
+        $this->discount = '0.000000';
         $this->version = 0;
     }
 
@@ -674,7 +676,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getDiscount()
     {
@@ -1024,13 +1026,13 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->discount !== $v) {
@@ -1199,6 +1201,10 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->discount !== '0.000000') {
+                return false;
+            }
+
             if ($this->version !== 0) {
                 return false;
             }
@@ -1264,7 +1270,7 @@ abstract class Customer implements ActiveRecordInterface
             $this->sponsor = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CustomerTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->discount = (null !== $col) ? (double) $col : null;
+            $this->discount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_token = (null !== $col) ? (string) $col : null;
@@ -3038,31 +3044,6 @@ abstract class Customer implements ActiveRecordInterface
     {
         $query = ChildOrderQuery::create(null, $criteria);
         $query->joinWith('Lang', $joinBehavior);
-
-        return $this->getOrders($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Customer is new, it will return
-     * an empty collection; or if this Customer has previously
-     * been saved, it will retrieve related Orders from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Customer.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildOrder[] List of ChildOrder objects
-     */
-    public function getOrdersJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildOrderQuery::create(null, $criteria);
-        $query->joinWith('Cart', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }

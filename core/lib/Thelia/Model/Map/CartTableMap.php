@@ -172,7 +172,7 @@ class CartTableMap extends TableMap
         $this->addForeignKey('ADDRESS_DELIVERY_ID', 'AddressDeliveryId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('ADDRESS_INVOICE_ID', 'AddressInvoiceId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', false, null, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, 0);
+        $this->addColumn('DISCOUNT', 'Discount', 'DECIMAL', false, 16, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -186,7 +186,6 @@ class CartTableMap extends TableMap
         $this->addRelation('AddressRelatedByAddressDeliveryId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_delivery_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('AddressRelatedByAddressInvoiceId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_invoice_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'cart_id', ), null, null, 'Orders');
         $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'cart_id', ), 'CASCADE', 'RESTRICT', 'CartItems');
     } // buildRelations()
 

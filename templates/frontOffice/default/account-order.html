@@ -9,7 +9,7 @@
 {block name='no-return-functions' append}
 {$breadcrumbs = [
 ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/$order_id"}]
+['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/%order_id" order_id=$order_id}]
 ]}
 {/block}
 
@@ -23,9 +23,6 @@
     {$payment_id=$PAYMENT_MODULE}
     {$delivery_id=$DELIVERY_MODULE}
     {$status=$STATUS}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-        {assign "orderCurrency" $SYMBOL}
-    {/loop}
 
     <article class="col-main" role="main" aria-labelledby="main-label">
 
@@ -54,7 +51,7 @@
                 {/if}
 
                 <dt>{intl l="PDF invoice"}</dt>
-                <dd><a href="{url path="/account/order/pdf/invoice/$ID"}">{intl l="Download"}</a></dd>
+                <dd><a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Download"}</a></dd>
             {/if}
             {if $DELIVERY_REF}
                 <dt>{intl l="Delivery REF"}</dt>
@@ -76,10 +73,10 @@
         {* Addresses *}
         <div id="order-addresses" class="row">
             <div class="col-md-6 col-sm-12">
-                <div class="panel">
+                <div class="panel panel-default">
                     <div class="panel-heading">{intl l="Delivery"}</div>
                     <div class="panel-body">
-                        <h4>{intl l="Module"}</h4>
+                        <h4>{intl l="Delivery Mode"}</h4>
                         {ifhook rel="account-order.delivery-information"}
                             {hook name="account-order.delivery-information" module="{$delivery_id}" order="{$order_id}"}
                         {/ifhook}
@@ -107,10 +104,10 @@
                 </div>
             </div>
             <div class="col-md-6 col-sm-12">
-                <div class="panel">
+                <div class="panel panel-default">
                     <div class="panel-heading">{intl l="Billing"}</div>
                     <div class="panel-body">
-                        <h4>{intl l="Module"}</h4>
+                        <h4>{intl l="Billing Mode"}</h4>
                         {ifhook rel="account-order.invoice-information"}
                             {hook name="account-order.invoice-information" module="{$payment_id}" order="{$order_id}"}
                         {/ifhook}
@@ -145,7 +142,7 @@
         {hook name="account-order.after-addresses" order="{$order_id}"}
 
         {* products *}
-        <table class="table table-order order-products">
+        <table class="table table-order table-bordered order-products">
             <thead>
                 <tr>
                     <th class="product">
@@ -185,10 +182,12 @@
                     {assign "realPrice" $PROMO_PRICE}
                     {assign "realTax" $PROMO_PRICE_TAX}
                     {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                    {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
                 {else}
                     {assign "realPrice" $PRICE}
                     {assign "realTax" $PRICE_TAX}
                     {assign "realTaxedPrice" $TAXED_PRICE}
+                    {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
                 {/if}
 
                 {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
@@ -204,15 +203,15 @@
                         </p>
                         {/ifloop}
                     </td>
-                    <td class="unitprice"><p>{format_money number=$realPrice symbol=$orderCurrency}</p></td>
-                    <td class="unitprice"><p>{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
+                    <td class="unitprice"><p>{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
+                    <td class="unitprice"><p>{format_money number=$realTaxedPrice currency_id=$CURRENCY}</p></td>
                     <td class="qty"><p>{$QUANTITY}</p></td>
-                    <td class="subprice"><p>{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
+                    <td class="subprice"><p>{format_money number=$realTotalPrice currency_id=$CURRENCY}</p></td>
                 </tr>
-                {ifhook rel="account-order.product"}
+                {ifhook rel="account-order.product-extra"}
                 <tr>
                     <td class="product-extra" colspan="5">
-                        {hook name="account-order.product" order="{$order_id}" order_product="{$ID}" product="{$PRODUCT_ID}"}
+                        {hook name="account-order.product-extra" order="{$order_id}" order_product="{$ID}" product="{$PRODUCT_ID}"}
                     </td>
                 </tr>
                 {/ifhook}
@@ -233,17 +232,17 @@
 
         <div class="row">
             <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
-                <table class="table order-total table-order table-order-total">
+                <table class="table order-total table-order table-bordered table-order-total">
                     <tfoot>
                         {if $DISCOUNT}
                         <tr>
                             <td><p>{intl l="Discount"}</p></td>
-                            <td><p>{format_money number=$DISCOUNT symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
                         </tr>
                         {/if}
                         <tr>
                             <td><p>{intl l="Total without tax"}</p></td>
-                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE} symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} currency_id=$CURRENCY}</p></td>
                         </tr>
                         {strip}
                             {capture name="tax"}
@@ -255,30 +254,26 @@
                                     {if $_price_taxe_ != 0}
                                     <tr>
                                         <td><p>{$name}</p></td>
-                                        <td><P>{format_money number=$_price_taxe_ symbol=$orderCurrency}</P></td>
+                                        <td><P>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</P></td>
                                     </tr>
                                     {/if}
                                 {/foreach}
                             {/capture}
                         {/strip}
                         {if $smarty.capture.tax ne ""}
-                            <tr>
-                                <td><p>{intl l="Tax"}</p></td>
-                                <td><P>{format_money number=$TOTAL_TAX symbol=$orderCurrency}</P></td>
-                            </tr>
                             {$smarty.capture.tax nofilter}
                         {/if}
                         <tr>
                             <td><p>{intl l="Total with tax"}</p></td>
-                            <td><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrency}</P></td>
+                            <td><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}</P></td>
                         </tr>
                         <tr>
                             <td><p>{intl l="Postage"}</p></td>
-                            <td><p>{format_money number=$POSTAGE symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number=$POSTAGE curency_id=$CURRENCY}</p></td>
                         </tr>
                         <tr>
                             <td><h3>{intl l="Total"}</h3></td>
-                            <td><h3>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</h3></td>
+                            <td><h3>{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</h3></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -299,9 +294,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="account-order.after-javascript-include"}
+{hook name="account-order.after-javascript-include" order=$order_id}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="account-order.javascript-initialization"}
+{hook name="account-order.javascript-initialization" order=$order_id}
 {/block}

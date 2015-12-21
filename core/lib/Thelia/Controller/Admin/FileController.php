@@ -190,16 +190,10 @@ class FileController extends BaseAdminController
             throw new ProcessFileException('', 404);
         }
 
-        $defaultTitle = $parentModel->getTitle();
-
-        if (empty($defaultTitle)) {
-            $defaultTitle = $fileBeingUploaded->getClientOriginalName();
-        }
-
         $fileModel
             ->setParentId($parentId)
             ->setLocale(Lang::getDefaultLanguage()->getLocale())
-            ->setTitle($defaultTitle)
+            ->setTitle($parentModel->getTitle())
         ;
 
         $fileCreateOrUpdateEvent = new FileCreateOrUpdateEvent($parentId);
@@ -582,10 +576,10 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a image has to be deleted (AJAX)
+     * Manage how a file has to be deleted
      *
-     * @param int    $fileId     Parent id owning image being deleted
-     * @param string $parentType Parent Type owning image being deleted
+     * @param int    $fileId     Parent id owning file being deleted
+     * @param string $parentType Parent Type owning file being deleted
      * @param string $objectType the type of the file, image or document
      * @param string $eventName  the event type.
      *
@@ -658,7 +652,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a image has to be deleted (AJAX)
+     * Manage how an image has to be deleted (AJAX)
      *
      * @param int    $imageId    Parent id owning image being deleted
      * @param string $parentType Parent Type owning image being deleted

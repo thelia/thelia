@@ -104,24 +104,26 @@
                                         {hook name="features.table-row" location="features_table_row" feature_id={$ID} }
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-                                            <div class="btn-group">
-                                                <a class="btn btn-default btn-xs feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-minus"></span>
-                                                </a>
-                                                <a class="btn btn-default btn-xs feature-add-to-all" title="{intl l='Add this feature to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-plus"></span>
-                                                </a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
                                             </div>
-                                            {/loop}
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
 
-                                            <div class="btn-group">
+                                                    <a class="feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                    </a>
+                                                    <a class="feature-add-to-all" title="{intl l='Add this feature to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                    </a>
+                                                {/loop}
+
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+    	                                            <a class="feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+    	                                            <a class="feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>
                                         </td>
@@ -156,14 +158,14 @@
 
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
               {* on success, redirect to the edition page, _ID_ is replaced with the created feature ID, see controller  *}
               <input type="hidden" name="{$name}" value="{url path='/admin/configuration/features/update' feature_id='_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -178,14 +180,14 @@
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='add_to_all'}
+        {form_field field='add_to_all'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">
@@ -211,7 +213,7 @@
         dialog_ok_label     = {intl l="Create this feature"}
 
         form_action        = {url path='/admin/configuration/features/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
