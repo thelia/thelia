@@ -251,7 +251,7 @@ class OrderTableMap extends TableMap
         $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
         $this->addForeignKey('INVOICE_ORDER_ADDRESS_ID', 'InvoiceOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
         $this->addForeignKey('DELIVERY_ORDER_ADDRESS_ID', 'DeliveryOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
-        $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'DATE', false, null, null);
+        $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'TIMESTAMP', false, null, null);
         $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', true, null, null);
         $this->addColumn('CURRENCY_RATE', 'CurrencyRate', 'FLOAT', true, null, null);
         $this->addColumn('TRANSACTION_REF', 'TransactionRef', 'VARCHAR', false, 100, null);

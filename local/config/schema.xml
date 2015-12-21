@@ -566,7 +566,7 @@
     <column name="customer_id" required="true" type="INTEGER" />
     <column name="invoice_order_address_id" required="true" type="INTEGER" />
     <column name="delivery_order_address_id" required="true" type="INTEGER" />
-    <column name="invoice_date" type="DATE" />
+    <column name="invoice_date" type="TIMESTAMP" />
     <column name="currency_id" required="true" type="INTEGER" />
     <column name="currency_rate" required="true" type="FLOAT" />
     <column description="transaction reference - usually use to identify a transaction with banking modules" name="transaction_ref" size="100" type="VARCHAR" />
