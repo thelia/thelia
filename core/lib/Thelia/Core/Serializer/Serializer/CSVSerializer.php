@@ -104,6 +104,10 @@ class CSVSerializer extends AbstractSerializer
         $data = [];
 
         foreach ($fileObject as $index => $row) {
+            if (empty($row)) {
+                continue;
+            }
+
             if ($index === 0) {
                 $this->headers = str_getcsv($row, static::DELIMITER, static::ENCLOSURE);
                 continue;
