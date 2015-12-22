@@ -657,7 +657,7 @@ abstract class Order implements ActiveRecordInterface
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
      *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
@@ -1532,7 +1532,7 @@ abstract class Order implements ActiveRecordInterface
             $this->delivery_order_address_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderTableMap::translateFieldName('InvoiceDate', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00') {
+            if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->invoice_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
