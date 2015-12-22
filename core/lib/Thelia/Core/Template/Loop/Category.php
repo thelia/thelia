@@ -240,7 +240,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $category->getParent())
                 ->set("ROOT", $category->getRoot($category->getId()))
-                ->set("URL", $category->getUrl($this->locale))
+                ->set("URL", $this->getReturnUrl() ? $category->getUrl($this->locale) : null)
                 ->set("META_TITLE", $category->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $category->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $category->getVirtualColumn('i18n_META_KEYWORDS'))

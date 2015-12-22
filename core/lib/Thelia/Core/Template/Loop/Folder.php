@@ -233,7 +233,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $folder->getParent())
                 ->set("ROOT", $folder->getRoot($folder->getId()))
-                ->set("URL", $folder->getUrl($this->locale))
+                ->set("URL", $this->getReturnUrl() ? $folder->getUrl($this->locale) : null)
                 ->set("META_TITLE", $folder->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $folder->getVirtualColumn('i18n_META_KEYWORDS'))

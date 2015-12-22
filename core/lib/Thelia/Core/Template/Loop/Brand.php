@@ -210,7 +210,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 ->set("CHAPO", $brand->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $brand->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $brand->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $brand->getUrl($this->locale))
+                ->set("URL", $this->getReturnUrl() ? $brand->getUrl($this->locale) : null)
                 ->set("META_TITLE", $brand->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $brand->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $brand->getVirtualColumn('i18n_META_KEYWORDS'))

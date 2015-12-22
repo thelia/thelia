@@ -63,7 +63,7 @@
                         <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
                               <option value="0" disabled>{intl l="Top level"}</option>
 
-                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
+                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0" return_url=false}
                                    <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{$TITLE}</option>
                               {/loop}
 
@@ -116,7 +116,7 @@
                     <select {form_field_attributes field='brand_id'}>
                         <option value="0">{intl l="No brand"}</option>
 
-                        {loop name="brand-list" type="brand" visible="*"}
+                        {loop name="brand-list" type="brand" visible="*" return_url=false}
                             <option value="{$ID}" {if $BRAND_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
                         {/loop}
                     </select>

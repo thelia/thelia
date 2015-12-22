@@ -340,7 +340,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
             ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
             ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ->set("URL", $product->getUrl($this->locale))
+            ->set("URL", $this->getReturnUrl() ? $product->getUrl($this->locale) : null)
             ->set("META_TITLE", $product->getVirtualColumn('i18n_META_TITLE'))
             ->set("META_DESCRIPTION", $product->getVirtualColumn('i18n_META_DESCRIPTION'))
             ->set("META_KEYWORDS", $product->getVirtualColumn('i18n_META_KEYWORDS'))

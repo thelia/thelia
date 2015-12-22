@@ -31,7 +31,7 @@
 		                <div class="form-group">
 		                    <select name="folder_id" id="folder_id" class="form-control">
 		                        <option value="">{intl l='Select a folder...'}</option>
-		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id"}
+		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
 		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 		                        {/loop}
 		                    </select>
@@ -149,7 +149,7 @@
 		                <div class="form-group">
 		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
 		                        <option value="">{intl l='Select a category...'}</option>
-		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id"}
+		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
 		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 		                        {/loop}
 		                    </select>
@@ -202,7 +202,7 @@
 		                </thead>
 
 		                <tbody>
-		                    {loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    {loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id" return_url=false}
 		                    <tr>
 		                        <td>{$ID}</td>
 
@@ -264,12 +264,12 @@
 
 	                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
 	                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
-	                    {loop name="default_category" visible="*" type="category" id=$DEFAULT_CATEGORY}
+	                    {loop name="default_category" visible="*" type="category" id=$DEFAULT_CATEGORY return_url=false}
 	                        {intl l='You can change the default category (%title) in the "General" tab.' title={$TITLE}}
 	                    {/loop}
 
 	                    {$exclude_from_tree = "-1"}
-	                    {loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                    {loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
 	                        {$exclude_from_tree = "$exclude_from_tree,$ID"}
 	                    {/loop}
 
@@ -281,7 +281,7 @@
 
 	                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
 	                            <option value="">{intl l='Select a category...'}</option>
-	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id"}
+	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id" return_url=false}
 	                                <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
 	                                    {$TITLE} {if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
 	                                </option>
@@ -318,7 +318,7 @@
 	                    </thead>
 
 	                    <tbody>
-	                        {loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                        {loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
 	                        <tr>
 	                            <td>{$ID}</td>
 
