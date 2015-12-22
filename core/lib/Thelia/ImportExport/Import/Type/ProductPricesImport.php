@@ -12,10 +12,8 @@
 
 namespace Thelia\ImportExport\Import\Type;
 
-use Thelia\Core\FileFormat\Formatting\FormatterData;
-use Thelia\Core\FileFormat\FormatType;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\Import\ImportHandler;
+use Thelia\ImportExport\Import\AbstractImport;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductPrice;
@@ -24,111 +22,67 @@ use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Class ProductPricesImport
- * @package Thelia\ImportExport\Import\Type
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ProductPricesImport extends ImportHandler
+class ProductPricesImport extends AbstractImport
 {
-    /**
-     * @return string|array
-     *
-     * Define all the type of formatters that this can handle
-     * return a string if it handle a single type ( specific exports ),
-     * or an array if multiple.
-     *
-     * Thelia types are defined in \Thelia\Core\FileFormat\FormatType
-     *
-     * example:
-     * return array(
-     *     FormatType::TABLE,
-     *     FormatType::UNBOUNDED,
-     * );
-     */
-    public function getHandledTypes()
+    protected $mandatoryColumns = [
+        'id',
+        'price'
+    ];
+
+    public function importData(array $data)
     {
-        return array(
-            FormatType::TABLE,
-            FormatType::UNBOUNDED,
-        );
-    }
+        $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
 
-    /**
-     * @param \Thelia\Core\FileFormat\Formatting\FormatterData
-     * @return string|array error messages
-     *
-     * The method does the import routine from a FormatterData
-     */
-    public function retrieveFromFormatterData(FormatterData $data)
-    {
-        $errors = [];
-        $translator = Translator::getInstance();
-
-        while (null !== $row = $data->popRow()) {
-            $this->checkMandatoryColumns($row);
-
-            $obj = ProductSaleElementsQuery::create()->findPk($row["id"]);
-
-            if ($obj === null) {
-                $errorMessage = $translator->trans(
-                    "The product sale element id %id doesn't exist",
-                    [
-                        "%id" => $row["id"]
-                    ]
-                );
-
-                $errors[] = $errorMessage ;
-            } else {
-                $currency = null;
-
-                if (isset($row["currency"])) {
-                    $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
-                }
-
-                if ($currency === null) {
-                    $currency = Currency::getDefaultCurrency();
-                }
-
-                $price = ProductPriceQuery::create()
-                    ->filterByProductSaleElementsId($obj->getId())
-                    ->findOneByCurrencyId($currency->getId())
-                ;
-
-                if ($price === null) {
-                    $price = new ProductPrice();
-
-                    $price
-                        ->setProductSaleElements($obj)
-                        ->setCurrency($currency)
-                    ;
-                }
-
-                $price->setPrice($row["price"]);
-
-                if (isset($row["promo_price"])) {
-                    $price->setPromoPrice($row["promo_price"]);
-                }
-
-                if (isset($row["promo"])) {
-                    $price
-                        ->getProductSaleElements()
-                        ->setPromo((int) $row["promo"])
-                        ->save()
-                    ;
-                }
-
-                $price->save();
-                $this->importedRows++;
+        if ($pse === null) {
+            return Translator::getInstance()->trans(
+                'The product sale element id %id doesn\'t exist',
+                [
+                    '%id' => $data['id']
+                ]
+            );
+        } else {
+            $currency = null;
+            if (isset($data['currency'])) {
+                $currency = CurrencyQuery::create()->findOneByCode($data['currency']);
             }
+            if ($currency === null) {
+                $currency = Currency::getDefaultCurrency();
+            }
+
+            $price = ProductPriceQuery::create()
+                ->filterByProductSaleElementsId($pse->getId())
+                ->findOneByCurrencyId($currency->getId())
+            ;
+
+            if ($price === null) {
+                $price = new ProductPrice;
+
+                $price
+                    ->setProductSaleElements($pse)
+                    ->setCurrency($currency)
+                ;
+            }
+
+            $price->setPrice($data['price']);
+
+            if (isset($data['promo_price'])) {
+                $price->setPromoPrice($data['promo_price']);
+            }
+
+            if (isset($data['promo'])) {
+                $price
+                    ->getProductSaleElements()
+                    ->setPromo((int) $data['promo'])
+                    ->save()
+                ;
+            }
+
+            $price->save();
+            $this->importedRows++;
         }
 
-        return $errors;
-    }
-
-    /**
-     * @return array The mandatory columns to have for import
-     */
-    protected function getMandatoryColumns()
-    {
-        return ["id", "price"];
+        return null;
     }
 }

@@ -13,6 +13,7 @@
 namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
@@ -88,7 +89,14 @@ abstract class AbstractExport implements \Iterator
             return current($this->data);
         }
 
-        return $this->data->getIterator()->current()->toArray();
+        $data = $this->data->getIterator()->current()->toArray(TableMap::TYPE_COLNAME, true, [], true);
+
+        foreach ($this->data->getQuery()->getWith() as $withKey => $with) {
+            $data = array_merge($data, $data[$withKey]);
+            unset($data[$withKey]);
+        }
+
+        return $data;
     }
 
     public function key()
@@ -367,12 +375,13 @@ abstract class AbstractExport implements \Iterator
      */
     public function beforeSerialize(array $data)
     {
-        foreach ($data as &$value) {
+        foreach ($data as $idx => &$value) {
             if ($value instanceof \DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
+            } elseif (is_array($value)) {
+                unset($data[$idx]);
             }
         }
-
 
         return $data;
     }

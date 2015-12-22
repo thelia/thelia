@@ -33,7 +33,7 @@ class ProductStockImport extends AbstractImport
 
         if ($pse === null) {
             return Translator::getInstance()->trans(
-                'The product sale element reference %id doesn\'t exist',
+                'The product sale element id %id doesn\'t exist',
                 [
                     '%id' => $data['id']
                 ]
