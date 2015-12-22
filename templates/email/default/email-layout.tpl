@@ -346,9 +346,10 @@ body,#bodyTable{
 .templateButtonContent,.templateButtonContent a:link,.templateButtonContent a:visited,.templateButtonContent a .yshortcuts{
     font-weight:normal;
 }
-{hook name="email.layout.css"}
 {/literal}
-</style></head>
+</style>
+{hook name="email-html.layout.css"}
+</head>
 <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="margin: 0;padding: 0;background-color: #444444;">
 <center>
     <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;margin: 0;padding: 0;background-color: #444444;border-collapse: collapse !important;height: 100% !important;width: 100% !important;">
@@ -444,7 +445,7 @@ body,#bodyTable{
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooter" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-top: 0;border-collapse: collapse !important;">
                                 <tr>
                                     <td align="center" valign="top" style="padding-bottom: 40px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
-                                        {hook name="email.layout.footer"}
+                                        {hook name="email-html.layout.footer"}
                                         {elsehook rel="email.layout.footer"}
                                         <table border="0" cellpadding="0" cellspacing="0" class="templateContainer" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 600px;border-collapse: collapse !important;">
                                             <tr>

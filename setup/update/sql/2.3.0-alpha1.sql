@@ -78,11 +78,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+10, 'fr_FR', 'Édition d\'un produit - en bas de la colonne de droite', NULL, NULL)
 ;
 
-SELECT @max_id := IFNULL(MAX(`id`),3000) FROM `hook` WHERE `type`=4;
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
-(@max_id+0, 'email.template.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id+1, 'email.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+0, 'email-html.template.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+1, 'email-html.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+2, 'email-html.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+3, 'email-html.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+4, 'email-html.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -138,8 +138,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+24, 'de_DE', NULL, NULL, NULL),
     (@max_id+25, 'de_DE', NULL, NULL, NULL),
     (@max_id+26, 'de_DE', NULL, NULL, NULL),
-    (@max_id+0, 'en_US', 'Email - layout - CSS', NULL, NULL),
-    (@max_id+1, 'en_US', 'Email - layout - footer', NULL, NULL),
+    (@max_id+0, 'en_US', 'Email html - layout - CSS', NULL, NULL),
+    (@max_id+1, 'en_US', 'Email html - layout - footer', NULL, NULL),
     (@max_id+2, 'en_US', 'Email html - order confirmation - before address', NULL, NULL),
     (@max_id+3, 'en_US', 'Email html - order confirmation - delivery address', NULL, NULL),
     (@max_id+4, 'en_US', 'Email html - order confirmation - after address', NULL, NULL),
@@ -192,8 +192,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+24, 'es_ES', NULL, NULL, NULL),
     (@max_id+25, 'es_ES', NULL, NULL, NULL),
     (@max_id+26, 'es_ES', NULL, NULL, NULL),
-    (@max_id+0, 'fr_FR', 'Email - layout - CSS', NULL, NULL),
-    (@max_id+1, 'fr_FR', 'Email - layout - pied de page', NULL, NULL),
+    (@max_id+0, 'fr_FR', 'Email html - layout - CSS', NULL, NULL),
+    (@max_id+1, 'fr_FR', 'Email html - layout - pied de page', NULL, NULL),
     (@max_id+2, 'fr_FR', 'Email html - confirmation commande - avant adresses', NULL, NULL),
     (@max_id+3, 'fr_FR', 'Email html - confirmation commande - adresse de livraison', NULL, NULL),
     (@max_id+4, 'fr_FR', 'Email html - confirmation commande - après adresses', NULL, NULL),
