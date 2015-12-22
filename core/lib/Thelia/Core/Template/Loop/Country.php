@@ -17,9 +17,9 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\AreaQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\CountryQuery;
 
 /**
@@ -81,22 +81,27 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         $excludeArea = $this->getExcludeArea();
 
         if (null !== $excludeArea) {
-            $search
-                ->useCountryAreaQuery('without_area')
-                ->filterByAreaId($excludeArea, Criteria::NOT_IN)
-                ->endUse();
+            // FIXME : did not find a way to do this in a single request :(
+            // select * from country where id not in (select country_id from country_area where area in (...))
+            $countries = CountryAreaQuery::create()
+                ->filterByAreaId($excludeArea, Criteria::IN)
+                ->select([ 'country_id' ])
+                ->find()
+            ;
+
+            $search->filterById($countries->toArray(), Criteria::NOT_IN);
         }
 
         $withArea = $this->getWithArea();
 
         if (true === $withArea) {
             $search
-                ->joinCountryArea('without_area', Criteria::LEFT_JOIN)
-                ->where('`without_area`.country_id ' . Criteria::ISNOTNULL);
+                ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
+                ->where('`with_area`.country_id ' . Criteria::ISNOTNULL);
         } elseif (false === $withArea) {
             $search
-                ->joinCountryArea('without_area', Criteria::LEFT_JOIN)
-                ->where('`without_area`.country_id ' . Criteria::ISNULL);
+                ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
+                ->where('`with_area`.country_id ' . Criteria::ISNULL);
         }
 
         $exclude = $this->getExclude();
