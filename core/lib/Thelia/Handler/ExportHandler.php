@@ -193,8 +193,6 @@ class ExportHandler
      */
     protected function processExport(AbstractExport $export, SerializerInterface $serializer)
     {
-        set_time_limit(0);
-
         $filename = sprintf(
             '%s-%s-%s.%s',
             (new \DateTime)->format('Ymd'),

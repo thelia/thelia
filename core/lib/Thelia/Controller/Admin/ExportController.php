@@ -179,6 +179,8 @@ class ExportController extends BaseAdminController
         try {
             $validatedForm = $this->validateForm($form);
 
+            set_time_limit(0);
+
             $lang = (new LangQuery)->findPk($validatedForm->get('language')->getData());
 
             /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
