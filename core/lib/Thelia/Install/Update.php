@@ -504,20 +504,20 @@ class Update
     {
         $content = [];
 
-        if (count($this->postInstructions) != 0) {
+        if (count($this->postInstructions) == 0) {
             return null;
         }
 
         ksort($this->postInstructions);
 
         foreach ($this->postInstructions as $version => $instructions) {
-            $content[] = sprintf("\n\n## %s", $version);
+            $content[] = sprintf("## %s", $version);
             foreach ($instructions as $instruction) {
-                $content[] = sprintf("\n\n%s", $instruction);
+                $content[] = sprintf("%s", $instruction);
             }
         }
 
-        $content = implode('', $content);
+        $content = implode("\n\n", $content);
 
         if ($format === 'html') {
             $content = Markdown::defaultTransform($content);
