@@ -27,9 +27,23 @@
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
 
-        					<div class="col-md-12 title title-without-tabs">
+        					<div class="col-md-6 title title-without-tabs">
                                 {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname={$FIRSTNAME} lastname={$LASTNAME} ref={$REF}}
         					</div>
+
+                            <div class="col-md-6 actions">
+                                {if $HAS_PREVIOUS != 0}
+                                <a href="{url path="/admin/customer/update?customer_id=%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous customer'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {/if}
+
+                                {if $HAS_NEXT != 0}
+                                <a href="{url path="/admin/customer/update?customer_id=%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next customer'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {/if}
+                            </div>
 
                             <div class="form-container">
                                 <div class="col-md-12">
@@ -37,6 +51,7 @@
         						    {form name="thelia.admin.customer.update"}
         						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype} class="clearfix">
 
+                                            <br>
                                             {include
                                                 file="includes/inner-form-toolbar.html"
                                                 hide_flags = true
