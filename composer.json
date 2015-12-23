@@ -25,7 +25,7 @@
         "symfony/http-kernel": "2.3.*",
         "symfony/routing": "2.3.*",
         "symfony/filesystem": "2.3.*",
-        "symfony/yaml": "2.3.*",
+        "symfony/yaml": "~2.3",
         "symfony/translation": "2.3.*",
         "symfony-cmf/routing": "~1.0",
         "symfony/validator": "2.3.*",

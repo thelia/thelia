@@ -138,7 +138,7 @@ class Update
 
         $definePropel = new DefinePropel(
             new DatabaseConfiguration(),
-            Yaml::parse($configPath),
+            Yaml::parse(file_get_contents($configPath)),
             $this->getEnvParameters()
         );
 
