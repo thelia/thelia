@@ -113,12 +113,6 @@
 
                         <hr class="space">
 
-                        <div class="alert alert-info">
-                            {intl l="Explain how it works !"}
-                        </div>
-
-                        <hr class="space">
-
                         <div class="panel panel-default">
                             <div class="panel-heading">{intl l="Select a configuration"}</div>
                             <div class="panel-body">
@@ -156,6 +150,12 @@
                                     </div>
 
                                 </div>
+                            </div>
+                            <div class="panel-footer">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                {intl l="For a tax rule, you can have multiple configurations, as only one tax rule is affected to a product."}
+                                {intl l="(according to a country the taxes applied could be different)"}<br>
+                                {intl l="So, each configuration is a list of taxes applied to a list of countries/states."}
                             </div>
                         </div>
 
@@ -215,6 +215,12 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="panel-footer">
+                                <span class="glyphicon glyphicon-info-sign"></span> {intl l="caption"} :
+                                <span class="label label-default">{intl l="country has no configuration"}</span>
+                                <span class="label label-success">{intl l="country has the current configuration"}</span>
+                                <span class="label label-danger">{intl l="country has an other configuration"}</span>
+                            </div>
                         </div>
 
                         <div class="panel panel-default">
@@ -261,6 +267,14 @@
 
                                 </div><!--//row-->
 
+                            </div>
+                            <div class="panel-footer">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                {intl l="Here, just drag and drog the available taxes in groups."}<br>
+                                {intl l="Each group of taxes are applied from top to bottom."}
+                                {intl l="In a group, each taxes are applied independently on the incomming price (the price without tax for the first group)."}
+                                {intl l="The outcomming price is the sum of the incomming one and the sum of taxes."}
+                                {intl l="This outcomming price is then passed to the next group as its incomming price, etc..."}
                             </div>
                         </div><!--//panel-->
 
