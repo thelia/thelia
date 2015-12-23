@@ -156,7 +156,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             new Argument(
                 'attribute_non_strict_match',
                 new TypeCollection(
-                    new Type\EnumListType(['min_stock', 'promo', 'new', 'min_weight', 'max_weight', 'min_price', 'max_price']),
+                    new Type\EnumListType(
+                        ['min_stock', 'promo', 'new', 'min_weight', 'max_weight', 'min_price', 'max_price']
+                    ),
                     new Type\EnumType(['*', 'none'])
                 ),
                 'none'
@@ -190,7 +192,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
                 case "title":
-                    $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+                    $search->where(
+                        "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
+                        THEN `requested_locale_i18n`.`TITLE`
+                        ELSE `default_locale_i18n`.`TITLE`
+                        END ".$searchCriteria." ?",
+                        $searchTerm,
+                        \PDO::PARAM_STR
+                    );
                     break;
             }
         }
@@ -245,7 +254,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $taxedPromoPrice = null;
             }
 
-            // Find previous and next product, in the default category.
             $default_category_id = $product->getDefaultCategoryId();
 
             $loopResultRow
@@ -264,8 +272,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("IS_PROMO", $product->getVirtualColumn('is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('is_new'))
                 ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
-                ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'))
-            ;
+                ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'));
             $this->addOutputFields($loopResultRow, $product);
 
             $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
@@ -308,8 +315,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("BEST_PRICE_TAX", $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE", $taxedPrice)
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
-            ;
+                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
 
             $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
         }
@@ -351,10 +357,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("DEFAULT_CATEGORY", $default_category_id)
             ->set("TAX_RULE_ID", $product->getTaxRuleId())
             ->set("BRAND_ID", $product->getBrandId() ?: 0)
-            ->set("SHOW_ORIGINAL_PRICE", $display_initial_price)
-        ;
+            ->set("SHOW_ORIGINAL_PRICE", $display_initial_price);
 
-        if ($this->getBackendContext() || $this->getWithPrevNextInfo()) {
+        if ($this->getWithPrevNextInfo()) {
             $visible = $this->getWithPrevNextVisible();
 
             // Find previous and next category
@@ -362,8 +367,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->joinProductCategory()
                 ->where('ProductCategory.category_id = ?', $default_category_id)
                 ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
-                ->orderByPosition(Criteria::DESC)
-            ;
+                ->orderByPosition(Criteria::DESC);
 
             if ($visible !== Type\BooleanOrBothType::ANY) {
                 $previousSearch->filterByVisible($visible ? 1 : 0);
@@ -375,8 +379,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->joinProductCategory()
                 ->where('ProductCategory.category_id = ?', $default_category_id)
                 ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
-                ->orderByPosition(Criteria::ASC)
-            ;
+                ->orderByPosition(Criteria::ASC);
 
             if ($visible !== Type\BooleanOrBothType::ANY) {
                 $nextSearch->filterByVisible($visible ? 1 : 0);
@@ -388,8 +391,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
                 ->set("HAS_NEXT", $next != null ? 1 : 0)
                 ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                ->set("NEXT", $next != null ? $next->getId() : -1)
-            ;
+                ->set("NEXT", $next != null ? $next->getId() : -1);
         }
 
         return $loopResultRow;

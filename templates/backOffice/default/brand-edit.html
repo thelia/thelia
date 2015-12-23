@@ -16,7 +16,7 @@
 {block name="main-content"}
     <div class="brand edit-brand">
         <div id="wrapper" class="container">
-            {loop name="brand_edit" type="brand" visible="*" id="{$brand_id}" backend_context="1" lang="$edit_language_id"}
+            {loop name="brand_edit" type="brand" visible="*" id="{$brand_id}" backend_context="1" lang="$edit_language_id" with_prev_next_info="true"}
 
             <nav>
                 <ul class="breadcrumb">

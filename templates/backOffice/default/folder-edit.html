@@ -18,7 +18,7 @@
         {hook name="folder-edit.top" folder_id=$folder_id}
 
         <div class="row">
-            {loop name="folder_edit" type="folder" visible="*" id="{$folder_id}" backend_context="1" lang="$edit_language_id"}
+            {loop name="folder_edit" type="folder" visible="*" id="{$folder_id}" backend_context="1" lang="$edit_language_id" with_prev_next_info="true"}
 
             {* Define close url *}
             {assign var='close_url' value="{url path='/admin/folders' folder_id=$ID}"}

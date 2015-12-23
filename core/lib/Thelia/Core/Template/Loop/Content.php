@@ -289,8 +289,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("META_KEYWORDS", $content->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("POSITION", $content->getPosition())
                 ->set("DEFAULT_FOLDER", $defaultFolderId)
-                ->set("VISIBLE", $content->getVisible())
-            ;
+                ->set("VISIBLE", $content->getVisible());
             $this->addOutputFields($loopResultRow, $content);
 
             $loopResult->addRow($this->findNextPrev($loopResultRow, $content, $defaultFolderId));
@@ -305,17 +304,16 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      * @param $defaultFolderId
      * @return LoopResultRow
      */
-    private function findNextPrev(LoopResultRow $loopResultRow, \Thelia\Model\Content $content, $defaultFolderId)
+    private function findNextPrev(LoopResultRow $loopResultRow, ContentModel $content, $defaultFolderId)
     {
         $isBackendContext = $this->getBackendContext();
 
-        if ($isBackendContext || $this->getWithPrevNextInfo()) {
+        if ($this->getWithPrevNextInfo()) {
             // Find previous and next category
             $previousQuery = ContentQuery::create()
                 ->joinContentFolder()
                 ->where('ContentFolder.folder_id = ?', $defaultFolderId)
-                ->filterByPosition($content->getPosition(), Criteria::LESS_THAN)
-            ;
+                ->filterByPosition($content->getPosition(), Criteria::LESS_THAN);
 
             if (! $isBackendContext) {
                 $previousQuery->filterByVisible(true);
@@ -323,14 +321,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $previous = $previousQuery
                 ->orderByPosition(Criteria::DESC)
-                ->findOne()
-            ;
+                ->findOne();
 
             $nextQuery = ContentQuery::create()
                 ->joinContentFolder()
                 ->where('ContentFolder.folder_id = ?', $defaultFolderId)
-                ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN)
-            ;
+                ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN);
 
             if (! $isBackendContext) {
                 $nextQuery->filterByVisible(true);
@@ -338,15 +334,13 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $next = $nextQuery
                 ->orderByPosition(Criteria::ASC)
-                ->findOne()
-            ;
+                ->findOne();
 
             $loopResultRow
                 ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
                 ->set("HAS_NEXT", $next != null ? 1 : 0)
                 ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                ->set("NEXT", $next != null ? $next->getId() : -1)
-            ;
+                ->set("NEXT", $next != null ? $next->getId() : -1);
         }
 
         return $loopResultRow;
