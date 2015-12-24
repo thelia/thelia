@@ -1067,4 +1067,7 @@ return array(
     'tax rule - create form' => '',
     'tax rule - delete form' => '',
     'tinymce wysiwyg editor' => '',
+    'Saint Barthélemy' => 'San Bartolomé',
+    'Saint Martin (French part)' => 'San Martín (parte francesa)',
+    'French Southern Territories' => 'Tierras Australes y Antárticas Francesas',
 );
