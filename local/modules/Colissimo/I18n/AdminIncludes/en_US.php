@@ -31,4 +31,5 @@ return array(
     'There is currently not orders to export' => 'There is currently no orders to export',
     'Total taxed amount' => 'Total taxed amount',
     'Weight up to ... (kg)' => 'Weight up to ... (kg)',
+    'Customer' => 'Customer'
 );
