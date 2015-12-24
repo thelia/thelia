@@ -14,7 +14,6 @@ namespace Colissimo\Controller;
 
 use Colissimo\Colissimo;
 use Colissimo\Model\ColissimoQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,8 +26,6 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerTitleQuery;
-use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
 
@@ -116,7 +113,22 @@ class Export extends BaseAdminController
                         $weight+=(double) $product->getWeight();
                     }
 
-                    $export .= "\"".$order->getRef()."\";\"".$address->getLastname()."\";\"".$address->getFirstname()."\";\"".$address->getAddress1()."\";\"".$address->getAddress2()."\";\"".$address->getAddress3()."\";\"".$address->getZipcode()."\";\"".$address->getCity()."\";\"".$country->getTitle()."\";\"".$phone."\";\"".$cellphone."\";\"".$weight."\";\"\";\"\";\"".$store_name."\";\"DOM\";\r\n";
+                    $export .=
+                        "\"".$order->getRef()
+                        ."\";\"".$address->getLastname()
+                        ."\";\"".$address->getFirstname()
+                        ."\";\"".$address->getAddress1()
+                        ."\";\"".$address->getAddress2()
+                        ."\";\"".$address->getAddress3()
+                        ."\";\"".$address->getZipcode()
+                        ."\";\"".$address->getCity()
+                        ."\";\"".$country->getTitle()
+                        ."\";\"".$phone
+                        ."\";\"" .$cellphone
+                        ."\";\"".$weight
+                        ."\";\"".$customer->getEmail()
+                        ."\";\"\";\"".$store_name
+                        ."\";\"DOM\";\r\n";
 
                     if ($status) {
                         $event = new OrderEvent($order);
@@ -155,5 +167,4 @@ class Export extends BaseAdminController
             );
         }
     }
-
-} 
+}
