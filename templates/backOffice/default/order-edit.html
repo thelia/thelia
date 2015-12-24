@@ -11,7 +11,7 @@
 
 {block name="main-content"}
 
-    {assign order_tab {$smarty.get.tab|default:"cart"}}
+    {assign order_tab {$tab|default:$smarty.get.tab|default:"cart"}}
 
     <div class="orders edit-order">
 
@@ -86,7 +86,7 @@
 
                                     {capture "order_tab_content"}
                                         {forhook rel="order.tab"}
-                                        <div class="tab-pane fade" id="{$id}">
+                                        <div class="tab-pane fade {if $order_tab == $id}active in{/if}" id="{$id}">
                                             {if $href}
                                             {* ajax *}
                                             <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
