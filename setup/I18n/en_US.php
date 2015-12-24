@@ -886,7 +886,7 @@ return array(
     'Spain' => 'Spain',
     'Sri Lanka' => 'Sri Lanka',
     'St Pierre et Miquelon' => 'St Pierre et Miquelon',
-    'Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page' => 'Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page',
+    'Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page' => 'Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page. 1 for yes, 0 for no.',
     'Store Information - JavaScript' => 'Store Information - JavaScript',
     'Store information configuration' => 'Store information configuration',
     'Sudan' => 'Sudan',

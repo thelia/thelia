@@ -70,7 +70,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (60, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
-(63, 'default_language_on_change', '1', 0, 0, NOW(), NOW())
+(63, 'default_language_on_change', '0', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
