@@ -1129,4 +1129,7 @@ return array(
     'tinymce wysiwyg editor' => 'Editeur TinyMCE',
     'Đồng' => 'Đồng',
     'Гривна' => 'Hryvnia Ukrainien',
+    'Saint Barthélemy' => 'Saint-Barthélemy',
+    'Saint Martin (French part)' => 'Saint-Martin (Antilles françaises)',
+    'French Southern Territories' => 'Terres australes et antarctiques françaises',
 );
