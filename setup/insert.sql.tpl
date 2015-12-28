@@ -95,6 +95,7 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW())
 ;
 
+-- Insert front hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
 (1, 'order-invoice.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2, 'order-invoice.delivery-address', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
@@ -318,8 +319,11 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (220, 'account-order.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
 (222, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(223, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(223, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+;
 
+-- Insert admin hooks
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1002, 'folder.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -716,7 +720,20 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1393, 'administrators.row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1394, 'advanced-configuration', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1395, 'advanced-configuration.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1396, 'brand.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1397, 'brand.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1398, 'category.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1399, 'category.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1400, 'content.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1401, 'content.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1402, 'folder.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1403, 'folder.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1404, 'product.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1405, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+;
 
+-- Insert pdf hooks
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2003, 'invoice.footer-top', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -728,7 +745,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2009, 'invoice.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2010, 'invoice.after-products', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2011, 'invoice.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-
 (2012, 'delivery.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2013, 'delivery.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2014, 'delivery.footer-top', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -739,12 +755,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2019, 'delivery.delivery-address', 3, 1, 0, 1, 1, 1, NOW(), NOW()),
 (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-
-
 (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
-
 (2023, 'wysiwyg.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-
 (2024, 'order-edit.cart-top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2025, 'order-edit.cart-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2026, 'order-edit.bill-top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -757,23 +769,13 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-
-(2037, 'brand.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2038, 'brand.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2039, 'category.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2040, 'category.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2041, 'content.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2042, 'content.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2043, 'folder.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2044, 'folder.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2045, 'product.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2046, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
+-- Insert email hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
-(3000, 'email.layout.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(3001, 'email.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3000, 'email-html.layout.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3001, 'email-html.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3002, 'email-html.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3003, 'email-html.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
 (3004, 'email-html.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1578,6 +1580,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
 {/foreach}
 ;
 
+-- Insert I18n front hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
 {foreach $locales as $locale}
     (1, '{$locale}', {intl l='Invoice choice - at the top' locale=$locale}, NULL, NULL),
@@ -1802,8 +1805,14 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (220, '{$locale}', {intl l='Order details - javascript initialization' locale=$locale}, NULL, NULL),
     (221, '{$locale}', {intl l='Customer account - additional information' locale=$locale}, NULL, NULL),
     (222, '{$locale}', {intl l='Order details - after product' locale=$locale}, NULL, NULL),
-    (223, '{$locale}', {intl l='Mini cart' locale=$locale}, NULL, NULL),
+    (223, '{$locale}', {intl l='Mini cart' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
+{/foreach}
+;
+
+-- Insert I18n admin hooks
+INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+{foreach $locales as $locale}
     (1000, '{$locale}', {intl l='Category - content' locale=$locale}, NULL, NULL),
     (1001, '{$locale}', {intl l='Content - content' locale=$locale}, NULL, NULL),
     (1002, '{$locale}', {intl l='Folder - content' locale=$locale}, NULL, NULL),
@@ -2200,7 +2209,23 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1393, '{$locale}', {intl l='Administrators - row' locale=$locale}, '', ''),
     (1394, '{$locale}', {intl l='Advanced Configuration' locale=$locale}, '', ''),
     (1395, '{$locale}', {intl l='Advanced Configuration - Javascript' locale=$locale}, '', ''),
+    (1396, '{$locale}', {intl l='Brand edit - right column top' locale=$locale}, NULL, NULL),
+    (1397, '{$locale}', {intl l='Brand edit - right column bottom' locale=$locale}, NULL, NULL),
+    (1398, '{$locale}', {intl l='Category edit - right column top' locale=$locale}, NULL, NULL),
+    (1399, '{$locale}', {intl l='Category edit - right column bottom' locale=$locale}, NULL, NULL),
+    (1400, '{$locale}', {intl l='Content edit - right column top' locale=$locale}, NULL, NULL),
+    (1401, '{$locale}', {intl l='Content edit - right column bottom' locale=$locale}, NULL, NULL),
+    (1402, '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
+    (1403, '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
+    (1404, '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
+    (1405, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
+{/foreach}
+;
+
+-- Insert I18n pdf hooks
+INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+{foreach $locales as $locale}
     (2001, '{$locale}', {intl l='Invoice - CSS' locale=$locale}, NULL, NULL),
     (2002, '{$locale}', {intl l='Invoice - in the header' locale=$locale}, NULL, NULL),
     (2003, '{$locale}', {intl l='Invoice - at the top of the footer' locale=$locale}, NULL, NULL),
@@ -2236,25 +2261,16 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, '{$locale}', {intl l='Invoice - After delivery module' locale=$locale}, NULL, NULL),
     (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL),
     (2035, '{$locale}', {intl l='Invoice - additional product information' locale=$locale}, NULL, NULL),
-    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL),
-    (2037, '{$locale}', {intl l='Brand edit - right column top' locale=$locale}, NULL, NULL),
-    (2038, '{$locale}', {intl l='Brand edit - right column bottom' locale=$locale}, NULL, NULL),
-    (2039, '{$locale}', {intl l='Category edit - right column top' locale=$locale}, NULL, NULL),
-    (2040, '{$locale}', {intl l='Category edit - right column bottom' locale=$locale}, NULL, NULL),
-    (2041, '{$locale}', {intl l='Content edit - right column top' locale=$locale}, NULL, NULL),
-    (2042, '{$locale}', {intl l='Content edit - right column bottom' locale=$locale}, NULL, NULL),
-    (2043, '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
-    (2044, '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
-    (2045, '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
-    (2046, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
 
+-- Insert I18n email hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
 {foreach $locales as $locale}
-    (3000, '{$locale}', {intl l='Email - layout - CSS' locale=$locale}, NULL, NULL),
-    (3001, '{$locale}', {intl l='Email - layout - footer' locale=$locale}, NULL, NULL),
+    (3000, '{$locale}', {intl l='Email html - layout - CSS' locale=$locale}, NULL, NULL),
+    (3001, '{$locale}', {intl l='Email html - layout - footer' locale=$locale}, NULL, NULL),
     (3002, '{$locale}', {intl l='Email html - order confirmation - before address' locale=$locale}, NULL, NULL),
     (3003, '{$locale}', {intl l='Email html - order confirmation - delivery address' locale=$locale}, NULL, NULL),
     (3004, '{$locale}', {intl l='Email html - order confirmation - after address' locale=$locale}, NULL, NULL),

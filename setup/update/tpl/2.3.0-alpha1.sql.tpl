@@ -51,11 +51,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
-SELECT @max_id := IFNULL(MAX(`id`),3000) FROM `hook` WHERE `type`=4;
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
-(@max_id+0, 'email.template.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id+1, 'email.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+0, 'email-html.template.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+1, 'email-html.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+2, 'email-html.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+3, 'email-html.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+4, 'email-html.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -85,8 +85,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
 {foreach $locales as $locale}
-    (@max_id+0, '{$locale}', {intl l='Email - layout - CSS' locale=$locale}, NULL, NULL),
-    (@max_id+1, '{$locale}', {intl l='Email - layout - footer' locale=$locale}, NULL, NULL),
+    (@max_id+0, '{$locale}', {intl l='Email html - layout - CSS' locale=$locale}, NULL, NULL),
+    (@max_id+1, '{$locale}', {intl l='Email html - layout - footer' locale=$locale}, NULL, NULL),
     (@max_id+2, '{$locale}', {intl l='Email html - order confirmation - before address' locale=$locale}, NULL, NULL),
     (@max_id+3, '{$locale}', {intl l='Email html - order confirmation - delivery address' locale=$locale}, NULL, NULL),
     (@max_id+4, '{$locale}', {intl l='Email html - order confirmation - after address' locale=$locale}, NULL, NULL),
