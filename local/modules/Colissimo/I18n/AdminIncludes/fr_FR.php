@@ -30,4 +30,5 @@ return array(
     'Sent' => 'Envoyé',
     'Total taxed amount' => 'Total TTC',
     'Weight up to ... (kg)' => 'Jusqu\'au poids (Kg)',
+    'Customer' => 'Client'
 );
