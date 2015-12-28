@@ -47,6 +47,72 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+8,  '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
     (@max_id+9,  '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
     (@max_id+10, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
+SELECT @max_id := IFNULL(MAX(`id`),3000) FROM `hook` WHERE `type`=4;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+(@max_id+0, 'email.template.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+1, 'email.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+2, 'email-html.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+3, 'email-html.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+4, 'email-html.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+5, 'email-html.order-confirmation.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+6, 'email-html.order-confirmation.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+7, 'email-html.order-confirmation.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+8, 'email-html.order-confirmation.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+9, 'email-html.order-notification.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+10, 'email-html.order-notification.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+11, 'email-html.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+12, 'email-html.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+13, 'email-html.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+14, 'email-html.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+15, 'email-txt.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+16, 'email-txt.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+17, 'email-txt.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+18, 'email-txt.order-confirmation.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+19, 'email-txt.order-confirmation.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+20, 'email-txt.order-confirmation.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+21, 'email-txt.order-notification.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+22, 'email-txt.order-notification.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+23, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+24, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+25, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id+26, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+{foreach $locales as $locale}
+    (@max_id+0, '{$locale}', {intl l='Email - layout - CSS' locale=$locale}, NULL, NULL),
+    (@max_id+1, '{$locale}', {intl l='Email - layout - footer' locale=$locale}, NULL, NULL),
+    (@max_id+2, '{$locale}', {intl l='Email html - order confirmation - before address' locale=$locale}, NULL, NULL),
+    (@max_id+3, '{$locale}', {intl l='Email html - order confirmation - delivery address' locale=$locale}, NULL, NULL),
+    (@max_id+4, '{$locale}', {intl l='Email html - order confirmation - after address' locale=$locale}, NULL, NULL),
+    (@max_id+5, '{$locale}', {intl l='Email html - order confirmation - order product' locale=$locale}, NULL, NULL),
+    (@max_id+6, '{$locale}', {intl l='Email html - order confirmation - before products' locale=$locale}, NULL, NULL),
+    (@max_id+7, '{$locale}', {intl l='Email html - order confirmation - after products' locale=$locale}, NULL, NULL),
+    (@max_id+8, '{$locale}', {intl l='Email html - order confirmation - footer' locale=$locale}, NULL, NULL),
+    (@max_id+9, '{$locale}', {intl l='Email html - order notification - before address' locale=$locale}, NULL, NULL),
+    (@max_id+10, '{$locale}', {intl l='Email html - order notification - delivery address' locale=$locale}, NULL, NULL),
+    (@max_id+11, '{$locale}', {intl l='Email html - order notification - after address' locale=$locale}, NULL, NULL),
+    (@max_id+12, '{$locale}', {intl l='Email html - order notification - order product' locale=$locale}, NULL, NULL),
+    (@max_id+13, '{$locale}', {intl l='Email html - order notification - before products' locale=$locale}, NULL, NULL),
+    (@max_id+14, '{$locale}', {intl l='Email html - order notification - after products' locale=$locale}, NULL, NULL),
+    (@max_id+15, '{$locale}', {intl l='Email txt - order confirmation - before address' locale=$locale}, NULL, NULL),
+    (@max_id+16, '{$locale}', {intl l='Email txt - order confirmation - delivery address' locale=$locale}, NULL, NULL),
+    (@max_id+17, '{$locale}', {intl l='Email txt - order confirmation - after address' locale=$locale}, NULL, NULL),
+    (@max_id+18, '{$locale}', {intl l='Email txt - order confirmation - order product' locale=$locale}, NULL, NULL),
+    (@max_id+19, '{$locale}', {intl l='Email txt - order confirmation - before products' locale=$locale}, NULL, NULL),
+    (@max_id+20, '{$locale}', {intl l='Email txt - order confirmation - after products' locale=$locale}, NULL, NULL),
+    (@max_id+21, '{$locale}', {intl l='Email txt - order notification - before address' locale=$locale}, NULL, NULL),
+    (@max_id+22, '{$locale}', {intl l='Email txt - order notification - delivery address' locale=$locale}, NULL, NULL),
+    (@max_id+23, '{$locale}', {intl l='Email txt - order notification - after address' locale=$locale}, NULL, NULL),
+    (@max_id+24, '{$locale}', {intl l='Email txt - order notification - order product' locale=$locale}, NULL, NULL),
+    (@max_id+25, '{$locale}', {intl l='Email txt - order notification - before products' locale=$locale}, NULL, NULL),
+    (@max_id+26, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 

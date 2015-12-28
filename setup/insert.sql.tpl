@@ -771,6 +771,36 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2046, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+(3000, 'email.layout.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3001, 'email.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3002, 'email-html.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3003, 'email-html.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(3004, 'email-html.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3005, 'email-html.order-confirmation.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3006, 'email-html.order-confirmation.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3007, 'email-html.order-confirmation.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3008, 'email-html.order-confirmation.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3009, 'email-html.order-notification.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3010, 'email-html.order-notification.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(3011, 'email-html.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3012, 'email-html.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3013, 'email-html.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3014, 'email-html.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3015, 'email-txt.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3016, 'email-txt.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(3017, 'email-txt.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3018, 'email-txt.order-confirmation.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3019, 'email-txt.order-confirmation.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3020, 'email-txt.order-confirmation.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3021, 'email-txt.order-notification.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3022, 'email-txt.order-notification.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(3023, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3024, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3025, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+;
+
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NOW(), NOW()),
 (2, 0, 2, NOW(), NOW()),
@@ -2207,7 +2237,6 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL),
     (2035, '{$locale}', {intl l='Invoice - additional product information' locale=$locale}, NULL, NULL),
     (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL),
-
     (2037, '{$locale}', {intl l='Brand edit - right column top' locale=$locale}, NULL, NULL),
     (2038, '{$locale}', {intl l='Brand edit - right column bottom' locale=$locale}, NULL, NULL),
     (2039, '{$locale}', {intl l='Category edit - right column top' locale=$locale}, NULL, NULL),
@@ -2218,6 +2247,39 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2044, '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
     (2045, '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
     (2046, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
+INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+{foreach $locales as $locale}
+    (3000, '{$locale}', {intl l='Email - layout - CSS' locale=$locale}, NULL, NULL),
+    (3001, '{$locale}', {intl l='Email - layout - footer' locale=$locale}, NULL, NULL),
+    (3002, '{$locale}', {intl l='Email html - order confirmation - before address' locale=$locale}, NULL, NULL),
+    (3003, '{$locale}', {intl l='Email html - order confirmation - delivery address' locale=$locale}, NULL, NULL),
+    (3004, '{$locale}', {intl l='Email html - order confirmation - after address' locale=$locale}, NULL, NULL),
+    (3005, '{$locale}', {intl l='Email html - order confirmation - order product' locale=$locale}, NULL, NULL),
+    (3006, '{$locale}', {intl l='Email html - order confirmation - before products' locale=$locale}, NULL, NULL),
+    (3007, '{$locale}', {intl l='Email html - order confirmation - after products' locale=$locale}, NULL, NULL),
+    (3008, '{$locale}', {intl l='Email html - order confirmation - footer' locale=$locale}, NULL, NULL),
+    (3009, '{$locale}', {intl l='Email html - order notification - before address' locale=$locale}, NULL, NULL),
+    (3010, '{$locale}', {intl l='Email html - order notification - delivery address' locale=$locale}, NULL, NULL),
+    (3011, '{$locale}', {intl l='Email html - order notification - after address' locale=$locale}, NULL, NULL),
+    (3012, '{$locale}', {intl l='Email html - order notification - order product' locale=$locale}, NULL, NULL),
+    (3013, '{$locale}', {intl l='Email html - order notification - before products' locale=$locale}, NULL, NULL),
+    (3014, '{$locale}', {intl l='Email html - order notification - after products' locale=$locale}, NULL, NULL),
+    (3015, '{$locale}', {intl l='Email txt - order confirmation - before address' locale=$locale}, NULL, NULL),
+    (3016, '{$locale}', {intl l='Email txt - order confirmation - delivery address' locale=$locale}, NULL, NULL),
+    (3017, '{$locale}', {intl l='Email txt - order confirmation - after address' locale=$locale}, NULL, NULL),
+    (3018, '{$locale}', {intl l='Email txt - order confirmation - order product' locale=$locale}, NULL, NULL),
+    (3019, '{$locale}', {intl l='Email txt - order confirmation - before products' locale=$locale}, NULL, NULL),
+    (3020, '{$locale}', {intl l='Email txt - order confirmation - after products' locale=$locale}, NULL, NULL),
+    (3021, '{$locale}', {intl l='Email txt - order notification - before address' locale=$locale}, NULL, NULL),
+    (3022, '{$locale}', {intl l='Email txt - order notification - delivery address' locale=$locale}, NULL, NULL),
+    (3023, '{$locale}', {intl l='Email txt - order notification - after address' locale=$locale}, NULL, NULL),
+    (3024, '{$locale}', {intl l='Email txt - order notification - order product' locale=$locale}, NULL, NULL),
+    (3025, '{$locale}', {intl l='Email txt - order notification - before products' locale=$locale}, NULL, NULL),
+    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
