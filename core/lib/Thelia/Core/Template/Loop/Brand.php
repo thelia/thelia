@@ -105,7 +105,13 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
     {
         $search->_and();
 
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+        $search->where(
+            "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
+            THEN `requested_locale_i18n`.`TITLE`ELSE `default_locale_i18n`.`TITLE`
+            END ".$searchCriteria." ?",
+            $searchTerm,
+            \PDO::PARAM_STR
+        );
     }
 
     public function buildModelCriteria()
@@ -113,7 +119,18 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $search = BrandQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
+        $this->configureI18nProcessing(
+            $search,
+            array(
+                'TITLE',
+                'CHAPO',
+                'DESCRIPTION',
+                'POSTSCRIPTUM',
+                'META_TITLE',
+                'META_DESCRIPTION',
+                'META_KEYWORDS'
+            )
+        );
 
         $id = $this->getId();
 
@@ -136,7 +153,14 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $search->where(
+                "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
+                THEN `requested_locale_i18n`.`TITLE`
+                ELSE `default_locale_i18n`.`TITLE`
+                END ".Criteria::LIKE." ?",
+                "%".$title."%",
+                \PDO::PARAM_STR
+            );
         }
 
         $current = $this->getCurrent();
@@ -216,16 +240,14 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 ->set("META_KEYWORDS", $brand->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("POSITION", $brand->getPosition())
                 ->set("VISIBLE", $brand->getVisible())
-                ->set("LOGO_IMAGE_ID", $brand->getLogoImageId() ?: 0)
-            ;
+                ->set("LOGO_IMAGE_ID", $brand->getLogoImageId() ?: 0);
 
             $isBackendContext = $this->getBackendContext();
 
-            if ($isBackendContext || $this->getWithPrevNextInfo()) {
+            if ($this->getWithPrevNextInfo()) {
                 // Find previous and next category
                 $previousQuery = BrandQuery::create()
-                    ->filterByPosition($brand->getPosition(), Criteria::LESS_THAN)
-                ;
+                    ->filterByPosition($brand->getPosition(), Criteria::LESS_THAN);
 
                 if (! $isBackendContext) {
                     $previousQuery->filterByVisible(true);
@@ -233,12 +255,10 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
                 $previous = $previousQuery
                     ->orderByPosition(Criteria::DESC)
-                    ->findOne()
-                ;
+                    ->findOne();
 
                 $nextQuery = BrandQuery::create()
-                    ->filterByPosition($brand->getPosition(), Criteria::GREATER_THAN)
-                ;
+                    ->filterByPosition($brand->getPosition(), Criteria::GREATER_THAN);
 
                 if (! $isBackendContext) {
                     $nextQuery->filterByVisible(true);
@@ -246,15 +266,13 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
                 $next = $nextQuery
                     ->orderByPosition(Criteria::ASC)
-                    ->findOne()
-                ;
+                    ->findOne();
 
                 $loopResultRow
                     ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
                     ->set("HAS_NEXT", $next != null ? 1 : 0)
                     ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1)
-                ;
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $brand);

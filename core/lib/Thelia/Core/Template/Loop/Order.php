@@ -43,6 +43,7 @@ use Thelia\Type\TypeCollection;
  * @method string[] getStatusCode()
  * @method string[] getExcludeStatusCode()
  * @method string[] getOrder()
+ * @method bool getWithPrevNextInfo()
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
@@ -54,6 +55,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             new Argument(
                 'customer',
                 new TypeCollection(
@@ -81,14 +83,16 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array(
-                        'id', 'id-reverse',
-                        'reference', 'reference-reverse',
-                        'create-date', 'create-date-reverse',
-                        'company', 'company-reverse',
-                        'customer-name', 'customer-name-reverse',
-                        'status', 'status-reverse'
-                    ))
+                    new Type\EnumListType(
+                        array(
+                            'id', 'id-reverse',
+                            'reference', 'reference-reverse',
+                            'create-date', 'create-date-reverse',
+                            'company', 'company-reverse',
+                            'customer-name', 'customer-name-reverse',
+                            'status', 'status-reverse'
+                        )
+                    )
                 ),
                 'create-date-reverse'
             )
@@ -190,16 +194,14 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             $search
                 ->useOrderStatusQuery()
                 ->filterByCode($statusCode, Criteria::IN)
-                ->endUse()
-            ;
+                ->endUse();
         }
 
         if (null !== $excludeStatusCode = $this->getExcludeStatusCode()) {
             $search
                 ->useOrderStatusQuery()
                 ->filterByCode($excludeStatusCode, Criteria::NOT_IN)
-                ->endUse()
-            ;
+                ->endUse();
         }
 
         $orderers = $this->getOrder();
@@ -212,51 +214,43 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 case 'id-reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'reference':
                     $search->orderByRef(Criteria::ASC);
                     break;
                 case 'reference-reverse':
                     $search->orderByRef(Criteria::DESC);
                     break;
-
                 case 'create-date':
                     $search->orderByCreatedAt(Criteria::ASC);
                     break;
                 case 'create-date-reverse':
                     $search->orderByCreatedAt(Criteria::DESC);
                     break;
-
                 case 'status':
                     $search->orderByStatusId(Criteria::ASC);
                     break;
                 case 'status-reverse':
                     $search->orderByStatusId(Criteria::DESC);
                     break;
-
                 case 'company':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
                         ->withColumn(OrderAddressTableMap::COMPANY, 'company')
-                        ->orderBy('company', Criteria::ASC)
-                    ;
+                        ->orderBy('company', Criteria::ASC);
                     break;
                 case 'company-reverse':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
                         ->withColumn(OrderAddressTableMap::COMPANY, 'company')
-                        ->orderBy('company', Criteria::DESC)
-                    ;
+                        ->orderBy('company', Criteria::DESC);
                     break;
-
                 case 'customer-name':
                     $search
                         ->joinCustomer()
                         ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
                         ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
                         ->orderBy('lastname', Criteria::ASC)
-                        ->orderBy('firstname', Criteria::ASC)
-                    ;
+                        ->orderBy('firstname', Criteria::ASC);
                     break;
                 case 'customer-name-reverse':
                     $search
@@ -264,8 +258,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                         ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
                         ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
                         ->orderBy('lastname', Criteria::DESC)
-                        ->orderBy('firstname', Criteria::DESC)
-                    ;
+                        ->orderBy('firstname', Criteria::DESC);
                     break;
             }
         }
@@ -314,8 +307,33 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('IS_CANCELED', $order->isCancelled())
                 ->set('IS_NOT_PAID', $order->isNotPaid())
                 ->set('IS_SENT', $order->isSent())
-                ->set('IS_PROCESSING', $order->isProcessing())
-            ;
+                ->set('IS_PROCESSING', $order->isProcessing());
+
+            if ($this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previousQuery = OrderQuery::create()
+                    ->filterById($order->getId(), Criteria::LESS_THAN)
+                    ->filterByStatusId($order->getStatusId(), Criteria::EQUAL);
+
+                $previous = $previousQuery
+                    ->orderById(Criteria::DESC)
+                    ->findOne();
+
+                $nextQuery = OrderQuery::create()
+                    ->filterById($order->getId(), Criteria::GREATER_THAN)
+                    ->filterByStatusId($order->getStatusId(), Criteria::EQUAL);
+
+                $next = $nextQuery
+                    ->orderById(Criteria::ASC)
+                    ->findOne();
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
+            }
+
             $this->addOutputFields($loopResultRow, $order);
 
             $loopResult->addRow($loopResultRow);

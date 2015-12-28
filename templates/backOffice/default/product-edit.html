@@ -20,7 +20,7 @@
             {hook name="product-edit.top" product_id=$product_id}
 
             <div class="row">
-                {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
+                {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" with_prev_next_info=true lang=$edit_language_id}
 
                 {* Define close url *}
                 {assign var='close_url' value="{url path='/admin/catalog' category_id=$DEFAULT_CATEGORY}"}

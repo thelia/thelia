@@ -18,7 +18,7 @@
             {hook name="content-edit.top" content_id=$content_id}
 
             <div class="row">
-                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
+                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id" with_prev_next_info="true"}
                     <div class="col-md-12 general-block-decorator">
                         <div class="row">
                             <div class="col-md-7 title">

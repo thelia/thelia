@@ -64,17 +64,19 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType([
-                        'alpha',
-                        'alpha_reverse',
-                        'manual',
-                        'manual_reverse',
-                        'random',
-                        'created',
-                        'created_reverse',
-                        'updated',
-                        'updated_reverse'
-                    ])
+                    new Type\EnumListType(
+                        [
+                            'alpha',
+                            'alpha_reverse',
+                            'manual',
+                            'manual_reverse',
+                            'random',
+                            'created',
+                            'created_reverse',
+                            'updated',
+                            'updated_reverse'
+                        ]
+                    )
                 ),
                 'manual'
             ),
@@ -240,17 +242,15 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("CHILD_COUNT", $folder->countChild())
                 ->set("CONTENT_COUNT", $folder->countAllContents())
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
-                ->set("POSITION", $folder->getPosition())
-            ;
+                ->set("POSITION", $folder->getPosition());
 
             $isBackendContext = $this->getBackendContext();
 
-            if ($isBackendContext || $this->getWithPrevNextInfo()) {
+            if ($this->getWithPrevNextInfo()) {
                 // Find previous and next folder
                 $previousQuery = FolderQuery::create()
                     ->filterByParent($folder->getParent())
-                    ->filterByPosition($folder->getPosition(), Criteria::LESS_THAN)
-                ;
+                    ->filterByPosition($folder->getPosition(), Criteria::LESS_THAN);
 
                 if (! $isBackendContext) {
                     $previousQuery->filterByVisible(true);
@@ -258,29 +258,25 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
                 $previous = $previousQuery
                     ->orderByPosition(Criteria::DESC)
-                    ->findOne()
-                ;
+                    ->findOne();
 
-                $nextQUery = FolderQuery::create()
+                $nextQuery = FolderQuery::create()
                     ->filterByParent($folder->getParent())
-                    ->filterByPosition($folder->getPosition(), Criteria::GREATER_THAN)
-                ;
+                    ->filterByPosition($folder->getPosition(), Criteria::GREATER_THAN);
 
                 if (! $isBackendContext) {
-                    $nextQUery->filterByVisible(true);
+                    $nextQuery->filterByVisible(true);
                 }
 
-                $next = $nextQUery
+                $next = $nextQuery
                     ->orderByPosition(Criteria::ASC)
-                    ->findOne()
-                ;
+                    ->findOne();
 
                 $loopResultRow
                     ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
                     ->set("HAS_NEXT", $next != null ? 1 : 0)
                     ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1)
-                ;
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $folder);

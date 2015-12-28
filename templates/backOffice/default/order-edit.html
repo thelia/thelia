@@ -32,7 +32,7 @@
 
                         {ifloop rel='the-order'}
 
-                            {loop type="order" name="the-order" id=$order_id customer="*"}
+                            {loop type="order" name="the-order" id=$order_id customer="*" with_prev_next_info="true" backend_context="1"}
 
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
                                     {$orderCurrency=$SYMBOL}
@@ -41,11 +41,11 @@
                                 {assign "orderStatusId" $STATUS}
 
                                 <div class="row">
-                                    <div class="col-md-7 title">
+                                    <div class="col-md-4 title">
                                         {intl l='Order %ref - ID %id' id={$ID} ref={$REF}}
                                     </div>
 
-                                    <div class="col-md-5 actions">
+                                    <div class="col-md-4 actions">
                                         <form class="form-horizontal" role="form" id="order-update-status-form" action="{url path="/admin/order/update/$ID/status"}" method="post">
                                             <input class="js-current-tab" type="hidden" name="tab" value="{$order_tab}">
                                             <div class="form-group">
@@ -67,6 +67,20 @@
                                                 </div>
                                             </div>
                                         </form>
+                                    </div>
+
+                                    <div class="col-md-4 actions">
+                                        {if $HAS_PREVIOUS != 0}
+                                        <a href="{url path="/admin/order/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous order'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                        {else}
+                                        <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                        {/if}
+
+                                        {if $HAS_NEXT != 0}
+                                        <a href="{url path="/admin/order/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next order'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                        {else}
+                                        <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                        {/if}
                                     </div>
                                 </div>
 
