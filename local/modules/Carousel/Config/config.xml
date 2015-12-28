@@ -18,5 +18,8 @@
             <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
             <tag name="hook.event_listener" event="module.config-js" type="back" templates="js:assets/js/module-configuration.js" />
         </hook>
+        <hook id="carousel.hook.back" class="Carousel\Hook\BackHook" scope="request">
+            <tag name="hook.event_listener" event="main.top-menu-tools" type="back" />
+        </hook>
     </hooks>
 </config>
