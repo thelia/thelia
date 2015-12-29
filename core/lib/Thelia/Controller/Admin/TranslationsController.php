@@ -286,6 +286,11 @@ class TranslationsController extends BaseAdminController
                     $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
                 } else {
                     $templateArguments['all_strings'] = $event->getTranslatableStrings();
+                    $templateArguments['all_strings_current_language'] = $this->getTranslatableStringsExamples(
+                        $directory,
+                        $walkMode,
+                        $domain
+                    );
                 }
 
                 $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR . 'I18n');
@@ -326,6 +331,32 @@ class TranslationsController extends BaseAdminController
             return $response;
         }
         return $this->renderTemplate();
+    }
+
+    protected function getTranslatableStringsExamples($directory, $walkMode, $domain)
+    {
+        $examples = [];
+
+        if ($this->getSession()->getLang()->getLocale() === $this->getCurrentEditionLocale()) {
+            return $examples;
+        }
+
+        $event = TranslationEvent::createGetStringsEvent(
+            $directory,
+            $walkMode,
+            $this->getSession()->getLang()->getLocale(),
+            $domain
+        );
+
+        $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_GET_STRINGS, $event);
+
+        $translations = $event->getTranslatableStrings();
+
+        foreach ($translations as $translation) {
+            $examples[$translation['text']] = $translation['translation'];
+        }
+
+        return $examples;
     }
 
     private function loadTranslation($directory, $domain)

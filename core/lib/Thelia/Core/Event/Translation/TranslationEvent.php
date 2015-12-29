@@ -258,6 +258,7 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param array $customFallbackStrings
+     * @return $this
      */
     public function setCustomFallbackStrings($customFallbackStrings)
     {
@@ -275,6 +276,7 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param array $globalFallbackStrings
+     * @return $this
      */
     public function setGlobalFallbackStrings($globalFallbackStrings)
     {

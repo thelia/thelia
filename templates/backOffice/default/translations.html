@@ -305,6 +305,15 @@
 	                                        <td class="col-md-6">
 	                                            {$info.text}
 
+                                                {if !empty($all_strings_current_language[$info.text])}
+                                                <div>
+                                                <br />
+                                                    <span>{intl l="Example of translation in the current language :"}</span>
+                                                    <br />
+                                                    <img src="{image file="assets/img/flags/{lang attr="code"}.png"}" alt="{lang attr="title"}" />
+                                                    {$all_strings_current_language[$info.text]}
+                                                </div>
+                                                {/if}
 
 												{if $info.dollar}
 												    <div>
