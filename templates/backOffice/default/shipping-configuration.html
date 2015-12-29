@@ -72,7 +72,7 @@
                                     </td>
                                     <td>
                                         {loop name="module-area" type="module" area=$ID backend_context="1"}
-                                            {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+                                            {$CODE} - {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL}<br />{/if}
                                         {/loop}
                                         {elseloop rel="module-area"}
                                             <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>

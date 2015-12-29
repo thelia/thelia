@@ -66,7 +66,7 @@
 		                                            <select id="item_name" required="required" name="item_name" class="submit-on-change form-control">
 		                                                <option value="">{intl l='Please select the module to translate'}</option>
 					                                    {loop type="module" name="translate-module" backend_context=1 order="title"}
-					                                        <option value="{$ID}" {if $item_name == $ID}selected="selected"{/if}>{$TITLE}</option>
+					                                        <option value="{$ID}" {if $item_name == $ID}selected="selected"{/if}>{$CODE} - {$TITLE}</option>
 					                                    {/loop}
 					                                </select>
 					                            </div>

@@ -517,7 +517,7 @@ return array(
     'Editing module' => 'Module en cours de modification',
     'Editing profile' => 'Modification du profil',
     'Editing profile \'%name\'' => 'Edition du profil \'%name\' ',
-    'Editing shipping configuration for module "%name"' => 'Configuration des zones de livraison du module "%title" ',
+    'Editing shipping configuration for module "%name"' => 'Configuration des zones de livraison du module "%name" ',
     'Editing shipping zone "%name"' => 'Modification de la zone de livraison "%name"',
     'Editing tax' => 'En cours de modification de la taxe',
     'Editing tax rule' => 'En cours de modification de la règle de taxe',
