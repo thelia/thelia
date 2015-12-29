@@ -18,7 +18,7 @@
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping zone "%name"' name="{$NAME}"}</li>
+            <li>{intl l='Editing shipping zone "%name"' name="{$NAME}"|escape}</li>
         </ul>
 
         {hook name="shipping-configuration-edit.top" area_id=$area_id}
