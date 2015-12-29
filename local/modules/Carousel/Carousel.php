@@ -73,7 +73,7 @@ class Carousel extends BaseModule
         $uploadDir = $this->getUploadDir();
         $fileSystem = new Filesystem();
 
-        if (!file_exists($uploadDir)) {
+        if (!$fileSystem->exists($uploadDir) && $fileSystem->exists(__DIR__ . DS . 'media' . DS . 'carousel')) {
             $finder = new Finder();
             $finder->files()->in(__DIR__ . DS . 'media' . DS . 'carousel');
 
