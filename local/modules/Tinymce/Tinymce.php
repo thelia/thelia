@@ -76,6 +76,11 @@ class Tinymce extends BaseModule
                 $fileSystem->mkdir($this->webMediaPath.DS.'thumbs');
             }
         }
+
+        static::setConfigValue(
+            'available_text_areas',
+            '#timymce_configuration-id-test_zone, .wysiwyg'
+        );
     }
 
     /**
