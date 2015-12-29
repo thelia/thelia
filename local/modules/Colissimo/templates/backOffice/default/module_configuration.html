@@ -186,7 +186,7 @@
                     <div id="table-prices-colissimo" {if $isColissimoFreeShipping eq 1} style="display:none;" {/if}>
                         <!-- Prices editing -->
                         {* -- Add price slice confirmation dialog ----------------------------------- *}
-                        {loop type="area" name="list area" backend_context=true}
+                        {loop type="area" name="list area" backend_context=true module_id=$module_id}
                         {include
                         file = "includes/generic-create-dialog.html"
 

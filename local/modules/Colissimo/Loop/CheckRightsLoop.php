@@ -24,7 +24,6 @@ use Thelia\Core\Translation\Translator;
  * @package Colissimo\Looop
  * @author Thelia <info@thelia.net>
  */
-
 class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
 {
     protected function getArgDefinitions()
@@ -37,24 +36,51 @@ class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
         $ret = array();
         $dir = __DIR__."/../Config/";
         if (!is_readable($dir)) {
-            $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't read Config directory", [], Colissimo::MESSAGE_DOMAIN), "ERRFILE"=>"");
+            $ret[] = array(
+                "ERRMES"=>Translator::getInstance()->trans(
+                    "Can't read Config directory",
+                    [],
+                    Colissimo::MESSAGE_DOMAIN
+                ),
+                "ERRFILE"=>""
+            );
         }
         if (!is_writable($dir)) {
-            $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't write Config directory", [], Colissimo::MESSAGE_DOMAIN), "ERRFILE"=>"");
+            $ret[] = array(
+                "ERRMES"=>Translator::getInstance()->trans(
+                    "Can't write Config directory",
+                    [],
+                    Colissimo::MESSAGE_DOMAIN
+                ),
+                "ERRFILE"=>""
+            );
         }
         if ($handle = opendir($dir)) {
             while (false !== ($file = readdir($handle))) {
                 if (strlen($file) > 5 && substr($file, -5) === ".json") {
                     if (!is_readable($dir.$file)) {
-                        $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't read file", [], Colissimo::MESSAGE_DOMAIN), "ERRFILE"=>"Colissimo/Config/".$file);
+                        $ret[] = array(
+                            "ERRMES"=>Translator::getInstance()->trans(
+                                "Can't read file",
+                                [],
+                                Colissimo::MESSAGE_DOMAIN
+                            ),
+                            "ERRFILE"=>"Colissimo/Config/".$file
+                        );
                     }
                     if (!is_writable($dir.$file)) {
-                        $ret[] = array("ERRMES"=>Translator::getInstance()->trans("Can't write file", [], Colissimo::MESSAGE_DOMAIN), "ERRFILE"=>"Colissimo/Config/".$file);
+                        $ret[] = array(
+                            "ERRMES"=>Translator::getInstance()->trans(
+                                "Can't write file",
+                                [],
+                                Colissimo::MESSAGE_DOMAIN
+                            ),
+                                "ERRFILE"=>"Colissimo/Config/".$file
+                        );
                     }
                 }
             }
         }
-
         return $ret;
     }
     public function parseResults(LoopResult $loopResult)
@@ -65,7 +91,6 @@ class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
                 ->set("ERRFILE", $arr["ERRFILE"]);
             $loopResult->addRow($loopResultRow);
         }
-
         return $loopResult;
     }
 }

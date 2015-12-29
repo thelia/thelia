@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Order;
 
@@ -63,7 +64,7 @@ class NotSendLoop extends Order
      */
     public function getArgDefinitions()
     {
-        return new ArgumentCollection();
+        return new ArgumentCollection(Argument::createBooleanTypeArgument('with_prev_next_info', false));
     }
 
     /**
