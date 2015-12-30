@@ -289,7 +289,7 @@
                                                 <tbody>
                                                 <tr>
                                                     <th>{intl l="Payment module"}</th>
-                                                    <td>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</td>
+                                                    <td>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$CODE} - {$TITLE}{/loop}</td>
                                                 </tr>
                                                 <tr>
                                                     <th>{intl l="Transaction reference"}</th>
@@ -329,7 +329,7 @@
 
                                         <dl class="dl-horizontal">
                                             <dt>{intl l="Name"}</dt>
-                                            <dd>{$TITLE}</dd>
+                                            <dd>{$CODE} - {$TITLE}</dd>
                                         </dl>
                                         <dl class="dl-horizontal">
                                             <dt>{intl l="Description"}</dt>
