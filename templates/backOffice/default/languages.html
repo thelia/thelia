@@ -52,18 +52,30 @@
                                     <th colspan="2">{intl l="Language name"}</th>
                                     <th>{intl l="ISO 639 Code"}</th>
                                     <th>{intl l="Locale"}</th>
+                                    <th>{intl l="Visible in front"}</th>
+                                    <th>{intl l="Active"}</th>
                                     <th>{intl l="Default"}</th>
                                     <th>{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {loop type="lang" name="lang.list" backend_context="1"}
+                                {loop type="lang" name="lang.list" backend_context="1" active="*"}
                                 <tr>
                                     <td>{$ID}</td>
                                     <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$CODE}" /></td>
                                     <td>{$TITLE}</td>
                                     <td>{$CODE}</td>
                                     <td>{$LOCALE}</td>
+                                    <td>
+                                        <div class="make-switch switch-small switch-radio lang-visible-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" name="visible" {if $VISIBLE}checked{/if}>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="make-switch switch-small switch-radio lang-active-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" name="active" {if $ACTIVE}checked{/if}>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="make-switch switch-small switch-radio lang-default-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="radio" name="is_default" {if $IS_DEFAULT}checked{/if}>
@@ -326,15 +338,21 @@
             });
 
             $(".lang-default-change").on("switch-change", function(e, data){
-                $('.lang-default-change').bootstrapSwitch('toggleRadioState');
-                var baseUrl = "{url path='/admin/configuration/languages/toggleDefault/'}";
-                if(data.value) {
-                    $.ajax({
-                        url : baseUrl+$(this).data('id')
-                    }).fail(function(){
-                        $('#toggle-default-failed').modal('show');
-                    });
-                }
+                var url = "{token_url path='/admin/configuration/languages/toggleDefault/_ID_'}";
+                // Reload the page
+                location.href = url.replace('_ID_', $(this).data('id'));
+            });
+
+            $(".lang-active-change").on("switch-change", function(e, data){
+                var url = "{token_url path='/admin/configuration/languages/toggleActive/_ID_'}";
+                // Reload the page
+                location.href = url.replace('_ID_', $(this).data('id'));
+            });
+
+            $(".lang-visible-change").on("switch-change", function(e, data){
+                var url = "{token_url path='/admin/configuration/languages/toggleVisible/_ID_'}";
+                // Reload the page
+                location.href = url.replace('_ID_', $(this).data('id'));
             });
 
             $(".lang-delete").click(function(){

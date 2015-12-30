@@ -100,7 +100,7 @@
                         </ul>
                     </li>
                     <li class="dropdown">
-                        {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
+                        {loop type="lang" name="ui-lang" id={lang attr='id'} backend_context="1"}
                         <button class="dropdown-toggle" data-toggle="dropdown">
                             <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
                             <span class="caret"></span>
@@ -108,7 +108,7 @@
                         {/loop}
 
                         <ul class="dropdown-menu">
-                            {loop type="lang" name="ui-lang"}
+                            {loop type="lang" name="ui-lang" backend_context="1"}
                                 <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                             {/loop}
                          </ul>

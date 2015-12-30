@@ -18,7 +18,9 @@ use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangEvent;
+use Thelia\Core\Event\Lang\LangToggleActiveEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
+use Thelia\Core\Event\Lang\LangToggleVisibleEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -73,6 +75,48 @@ class Lang extends BaseAction implements EventSubscriberInterface
             $lang->setDispatcher($event->getDispatcher());
 
             $lang->toggleDefault();
+
+            $event->setLang($lang);
+        }
+    }
+
+    public function toggleActive(LangToggleActiveEvent $event)
+    {
+        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
+            if ($lang->getByDefault()) {
+                throw new \RuntimeException(
+                    Translator::getInstance()->trans('Cannot disable the default language')
+                );
+            }
+
+            $lang->setActive($lang->getActive() ? 0 : 1);
+
+            if (!$lang->getActive()) {
+                $lang->setVisible(0);
+            }
+
+            $lang->save();
+
+            $event->setLang($lang);
+        }
+    }
+
+    public function toggleVisible(LangToggleVisibleEvent $event)
+    {
+        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
+            if ($lang->getByDefault()) {
+                throw new \RuntimeException(
+                    Translator::getInstance()->trans('Cannot hide the default language')
+                );
+            }
+
+            $lang->setVisible($lang->getVisible() ? 0 : 1);
+
+            if (!$lang->getActive() && $lang->getVisible()) {
+                $lang->setActive(1);
+            }
+
+            $lang->save();
 
             $event->setLang($lang);
         }
@@ -194,6 +238,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::LANG_UPDATE => array('update', 128),
             TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128),
+            TheliaEvents::LANG_TOGGLEACTIVE => array('toggleActive', 128),
+            TheliaEvents::LANG_TOGGLEVISIBLE => array('toggleVisible', 128),
             TheliaEvents::LANG_CREATE => array('create', 128),
             TheliaEvents::LANG_DELETE => array('delete', 128),
             TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128),

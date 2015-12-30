@@ -466,6 +466,8 @@
     <column name="decimal_separator" size="45" type="VARCHAR" />
     <column name="thousands_separator" size="45" type="VARCHAR" />
     <column name="decimals" size="45" type="VARCHAR" />
+    <column defaultValue="0" name="active" type="BOOLEAN" />
+    <column defaultValue="0" name="visible" type="TINYINT" />
     <column name="by_default" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <index name="idx_lang_by_default">

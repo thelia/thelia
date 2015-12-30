@@ -52,6 +52,8 @@ class Lang extends BaseLang
                     ->update(array('ByDefault' => 0), $con);
 
                 $this
+                    ->setVisible(1)
+                    ->setActive(1)
                     ->setByDefault(1)
                     ->save($con);
 

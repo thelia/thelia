@@ -558,6 +558,8 @@ CREATE TABLE `lang`
     `decimal_separator` VARCHAR(45),
     `thousands_separator` VARCHAR(45),
     `decimals` VARCHAR(45),
+    `active` TINYINT(1) DEFAULT 0,
+    `visible` TINYINT DEFAULT 0,
     `by_default` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,

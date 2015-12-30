@@ -13,10 +13,15 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
+use Thelia\Core\Event\Lang\LangEvent;
+use Thelia\Core\Event\Lang\LangToggleActiveEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
+use Thelia\Core\Event\Lang\LangToggleVisibleEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -27,6 +32,7 @@ use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Form\Lang\LangUrlForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
@@ -44,7 +50,7 @@ class LangController extends BaseAdminController
         return $this->renderDefault();
     }
 
-    public function renderDefault(array $param = array())
+    public function renderDefault(array $param = array(), $status = 200)
     {
         $data = array();
         foreach (LangQuery::create()->find() as $lang) {
@@ -56,7 +62,7 @@ class LangController extends BaseAdminController
         return $this->render('languages', array_merge($param, array(
             'lang_without_translation' => ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             'one_domain_per_lang' => ConfigQuery::isMultiDomainActivated()
-        )));
+        )), $status);
     }
 
     public function updateAction($lang_id)
@@ -112,6 +118,7 @@ class LangController extends BaseAdminController
                 );
             }
 
+            /** @var Lang $changedObject */
             $changedObject = $event->getLang();
             $this->adminLogAppend(
                 AdminResources::LANGUAGE,
@@ -138,6 +145,11 @@ class LangController extends BaseAdminController
         return $response;
     }
 
+    /**
+     * @param LangCreateEvent $event
+     * @param Form $form
+     * @return LangCreateEvent
+     */
     protected function hydrateEvent($event, Form $form)
     {
         return $event
@@ -154,45 +166,26 @@ class LangController extends BaseAdminController
 
     public function toggleDefaultAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
-            return $response;
-        }
+        return $this->toggleLangDispatch(
+            TheliaEvents::LANG_TOGGLEDEFAULT,
+            new LangToggleDefaultEvent($lang_id)
+        );
+    }
 
-        $this->checkXmlHttpRequest();
-        $error = false;
-        try {
-            $event = new LangToggleDefaultEvent($lang_id);
+    public function toggleActiveAction($lang_id)
+    {
+        return $this->toggleLangDispatch(
+            TheliaEvents::LANG_TOGGLEACTIVE,
+            new LangToggleActiveEvent($lang_id)
+        );
+    }
 
-            $this->dispatch(TheliaEvents::LANG_TOGGLEDEFAULT, $event);
-
-            if (false === $event->hasLang()) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
-                );
-            }
-
-            $changedObject = $event->getLang();
-            $this->adminLogAppend(
-                AdminResources::LANGUAGE,
-                AccessManager::UPDATE,
-                sprintf(
-                    "%s %s (ID %s) modified",
-                    'Lang',
-                    $changedObject->getTitle(),
-                    $changedObject->getId()
-                ),
-                $changedObject->getId()
-            );
-        } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
-            $error = $e->getMessage();
-        }
-
-        if ($error) {
-            return $this->nullResponse(500);
-        } else {
-            return $this->nullResponse();
-        }
+    public function toggleVisibleAction($lang_id)
+    {
+        return $this->toggleLangDispatch(
+            TheliaEvents::LANG_TOGGLEVISIBLE,
+            new LangToggleVisibleEvent($lang_id)
+        );
     }
 
     public function addAction()
@@ -204,6 +197,7 @@ class LangController extends BaseAdminController
         $createForm = $this->createForm(AdminForm::LANG_CREATE);
 
         $error_msg = false;
+        $ex = null;
 
         try {
             $form = $this->validateForm($createForm);
@@ -219,6 +213,7 @@ class LangController extends BaseAdminController
                 );
             }
 
+            /** @var Lang $createdObject */
             $createdObject = $createEvent->getLang();
             $this->adminLogAppend(
                 AdminResources::LANGUAGE,
@@ -295,6 +290,7 @@ class LangController extends BaseAdminController
         }
 
         $error_msg = false;
+        $ex = null;
 
         $behaviorForm = $this->createForm(AdminForm::LANG_DEFAULT_BEHAVIOR);
 
@@ -336,6 +332,7 @@ class LangController extends BaseAdminController
         }
 
         $error_msg = false;
+        $ex = null;
         $langUrlForm = $this->createForm(AdminForm::LANG_URL);
 
         try {
@@ -396,5 +393,63 @@ class LangController extends BaseAdminController
             ->update(array('Value' => $activate));
 
         return $this->generateRedirectFromRoute('admin.configuration.languages');
+    }
+
+    /**
+     * @param string $eventName
+     * @param LangEvent $event
+     * @return Response
+     */
+    protected function toggleLangDispatch($eventName, $event)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $errorMessage = null;
+
+        $this->getTokenProvider()->checkToken(
+            $this->getRequest()->query->get('_token')
+        );
+
+        try {
+            $this->dispatch($eventName, $event);
+
+            if (false === $event->hasLang()) {
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                );
+            }
+
+            $changedObject = $event->getLang();
+            $this->adminLogAppend(
+                AdminResources::LANGUAGE,
+                AccessManager::UPDATE,
+                sprintf(
+                    "%s %s (ID %s) modified",
+                    'Lang',
+                    $changedObject->getTitle(),
+                    $changedObject->getId()
+                ),
+                $changedObject->getId()
+            );
+
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(sprintf("Error on changing languages with message : %s", $e->getMessage()));
+            $errorMessage = $e->getMessage();
+        }
+
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return new JsonResponse(
+                $errorMessage !== null ? ['message' => $errorMessage] : [],
+                $errorMessage !== null ? 500 : 200
+            );
+        }
+
+        if ($errorMessage !== null) {
+            return $this->renderDefault(['error_message' => $errorMessage], 500);
+        } else {
+            return $this->generateRedirectFromRoute('admin.configuration.languages');
+        }
     }
 }

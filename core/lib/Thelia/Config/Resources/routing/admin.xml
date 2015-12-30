@@ -1280,6 +1280,16 @@
         <requirement key="lang_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.languages.toggleActive" path="/admin/configuration/languages/toggleActive/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleActiveAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleVisible" path="/admin/configuration/languages/toggleVisible/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleVisibleAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
     <route id="admin.configuration.languages.add" path="/admin/configuration/languages/add">
         <default key="_controller">Thelia\Controller\Admin\LangController::addAction</default>
     </route>
