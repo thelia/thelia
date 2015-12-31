@@ -51,7 +51,7 @@ class TaxCreationForm extends BaseForm
         }
 
         $this->formBuilder
-            ->add("locale", "text", array(
+            ->add("locale", "hidden", array(
                 "constraints" => array(new NotBlank()),
             ))
             ->add("type", "choice", array(

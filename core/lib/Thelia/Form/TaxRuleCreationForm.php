@@ -21,7 +21,7 @@ class TaxRuleCreationForm extends BaseForm
     protected function buildForm($change_mode = false)
     {
         $this->formBuilder
-            ->add("locale", "text", array(
+            ->add("locale", "hidden", array(
                 "constraints" => array(new NotBlank()),
             ))
         ;
