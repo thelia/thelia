@@ -900,6 +900,6 @@ ALTER TABLE  `lang` ADD  `active` BOOLEAN NOT NULL DEFAULT FALSE AFTER  `decimal
 ALTER TABLE  `lang` ADD  `visible` TINYINT NOT NULL DEFAULT  '0' AFTER  `active` ;
 
 -- Update lang
-UPDATE `lang` SET `active` = 1 AND `visible` = 1 WHERE 1;
+UPDATE `lang` SET `active` = '1', `visible` = '1' WHERE 1;
 
 SET FOREIGN_KEY_CHECKS = 1;
