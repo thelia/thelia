@@ -382,6 +382,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
+     * @param OrderManualEvent $event
      */
     public function createManual(OrderManualEvent $event)
     {
@@ -524,9 +525,8 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param  ModelOrder                               $order
-     * @param $newStatus
-     * @param $canceledStatus
+     * @param ModelOrder $order
+     * @param $newStatus $newStatus the new status ID
      * @throws \Thelia\Exception\TheliaProcessException
      */
     public function updateQuantity(ModelOrder $order, $newStatus)
