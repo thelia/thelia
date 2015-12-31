@@ -6,7 +6,7 @@
 {ifloop rel="deliveries"}
 <table class="table table-condensed table-delivery">
     <tbody>
-    {loop type="delivery" name="deliveries" force_return="true" country=$country}
+    {loop type="delivery" name="deliveries" force_return="true" country=$country state=$state}
 
         {assign var="isDeliveryMethodChecked" value="0"}
         <tr>

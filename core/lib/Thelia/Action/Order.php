@@ -201,6 +201,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setPhone($deliveryAddress->getPhone())
             ->setCellphone($deliveryAddress->getCellphone())
             ->setCountryId($deliveryAddress->getCountryId())
+            ->setStateId($deliveryAddress->getStateId())
             ->save($con)
         ;
 
@@ -218,6 +219,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setPhone($invoiceAddress->getPhone())
             ->setCellphone($invoiceAddress->getCellphone())
             ->setCountryId($invoiceAddress->getCountryId())
+            ->setStateId($deliveryAddress->getStateId())
             ->save($con)
         ;
 
@@ -616,6 +618,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setZipcode($event->getZipcode())
             ->setCity($event->getCity())
             ->setCountryId($event->getCountry())
+            ->setStateId($event->getState())
             ->setPhone($event->getPhone())
             ->setCellphone($event->getCellphone())
         ;

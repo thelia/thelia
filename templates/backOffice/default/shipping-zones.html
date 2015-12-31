@@ -64,7 +64,7 @@
                                     <td>
                                         {loop name="area.module.associated" type="area" with_zone=$ID backend_context="1"}
                                             {$countries = ''}
-                                            {loop name="country-area" type="country" area=$ID backend_context="1"}
+                                            {loop name="country-area" type="country" area=$ID backend_context="1" visible="*"}
                                                 {$countries = "$countries, $TITLE"}
                                             {/loop}
                                             {$countries = ltrim($countries, ', ')}

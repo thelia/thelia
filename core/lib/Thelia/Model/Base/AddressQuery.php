@@ -34,6 +34,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery orderByZipcode($order = Criteria::ASC) Order by the zipcode column
  * @method     ChildAddressQuery orderByCity($order = Criteria::ASC) Order by the city column
  * @method     ChildAddressQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
+ * @method     ChildAddressQuery orderByStateId($order = Criteria::ASC) Order by the state_id column
  * @method     ChildAddressQuery orderByPhone($order = Criteria::ASC) Order by the phone column
  * @method     ChildAddressQuery orderByCellphone($order = Criteria::ASC) Order by the cellphone column
  * @method     ChildAddressQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
@@ -53,6 +54,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery groupByZipcode() Group by the zipcode column
  * @method     ChildAddressQuery groupByCity() Group by the city column
  * @method     ChildAddressQuery groupByCountryId() Group by the country_id column
+ * @method     ChildAddressQuery groupByStateId() Group by the state_id column
  * @method     ChildAddressQuery groupByPhone() Group by the phone column
  * @method     ChildAddressQuery groupByCellphone() Group by the cellphone column
  * @method     ChildAddressQuery groupByIsDefault() Group by the is_default column
@@ -74,6 +76,10 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery leftJoinCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the Country relation
  * @method     ChildAddressQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
  * @method     ChildAddressQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
+ *
+ * @method     ChildAddressQuery leftJoinState($relationAlias = null) Adds a LEFT JOIN clause to the query using the State relation
+ * @method     ChildAddressQuery rightJoinState($relationAlias = null) Adds a RIGHT JOIN clause to the query using the State relation
+ * @method     ChildAddressQuery innerJoinState($relationAlias = null) Adds a INNER JOIN clause to the query using the State relation
  *
  * @method     ChildAddressQuery leftJoinCartRelatedByAddressDeliveryId($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
  * @method     ChildAddressQuery rightJoinCartRelatedByAddressDeliveryId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
@@ -99,6 +105,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddress findOneByZipcode(string $zipcode) Return the first ChildAddress filtered by the zipcode column
  * @method     ChildAddress findOneByCity(string $city) Return the first ChildAddress filtered by the city column
  * @method     ChildAddress findOneByCountryId(int $country_id) Return the first ChildAddress filtered by the country_id column
+ * @method     ChildAddress findOneByStateId(int $state_id) Return the first ChildAddress filtered by the state_id column
  * @method     ChildAddress findOneByPhone(string $phone) Return the first ChildAddress filtered by the phone column
  * @method     ChildAddress findOneByCellphone(string $cellphone) Return the first ChildAddress filtered by the cellphone column
  * @method     ChildAddress findOneByIsDefault(int $is_default) Return the first ChildAddress filtered by the is_default column
@@ -118,6 +125,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     array findByZipcode(string $zipcode) Return ChildAddress objects filtered by the zipcode column
  * @method     array findByCity(string $city) Return ChildAddress objects filtered by the city column
  * @method     array findByCountryId(int $country_id) Return ChildAddress objects filtered by the country_id column
+ * @method     array findByStateId(int $state_id) Return ChildAddress objects filtered by the state_id column
  * @method     array findByPhone(string $phone) Return ChildAddress objects filtered by the phone column
  * @method     array findByCellphone(string $cellphone) Return ChildAddress objects filtered by the cellphone column
  * @method     array findByIsDefault(int $is_default) Return ChildAddress objects filtered by the is_default column
@@ -211,7 +219,7 @@ abstract class AddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `LABEL`, `CUSTOMER_ID`, `TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `COUNTRY_ID`, `PHONE`, `CELLPHONE`, `IS_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `address` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `LABEL`, `CUSTOMER_ID`, `TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `COUNTRY_ID`, `STATE_ID`, `PHONE`, `CELLPHONE`, `IS_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `address` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -732,6 +740,49 @@ abstract class AddressQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the state_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStateId(1234); // WHERE state_id = 1234
+     * $query->filterByStateId(array(12, 34)); // WHERE state_id IN (12, 34)
+     * $query->filterByStateId(array('min' => 12)); // WHERE state_id > 12
+     * </code>
+     *
+     * @see       filterByState()
+     *
+     * @param     mixed $stateId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function filterByStateId($stateId = null, $comparison = null)
+    {
+        if (is_array($stateId)) {
+            $useMinMax = false;
+            if (isset($stateId['min'])) {
+                $this->addUsingAlias(AddressTableMap::STATE_ID, $stateId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($stateId['max'])) {
+                $this->addUsingAlias(AddressTableMap::STATE_ID, $stateId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AddressTableMap::STATE_ID, $stateId, $comparison);
+    }
+
+    /**
      * Filter the query on the phone column
      *
      * Example usage:
@@ -1139,6 +1190,81 @@ abstract class AddressQuery extends ModelCriteria
         return $this
             ->joinCountry($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Country', '\Thelia\Model\CountryQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\State object
+     *
+     * @param \Thelia\Model\State|ObjectCollection $state The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function filterByState($state, $comparison = null)
+    {
+        if ($state instanceof \Thelia\Model\State) {
+            return $this
+                ->addUsingAlias(AddressTableMap::STATE_ID, $state->getId(), $comparison);
+        } elseif ($state instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(AddressTableMap::STATE_ID, $state->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByState() only accepts arguments of type \Thelia\Model\State or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the State relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function joinState($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('State');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'State');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the State relation State object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\StateQuery A secondary query class using the current class as primary query
+     */
+    public function useStateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinState($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'State', '\Thelia\Model\StateQuery');
     }
 
     /**

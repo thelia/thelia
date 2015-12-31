@@ -20,6 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\TaxRule;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleI18nQuery;
 use Thelia\Model\TaxRuleQuery;

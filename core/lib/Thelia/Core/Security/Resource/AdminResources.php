@@ -65,6 +65,8 @@ final class AdminResources
 
     const COUNTRY = "admin.configuration.country";
 
+    const STATE = "admin.configuration.state";
+
     const COUPON = "admin.coupon";
 
     const CURRENCY = "admin.configuration.currency";

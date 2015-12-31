@@ -503,11 +503,6 @@ class OrderController extends BaseFrontController
     {
         $this->checkXmlHttpRequest();
 
-        $country = $this->getRequest()->get(
-            'country_id',
-            $this->container->get('thelia.taxEngine')->getDeliveryCountry()->getId()
-        );
-
         // Change the delivery address if customer has changed it
         $session = $this->getSession();
         $addressId = $this->getRequest()->get('address_id', null);
@@ -515,12 +510,24 @@ class OrderController extends BaseFrontController
             $address = AddressQuery::create()->findPk($addressId);
             if (null !== $address && $address->getCustomerId() === $session->getCustomerUser()->getId()) {
                 $session->getOrder()->setChoosenDeliveryAddress($addressId);
-                $args["address"] = $addressId;
             }
         }
 
+        // seems to be not necessary anymore since we have the new adress selected.
+        // keep for compatibility with old template
+        // TODO remove in version 2.3
+        $countryId = $this->getRequest()->get(
+            'country_id',
+            $this->container->get('thelia.taxEngine')->getDeliveryCountry()->getId()
+        );
+
+        $state = $this->container->get('thelia.taxEngine')->getDeliveryState();
+        $stateId = ($state !== null) ? $state->getId() : null;
+        $stateId = $this->getRequest()->get('state_id', $stateId);
+
         $args = array(
-            'country' => $country,
+            'country' => $countryId,
+            'state' => $stateId,
             'address' => $session->getOrder()->getChoosenDeliveryAddress()
         );
 

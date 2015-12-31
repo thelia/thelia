@@ -12,9 +12,10 @@
 
 namespace Thelia\Form\Area;
 
-use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
@@ -24,6 +25,8 @@ use Thelia\Form\BaseForm;
  */
 class AreaDeleteCountryForm extends BaseForm
 {
+    use CountryListValidationTrait;
+
     /**
      * @inheritdoc
      */
@@ -46,18 +49,25 @@ class AreaDeleteCountryForm extends BaseForm
                 'country_id',
                 'collection',
                 [
-                    'type'         => 'integer',
-                    'allow_add'    => true,
+                    'type' => 'text',
+                    'constraints' => [
+                        new NotBlank(),
+                        new Callback(["methods" => [[$this, "verifyCountryList"]]])
+                    ],
+                    'allow_add' => true,
                     'allow_delete' => true,
-                    'label'        => Translator::getInstance()->trans('Countries'),
-                    'label_attr'   => [
-                        'for'         => 'products',
-                        'help'        => Translator::getInstance()->trans('Select the countries to delete from this shipping zone'),
+                    'label' => Translator::getInstance()->trans('Countries'),
+                    'label_attr' => [
+                        'for' => 'country_delete_id',
+                        'help' => Translator::getInstance()->trans(
+                            'Select the countries to delete from this shipping zone'
+                        ),
                     ]
                 ]
             )
         ;
     }
+
 
     /**
      * @return string the name of you form. This name must be unique

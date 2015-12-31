@@ -191,6 +191,7 @@ return array(
     'Secure Payment' => 'Secure Payment',
     'Secure payment' => 'Secure payment',
     'Select Country' => 'Select Country',
+    'Select State' => 'Select State',
     'Select Title' => 'Select Title',
     'Select your country:' => 'Select your country:',
     'Send' => 'Send',

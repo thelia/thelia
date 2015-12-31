@@ -134,6 +134,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 ->set("ZIPCODE", $address->getZipcode())
                 ->set("CITY", $address->getCity())
                 ->set("COUNTRY", $address->getCountryId())
+                ->set("STATE", $address->getStateId())
                 ->set("PHONE", $address->getPhone())
                 ->set("CELLPHONE", $address->getCellphone())
                 ->set("DEFAULT", $address->getIsDefault())

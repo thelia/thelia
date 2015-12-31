@@ -58,7 +58,7 @@ class OrderAddressTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 15;
+    const NUM_COLUMNS = 16;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class OrderAddressTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 15;
+    const NUM_HYDRATE_COLUMNS = 16;
 
     /**
      * the column name for the ID field
@@ -136,6 +136,11 @@ class OrderAddressTableMap extends TableMap
     const COUNTRY_ID = 'order_address.COUNTRY_ID';
 
     /**
+     * the column name for the STATE_ID field
+     */
+    const STATE_ID = 'order_address.STATE_ID';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'order_address.CREATED_AT';
@@ -157,12 +162,12 @@ class OrderAddressTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CustomerTitleId', 'Company', 'Firstname', 'Lastname', 'Address1', 'Address2', 'Address3', 'Zipcode', 'City', 'Phone', 'Cellphone', 'CountryId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'customerTitleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'countryId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderAddressTableMap::ID, OrderAddressTableMap::CUSTOMER_TITLE_ID, OrderAddressTableMap::COMPANY, OrderAddressTableMap::FIRSTNAME, OrderAddressTableMap::LASTNAME, OrderAddressTableMap::ADDRESS1, OrderAddressTableMap::ADDRESS2, OrderAddressTableMap::ADDRESS3, OrderAddressTableMap::ZIPCODE, OrderAddressTableMap::CITY, OrderAddressTableMap::PHONE, OrderAddressTableMap::CELLPHONE, OrderAddressTableMap::COUNTRY_ID, OrderAddressTableMap::CREATED_AT, OrderAddressTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CUSTOMER_TITLE_ID', 'COMPANY', 'FIRSTNAME', 'LASTNAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ZIPCODE', 'CITY', 'PHONE', 'CELLPHONE', 'COUNTRY_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'customer_title_id', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'country_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+        self::TYPE_PHPNAME       => array('Id', 'CustomerTitleId', 'Company', 'Firstname', 'Lastname', 'Address1', 'Address2', 'Address3', 'Zipcode', 'City', 'Phone', 'Cellphone', 'CountryId', 'StateId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'customerTitleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'countryId', 'stateId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderAddressTableMap::ID, OrderAddressTableMap::CUSTOMER_TITLE_ID, OrderAddressTableMap::COMPANY, OrderAddressTableMap::FIRSTNAME, OrderAddressTableMap::LASTNAME, OrderAddressTableMap::ADDRESS1, OrderAddressTableMap::ADDRESS2, OrderAddressTableMap::ADDRESS3, OrderAddressTableMap::ZIPCODE, OrderAddressTableMap::CITY, OrderAddressTableMap::PHONE, OrderAddressTableMap::CELLPHONE, OrderAddressTableMap::COUNTRY_ID, OrderAddressTableMap::STATE_ID, OrderAddressTableMap::CREATED_AT, OrderAddressTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CUSTOMER_TITLE_ID', 'COMPANY', 'FIRSTNAME', 'LASTNAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ZIPCODE', 'CITY', 'PHONE', 'CELLPHONE', 'COUNTRY_ID', 'STATE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'customer_title_id', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'country_id', 'state_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
     );
 
     /**
@@ -172,12 +177,12 @@ class OrderAddressTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerTitleId' => 1, 'Company' => 2, 'Firstname' => 3, 'Lastname' => 4, 'Address1' => 5, 'Address2' => 6, 'Address3' => 7, 'Zipcode' => 8, 'City' => 9, 'Phone' => 10, 'Cellphone' => 11, 'CountryId' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'customerTitleId' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'countryId' => 12, 'createdAt' => 13, 'updatedAt' => 14, ),
-        self::TYPE_COLNAME       => array(OrderAddressTableMap::ID => 0, OrderAddressTableMap::CUSTOMER_TITLE_ID => 1, OrderAddressTableMap::COMPANY => 2, OrderAddressTableMap::FIRSTNAME => 3, OrderAddressTableMap::LASTNAME => 4, OrderAddressTableMap::ADDRESS1 => 5, OrderAddressTableMap::ADDRESS2 => 6, OrderAddressTableMap::ADDRESS3 => 7, OrderAddressTableMap::ZIPCODE => 8, OrderAddressTableMap::CITY => 9, OrderAddressTableMap::PHONE => 10, OrderAddressTableMap::CELLPHONE => 11, OrderAddressTableMap::COUNTRY_ID => 12, OrderAddressTableMap::CREATED_AT => 13, OrderAddressTableMap::UPDATED_AT => 14, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CUSTOMER_TITLE_ID' => 1, 'COMPANY' => 2, 'FIRSTNAME' => 3, 'LASTNAME' => 4, 'ADDRESS1' => 5, 'ADDRESS2' => 6, 'ADDRESS3' => 7, 'ZIPCODE' => 8, 'CITY' => 9, 'PHONE' => 10, 'CELLPHONE' => 11, 'COUNTRY_ID' => 12, 'CREATED_AT' => 13, 'UPDATED_AT' => 14, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_title_id' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'country_id' => 12, 'created_at' => 13, 'updated_at' => 14, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerTitleId' => 1, 'Company' => 2, 'Firstname' => 3, 'Lastname' => 4, 'Address1' => 5, 'Address2' => 6, 'Address3' => 7, 'Zipcode' => 8, 'City' => 9, 'Phone' => 10, 'Cellphone' => 11, 'CountryId' => 12, 'StateId' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'customerTitleId' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'countryId' => 12, 'stateId' => 13, 'createdAt' => 14, 'updatedAt' => 15, ),
+        self::TYPE_COLNAME       => array(OrderAddressTableMap::ID => 0, OrderAddressTableMap::CUSTOMER_TITLE_ID => 1, OrderAddressTableMap::COMPANY => 2, OrderAddressTableMap::FIRSTNAME => 3, OrderAddressTableMap::LASTNAME => 4, OrderAddressTableMap::ADDRESS1 => 5, OrderAddressTableMap::ADDRESS2 => 6, OrderAddressTableMap::ADDRESS3 => 7, OrderAddressTableMap::ZIPCODE => 8, OrderAddressTableMap::CITY => 9, OrderAddressTableMap::PHONE => 10, OrderAddressTableMap::CELLPHONE => 11, OrderAddressTableMap::COUNTRY_ID => 12, OrderAddressTableMap::STATE_ID => 13, OrderAddressTableMap::CREATED_AT => 14, OrderAddressTableMap::UPDATED_AT => 15, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CUSTOMER_TITLE_ID' => 1, 'COMPANY' => 2, 'FIRSTNAME' => 3, 'LASTNAME' => 4, 'ADDRESS1' => 5, 'ADDRESS2' => 6, 'ADDRESS3' => 7, 'ZIPCODE' => 8, 'CITY' => 9, 'PHONE' => 10, 'CELLPHONE' => 11, 'COUNTRY_ID' => 12, 'STATE_ID' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_title_id' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'country_id' => 12, 'state_id' => 13, 'created_at' => 14, 'updated_at' => 15, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
     );
 
     /**
@@ -209,6 +214,7 @@ class OrderAddressTableMap extends TableMap
         $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
         $this->addColumn('CELLPHONE', 'Cellphone', 'VARCHAR', false, 20, null);
         $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
+        $this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -220,6 +226,7 @@ class OrderAddressTableMap extends TableMap
     {
         $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_ONE, array('state_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('OrderRelatedByInvoiceOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'invoice_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByInvoiceOrderAddressId');
         $this->addRelation('OrderRelatedByDeliveryOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryOrderAddressId');
     } // buildRelations()
@@ -388,6 +395,7 @@ class OrderAddressTableMap extends TableMap
             $criteria->addSelectColumn(OrderAddressTableMap::PHONE);
             $criteria->addSelectColumn(OrderAddressTableMap::CELLPHONE);
             $criteria->addSelectColumn(OrderAddressTableMap::COUNTRY_ID);
+            $criteria->addSelectColumn(OrderAddressTableMap::STATE_ID);
             $criteria->addSelectColumn(OrderAddressTableMap::CREATED_AT);
             $criteria->addSelectColumn(OrderAddressTableMap::UPDATED_AT);
         } else {
@@ -404,6 +412,7 @@ class OrderAddressTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.PHONE');
             $criteria->addSelectColumn($alias . '.CELLPHONE');
             $criteria->addSelectColumn($alias . '.COUNTRY_ID');
+            $criteria->addSelectColumn($alias . '.STATE_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

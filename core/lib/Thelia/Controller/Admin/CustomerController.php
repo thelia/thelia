@@ -112,6 +112,7 @@ class CustomerController extends AbstractCrudController
             $data['zipcode']   = $address->getZipcode();
             $data['city']      = $address->getCity();
             $data['country']   = $address->getCountryId();
+            $data['state']     = $address->getStateId();
         }
 
         // A loop is used in the template
@@ -148,7 +149,8 @@ class CustomerController extends AbstractCrudController
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
             isset($data["company"])?$data["company"]:null,
-            null
+            null,
+            $data["state"]
         );
 
         return $customerCreateEvent;

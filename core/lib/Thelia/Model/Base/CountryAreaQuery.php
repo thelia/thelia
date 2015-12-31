@@ -3,6 +3,7 @@
 namespace Thelia\Model\Base;
 
 use \Exception;
+use \PDO;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -20,12 +21,16 @@ use Thelia\Model\Map\CountryAreaTableMap;
  *
  *
  *
+ * @method     ChildCountryAreaQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCountryAreaQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
+ * @method     ChildCountryAreaQuery orderByStateId($order = Criteria::ASC) Order by the state_id column
  * @method     ChildCountryAreaQuery orderByAreaId($order = Criteria::ASC) Order by the area_id column
  * @method     ChildCountryAreaQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCountryAreaQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
+ * @method     ChildCountryAreaQuery groupById() Group by the id column
  * @method     ChildCountryAreaQuery groupByCountryId() Group by the country_id column
+ * @method     ChildCountryAreaQuery groupByStateId() Group by the state_id column
  * @method     ChildCountryAreaQuery groupByAreaId() Group by the area_id column
  * @method     ChildCountryAreaQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCountryAreaQuery groupByUpdatedAt() Group by the updated_at column
@@ -45,12 +50,16 @@ use Thelia\Model\Map\CountryAreaTableMap;
  * @method     ChildCountryArea findOne(ConnectionInterface $con = null) Return the first ChildCountryArea matching the query
  * @method     ChildCountryArea findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCountryArea matching the query, or a new ChildCountryArea object populated from the query conditions when no match is found
  *
+ * @method     ChildCountryArea findOneById(int $id) Return the first ChildCountryArea filtered by the id column
  * @method     ChildCountryArea findOneByCountryId(int $country_id) Return the first ChildCountryArea filtered by the country_id column
+ * @method     ChildCountryArea findOneByStateId(int $state_id) Return the first ChildCountryArea filtered by the state_id column
  * @method     ChildCountryArea findOneByAreaId(int $area_id) Return the first ChildCountryArea filtered by the area_id column
  * @method     ChildCountryArea findOneByCreatedAt(string $created_at) Return the first ChildCountryArea filtered by the created_at column
  * @method     ChildCountryArea findOneByUpdatedAt(string $updated_at) Return the first ChildCountryArea filtered by the updated_at column
  *
+ * @method     array findById(int $id) Return ChildCountryArea objects filtered by the id column
  * @method     array findByCountryId(int $country_id) Return ChildCountryArea objects filtered by the country_id column
+ * @method     array findByStateId(int $state_id) Return ChildCountryArea objects filtered by the state_id column
  * @method     array findByAreaId(int $area_id) Return ChildCountryArea objects filtered by the area_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildCountryArea objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCountryArea objects filtered by the updated_at column
@@ -111,13 +120,80 @@ abstract class CountryAreaQuery extends ModelCriteria
      */
     public function findPk($key, $con = null)
     {
-        throw new \LogicException('The ChildCountryArea class has no primary key');
+        if ($key === null) {
+            return null;
+        }
+        if ((null !== ($obj = CountryAreaTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+            // the object is already in the instance pool
+            return $obj;
+        }
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(CountryAreaTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
+    }
+
+    /**
+     * Find object by primary key using raw SQL to go fast.
+     * Bypass doSelect() and the object formatter by using generated code.
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
+     *
+     * @return   ChildCountryArea A model object, or null if the key is not found
+     */
+    protected function findPkSimple($key, $con)
+    {
+        $sql = 'SELECT `ID`, `COUNTRY_ID`, `STATE_ID`, `AREA_ID`, `CREATED_AT`, `UPDATED_AT` FROM `country_area` WHERE `ID` = :p0';
+        try {
+            $stmt = $con->prepare($sql);
+            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (Exception $e) {
+            Propel::log($e->getMessage(), Propel::LOG_ERR);
+            throw new PropelException(sprintf('Unable to execute SELECT statement [%s]', $sql), 0, $e);
+        }
+        $obj = null;
+        if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
+            $obj = new ChildCountryArea();
+            $obj->hydrate($row);
+            CountryAreaTableMap::addInstanceToPool($obj, (string) $key);
+        }
+        $stmt->closeCursor();
+
+        return $obj;
+    }
+
+    /**
+     * Find object by primary key.
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
+     *
+     * @return ChildCountryArea|array|mixed the result, formatted by the current formatter
+     */
+    protected function findPkComplex($key, $con)
+    {
+        // As the query uses a PK condition, no limit(1) is necessary.
+        $criteria = $this->isKeepQuery() ? clone $this : $this;
+        $dataFetcher = $criteria
+            ->filterByPrimaryKey($key)
+            ->doSelect($con);
+
+        return $criteria->getFormatter()->init($criteria)->formatOne($dataFetcher);
     }
 
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
+     * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -126,7 +202,16 @@ abstract class CountryAreaQuery extends ModelCriteria
      */
     public function findPks($keys, $con = null)
     {
-        throw new \LogicException('The ChildCountryArea class has no primary key');
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getReadConnection($this->getDbName());
+        }
+        $this->basePreSelect($con);
+        $criteria = $this->isKeepQuery() ? clone $this : $this;
+        $dataFetcher = $criteria
+            ->filterByPrimaryKeys($keys)
+            ->doSelect($con);
+
+        return $criteria->getFormatter()->init($criteria)->format($dataFetcher);
     }
 
     /**
@@ -138,7 +223,8 @@ abstract class CountryAreaQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        throw new \LogicException('The ChildCountryArea class has no primary key');
+
+        return $this->addUsingAlias(CountryAreaTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -150,7 +236,49 @@ abstract class CountryAreaQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-        throw new \LogicException('The ChildCountryArea class has no primary key');
+
+        return $this->addUsingAlias(CountryAreaTableMap::ID, $keys, Criteria::IN);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryAreaQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CountryAreaTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CountryAreaTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CountryAreaTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -194,6 +322,47 @@ abstract class CountryAreaQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CountryAreaTableMap::COUNTRY_ID, $countryId, $comparison);
+    }
+
+    /**
+     * Filter the query on the state_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStateId(1234); // WHERE state_id = 1234
+     * $query->filterByStateId(array(12, 34)); // WHERE state_id IN (12, 34)
+     * $query->filterByStateId(array('min' => 12)); // WHERE state_id > 12
+     * </code>
+     *
+     * @param     mixed $stateId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryAreaQuery The current query, for fluid interface
+     */
+    public function filterByStateId($stateId = null, $comparison = null)
+    {
+        if (is_array($stateId)) {
+            $useMinMax = false;
+            if (isset($stateId['min'])) {
+                $this->addUsingAlias(CountryAreaTableMap::STATE_ID, $stateId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($stateId['max'])) {
+                $this->addUsingAlias(CountryAreaTableMap::STATE_ID, $stateId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CountryAreaTableMap::STATE_ID, $stateId, $comparison);
     }
 
     /**
@@ -485,8 +654,7 @@ abstract class CountryAreaQuery extends ModelCriteria
     public function prune($countryArea = null)
     {
         if ($countryArea) {
-            throw new \LogicException('ChildCountryArea class has no primary key');
-
+            $this->addUsingAlias(CountryAreaTableMap::ID, $countryArea->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
