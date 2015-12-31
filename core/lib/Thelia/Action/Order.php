@@ -246,7 +246,6 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $taxCountry = $deliveryAddress->getCountry();
         }
->>>>>>> Improved manual order creation to allow order duplication
 
         $placedOrder->setStatusId(
             OrderStatusQuery::getNotPaidStatus()->getId()
