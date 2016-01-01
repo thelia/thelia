@@ -1882,6 +1882,31 @@ abstract class CustomerTitle implements ActiveRecordInterface
         return $this->getAddresses($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerTitle is new, it will return
+     * an empty collection; or if this CustomerTitle has previously
+     * been saved, it will retrieve related Addresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerTitle.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAddress[] List of ChildAddress objects
+     */
+    public function getAddressesJoinState($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAddressQuery::create(null, $criteria);
+        $query->joinWith('State', $joinBehavior);
+
+        return $this->getAddresses($query, $con);
+    }
+
     /**
      * Clears out the collOrderAddresses collection
      *
@@ -2121,6 +2146,31 @@ abstract class CustomerTitle implements ActiveRecordInterface
     {
         $query = ChildOrderAddressQuery::create(null, $criteria);
         $query->joinWith('Country', $joinBehavior);
+
+        return $this->getOrderAddresses($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerTitle is new, it will return
+     * an empty collection; or if this CustomerTitle has previously
+     * been saved, it will retrieve related OrderAddresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerTitle.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrderAddress[] List of ChildOrderAddress objects
+     */
+    public function getOrderAddressesJoinState($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderAddressQuery::create(null, $criteria);
+        $query->joinWith('State', $joinBehavior);
 
         return $this->getOrderAddresses($query, $con);
     }

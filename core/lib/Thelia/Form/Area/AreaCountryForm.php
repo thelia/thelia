@@ -12,9 +12,10 @@
 
 namespace Thelia\Form\Area;
 
-use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
@@ -24,6 +25,8 @@ use Thelia\Form\BaseForm;
  */
 class AreaCountryForm extends BaseForm
 {
+    use CountryListValidationTrait;
+
     /**
      * @inheritdoc
      */
@@ -44,18 +47,22 @@ class AreaCountryForm extends BaseForm
                 'country_id',
                 'collection',
                 [
-                    'type'         => 'integer',
-                    'required'     => true,
-                    'constraints'  => [ new NotBlank() ],
-                    'allow_add'    => true,
+                    'type' => 'text',
+                    'required' => true,
+                    'constraints' => [
+                        new NotBlank(),
+                        new Callback(["methods" => [[$this, "verifyCountryList"]]])
+                    ],
+                    'allow_add' => true,
                     'allow_delete' => true,
-                    'label'        => Translator::getInstance()->trans('Countries'),
-                    'label_attr'   => [
-                        'for'         => 'products',
-                        'help'        => Translator::getInstance()->trans('Select the countries to include in this shipping zone'),
+                    'label' => Translator::getInstance()->trans('Countries'),
+                    'label_attr' => [
+                        'for' => 'countries-add',
+                        'help' => Translator::getInstance()
+                            ->trans('Select the countries to include in this shipping zone'),
                     ],
                     'attr' => [
-                        'size'     => 10,
+                        'size' => 10,
                         'multiple' => true,
                     ]
                 ]

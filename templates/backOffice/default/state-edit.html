@@ -1,0 +1,109 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
+{block name="page-title"}{intl l='Edit a state'}{/block}
+
+{block name="check-resource"}admin.configuration.state{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+    <div class="states edit-state">
+
+        <div id="wrapper" class="container">
+
+            {loop name="state_edit" type="state" id="$state_id" backend_context="1" lang="$edit_language_id" visible="*"}
+
+                <ul class="breadcrumb">
+        			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                    <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                    <li><a href="{url path='/admin/configuration/states'}">{intl l="States"}</a></li>
+                    <li>{intl l='Editing state "%name"' name="{$TITLE}"}</li>
+                </ul>
+
+            {hook name="state-edit.top" state_id=$state_id}
+
+        		<div class="row">
+        			<div class="col-md-12 general-block-decorator">
+        				<div class="row">
+
+        					<div class="col-md-12 title title-without-tabs">
+        					   {intl l='Edit state "%name"' name="{$TITLE}"}
+        					</div>
+
+                            <div class="form-container">
+                                <div class="col-md-12">
+
+        						    {form name="thelia.admin.state.modification"}
+        						    	<form method="POST" action="{url path="/admin/configuration/state/save/%id" id=$ID}" {form_enctype} class="clearfix">
+                                            {include
+                                                file = "includes/inner-form-toolbar.html"
+                                                hide_submit_buttons = false
+
+                                                page_url  = {url path="/admin/configuration/state/update/%id" id=$ID}
+                                                close_url = {url path="/admin/configuration/states"}
+                                            }
+
+                                            {* Be sure to get the state ID, even if the form could not be validated *}
+                                            <input type="hidden" name="state_id" value="{$state_id}" />
+
+                                            {form_hidden_fields exclude="locale"}
+
+                                            {render_form_field field='success_url' value={url path="/admin/configuration/states"}}
+                                            {render_form_field field='locale' value={$edit_language_locale}}
+
+                                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                            <div class="row">
+            	                                <div class="col-md-6">
+                                                    {render_form_field field='title'}
+                                                    {render_form_field field="visible"}
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    {custom_render_form_field field='country_id'}
+                                                        <select {form_field_attributes field='country_id'}>
+                                                            {loop name="country-list" type="country" visible="*" has_states="1"}
+                                                                <option value="{$ID}" {if $ID == $COUNTRY}selected{/if}>{$TITLE}</option>
+                                                            {/loop}
+                                                        </select>
+                                                    {/custom_render_form_field}
+
+                                                    {render_form_field field="isocode"}
+                                                </div>
+                                            </div>
+                                        </form>
+        							{/form}
+
+        						</div>
+        					</div>
+
+        				</div>
+        			</div>
+
+        		</div>
+
+            {hook name="state-edit.bottom" state_id=$state_id}
+
+    		{/loop}
+
+            {elseloop rel="state_edit"}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-error">
+                            {intl l="Sorry, state ID=%id was not found." id={$state_id}}
+                        </div>
+                    </div>
+                </div>
+            {/elseloop}
+
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="state.edit-js" location="state-edit-js" state_id=$state_id }
+    {hook name="wysiwyg.js" location="wysiwyg-state-edit-js" }
+{/block}

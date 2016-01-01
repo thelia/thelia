@@ -23,18 +23,26 @@ use Thelia\Model\Map\CountryTableMap;
  *
  *
  * @method     ChildCountryQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildCountryQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildCountryQuery orderByIsocode($order = Criteria::ASC) Order by the isocode column
  * @method     ChildCountryQuery orderByIsoalpha2($order = Criteria::ASC) Order by the isoalpha2 column
  * @method     ChildCountryQuery orderByIsoalpha3($order = Criteria::ASC) Order by the isoalpha3 column
+ * @method     ChildCountryQuery orderByHasStates($order = Criteria::ASC) Order by the has_states column
+ * @method     ChildCountryQuery orderByNeedZipCode($order = Criteria::ASC) Order by the need_zip_code column
+ * @method     ChildCountryQuery orderByZipCodeFormat($order = Criteria::ASC) Order by the zip_code_format column
  * @method     ChildCountryQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method     ChildCountryQuery orderByShopCountry($order = Criteria::ASC) Order by the shop_country column
  * @method     ChildCountryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCountryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildCountryQuery groupById() Group by the id column
+ * @method     ChildCountryQuery groupByVisible() Group by the visible column
  * @method     ChildCountryQuery groupByIsocode() Group by the isocode column
  * @method     ChildCountryQuery groupByIsoalpha2() Group by the isoalpha2 column
  * @method     ChildCountryQuery groupByIsoalpha3() Group by the isoalpha3 column
+ * @method     ChildCountryQuery groupByHasStates() Group by the has_states column
+ * @method     ChildCountryQuery groupByNeedZipCode() Group by the need_zip_code column
+ * @method     ChildCountryQuery groupByZipCodeFormat() Group by the zip_code_format column
  * @method     ChildCountryQuery groupByByDefault() Group by the by_default column
  * @method     ChildCountryQuery groupByShopCountry() Group by the shop_country column
  * @method     ChildCountryQuery groupByCreatedAt() Group by the created_at column
@@ -43,6 +51,10 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildCountryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCountryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method     ChildCountryQuery leftJoinState($relationAlias = null) Adds a LEFT JOIN clause to the query using the State relation
+ * @method     ChildCountryQuery rightJoinState($relationAlias = null) Adds a RIGHT JOIN clause to the query using the State relation
+ * @method     ChildCountryQuery innerJoinState($relationAlias = null) Adds a INNER JOIN clause to the query using the State relation
  *
  * @method     ChildCountryQuery leftJoinTaxRuleCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleCountry relation
  * @method     ChildCountryQuery rightJoinTaxRuleCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleCountry relation
@@ -76,18 +88,26 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountry findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCountry matching the query, or a new ChildCountry object populated from the query conditions when no match is found
  *
  * @method     ChildCountry findOneById(int $id) Return the first ChildCountry filtered by the id column
+ * @method     ChildCountry findOneByVisible(int $visible) Return the first ChildCountry filtered by the visible column
  * @method     ChildCountry findOneByIsocode(string $isocode) Return the first ChildCountry filtered by the isocode column
  * @method     ChildCountry findOneByIsoalpha2(string $isoalpha2) Return the first ChildCountry filtered by the isoalpha2 column
  * @method     ChildCountry findOneByIsoalpha3(string $isoalpha3) Return the first ChildCountry filtered by the isoalpha3 column
+ * @method     ChildCountry findOneByHasStates(int $has_states) Return the first ChildCountry filtered by the has_states column
+ * @method     ChildCountry findOneByNeedZipCode(int $need_zip_code) Return the first ChildCountry filtered by the need_zip_code column
+ * @method     ChildCountry findOneByZipCodeFormat(string $zip_code_format) Return the first ChildCountry filtered by the zip_code_format column
  * @method     ChildCountry findOneByByDefault(int $by_default) Return the first ChildCountry filtered by the by_default column
  * @method     ChildCountry findOneByShopCountry(boolean $shop_country) Return the first ChildCountry filtered by the shop_country column
  * @method     ChildCountry findOneByCreatedAt(string $created_at) Return the first ChildCountry filtered by the created_at column
  * @method     ChildCountry findOneByUpdatedAt(string $updated_at) Return the first ChildCountry filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildCountry objects filtered by the id column
+ * @method     array findByVisible(int $visible) Return ChildCountry objects filtered by the visible column
  * @method     array findByIsocode(string $isocode) Return ChildCountry objects filtered by the isocode column
  * @method     array findByIsoalpha2(string $isoalpha2) Return ChildCountry objects filtered by the isoalpha2 column
  * @method     array findByIsoalpha3(string $isoalpha3) Return ChildCountry objects filtered by the isoalpha3 column
+ * @method     array findByHasStates(int $has_states) Return ChildCountry objects filtered by the has_states column
+ * @method     array findByNeedZipCode(int $need_zip_code) Return ChildCountry objects filtered by the need_zip_code column
+ * @method     array findByZipCodeFormat(string $zip_code_format) Return ChildCountry objects filtered by the zip_code_format column
  * @method     array findByByDefault(int $by_default) Return ChildCountry objects filtered by the by_default column
  * @method     array findByShopCountry(boolean $shop_country) Return ChildCountry objects filtered by the shop_country column
  * @method     array findByCreatedAt(string $created_at) Return ChildCountry objects filtered by the created_at column
@@ -180,7 +200,7 @@ abstract class CountryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ISOCODE`, `ISOALPHA2`, `ISOALPHA3`, `BY_DEFAULT`, `SHOP_COUNTRY`, `CREATED_AT`, `UPDATED_AT` FROM `country` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `VISIBLE`, `ISOCODE`, `ISOALPHA2`, `ISOALPHA3`, `HAS_STATES`, `NEED_ZIP_CODE`, `ZIP_CODE_FORMAT`, `BY_DEFAULT`, `SHOP_COUNTRY`, `CREATED_AT`, `UPDATED_AT` FROM `country` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -311,6 +331,47 @@ abstract class CountryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(CountryTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(CountryTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CountryTableMap::VISIBLE, $visible, $comparison);
+    }
+
+    /**
      * Filter the query on the isocode column
      *
      * Example usage:
@@ -395,6 +456,117 @@ abstract class CountryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CountryTableMap::ISOALPHA3, $isoalpha3, $comparison);
+    }
+
+    /**
+     * Filter the query on the has_states column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByHasStates(1234); // WHERE has_states = 1234
+     * $query->filterByHasStates(array(12, 34)); // WHERE has_states IN (12, 34)
+     * $query->filterByHasStates(array('min' => 12)); // WHERE has_states > 12
+     * </code>
+     *
+     * @param     mixed $hasStates The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByHasStates($hasStates = null, $comparison = null)
+    {
+        if (is_array($hasStates)) {
+            $useMinMax = false;
+            if (isset($hasStates['min'])) {
+                $this->addUsingAlias(CountryTableMap::HAS_STATES, $hasStates['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($hasStates['max'])) {
+                $this->addUsingAlias(CountryTableMap::HAS_STATES, $hasStates['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CountryTableMap::HAS_STATES, $hasStates, $comparison);
+    }
+
+    /**
+     * Filter the query on the need_zip_code column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNeedZipCode(1234); // WHERE need_zip_code = 1234
+     * $query->filterByNeedZipCode(array(12, 34)); // WHERE need_zip_code IN (12, 34)
+     * $query->filterByNeedZipCode(array('min' => 12)); // WHERE need_zip_code > 12
+     * </code>
+     *
+     * @param     mixed $needZipCode The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByNeedZipCode($needZipCode = null, $comparison = null)
+    {
+        if (is_array($needZipCode)) {
+            $useMinMax = false;
+            if (isset($needZipCode['min'])) {
+                $this->addUsingAlias(CountryTableMap::NEED_ZIP_CODE, $needZipCode['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($needZipCode['max'])) {
+                $this->addUsingAlias(CountryTableMap::NEED_ZIP_CODE, $needZipCode['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CountryTableMap::NEED_ZIP_CODE, $needZipCode, $comparison);
+    }
+
+    /**
+     * Filter the query on the zip_code_format column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByZipCodeFormat('fooValue');   // WHERE zip_code_format = 'fooValue'
+     * $query->filterByZipCodeFormat('%fooValue%'); // WHERE zip_code_format LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $zipCodeFormat The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByZipCodeFormat($zipCodeFormat = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($zipCodeFormat)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $zipCodeFormat)) {
+                $zipCodeFormat = str_replace('*', '%', $zipCodeFormat);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CountryTableMap::ZIP_CODE_FORMAT, $zipCodeFormat, $comparison);
     }
 
     /**
@@ -549,6 +721,79 @@ abstract class CountryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CountryTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\State object
+     *
+     * @param \Thelia\Model\State|ObjectCollection $state  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByState($state, $comparison = null)
+    {
+        if ($state instanceof \Thelia\Model\State) {
+            return $this
+                ->addUsingAlias(CountryTableMap::ID, $state->getCountryId(), $comparison);
+        } elseif ($state instanceof ObjectCollection) {
+            return $this
+                ->useStateQuery()
+                ->filterByPrimaryKeys($state->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByState() only accepts arguments of type \Thelia\Model\State or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the State relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function joinState($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('State');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'State');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the State relation State object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\StateQuery A secondary query class using the current class as primary query
+     */
+    public function useStateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinState($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'State', '\Thelia\Model\StateQuery');
     }
 
     /**

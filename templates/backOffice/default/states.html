@@ -1,0 +1,266 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
+{block name="page-title"}{intl l='States'}{/block}
+
+{block name="check-resource"}admin.configuration.state{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="states">
+
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li><a href="{url path='/admin/configuration/states'}">{intl l="States"}</a></li>
+            </ul>
+
+            {hook name="states.top" location="states_top" }
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <form action="" method="post">
+
+                        <div class="general-block-decorator">
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+                                    <caption class="clearfix">
+                                        {intl l='States'}
+                                        {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.state" access="CREATE"}
+                                            <a class="btn btn-primary action-btn" title="{intl l='Add a new state'}" href="#add_state_dialog" data-toggle="modal">
+                                                <span class="glyphicon glyphicon-plus-sign"></span>
+                                            </a>
+                                        {/loop}
+                                    </caption>
+                                    <thead>
+                                        <tr>
+                                            <th>{intl  l="ID"}</th>
+                                            <th>{intl l="Name"}</th>
+                                            <th>{intl l="ISO Code"}</th>
+                                            <th>{intl l="Country"}</th>
+                                            <th>{intl l="Visible"}</th>
+
+                                            {hook name="states.table-header" location="states_table_header" }
+
+                                            <th class="actions">{intl l='Actions'}</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {loop name="state_list" type="state" backend_context="1" page=$page limit=$page_limit order=$order visible="*"}
+                                            <tr>
+                                                <td>{$ID}</td>
+                                                <td><a href="{url path="/admin/configuration/state/update/%id" id=$ID}">{$TITLE}</a></td>
+                                                <td>{$ISOCODE}</td>
+                                                <td>
+                                                    {loop type="country" name="country" id={$COUNTRY} limit="1" visible="*"}
+                                                        <a href="{url path="/admin/configuration/country/update/%id" id=$ID}">{$TITLE}</a>
+                                                    {/loop}
+                                                </td>
+                                                <td class="text-center">
+                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.state" access="UPDATE"}
+                                                        <div class="make-switch switch-small visibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                            <input type="checkbox" class="visibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                        </div>
+                                                    {/loop}
+
+                                                    {elseloop rel="can_change"}
+                                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                            <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                        </div>
+                                                    {/elseloop}
+                                                </td>
+
+
+                                                {hook name="states.table-row" location="states_table_row" state_id={$ID} }
+
+                                                <td class="actions">
+                                                    <div class="btn-toolbar btn toolbar-primary">
+                                                        <span class="glyphicon glyphicon-cog"></span>
+                                                    </div>
+                                                    <div class="toolbar-options hidden">
+                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.state" access="UPDATE"}
+                                                            <a class="state-change" title="{intl l='Change this state'}" href="{url path="/admin/configuration/state/update/%id" id=$ID}">
+                                                                <span class="glyphicon glyphicon-edit"></span>
+                                                            </a>
+                                                        {/loop}
+
+                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.state" access="DELETE"}
+                                                            <a class="state-delete" title="{intl l='Delete this state'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                                <span class="glyphicon glyphicon-trash"></span>
+                                                            </a>
+                                                        {/loop}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/loop}
+                                        {elseloop rel="state_list"}
+                                            <tr>
+                                                <td colspan="8">
+                                                    <div class="alert alert-info">
+                                                        {intl l="No state has been created yet. Click the + button to create one."}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/elseloop}
+                                    </tbody>
+                                    {ifloop rel="state_list"}
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="100">
+                                                {include
+                                                file = "includes/pagination.html"
+
+                                                loop_ref       = "state_list"
+                                                max_page_count = 10
+                                                page_url       = "{url path="/admin/configuration/states"}"
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                    {/ifloop}
+
+                                 </table>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {hook name="states.bottom" location="states_bottom" }
+
+        </div>
+    </div>
+
+    {* Adding a new State *}
+
+    {form name="thelia.admin.state.creation"}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+        {capture "state_creation_dialog"}
+
+            {form_hidden_fields exclude="locale"}
+
+            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+            {render_form_field field='success_url' value="{url path='/admin/configuration/state/update/_ID_'}"}
+
+            {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+                {render_form_field field="locale" value=$LOCALE}
+
+                <div class="input-group">
+                    <input type="text" {form_field_attributes field="title"}>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                </div>
+            {/loop}
+            {/custom_render_form_field}
+
+            {custom_render_form_field field='country_id'}
+                <select {form_field_attributes field='country_id'}>
+                    <option value="0">{intl l="No country"}</option>
+
+                    {loop name="country-list" type="country" visible="*" has_states="1"}
+                        <option value="{$ID}">{$TITLE}</option>
+                    {/loop}
+                </select>
+            {/custom_render_form_field}
+
+            {render_form_field field="isocode"}
+
+            {custom_render_form_field field="visible"}
+                <input type="checkbox" checked {form_field_attributes field="visible"}> {$label}
+            {/custom_render_form_field}
+
+            {hook name="state.create-form" location="state_create_form" }
+
+        {/capture}
+
+        {include
+            file = "includes/generic-create-dialog.html"
+
+            dialog_id    = "add_state_dialog"
+            dialog_title = {intl l="Create a new state"}
+            dialog_body  = {$smarty.capture.state_creation_dialog nofilter}
+
+            dialog_ok_label     = {intl l="Create this state"}
+            dialog_cancel_label = {intl l="Cancel"}
+
+            form_action        = {url path='/admin/configuration/states/create'}
+            form_enctype       = {form_enctype}
+            form_error_message = $form_error_message
+        }
+    {/form}
+
+
+    {* Delete confirmation dialog *}
+
+    {capture "delete_dialog"}
+        <input type="hidden" name="state_id" id="state_delete_id" value="" />
+
+        {hook name="state.delete-form" location="state_delete_form" }
+
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "delete_dialog"
+        dialog_title    = {intl l="Delete state"}
+        dialog_message  = {intl l="Do you really want to delete this state ?"}
+
+        form_action         = {token_url path='/admin/configuration/states/delete'}
+        form_content        = {$smarty.capture.delete_dialog nofilter}
+    }
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+
+        <script>
+            $(document).ready(function(){
+                // Toogle switch on input radio
+                $('.switch-radio').on('switch-change', function () {
+                    $('.switch-radio').bootstrapSwitch('toggleRadioState');
+                });
+
+                $('.state-delete').click(function(ev){
+                    $('#state_delete_id').val($(this).data('id'));
+                });
+
+                {* Visibility toggle *}
+
+                $(".visibleToggle").on('switch-change', function(event, data) {
+                    $.ajax({
+                        url : "{url path='admin/configuration/state/toggle-online'}",
+                        data : {
+                            state_id : $(this).data('id'),
+                            action : 'visibilityToggle'
+                        }
+                    });
+                });
+            });
+
+        </script>
+    {/javascripts}
+
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="states.js" location="states-js" }
+{/block}

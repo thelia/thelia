@@ -51,6 +51,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param  null                                      $company
      * @param  null                                      $ref
      * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
+     * @param  int                                       $stateId          customer state id (from State table)
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -74,7 +75,8 @@ class Customer extends BaseCustomer implements UserInterface
         $discount = 0,
         $company = null,
         $ref = null,
-        $forceEmailUpdate = false
+        $forceEmailUpdate = false,
+        $stateId = null
     ) {
         $this
             ->setTitleId($titleId)
@@ -112,6 +114,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setZipcode($zipcode)
                     ->setCity($city)
                     ->setCountryId($countryId)
+                    ->setStateId($stateId)
                     ->setIsDefault(1)
                     ;
 
@@ -132,6 +135,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setZipcode($zipcode)
                     ->setCity($city)
                     ->setCountryId($countryId)
+                    ->setStateId($stateId)
                     ->save($con)
                 ;
             }

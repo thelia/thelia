@@ -46,7 +46,7 @@
                             <select id="hooks-filter-module" class="form-control">
                                 <option value="">{intl l="All"}</option>
                                 {loop type="module" name="module" order='title' backend_context=1}
-                                <option value="{$ID}">{$TITLE}</option>
+                                <option value="{$ID}">{$CODE} - {$TITLE}</option>
                                 {/loop}
                             </select>
                         </div>

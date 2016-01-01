@@ -42,6 +42,8 @@ class CountryTest extends \PHPUnit_Framework_TestCase
             ->setIsocode('001')
             ->setIsoAlpha2('AA')
             ->setIsoAlpha3('AAA')
+            ->setVisible(1)
+            ->setHasStates(0)
             ->setLocale('en_US')
             ->setTitle('Test')
             ->setDispatcher($this->dispatcher)
@@ -57,6 +59,9 @@ class CountryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('001', $createdCountry->getIsocode());
         $this->assertEquals('AA', $createdCountry->getIsoalpha2());
+        $this->assertEquals('AAA', $createdCountry->getIsoalpha3());
+        $this->assertEquals(1, $createdCountry->getVisible());
+        $this->assertEquals(0, $createdCountry->getHasStates());
         $this->assertEquals('AAA', $createdCountry->getIsoalpha3());
         $this->assertEquals('en_US', $createdCountry->getLocale());
         $this->assertEquals('Test', $createdCountry->getTitle());
@@ -76,6 +81,8 @@ class CountryTest extends \PHPUnit_Framework_TestCase
             ->setIsocode('002')
             ->setIsoAlpha2('BB')
             ->setIsoAlpha3('BBB')
+            ->setVisible(1)
+            ->setHasStates(0)
             ->setLocale('en_US')
             ->setTitle('Test')
             ->setDispatcher($this->dispatcher)
@@ -91,6 +98,8 @@ class CountryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('002', $updatedCountry->getIsocode());
         $this->assertEquals('BB', $updatedCountry->getIsoalpha2());
         $this->assertEquals('BBB', $updatedCountry->getIsoalpha3());
+        $this->assertEquals(1, $updatedCountry->getVisible());
+        $this->assertEquals(0, $updatedCountry->getHasStates());
         $this->assertEquals('en_US', $updatedCountry->getLocale());
         $this->assertEquals('Test', $updatedCountry->getTitle());
 

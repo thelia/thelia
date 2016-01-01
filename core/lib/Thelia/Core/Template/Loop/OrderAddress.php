@@ -76,6 +76,7 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
                 ->set("ZIPCODE", $orderAddress->getZipcode())
                 ->set("CITY", $orderAddress->getCity())
                 ->set("COUNTRY", $orderAddress->getCountryId())
+                ->set("STATE", $orderAddress->getStateId())
                 ->set("PHONE", $orderAddress->getPhone())
                 ->set("CELLPHONE", $orderAddress->getCellphone())
             ;

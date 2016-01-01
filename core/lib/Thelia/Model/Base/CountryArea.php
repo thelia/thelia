@@ -59,10 +59,22 @@ abstract class CountryArea implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
+
+    /**
      * The value for the country_id field.
      * @var        int
      */
     protected $country_id;
+
+    /**
+     * The value for the state_id field.
+     * @var        int
+     */
+    protected $state_id;
 
     /**
      * The value for the area_id field.
@@ -359,6 +371,17 @@ abstract class CountryArea implements ActiveRecordInterface
     }
 
     /**
+     * Get the [id] column value.
+     *
+     * @return   int
+     */
+    public function getId()
+    {
+
+        return $this->id;
+    }
+
+    /**
      * Get the [country_id] column value.
      *
      * @return   int
@@ -367,6 +390,17 @@ abstract class CountryArea implements ActiveRecordInterface
     {
 
         return $this->country_id;
+    }
+
+    /**
+     * Get the [state_id] column value.
+     *
+     * @return   int
+     */
+    public function getStateId()
+    {
+
+        return $this->state_id;
     }
 
     /**
@@ -421,6 +455,27 @@ abstract class CountryArea implements ActiveRecordInterface
     }
 
     /**
+     * Set the value of [id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\CountryArea The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[CountryAreaTableMap::ID] = true;
+        }
+
+
+        return $this;
+    } // setId()
+
+    /**
      * Set the value of [country_id] column.
      *
      * @param      int $v new value
@@ -444,6 +499,27 @@ abstract class CountryArea implements ActiveRecordInterface
 
         return $this;
     } // setCountryId()
+
+    /**
+     * Set the value of [state_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\CountryArea The current object (for fluent API support)
+     */
+    public function setStateId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->state_id !== $v) {
+            $this->state_id = $v;
+            $this->modifiedColumns[CountryAreaTableMap::STATE_ID] = true;
+        }
+
+
+        return $this;
+    } // setStateId()
 
     /**
      * Set the value of [area_id] column.
@@ -549,19 +625,25 @@ abstract class CountryArea implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CountryAreaTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CountryAreaTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CountryAreaTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->country_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CountryAreaTableMap::translateFieldName('AreaId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CountryAreaTableMap::translateFieldName('StateId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->state_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CountryAreaTableMap::translateFieldName('AreaId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->area_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CountryAreaTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CountryAreaTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CountryAreaTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CountryAreaTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -574,7 +656,7 @@ abstract class CountryArea implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = CountryAreaTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = CountryAreaTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CountryArea object", 0, $e);
@@ -815,10 +897,20 @@ abstract class CountryArea implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[CountryAreaTableMap::ID] = true;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CountryAreaTableMap::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(CountryAreaTableMap::ID)) {
+            $modifiedColumns[':p' . $index++]  = '`ID`';
+        }
         if ($this->isColumnModified(CountryAreaTableMap::COUNTRY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+        }
+        if ($this->isColumnModified(CountryAreaTableMap::STATE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`STATE_ID`';
         }
         if ($this->isColumnModified(CountryAreaTableMap::AREA_ID)) {
             $modifiedColumns[':p' . $index++]  = '`AREA_ID`';
@@ -840,8 +932,14 @@ abstract class CountryArea implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '`ID`':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '`COUNTRY_ID`':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
+                        break;
+                    case '`STATE_ID`':
+                        $stmt->bindValue($identifier, $this->state_id, PDO::PARAM_INT);
                         break;
                     case '`AREA_ID`':
                         $stmt->bindValue($identifier, $this->area_id, PDO::PARAM_INT);
@@ -859,6 +957,13 @@ abstract class CountryArea implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -908,15 +1013,21 @@ abstract class CountryArea implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getCountryId();
+                return $this->getId();
                 break;
             case 1:
-                return $this->getAreaId();
+                return $this->getCountryId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getStateId();
                 break;
             case 3:
+                return $this->getAreaId();
+                break;
+            case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -948,10 +1059,12 @@ abstract class CountryArea implements ActiveRecordInterface
         $alreadyDumpedObjects['CountryArea'][$this->getPrimaryKey()] = true;
         $keys = CountryAreaTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getCountryId(),
-            $keys[1] => $this->getAreaId(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getCountryId(),
+            $keys[2] => $this->getStateId(),
+            $keys[3] => $this->getAreaId(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1000,15 +1113,21 @@ abstract class CountryArea implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setCountryId($value);
+                $this->setId($value);
                 break;
             case 1:
-                $this->setAreaId($value);
+                $this->setCountryId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setStateId($value);
                 break;
             case 3:
+                $this->setAreaId($value);
+                break;
+            case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1035,10 +1154,12 @@ abstract class CountryArea implements ActiveRecordInterface
     {
         $keys = CountryAreaTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setCountryId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setAreaId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCountryId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setStateId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setAreaId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1050,7 +1171,9 @@ abstract class CountryArea implements ActiveRecordInterface
     {
         $criteria = new Criteria(CountryAreaTableMap::DATABASE_NAME);
 
+        if ($this->isColumnModified(CountryAreaTableMap::ID)) $criteria->add(CountryAreaTableMap::ID, $this->id);
         if ($this->isColumnModified(CountryAreaTableMap::COUNTRY_ID)) $criteria->add(CountryAreaTableMap::COUNTRY_ID, $this->country_id);
+        if ($this->isColumnModified(CountryAreaTableMap::STATE_ID)) $criteria->add(CountryAreaTableMap::STATE_ID, $this->state_id);
         if ($this->isColumnModified(CountryAreaTableMap::AREA_ID)) $criteria->add(CountryAreaTableMap::AREA_ID, $this->area_id);
         if ($this->isColumnModified(CountryAreaTableMap::CREATED_AT)) $criteria->add(CountryAreaTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CountryAreaTableMap::UPDATED_AT)) $criteria->add(CountryAreaTableMap::UPDATED_AT, $this->updated_at);
@@ -1069,32 +1192,29 @@ abstract class CountryArea implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(CountryAreaTableMap::DATABASE_NAME);
+        $criteria->add(CountryAreaTableMap::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * Returns NULL since this table doesn't have a primary key.
-     * This method exists only for BC and is deprecated!
-     * @return null
+     * Returns the primary key for this object (row).
+     * @return   int
      */
     public function getPrimaryKey()
     {
-        return null;
+        return $this->getId();
     }
 
     /**
-     * Dummy primary key setter.
+     * Generic method to set the primary key (id column).
      *
-     * This function only exists to preserve backwards compatibility.  It is no longer
-     * needed or required by the Persistent interface.  It will be removed in next BC-breaking
-     * release of Propel.
-     *
-     * @deprecated
+     * @param       int $key Primary key.
+     * @return void
      */
-    public function setPrimaryKey($pk)
+    public function setPrimaryKey($key)
     {
-        // do nothing, because this object doesn't have any primary keys
+        $this->setId($key);
     }
 
     /**
@@ -1104,7 +1224,7 @@ abstract class CountryArea implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return ;
+        return null === $this->getId();
     }
 
     /**
@@ -1121,11 +1241,13 @@ abstract class CountryArea implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCountryId($this->getCountryId());
+        $copyObj->setStateId($this->getStateId());
         $copyObj->setAreaId($this->getAreaId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1258,7 +1380,9 @@ abstract class CountryArea implements ActiveRecordInterface
      */
     public function clear()
     {
+        $this->id = null;
         $this->country_id = null;
+        $this->state_id = null;
         $this->area_id = null;
         $this->created_at = null;
         $this->updated_at = null;

@@ -1,6 +1,22 @@
 # 2.3.0-alpha1
 
-- #1844 Added hooks in the right column part of the edtion form of brand, content, category folder and product templates :
+- #1823 Add states/provinces concept. The objective of this PR is to separate states/provinces of countries. For now, the concept of states/provinces was managed in country model which was not the best way.
+- #1878 Add module code in the lists of the BackOffice for a better understanding.
+- #1832 Language improvement. Add the possibility to disable a language. It's possible to disable the language only for the front.
+- #1851 Add in the module Tinymce, the possibility to choose in which text areas the editor will be used.
+- #1840 Add the possibility to generate an url with the arguments ```router``` and ```route_id``` in the smarty function ```url```. Documentation ```http://doc.thelia.net/en/documentation/templates/urls-and-paths.html```
+- #1872 Add next/prev buttons for orders and customers. Modify the loops of brands, categories, folders and contents so that the queries to get the next and previous objects are sent only when it is needed.
+- #1850 #1859 Add hooks for email template
+- #1845 Add price including taxes in the combination creation pop-up in the BackOffice
+- #1868 Allow to open order-edit.html template with a specific module tab
+- #1861 Add links to the appropriate pages
+- #1860 Change version of Symfony Yaml components
+- #1843 Fix smarty form_collection_field, a performance problem was introduced after this PR: #1613 because ​the Form::createView() method create all form view on each call.
+- #1856 Convert order.invoice_date to datetime column
+- #1852 Add the possibility to disable the generation of url for the loops, adds argument ```return_url``` in loops, the default value for argument ```return_url``` is ```true```
+- #1857 Fix of hookblack : order.tab
+- #1792 Update module Carousel, change the location of saving of the images
+- #1844 #1848 Added hooks in the right column part of the edtion form of brand, content, category folder and product templates :
     - ```brand.modification.form-right.top```, ```brand.modification.form-right.bottom```
     - ```category.modification.form-right.top```, ```category.modification.form-right.bottom```
     - ```content.modification.form-right.top```, ```content.modification.form-right.bottom```

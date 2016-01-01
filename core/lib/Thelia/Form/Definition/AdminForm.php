@@ -115,6 +115,9 @@ final class AdminForm
     const COUNTRY_CREATION = 'thelia.admin.country.creation';
     const COUNTRY_MODIFICATION = 'thelia.admin.country.modification';
 
+    const STATE_CREATION = 'thelia.admin.state.creation';
+    const STATE_MODIFICATION = 'thelia.admin.state.modification';
+
     const AREA_CREATE = 'thelia.admin.area.create';
     const AREA_MODIFICATION = 'thelia.admin.area.modification';
     const AREA_COUNTRY = 'thelia.admin.area.country';

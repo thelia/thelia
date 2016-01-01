@@ -96,14 +96,21 @@
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
+                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.state" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/states'}">{intl l='States / Provinces'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/states'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+
+                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping configuration'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
+                                {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping zones management'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>

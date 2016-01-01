@@ -66,26 +66,35 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function updateTaxes(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-            if (!is_array($taxList = $event->getTaxList())) {
-                $taxList = json_decode($taxList, true);
+
+            $taxList = $this->getArrayFromJson($event->getTaxList());
+            $countryList = $this->getArrayFromJson($event->getCountryList());
+            $countryDeletedList = $this->getArrayFromJson($event->getCountryDeletedList());
+
+            /* clean the current tax rule for the countries/states */
+            $deletes = array_merge($countryList, $countryDeletedList);
+            foreach ($deletes as $item) {
+                TaxRuleCountryQuery::create()
+                    ->filterByTaxRule($taxRule)
+                    ->filterByCountryId(intval($item[0]), Criteria::EQUAL)
+                    ->filterByStateId(intval($item[1]) !== 0 ? $item[1] : null, Criteria::EQUAL)
+                    ->delete();
             }
 
-            /* clean the current tax rule for the countries */
-            TaxRuleCountryQuery::create()
-                ->filterByTaxRule($taxRule)
-                ->filterByCountryId($event->getCountryList(), Criteria::IN)
-                ->delete();
-
             /* for each country */
-            foreach ($event->getCountryList() as $country) {
+            foreach ($countryList as $item) {
                 $position = 1;
+                $countryId = intval($item[0]);
+                $stateId = intval($item[1]);
+
                 /* on applique les nouvelles regles */
                 foreach ($taxList as $tax) {
                     if (is_array($tax)) {
                         foreach ($tax as $samePositionTax) {
                             $taxModel = new TaxRuleCountry();
                             $taxModel->setTaxRule($taxRule)
-                                ->setCountryId($country)
+                                ->setCountryId($countryId)
+                                ->setStateId($stateId ?: null)
                                 ->setTaxId($samePositionTax)
                                 ->setPosition($position);
                             $taxModel->save();
@@ -93,7 +102,8 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                     } else {
                         $taxModel = new TaxRuleCountry();
                         $taxModel->setTaxRule($taxRule)
-                            ->setCountryId($country)
+                            ->setCountryId($countryId)
+                            ->setStateId($stateId ?: null)
                             ->setTaxId($tax)
                             ->setPosition($position);
                         $taxModel->save();
@@ -104,6 +114,13 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
 
             $event->setTaxRule($taxRule);
         }
+    }
+
+    protected function getArrayFromJson($obj)
+    {
+        return is_array($obj)
+            ? $obj
+            : json_decode($obj, true);
     }
 
     /**

@@ -175,11 +175,24 @@
                                                     {/form_field}
 
                                                     {form_field field='country'}
+                                                        {$countryFieldId=$label_attr.for}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                                                                {loop type="country" name="country1"}
+                                                                {loop type="country" name="country1" visible="*"}
                                                                     <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
+                                                                {/loop}
+                                                            </select>
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field field='state'}
+                                                        <div class="form-group group-state{if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                                                            <select name="{$name}" id="{$label_attr.for}" class="form-control"
+                                                                    data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state">
+                                                                {loop type="state" name="state1" visible="*"}
+                                                                    <option value="{$ID}" {if {$value} == $ID}selected{/if} data-country="{$COUNTRY}">{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
                                                         </div>
@@ -233,9 +246,11 @@
                                                                         {if $ADDRESS2}<br />{$ADDRESS2}{/if}
                                                                         {if $ADDRESS3}<br />{$ADDRESS3}{/if}
                                                                         <br>{$ZIPCODE} {$CITY}
-                                                                        {loop name="address.country" type="country" id=$COUNTRY}
+                                                                        {loop name="address.country" type="country" id=$COUNTRY visible="*"}
                                                                             <br>{$TITLE}
                                                                         {/loop}
+                                                                        {if $STATE}{loop type="state" name="address.state" id=$STATE}, {$TITLE}{/loop}{/if}
+
                                                                         {if $PHONE}
                                                                             <br>{intl l="Phone"}: {$PHONE}
                                                                         {/if}
@@ -378,7 +393,7 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "address_creation_dialog"}
 
-        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
+        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page dialog_type="new"}
 
         {hook name="customer.address-create-form" location="customer_address_create_form" customer_id=$customer_id page=$page}
 
@@ -411,7 +426,7 @@
 	    {capture "address_update_dialog"}
 	        <input type="hidden" name="address_id" id="address_update_id" value="{$address_id}" />
 
-	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
+	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page dialog_type="update"}
             {hook name="customer.address-update-form" location="customer_address_update_form" customer_id=$customer_id page=$page}
 	    {/capture}
 
@@ -478,7 +493,9 @@
 
 
 {block name="javascript-initialization"}
-
+    {javascripts file='assets/js/thelia-states.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
     <script>
         $(function() {
 

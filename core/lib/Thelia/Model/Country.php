@@ -17,6 +17,42 @@ class Country extends BaseCountry
 
     protected static $defaultCountry = null;
 
+
+    /**
+     * get a regex pattern according to the zip code format field
+     * to match a zip code for this country.
+     *
+     * zip code format :
+     * - N : number
+     * - L : letter
+     * - C : iso of a state
+     *
+     * @return string|null will return a regex to match the zip code, otherwise null will be return
+     *                     if zip code format is not defined
+     */
+    public function getZipCodeRE()
+    {
+        $zipCodeFormat = $this->getZipCodeFormat();
+
+        if (empty($zipCodeFormat)) {
+            return null;
+        }
+
+
+        $zipCodeRE = preg_replace("/\\s+/", ' ', $zipCodeFormat);
+
+        $trans = [
+            "N" => "\\d",
+            "L" => "[a-zA-Z]",
+            "C" => ".+",
+            " " => " +"
+        ];
+
+        $zipCodeRE = "#^" . strtr($zipCodeRE, $trans) . "$#";
+
+        return $zipCodeRE;
+    }
+
     /**
      * This method ensure backward compatibility to Thelia 2.1, where a country belongs to one and
      * only one shipping zone.

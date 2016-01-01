@@ -206,9 +206,8 @@
                             </div><!--/.form-group-->
                         {/form_field}
 
-
-
                         {form_field field="country"}
+                            {$countryFieldId=$label_attr.for}
                             <div class="form-group group-country{if $error} has-error{/if}">
                                 <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input col-sm-5">
@@ -223,6 +222,30 @@
                                                     {/if}
 
                                             >{$TITLE}</option>
+                                        {/loop}
+                                    </select>
+                                    {if $error }
+                                        <span class="help-block">{$message}</span>
+                                        {assign var="error_focus" value="true"}
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
+
+                        {form_field field="state"}
+                            <div class="form-group group-state{if $error} has-error{/if}">
+                                <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <div class="control-input col-sm-5">
+                                    <select name="{$name}" id="{$label_attr.for}"
+                                            data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state"
+                                            class="form-control"{if !isset($error_focus) && $error} autofocus{/if}>
+                                        <option value="">-- {intl l="Select State"} --</option>
+                                        {loop type="state" name="state.list"}
+                                            <option value="{$ID}" data-country="{$COUNTRY}"
+                                                {if $value != ""}
+                                                    {if $value == $ID}selected{/if}
+                                                {/if}
+                                                >{$TITLE}</option>
                                         {/loop}
                                     </select>
                                     {if $error }

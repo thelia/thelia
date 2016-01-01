@@ -103,9 +103,13 @@
   </table>
   <table name="country" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0" name="visible" required="true" type="TINYINT" />
     <column name="isocode" required="true" size="4" type="VARCHAR" />
     <column name="isoalpha2" size="2" type="VARCHAR" />
     <column name="isoalpha3" size="4" type="VARCHAR" />
+    <column defaultValue="0" name="has_states" type="TINYINT" />
+    <column defaultValue="0" name="need_zip_code" type="TINYINT" />
+    <column name="zip_code_format" size="20" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -118,6 +122,20 @@
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="state" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0" name="visible" required="true" type="TINYINT" />
+    <column name="isocode" required="true" size="4" type="VARCHAR" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="country_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="country" name="fk_state_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title" />
     </behavior>
   </table>
   <table name="tax" namespace="Thelia\Model">
@@ -142,9 +160,11 @@
     </behavior>
   </table>
   <table name="tax_rule_country" namespace="Thelia\Model">
-    <column name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="tax_id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_rule_id" required="true" type="INTEGER" />
+    <column name="country_id" required="true" type="INTEGER" />
+    <column name="state_id" type="INTEGER" />
+    <column name="tax_id" required="true" type="INTEGER" />
     <column name="position" required="true" type="INTEGER" />
     <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_id" />
@@ -155,6 +175,9 @@
     <foreign-key foreignTable="country" name="fk_tax_rule_country_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="country_id" />
     </foreign-key>
+    <foreign-key foreignTable="state" name="fk_tax_rule_country_state_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
+    </foreign-key>
     <index name="idx_tax_rule_country_tax_id">
       <index-column name="tax_id" />
     </index>
@@ -163,6 +186,9 @@
     </index>
     <index name="idx_tax_rule_country_country_id">
       <index-column name="country_id" />
+    </index>
+    <index name="idx_tax_rule_country_state_id">
+      <index-column name="state_id" />
     </index>
     <index name="idx_tax_rule_country_tax_rule_id_country_id_position">
       <index-column name="tax_rule_id" />
@@ -420,6 +446,7 @@
     <column name="zipcode" required="true" size="10" type="VARCHAR" />
     <column name="city" required="true" size="255" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
+    <column name="state_id" required="false" type="INTEGER" />
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
     <column defaultValue="0" name="is_default" type="TINYINT" />
@@ -431,6 +458,9 @@
     </foreign-key>
     <foreign-key foreignTable="country" name="fk_address_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <foreign-key foreignTable="state" name="fk_address_state_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
     </foreign-key>
     <index name="idx_address_customer_id">
       <index-column name="customer_id" />
@@ -466,6 +496,8 @@
     <column name="decimal_separator" size="45" type="VARCHAR" />
     <column name="thousands_separator" size="45" type="VARCHAR" />
     <column name="decimals" size="45" type="VARCHAR" />
+    <column defaultValue="0" name="active" type="BOOLEAN" />
+    <column defaultValue="0" name="visible" type="TINYINT" />
     <column name="by_default" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <index name="idx_lang_by_default">
@@ -676,11 +708,15 @@
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
+    <column name="state_id" required="false" type="INTEGER" />
     <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_title_id" />
     </foreign-key>
     <foreign-key foreignTable="country" name="fk_order_address_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <foreign-key foreignTable="state" name="fk_order_address_state_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
     </foreign-key>
     <index name="fk_order_address_customer_title_id_idx">
       <index-column name="customer_title_id" />
@@ -1816,7 +1852,9 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="country_area" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="country_id" required="true" type="INTEGER" />
+    <column name="state_id" type="INTEGER" />
     <column name="area_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="area" name="fk_country_area_area_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
@@ -1824,11 +1862,19 @@
     <foreign-key foreignTable="country" name="fk_country_area_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="country_id" />
     </foreign-key>
+    <!-- not possible as propel generates 2 methods filterByState in Country model.
+    <foreign-key foreignTable="state" refPhpName="AreaState" name="fk_country_area_state_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
+    </foreign-key>
+    -->
     <index name="country_area_area_id_idx">
       <index-column name="area_id" />
     </index>
     <index name="fk_country_area_country_id_idx">
       <index-column name="country_id" />
+    </index>
+    <index name="fk_country_area_state_id_idx">
+      <index-column name="state_id" />
     </index>
     <behavior name="timestampable" />
   </table>

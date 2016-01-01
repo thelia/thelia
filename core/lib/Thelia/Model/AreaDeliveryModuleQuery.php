@@ -3,7 +3,6 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\AreaDeliveryModuleQuery as BaseAreaDeliveryModuleQuery;
-use Thelia\Module\BaseModule;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'area_delivery_module' table.
@@ -22,19 +21,23 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
      *
      * @param Country $country
      * @param Module $module
+     * @param State|null $state
+     *
      * @return null|AreaDeliveryModule
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function findByCountryAndModule(Country $country, Module $module)
+    public function findByCountryAndModule(Country $country, Module $module, State $state = null)
     {
         $response = null;
 
-        $countryInAreaList = CountryAreaQuery::create()->filterByCountryId($country->getId())->find();
+        $countryInAreaList = CountryAreaQuery::findByCountryAndState($country, $state);
 
+        /** @var CountryArea $countryInArea */
         foreach ($countryInAreaList as $countryInArea) {
-            $response = $this->filterByAreaId($countryInArea->getAreaId())
+            $response = self::create()->filterByAreaId($countryInArea->getAreaId())
                 ->filterByModule($module)
-                ->findOne();
+                ->findOne()
+            ;
 
             if ($response !== null) {
                 break;

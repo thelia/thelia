@@ -22,6 +22,7 @@ use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**
  * Language loop, to get a list of available languages
@@ -38,6 +39,8 @@ use Thelia\Type;
  * @method string[] getCode()
  * @method string[] getLocale()
  * @method int[] getExclude()
+ * @method bool getActive()
+ * @method bool getVisible()
  * @method bool getDefaultOnly()
  * @method bool getExcludeDefault()
  * @method string[] getOrder()
@@ -56,13 +59,17 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
             Argument::createAnyListTypeArgument('code'),
             Argument::createAnyListTypeArgument('locale'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanOrBothTypeArgument('active', true),
+            Argument::createBooleanOrBothTypeArgument('visible', true),
             Argument::createBooleanTypeArgument('default_only', false),
             Argument::createBooleanTypeArgument('exclude_default', false),
-            new Argument(
+            Argument::createEnumListTypeArgument(
                 'order',
-                new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'position', 'position_reverse'))
-                ),
+                [
+                    'id', 'id_reverse',
+                    'alpha', 'alpha_reverse',
+                    'position', 'position_reverse'
+                ],
                 'position'
             )
         );
@@ -82,6 +89,14 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $locale = $this->getLocale()) {
             $search->filterByLocale($locale, Criteria::IN);
+        }
+
+        if (!$this->getBackendContext() && Type\BooleanOrBothType::ANY !== $visible = $this->getVisible()) {
+            $search->filterByVisible($visible);
+        }
+
+        if (Type\BooleanOrBothType::ANY !== $active = $this->getActive()) {
+            $search->filterByActive($active);
         }
 
         if ($this->getDefaultOnly()) {
@@ -136,6 +151,8 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set("CODE", $result->getCode())
                 ->set("LOCALE", $result->getLocale())
                 ->set("URL", $result->getUrl())
+                ->set("ACTIVE", $result->getActive())
+                ->set("VISIBLE", $result->getVisible())
                 ->set("IS_DEFAULT", $result->getByDefault())
                 ->set("DATE_FORMAT", $result->getDateFormat())
                 ->set("TIME_FORMAT", $result->getTimeFormat())

@@ -21,6 +21,12 @@ class CountryUpdateEvent extends CountryCreateEvent
 {
     protected $country_id;
 
+    /** @var bool */
+    protected $needZipCode;
+    /** @var string */
+    protected $zipCodeFormat;
+    /** @var int area zone */
+
     protected $chapo;
     protected $description;
     protected $postscriptum;
@@ -100,5 +106,39 @@ class CountryUpdateEvent extends CountryCreateEvent
     public function getCountryId()
     {
         return $this->country_id;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isNeedZipCode()
+    {
+        return $this->needZipCode;
+    }
+
+    /**
+     * @param boolean $needZipCode
+     */
+    public function setNeedZipCode($needZipCode)
+    {
+        $this->needZipCode = $needZipCode;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getZipCodeFormat()
+    {
+        return $this->zipCodeFormat;
+    }
+
+    /**
+     * @param string $zipCodeFormat
+     */
+    public function setZipCodeFormat($zipCodeFormat)
+    {
+        $this->zipCodeFormat = $zipCodeFormat;
+        return $this;
     }
 }

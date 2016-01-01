@@ -543,7 +543,8 @@ class CustomerController extends BaseFrontController
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
             isset($data["company"])?$data["company"]:null,
-            null
+            null,
+            isset($data["state"])?$data["state"]:null
         );
 
         return $customerCreateEvent;

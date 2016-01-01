@@ -146,7 +146,7 @@
 		                {if $addresses != "  "}- {$addresses}{/if}
 		                {if $city != " " }- {$city}{/if}
 		                {if {config key="store_country"} }
-		                {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+		                {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
 		                {/if}
 		                {if {config key="store_business_id"} }
 		                - {config key="store_business_id"}
@@ -213,7 +213,8 @@
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {loop type="country" visible="*" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}
                     {/loop}
                 </p>
                 {/elsehook}
@@ -226,7 +227,8 @@
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {loop type="country" visible="*" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                    -{if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}
                     {/loop}
                 </p>
             </td>

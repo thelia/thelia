@@ -73,6 +73,7 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->setZipcode($event->getZipcode())
                 ->setCity($event->getCity())
                 ->setCountryId($event->getCountry())
+                ->setStateId($event->getState())
                 ->setCellphone($event->getCellphone())
                 ->setPhone($event->getPhone())
                 ->setCompany($event->getCompany())

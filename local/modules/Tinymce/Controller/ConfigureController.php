@@ -59,6 +59,21 @@ class ConfigureController extends BaseAdminController
             // Get the form field values
             $data = $form->getData();
 
+            Tinymce::setConfigValue('product_summary', $data['product_summary']);
+            Tinymce::setConfigValue('product_conclusion', $data['product_conclusion']);
+
+            Tinymce::setConfigValue('content_summary', $data['content_summary']);
+            Tinymce::setConfigValue('content_conclusion', $data['content_conclusion']);
+
+            Tinymce::setConfigValue('category_summary', $data['category_summary']);
+            Tinymce::setConfigValue('category_conclusion', $data['category_conclusion']);
+
+            Tinymce::setConfigValue('folder_summary', $data['folder_summary']);
+            Tinymce::setConfigValue('folder_conclusion', $data['folder_conclusion']);
+
+            Tinymce::setConfigValue('brand_summary', $data['brand_summary']);
+            Tinymce::setConfigValue('brand_conclusion', $data['brand_conclusion']);
+
             Tinymce::setConfigValue('show_menu_bar', $data['show_menu_bar']);
             Tinymce::setConfigValue('force_pasting_as_text', $data['force_pasting_as_text']);
             Tinymce::setConfigValue('editor_height', $data['editor_height']);

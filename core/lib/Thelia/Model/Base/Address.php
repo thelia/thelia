@@ -27,6 +27,8 @@ use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
 use Thelia\Model\CustomerTitle as ChildCustomerTitle;
 use Thelia\Model\CustomerTitleQuery as ChildCustomerTitleQuery;
+use Thelia\Model\State as ChildState;
+use Thelia\Model\StateQuery as ChildStateQuery;
 use Thelia\Model\Map\AddressTableMap;
 
 abstract class Address implements ActiveRecordInterface
@@ -142,6 +144,12 @@ abstract class Address implements ActiveRecordInterface
     protected $country_id;
 
     /**
+     * The value for the state_id field.
+     * @var        int
+     */
+    protected $state_id;
+
+    /**
      * The value for the phone field.
      * @var        string
      */
@@ -186,6 +194,11 @@ abstract class Address implements ActiveRecordInterface
      * @var        Country
      */
     protected $aCountry;
+
+    /**
+     * @var        State
+     */
+    protected $aState;
 
     /**
      * @var        ObjectCollection|ChildCart[] Collection to store aggregation of ChildCart objects.
@@ -634,6 +647,17 @@ abstract class Address implements ActiveRecordInterface
     }
 
     /**
+     * Get the [state_id] column value.
+     *
+     * @return   int
+     */
+    public function getStateId()
+    {
+
+        return $this->state_id;
+    }
+
+    /**
      * Get the [phone] column value.
      *
      * @return   string
@@ -992,6 +1016,31 @@ abstract class Address implements ActiveRecordInterface
     } // setCountryId()
 
     /**
+     * Set the value of [state_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Address The current object (for fluent API support)
+     */
+    public function setStateId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->state_id !== $v) {
+            $this->state_id = $v;
+            $this->modifiedColumns[AddressTableMap::STATE_ID] = true;
+        }
+
+        if ($this->aState !== null && $this->aState->getId() !== $v) {
+            $this->aState = null;
+        }
+
+
+        return $this;
+    } // setStateId()
+
+    /**
      * Set the value of [phone] column.
      *
      * @param      string $v new value
@@ -1176,22 +1225,25 @@ abstract class Address implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : AddressTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->country_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : AddressTableMap::translateFieldName('Phone', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : AddressTableMap::translateFieldName('StateId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->state_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : AddressTableMap::translateFieldName('Phone', TableMap::TYPE_PHPNAME, $indexType)];
             $this->phone = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : AddressTableMap::translateFieldName('Cellphone', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AddressTableMap::translateFieldName('Cellphone', TableMap::TYPE_PHPNAME, $indexType)];
             $this->cellphone = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AddressTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : AddressTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : AddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : AddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : AddressTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : AddressTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1204,7 +1256,7 @@ abstract class Address implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 18; // 18 = AddressTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 19; // 19 = AddressTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Address object", 0, $e);
@@ -1234,6 +1286,9 @@ abstract class Address implements ActiveRecordInterface
         }
         if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
             $this->aCountry = null;
+        }
+        if ($this->aState !== null && $this->state_id !== $this->aState->getId()) {
+            $this->aState = null;
         }
     } // ensureConsistency
 
@@ -1277,6 +1332,7 @@ abstract class Address implements ActiveRecordInterface
             $this->aCustomer = null;
             $this->aCustomerTitle = null;
             $this->aCountry = null;
+            $this->aState = null;
             $this->collCartsRelatedByAddressDeliveryId = null;
 
             $this->collCartsRelatedByAddressInvoiceId = null;
@@ -1429,6 +1485,13 @@ abstract class Address implements ActiveRecordInterface
                 $this->setCountry($this->aCountry);
             }
 
+            if ($this->aState !== null) {
+                if ($this->aState->isModified() || $this->aState->isNew()) {
+                    $affectedRows += $this->aState->save($con);
+                }
+                $this->setState($this->aState);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1541,6 +1604,9 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::COUNTRY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
         }
+        if ($this->isColumnModified(AddressTableMap::STATE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`STATE_ID`';
+        }
         if ($this->isColumnModified(AddressTableMap::PHONE)) {
             $modifiedColumns[':p' . $index++]  = '`PHONE`';
         }
@@ -1605,6 +1671,9 @@ abstract class Address implements ActiveRecordInterface
                         break;
                     case '`COUNTRY_ID`':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
+                        break;
+                    case '`STATE_ID`':
+                        $stmt->bindValue($identifier, $this->state_id, PDO::PARAM_INT);
                         break;
                     case '`PHONE`':
                         $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
@@ -1723,18 +1792,21 @@ abstract class Address implements ActiveRecordInterface
                 return $this->getCountryId();
                 break;
             case 13:
-                return $this->getPhone();
+                return $this->getStateId();
                 break;
             case 14:
-                return $this->getCellphone();
+                return $this->getPhone();
                 break;
             case 15:
-                return $this->getIsDefault();
+                return $this->getCellphone();
                 break;
             case 16:
-                return $this->getCreatedAt();
+                return $this->getIsDefault();
                 break;
             case 17:
+                return $this->getCreatedAt();
+                break;
+            case 18:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1779,11 +1851,12 @@ abstract class Address implements ActiveRecordInterface
             $keys[10] => $this->getZipcode(),
             $keys[11] => $this->getCity(),
             $keys[12] => $this->getCountryId(),
-            $keys[13] => $this->getPhone(),
-            $keys[14] => $this->getCellphone(),
-            $keys[15] => $this->getIsDefault(),
-            $keys[16] => $this->getCreatedAt(),
-            $keys[17] => $this->getUpdatedAt(),
+            $keys[13] => $this->getStateId(),
+            $keys[14] => $this->getPhone(),
+            $keys[15] => $this->getCellphone(),
+            $keys[16] => $this->getIsDefault(),
+            $keys[17] => $this->getCreatedAt(),
+            $keys[18] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1799,6 +1872,9 @@ abstract class Address implements ActiveRecordInterface
             }
             if (null !== $this->aCountry) {
                 $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aState) {
+                $result['State'] = $this->aState->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collCartsRelatedByAddressDeliveryId) {
                 $result['CartsRelatedByAddressDeliveryId'] = $this->collCartsRelatedByAddressDeliveryId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1880,18 +1956,21 @@ abstract class Address implements ActiveRecordInterface
                 $this->setCountryId($value);
                 break;
             case 13:
-                $this->setPhone($value);
+                $this->setStateId($value);
                 break;
             case 14:
-                $this->setCellphone($value);
+                $this->setPhone($value);
                 break;
             case 15:
-                $this->setIsDefault($value);
+                $this->setCellphone($value);
                 break;
             case 16:
-                $this->setCreatedAt($value);
+                $this->setIsDefault($value);
                 break;
             case 17:
+                $this->setCreatedAt($value);
+                break;
+            case 18:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1931,11 +2010,12 @@ abstract class Address implements ActiveRecordInterface
         if (array_key_exists($keys[10], $arr)) $this->setZipcode($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setCity($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setCountryId($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setPhone($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setCellphone($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setIsDefault($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[13], $arr)) $this->setStateId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPhone($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setCellphone($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setIsDefault($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
     }
 
     /**
@@ -1960,6 +2040,7 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::ZIPCODE)) $criteria->add(AddressTableMap::ZIPCODE, $this->zipcode);
         if ($this->isColumnModified(AddressTableMap::CITY)) $criteria->add(AddressTableMap::CITY, $this->city);
         if ($this->isColumnModified(AddressTableMap::COUNTRY_ID)) $criteria->add(AddressTableMap::COUNTRY_ID, $this->country_id);
+        if ($this->isColumnModified(AddressTableMap::STATE_ID)) $criteria->add(AddressTableMap::STATE_ID, $this->state_id);
         if ($this->isColumnModified(AddressTableMap::PHONE)) $criteria->add(AddressTableMap::PHONE, $this->phone);
         if ($this->isColumnModified(AddressTableMap::CELLPHONE)) $criteria->add(AddressTableMap::CELLPHONE, $this->cellphone);
         if ($this->isColumnModified(AddressTableMap::IS_DEFAULT)) $criteria->add(AddressTableMap::IS_DEFAULT, $this->is_default);
@@ -2040,6 +2121,7 @@ abstract class Address implements ActiveRecordInterface
         $copyObj->setZipcode($this->getZipcode());
         $copyObj->setCity($this->getCity());
         $copyObj->setCountryId($this->getCountryId());
+        $copyObj->setStateId($this->getStateId());
         $copyObj->setPhone($this->getPhone());
         $copyObj->setCellphone($this->getCellphone());
         $copyObj->setIsDefault($this->getIsDefault());
@@ -2244,6 +2326,57 @@ abstract class Address implements ActiveRecordInterface
         }
 
         return $this->aCountry;
+    }
+
+    /**
+     * Declares an association between this object and a ChildState object.
+     *
+     * @param                  ChildState $v
+     * @return                 \Thelia\Model\Address The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setState(ChildState $v = null)
+    {
+        if ($v === null) {
+            $this->setStateId(NULL);
+        } else {
+            $this->setStateId($v->getId());
+        }
+
+        $this->aState = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildState object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAddress($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildState object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildState The associated ChildState object.
+     * @throws PropelException
+     */
+    public function getState(ConnectionInterface $con = null)
+    {
+        if ($this->aState === null && ($this->state_id !== null)) {
+            $this->aState = ChildStateQuery::create()->findPk($this->state_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aState->addAddresses($this);
+             */
+        }
+
+        return $this->aState;
     }
 
 
@@ -2819,6 +2952,7 @@ abstract class Address implements ActiveRecordInterface
         $this->zipcode = null;
         $this->city = null;
         $this->country_id = null;
+        $this->state_id = null;
         $this->phone = null;
         $this->cellphone = null;
         $this->is_default = null;
@@ -2861,6 +2995,7 @@ abstract class Address implements ActiveRecordInterface
         $this->aCustomer = null;
         $this->aCustomerTitle = null;
         $this->aCountry = null;
+        $this->aState = null;
     }
 
     /**

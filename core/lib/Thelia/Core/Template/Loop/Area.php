@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -21,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\Area as AreaModel;
+use Thelia\Model\CountryAreaQuery;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
@@ -38,7 +40,7 @@ use Thelia\Type\TypeCollection;
  * @method int[] getModuleId()
  * @method string[] getOrder()
  */
-class Area extends BaseLoop implements PropelSearchLoopInterface
+class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
@@ -69,9 +71,9 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
 
     public function buildModelCriteria()
     {
-        $id = $this->getId();
-
         $search = AreaQuery::create();
+
+        $id = $this->getId();
 
         if (count($id)) {
             $search->filterById($id, Criteria::IN);

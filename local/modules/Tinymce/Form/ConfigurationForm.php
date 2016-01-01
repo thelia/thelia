@@ -105,8 +105,50 @@ class ConfigurationForm extends BaseForm
                         'help' => $this->translator->trans('This is a sample text editor, to view actual configuration.', [], Tinymce::MODULE_DOMAIN)
                     ]
                 ]
+            )->add(
+                'available_text_areas',
+                'text',
+                [
+                    'disabled' => true,
+                    'required'   => false,
+                    'label_attr' => [],
+                    'data' => Tinymce::getConfigValue('available_text_areas')
+                ]
+            );
+
+        foreach ($this->getFieldsKeys() as $key) {
+            $this->addConfigField($key);
+        }
+    }
+
+    public function getFieldsKeys()
+    {
+        return array(
+            'product_summary',
+            'product_conclusion',
+            'brand_summary',
+            'brand_conclusion',
+            'content_summary',
+            'content_conclusion',
+            'folder_summary',
+            'folder_conclusion',
+            'category_summary',
+            'category_conclusion',
+        );
+    }
+
+    protected function addConfigField($key)
+    {
+        $this->formBuilder->add(
+            $key,
+            "checkbox",
+            array(
+                "label_attr" => [],
+                "required" => false,
+                "constraints" => array(),
+                "data" => intval(Tinymce::getConfigValue($key, 0)) != 0,
             )
-        ;
+        );
     }
 
     /**

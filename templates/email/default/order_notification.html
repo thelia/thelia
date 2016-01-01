@@ -39,15 +39,16 @@
                         {hook name="email-html.order-notification.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                     {/ifhook}
                     {elsehook rel="email-html.order-notification.delivery-address"}
-                        {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                        {if $COMPANY != ""}{$COMPANY}<br />{/if}
-                        {$FIRSTNAME} {$LASTNAME}<br />
-                        {$ADDRESS1}<br>
-                        {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
-                        {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
-                        {$CITY}<br />
-                        {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
-                        {/loop}
+                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
+                    {$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1}<br>
+                    {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
+                    {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
+                    {$CITY}<br />
+                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}<br />
+                    {/loop}
                     {/elsehook}
                 </td>
                 <td valign="top">
@@ -59,7 +60,8 @@
                     {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
                     {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
                     {$CITY}<br />
-                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                    {$ZIPCODE}, {loop type="country" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}<br />
                     {/loop}
                 </td>
             </tr>
