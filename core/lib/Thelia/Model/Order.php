@@ -21,7 +21,7 @@ class Order extends BaseOrder
     protected $disableVersioning = false;
 
     /**
-     * @param Address $choosenDeliveryAddress
+     * @param int $choosenDeliveryAddress (Address ID)
      * @return $this
      */
     public function setChoosenDeliveryAddress($choosenDeliveryAddress)
@@ -42,11 +42,18 @@ class Order extends BaseOrder
         return $this;
     }
 
+    /**
+     * @return boolean
+     */
     public function isVersioningDisable()
     {
         return $this->disableVersioning;
     }
 
+    /**
+     * @param ConnectionInterface $con Optional Connection object.
+     * @return boolean
+     */
     public function isVersioningNecessary($con = null)
     {
         if ($this->isVersioningDisable()) {
@@ -57,7 +64,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return Address
+     * @return int (Address ID)
      */
     public function getChoosenDeliveryAddress()
     {
@@ -65,7 +72,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param Address $choosenInvoiceAddress
+     * @param int $choosenInvoiceAddress
      * @return $this
      */
     public function setChoosenInvoiceAddress($choosenInvoiceAddress)
@@ -76,7 +83,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return Address
+     * @return  int (Address ID)
      */
     public function getChoosenInvoiceAddress()
     {
