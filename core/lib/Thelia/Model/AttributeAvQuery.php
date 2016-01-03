@@ -16,4 +16,5 @@ use Thelia\Model\Base\AttributeAvQuery as BaseAttributeAvQuery;
  */
 class AttributeAvQuery extends BaseAttributeAvQuery
 {
-} // AttributeAvQuery
+}
+// AttributeAvQuery

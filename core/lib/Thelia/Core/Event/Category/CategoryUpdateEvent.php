@@ -22,6 +22,8 @@ class CategoryUpdateEvent extends CategoryCreateEvent
 
     protected $parent;
 
+    protected $defaultTemplateId;
+
     public function __construct($category_id)
     {
         $this->category_id = $category_id;
@@ -84,6 +86,24 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     {
         $this->parent = $parent;
 
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultTemplateId()
+    {
+        return $this->defaultTemplateId;
+    }
+
+    /**
+     * @param int $defaultTemplateId
+     * @return $this
+     */
+    public function setDefaultTemplateId($defaultTemplateId)
+    {
+        $this->defaultTemplateId = $defaultTemplateId;
         return $this;
     }
 }

@@ -13,7 +13,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -33,6 +32,9 @@ use Thelia\Model\OrderQuery;
  * Class OrderCoupon
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method string[] getOrder()
  */
 class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -60,7 +62,6 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
         ;
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -68,12 +69,10 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
         $this->container->get('thelia.condition.factory');
 
         if (null !== $order = OrderQuery::create()->findPk($this->getOrder())) {
-
             $oneDayInSeconds = 86400;
 
             /** @var \Thelia\Model\OrderCoupon $orderCoupon */
             foreach ($loopResult->getResultDataCollection() as $orderCoupon) {
-
                 $loopResultRow = new LoopResultRow($orderCoupon);
 
                 $now = time();
@@ -97,7 +96,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set("TITLE", $orderCoupon->getTitle())
                     ->set("SHORT_DESCRIPTION", $orderCoupon->getShortDescription())
                     ->set("DESCRIPTION", $orderCoupon->getDescription())
-                    ->set("EXPIRATION_DATE", $orderCoupon->getExpirationDate( $order->getLangId() ))
+                    ->set("EXPIRATION_DATE", $orderCoupon->getExpirationDate($order->getLangId()))
                     ->set("IS_CUMULATIVE", $orderCoupon->getIsCumulative())
                     ->set("IS_REMOVING_POSTAGE", $orderCoupon->getIsRemovingPostage())
                     ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $orderCoupon->getIsAvailableOnSpecialOffers())
@@ -106,6 +105,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
                     ->set("PER_CUSTOMER_USAGE_COUNT", $orderCoupon->getPerCustomerUsageCount())
                 ;
+                $this->addOutputFields($loopResultRow, $orderCoupon);
 
                 $loopResult->addRow($loopResultRow);
             }

@@ -1,0 +1,14 @@
+{extends file="coupon/type-fragments/base-remove-on-products.html"}
+
+{block name="discount-field"}
+    <div class="form-group input-coupon-percentage">
+
+        <label for="coupon-percentage" class="control-label">{intl l="Discount percentage"}</label>
+
+        <div class="input-group">
+            <input id="coupon-percentage" type="number" class="form-control" name="{$percentage_field_name}" value="{$percentage_value}" placeholder="5">
+
+            <div class="input-group-addon">%</div>
+        </div>
+    </div>
+{/block}

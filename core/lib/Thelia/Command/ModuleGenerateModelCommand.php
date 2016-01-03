@@ -25,7 +25,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateModelCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateModelCommand extends BaseModuleGenerate
 {
@@ -46,13 +46,12 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
                 "with this option generate sql file at the same time"
             )
         ;
-
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . DS . $this->module;
+        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
 
         $fs = new Filesystem();
 
@@ -68,7 +67,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
         $output->renderBlock(array(
            '',
-           'Model generated successfuly',
+           'Model generated successfully',
            ''
         ), 'bg=green;fg=black');
 
@@ -80,7 +79,6 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
     protected function generateSql(OutputInterface $output)
     {
-
         $command = $this->getApplication()->find("module:generate:sql");
 
         $command->run(
@@ -108,7 +106,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         );
 
         $verifyDirectories = array(
-            THELIA_MODULE_DIR . DS . "Thelia",
+            THELIA_MODULE_DIR . "Thelia",
             $this->moduleDirectory . DS . "Model" . DS . "Thelia"
         );
 
@@ -117,7 +115,5 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
                 $fs->remove($directory);
             }
         }
-
     }
-
 }

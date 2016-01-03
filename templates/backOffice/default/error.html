@@ -1,0 +1,19 @@
+{extends file="general_error.html"}
+
+{block name="page-title"}{intl l='Error'}{/block}
+{block name="content-title"}{intl l='Error'}{/block}
+
+{block name="error-message"}
+    <h2>{intl l='An unexpected error occured'}</h2>
+    <p>{intl
+            l='The page you\'ve requested has a problem. Please contact the module developer if you were using one, or feel free to give the Thelia team a feedback on github: %url.'
+            url='<a href="https://github.com/thelia/thelia/issues">here</a>'
+        }
+    </p>
+
+    {if $exception_message}
+        <p>
+            {intl l='The following error message has been found: %msg' msg={$exception_message}}
+        </p>
+    {/if}
+{/block}

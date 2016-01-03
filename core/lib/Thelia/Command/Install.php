@@ -16,16 +16,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
+use Thelia\Tools\TokenProvider;
 
 /**
  * try to install a new instance of Thelia
  *
  * Class Install
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Install extends ContainerAwareCommand
 {
@@ -42,7 +42,8 @@ class Install extends ContainerAwareCommand
                 "db_host",
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "host for your database"
+                "host for your database",
+                "localhost"
             )
             ->addOption(
                 "db_username",
@@ -62,8 +63,14 @@ class Install extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 "database name"
             )
+            ->addOption(
+                "db_port",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "database port",
+                "3306"
+            )
         ;
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -84,11 +91,12 @@ class Install extends ContainerAwareCommand
             "host" => $input->getOption("db_host"),
             "dbName" => $input->getOption("db_name"),
             "username" => $input->getOption("db_username"),
-            "password" => $input->getOption("db_password")
+            "password" => $input->getOption("db_password"),
+            "port" => $input->getOption("db_port")
         );
 
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
-                $connectionInfo = $this->getConnectionInfo($input, $output);
+            $connectionInfo = $this->getConnectionInfo($input, $output);
         }
 
         $database = new Database($connection);
@@ -101,6 +109,7 @@ class Install extends ContainerAwareCommand
             ""
         ));
         $database->insertSql($connectionInfo["dbName"]);
+        $this->manageSecret($database);
 
         $output->writeln(array(
             "",
@@ -116,6 +125,13 @@ class Install extends ContainerAwareCommand
             "<info>Config file created with success. Your thelia is installed</info>",
             ""
         ));
+    }
+
+    protected function manageSecret(Database $database)
+    {
+        $secret = TokenProvider::generateToken();
+        $sql = "UPDATE `config` SET `value`=? WHERE `name`='form.secret'";
+        $database->execute($sql, [$secret]);
     }
 
     /**
@@ -134,21 +150,24 @@ class Install extends ContainerAwareCommand
 
         foreach ($permissions->getValidationMessages() as $item => $data) {
             if ($data['status']) {
-                $output->writeln(array(
-                    sprintf("<info>%s ...</info> %s",
-                        $data['text'],
-                        "<info>Ok</info>")
+                $output->writeln(
+                    array(
+                        sprintf(
+                            "<info>%s ...</info> %s",
+                            $data['text'],
+                            "<info>Ok</info>"
+                        )
                     )
                 );
             } else {
                 $output->writeln(array(
-                    sprintf("<error>%s </error>%s",
+                    sprintf(
+                        "<error>%s </error>%s",
                         $data['text'],
                         sprintf("<error>%s</error>", $data["hint"])
                     )
                 ));
             }
-
         }
 
         if (false === $isValid) {
@@ -177,14 +196,13 @@ class Install extends ContainerAwareCommand
         $configContent = str_replace("%PASSWORD%", $connectionInfo["password"], $configContent);
         $configContent = str_replace(
             "%DSN%",
-            sprintf("mysql:host=%s;dbname=%s", $connectionInfo["host"], $connectionInfo["dbName"]),
+            sprintf("mysql:host=%s;dbname=%s;port=%s", $connectionInfo["host"], $connectionInfo["dbName"], $connectionInfo['port']),
             $configContent
         );
 
         file_put_contents($configFile, $configContent);
 
         $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
-
     }
 
     /**
@@ -196,16 +214,15 @@ class Install extends ContainerAwareCommand
      */
     protected function tryConnection($connectionInfo, OutputInterface $output)
     {
-
         if (is_null($connectionInfo["dbName"])) {
             return false;
         }
 
-        $dsn = "mysql:host=%s";
+        $dsn = "mysql:host=%s;port=%s";
 
         try {
             $connection = new \PDO(
-                sprintf($dsn, $connectionInfo["host"]),
+                sprintf($dsn, $connectionInfo["host"], $connectionInfo["port"]),
                 $connectionInfo["username"],
                 $connectionInfo["password"]
             );
@@ -236,7 +253,7 @@ class Install extends ContainerAwareCommand
 
         $connectionInfo["host"] = $dialog->askAndValidate(
             $output,
-            $this->decorateInfo("Database host : "),
+            $this->decorateInfo("Database host [default: localhost] : "),
             function ($answer) {
                 $answer = trim($answer);
                 if (is_null($answer)) {
@@ -244,7 +261,24 @@ class Install extends ContainerAwareCommand
                 }
 
                 return $answer;
-            }
+            },
+            false,
+            "localhost"
+        );
+
+        $connectionInfo["port"] = $dialog->askAndValidate(
+            $output,
+            $this->decorateInfo("Database port [default: 3306]: "),
+            function ($answer) {
+                $answer = trim($answer);
+                if (is_null($answer)) {
+                    throw new \RuntimeException("You must specify a database port");
+                }
+
+                return $answer;
+            },
+            false,
+            "3306"
         );
 
         $connectionInfo["dbName"] = $dialog->askAndValidate(
@@ -287,5 +321,4 @@ class Install extends ContainerAwareCommand
     {
         return sprintf("<info>%s</info>", $text);
     }
-
 }

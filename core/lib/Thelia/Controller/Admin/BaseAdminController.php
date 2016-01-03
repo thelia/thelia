@@ -13,31 +13,26 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Model\ConfigQuery;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Tools\URL;
-use Thelia\Tools\Redirect;
-use Thelia\Model\AdminLog;
-
-use Thelia\Model\LangQuery;
+use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Symfony\Component\Routing\Router;
-use Thelia\Model\Admin;
-use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Model\AdminLog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Model\LangQuery;
+use Thelia\Tools\URL;
 
 class BaseAdminController extends BaseController
 {
+    const CONTROLLER_TYPE = 'admin';
+
     const TEMPLATE_404 = "404";
 
     /**
@@ -45,17 +40,7 @@ class BaseAdminController extends BaseController
      * setCurrentRouter() method to pass their own router, and use the route related
      * methods of this class.
      */
-    private $currentRouter = "router.admin";
-
-    protected function getCurrentRouter()
-    {
-        return $this->currentRouter;
-    }
-
-    protected function setCurrentRouter($routerId)
-    {
-        $this->currentRouter = $routerId;
-    }
+    protected $currentRouter = "router.admin";
 
     /**
      * Helper to append a message to the admin log.
@@ -64,15 +49,23 @@ class BaseAdminController extends BaseController
      * @param string $action
      * @param string $message
      */
-    public function adminLogAppend($resource, $action, $message)
+    public function adminLogAppend($resource, $action, $message, $resourceId = null)
     {
-        AdminLog::append($resource, $action, $message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
+        AdminLog::append(
+            $resource,
+            $action,
+            $message,
+            $this->getRequest(),
+            $this->getSecurityContext()->getAdminUser(),
+            true,
+            $resourceId
+        );
     }
 
     /**
      * This method process the rendering of view called from an admin page
      *
-     * @param  unknown  $template
+     * @param  string   $template the template name
      * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
@@ -92,6 +85,14 @@ class BaseAdminController extends BaseController
     }
 
     /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
+    }
+
+    /**
      * Return a 404 error
      *
      * @return \Thelia\Core\HttpFoundation\Response
@@ -104,17 +105,28 @@ class BaseAdminController extends BaseController
     /**
      * Return a general error page
      *
-     * @param mixed $message a message string, or an exception instance
+     * @param \Exception|string $message a message string, or an exception instance
+     * @param int    $status  the HTTP status (default is 500)
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function errorPage($message, $status = 500)
     {
         if ($message instanceof \Exception) {
-            $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
+            $strMessage = $this->getTranslator()->trans(
+                "Sorry, an error occured: %msg",
+                [ '%msg' => $message->getMessage() ]
+            );
+
+            Tlog::getInstance()->addError($strMessage.": ".$message->getTraceAsString());
+
+            $message = $strMessage;
+        } else {
+            Tlog::getInstance()->addError($message);
         }
 
-        return $this->render('general_error',
+        return $this->render(
+            'general_error',
             array(
                 "error_message" => $message
             ),
@@ -137,15 +149,15 @@ class BaseAdminController extends BaseController
         $modules = is_array($modules) ? $modules : array($modules);
         $accesses = is_array($accesses) ? $accesses : array($accesses);
 
-         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
-             // Okay !
+        if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
+            // Okay !
              return null;
-         }
+        }
 
          // Log the problem
          $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
 
-         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
+        return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
     /*
@@ -159,20 +171,19 @@ class BaseAdminController extends BaseController
                 '%error' => $exception->getMessage()
             )
         );
-     }
+    }
 
     /**
      * Setup the error context when an error occurs in a action method.
      *
-     * @param string    $action        the action that caused the error (category modification, variable creation, currency update, etc.)
-     * @param BaseForm  $form          the form where the error occured, or null if no form was involved
-     * @param string    $error_message the error message
-     * @param Exception $exception     the exception or null if no exception
+     * @param string     $action        the action that caused the error (category modification, variable creation, currency update, etc.)
+     * @param BaseForm   $form          the form where the error occured, or null if no form was involved
+     * @param string     $error_message the error message
+     * @param \Exception $exception     the exception or null if no exception
      */
-    protected function setupFormErrorContext($action,  $error_message, BaseForm $form = null, \Exception $exception = null)
+    protected function setupFormErrorContext($action, $error_message, BaseForm $form = null, \Exception $exception = null)
     {
         if ($error_message !== false) {
-
             // Log the error message
             Tlog::getInstance()->error(
                 $this->getTranslator()->trans(
@@ -199,14 +210,19 @@ class BaseAdminController extends BaseController
     }
 
     /**
-     * @return a ParserInterface instance parser
+     * @param TemplateDefinition $template the template to process
+     *
+     * @return ParserInterface instance parser
      */
     protected function getParser($template = null)
     {
         $parser = $this->container->get("thelia.parser");
 
         // Define the template that should be used
-        $parser->setTemplateDefinition($template ?: TemplateHelper::getInstance()->getActiveAdminTemplate());
+        $parser->setTemplateDefinition(
+            $template ?: $this->getTemplateHelper()->getActiveAdminTemplate(),
+            $this->useFallbackTemplate
+        );
 
         return $parser;
     }
@@ -229,51 +245,12 @@ class BaseAdminController extends BaseController
     }
 
     /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string         $routeId       a route ID, as defines in Config/Resources/routing/admin.xml
-     * @param mixed          $parameters    An array of parameters
-     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
-     *
-     * @throws RouteNotFoundException              If the named route doesn't exist
-     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
-     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
-     *                                             it does not match the requirement
-     * @throws \InvalidArgumentException           When the router doesn't exist
-     * @return string                              The generated URL
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
-    {
-        return $this->getRouteFromRouter(
-            $this->currentRouter,
-            $routeId,
-            $parameters,
-            $referenceType
-        );
-    }
-
-    /**
-     * Redirect to à route ID related URL
-     *
-     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array  $urlParameters   the URL parameters, as a var/value pair array
-     * @param array  $routeParameters
-     */
-    public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
-    {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
-    }
-
-    /**
      * Get the current edition currency ID, checking if a change was requested in the current request.
      */
     protected function getCurrentEditionCurrency()
     {
         // Return the new language if a change is required.
         if (null !== $edit_currency_id = $this->getRequest()->get('edit_currency_id', null)) {
-
             if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
                 return $edit_currency;
             }
@@ -290,7 +267,6 @@ class BaseAdminController extends BaseController
     {
         // Return the new language if a change is required.
         if (null !== $edit_language_id = $this->getRequest()->get('edit_language_id', null)) {
-
             if (null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
                 return $edit_language;
             }
@@ -310,17 +286,21 @@ class BaseAdminController extends BaseController
 
     /**
      * A simple helper to get the URL based on the language.
+     *
+     * @param  string      $locale the locale, or null to get the current one
+     * @return null|string the URL for the current language, or null if the "One domain for each lang" feature is disabled.
      */
     protected function getUrlLanguage($locale = null)
     {
         // Check if the functionality is activated
-        if(!ConfigQuery::read("one_domain_foreach_lang", false))
-
-            return;
+        if (!ConfigQuery::isMultiDomainActivated()) {
+            return null;
+        }
 
         // If we don't have a locale value, use the locale value in the session
-        if(!$locale)
+        if (!$locale) {
             $locale = $this->getCurrentEditionLocale();
+        }
 
         return LangQuery::create()->findOneByLocale($locale)->getUrl();
     }
@@ -330,67 +310,27 @@ class BaseAdminController extends BaseController
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
      *
-     * @param unknown $objectName           the object name (e.g. 'attribute', 'message')
-     * @param unknown $requestParameterName the name of the request parameter that defines the list order
-     * @param unknown $defaultListOrder     the default order to use, if none is defined
-     * @param string  $updateSession        if true, the session will be updated with the current order.
+     * @param string $objectName           the object name (e.g. 'attribute', 'message')
+     * @param string $requestParameterName the name of the request parameter that defines the list order
+     * @param string $defaultListOrder     the default order to use, if none is defined
+     * @param bool   $updateSession        if true, the session will be updated with the current order.
      *
-     * @return String the current liste order.
+     * @return String the current list order.
      */
     protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
     {
-        $order = $defaultListOrder;
-
         $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
 
         // Find the current order
         $order = $this->getRequest()->get(
-                $requestParameterName,
-                $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
+            $requestParameterName,
+            $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
         );
 
-        if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
+        if ($updateSession) {
+            $this->getSession()->set($orderSessionIdentifier, $order);
+        }
         return $order;
-    }
-
-    /**
-     * Create the remember me cookie for the given user.
-     */
-    protected function createAdminRememberMeCookie(Admin $user)
-    {
-        $ctp = new CookieTokenProvider();
-
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-        $cookieExpiration = ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
-
-        $ctp->createCookie($user, $cookieName, $cookieExpiration);
-    }
-
-    /**
-     * Get the rememberme key from the cookie.
-     *
-     * @return string hte key found, or null if no key was found.
-     */
-    protected function getRememberMeKeyFromCookie()
-    {
-       // Check if we can authenticate the user with a cookie-based token
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-
-        $ctp = new CookieTokenProvider();
-
-        return $ctp->getKeyFromCookie($this->getRequest(), $cookieName);
-    }
-
-    /** Clear the remember me cookie.
-     *
-     */
-    protected function clearRememberMeCookie()
-    {
-        $ctp = new CookieTokenProvider();
-
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-
-        $ctp->clearCookie($cookieName);
     }
 
     /**
@@ -415,15 +355,14 @@ class BaseAdminController extends BaseController
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
-     * @param array $args        the template arguments
-     * @param null  $templateDir
+     * @param string $templateName the complete template name, with extension
+     * @param array  $args         the template arguments
+     * @param null   $templateDir
      *
      * @return string|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
-
         // Add the template standard extension
         $templateName .= '.html';
 
@@ -458,7 +397,6 @@ class BaseAdminController extends BaseController
         // Render the template.
         try {
             $content = $this->getParser($templateDir)->render($templateName, $args);
-
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.

@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
         </ul>
 
-        {module_include location='messages_top'}
+        {hook name="messages.top" location="messages_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -31,7 +31,7 @@
     	                        <caption>
     	                           {intl l='Thelia mailing templates'}
     	                           {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.message" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                 {/loop}
@@ -42,7 +42,7 @@
         	                           <th>{intl l="Purpose"}</th>
                                        <th>{intl l="Name"}</th>
 
-                                       {module_include location='messages_table_header'}
+                                       {hook name="messages.table-header" location="messages_table_header" }
 
                                        <th>&nbsp;</th>
         	                        </tr>
@@ -67,21 +67,24 @@
                                            {/if}
                                            </td>
 
-        	                                {module_include location='messages_table_row'}
+        	                                {hook name="messages.table-row" location="messages_table_row" message_id={$ID} }
 
         	                                <td class="actions">
         	                                    {if ! $SECURED}
-        		                                    <div class="btn-group">
+                                                    <div class="btn-toolbar btn toolbar-primary">
+                                                        <span class="glyphicon glyphicon-cog"></span>
+                                                    </div>
+                                                    <div class="toolbar-options hidden">
                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
-                                                           <a class="btn btn-default btn-xs message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                                        {/loop}
 
                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.message" access="DELETE"}
-                                                           <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                           <a class="message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                        {/loop}
         		                                    </div>
         		                                {else}
-        		                                    <i title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
+        		                                    <span title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></span>
         	                                    {/if}
         	                                </td>
         	                            </tr>
@@ -103,7 +106,7 @@
             </div>
         </div>
 
-        {module_include location='messages_bottom'}
+        {hook name="messages.bottom" location="messages_bottom" }
 
     </div>
 </div>
@@ -116,51 +119,30 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
-		    {form_hidden_fields form=$form}
+		    {form_hidden_fields exclude="secured,success_url"}
 
-		    {form_field form=$form field='success_url'}
-		    {* on success, redirect to the edition page, _ID_ is replaced with the created message ID, see controller  *}
-		    <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages/update' message_id='_ID_'}" />
-		    {/form_field}
+            {render_form_field field="success_url" value={url path='/admin/configuration/messages/update' message_id='_ID_'}}
 
 		    {* We do not allow users to create secured messages from here *}
+            {render_form_field field='secured' value='0'}
 
-		    {form_field form=$form field='secured'}
-		    <input type="hidden" name="{$name}" value="0" />
-		    {/form_field}
+            {render_form_field field='name'}
 
-	        {form_field form=$form field='name'}
-	        <div class="form-group {if $error}has-error{/if}">
-	            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-	            <input type="text" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Mailing template name'}" placeholder="{intl l='Mailing template name'}" class="form-control">
-	        </div>
-	        {/form_field}
+            {custom_render_form_field field="title"}
+                {loop type="lang" name="default-lang" default_only="1"}
+                    {* Switch edition to the current locale *}
+                    <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-	        {form_field form=$form field='title'}
-	        <div class="form-group {if $error}has-error{/if}">
-	            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                    {render_form_field field="locale" value=$LOCALE}
 
-	            {loop type="lang" name="default-lang" default_only="1"}
+                    <div class="input-group">
+                        <input type="text" {form_field_attributes field="title"}>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    </div>
+                {/loop}
+            {/custom_render_form_field}
 
-	                {* Switch edition to the current locale *}
-	                <input type="hidden" name="edit_language_id" value="{$ID}" />
-
-	                <div class="input-group">
-	                    <input type="text" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="form-control">
-	                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
-	                </div>
-
-	                <div class="help-block">{intl l="Enter here the mailing template purpose in the default language (%title)" title={$TITLE}}</div>
-
-	                {form_field form=$form field='locale'}
-	                    <input type="hidden" name="{$name}" value="{$LOCALE}" />
-	                {/form_field}
-	            {/loop}
-
-	        </div>
-	        {/form_field}
-
-            {module_include location='message_create_form'}
+            {hook name="message.create-form" location="message_create_form" }
 
         {/capture}
 
@@ -174,7 +156,7 @@
             dialog_ok_label     = {intl l="Create this mailing template"}
 
             form_action        = {url path='/admin/configuration/messages/create'}
-            form_enctype       = {form_enctype form=$form}
+            form_enctype       = {form_enctype}
             form_error_message = $form_error_message
         }
     {/form}
@@ -184,7 +166,7 @@
     {capture "delete_dialog"}
         <input type="hidden" name="message_id" id="message_delete_id" value="" />
 
-        {module_include location='message_delete_form'}
+        {hook name="message.delete-form" location="message_delete_form" }
 
     {/capture}
 
@@ -195,7 +177,7 @@
         dialog_title    = {intl l="Delete mailing template"}
         dialog_message  = {intl l="Do you really want to delete this mailing template ?"}
 
-        form_action         = {url path='/admin/configuration/messages/delete'}
+        form_action         = {token_url path='/admin/configuration/messages/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}
@@ -220,5 +202,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='messages-js'}
+    {hook name="messages.js" location="messages-js" }
 {/block}

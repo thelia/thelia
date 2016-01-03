@@ -22,22 +22,22 @@
 /*************************************************************************************/
 
 namespace Front\Controller;
+
 use Front\Front;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\Customer;
 
 /**
  * Class AddressController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressController extends BaseFrontController
 {
@@ -66,8 +66,8 @@ class AddressController extends BaseFrontController
 
         $this->checkAuth();
 
-        $addressCreate = new AddressCreateForm($this->getRequest());
-
+        $addressCreate = $this->createForm(FrontForm::ADDRESS_CREATE);
+        $message = false;
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
 
@@ -76,12 +76,12 @@ class AddressController extends BaseFrontController
             $event->setCustomer($customer);
 
             $this->dispatch(TheliaEvents::ADDRESS_CREATE, $event);
-            $this->redirectSuccess($addressCreate);
 
+            return $this->generateSuccessRedirect($addressCreate);
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -93,7 +93,33 @@ class AddressController extends BaseFrontController
                 ->addForm($addressCreate)
                 ->setGeneralError($message)
             ;
+
+            // Redirect to error URL if defined
+            if ($addressCreate->hasErrorUrl()) {
+                return $this->generateErrorRedirect($addressCreate);
+            }
         }
+    }
+
+    protected function createAddressEvent($form)
+    {
+        return new AddressCreateOrUpdateEvent(
+            $form->get("label")->getData(),
+            $form->get("title")->getData(),
+            $form->get("firstname")->getData(),
+            $form->get("lastname")->getData(),
+            $form->get("address1")->getData(),
+            $form->get("address2")->getData(),
+            $form->get("address3")->getData(),
+            $form->get("zipcode")->getData(),
+            $form->get("city")->getData(),
+            $form->get("country")->getData(),
+            $form->get("cellphone")->getData(),
+            $form->get("phone")->getData(),
+            $form->get("company")->getData(),
+            $form->get("is_default")->getData(),
+            $form->get("state")->getData()
+        );
     }
 
     public function updateViewAction($address_id)
@@ -104,7 +130,7 @@ class AddressController extends BaseFrontController
         $address = AddressQuery::create()->findPk($address_id);
 
         if (!$address || $customer->getId() != $address->getCustomerId()) {
-            $this->redirectToRoute('default');
+            return $this->generateRedirectFromRoute('default');
         }
 
         $this->getParserContext()->set("address_id", $address_id);
@@ -115,8 +141,8 @@ class AddressController extends BaseFrontController
         $this->checkAuth();
         $request = $this->getRequest();
 
-        $addressUpdate = new AddressUpdateForm($request);
-
+        $addressUpdate = $this->createForm(FrontForm::ADDRESS_UPDATE);
+        $message = false;
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
 
@@ -125,11 +151,11 @@ class AddressController extends BaseFrontController
             $address = AddressQuery::create()->findPk($address_id);
 
             if (null === $address) {
-                $this->redirectToRoute('default');
+                return $this->generateRedirectFromRoute('default');
             }
 
             if ($address->getCustomer()->getId() != $customer->getId()) {
-                $this->redirectToRoute('default');
+                return $this->generateRedirectFromRoute('default');
             }
 
             $event = $this->createAddressEvent($form);
@@ -137,11 +163,11 @@ class AddressController extends BaseFrontController
 
             $this->dispatch(TheliaEvents::ADDRESS_UPDATE, $event);
 
-            $this->redirectSuccess($addressUpdate);
+            return $this->generateSuccessRedirect($addressUpdate);
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
         $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {
@@ -167,12 +193,20 @@ class AddressController extends BaseFrontController
         if (!$address || $customer->getId() != $address->getCustomerId()) {
             // If Ajax Request
             if ($this->getRequest()->isXmlHttpRequest()) {
-                return $this->jsonResponse(json_encode(array(
-                                "success" => false,
-                                "message" => "Error during address deletion process"
-                            )));
+                return $this->jsonResponse(
+                    json_encode(
+                        array(
+                            "success" => false,
+                            "message" => $this->getTranslator()->trans(
+                                "Error during address deletion process",
+                                [],
+                                Front::MESSAGE_DOMAIN
+                            )
+                        )
+                    )
+                );
             } else {
-                $this->redirectToRoute('default');
+                return $this->generateRedirectFromRoute('default');
             }
         }
 
@@ -201,27 +235,34 @@ class AddressController extends BaseFrontController
             return $response;
 
         } else {
-            $this->redirectToRoute('default', array('view'=>'account'));
+            return $this->generateRedirectFromRoute('default', array('view'=>'account'));
         }
     }
 
-    protected function createAddressEvent($form)
+    public function makeAddressDefaultAction($addressId)
     {
-        return new AddressCreateOrUpdateEvent(
-            $form->get("label")->getData(),
-            $form->get("title")->getData(),
-            $form->get("firstname")->getData(),
-            $form->get("lastname")->getData(),
-            $form->get("address1")->getData(),
-            $form->get("address2")->getData(),
-            $form->get("address3")->getData(),
-            $form->get("zipcode")->getData(),
-            $form->get("city")->getData(),
-            $form->get("country")->getData(),
-            $form->get("cellphone")->getData(),
-            $form->get("phone")->getData(),
-            $form->get("company")->getData(),
-            $form->get("is_default")->getData()
-        );
+        $this->checkAuth();
+
+        $address = AddressQuery::create()
+            ->filterByCustomer($this->getSecurityContext()->getCustomerUser())
+            ->findPk($addressId)
+        ;
+
+        if (null === $address) {
+            $this->pageNotFound();
+        }
+
+        try {
+            $event = new AddressEvent($address);
+            $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $event);
+        } catch (\Exception $e) {
+            $this->getParserContext()
+                ->setGeneralError($e->getMessage())
+            ;
+
+            return $this->render("account");
+        }
+
+        return $this->generateRedirectFromRoute('default', array('view'=>'account'));
     }
 }

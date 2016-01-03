@@ -16,7 +16,7 @@
 
         {include file="includes/catalog-breadcrumb.html"}
 
-        {module_include location='categories_top'}
+        {hook name="categories.top" location="categories_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -27,16 +27,15 @@
                                  {* display parent category name, and get current cat ID *}
                                  {loop name="category_title" type="category" visible="*" id=$category_id}
                                      {intl l="Categories in %cat" cat={$TITLE}}
-                                     {$cat_id = $ID}
                                  {/loop}
                                  {elseloop rel="category_title"}
                                      {intl l="Top level categories"}
                                  {/elseloop}
 
-                                 {module_include location='category_list_caption'}
+                                 {hook name="categories.caption" location="category_list_caption" }
 
                                  {loop type="auth" name="can_create" role="ADMIN" resource="admin.category" access="CREATE"}
-                                 <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new category'}" href="#category_creation_dialog" data-toggle="modal">
+                                 <a class="btn btn-primary action-btn" title="{intl l='Add a new category'}" href="#category_creation_dialog" data-toggle="modal">
                                      <span class="glyphicon glyphicon-plus-sign"></span>
                                  </a>
                                  {/loop}
@@ -50,7 +49,7 @@
                                             current_order=$category_order
                                             order='id'
                                             reverse_order='id_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='ID'}"
                                          }
@@ -63,20 +62,20 @@
                                             current_order=$category_order
                                             order='alpha'
                                             reverse_order='alpha_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='Category title'}"
                                          }
                                          </th>
 
-                                         {module_include location='category_list_header'}
+                                         {hook name="categories.header" location="category_list_header" }
 
                                          <th>
                                          {admin_sortable_header
                                             current_order=$category_order
                                             order='visible'
                                             reverse_order='visible_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='Online'}"
                                          }
@@ -87,7 +86,7 @@
                                             current_order=$category_order
                                             order='manual'
                                             reverse_order='manual_reverse'
-                                            path={url path='/admin/categories' id_category=$category_id}
+                                            path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
                                             label="{intl l='Position'}"
                                          }
@@ -104,7 +103,7 @@
 
                                      <td>
                                      {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                       <a href="{url path='admin/catalog' category_id=$OBJECT_ID}" title="{intl l='Browse this category'}"><img class="img-thumbnail" src="{$IMAGE_URL}" alt="{$TITLE}" /></a>
+                                       <a href="{url path='admin/catalog' category_id=$OBJECT_ID}" title="{intl l='Browse this category'}"><img class="img-thumbnail" src="{$IMAGE_URL nofilter}" alt="{$TITLE}" /></a>
                                      {/loop}
                                      </td>
 
@@ -114,7 +113,7 @@
                                           </a>
                                      </td>
 
-                                     {module_include location='category_list_row'}
+                                     {hook name="categories.row" location="category_list_row" category_id={$ID} }
 
                                      <td>
                                          {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
@@ -143,15 +142,18 @@
                                      </td>
 
                                      <td class="actions">
-                                         <div class="btn-group">
-                                             <a class="btn btn-default btn-xs" title="{intl l='Browse this category'}" href="{url path='admin/categories' category_id=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
+                                         <div class="btn-toolbar btn toolbar-primary">
+                                             <span class="glyphicon glyphicon-cog"></span>
+                                         </div>
+                                         <div class="toolbar-options hidden">
+                                             <a title="{intl l='Browse this category'}" href="{url path='admin/categories' category_id=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
 
                                              {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path='/admin/categories/update' category_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this category'}" href="{url path='/admin/categories/update' category_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                              {/loop}
 
                                              {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="DELETE"}
-                                                <a class="btn btn-default btn-xs category-delete" title="{intl l='Delete this category and all its contents'}"  href="#category_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="category-delete" title="{intl l='Delete this category and all its contents'}"  href="#category_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                              {/loop}
                                          </div>
                                       </td>
@@ -187,6 +189,10 @@
 
      {* No product on toplevel category, e.g. id_category = 0 *}
 
+     {loop type="currency" name="product-currency" id=$edit_currency_id backend_context="1"}
+        {$currency_symbol = $SYMBOL}
+     {/loop}
+
      {if $category_id > 0}
      <div class="row">
          <div class="col-md-12">
@@ -203,9 +209,9 @@
                              {intl l="Top level Products"}
                          {/elseloop}
 
-                         {module_include location='product_list_caption'}
+                         {hook name="products.caption" location="product_list_caption" }
 
-                         <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product'}" href="#product_creation_dialog" data-toggle="modal">
+                         <a class="btn btn-primary action-btn" title="{intl l='Add a new product'}" href="#product_creation_dialog" data-toggle="modal">
                              <span class="glyphicon glyphicon-plus-sign"></span>
                          </a>
                      </caption>
@@ -218,7 +224,8 @@
                                     current_order=$product_order
                                     order='id'
                                     reverse_order='id_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='ID'}"
                                  }
 
@@ -229,7 +236,8 @@
                                     current_order=$product_order
                                     order='ref'
                                     reverse_order='ref_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='Reference'}"
                                  }
                                  </th>
@@ -239,28 +247,42 @@
                                     current_order=$product_order
                                     order='alpha'
                                     reverse_order='alpha_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='Product title'}"
                                  }
 
-                                 {module_include location='product_list_header'}
+                                 {hook name="products.header" location="product_list_header" }
 
-                                 <th>
-                                 {admin_sortable_header
-                                    current_order=$product_order
-                                    order='visible'
-                                    reverse_order='visible_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
-                                    label="{intl l='Online'}"
-                                 }
+                                 <th class="text-right">
+                                     {admin_sortable_header
+                                     current_order=$product_order
+                                     order='min_price'
+                                     reverse_order='max_price'
+                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                     request_parameter_name='product_order'
+                                     label="{intl l='Price'}"
+                                     }
                                  </th>
 
-                                 <th>
+                                 <th class="text-center">
+                                     {admin_sortable_header
+                                     current_order=$product_order
+                                     order='visible'
+                                     reverse_order='visible_reverse'
+                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                     request_parameter_name='product_order'
+                                     label="{intl l='Online'}"
+                                     }
+                                 </th>
+
+                                 <th class="text-center">
                                  {admin_sortable_header
                                     current_order=$product_order
                                     order='manual'
                                     reverse_order='manual_reverse'
-                                    path={url path='/admin/categories' id_category=$category_id target='products'}
+                                    path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                    request_parameter_name='product_order'
                                     label="{intl l='Position'}"
                                  }
                                  </th>
@@ -270,24 +292,30 @@
                          </thead>
 
                          <tbody>
-                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page limit=#max_displayed_products#}
+                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products#}
                          <tr>
                              <td>{$ID}</td>
 
                              <td>
                              {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
                                <a href="{url path='/admin/products/update' product_id=$OBJECT_ID page=$page}" title="{intl l='Edit this product'}">
-                                 <img src="{$IMAGE_URL}" alt="{$TITLE}" />
+                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                </a>
                              {/loop}
+                             </td>
 
-                             <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a></td>
+                             <td class="object-title">
+                                 <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
+                                 {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
+                             </td>
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
-                             {module_include location='product_list_row'}
+                             {hook name="products.row" location="product_list_row" product_id={$ID} }
 
-                             <td>
+                             <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
+
+                             <td class="text-center">
                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
                                         <div class="make-switch switch-small productVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="checkbox" class="productVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
@@ -301,7 +329,7 @@
                                     {/elseloop}
                              </td>
 
-                             <td>
+                             <td class="text-center">
                              {admin_position_block
                                  resource="admin.product"
                                  access="UPDATE"
@@ -314,14 +342,17 @@
                              </td>
 
                              <td class="actions">
-                                 <div class="btn-group">
-                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID page=$page}"><i class="glyphicon glyphicon-edit"></i></a>
-                                {/loop}
+                                 <div class="btn-toolbar btn toolbar-primary">
+                                     <span class="glyphicon glyphicon-cog"></span>
+                                 </div>
+                                 <div class="toolbar-options hidden">
+                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
+                                        <a title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
+                                     {/loop}
 
-                                 {loop type="auth" name="can_delete" role="ADMIN" resource="admin.product" access="DELETE"}
-                                       <a class="btn btn-default btn-xs product-delete" title="{intl l='Delete this product'}"  href="#product_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-                                 {/loop}
+                                     {loop type="auth" name="can_delete" role="ADMIN" resource="admin.product" access="DELETE"}
+                                           <a class="product-delete" title="{intl l='Delete this product'}"  href="#product_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                     {/loop}
                                  </div>
                               </td>
                          </tr>
@@ -329,13 +360,13 @@
                          </tbody>
                          <tfoot>
                          <tr>
-                             <td colspan="6">
+                             <td colspan="100">
                                  {include
                                  file = "includes/pagination.html"
 
                                  loop_ref       = "product_list"
                                  max_page_count = 10
-                                 page_url       = "{url path="/admin/categories" category_id=$category_id product_order=$product_order}"
+                                 page_url       = "{url path="/admin/catalog" category_id=$category_id product_order=$product_order}"
                                  }
 
                              </td>
@@ -359,11 +390,12 @@
         <div class="alert alert-info">{intl l="To create a new product, select an existing category, or create a new one."}</div>
         {/if}
 
-        {module_include location='categories_bottom'}
+        {hook name="categories.bottom" location="categories_bottom" }
 
     </div>
 
-    {module_include location='catalog_bottom'}
+    {hook name="categories.catalog-bottom" location="catalog_bottom" }
+
 </div>
 
 
@@ -374,50 +406,35 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "category_creation_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields exclude="parent,locale"}
 
-        {form_field form=$form field='success_url'}
-           {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-           <input type="hidden" name="{$name}" value="{url path='/admin/categories/update' category_id='_ID_'}" />
-        {/form_field}
+        <input type="hidden" {form_field_attributes field='parent' value={$category_id}}>
 
-        {form_field form=$form field='parent'}
-           <input type="hidden" name="{$name}" value="{$category_id}" />
-        {/form_field}
+        {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+        {render_form_field field="success_url" value={url path='/admin/categories/update' category_id='_ID_'}}
 
-        {form_field form=$form field='title'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                {loop type="lang" name="default-lang" default_only="1"}
-                    <div class="input-group">
-                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Category title'}" placeholder="{intl l='Name'}">
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
-                    </div>
-
-                    <div class="help-block">{intl l='Enter here the category name in the default language (%title)' title="$TITLE"}</div>
-
-                    {* Switch edition to the current locale *}
-                    <input type="hidden" name="edit_language_id" value="{$ID}" />
-
-                    {form_field form=$form field='locale'}
-                        <input type="hidden" name="{$name}" value="{$LOCALE}" />
-                    {/form_field}
-                {/loop}
-            </div>
-        {/form_field}
-
-        {form_field form=$form field='visible'}
-            <div class="form-group {if $error}has-error{/if}">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" checked="checked">
-                        {$label}
-                    </label>
+        {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                <div class="input-group">
+                    <input type="text" {form_field_attributes field="title"}>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                 </div>
-            </div>
+
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+                {render_form_field field="locale" value=$LOCALE}
+            {/loop}
+        {/custom_render_form_field}
+        
+        {form_field field="visible"}
+
+        <label class="checkbox">
+            <input type="checkbox" checked name="{$name}" value="1"> {$label}
+        </label>
         {/form_field}
 
-        {module_include location='category_create_form'}
+        {hook name="category.create-form" location="category_create_form" }
 
     {/capture}
 
@@ -431,7 +448,7 @@
         dialog_ok_label     = {intl l="Create this category"}
 
         form_action        = {url path='/admin/categories/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
@@ -443,21 +460,21 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "product_creation_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
         {* Be sure to get the category_id, even if the form could not be validated *}
         <input type="hidden" name="category_id" value="{$category_id}" />
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
            <input type="hidden" name="{$name}" value="{url path='/admin/products/update' product_id='_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='default_category'}
+        {form_field field='default_category'}
            <input type="hidden" name="{$name}" value="{$category_id}" />
         {/form_field}
 
-        {form_field form=$form field='ref'}
+        {form_field field='ref'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -469,107 +486,169 @@
             </div>
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                 {loop type="lang" name="default-lang" default_only="1" backend_context="1"}
                     <div class="input-group">
                         <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Title'}">
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l='Enter here the product name in the default language (%title)' title="$TITLE"}</div>
+                    <div class="help-block">{intl l='Enter here the product name in the default language (%title)' title=$TITLE}</div>
 
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
+        <div class="row">
+            <div class="col-sm-6">
+                {form_field field='tax_rule'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
+                        <div class="form-group">
+                            <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+                                <option value="">{intl l="Select a tax tule"}</option>
+                                {loop name="tax" type="tax-rule" backend_context="1"}
+                                    <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+                                {/loop}
+                            </select>
+                        </div>
 
-        {form_field form=$form field='tax_rule'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <div class="form-group">
-                    <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                        <option value="">{intl l="Select a tax tule"}</option>
-                        {loop name="tax" type="tax-rule" backend_context="1"}
-                            <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+                        <div class="help-block">{intl l='Select here the tax applicable to this product'}</div>
+                    </div>
+                {/form_field}
+            </div>
+
+            <div class="col-sm-6">
+                {* If there are some templates, display select template field *}
+                {ifloop rel="product_template"}
+
+                    {* Get category template *}
+                    {loop type="category" name="new_product_category" visible="*" id=$category_id}
+                        {assign var="product_template" value=$TEMPLATE}
+                        {assign var="parent_category" value=$PARENT}
+                    {/loop}
+
+                    {* If current category has no template, get a parent's one *}
+                    {if !$product_template}
+                        {while $parent_category != 0 && !$product_template}
+                            {loop type="category" name="parent_category" visible="*" id=$parent_category}
+                                {assign var="parent_category" value=$PARENT}
+                                {assign var="product_template" value=$TEMPLATE}
+                            {/loop}
+                        {/while}
+                    {/if}
+
+                    {form_field field='template_id'}
+                        <div class="form-group {if $error}has-error{/if}">
+                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+                            <div class="form-group">
+                                <select id="{$label_attr.for}" name="{$name}" class="form-control">
+                                    <option value="">{intl l="Select a template"}</option>
+                                    {loop name="product_template" type="product-template"}
+                                        <option value="{$ID}" {if $product_template == $ID}selected{/if}>{$NAME}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+
+                            <div class="help-block">{intl l='Select here a template for this product'}</div>
+                        </div>
+                    {/form_field}
+                {/ifloop}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {form_field field='price'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        {loop type="currency" name="default-currency" default_only="1" backend_context="1"}
+
+                            <div class="input-group">
+                                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}" data-price-type="price-without-tax" data-rel-price="price_with_tax">
+                                <span class="input-group-addon">{$SYMBOL}</span>
+                            </div>
+
+                            <div class="help-block">{intl l='Enter here the product price in %title' title={$NAME}}</div>
+
+                            {form_field field='currency'}
+                                <input type="hidden" name="{$name}" value="{$ID}" />
+                            {/form_field}
+
                         {/loop}
-                    </select>
+                    </div>
+                {/form_field}
+            </div>
+
+            <div class="col-sm-6">
+                {form_field field='tax_price'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        {loop type="currency" name="default-currency" default_only="1" backend_context="1"}
+
+                            <div class="input-group">
+                                <input type="text" id="{$label_attr.for}" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product tax price'}" data-price-type="price-with-tax" data-rel-price="price_without_tax">
+                                <span class="input-group-addon">{$SYMBOL}</span>
+                            </div>
+
+                            <div class="help-block">{intl l='Enter here the product tax price in %title' title={$NAME}}</div>
+                        {/loop}
+                    </div>
+                {/form_field}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {form_field field='weight'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+
+                        <div class="input-group">
+                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
+                            <span class="input-group-addon">{intl l="Kg"}</span>
+                        </div>
+
+                        <div class="help-block">{intl l='Enter here the product weight, in Kilogrammes'}</div>
+                    </div>
+                {/form_field}
                 </div>
 
-                <div class="help-block">{intl l='Select here the tax applicable to this product'}</div>
+                <div class="col-sm-6">
+                {form_field field='quantity'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product stock'}">
+
+                        <div class="help-block">{intl l='Enter here the product stock'}</div>
+                    </div>
+                {/form_field}
             </div>
+        </div>
+
+        {form_field field='virtual'}
+        <div class="form-group {if $error}has-error{/if}">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1">
+                    {$label}
+                </label>
+            </div>
+        </div>
         {/form_field}
 
-        {form_field form=$form field='price'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-				{loop type="currency" name="default-currency" default_only="1" backend_context="1"}
-
-					<div class="row">
-	                    <div class="col-lg-4">
-						    <div class="input-group">
-						        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}" data-price-type="price-without-tax" data-rel-price="price_with_tax">
-						        <span class="input-group-addon">{$SYMBOL}</span>
-						    </div>
-					    </div>
-					</div>
-
-					<div class="help-block">{intl l='Enter here the product price in %title' title={$NAME}}</div>
-
-			        {form_field form=$form field='currency'}
-			            <input type="hidden" name="{$name}" value="{$ID}" />
-			        {/form_field}
-
-				{/loop}
-            </div>
-        {/form_field}
-
-        {form_field form=$form field='tax_price'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-				{loop type="currency" name="default-currency" default_only="1" backend_context="1"}
-
-					<div class="row">
-	                    <div class="col-lg-4">
-						    <div class="input-group">
-						        <input type="text" id="{$label_attr.for}" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product tax price'}" data-price-type="price-with-tax" data-rel-price="price_without_tax">
-						        <span class="input-group-addon">{$SYMBOL}</span>
-						    </div>
-					    </div>
-					</div>
-
-					<div class="help-block">{intl l='Enter here the product tax price in %title' title={$NAME}}</div>
-				{/loop}
-            </div>
-        {/form_field}
-
-        {form_field form=$form field='weight'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label}: </label>
-
-                <div class="row">
-                    <div class="col-lg-4">
-		                <div class="input-group">
-		                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
-		                    <span class="input-group-addon">{intl l="Kg"}</span>
-		                </div>
-		            </div>
-		        </div>
-
-                <div class="help-block">{intl l='Enter here the product weight, in Kilogrammes'}</div>
-            </div>
-        {/form_field}
-
-        {form_field form=$form field='visible'}
+        {form_field field='visible'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox">
                     <label>
@@ -580,7 +659,7 @@
             </div>
         {/form_field}
 
-        {module_include location='product_create_form'}
+        {hook name="product.create-form" location="product_create_form" }
 
     {/capture}
 
@@ -594,7 +673,7 @@
         dialog_ok_label     = {intl l="Create this product"}
 
         form_action        = {url path='/admin/products/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
@@ -604,7 +683,7 @@
 {capture "category_delete_dialog"}
     <input type="hidden" name="category_id" id="category_delete_id" value="" />
 
-    {module_include location='category_delete_form'}
+    {hook name="category.delete-form" location="category_delete_form" }
 
 {/capture}
 
@@ -615,7 +694,7 @@
     dialog_title    = {intl l="Delete category"}
     dialog_message  = {intl l="Do you really want to delete this category and all its content ?"}
 
-    form_action         = {url path='/admin/categories/delete'}
+    form_action         = {token_url path='/admin/categories/delete'}
     form_content        = {$smarty.capture.category_delete_dialog nofilter}
 }
 
@@ -626,7 +705,7 @@
     <input type="hidden" name="category_id" value="{$category_id}" />
     <input type="hidden" name="page" value="{$page}">
 
-    {module_include location='product_delete_form'}
+    {hook name="product.delete-form" location="product_delete_form" }
 
 {/capture}
 
@@ -635,9 +714,9 @@
 
     dialog_id       = "product_delete_dialog"
     dialog_title    = {intl l="Delete product"}
-    dialog_message  = {intl l="Do you really want to delete this product ?"}
+    dialog_message  = {intl l="Do you really want to delete this product and all it's components (images, documents)?<br>This can't be canceled."}
 
-    form_action         = {url path='/admin/products/delete'}
+    form_action         = {token_url path='/admin/products/delete'}
     form_content        = {$smarty.capture.product_delete_dialog nofilter}
 }
 {/block}
@@ -794,14 +873,20 @@
                 captureLength: 1,
                 wait         : 300,
                 callback     : function () {
+                    var price = $(this).val();
+                    $(this).val(sanitizeFloat(price));
                     update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
                 }
             });
+
+            function sanitizeFloat(numVal) {
+                return numVal.replace(",", ".");
+            };
 
         });
     </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='categories-js'}
+    {hook name="categories.js" location="categories-js" }
 {/block}

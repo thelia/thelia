@@ -16,4 +16,5 @@ use Thelia\Model\Base\OrderStatusI18nQuery as BaseOrderStatusI18nQuery;
  */
 class OrderStatusI18nQuery extends BaseOrderStatusI18nQuery
 {
-} // OrderStatusI18nQuery
+}
+// OrderStatusI18nQuery

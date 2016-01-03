@@ -1,10 +1,14 @@
 {extends file="admin-layout.tpl"}
 
+{block name="after-bootstrap-css"}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}">
+{/block}
+
 {block name="no-return-functions"}
     {$admin_current_location = 'configuration'}
 {/block}
 
-{block name="page-title"}{intl l='Thelia Mailing System'}{/block}
+{block name="page-title"}{intl l='Administration logs'}{/block}
 
 {block name="check-resource"}admin.configuration.admin-logs{/block}
 {block name="check-access"}view{/block}
@@ -20,7 +24,7 @@
                 <li><a href="{url path='/admin/configuration/adminLogs'}">{intl l="Administration logs"}</a></li>
             </ul>
 
-            {module_include location='admin_logs_top'}
+            {hook name="admin-logs.top" location="admin_logs_top" }
 
             <div class="row">
                 <div class="col-md-12">
@@ -34,76 +38,67 @@
                             </div>
                         </div>
 
-                        <div class="row">
-	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Period'} :</strong>
-	                            </div>
 
-	                            <div class="row">
-	                                <div class="col-lg-3 clearfix">
-	                                    <div class="input-group">
-	                                        <span class="input-group-addon">{intl l='From'}</span>
-	                                        <input class="form-control" type="text" id="from_date" readonly="readonly">
-	                                        <span class="input-group-btn">
-	                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#from_date" type="button">
-	                                                <span class="glyphicon glyphicon-calendar"></span>
-	                                            </button>
-	                                        </span>
-	                                    </div>
-	                                </div>
-	                                <div class="col-lg-3 clearfix input-group">
-	                                    <div class="input-group">
-	                                        <span class="input-group-addon">{intl l='To'}</span>
-	                                        <input class="form-control" type="text" id="to_date" readonly="readonly">
-	                                        <span class="input-group-btn">
-	                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#to_date" type="button">
-	                                                <span class="glyphicon glyphicon-calendar"></span>
-	                                            </button>
-	                                        </span>
-	                                    </div>
-	                                </div>
-	                            </div>
-	                        </div>
+                        <div class="row">
+                            <div class="col-md-1 text-right">
+                                <p class="form-control-static"><strong>{intl l='Period'} :</strong></p>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <span class="input-group-addon">{intl l='From'}</span>
+                                        <input class="form-control datetime-picker from-datetime-picker" type="text" id="from_date" readonly="readonly">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <span class="input-group-addon">{intl l='To'}</span>
+                                        <input class="form-control datetime-picker to-datetime-picker" type="text" id="to_date" readonly="readonly">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
 	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Administrators'} :</strong>
-	                            </div>
+
+                                <p class="form-control-static"><strong>{intl l='Administrators'} :</strong></p>
 
 	                            <div class="row">
 	                            {loop type="admin" name="admin-list" backend_context="1"}
-	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
-	                                    </div>
-	                                    <div class="row">
-	                                {/if}
 	                                <div class="col-md-3">
-	                                    <input id="admin_{$ID}" data-id="{$LOGIN}" class="js-admin" type="checkbox" checked>
-	                                    <label for="admin_{$ID}" style="font-weight: normal;">{$LOGIN} ({$FIRSTNAME|upper} {$LASTNAME|ucwords})</label>
+                                        <label class="checkbox-inline">
+                                            <input id="admin_{$ID}" data-id="{$LOGIN}" class="js-admin" type="checkbox" checked>{$LOGIN} ({$FIRSTNAME} {$LASTNAME})
+                                        </label>
 	                                </div>
-	                            {/loop}
+                                    {if ($LOOP_COUNT)%4 == 0}<div class="clearfix"></div>{/if}
+                                {/loop}
 	                            </div>
 	                        </div>
 	                    </div>
 
                         <div class="row">
 	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Resources'} :</strong>
-	                            </div>
+                                <p class="form-control-static"><strong>{intl l='Resources'} :</strong></p>
 
 	                            <div class="row">
 	                            {loop type="resource" name="resources-list" backend_context="1"}
-	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
-	                                    </div>
-	                                    <div class="row">
-	                                {/if}
 	                                <div class="col-md-3">
-	                                    <input id="resource_{$ID}" data-id="{$CODE}" class="js-resource" type="checkbox" checked>
-	                                    <label for="resource_{$ID}" style="font-weight: normal;">{$TITLE}</label>
+                                        <label class="checkbox-inline">
+	                                        <input id="resource_{$ID}" data-id="{$CODE}" class="js-resource" type="checkbox" checked> {$TITLE}
+                                        </label>
 	                                </div>
+                                    {if ($LOOP_COUNT)%4 == 0}<div class="clearfix"></div>{/if}
 	                            {/loop}
 	                            </div>
 
@@ -112,20 +107,17 @@
 
                         <div class="row">
 	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Modules'} :</strong>
-	                            </div>
+                                <p class="form-control-static"><strong>{intl l='Modules'} :</strong></p>
 
 	                            <div class="row">
 	                            {loop type="module" name="modules-list" backend_context="1"}
-	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
-	                                    </div>
-	                                    <div class="row">
-	                                {/if}
 	                                <div class="col-md-3">
-	                                    <input id="module_{$ID}" data-id="{$CODE}" class="js-module" type="checkbox" checked>
-	                                    <label for="module_{$ID}" style="font-weight: normal;">{$TITLE}</label>
+                                        <label class="checkbox-inline">
+	                                        <input id="module_{$ID}" data-id="{$CODE}" class="js-module" type="checkbox" checked> {$CODE} - {$TITLE}
+                                        </label>
 	                                </div>
+
+                                    {if ($LOOP_COUNT)%4 == 0}<div class="clearfix"></div>{/if}
 	                            {/loop}
 	                            </div>
 
@@ -138,59 +130,50 @@
                             </div>
                         </div>
 
-                        <div id="loading-block" class="col-md-12 loading-block"></div>
+                        <div class="row">
+                            <div id="loading-block" class="col-md-12 loading-block"></div>
 
-                        <div class="col-md-12 clearfix" id="logger-display"></div>
+                            <div class="col-md-12 clearfix" id="logger-display"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {module_include location='admin_logs_bottom'}
+            {hook name="admin-logs.bottom" location="admin_logs_bottom" }
 
         </div>
     </div>
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+    <script src="{javascript file='assets/js/bootstrap-switch/bootstrap-switch.js'}"></script>
+
+    {javascripts file='assets/js/moment-with-locales.min.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
 
-    {javascripts file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.js'}
+    {javascripts file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-
-    {stylesheets file='assets/js/jquery.ui/jquery.ui.theme.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
-    {stylesheets file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
-
-    {javascripts file="assets/js/jquery/jquery.ui.ui.datepicker/i18n/jquery.ui.datepicker-{lang attr="locale"}.js" catchException="true"}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-
 
     <script type="text/javascript">
 
+        {$langcode = {lang attr="code"}|substr:0:2}
+
         jQuery(function($) {
 
-            $('#from_date').datepicker({
-                maxDate: "-1d",
-                showOn: 'manual'
+            $('.from-datetime-picker').datetimepicker({
+                locale: "{$langcode}",
+                format: 'YYYY-MM-DD',
+                defaultDate: moment().subtract(7, 'days'),
+                ignoreReadonly: true
             });
-            $('#from_date').datepicker( "setDate", "-7d" );
 
-            $('#to_date').datepicker({
-                maxDate: "0",
-                showOn: 'manual'
-            });
-            $('#to_date').datepicker( "setDate", "0" );
-
-            $('.js-show-datepicker').click(function(e){
-                $($(this).data('datepicker-selector')).datepicker('show');
+            $('.to-datetime-picker').datetimepicker({
+                locale: "{$langcode}",
+                format: 'YYYY-MM-DD',
+                defaultDate: moment(),
+                ignoreReadonly: true
             });
 
             $('.js-show-logs').click(function(e) {
@@ -205,22 +188,22 @@
 
                 $('.js-admin:checked').each(function(k, v) {
                     admins.push($(v).data('id'));
-                })
+                });
                 $('.js-resource:checked').each(function(k, v) {
                     resources.push($(v).data('id'));
-                })
+                });
                 $('.js-module:checked').each(function(k, v) {
                     modules.push($(v).data('id'));
-                })
+                });
 
-                var fromDate = new Date( $('#from_date').datepicker( "getDate" ) );
-                var toDate = new Date( $('#to_date').datepicker( "getDate" ) );
+                var fromDate = $('.from-datetime-picker').data('DateTimePicker').date().format('YYYY-MM-DD');
+                var toDate = $('.to-datetime-picker').data('DateTimePicker').date().format('YYYY-MM-DD');
 
                 $.post(
                     "{url path='/admin/configuration/adminLogs/logger'}",
                     {
-                        fromDate:       $.datepicker.formatDate("yy-mm-dd", fromDate),
-                        toDate:         $.datepicker.formatDate("yy-mm-dd", toDate),
+                        fromDate:       fromDate,
+                        toDate:         toDate,
                         admins:         admins,
                         resources:      resources,
                         modules:        modules
@@ -229,8 +212,12 @@
                         $('#loading-block').hide();
                         $('#logger-display').html(html);
                         $('.js-show-logs').attr('disabled', false);
+
+                        $('html, body').scrollTop($("#logger-display").offset().top);
                     }
                 );
+
+                e.preventDefault();
             });
         });
 
@@ -238,5 +225,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='admin-logs-js'}
+    {hook name="admin-logs.js" location="admin-logs-js" }
 {/block}

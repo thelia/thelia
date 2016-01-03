@@ -19,11 +19,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
-use Thelia\Cart\CartTrait;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
@@ -36,10 +36,6 @@ use Thelia\Model\CurrencyQuery;
  */
 class BaseFacade implements FacadeInterface
 {
-    use CartTrait {
-        CartTrait::getCart as getCartFromTrait;
-    }
-
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
@@ -66,7 +62,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCart()
     {
-        return $this->getCartFromTrait($this->getDispatcher(), $this->getRequest());
+        return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
     }
 
     /**
@@ -77,7 +73,9 @@ class BaseFacade implements FacadeInterface
     public function getDeliveryAddress()
     {
         try {
-            return AddressQuery::create()->findPk($this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress());
+            return AddressQuery::create()->findPk(
+                $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
+            );
         } catch (\Exception $ex) {
             throw new \LogicException("Failed to get delivery address (" . $ex->getMessage() . ")");
         }
@@ -116,19 +114,47 @@ class BaseFacade implements FacadeInterface
     /**
      * Return Products total price
      *
+     * @param bool $withItemsInPromo if true, the discounted items are included in the total
+     *
      * @return float
      */
-    public function getCartTotalPrice()
+    public function getCartTotalPrice($withItemsInPromo = true)
     {
-        return $this->getRequest()->getSession()->getCart()->getTotalAmount();
+        $total = 0;
 
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
+
+        foreach ($cartItems as $cartItem) {
+            if ($withItemsInPromo || ! $cartItem->getPromo()) {
+                $total += $cartItem->getRealPrice() * $cartItem->getQuantity();
+            }
+        }
+
+        return $total;
     }
 
-    public function getCartTotalTaxPrice()
+    public function getCartTotalTaxPrice($withItemsInPromo = true)
     {
         $taxCountry = $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
 
-        return $this->getCart()->getTaxedAmount($taxCountry, false);
+        $total = 0;
+
+        foreach ($cartItems as $cartItem) {
+            if ($withItemsInPromo || ! $cartItem->getPromo()) {
+                $total += $cartItem->getRealTaxedPrice($taxCountry) * $cartItem->getQuantity();
+            }
+        }
+
+        return $total;
+    }
+
+    /**
+     * @return Country the delivery country
+     */
+    public function getDeliveryCountry()
+    {
+        return $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
     }
 
     /**
@@ -148,7 +174,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getNbArticlesInCart()
     {
-        return count($this->getRequest()->getSession()->getCart()->getCartItems());
+        return count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
     }
 
     /**
@@ -163,11 +189,23 @@ class BaseFacade implements FacadeInterface
         if (null === $couponCodes) {
             return array();
         }
+        /** @var CouponFactory $couponFactory */
         $couponFactory = $this->container->get('thelia.coupon.factory');
 
-        $coupons = array();
+        $coupons = [];
+
         foreach ($couponCodes as $couponCode) {
-            $coupons[] = $couponFactory->buildCouponFromCode($couponCode);
+            // Only valid coupons are returned
+            try {
+                if (false !== $couponInterface = $couponFactory->buildCouponFromCode($couponCode)) {
+                    $coupons[] = $couponInterface;
+                }
+            } catch (\Exception $ex) {
+                // Just ignore the coupon and log the problem, just in case someone realize it.
+                Tlog::getInstance()->warning(
+                    sprintf("Coupon %s ignored, exception occurred: %s", $couponCode, $ex->getMessage())
+                );
+            }
         }
 
         return $coupons;
@@ -218,7 +256,9 @@ class BaseFacade implements FacadeInterface
             $this->parser = $this->container->get('thelia.parser');
 
             // Define the current back-office template that should be used
-            $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+            $this->parser->setTemplateDefinition(
+                $this->parser->getTemplateHelper()->getActiveAdminTemplate()
+            );
         }
 
         return $this->parser;

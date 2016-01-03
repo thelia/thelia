@@ -65,6 +65,14 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElementsQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
  * @method     ChildProductSaleElementsQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
  *
+ * @method     ChildProductSaleElementsQuery leftJoinProductSaleElementsProductImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductSaleElementsProductImage relation
+ * @method     ChildProductSaleElementsQuery rightJoinProductSaleElementsProductImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElementsProductImage relation
+ * @method     ChildProductSaleElementsQuery innerJoinProductSaleElementsProductImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElementsProductImage relation
+ *
+ * @method     ChildProductSaleElementsQuery leftJoinProductSaleElementsProductDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductSaleElementsProductDocument relation
+ * @method     ChildProductSaleElementsQuery rightJoinProductSaleElementsProductDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElementsProductDocument relation
+ * @method     ChildProductSaleElementsQuery innerJoinProductSaleElementsProductDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElementsProductDocument relation
+ *
  * @method     ChildProductSaleElements findOne(ConnectionInterface $con = null) Return the first ChildProductSaleElements matching the query
  * @method     ChildProductSaleElements findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProductSaleElements matching the query, or a new ChildProductSaleElements object populated from the query conditions when no match is found
  *
@@ -979,6 +987,186 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
         return $this
             ->joinProductPrice($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ProductPrice', '\Thelia\Model\ProductPriceQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ProductSaleElementsProductImage object
+     *
+     * @param \Thelia\Model\ProductSaleElementsProductImage|ObjectCollection $productSaleElementsProductImage  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByProductSaleElementsProductImage($productSaleElementsProductImage, $comparison = null)
+    {
+        if ($productSaleElementsProductImage instanceof \Thelia\Model\ProductSaleElementsProductImage) {
+            return $this
+                ->addUsingAlias(ProductSaleElementsTableMap::ID, $productSaleElementsProductImage->getProductSaleElementsId(), $comparison);
+        } elseif ($productSaleElementsProductImage instanceof ObjectCollection) {
+            return $this
+                ->useProductSaleElementsProductImageQuery()
+                ->filterByPrimaryKeys($productSaleElementsProductImage->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByProductSaleElementsProductImage() only accepts arguments of type \Thelia\Model\ProductSaleElementsProductImage or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ProductSaleElementsProductImage relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function joinProductSaleElementsProductImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ProductSaleElementsProductImage');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ProductSaleElementsProductImage');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ProductSaleElementsProductImage relation ProductSaleElementsProductImage object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ProductSaleElementsProductImageQuery A secondary query class using the current class as primary query
+     */
+    public function useProductSaleElementsProductImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinProductSaleElementsProductImage($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductSaleElementsProductImage', '\Thelia\Model\ProductSaleElementsProductImageQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ProductSaleElementsProductDocument object
+     *
+     * @param \Thelia\Model\ProductSaleElementsProductDocument|ObjectCollection $productSaleElementsProductDocument  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByProductSaleElementsProductDocument($productSaleElementsProductDocument, $comparison = null)
+    {
+        if ($productSaleElementsProductDocument instanceof \Thelia\Model\ProductSaleElementsProductDocument) {
+            return $this
+                ->addUsingAlias(ProductSaleElementsTableMap::ID, $productSaleElementsProductDocument->getProductSaleElementsId(), $comparison);
+        } elseif ($productSaleElementsProductDocument instanceof ObjectCollection) {
+            return $this
+                ->useProductSaleElementsProductDocumentQuery()
+                ->filterByPrimaryKeys($productSaleElementsProductDocument->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByProductSaleElementsProductDocument() only accepts arguments of type \Thelia\Model\ProductSaleElementsProductDocument or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ProductSaleElementsProductDocument relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function joinProductSaleElementsProductDocument($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ProductSaleElementsProductDocument');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ProductSaleElementsProductDocument');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ProductSaleElementsProductDocument relation ProductSaleElementsProductDocument object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ProductSaleElementsProductDocumentQuery A secondary query class using the current class as primary query
+     */
+    public function useProductSaleElementsProductDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinProductSaleElementsProductDocument($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductSaleElementsProductDocument', '\Thelia\Model\ProductSaleElementsProductDocumentQuery');
+    }
+
+    /**
+     * Filter the query by a related ProductImage object
+     * using the product_sale_elements_product_image table as cross reference
+     *
+     * @param ProductImage $productImage the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByProductImage($productImage, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useProductSaleElementsProductImageQuery()
+            ->filterByProductImage($productImage, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related ProductDocument object
+     * using the product_sale_elements_product_document table as cross reference
+     *
+     * @param ProductDocument $productDocument the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByProductDocument($productDocument, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useProductSaleElementsProductDocumentQuery()
+            ->filterByProductDocument($productDocument, $comparison)
+            ->endUse();
     }
 
     /**

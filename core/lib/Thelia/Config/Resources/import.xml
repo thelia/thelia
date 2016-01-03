@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+    <import_categories>
+        <import_category id="thelia.import.products">
+            <title locale="fr_FR">Produits</title>
+            <title locale="en_US">Products</title>
+        </import_category>
+        <import_category id="thelia.import.modules">
+            <title locale="en_US">Modules</title>
+            <title locale="fr_FR">Modules</title>
+        </import_category>
+    </import_categories>
+
+    <imports>
+        <import id="thelia.import.stock" class="Thelia\ImportExport\Import\Type\ProductStockImport" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importer votre stock</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes :
+                    <ul>
+                        <li>id: L'id de la déclinaison de produit</li>
+                        <li>stock: La quantité de la déclinaison </li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import your stock</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns to work:
+                    <ul>
+                        <li>id: The id of your product sale elements </li>
+                        <li>stock: The quantity of product you have </li>
+                    </ul>
+                    It can have the column "ean" that defines the product's EAN code.
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+
+        <import id="thelia.import.price" class="Thelia\ImportExport\Import\Type\ProductPricesImport" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importer vos prix Hors-Taxes</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes:
+                    <ul>
+                        <li>id: L'id de la déclinaison de produit</li>
+                        <li>price: Le prix Hors-Taxes de votre déclinaison de combinaison de produit</li>
+                    </ul>
+                    Il peut aussi optionnellement avoir ces colonnes:
+                    <ul>
+                       <li>currency: Le code de la monnaie (exemple: EUR, USD)</li>
+                       <li>promo_price: Le prix promotionnel Hors-Taxes de votre déclinaison de combinaison de produit</li>
+                       <li>promo: Si cette valeur est a 0, désactive la promotion, si elle est a 1, l'active</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import your prices excluding taxes</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns:
+                    <ul>
+                        <li>id: The id of your product sale elements </li>
+                        <li>price: The price excluding taxes of the product attribute combinations</li>
+                    </ul>
+                    It may also optionally have those columns:
+                    <ul>
+                       <li>currency: the currency code (example: EUR, USD)</li>
+                       <li>promo_price: the promo price excluding taxes of the product attribute combinations</li>
+                       <li>promo: If this value is 0, set the product not in promo, if 1, it sets the product in promo</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+    </imports>
+</config>

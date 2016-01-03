@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\FeatureProduct;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\FeatureProduct;
 

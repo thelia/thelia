@@ -28,9 +28,9 @@ class IntListType extends BaseType
     public function isValid($values)
     {
         foreach (explode(',', $values) as $value) {
-            if(filter_var($value, FILTER_VALIDATE_INT) === false)
-
+            if (filter_var($value, FILTER_VALIDATE_INT) === false) {
                 return false;
+            }
         }
 
         return true;

@@ -22,7 +22,7 @@
             </ul>
         </nav>
 
-        {module_include location='coupon_top'}
+        {hook name="coupon.top" location="coupon_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -33,10 +33,10 @@
                             <caption>
                                 {intl l='Coupons'}
 
-                                {module_include location='coupon_list_caption'}
+                                {hook name="coupon.list-caption" location="coupon_list_caption" }
 
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.coupon" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                 {/loop}
@@ -104,9 +104,9 @@
                                     }
                                     </th>
 
-                                    {module_include location='coupon_table_header'}
+                                    {hook name="coupon.table-header" location="coupon_table_header" }
 
-                                    <th>&nbsp;</th>
+                                    <th>{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -114,7 +114,7 @@
                                     <tr>
                                         <td>
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}">{$CODE}</a>
+                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}">{$CODE}</a>
                                             {/loop}
                                             {elseloop rel="can_change"}
                                                 {$CODE}
@@ -151,27 +151,63 @@
                                             {/if}
                                         </td>
 
-                                        {module_include location='coupon_table_row'}
+                                        {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
 
-                                        <td class="text-center">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                            {/loop}
+                                        <td class="actions">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
+                                                    <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
+                                                    <a title="{intl l='Delete this coupon'}" class="delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                    </a>
+                                                {/loop}
+                                            </div>
                                         </td>
                                     </tr>
                                 {/loop}
+                                {elseloop rel="list_coupon"}
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="alert alert-info text-center">
+                                                <p>{intl l="No coupon is currently defined. Please use the (+) button above to create your first coupon."}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                {module_include location='coupon_bottom'}
+                {hook name="coupon.bottom" location="coupon_bottom" }
 
             </div>
         </div>
 
     </div> <!-- #wrapper -->
 
+    {* DELETE MODAL *}
+    {capture "delete_dialog"}
+        <input type="hidden" name="coupon_id" id="coupon_delete_id" value="" />
+
+        {hook name="coupon.delete-form" }
+    {/capture}
+
+    {include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_coupon"
+    dialog_title    = {intl l="Delete coupon"}
+    dialog_message  = {intl l="Do you really want to delete this coupon ?"}
+
+    form_action         = {token_url path='/admin/coupon/delete'}
+    form_content        = {$smarty.capture.delete_dialog nofilter}
+    }
 </div>
 
 {/block}
@@ -199,11 +235,15 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
+    <script>
+        $(document).ready(function() {
+            $(".delete_coupon_btn").click(function() {
+                $("#coupon_delete_id").val($(this).data("id"));
+            });
+        });
+    </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='coupon-list-js'}
+    {hook name="coupon.list-js" location="coupon-list-js" }
 {/block}

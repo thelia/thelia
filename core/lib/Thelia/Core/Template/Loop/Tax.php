@@ -16,15 +16,14 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\TaxQuery;
+use Thelia\Model\Tax as TaxModel;
 
 /**
  *
@@ -34,6 +33,14 @@ use Thelia\Model\TaxQuery;
  * Class Tax
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method int[] getTaxRule()
+ * @method int[] getExcludeTaxRule()
+ * @method int getCountry()
+ * @method string[] getOrder()
  */
 class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -50,7 +57,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('tax_rule'),
             Argument::createIntListTypeArgument('exclude_tax_rule'),
             Argument::createIntTypeArgument('country'),
-                new Argument(
+            new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
@@ -81,7 +88,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $country = $this->getCountry();
 
-        $taxRule = $this->getTax_rule();
+        $taxRule = $this->getTaxRule();
         if (null !== $taxRule && null !== $country) {
             $search->filterByTaxRuleCountry(
                 TaxRuleCountryQuery::create()
@@ -92,7 +99,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             );
         }
 
-        $excludeTaxRule = $this->getExclude_tax_rule();
+        $excludeTaxRule = $this->getExcludeTaxRule();
         if (null !== $excludeTaxRule && null !== $country) {
             $excludedTaxes = TaxRuleCountryQuery::create()
                 ->filterByCountryId($country, Criteria::EQUAL)
@@ -128,29 +135,29 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TaxModel $tax */
         foreach ($loopResult->getResultDataCollection() as $tax) {
             $loopResultRow = new LoopResultRow($tax);
 
             $loopResultRow
-                ->set("ID"                      , $tax->getId())
-                ->set("TYPE"                    , $tax->getType())
-                ->set("ESCAPED_TYPE"            , \Thelia\Model\Tax::escapeTypeName($tax->getType()))
-                ->set("REQUIREMENTS"            , $tax->getRequirements())
-                ->set("IS_TRANSLATED"           , $tax->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $tax->getVirtualColumn('i18n_TITLE'))
-                ->set("DESCRIPTION"             , $tax->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("ID", $tax->getId())
+                ->set("TYPE", $tax->getType())
+                ->set("ESCAPED_TYPE", TaxModel::escapeTypeName($tax->getType()))
+                ->set("REQUIREMENTS", $tax->getRequirements())
+                ->set("IS_TRANSLATED", $tax->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $tax->getVirtualColumn('i18n_TITLE'))
+                ->set("DESCRIPTION", $tax->getVirtualColumn('i18n_DESCRIPTION'))
             ;
+            $this->addOutputFields($loopResultRow, $tax);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

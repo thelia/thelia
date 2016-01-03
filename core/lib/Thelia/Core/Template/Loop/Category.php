@@ -16,17 +16,16 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CategoryQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\Category as CategoryModel;
 
 /**
  *
@@ -40,17 +39,25 @@ use Thelia\Model\ProductQuery;
  * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual_reverse', 'random'
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
  *
- * example :
- *
- * <THELIA_cat type="category" parent="3" limit="4">
- *      #TITLE : #ID
- * </THELIA_cat>
- *
- *
  * Class Category
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getParent()
+ * @method int getExcludeParent()
+ * @method int getProduct()
+ * @method int getExcludeProduct()
+ * @method bool getCurrent()
+ * @method bool getNotEmpty()
+ * @method bool getWithPrevNextInfo()
+ * @method bool getNeedCountChild()
+ * @method bool getNeedProductCount()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -64,7 +71,8 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntTypeArgument('parent'),
+            Argument::createIntListTypeArgument('parent'),
+            Argument::createIntListTypeArgument('exclude_parent'),
             Argument::createIntTypeArgument('product'),
             Argument::createIntTypeArgument('exclude_product'),
             Argument::createBooleanTypeArgument('current'),
@@ -94,6 +102,12 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         ];
     }
 
+    /**
+     * @param CategoryQuery $search
+     * @param string $searchTerm
+     * @param string $searchIn
+     * @param string $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
@@ -117,7 +131,13 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         $parent = $this->getParent();
 
         if (!is_null($parent)) {
-            $search->filterByParent($parent);
+            $search->filterByParent($parent, Criteria::IN);
+        }
+
+        $excludeParent = $this->getExcludeParent();
+
+        if (!is_null($excludeParent)) {
+            $search->filterByParent($excludeParent, Criteria::NOT_IN);
         }
 
         $current = $this->getCurrent();
@@ -128,7 +148,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
 
-         $exclude = $this->getExclude();
+        $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
@@ -136,22 +156,28 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         $product = $this->getProduct();
 
         if ($product != null) {
             $obj = ProductQuery::create()->findPk($product);
 
-            if ($obj != null) $search->filterByProduct($obj, Criteria::IN);
+            if ($obj != null) {
+                $search->filterByProduct($obj, Criteria::IN);
+            }
         }
 
-        $exclude_product = $this->getExclude_product();
+        $excludeProduct = $this->getExcludeProduct();
 
-        if ($exclude_product != null) {
-            $obj = ProductQuery::create()->findPk($exclude_product);
+        if ($excludeProduct != null) {
+            $obj = ProductQuery::create()->findPk($excludeProduct);
 
-            if ($obj != null) $search->filterByProduct($obj, Criteria::NOT_IN);
+            if ($obj != null) {
+                $search->filterByProduct($obj, Criteria::NOT_IN);
+            }
         }
 
         $orders  = $this->getOrder();
@@ -190,17 +216,13 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             }
         }
 
-        /* @todo */
-        $notEmpty  = $this->getNot_empty();
-
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var CategoryModel $category */
         foreach ($loopResult->getResultDataCollection() as $category) {
-
             /*
              * no cause pagination lost :
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
@@ -209,23 +231,22 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
-                ->set("ID"                      , $category->getId())
-                ->set("IS_TRANSLATED"           ,$category->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  ,$this->locale)
-                ->set("TITLE"                   , $category->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"                   , $category->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"             , $category->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"            , $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("PARENT"                  , $category->getParent())
-                ->set("URL"                     , $category->getUrl($this->locale))
-                ->set("META_TITLE"              , $category->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION"        , $category->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"            , $category->getVirtualColumn('i18n_META_KEYWORDS'))
-
-                ->set("VISIBLE"                 , $category->getVisible() ? "1" : "0")
-                ->set("POSITION"                , $category->getPosition())
-
-            ;
+                ->set("ID", $category->getId())
+                ->set("IS_TRANSLATED", $category->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("PARENT", $category->getParent())
+                ->set("ROOT", $category->getRoot($category->getId()))
+                ->set("URL", $this->getReturnUrl() ? $category->getUrl($this->locale) : null)
+                ->set("META_TITLE", $category->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION", $category->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS", $category->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("VISIBLE", $category->getVisible() ? "1" : "0")
+                ->set("POSITION", $category->getPosition())
+                ->set("TEMPLATE", $category->getDefaultTemplateId());
 
             if ($this->getNeedCountChild()) {
                 $loopResultRow->set("CHILD_COUNT", $category->countChild());
@@ -235,35 +256,46 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
             }
 
-            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
-                // Find previous and next category
-                $previous = CategoryQuery::create()
-                    ->filterByParent($category->getParent())
-                    ->filterByPosition($category->getPosition(), Criteria::LESS_THAN)
-                    ->orderByPosition(Criteria::DESC)
-                    ->findOne()
-                ;
+            $isBackendContext = $this->getBackendContext();
 
-                $next = CategoryQuery::create()
+            if ($this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previousQuery = CategoryQuery::create()
                     ->filterByParent($category->getParent())
-                    ->filterByPosition($category->getPosition(), Criteria::GREATER_THAN)
+                    ->filterByPosition($category->getPosition(), Criteria::LESS_THAN);
+
+                if (! $isBackendContext) {
+                    $previousQuery->filterByVisible(true);
+                }
+
+                $previous = $previousQuery
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne();
+
+                $nextQuery = CategoryQuery::create()
+                    ->filterByParent($category->getParent())
+                    ->filterByPosition($category->getPosition(), Criteria::GREATER_THAN);
+
+                if (! $isBackendContext) {
+                    $nextQuery->filterByVisible(true);
+                }
+
+                $next = $nextQuery
                     ->orderByPosition(Criteria::ASC)
-                    ->findOne()
-                ;
+                    ->findOne();
 
                 $loopResultRow
-                    ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT"                , $next != null ? 1 : 0)
-
-                    ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT"                    , $next != null ? $next->getId() : -1)
-                ;
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
             }
+
+            $this->addOutputFields($loopResultRow, $category);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

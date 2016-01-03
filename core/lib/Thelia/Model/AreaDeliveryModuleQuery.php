@@ -16,19 +16,35 @@ use Thelia\Model\Base\AreaDeliveryModuleQuery as BaseAreaDeliveryModuleQuery;
  */
 class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
 {
-
-    public function findByCountryAndModule(Country $country, Module $module)
+    /**
+     * Check if a delivery module is suitable for the given country.
+     *
+     * @param Country $country
+     * @param Module $module
+     * @param State|null $state
+     *
+     * @return null|AreaDeliveryModule
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function findByCountryAndModule(Country $country, Module $module, State $state = null)
     {
         $response = null;
 
-        if (null !== $country->getAreaId()) {
-            $response = $this->filterByAreaId($country->getAreaId())
-                ->filterByModule($module)
-                ->findOne();
+        $countryInAreaList = CountryAreaQuery::findByCountryAndState($country, $state);
 
+        /** @var CountryArea $countryInArea */
+        foreach ($countryInAreaList as $countryInArea) {
+            $response = self::create()->filterByAreaId($countryInArea->getAreaId())
+                ->filterByModule($module)
+                ->findOne()
+            ;
+
+            if ($response !== null) {
+                break;
+            }
         }
 
         return $response;
     }
-
-} // AreaDeliveryModuleQuery
+}
+// AreaDeliveryModuleQuery

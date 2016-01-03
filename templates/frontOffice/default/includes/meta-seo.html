@@ -1,0 +1,6 @@
+{if $META_DESCRIPTION}
+<meta name="description" content="{$META_DESCRIPTION}">
+{elseif $CHAPO}
+<meta name="description" content="{$CHAPO|truncate:150:""}">
+{/if}
+{if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}

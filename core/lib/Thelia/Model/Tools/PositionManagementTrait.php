@@ -50,15 +50,15 @@ trait PositionManagementTrait
      */
     public function getNextPosition()
     {
-         $query = $this->createQuery()
+        $query = $this->createQuery()
             ->orderByPosition(Criteria::DESC)
             ->limit(1);
 
-         $this->addCriteriaToPositionQuery($query);
+        $this->addCriteriaToPositionQuery($query);
 
-         $last = $query->findOne();
+        $last = $query->findOne();
 
-         return $last != null ? $last->getPosition() + 1 : 1;
+        return $last != null ? $last->getPosition() + 1 : 1;
     }
 
     /**
@@ -105,7 +105,6 @@ trait PositionManagementTrait
 
         // If we found the proper object, exchange their positions
         if ($result) {
-
             $cnx = Propel::getWriteConnection($this->getDatabaseName());
 
             $cnx->beginTransaction();
@@ -147,8 +146,7 @@ trait PositionManagementTrait
         $current_position = $this->getPosition();
 
         if ($newPosition != null && $newPosition > 0 && $newPosition != $current_position) {
-
-             // Find categories to offset
+            // Find categories to offset
             $search = $this->createQuery();
 
             $this->addCriteriaToPositionQuery($search);
@@ -173,7 +171,6 @@ trait PositionManagementTrait
 
             try {
                 foreach ($results as $result) {
-
                     $objNewPosition = $result->getPosition() + $delta;
 
                     $result->setDispatcher($this->getDispatcher())->setPosition($objNewPosition)->save($cnx);

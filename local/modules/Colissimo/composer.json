@@ -1,0 +1,11 @@
+{
+    "name": "thelia/colissimo-module",
+    "license": "LGPL-3.0+",
+    "type": "thelia-module",
+    "require": {
+        "thelia/installer": "~1.1"
+    },
+    "extra": {
+        "installer-name": "Colissimo"
+    }
+}

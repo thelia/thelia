@@ -16,4 +16,5 @@ use Thelia\Model\Base\ContentFolderQuery as BaseContentFolderQuery;
  */
 class ContentFolderQuery extends BaseContentFolderQuery
 {
-} // ContentFolderQuery
+}
+// ContentFolderQuery

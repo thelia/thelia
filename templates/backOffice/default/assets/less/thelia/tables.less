@@ -25,6 +25,12 @@
         border-bottom: 1px solid @table-border-color;
       }
     }
+    tr.inactive {
+      td {
+        color: @gray-light;
+        font-style: italic;
+      }
+    }
   }
   
 }
@@ -52,20 +58,19 @@ tfoot{
 .table-striped {
 
 	caption {
-		text-align: left;
-		color: #5A6876;
-		text-transform: uppercase;
-		font-weight: bold;
-		padding-bottom: 0.5em;
-		border-bottom: 2px solid #A5CED8;
-		line-height: 30px;
-
 		.action-btn {
 			display: block;
 			float: right;
 			margin-left: 10px;
 			text-transform: none;
 		}
+
+        .action-select {
+            display: inline-block;
+            float: right;
+            margin-left: 10px;
+            width: auto;
+        }
 	}
 
 	td.object-title, th.object-title {
@@ -86,16 +91,6 @@ tfoot{
 
     td:nth-child(2) {
         text-align: right;
-    }
-
-    caption {
-        background-color: #FFFFFF;
-        border-bottom: 2px solid #A5CED8;
-        color: #5A6876;
-        font-weight: bold;
-        line-height: 30px;
-        text-align: left;
-        text-transform: uppercase;
     }
 }
 

@@ -1,0 +1,19 @@
+{hook name="brand.sidebar-top"}
+{ifhook rel="brand.sidebar-body"}
+{hook name="brand.sidebar-body"}
+{/ifhook}
+{elsehook rel="brand.sidebar-body"}
+<section id="brands" class="block block-nav" role="navigation" aria-labelledby="brands-label">
+    <div class="block-heading"><h3 class="block-title" id="brands-label">{intl l="Brands"}</h3></div>
+    <div class="block-content">
+        <nav class="nav-brands">
+            <ul id="brand" class="accordion">
+                {loop name="brands-list" type="brand"}
+                    <li><a href="{$URL nofilter}">{$TITLE} ({count type="product" brand="{$ID}"})</a></li>
+                {/loop}
+            </ul>
+        </nav>
+    </div>
+</section>
+{/elsehook}
+{hook name="brand.sidebar-bottom"}

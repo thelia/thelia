@@ -16,15 +16,14 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
+use Thelia\Model\Config as ConfigModel;
 
 /**
  * Config loop, to access configuration variables
@@ -37,6 +36,14 @@ use Thelia\Type\EnumListType;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string getVariable()
+ * @method bool|string getHidden()
+ * @method bool|string getSecured()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -68,7 +75,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 'name'
             )
         );
-     }
+    }
 
     public function buildModelCriteria()
     {
@@ -81,21 +88,25 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $this->configureI18nProcessing($search);
 
-        if (! is_null($id))
+        if (! is_null($id)) {
             $search->filterById($id);
+        }
 
-        if (! is_null($name))
+        if (! is_null($name)) {
             $search->filterByName($name);
+        }
 
         if (! is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getHidden() != BooleanOrBothType::ANY)
+        if ($this->getHidden() != BooleanOrBothType::ANY) {
             $search->filterByHidden($this->getHidden() ? 1 : 0);
+        }
 
-        if (! is_null($secured) && $secured != BooleanOrBothType::ANY)
+        if (! is_null($secured) && $secured != BooleanOrBothType::ANY) {
             $search->filterBySecured($secured ? 1 : 0);
+        }
 
         $orders  = $this->getOrder();
 
@@ -128,36 +139,35 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'value_reverse':
                     $search->orderByValue(Criteria::DESC);
                     break;
-             }
+            }
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var ConfigModel $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID"           , $result->getId())
-                ->set("NAME"         , $result->getName())
-                ->set("VALUE"        , $result->getValue())
+                ->set("ID", $result->getId())
+                ->set("NAME", $result->getName())
+                ->set("VALUE", $result->getValue())
                 ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"       , $this->locale)
-                ->set("TITLE"        , $result->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"        , $result->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"  , $result->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM" , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("HIDDEN"       , $result->getHidden())
-                ->set("SECURED"      , $result->getSecured())
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("HIDDEN", $result->getHidden())
+                ->set("SECURED", $result->getSecured())
             ;
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

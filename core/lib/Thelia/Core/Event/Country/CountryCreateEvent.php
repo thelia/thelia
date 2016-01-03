@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Country;
 /**
  * Class CountryCreateEvent
  * @package Thelia\Core\Event\Country
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryCreateEvent extends CountryEvent
 {
@@ -25,9 +25,11 @@ class CountryCreateEvent extends CountryEvent
     protected $isoAlpha2;
     protected $isoAlpha3;
 
-    /**
-     * @var int area zone
-     */
+    /** @var bool is visible */
+    protected $visible;
+    /** @var bool has states */
+    protected $hasStates;
+
     protected $area;
 
     /**
@@ -138,4 +140,37 @@ class CountryCreateEvent extends CountryEvent
         return $this->area;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param boolean $visible
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isHasStates()
+    {
+        return $this->hasStates;
+    }
+
+    /**
+     * @param boolean $hasStates
+     */
+    public function setHasStates($hasStates)
+    {
+        $this->hasStates = $hasStates;
+        return $this;
+    }
 }

@@ -9,12 +9,15 @@
 
         <div id="wrapper" class="container">
 
-            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id"}
+            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id" visible="*"}
                 <ul class="breadcrumb">
-        			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-                    <li><a href="{url path="{$redirectUrl}"}">{intl l="Image"}</a></li>
+                    {foreach $breadcrumb as $label=>$link}
+                    <li><a href="{$link}">{$label}</a></li>
+                    {/foreach}
                     <li>{intl l='Editing image "%name"' name={$TITLE}}</li>
                 </ul>
+
+            {hook name="image-edit.top" image_id=$imageId}
 
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
@@ -28,24 +31,19 @@
                                 <div class="col-md-12">
 
         						    {form name="$formId"}
-        						    	<form method="POST" action="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" {form_enctype form=$form} class="clearfix">
+        						    	<form method="POST" action="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" {form_enctype} class="clearfix">
                                             {include
                                                 file = "includes/inner-form-toolbar.html"
                                                 hide_submit_buttons = false
 
                                                 page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
-                                                close_url = "{url path="{$redirectUrl}" noamp=1}"
+                                                close_url = "{url path="{$redirectUrl}" current_tab="images" noamp=1}"
                                             }
 
-        						        	{form_hidden_fields form=$form}
+        						        	{form_hidden_fields}
 
-        						        	{form_field form=$form field='success_url'}
-        						        		<input type="hidden" name="{$name}" value="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" />
-        						        	{/form_field}
-
-                                            {form_field form=$form field='locale'}
-                                                <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-                                            {/form_field}
+                                            {render_form_field field="success_url" value="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}"}
+                                            {render_form_field field="locale" value="$edit_language_locale"}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -56,51 +54,41 @@
                                                     <div class="form-group">
                                                         <label class="control-label">{intl l="Preview"} : </label>
                                                         <p>
-                                                            <a href="{$ORIGINAL_IMAGE_URL}" alt="{$TITLE}" target="_blank">
-                                                                <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail">
+                                                            <a href="{$ORIGINAL_IMAGE_URL nofilter}" alt="{$TITLE}" target="_blank">
+                                                                {if $PROCESSING_ERROR}
+                                                                    <img src="//placehold.it/580x580&text={intl l='Image+file+not+found'}" alt="{$TITLE}" class="img-thumbnail">
+                                                                {else}
+                                                                    <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" class="img-thumbnail">
+                                                                {/if}
                                                             </a>
                                                         </p>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6">
-                                                    {form_field form=$form field='file'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                            <input type="file" id="{$label_attr.for}" name="{$name}" value="" title="{$label}" placeholder="{intl l='File'}">
+                                                    {render_form_field field="file"}
+
+                                                    {form_field field='visible'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VISIBLE != 0}checked="checked"{/if}>
+                                                                {$label}
+                                                            </label>
                                                         </div>
+                                                    </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='title'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{$label}" placeholder="{intl l='Title'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field form=$form field='chapo'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{$label}" placeholder="{intl l='Chapo'}">{$CHAPO}</textarea>
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field form=$form field='postscriptum'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{$label}" placeholder="{intl l='Post Scriptum'}">{$POSTSCRIPTUM}</textarea>
-                                                        </div>
-                                                    {/form_field}
+                                                    {render_form_field field="title" value=$TITLE}
+                                                    {render_form_field field="chapo" value=$CHAPO}
+                                                    {render_form_field field="postscriptum" value=$POSTSCRIPTUM}
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    {form_field form=$form field='description'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control wysiwyg" title="{$label}" placeholder="{intl l='Description'}">{$DESCRIPTION}</textarea>
-                                                        </div>
-                                                    {/form_field}
+                                                    {render_form_field field="description" value=$DESCRIPTION extra_class="wysiwyg"}
                                                 </div>
                                             </div>
 
@@ -109,11 +97,9 @@
                                                 hide_submit_buttons = false
                                                 hide_flags = true
 
-                                                page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
-                                                close_url = "{url path="{$redirectUrl}"}"
+                                                page_url  = "{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}"
+                                                close_url = "{url path="{$redirectUrl}" current_tab="images"}"
                                             }
-
-
                                         </form>
         							{/form}
 
@@ -125,6 +111,8 @@
 
         		</div>
 
+            {hook name="image-edit.bottom" image_id=$imageId}
+
     		{/loop}
 
             {elseloop rel="image_edit"}
@@ -132,7 +120,7 @@
                     <div class="col-md-12">
                         <div class="row inner-toolbar clearfix">
                             <div class="col-md-6 inner-actions pull-right">
-                                <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                                <a href="{url path="{$redirectUrl}" current_tab="images"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
                             </div>
                         </div>
                         <div class="alert alert-error">
@@ -146,13 +134,8 @@
     </div>
 {/block}
 
-{block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-{/block}
-
 {block name="javascript-last-call"}
-    {module_include location='image-edit-js'}
+    {hook name="image.edit-js" location="image-edit-js" source="{$imageType}" image_id="{$imageId}" }
+
+    {hook name="wysiwyg.js" location="wysiwyg-image-edit-js" }
 {/block}

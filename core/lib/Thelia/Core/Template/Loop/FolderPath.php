@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -23,40 +24,16 @@ use Thelia\Type\BooleanOrBothType;
 /**
  * Class FolderPath
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
+ *
+ * {@inheritdoc}
+ * @method int getFolder()
+ * @method bool|string getVisible()
+ * @method string[] getOrder()
  */
 class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
     /**
-     *
-     * define all args used in your loop
-     *
-     *
-     * example :
-     *
-     * public function getArgDefinitions()
-     * {
-     *  return new ArgumentCollection(
-     *       Argument::createIntListTypeArgument('id'),
-     *           new Argument(
-     *           'ref',
-     *           new TypeCollection(
-     *               new Type\AlphaNumStringListType()
-     *           )
-     *       ),
-     *       Argument::createIntListTypeArgument('category'),
-     *       Argument::createBooleanTypeArgument('new'),
-     *       Argument::createBooleanTypeArgument('promo'),
-     *       Argument::createFloatTypeArgument('min_price'),
-     *       Argument::createFloatTypeArgument('max_price'),
-     *       Argument::createIntTypeArgument('min_stock'),
-     *       Argument::createFloatTypeArgument('min_weight'),
-     *       Argument::createFloatTypeArgument('max_weight'),
-     *       Argument::createBooleanTypeArgument('current'),
-     *
-     *   );
-     * }
-     *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     protected function getArgDefinitions()
@@ -78,7 +55,9 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
         $results = array();
 
@@ -88,7 +67,6 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
             $folder = $search->findOne();
 
             if ($folder != null) {
-
                 $results[] = array(
                     "ID" => $folder->getId(),
                     "TITLE" => $folder->getVirtualColumn('i18n_TITLE'),
@@ -99,7 +77,6 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                 $parent = $folder->getParent();
 
                 if ($parent > 0) {
-
                     // Prevent circular refererences
                     if (in_array($parent, $ids)) {
                         throw new \LogicException(sprintf("Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)", $id, $parent));
@@ -112,7 +89,9 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     $this->configureI18nProcessing($search, array('TITLE'));
 
                     $search->filterById($parent);
-                    if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+                    if ($visible != BooleanOrBothType::ANY) {
+                        $search->filterByVisible($visible);
+                    }
                 }
             }
         } while ($folder != null && $parent > 0);

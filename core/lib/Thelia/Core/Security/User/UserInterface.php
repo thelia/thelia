@@ -21,6 +21,11 @@ namespace Thelia\Core\Security\User;
 interface UserInterface
 {
     /**
+     * Return the user unique ID
+     */
+    public function getId();
+
+    /**
      * Return the user unique name
      */
     public function getUsername();

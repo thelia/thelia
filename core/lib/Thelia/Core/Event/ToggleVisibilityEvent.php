@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Event;
 
-class ToggleVisibilityEvent  extends ActionEvent
+class ToggleVisibilityEvent extends ActionEvent
 {
     protected $object_id;
 
@@ -33,5 +33,25 @@ class ToggleVisibilityEvent  extends ActionEvent
         $this->object_id = $object_id;
 
         return $this;
+    }
+
+    /**
+     * @param mixed $object
+     *
+     * @return $this
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getObject()
+    {
+        return $this->object;
     }
 }

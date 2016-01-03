@@ -1,0 +1,24 @@
+{ifloop rel="carousel.front"}
+<section class="carousel-container">
+    <div id="carousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-wrapper">
+            <div class="carousel-inner">
+                {loop type="carousel" name="carousel.front" width="1200" height="390" resize_mode="borders"}
+                <figure class="item {if $LOOP_COUNT == 1}active{/if}">
+                    {if $URL}<a href="{$URL|default:'#'}">{/if}
+                    <img src="{$IMAGE_URL}" alt="{$ALT}">
+                    {if $URL}</a>{/if}
+
+                    <div class="carousel-caption">
+                        {if $TITLE}<h3>{$TITLE}</h3>{/if}
+                        {if $DESCRIPTION}{$DESCRIPTION nofilter}{/if}
+                    </div>
+                </figure>
+                {/loop}
+            </div>
+        </div>
+        <a class="left carousel-control" href="#carousel" data-slide="prev"><span class="icon-prev"></span></a>
+        <a class="right carousel-control" href="#carousel" data-slide="next"><span class="icon-next"></span></a>
+    </div>
+</section><!-- #carousel -->
+{/ifloop}

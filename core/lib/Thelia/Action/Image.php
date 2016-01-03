@@ -12,23 +12,17 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageDeleteEvent;
-use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\Event\UpdateFilePositionEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\FileManager;
-use Thelia\Tools\URL;
-
-use Imagine\Image\ImagineInterface;
-use Imagine\Image\ImageInterface;
 use Imagine\Image\Box;
-use Imagine\Image\Color;
+use Imagine\Image\ImageInterface;
+use Imagine\Image\ImagineInterface;
+use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
-use Thelia\Exception\ImageException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\ImageException;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -76,7 +70,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     protected function getCacheDirFromWebRoot()
     {
-        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
+        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache' . DS . 'images');
     }
 
     /**
@@ -88,12 +82,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  \Thelia\Core\Event\Image\ImageEvent $event
-     * @throws \InvalidArgumentException,          ImageException
+     * @param ImageEvent $event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @throws \InvalidArgumentException
      */
     public function processImage(ImageEvent $event)
     {
-
         $subdir      = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();
 
@@ -107,22 +102,21 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, true);
 
         if (! file_exists($cacheFilePath)) {
-
             if (! file_exists($source_file)) {
                 throw new ImageException(sprintf("Source image file %s does not exists.", $source_file));
             }
 
-            // Create a chached version of the original image in the web space, if not exists
+            // Create a cached version of the original image in the web space, if not exists
 
             if (! file_exists($originalImagePathInCache)) {
-
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
                     if (false == symlink($source_file, $originalImagePathInCache)) {
-                         throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
+                        throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
                     }
-                } else {// mode = 'copy'
+                } else {
+                    // mode = 'copy'
                     if (false == @copy($source_file, $originalImagePathInCache)) {
                         throw new ImageException(sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir));
                     }
@@ -131,87 +125,109 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (! $event->isOriginalImage()) {
-
                 // We have to process the image.
                 $imagine = $this->createImagineInstance();
 
                 $image = $imagine->open($source_file);
 
                 if ($image) {
+                    // Allow image pre-processing (watermarging, or other stuff...)
+                    $event->setImageObject($image);
+                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
+                    $image = $event->getImageObject();
 
                     $background_color = $event->getBackgroundColor();
 
+                    $palette = new RGB();
+
                     if ($background_color != null) {
-                        $bg_color = new Color($background_color);
-                    } else
-                        $bg_color = null;
+                        $bg_color = $palette->color($background_color);
+                    } else {
+                        // Define a fully transparent white background color
+                        $bg_color = $palette->color('fff', 0);
+                    }
 
                     // Apply resize
-                    $image = $this->applyResize($imagine, $image, $event->getWidth(), $event->getHeight(), $event->getResizeMode(), $bg_color);
+                    $image = $this->applyResize(
+                        $imagine,
+                        $image,
+                        $event->getWidth(),
+                        $event->getHeight(),
+                        $event->getResizeMode(),
+                        $bg_color,
+                        $event->getAllowZoom()
+                    );
 
                     // Rotate if required
                     $rotation = intval($event->getRotation());
 
-                    if ($rotation != 0)
+                    if ($rotation != 0) {
                         $image->rotate($rotation, $bg_color);
+                    }
 
                     // Flip
                     // Process each effects
                     foreach ($event->getEffects() as $effect) {
-
                         $effect = trim(strtolower($effect));
 
                         $params = explode(':', $effect);
 
                         switch ($params[0]) {
 
-                        case 'greyscale':
-                        case 'grayscale':
-                            $image->effects()->grayscale();
-                            break;
+                            case 'greyscale':
+                            case 'grayscale':
+                                $image->effects()->grayscale();
+                                break;
 
-                        case 'negative':
-                            $image->effects()->negative();
-                            break;
+                            case 'negative':
+                                $image->effects()->negative();
+                                break;
 
-                        case 'horizontal_flip':
-                        case 'hflip':
-                            $image->flipHorizontally();
-                            break;
+                            case 'horizontal_flip':
+                            case 'hflip':
+                                $image->flipHorizontally();
+                                break;
 
-                        case 'vertical_flip':
-                        case 'vflip':
-                            $image-> flipVertically();
-                            break;
+                            case 'vertical_flip':
+                            case 'vflip':
+                                $image->flipVertically();
+                                break;
 
-                        case 'gamma':
-                            // Syntax: gamma:value. Exemple: gamma:0.7
-                            if (isset($params[1])) {
-                                $gamma = floatval($params[1]);
+                            case 'gamma':
+                                // Syntax: gamma:value. Exemple: gamma:0.7
+                                if (isset($params[1])) {
+                                    $gamma = floatval($params[1]);
 
-                                $image->effects()->gamma($gamma);
-                            }
-                            break;
+                                    $image->effects()->gamma($gamma);
+                                }
+                                break;
 
-                        case 'colorize':
-                            // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
-                            if (isset($params[1])) {
-                                $the_color = new Color($params[1]);
+                            case 'colorize':
+                                // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
+                                if (isset($params[1])) {
+                                    $the_color = $palette->color($params[1]);
 
-                                $image->effects()->colorize($the_color);
-                            }
-                            break;
+                                    $image->effects()->colorize($the_color);
+                                }
+                                break;
                         }
                     }
 
                     $quality = $event->getQuality();
 
-                    if (is_null($quality)) $quality = ConfigQuery::read('default_image_quality_percent', 75);
+                    if (is_null($quality)) {
+                        $quality = ConfigQuery::read('default_images_quality_percent', 75);
+                    }
+
+                    // Allow image post-processing (watermarging, or other stuff...)
+                    $event->setImageObject($image);
+                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
+                    $image = $event->getImageObject();
 
                     $image->save(
-                            $cacheFilePath,
-                            array('quality' => $quality)
-                     );
+                        $cacheFilePath,
+                        array('quality' => $quality)
+                    );
                 } else {
                     throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
                 }
@@ -233,83 +249,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     }
 
     /**
-     * Take care of saving image in the database and file storage
-     *
-     * @param \Thelia\Core\Event\Image\ImageCreateOrUpdateEvent $event Image event
-     *
-     * @throws \Thelia\Exception\ImageException
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function saveImage(ImageCreateOrUpdateEvent $event)
-    {
-        $fileManager = new FileManager();
-        $model = $event->getModelImage();
-
-        $nbModifiedLines = $model->save();
-        $event->setModelImage($model);
-
-        if (!$nbModifiedLines) {
-            throw new ImageException(
-                sprintf(
-                    'Image "%s" with parent id %s (%s) failed to be saved',
-                    $event->getParentName(),
-                    $event->getParentId(),
-                    $event->getImageType()
-                )
-            );
-        }
-
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
-        $event->setUploadedFile($newUploadedFile);
-    }
-
-    /**
-     * Take care of updating image in the database and file storage
-     *
-     * @param ImageCreateOrUpdateEvent $event Image event
-     *
-     * @throws \Thelia\Exception\ImageException
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function updateImage(ImageCreateOrUpdateEvent $event)
-    {
-        $fileManager = new FileManager();
-        // Copy and save file
-        if ($event->getUploadedFile()) {
-            // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getImageType(), FileManager::FILE_TYPE_IMAGES) . '/' . $event->getOldModelImage()->getFile();
-            unlink(str_replace('..', '', $url));
-
-            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
-            $event->setUploadedFile($newUploadedFile);
-        }
-
-        // Update image modifications
-        $event->getModelImage()->save();
-        $event->setModelImage($event->getModelImage());
-    }
-
-    public function updatePosition(UpdateFilePositionEvent $event)
-    {
-        $this->genericUpdatePosition($event->getQuery(), $event);
-    }
-
-    /**
-     * Take care of deleting image in the database and file storage
-     *
-     * @param ImageDeleteEvent $event Image event
-     *
-     * @throws \Exception
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function deleteImage(ImageDeleteEvent $event)
-    {
-        $fileManager = new FileManager();
-
-        $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
-    }
-
-    /**
      * Process image resizing, with borders or cropping. If $dest_width and $dest_height
      * are both null, no resize is performed.
      *
@@ -319,23 +258,35 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      * @param  int              $dest_height the required height
      * @param  int              $resize_mode the resize mode (crop / bands / keep image ratio)p
      * @param  string           $bg_color    the bg_color used for bands
+     * @param  bool             $allow_zoom  if true, image may be zoomed to matchrequired size. If false, image is not zoomed.
      * @return ImageInterface   the resized image.
      */
-    protected function applyResize(ImagineInterface $imagine, ImageInterface $image, $dest_width, $dest_height, $resize_mode, $bg_color)
-    {
+    protected function applyResize(
+        ImagineInterface $imagine,
+        ImageInterface $image,
+        $dest_width,
+        $dest_height,
+        $resize_mode,
+        $bg_color,
+        $allow_zoom = false
+    ) {
         if (! (is_null($dest_width) && is_null($dest_height))) {
-
             $width_orig = $image->getSize()->getWidth();
             $height_orig = $image->getSize()->getHeight();
 
-            if (is_null($dest_width))
-                $dest_width = $width_orig;
+            $ratio = $width_orig / $height_orig;
 
-            if (is_null($dest_height))
-                $dest_height = $height_orig;
+            if (is_null($dest_width)) {
+                $dest_width = $dest_height * $ratio;
+            }
 
-            if (is_null($resize_mode))
+            if (is_null($dest_height)) {
+                $dest_height = $dest_width / $ratio;
+            }
+
+            if (is_null($resize_mode)) {
                 $resize_mode = self::KEEP_IMAGE_RATIO;
+            }
 
             $width_diff = $dest_width / $width_orig;
             $height_diff = $dest_height / $height_orig;
@@ -343,45 +294,59 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $delta_x = $delta_y = $border_width = $border_height = 0;
 
             if ($width_diff > 1 && $height_diff > 1) {
+                $resize_width = $width_orig;
+                $resize_height = $height_orig;
 
-                $next_width = $width_orig;
-                $next_height = $height_orig;
-
-                $dest_width = ($resize_mode == self::EXACT_RATIO_WITH_BORDERS ? $dest_width : $next_width);
-                $dest_height = ($resize_mode == self::EXACT_RATIO_WITH_BORDERS ? $dest_height : $next_height);
+                // When cropping, be sure to always generate an image which is
+                //  no smaller than the required size, zooming it if required.
+                if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
+                    if ($allow_zoom) {
+                        if ($width_diff > $height_diff) {
+                            $resize_width = $dest_width;
+                            $resize_height = intval($height_orig * $dest_width / $width_orig);
+                            $delta_y = ($resize_height - $dest_height) / 2;
+                        } else {
+                            $resize_height = $dest_height;
+                            $resize_width = intval(($width_orig * $resize_height) / $height_orig);
+                            $delta_x = ($resize_width - $dest_width) / 2;
+                        }
+                    } else {
+                        // No zoom : final image may be smaller than the required size.
+                        $dest_width = $resize_width;
+                        $dest_height = $resize_height;
+                    }
+                }
             } elseif ($width_diff > $height_diff) {
                 // Image height > image width
-
-                $next_height = $dest_height;
-                $next_width = intval(($width_orig * $next_height) / $height_orig);
+                $resize_height = $dest_height;
+                $resize_width = intval(($width_orig * $resize_height) / $height_orig);
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    $next_width = $dest_width;
-                    $next_height = intval($height_orig * $dest_width / $width_orig);
-                    $delta_y = ($next_height - $dest_height) / 2;
+                    $resize_width = $dest_width;
+                    $resize_height = intval($height_orig * $dest_width / $width_orig);
+                    $delta_y = ($resize_height - $dest_height) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
-                    $dest_width = $next_width;
+                    $dest_width = $resize_width;
                 }
             } else {
                 // Image width > image height
-                $next_width = $dest_width;
-                $next_height = intval($height_orig * $dest_width / $width_orig);
+                $resize_width = $dest_width;
+                $resize_height = intval($height_orig * $dest_width / $width_orig);
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    $next_height = $dest_height;
-                    $next_width  = intval(($width_orig * $next_height) / $height_orig);
-                    $delta_x = ($next_width - $dest_width) / 2;
+                    $resize_height = $dest_height;
+                    $resize_width  = intval(($width_orig * $resize_height) / $height_orig);
+                    $delta_x = ($resize_width - $dest_width) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
-                    $dest_height = $next_height;
+                    $dest_height = $resize_height;
                 }
             }
 
-            $image->resize(new Box($next_width, $next_height));
+            $image->resize(new Box($resize_width, $resize_height));
 
             if ($resize_mode == self::EXACT_RATIO_WITH_BORDERS) {
-
-                $border_width = intval(($dest_width - $next_width) / 2);
-                $border_height = intval(($dest_height - $next_height) / 2);
+                $border_width = intval(($dest_width - $resize_width) / 2);
+                $border_height = intval(($dest_height - $resize_height) / 2);
 
                 $canvas = new Box($dest_width, $dest_height);
 
@@ -408,17 +373,17 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $driver = ConfigQuery::read("imagine_graphic_driver", "gd");
 
         switch ($driver) {
-        case 'imagik':
-            $image = new \Imagine\Imagick\Imagine();
-            break;
+            case 'imagick':
+                $image = new \Imagine\Imagick\Imagine();
+                break;
 
-        case 'gmagick':
-            $image = new \Imagine\Gmagick\Imagine();
-            break;
+            case 'gmagick':
+                $image = new \Imagine\Gmagick\Imagine();
+                break;
 
-        case 'gd':
-        default:
-            $image = new \Imagine\Gd\Imagine();
+            case 'gd':
+            default:
+                $image = new \Imagine\Gd\Imagine();
         }
 
         return $image;
@@ -428,11 +393,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
+
+            // Implemented in parent class BaseCachedFile
             TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
-            TheliaEvents::IMAGE_DELETE => array("deleteImage", 128),
-            TheliaEvents::IMAGE_SAVE => array("saveImage", 128),
-            TheliaEvents::IMAGE_UPDATE => array("updateImage", 128),
+            TheliaEvents::IMAGE_DELETE => array("deleteFile", 128),
+            TheliaEvents::IMAGE_SAVE => array("saveFile", 128),
+            TheliaEvents::IMAGE_UPDATE => array("updateFile", 128),
             TheliaEvents::IMAGE_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::IMAGE_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
         );
     }
 }

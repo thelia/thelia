@@ -20,11 +20,10 @@ use Thelia\Form\BaseForm;
 /**
  * Class ShippingZoneAddArea
  * @package Thelia\Form\ShippingZone
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ShippingZoneAddArea extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -51,16 +50,16 @@ class ShippingZoneAddArea extends BaseForm
             ->add('area_id', 'integer', array(
                 'constraints' => array(
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0))
+                    new GreaterThan(array('value' => 0)),
                 ),
                 'label_attr' => array('for' => 'shipping_area'),
-                'label' => Translator::getInstance()->trans('Available shipping zones')
+                'label' => Translator::getInstance()->trans('Available shipping zones'),
             ))
             ->add('shipping_zone_id', 'integer', array(
                 'constraints' => array(
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0))
-                )
+                    new GreaterThan(array('value' => 0)),
+                ),
             ))
         ;
     }

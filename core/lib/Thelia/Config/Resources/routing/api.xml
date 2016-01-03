@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="api.test" path="/api" methods="get">
+        <default key="_controller">Thelia:Api\Index:index</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <!-- customer routes -->
+    <route id="api.customer.list" path="/api/customers" methods="get">
+        <default key="_controller">Thelia:Api\Customer:list</default>
+    </route>
+
+    <route id="api.customer.get" path="/api/customers/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Customer:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <route id="api.customer.create" path="/api/customers" methods="post">
+        <default key="_controller">Thelia:Api\Customer:create</default>
+    </route>
+
+    <route id="api.customer.update" path="/api/customers" methods="put">
+        <default key="_controller">Thelia:Api\Customer:update</default>
+    </route>
+
+    <route id="api.customer.delete" path="/api/customers/{entityId}" methods="delete">
+        <default key="_controller">Thelia:Api\Customer:delete</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
+    <route id="api.customer.checkLogin" path="/api/customers/checkLogin" methods="post">
+        <default key="_controller">Thelia:Api\Customer:checkLogin</default>
+    </route>
+    <!-- end customer route -->
+
+    <!-- title route -->
+    <route id="api.title.list" path="/api/title" methods="get">
+        <default key="_controller">Thelia:Api\Title:list</default>
+    </route>
+
+    <route id="api.title.create" path="/api/title" methods="post">
+        <default key="_controller">Thelia:Api\Title:create</default>
+    </route>
+
+    <route id="api.title.update" path="/api/title" methods="put">
+        <default key="_controller">Thelia:Api\Title:update</default>
+    </route>
+
+    <route id="api.title.get" path="/api/title/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Title:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <route id="api.title.delete" path="/api/title/{entityId}" methods="delete">
+        <default key="_controller">Thelia:Api\Title:delete</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+    <!-- end title route -->
+
+    <!-- product route -->
+    <route id="api.product.list" path="/api/products" methods="get">
+        <default key="_controller">Thelia:Api\Product:list</default>
+    </route>
+
+    <route id="api.product.get" path="/api/products/{productId}" methods="get">
+        <default key="_controller">Thelia:Api\Product:getProduct</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+
+    <route id="api.product.update" path="/api/products/{productId}" methods="put">
+        <default key="_controller">Thelia:Api\Product:update</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+
+    <route id="api.product.create" path="/api/products" methods="post">
+        <default key="_controller">Thelia:Api\Product:create</default>
+    </route>
+
+    <route id="api.product.delete" path="/api/products/{productId}" methods="delete">
+        <default key="_controller">Thelia:Api\Product:delete</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+    <!-- end product route -->
+
+    <!-- product image route -->
+    <route id="api.product.image.list" path="/api/products/{entityId}/images" methods="get">
+        <default key="_controller">Thelia:Api\Image:list</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <route id="api.product.image.get" path="/api/products/{entityId}/images/{imageId}" methods="get">
+        <default key="_controller">Thelia:Api\Image:getImage</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
+
+    <route id="api.product.image.update" path="/api/products/{entityId}/images/{imageId}" methods="put">
+        <default key="_controller">Thelia:Api\Image:updateImage</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
+
+    <route id="api.product.image.delete" path="/api/products/{entityId}/images/{imageId}" methods="delete">
+        <default key="_controller">Thelia:Api\Image:deleteImage</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
+
+    <route id="api.product.image.create" path="/api/products/{entityId}/images" methods="post">
+        <default key="_controller">Thelia:Api\Image:createImage</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end product image route -->
+
+    <!-- product sale elements route -->
+    <route id="api.product.pse.list" path="/api/pse/product/{productId}" methods="get">
+        <default key="_controller">Thelia:Api\ProductSaleElements:list</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.get" path="/api/pse/{pseId}" methods="get">
+        <default key="_controller">Thelia:Api\ProductSaleElements:getPse</default>
+        <requirement key="pseId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.delete" path="/api/pse/{pseId}" methods="delete">
+        <default key="_controller">Thelia:Api\ProductSaleElements:delete</default>
+        <requirement key="pseId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.create" path="/api/pse" methods="post">
+        <default key="_controller">Thelia:Api\ProductSaleElements:create</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.update" path="/api/pse/{pseId}" methods="put">
+        <default key="_controller">Thelia:Api\ProductSaleElements:update</default>
+        <default key="pseId">\d+</default>
+    </route>
+
+    <!-- end product sale elements route -->
+
+    <!-- category route -->
+    <route id="api.category.list" path="/api/categories" methods="get">
+        <default key="_controller">Thelia:Api\Category:list</default>
+    </route>
+
+    <route id="api.category.get" path="/api/categories/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Category:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <route id="api.category.create" path="/api/categories" methods="post">
+        <default key="_controller">Thelia:Api\Category:create</default>
+    </route>
+
+    <route id="api.category.update" path="/api/categories" methods="put">
+        <default key="_controller">Thelia:Api\Category:update</default>
+    </route>
+
+    <route id="api.category.delete" path="/api/categories/{entityId}" methods="delete">
+        <default key="_controller">Thelia:Api\Category:delete</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end category route -->
+
+    <!-- tax rule route -->
+    <route id="api.tax-rule.list" path="/api/tax-rules" methods="get">
+        <default key="_controller">Thelia:Api\TaxRule:list</default>
+    </route>
+
+    <route id="api.tax-rule.get" path="/api/tax-rules/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\TaxRule:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <route id="api.tax-rule.create" path="/api/tax-rules" methods="post">
+        <default key="_controller">Thelia:Api\TaxRule:create</default>
+    </route>
+
+    <route id="api.tax-rule.update" path="/api/tax-rules" methods="put">
+        <default key="_controller">Thelia:Api\TaxRule:update</default>
+    </route>
+
+    <route id="api.tax-rule.delete" path="/api/tax-rules/{entityId}" methods="delete">
+        <default key="_controller">Thelia:Api\TaxRule:delete</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+    <!-- end tax rule -->
+
+    <!-- attribute av route -->
+
+    <route id="api.attribute-av.list" path="/api/attribute-avs" methods="get">
+        <default key="_controller">Thelia:Api\AttributeAv:list</default>
+    </route>
+
+    <route id="api.attribute-av.get" path="/api/attribute-avs/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\AttributeAv:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end attribute av route -->
+
+    <!-- country route -->
+
+    <route id="api.country.list" path="/api/countries" methods="get">
+        <default key="_controller">Thelia:Api\Country:list</default>
+    </route>
+
+    <route id="api.country.get" path="/api/countries/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Country:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end country route -->
+
+    <!-- tax route -->
+
+    <route id="api.taxes.list" path="/api/taxes" methods="get">
+        <default key="_controller">Thelia:Api\Tax:list</default>
+    </route>
+
+    <route id="api.taxes.get" path="/api/taxes/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Tax:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end tax route -->
+
+    <!-- tax route -->
+
+    <route id="api.language.list" path="/api/languages" methods="get">
+        <default key="_controller">Thelia:Api\Lang:list</default>
+    </route>
+
+    <route id="api.language.get" path="/api/languages/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Lang:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end tax route -->
+
+    <!-- brand route -->
+
+    <route id="api.brand.list" path="/api/brands" methods="get">
+        <default key="_controller">Thelia:Api\Brand:list</default>
+    </route>
+
+    <route id="api.brand.get" path="/api/brands/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Brand:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end brand route -->
+
+    <!-- currency route -->
+
+    <route id="api.currency.list" path="/api/currencies" methods="get">
+        <default key="_controller">Thelia:Api\Currency:list</default>
+    </route>
+
+    <route id="api.currency.get" path="/api/currencies/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Currency:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end currency route -->
+</routes>

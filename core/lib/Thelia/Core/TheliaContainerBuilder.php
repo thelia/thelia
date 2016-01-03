@@ -19,16 +19,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * Class TheliaContainerBuilder
  * @package Thelia\Core
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TheliaContainerBuilder extends ContainerBuilder
 {
-
-    public function compile() {}
+    public function compile()
+    {
+    }
 
     public function customCompile()
     {
         parent::compile();
     }
-
 }

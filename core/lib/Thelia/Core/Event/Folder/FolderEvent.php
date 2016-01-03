@@ -11,13 +11,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Folder;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Folder;
 
 /**
  * Class FolderEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderEvent extends ActionEvent
 {
@@ -58,5 +59,4 @@ class FolderEvent extends ActionEvent
     {
         return null !== $this->folder;
     }
-
 }

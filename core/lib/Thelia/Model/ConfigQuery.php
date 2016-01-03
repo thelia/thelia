@@ -50,8 +50,12 @@ class ConfigQuery extends BaseConfigQuery
             $config->setName($configName);
         }
 
-        if ($secured !== null) $config->setSecured($secured ? 1 : 0);
-        if ($hidden !== null) $config->setHidden($hidden ? 1 : 0);
+        if ($secured !== null) {
+            $config->setSecured($secured ? 1 : 0);
+        }
+        if ($hidden !== null) {
+            $config->setHidden($hidden ? 1 : 0);
+        }
 
         $config->setValue($value);
         $config->save();
@@ -71,6 +75,11 @@ class ConfigQuery extends BaseConfigQuery
         self::$cache = array();
 
         return true;
+    }
+
+    public static function getConfiguredShopUrl()
+    {
+        return ConfigQuery::read("url_site", '');
     }
 
     public static function getDefaultLangWhenNoTranslationAvailable()
@@ -107,6 +116,40 @@ class ConfigQuery extends BaseConfigQuery
     {
         return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
     }
+
+    public static function getStoreEmail()
+    {
+        return self::read('store_email', null);
+    }
+
+    public static function getStoreName()
+    {
+        return self::read('store_name', '');
+    }
+
+    public static function getStoreDescription()
+    {
+        return self::read('store_description', '');
+    }
+
+    /**
+     * @return array a list of email addresses to send the shop's notifications
+     */
+    public static function getNotificationEmailsList()
+    {
+        $contactEmail = self::getStoreEmail();
+
+        $list = preg_split("/[,;]/", self::read('store_notification_emails', $contactEmail));
+
+        $arr = [];
+
+        foreach ($list as $item) {
+            $arr[] = trim($item);
+        }
+
+        return $arr;
+    }
+
     /* smtp config */
     public static function isSmtpEnable()
     {
@@ -165,42 +208,91 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function setSmtpHost($value)
     {
-        return self::write('smtp.host', $value, 1, 1);
+        self::write('smtp.host', $value, 1, 1);
     }
 
     public static function setSmtpPort($value)
     {
-        return self::write('smtp.port', $value, 1, 1);
+        self::write('smtp.port', $value, 1, 1);
     }
 
     public static function setSmtpEncryption($value)
     {
-        return self::write('smtp.encryption', $value, 1, 1);
+        self::write('smtp.encryption', $value, 1, 1);
     }
 
     public static function setSmtpUsername($value)
     {
-        return self::write('smtp.username', $value, 1, 1);
+        self::write('smtp.username', $value, 1, 1);
     }
 
     public static function setSmtpPassword($value)
     {
-        return self::write('smtp.password', $value, 1, 1);
+        self::write('smtp.password', $value, 1, 1);
     }
 
     public static function setSmtpAuthMode($value)
     {
-        return self::write('smtp.authmode', $value, 1, 1);
+        self::write('smtp.authmode', $value, 1, 1);
     }
 
     public static function setSmtpTimeout($value)
     {
-        return self::write('smtp.timeout', $value, 1, 1);
+        self::write('smtp.timeout', $value, 1, 1);
     }
 
     public static function setSmtpSourceIp($value)
     {
-        return self::write('smtp.sourceip', $value, 1, 1);
+        self::write('smtp.sourceip', $value, 1, 1);
     }
     /* end smtp config */
-} // ConfigQuery
+
+    /* Thelia version */
+    public static function getTheliaSimpleVersion()
+    {
+        $majorVersion = self::read('thelia_major_version');
+        $minorVersion = self::read('thelia_minus_version');
+        $releaseVersion = self::read('thelia_release_version');
+
+        return $majorVersion.'.'.$minorVersion.'.'.$releaseVersion;
+    }
+
+    public static function isShowingErrorMessage()
+    {
+        return (bool) static::read("error_message.show", false);
+    }
+
+    /**
+     * @param bool $v
+     */
+    public static function setShowingErrorMessage($v)
+    {
+        static::write("error_message.show", (int) (@(bool) $v));
+    }
+
+    public static function getErrorMessagePageName()
+    {
+        return static::read("error_message.page_name");
+    }
+
+    public static function setErrorMessagePageName($v)
+    {
+        static::write("error_message.page_name", $v);
+    }
+
+    public static function getAdminCacheHomeStatsTTL()
+    {
+        return intval(static::read("admin_cache_home_stats_ttl", 600));
+    }
+
+    /**
+     * check if Thelia multi domain is activated. (Means one domain for each language)
+     *
+     * @return bool
+     */
+    public static function isMultiDomainActivated()
+    {
+        return (bool) self::read("one_domain_foreach_lang", false);
+    }
+}
+// ConfigQuery

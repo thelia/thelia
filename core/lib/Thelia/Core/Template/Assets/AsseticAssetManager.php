@@ -17,6 +17,7 @@ use Assetic\FilterManager;
 use Assetic\Filter;
 use Assetic\Factory\AssetFactory;
 use Assetic\AssetWriter;
+use Thelia\Core\Template\Assets\Filter\LessDotPhpFilter;
 use Thelia\Model\ConfigQuery;
 use Thelia\Log\Tlog;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,6 +32,8 @@ class AsseticAssetManager implements AssetManagerInterface
     protected $debugMode;
 
     protected $source_file_extensions = array('less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml');
+
+    protected $assetFilters = [];
 
     public function __construct($debugMode)
     {
@@ -49,7 +52,8 @@ class AsseticAssetManager implements AssetManagerInterface
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::LEAVES_ONLY);
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
 
         foreach ($iterator as $file) {
             $stamp .= $file->getMTime();
@@ -85,7 +89,8 @@ class AsseticAssetManager implements AssetManagerInterface
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($from_directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST);
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
 
         foreach ($iterator as $item) {
             if ($item->isDir()) {
@@ -98,9 +103,8 @@ class AsseticAssetManager implements AssetManagerInterface
 
                     $fs->mkdir($dest_dir, 0777);
                 }
-            }
-            // We don't copy source files
-            else if (! $this->isSourceFile($item)) {
+            } elseif (! $this->isSourceFile($item)) {
+                // We don't copy source files
 
                 $dest_file = $to_directory . DS . $iterator->getSubPathName();
 
@@ -117,12 +121,12 @@ class AsseticAssetManager implements AssetManagerInterface
      * Compute the destination directory path, from the source directory and the
      * base directory of the web assets
      *
-     * @param string $webAssetsDirectoryBase base directory of the web assets
-     * @param        $webAssetsTemplate
-     * @param string $webAssetsKey           the assests key : module name or 0 for base template
+     * @param string $webAssetsDirectoryBase Base base directory of the web assets
+     * @param string $webAssetsTemplate      The template directory, relative to '<thelia_root>/templates'
+     * @param string $webAssetsKey           the assets key : module name or 0 for template assets
      *
      * @internal param string $source_assets_directory the source directory
-     * @return the full path of the destination directory
+     * @return string the full path of the destination directory
      */
     protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
     {
@@ -135,7 +139,7 @@ class AsseticAssetManager implements AssetManagerInterface
      * the source directory. If any change is detected, the whole asset directory
      * is copied in the web space.
      *
-     * @param string $sourceAssetsDirectory  the full path to the source asstes directory
+     * @param string $sourceAssetsDirectory  the full path to the source assets directory
      * @param string $webAssetsDirectoryBase the base directory of the web based asset directory
      * @param        $webAssetsTemplate
      * @param string $webAssetsKey           the assets key : module name or 0 for base template
@@ -157,7 +161,6 @@ class AsseticAssetManager implements AssetManagerInterface
         $curr_stamp = $this->getStamp($sourceAssetsDirectory);
 
         if ($prev_stamp !== $curr_stamp) {
-
             $fs = new Filesystem();
 
             $tmp_dir = "$to_directory.tmp";
@@ -168,7 +171,9 @@ class AsseticAssetManager implements AssetManagerInterface
             $this->copyAssets($fs, $sourceAssetsDirectory, $tmp_dir);
 
             // Remove existing directory
-            if ($fs->exists($to_directory)) $fs->remove($to_directory);
+            if ($fs->exists($to_directory)) {
+                $fs->remove($to_directory);
+            }
 
             // Put in place the new directory
             $fs->rename($tmp_dir, $to_directory);
@@ -183,7 +188,8 @@ class AsseticAssetManager implements AssetManagerInterface
             */
             if (false === @file_put_contents($stamp_file_path, $curr_stamp)) {
                 throw new \RuntimeException(
-                    "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that.");
+                    "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that."
+                );
             }
             /*            } else {
                             @fclose($fp);
@@ -198,47 +204,29 @@ class AsseticAssetManager implements AssetManagerInterface
      * @param  FilterManager             $filterManager the Assetic filter manager
      * @param  string                    $filters       a comma separated list of filter names
      * @throws \InvalidArgumentException if a wrong filter is passed
-     * @return an                        array of filter names
+     * @return array                     an array of filter names
      */
     protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
     {
         if (!empty($filters)) {
-
             $filter_list = explode(',', $filters);
 
             foreach ($filter_list as $filter_name) {
-
                 $filter_name = trim($filter_name);
 
-                switch ($filter_name) {
-                    case 'less':
-                        $filterManager->set('less', new Filter\LessphpFilter());
-                        break;
+                foreach ($this->assetFilters as $filterIdentifier => $filterInstance) {
+                    if ($filterIdentifier == $filter_name) {
+                        $filterManager->set($filterIdentifier, $filterInstance);
 
-                    case 'sass':
-                        $filterManager->set('sass', new Filter\Sass\SassFilter());
-                        break;
-
-                    case 'cssembed':
-                        $filterManager->set('cssembed', new Filter\PhpCssEmbedFilter());
-                        break;
-
-                    case 'cssrewrite':
-                        $filterManager->set('cssrewrite', new Filter\CssRewriteFilter());
-                        break;
-
-                    case 'cssimport':
-                        $filterManager->set('cssimport', new Filter\CssImportFilter());
-                        break;
-
-                    case 'compass':
-                        $filterManager->set('compass', new Filter\CompassFilter());
-                        break;
-
-                    default:
-                        throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
-                        break;
+                        // No, goto is not evil.
+                        goto filterFound;
+                    }
                 }
+
+                throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
+                break;
+
+                filterFound:
             }
         } else {
             $filter_list = array();
@@ -267,6 +255,10 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
     {
+        Tlog::getInstance()->addDebug(
+            "Processing asset: assetSource=$assetSource, assetDirectoryBase=$assetDirectoryBase, webAssetsDirectoryBase=$webAssetsDirectoryBase, webAssetsTemplate=$webAssetsTemplate, webAssetsKey=$webAssetsKey, outputUrl=$outputUrl"
+        );
+
         $assetName = basename($assetSource);
         $inputDirectory = realpath(dirname($assetSource));
 
@@ -306,8 +298,7 @@ class AsseticAssetManager implements AssetManagerInterface
         Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
-        if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true)) ) {
-
+        if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
             $writer = new AssetWriter($outputDirectory . DS . $assetFileDirectoryInAssetDirectory);
 
             Tlog::getInstance()->addDebug("Writing asset to $outputDirectory" . DS . "$assetFileDirectoryInAssetDirectory");
@@ -323,5 +314,21 @@ class AsseticAssetManager implements AssetManagerInterface
         }
 
         return rtrim($outputUrl, '/') . '/' . trim($outputRelativeWebPath, '/') . '/' . trim($assetFileDirectoryInAssetDirectory, '/') . '/' . ltrim($assetTargetFilename, '/');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isDebugMode()
+    {
+        return $this->debugMode;
+    }
+
+    /**
+     * Register an asset filter
+     */
+    public function registerAssetFilter($filterIdentifier, $filter)
+    {
+        $this->assetFilters[$filterIdentifier] = $filter;
     }
 }

@@ -11,7 +11,7 @@
 
 {block name="main-content"}
 
-    {assign order_tab {$smarty.get.tab|default:"cart"}}
+    {assign order_tab {$tab|default:$smarty.get.tab|default:"cart"}}
 
     <div class="orders edit-order">
 
@@ -23,6 +23,8 @@
                 <li>{intl l="Order details"}</a></li>
 	        </ul>
 
+            {hook name="order-edit.top" order_id=$order_id}
+
 	        <div class="row">
             	<div class="col-md-12">
 
@@ -30,7 +32,7 @@
 
                         {ifloop rel='the-order'}
 
-                            {loop type="order" name="the-order" id=$order_id customer="*"}
+                            {loop type="order" name="the-order" id=$order_id customer="*" with_prev_next_info="true" backend_context="1"}
 
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
                                     {$orderCurrency=$SYMBOL}
@@ -39,11 +41,11 @@
                                 {assign "orderStatusId" $STATUS}
 
                                 <div class="row">
-                                    <div class="col-md-7 title">
+                                    <div class="col-md-4 title">
                                         {intl l='Order %ref - ID %id' id={$ID} ref={$REF}}
                                     </div>
 
-                                    <div class="col-md-5 actions">
+                                    <div class="col-md-4 actions">
                                         <form class="form-horizontal" role="form" id="order-update-status-form" action="{url path="/admin/order/update/$ID/status"}" method="post">
                                             <input class="js-current-tab" type="hidden" name="tab" value="{$order_tab}">
                                             <div class="form-group">
@@ -51,37 +53,100 @@
                                                 <div class="col-sm-6">
                                                     <select class="js-update-order-status" name="status_id" data-toggle="selectpicker">
                                                     {loop type="order-status" name="all-status"}
-                                                    {assign "orderStatusLabel" "order_$CODE"}
-                                                        <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label label-{#$orderStatusLabel#}'>{$TITLE}</span>">{$TITLE}</option>
+                                                        {assign "orderStatusCode" "order_$CODE"}
+                                                        {if #$orderStatusCode# == ''}
+                                                            {assign "defaultLabel" "label-default"}
+                                                            {assign "orderStatusLabel" $CODE}
+                                                        {else}
+                                                            {assign "defaultLabel" ''}
+                                                            {assign "orderStatusLabel" #$orderStatusCode#}
+                                                        {/if}
+                                                        <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label {$defaultLabel} label-{$orderStatusLabel}'>{$TITLE}</span>">{$TITLE}</option>
                                                     {/loop}
                                                     </select>
                                                 </div>
                                             </div>
                                         </form>
                                     </div>
+
+                                    <div class="col-md-4 actions">
+                                        {if $HAS_PREVIOUS != 0}
+                                        <a href="{url path="/admin/order/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous order'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                        {else}
+                                        <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                        {/if}
+
+                                        {if $HAS_NEXT != 0}
+                                        <a href="{url path="/admin/order/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next order'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                        {else}
+                                        <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                        {/if}
+                                    </div>
                                 </div>
+
+                                {hookblock name="order.tab" id={$order_id} fields="id,title,href,content"}
+
+                                    {capture "order_tab_tab"}
+                                        {forhook rel="order.tab"}
+                                        <li {if $order_tab == $id}class="active"{/if}>
+                                            <a href="#{$id}"
+                                               {if $href}data-href="{$href}"{/if}
+                                               data-tab-name="{$id}"
+                                               data-toggle="tab">{$title}
+                                            </a>
+                                        </li>
+                                        {/forhook}
+                                    {/capture}
+
+                                    {capture "order_tab_content"}
+                                        {forhook rel="order.tab"}
+                                        <div class="tab-pane fade {if $order_tab == $id}active in{/if}" id="{$id}">
+                                            {if $href}
+                                            {* ajax *}
+                                            <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                            {else}
+                                            {$content nofilter}
+                                            {/if}
+                                        </div>
+                                        {/forhook}
+                                    {/capture}
+
+                                {/hookblock}
+
 
                                 <ul class="nav nav-tabs clearfix">
                                     <li {if $order_tab == 'cart'}class="active"{/if}><a href="#cart" data-tab-name="cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Ordered products"}</a></li>
                                     <li {if $order_tab == 'bill'}class="active"{/if}><a href="#bill" data-tab-name="bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Invoice and Delivery"}</a></li>
+                                    {$smarty.capture.order_tab_tab nofilter}
                                     <li {if $order_tab == 'modules'}class="active"{/if}><a href="#modules" data-tab-name="modules" data-toggle="tab"><span class="glyphicon glyphicon-paperclip"></span> {intl l="Modules"}</a></li>
-
                                 </ul>
 
                                 <div class="tab-content">
                                     <div class="tab-pane fade {if $order_tab == 'cart'}active in{/if}" id="cart">
+
+                                        {hook name="order-edit.cart-top" location="order-edit-cart-top" order_id=$order_id}
+
                                         <div class="table-responsive">
+                                            {if $smarty.get.update_status_error_message}
+                                                <div class='alert alert-danger'>
+                                                    {$smarty.get.update_status_error_message}
+                                                </div>
+                                            {/if}
+
+                                            {hook name="order-edit.before-order-product-list" location="before-order-product-list" order_id=$order_id}
+
                                             <table class="table table-striped table-condensed table-left-aligned">
                                                 <caption class="clearfix">
                                                    {intl l='Cart - Prices in %currency' currency={$orderCurrency}}
                                                 </caption>
                                                 <thead>
                                                     <tr>
-                                                       <th class="col-md-7">{intl l="Product"}</th>
+                                                       <th class="col-md-6">{intl l="Product"}</th>
+                                                       {hook name="order-edit.order-product-table-header" location="order_edit_table_header" }
                                                        <th class="col-md-1 text-right">{intl l="Unit. price"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Tax"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Unit taxed price"}</th>
-                                                       <th class="col-md-1 text-right">{intl l="Quantity"}</th>
+                                                       <th class="text-right">{intl l="Quantity"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Taxed total"}</th>
                                                     </tr>
                                                 </thead>
@@ -92,14 +157,27 @@
                                                         {assign "realPrice" $PROMO_PRICE}
                                                         {assign "realTax" $PROMO_PRICE_TAX}
                                                         {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                                                        {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
                                                     {else}
                                                         {assign "realPrice" $PRICE}
                                                         {assign "realTax" $PRICE_TAX}
                                                         {assign "realTaxedPrice" $TAXED_PRICE}
+                                                        {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
                                                     {/if}
+                                                    {hook name="order-edit.before-order-product-row" location="before-order-product-row" order_id=$order_id order_product_id=$ID}
                                                     <tr>
                                                         <td>
-                                                            <a href="#">{$TITLE}</a>
+                                                            {ifloop rel="my_product_loop"}
+                                                                {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
+                                                                    <a href="{url path='/admin/products/update' product_id=$ID}">{$REF} - {$TITLE}</a>
+                                                                    {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
+                                                                {/loop}
+                                                            {/ifloop}
+                                                            {elseloop rel="my_product_loop"}
+                                                                {* The product doesn't exist anymore *}
+                                                                {$TITLE}
+                                                                {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted"></span>{/if}
+                                                            {/elseloop}
                                                             {ifloop rel="combinations"}
                                                             <dl class="dl-horizontal">
                                                                 {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
@@ -108,31 +186,33 @@
                                                                 {/loop}
                                                             </dl>
                                                             {/ifloop}
-                                                            {module_include location='order-product-list'}
+                                                            {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
-                                                        <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
-                                                        <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
-                                                        <td class="text-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</td>
+                                                        {hook name="order-edit.order-product-table-row" location="order_edit_table_row" order_product_id={$ID} }
+                                                        <td class="text-right">{format_money number=$realPrice currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$realTax currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$realTaxedPrice currency_id=$CURRENCY}</td>
                                                         <td class="text-right">{$QUANTITY}</td>
-                                                        <td class="text-right">{format_money number=$realTaxedPrice * $QUANTITY symbol=$orderCurrency}</td>
+                                                        <td class="text-right">{format_money number=$realTotalPrice currency_id=$CURRENCY}</td>
                                                     </tr>
+                                                    {hook name="order-edit.after-order-product-row" location="after-order-product-row" order_id=$order_id order_product_id=$ID}
                                                 {/loop}
                                                 </tbody>
                                                 <tbody class="table-condensed">
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Total without discount"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Discount"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$DISCOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$DISCOUNT currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
-                                                        <td class="text-right">
+                                                        <td colspan="100" class="text-right">
                                                             {loop type="order_coupon" name="couponcode" order=$ID}
                                                                 {$CODE}{if $LOOP_COUNT != $LOOP_TOTAL}, {/if}
                                                             {/loop}
@@ -144,20 +224,61 @@
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Total including discount"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Postage"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$POSTAGE symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right">
+                                                            <strong>{format_money number=$POSTAGE currency_id=$CURRENCY}</strong>
+                                                            <em title="{intl l='Taxes'}">({format_money number=$POSTAGE_TAX currency_id=$CURRENCY})</em>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3"><strong>{intl l="Weight"}</strong></td>
+                                                        <td colspan="100" class="text-right">
+                                                            <strong>{format_number number=$WEIGHT} {intl l="Kg"}</strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="active">
+                                                        <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3" class="last"><strong>{intl l="Total"}</strong></td>
-                                                        <td class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
+
+                                            {hook name="order-edit.after-order-product-list" location="after-order-product-list" order_id=$order_id}
+                                        </div>
+
+
+                                        {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                            {assign "orderInvoiceFirstName" $FIRSTNAME}
+                                            {assign "orderInvoiceLastName" $LASTNAME}
+                                            {assign "orderInvoiceCompany" $COMPANY}
+                                        {/loop}
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-condensed table-left-aligned">
+                                                <caption class="clearfix">
+                                                    {intl l='Customer information'}
+                                                </caption>
+                                                <tbody>
+                                                <tr>
+                                                    <th>{intl l="Customer"}</th>
+                                                    <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                                </tr>
+                                                {if $orderInvoiceCompany}
+                                                <tr>
+                                                    <th>{intl l="Company"}</th>
+                                                    <td>{$orderInvoiceCompany}</td>
+                                                </tr>
+                                                {/if}
+                                                </tbody>
+                                            </table>
+
+                                            {hook name="order-edit.customer-information-bottom" order_id=$order_id customer_id=$CUSTOMER}
+
                                         </div>
 
                                         <div class="table-responsive">
@@ -168,7 +289,7 @@
                                                 <tbody>
                                                 <tr>
                                                     <th>{intl l="Payment module"}</th>
-                                                    <td>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</td>
+                                                    <td>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$CODE} - {$TITLE}{/loop}</td>
                                                 </tr>
                                                 <tr>
                                                     <th>{intl l="Transaction reference"}</th>
@@ -176,188 +297,251 @@
                                                 </tr>
                                                 </tbody>
                                             </table>
+
+                                            {hook name="order-edit.payment-module-bottom" order_id=$order_id module_id=$PAYMENT_MODULE}
+
                                         </div>
+
+                                        {hook name="order-edit.cart-bottom" location="order-edit-cart-bottom" order_id=$order_id}
 
                                     </div> <!-- #cart -->
 
                                     <div class="tab-pane fade {if $order_tab == 'bill'}active in{/if} clearfix" id="bill">
 
+                                        {hook name="order-edit.bill-top" location="order-edit-bill-top" order_id=$order_id}
+
                                         <div class="title title-without-tabs clearfix">
                                             {intl l='Delivery module'}
-                                            <div class="pull-right col-md-3">
-                                                <form action="{url path="/admin/order/update/$ID/delivery-ref"}" method="post">
+                                            <div class="pull-right col-md-6 col-lg-3">
+                                                <form action="{url path="/admin/order/update/%id/delivery-ref" id=$ID}" method="post">
                                                     <input class="js-current-tab" type="hidden" name="tab" value="{$order_tab}">
                                                     <div class="input-group">
                                                         <input class="form-control" type="text" name="delivery_ref" value="{$DELIVERY_REF}" placeholder="{intl l="tracking reference"}"/>
                                                         <span class="input-group-btn">
-                                                            <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
+                                                            <button class="btn btn-success">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
                                                         </span>
                                                     </div>
                                                 </form>
                                             </div>
                                         </div>
 
-                                        {loop name="payment-module" type="module" id=$DELIVERY_MODULE}
+                                        {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}
 
                                         <dl class="dl-horizontal">
                                             <dt>{intl l="Name"}</dt>
-                                            <dd>{$TITLE}</dd>
+                                            <dd>{$CODE} - {$TITLE}</dd>
                                         </dl>
                                         <dl class="dl-horizontal">
                                             <dt>{intl l="Description"}</dt>
-                                            <dd>{$DESCRIPTION}</dd>
+                                            <dd>{$DESCRIPTION nofilter}</dd>
                                         </dl>
+
+                                        {hook name="order-edit.delivery-module-bottom" order_id=$order_id module_id=$DELIVERY_MODULE}
 
                                         {/loop}
 
-                                        <div class="col-md-6">
-                                            <div class="table-responsive">
-                                                <table class="table table-striped table-condensed table-left-aligned">
-                                                    <caption class="clearfix">
-                                                        {intl l='Invoice informations'}
-                                                        <div class="pull-right">
-                                                            <a class="btn btn-default btn-primary" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/$ID"}">
-                                                                <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Invoice'}
-                                                            </a>
-                                                            <a class="btn btn-default btn-primary js-update-order-address" data-address-id="{$INVOICE_ADDRESS}" title="{intl l='Edit invoice address'}" href="#edit_order_address_dialog" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                            </a>
-                                                        </div>
-                                                    </caption>
-                                                    <tbody>
-                                                    <tr>
-                                                        <th>{intl l="Invoice reference"}</th>
-                                                        <td>{$INVOICE_REF}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>{intl l="Invoice date"}</th>
-                                                        <td>{format_date date=$INVOICE_DATE output="date"}</td>
-                                                    </tr>
+                                        {if $smarty.get.update_status_error_message}
+                                            <div class='alert alert-danger'>
+                                                {$smarty.get.update_status_error_message}
+                                            </div>
+                                        {/if}
 
-                                                    {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
-                                                        <tr data-field-class="js-title" data-value="{$TITLE}">
-                                                            <th>{intl l="Title"}</th>
-                                                            <td>{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}</td>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-condensed table-left-aligned">
+                                                        <caption class="clearfix">
+                                                            {intl l='Invoice informations'}
+                                                            <div>
+                                                            <div class="btn-group">
+                                                                <a class="btn btn-primary" title="{intl l='View invoice PDF'}" href="{url path="/admin/order/pdf/invoice/%id/%browser" browser=1 id=$ID}" target="_blank">
+                                                                    <span class="glyphicon glyphicon glyphicon-eye-open"></span> {intl l='PDF | Invoice'}
+                                                                </a>
+                                                                <a class="btn btn-primary" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/%id/%browser" browser=0 id=$ID}">
+                                                                    <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Invoice'}
+                                                                </a>
+                                                                <a class="btn btn-primary js-update-order-address" data-address-id="{$INVOICE_ADDRESS}" title="{intl l='Edit invoice address'}" href="#edit_order_address_dialog" data-toggle="modal">
+                                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                                </a>
+                                                            </div>
+                                                            </div>
+                                                        </caption>
+                                                        <tbody>
+                                                        <tr>
+                                                            <th>{intl l="Invoice reference"}</th>
+                                                            <td>{$INVOICE_REF}</td>
                                                         </tr>
-                                                        <tr data-field-class="js-company">
-                                                            <th>{intl l="Company"}</th>
-                                                            <td>{$COMPANY}</td>
+                                                        <tr>
+                                                            <th>{intl l="Invoice date"}</th>
+                                                            <td>{format_date date=$INVOICE_DATE output="date"}</td>
                                                         </tr>
-                                                        <tr data-field-class="js-firstname">
-                                                            <th>{intl l="Firstname"}</th>
-                                                            <td>{$FIRSTNAME}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-lastname">
-                                                            <th>{intl l="Lastname"}</th>
-                                                            <td>{$LASTNAME}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-address1">
-                                                            <th>{intl l="Street address"}</th>
-                                                            <td>{$ADDRESS1}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-address2">
-                                                            <th>{intl l="Additional address"}</th>
-                                                            <td>{$ADDRESS2}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-address3">
-                                                            <th>{intl l="Additional address"}</th>
-                                                            <td>{$ADDRESS3}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-zipcode">
-                                                            <th>{intl l="Zip code"}</th>
-                                                            <td>{$ZIPCODE}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-city">
-                                                            <th>{intl l="City"}</th>
-                                                            <td>{$CITY}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-country" data-value="{$COUNTRY}">
-                                                            <th>{intl l="Country"}</th>
-                                                            <td>{loop type="country" name="order-invoice-address-country" id=$COUNTRY}{$TITLE}{/loop}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-phone">
-                                                            <th>{intl l="Phone"}</th>
-                                                            <td>{$PHONE}</td>
-                                                        </tr>
-                                                    {/loop}
-                                                    </tbody>
-                                                </table>
+
+                                                        {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                                            <tr data-field-class="js-company">
+                                                                <th>{intl l="Company"}</th>
+                                                                <td>{$COMPANY}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-title" data-value="{$TITLE}">
+                                                                <th>{intl l="Title"}</th>
+                                                                <td>{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-firstname">
+                                                                <th>{intl l="Firstname"}</th>
+                                                                <td>{$FIRSTNAME}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-lastname">
+                                                                <th>{intl l="Lastname"}</th>
+                                                                <td>{$LASTNAME}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-address1">
+                                                                <th>{intl l="Street address"}</th>
+                                                                <td>{$ADDRESS1}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-address2">
+                                                                <th>{intl l="Additional address"}</th>
+                                                                <td>{$ADDRESS2}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-address3">
+                                                                <th>{intl l="Additional address"}</th>
+                                                                <td>{$ADDRESS3}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-zipcode">
+                                                                <th>{intl l="Zip code"}</th>
+                                                                <td>{$ZIPCODE}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-city">
+                                                                <th>{intl l="City"}</th>
+                                                                <td>{$CITY}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-country" data-value="{$COUNTRY}">
+                                                                <th>{intl l="Country"}</th>
+                                                                <td>{loop type="country" name="order-invoice-address-country" id=$COUNTRY visible="*"}{$TITLE}{/loop}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-state" data-value="{$STATE}">
+                                                                <th>{intl l="State"}</th>
+                                                                <td>
+                                                                    {if $STATE}
+                                                                        {loop type="state" name="order-invoice-address-state" id=$STATE visible="*"}{$TITLE}{/loop}
+                                                                    {else}
+                                                                        -
+                                                                    {/if}
+                                                                </td>
+                                                            </tr>
+                                                            <tr data-field-class="js-phone">
+                                                                <th>{intl l="Phone"}</th>
+                                                                <td>{$PHONE}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-cellphone">
+                                                                <th>{intl l="Cellphone"}</th>
+                                                                <td>{$CELLPHONE}</td>
+                                                            </tr>
+                                                        {/loop}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-condensed table-left-aligned">
+                                                        <caption class="clearfix">
+                                                            {intl l='Delivery address'}
+                                                            <div>
+                                                            <div class="btn-group">
+                                                                <a class="btn btn-primary" title="{intl l='View purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id/%browser" browser=1 id=$ID}" target="_blank">
+                                                                    <span class="glyphicon glyphicon glyphicon-eye-open"></span> {intl l='PDF | Purchase order'}
+                                                                </a>
+                                                                <a class="btn btn-primary" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id/%browser" browser=0 id=$ID}">
+                                                                    <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Purchase order'}
+                                                                </a>
+                                                                <a class="btn btn-primary js-update-order-address" data-address-id="{$DELIVERY_ADDRESS}" title="{intl l='Edit delivery address'}" href="#edit_order_address_dialog" data-toggle="modal">
+                                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                                </a>
+                                                            </div>
+                                                            </div>
+                                                        </caption>
+                                                        <tbody>
+                                                        {ifhook rel="order-edit.bill-delivery-address"}
+                                                            {* delivery module can customize the delivery address *}
+                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order_id={$order_id}}
+                                                        {/ifhook}
+                                                        {elsehook rel="order-edit.bill-delivery-address"}
+                                                            {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
+                                                                <tr data-field-class="js-company">
+                                                                    <th>{intl l="Company"}</th>
+                                                                    <td>{$COMPANY}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-title" data-value="{$TITLE}">
+                                                                    <th>{intl l="Title"}</th>
+                                                                    <td>{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-firstname">
+                                                                    <th>{intl l="Firstname"}</th>
+                                                                    <td>{$FIRSTNAME}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-lastname">
+                                                                    <th>{intl l="Lastname"}</th>
+                                                                    <td>{$LASTNAME}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-address1">
+                                                                    <th>{intl l="Street address"}</th>
+                                                                    <td>{$ADDRESS1}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-address2">
+                                                                    <th>{intl l="Additional address"}</th>
+                                                                    <td>{$ADDRESS2}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-address3">
+                                                                    <th>{intl l="Additional address"}</th>
+                                                                    <td>{$ADDRESS3}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-zipcode">
+                                                                    <th>{intl l="Zip code"}</th>
+                                                                    <td>{$ZIPCODE}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-city">
+                                                                    <th>{intl l="City"}</th>
+                                                                    <td>{$CITY}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-country" data-value="{$COUNTRY}">
+                                                                    <th>{intl l="Country"}</th>
+                                                                    <td>{loop type="country" name="order-delivery-address-country" id=$COUNTRY visible="*"}{$TITLE}{/loop}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-state" data-value="{$STATE}">
+                                                                    <th>{intl l="State"}</th>
+                                                                    <td>
+                                                                        {if $STATE}
+                                                                            {loop type="state" name="order-delivery-address-state" id=$STATE visible="*"}{$TITLE}{/loop}
+                                                                        {else}
+                                                                            -
+                                                                        {/if}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr data-field-class="js-phone">
+                                                                    <th>{intl l="Phone"}</th>
+                                                                    <td>{$PHONE}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-cellphone">
+                                                                    <th>{intl l="Cellphone"}</th>
+                                                                    <td>{$CELLPHONE}</td>
+                                                                </tr>
+                                                            {/loop}
+                                                        {/elsehook}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
-                                            <div class="table-responsive">
-                                                <table class="table table-striped table-condensed table-left-aligned">
-                                                    <caption class="clearfix">
-                                                        {intl l='Delivery address'}
-                                                        <div class="pull-right">
-                                                            <a class="btn btn-default btn-primary" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/$ID"}">
-                                                                <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Purchase order'}
-                                                            </a>
-                                                            <a class="btn btn-default btn-primary js-update-order-address" data-address-id="{$DELIVERY_ADDRESS}" title="{intl l='Edit delivery address'}" href="#edit_order_address_dialog" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                            </a>
-                                                        </div>
-                                                    </caption>
-                                                    <tbody>
-                                                    {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
-                                                        <tr data-field-class="js-title" data-value="{$TITLE}">
-                                                            <th>{intl l="Title"}</th>
-                                                            <td>{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-company">
-                                                            <th>{intl l="Company"}</th>
-                                                            <td>{$COMPANY}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-firstname">
-                                                            <th>{intl l="Firstname"}</th>
-                                                            <td>{$FIRSTNAME}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-lastname">
-                                                            <th>{intl l="Lastname"}</th>
-                                                            <td>{$LASTNAME}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-address1">
-                                                            <th>{intl l="Street address"}</th>
-                                                            <td>{$ADDRESS1}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-address2">
-                                                            <th>{intl l="Additional address"}</th>
-                                                            <td>{$ADDRESS2}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-address3">
-                                                            <th>{intl l="Additional address"}</th>
-                                                            <td>{$ADDRESS3}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-zipcode">
-                                                            <th>{intl l="Zip code"}</th>
-                                                            <td>{$ZIPCODE}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-city">
-                                                            <th>{intl l="City"}</th>
-                                                            <td>{$CITY}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-country" data-value="{$COUNTRY}">
-                                                            <th>{intl l="Country"}</th>
-                                                            <td>{loop type="country" name="order-delivery-address-country" id=$COUNTRY}{$TITLE}{/loop}</td>
-                                                        </tr>
-                                                        <tr data-field-class="js-phone">
-                                                            <th>{intl l="Phone"}</th>
-                                                            <td>{$PHONE}</td>
-                                                        </tr>
-                                                    {/loop}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-
-
+                                        {hook name="order-edit.bill-bottom" location="order-edit-bill-bottom" order_id=$order_id}
 
                                     </div> <!-- #bill -->
 
-                                    <div class="tab-pane fade {if $order_tab == 'modules'}active in{/if} clearfix" id="modules">
+                                    {$smarty.capture.order_tab_content nofilter}
 
-                                        {include file="includes/module-tab-content.html" location="order-edit"}
+                                    <div class="tab-pane fade {if $order_tab == 'modules'}active in{/if} clearfix" id="modules">
+                                        {* ugly fix : {hook name="order.tab-content"} *}
+                                        {include file="includes/module-tab-content.html" hook="order.tab-content" location="order-edit" id=$order_id view="order-edit"}
                                     </div>
                                 </div>
                             {/loop}
@@ -374,6 +558,8 @@
             	</div>
             </div>
 
+            {hook name="order-edit.bottom" order_id=$order_id}
+
         </div>
     </div>
 
@@ -384,20 +570,20 @@
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "edit_order_address_dialog"}
             
-            {form_hidden_fields form=$form}
+            {form_hidden_fields}
                     
-            {form_field form=$form field='id'}
+            {form_field field='id'}
                 <input type="hidden" id="{$label_attr.for}" name="{$name}" class="js-order-address-id" value="{$value}">
             {/form_field}
 
-            {form_field form=$form field='company'}
+            {form_field field='company'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-company" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='title'}                
+            {form_field field='title'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     
@@ -409,68 +595,89 @@
                 </div>
             {/form_field}
 
-            {form_field form=$form field='firstname'}
+            {form_field field='firstname'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-firstname" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='lastname'}
+            {form_field field='lastname'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-lastname" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='address1'}
+            {form_field field='address1'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address1" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
                 </div>
 
                 <div class="form-group">
-                    {form_field form=$form field='address2'}
+                    {form_field field='address2'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address2" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                     {/form_field}                    
                 </div>
 
                 <div class="form-group">
-                    {form_field form=$form field='address3'}
+                    {form_field field='address3'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address3" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                     {/form_field}
                 </div>
             {/form_field}
 
-            {form_field form=$form field='zipcode'}
+            {form_field field='zipcode'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-zipcode" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='city'}
+            {form_field field='city'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-city" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='country'}
+            {form_field field='country'}
+                {$countryFieldId=$label_attr.for}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <select name="{$name}" id="{$label_attr.for}" class="form-control js-country">
-                        {loop type="country" name="country1"}
+                        {loop type="country" name="country1" visible="*"}
                             <option value="{$ID}">{$TITLE}</option>
                         {/loop}
                     </select>
                 </div>
             {/form_field}
 
-            {form_field form=$form field='phone'}
+            {form_field field='state'}
+                <div class="form-group group-state {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control js-state"
+                        data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state"
+                        >
+                        {loop type="state" name="state1" visible="*"}
+                            <option value="{$ID}" data-country="{$COUNTRY}">{$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+            {form_field field='phone'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-phone" value="{$value}" title="{$label}" placeholder="{intl l='Phone'}">
+                </div>
+            {/form_field}
+
+            {form_field field='cellphone'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-cellphone" value="{$value}" title="{$label}" placeholder="{intl l='Cellphone'}">
                 </div>
             {/form_field}
 
@@ -486,8 +693,8 @@
             dialog_ok_label     = {intl l="Confirm changes"}
             dialog_cancel_label = {intl l="Cancel"}
 
-            form_action        = {url path="/admin/order/update/$order_id/address"}
-            form_enctype       = {form_enctype form=$form}
+            form_action        = {url path="/admin/order/update/%id/address" id=$order_id}
+            form_enctype       = {form_enctype}
             form_error_message = $form_error_message
             form_id = 'updateOrderAddressForm'
         }
@@ -501,36 +708,61 @@
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src='{$asset_url}'></script>
     {/javascripts}
-    {javascripts file='assets/js/main.js'}
-        <script src='{$asset_url}'></script>
+
+    {javascripts file='assets/js/thelia-states.js'}
+        <script src="{$asset_url}"></script>
     {/javascripts}
 
     <script type="text/javascript">
-        $(".js-update-order-status").change(function(e){
-            e.preventDefault();
-            $('#order-update-status-form').submit();
-        });
 
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            $(".js-current-tab").val($(e.target).data("tab-name"));
-        });
+        $(function() {
+            // Atomatic ajax tab load, if data-href is defined.
+            $('.nav-tabs a[data-href]').on('shown.bs.tab', function (ev) {
+                var $this = $(this);
+                $($this.attr('href')).load($this.data('href'), function (ev) {
+                    if ($this.data('callback')) {
+                        eval($this.data('callback') + '();');
+                    }
+                });
 
-        $(".js-update-order-address").click(function(){
-            $(".js-order-address-id").val(
-                $(this).data("address-id")
-            );
+            });
 
-            $(this).parents('table').find('tr').each(function(k, v) {
-                if(!$(v).data('field-class')) {
-                    return true;
-                }
-                if($(v).data('value')) {
-                    var fieldValue = $(v).data('value');
-                } else {
-                    var fieldValue = $(v).children('td').text();
-                }
+            $(".js-update-order-status").change(function (e) {
+                e.preventDefault();
+                $('#order-update-status-form').submit();
+            });
 
-                $('.' + $(v).data('field-class')).val(fieldValue);
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $(".js-current-tab").val($(e.target).data("tab-name"));
+            });
+
+            $(".js-update-order-address").click(function () {
+                $(".js-order-address-id").val(
+                        $(this).data("address-id")
+                );
+
+                $(this).parents('table').find('tr').each(function (k, v) {
+                    var $field = $(v),
+                        $formField,
+                        fieldValue;
+
+                    if (!$field.data('field-class')) {
+                        return true;
+                    }
+                    if ($field.data('value')) {
+                        fieldValue = $field.data('value');
+                    } else {
+                        fieldValue = $field.children('td').text();
+                    }
+
+                    $formField = $('.' + $field.data('field-class'));
+
+                    $formField.val(fieldValue);
+
+                    if ($field.data('field-class') == 'js-country') {
+                        $formField.trigger("change");
+                    }
+                });
             });
         });
     </script>
@@ -538,5 +770,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='order-edit-js'}
+    {hook name="order.edit-js" location="order-edit-js" order_id={$order_id} }
 {/block}

@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/templates'}">{intl l="Product templates"}</a></li>
         </ul>
 
-        {module_include location='templates_top'}
+        {hook name="templates.top" location="templates_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -37,7 +37,7 @@
     	                           {intl l='Thelia product templates'}
 
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product template'}" href="#creation_dialog" data-toggle="modal">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new product template'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                     {/loop}
@@ -64,7 +64,7 @@
                                             }
                                         </th>
 
-                                        {module_include location='templates_table_header'}
+                                        {hook name="templates.table-header" location="templates_table_header" }
 
                                         <th class="actions">{intl l="Actions"}</th>
                                     </tr>
@@ -84,16 +84,19 @@
                                             {/elseloop}
                                         </td>
 
-                                        {module_include location='templates_table_row'}
+                                        {hook name="templates.table-row" location="templates_table_row" template_id=$ID}
 
                                         <td class="actions">
-                                            <div class="btn-group">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs template-change" title="{intl l='Change this product template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+    	                                            <a class="template-change" title="{intl l='Change this product template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs template-delete" title="{intl l='Delete this product template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+    	                                            <a class="template-delete" title="{intl l='Delete this product template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>
                                         </td>
@@ -117,7 +120,7 @@
             </div>
         </div>
 
-        {module_include location='templates_bottom'}
+        {hook name="templates.bottom" location="templates_bottom" }
 
     </div>
 </div>
@@ -128,14 +131,14 @@
 
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
               {* on success, redirect to the edition page, _ID_ is replaced with the created template ID, see controller  *}
               <input type="hidden" name="{$name}" value="{url path='/admin/configuration/templates/update' template_id='_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='name'}
+        {form_field field='name'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -150,14 +153,14 @@
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {module_include location='template_create_form'}
+        {hook name="template.create-form" location="template_create_form" }
 
     {/capture}
 
@@ -171,7 +174,7 @@
         dialog_ok_label     = {intl l="Create this product template"}
 
         form_action        = {url path='/admin/configuration/templates/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
@@ -181,7 +184,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="template_id" id="template_delete_id" value="" />
 
-    {module_include location='template_delete_form'}
+    {hook name="template.delete-form" location="template_delete_form" }
 
 {/capture}
 
@@ -192,7 +195,7 @@
     dialog_title    = {intl l="Delete template"}
     dialog_message  = {intl l="Do you really want to delete this template ? It will be removed from all products."}
 
-    form_action     = {url path='/admin/configuration/templates/delete'}
+    form_action     = {token_url path='/admin/configuration/templates/delete'}
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 {/block}
@@ -218,5 +221,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='templates-js'}
+    {hook name="templates.js" location="templates-js" }
 {/block}

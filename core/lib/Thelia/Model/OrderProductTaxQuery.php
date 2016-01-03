@@ -16,5 +16,5 @@ use Thelia\Model\Base\OrderProductTaxQuery as BaseOrderProductTaxQuery;
  */
 class OrderProductTaxQuery extends BaseOrderProductTaxQuery
 {
-
-} // OrderProductTaxQuery
+}
+// OrderProductTaxQuery

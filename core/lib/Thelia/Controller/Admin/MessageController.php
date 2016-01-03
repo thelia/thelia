@@ -12,15 +12,19 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Message\MessageDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;use Thelia\Core\Event\Message\MessageUpdateEvent;
-use Thelia\Core\Event\Message\MessageCreateEvent;
-use Thelia\Model\MessageQuery;
-use Thelia\Form\MessageModificationForm;
-use Thelia\Form\MessageCreationForm;
 use Symfony\Component\Finder\Finder;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Event\Message\MessageCreateEvent;
+use Thelia\Core\Event\Message\MessageDeleteEvent;
+use Thelia\Core\Event\Message\MessageUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\MessageQuery;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 
 /**
  * Manages messages sent by mail
@@ -35,9 +39,7 @@ class MessageController extends AbstractCrudController
             'message',
             null, // no sort order change
             null, // no sort order change
-
             AdminResources::MESSAGE,
-
             TheliaEvents::MESSAGE_CREATE,
             TheliaEvents::MESSAGE_UPDATE,
             TheliaEvents::MESSAGE_DELETE,
@@ -48,12 +50,12 @@ class MessageController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new MessageCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::MESSAGE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new MessageModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::MESSAGE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -64,7 +66,7 @@ class MessageController extends AbstractCrudController
             ->setMessageName($formData['name'])
             ->setLocale($formData["locale"])
             ->setTitle($formData['title'])
-            ->setSecured($formData['secured'])
+            ->setSecured($formData['secured'] ? true : false)
             ;
 
         return $createEvent;
@@ -108,7 +110,7 @@ class MessageController extends AbstractCrudController
         $data = array(
             'id'            => $object->getId(),
             'name'          => $object->getName(),
-            'secured'       => $object->getSecured(),
+            'secured'       => $object->getSecured() ? true : false,
             'locale'        => $object->getLocale(),
             'title'         => $object->getTitle(),
             'subject'       => $object->getSubject(),
@@ -122,7 +124,7 @@ class MessageController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new MessageModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::MESSAGE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -161,12 +163,35 @@ class MessageController extends AbstractCrudController
     {
         $list = array();
 
-        $dir = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $dir = $this->getTemplateHelper()->getActiveMailTemplate()->getAbsolutePath();
 
         $finder = Finder::create()->files()->in($dir)->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
 
         foreach ($finder as $file) {
             $list[] = $file->getBasename();
+        }
+
+        // Add modules templates
+        $modules = ModuleQuery::getActivated();
+        /** @var Module $module */
+        foreach ($modules as $module) {
+            $dir = $module->getAbsoluteTemplateBasePath() . DS . TemplateDefinition::EMAIL_SUBDIR . DS . 'default';
+
+            if (file_exists($dir)) {
+                $finder = Finder::create()
+                    ->files()
+                    ->in($dir)
+                    ->ignoreDotFiles(true)
+                    ->sortByName()
+                    ->name("*.$requiredExtension");
+
+                foreach ($finder as $file) {
+                    $fileName = $file->getBasename();
+                    if (!in_array($fileName, $list)) {
+                        $list[] = $fileName;
+                    }
+                }
+            }
         }
 
         return $list;
@@ -184,13 +209,54 @@ class MessageController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.configuration.messages.update", array(
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.messages.update",
+            [
                 'message_id' => $this->getRequest()->get('message_id')
-        ));
+            ]
+        );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.messages.default');
+        return $this->generateRedirectFromRoute('admin.configuration.messages.default');
+    }
+
+    public function previewAction($messageId, $html = true)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+            return $response;
+        }
+
+        if (null === $message = MessageQuery::create()->findPk($messageId)) {
+            $this->pageNotFound();
+        }
+
+        $parser = $this->getParser($this->getTemplateHelper()->getActiveMailTemplate());
+
+        foreach ($this->getRequest()->query->all() as $key => $value) {
+            $parser->assign($key, $value);
+        }
+
+        if ($html) {
+            $content = $message->setLocale($this->getCurrentEditionLocale())->getHtmlMessageBody($parser);
+        } else {
+            $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
+        }
+
+        return new Response($content);
+    }
+
+    public function previewAsHtmlAction($messageId)
+    {
+        return $this->previewAction($messageId);
+    }
+
+    public function previewAsTextAction($messageId)
+    {
+        $response = $this->previewAction($messageId, false);
+        $response->headers->add(["Content-Type" => "text/plain"]);
+
+        return $response;
     }
 }

@@ -54,4 +54,14 @@ interface AssetManagerInterface
      * @return string The URL to the generated asset file.
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug);
+
+    /**
+     * @return bool true if the AssetManager was started in debug mode
+     */
+    public function isDebugMode();
+
+    /**
+     * Register an asset filter
+     */
+    public function registerAssetFilter($filterIdentifier, $filter);
 }

@@ -16,5 +16,5 @@ use Thelia\Model\Base\ProductPriceQuery as BaseProductPriceQuery;
  */
 class ProductPriceQuery extends BaseProductPriceQuery
 {
-
-} // ProductPriceQuery
+}
+// ProductPriceQuery

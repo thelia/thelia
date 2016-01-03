@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/languages'}">{intl l="Languages"}</a></li>
         </ul>
 
-        {module_include location='languages_top'}
+        {hook name="languages.top" location="languages_top" }
 
         {if $error_message}
             <div class="row">
@@ -40,7 +40,7 @@
                             <caption>
                                {intl l="Languages management"}
                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.language" access="CREATE"}
-                                <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new language'}" href="#creation_dialog" data-toggle="modal">
+                                <a class="btn btn-primary action-btn" title="{intl l='Add a new language'}" href="#creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
                             {/loop}
@@ -48,37 +48,56 @@
                             </caption>
                             <thead>
                                 <tr>
+                                    <th>{intl l="ID"}</th>
                                     <th colspan="2">{intl l="Language name"}</th>
                                     <th>{intl l="ISO 639 Code"}</th>
                                     <th>{intl l="Locale"}</th>
+                                    <th>{intl l="Visible in front"}</th>
+                                    <th>{intl l="Active"}</th>
                                     <th>{intl l="Default"}</th>
                                     <th>{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {loop type="lang" name="lang.list" backend_context="1"}
+                                {loop type="lang" name="lang.list" backend_context="1" active="*"}
                                 <tr>
+                                    <td>{$ID}</td>
                                     <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$CODE}" /></td>
                                     <td>{$TITLE}</td>
                                     <td>{$CODE}</td>
                                     <td>{$LOCALE}</td>
+                                    <td>
+                                        <div class="make-switch switch-small switch-radio lang-visible-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" name="visible" {if $VISIBLE}checked{/if}>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="make-switch switch-small switch-radio lang-active-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" name="active" {if $ACTIVE}checked{/if}>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="make-switch switch-small switch-radio lang-default-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="radio" name="is_default" {if $IS_DEFAULT}checked{/if}>
                                         </div>
                                     </td>
                                     <td class="actions">
-                                        <div class="btn-group">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs lang-change" data-id="{$ID}" title="{intl l='Change this language'}">
+                                                <a class="lang-change no-follow-link" data-id="{$ID}" title="{intl l='Change this language'}">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                 </a>
                                             {/loop}
+                                            {if !$IS_DEFAULT}
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="DELETE"}
-                                                <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="btn btn-default btn-xs lang-delete" title="{intl l="Delete this language"}">
+                                                <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="lang-delete" title="{intl l="Delete this language"}">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             {/loop}
+                                            {/if}
                                         </div>
                                     </td>
                                 </tr>
@@ -102,8 +121,8 @@
                     <div class="title title-without-tabs">{intl l="Parameters"}</div>
                     {form name="thelia.lang.defaultBehavior"}
                     <form action="{url path="/admin/configuration/languages/defaultBehavior"}" method="post">
-                        {form_hidden_fields form=$form}
-                        {form_field form=$form field="behavior"}
+                        {form_hidden_fields}
+                        {form_field field="behavior"}
                         <div class="form-group {if $error}has-error{/if}" >
                             <label for="{$label_attr.for}" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
                             <div class="input-group">
@@ -113,7 +132,7 @@
                                     {/foreach}
                                 </select>
                                 <div class="input-group-btn">
-                                    <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l='Save'}</button>
+                                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l='Save'}</button>
                                 </div>
                             </div>
                         </div>
@@ -128,10 +147,10 @@
                     <div class="title title-without-tabs">{intl l="Using a domain or subdomain for each language"}</div>
                     {form name="thelia.lang.url"}
                     <form action="{url path="/admin/configuration/languages/updateUrl"}" method="post">
-                        {form_hidden_fields form=$form}
+                        {form_hidden_fields}
                         <table class="table table-striped table-condensed table-left-aligned">
                             <tbody>
-                            {form_tagged_fields form=$form tag='url'}
+                            {form_tagged_fields tag='url'}
                                 {if $attr_list.url_id}
                                 <tr>
                                     <th>{$attr_list.url_title}</th>
@@ -147,14 +166,14 @@
                             <tfoot>
                                 <tr>
                                     <td></td>
-                                    <td class="pull-right">
+                                    <td class="text-right">
                                         {if $one_domain_per_lang == 0}
                                             <a href="{url path="/admin/configuration/languages/domain/activate"}" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="activate"}</a>
                                         {else}
                                             <a href="{url path="/admin/configuration/languages/domain/deactivate"}" class="btn btn-default btn-danger"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="deactivate"}</a>
                                         {/if}
 
-                                        <button type="submit" {if $one_domain_per_lang == 0}disabled{/if} class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
+                                        <button type="submit" {if $one_domain_per_lang == 0}disabled{/if} class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -165,7 +184,7 @@
             </div>
         </div>
 
-        {module_include location='languages_bottom'}
+        {hook name="languages.bottom" location="languages_bottom" }
 
     </div>
 </div>
@@ -175,56 +194,56 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Language title'}">
             </div>
         {/form_field}
-        {form_field form=$form field='code'}
+        {form_field field='code'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='ISO Code'}">
                 <span class="help-block">{intl l='<a href="http://en.wikipedia.org/wiki/ISO_639-1_language_matrix" target="_other">Check the list</a> of ISO 639-1 codes'}</span>
             </div>
         {/form_field}
-        {form_field form=$form field='locale'}
+        {form_field field='locale'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='en_US'}">
             </div>
         {/form_field}
-        {form_field form=$form field='date_format'}
+        {form_field field='date_format'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='d-m-Y'}">
                 <span class="help-block">{intl l='The syntax used is identical to the PHP <a href="http://www.php.net/date" target="_other">date()</a> function'}</span>
             </div>
         {/form_field}
-        {form_field form=$form field='time_format'}
+        {form_field field='time_format'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='H:i:s'}">
                 <span class="help-block">{intl l='The syntax used is identical to the PHP <a href="http://www.php.net/date" target="_other">date()</a> function'}</span>
             </div>
         {/form_field}
-        {form_field form=$form field='decimal_separator'}
+        {form_field field='decimal_separator'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='eg: . or ,'}">
                 <span class="help-block">{intl l='Sets the separator for the decimal point'}</span>
             </div>
         {/form_field}
-        {form_field form=$form field='thousands_separator'}
+        {form_field field='thousands_separator'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
                 <span class="help-block">{intl l='Sets the thousands separator.'}</span>
             </div>
         {/form_field}
-        {form_field form=$form field='decimals'}
+        {form_field field='decimals'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="2">
@@ -232,7 +251,7 @@
             </div>
         {/form_field}
 
-        {module_include location='language_create_form'}
+        {hook name="language.create-form" location="language_create_form" }
 
     {/capture}
 
@@ -246,7 +265,7 @@
         dialog_ok_label     = {intl l="Create this language"}
 
         form_action        = {url path='/admin/configuration/languages/add'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
@@ -256,7 +275,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="language_id" id="language_delete_id" value="" />
 
-    {module_include location='languages_delete_form'}
+    {hook name="languages.delete-form" location="languages_delete_form" }
 
 {/capture}
 
@@ -267,7 +286,7 @@
     dialog_title    = {intl l="Delete language"}
     dialog_message  = {intl l="Do you really want to delete this language ?"}
 
-    form_action         = {url path='/admin/configuration/languages/delete'}
+    form_action         = {token_url path='/admin/configuration/languages/delete'}
     form_content        = {$smarty.capture.delete_dialog nofilter}
     form_error_message  = $error_delete_message
 }
@@ -297,10 +316,6 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
@@ -323,15 +338,21 @@
             });
 
             $(".lang-default-change").on("switch-change", function(e, data){
-                $('.lang-default-change').bootstrapSwitch('toggleRadioState');
-                var baseUrl = "{url path='/admin/configuration/languages/toggleDefault/'}";
-                if(data.value) {
-                    $.ajax({
-                        url : baseUrl+$(this).data('id')
-                    }).fail(function(){
-                        $('#toggle-default-failed').modal('show');
-                    });
-                }
+                var url = "{token_url path='/admin/configuration/languages/toggleDefault/_ID_'}";
+                // Reload the page
+                location.href = url.replace('_ID_', $(this).data('id'));
+            });
+
+            $(".lang-active-change").on("switch-change", function(e, data){
+                var url = "{token_url path='/admin/configuration/languages/toggleActive/_ID_'}";
+                // Reload the page
+                location.href = url.replace('_ID_', $(this).data('id'));
+            });
+
+            $(".lang-visible-change").on("switch-change", function(e, data){
+                var url = "{token_url path='/admin/configuration/languages/toggleVisible/_ID_'}";
+                // Reload the page
+                location.href = url.replace('_ID_', $(this).data('id'));
             });
 
             $(".lang-delete").click(function(){
@@ -342,5 +363,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='languages-js'}
+    {hook name="languages.js" location="languages-js" }
 {/block}

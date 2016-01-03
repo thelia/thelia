@@ -34,8 +34,9 @@ class SecurityContext
     {
         $session = $this->request->getSession();
 
-        if ($session === null)
+        if ($session === null) {
             throw new \LogicException("No session found.");
+        }
 
         return $session;
     }
@@ -81,13 +82,21 @@ class SecurityContext
     }
 
     /**
+     * @return bool true if a user (either admin or customer) is logged in, false otherwise.
+     */
+    final public function hasLoggedInUser()
+    {
+        return $this->hasCustomerUser() || $this->hasAdminUser();
+    }
+
+    /**
      * Check if a user has at least one of the required roles
      *
      * @param  UserInterface $user  the user
      * @param  array         $roles the roles
      * @return boolean       true if the user has the required role, false otherwise
      */
-    final public function hasRequiredRole($user, array $roles)
+    final public function hasRequiredRole(UserInterface $user = null, array $roles = [])
     {
         if ($user != null) {
             // Check if user's roles matches required roles
@@ -103,25 +112,9 @@ class SecurityContext
         return false;
     }
 
-    /**
-    * Checks if the current user is allowed
-    *
-    * @return Boolean
-    */
-    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
+    final public function isUserGranted(array $roles, array $resources, array $modules, array $accesses, UserInterface $user)
     {
-        // Find a user which matches the required roles.
-        $user = $this->getCustomerUser();
-
         if (! $this->hasRequiredRole($user, $roles)) {
-            $user = $this->getAdminUser();
-
-            if (! $this->hasRequiredRole($user, $roles)) {
-                $user = null;
-            }
-        }
-
-        if (null === $user) {
             return false;
         }
 
@@ -129,7 +122,7 @@ class SecurityContext
             return true;
         }
 
-        if ( !method_exists($user, 'getPermissions') ) {
+        if (!method_exists($user, 'getPermissions')) {
             return false;
         }
 
@@ -183,6 +176,45 @@ class SecurityContext
     }
 
     /**
+    * Checks if the current user is allowed
+    *
+    * @return Boolean
+    */
+    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
+    {
+        // Find a user which matches the required roles.
+        $user = $this->checkRole($roles);
+
+        if (null === $user) {
+            return false;
+        } else {
+            return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
+        }
+    }
+
+    /**
+     * look if a user has the required role.
+     *
+     * @param array $roles
+     * @return null|UserInterface
+     */
+    public function checkRole(array $roles)
+    {
+        // Find a user which matches the required roles.
+        $user = $this->getCustomerUser();
+
+        if (! $this->hasRequiredRole($user, $roles)) {
+            $user = $this->getAdminUser();
+
+            if (! $this->hasRequiredRole($user, $roles)) {
+                $user = null;
+            }
+        }
+
+        return $user;
+    }
+
+    /**
     * Sets the authenticated admin user.
     *
     * @param UserInterface $user A UserInterface, or null if no further user should be stored
@@ -219,6 +251,6 @@ class SecurityContext
      */
     public function clearAdminUser()
     {
-       $this->getSession()->clearAdminUser();
+        $this->getSession()->clearAdminUser();
     }
 }

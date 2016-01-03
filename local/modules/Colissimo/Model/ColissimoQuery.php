@@ -33,7 +33,7 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Class ColissimoQuery
  * @package Colissimo\Model
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ColissimoQuery 
 {

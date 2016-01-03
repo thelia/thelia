@@ -11,12 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Install;
+
 use Thelia\Install\Exception\AlreadyInstallException;
 
 /**
  * Class BaseInstall
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 abstract class BaseInstall
 {
@@ -32,7 +33,6 @@ abstract class BaseInstall
      */
     public function __construct($verifyInstall = true)
     {
-
         // Check if install wizard is launched via CLI
         if (php_sapi_name() == 'cli') {
             $this->isConsoleMode = true;

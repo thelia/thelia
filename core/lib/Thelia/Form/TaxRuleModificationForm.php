@@ -34,7 +34,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                                 ),
                             )
                         ),
-                    )
+                    ),
             ))
         ;
     }

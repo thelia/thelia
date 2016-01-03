@@ -12,11 +12,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\AdministratorCreationForm;
-use Thelia\Form\AdministratorModificationForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AdminQuery;
 
 class AdministratorController extends AbstractCrudController
@@ -27,9 +26,7 @@ class AdministratorController extends AbstractCrudController
             'administrator',
             'manual',
             'order',
-
             AdminResources::ADMINISTRATOR,
-
             TheliaEvents::ADMINISTRATOR_CREATE,
             TheliaEvents::ADMINISTRATOR_UPDATE,
             TheliaEvents::ADMINISTRATOR_DELETE
@@ -38,12 +35,12 @@ class AdministratorController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new AdministratorCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::ADMINISTRATOR_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new AdministratorModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -103,7 +100,7 @@ class AdministratorController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new AdministratorModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -145,24 +142,24 @@ class AdministratorController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         // We always return to the feature edition form
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     protected function performAdditionalCreateAction($updateEvent)
     {
         // We always return to the feature edition form
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     protected function performAdditionalUpdateAction($updateEvent)
     {
         // We always return to the feature edition form
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.administrators.view"
         );
     }

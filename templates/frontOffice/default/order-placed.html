@@ -26,32 +26,51 @@
             {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="placed-order" id=$placed_order_id}
+            {ifhook rel="order-placed.body"}
+                {hook name="order-placed.body" module="$PAYMENT_MODULE"}
+            {/ifhook}
+            {elsehook rel="order-placed.body"}
+                <div id="payment-success" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{intl l="You choose"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    </div>
+                    <div class="panel-body">
+                        <h3>{intl l="Thank you for the trust you place in us."}</h3>
+                        <p>{intl l="A summary of your order has been sent to the following address"} : {customer attr="email"}</p>
+                        <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
+                        <dl class="dl-horizontal">
+                            <dt>{intl l="Order number"} : </dt>
+                            <dd>{$REF}</dd>
+                            <dt>{intl l="Date"} : </dt>
+                            <dd>{format_date date=$CREATE_DATE output="date"}</dd>
+                            <dt>{intl l="Total"} : </dt>
+                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} currency_id=$CURRENCY}</dd>
+                        </dl>
 
-            <div id="payment-success" class="panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                        {block name='additional-payment-info'}{/block}
+
+                        {hook name="order-placed.additional-payment-info" module="$PAYMENT_MODULE" placed_order_id=$placed_order_id}
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <h3>{intl l="Thank you for the trust you place in us."}</h3>
-                    <p>{intl l="A summary of your order email has been sent to the following address"} : {customer attr="email"}</p>
-                    <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
-
-                    <dl class="dl-horizontal">
-                        <dt>{intl l="Order number"} : </dt>
-                        <dd>{$REF}</dd>
-                        <dt>{intl l="Date"} : </dt>
-                        <dd>{format_date date=$CREATE_DATE output="date"}</dd>
-                        <dt>{intl l="Total"} : </dt>
-                        <dd>{$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop}</dd>
-                    </dl>
-                </div>
-            </div>
-
+            {/elsehook}
             {/loop}
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-default">{intl l="Go home"}</a>
 
         </article>
 
     </div>
+{/block}
+
+
+{block name="stylesheet"}
+{hook name="order-placed.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order-placed.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="order-placed.javascript-initialization"}
 {/block}

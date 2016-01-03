@@ -40,6 +40,8 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
  */
 class Coupon extends BaseCoupon
 {
+    // Define the value of an unlimited coupon usage.
+    const UNLIMITED_COUPON_USE = -1;
 
     use ModelEventDispatcherTrait;
 
@@ -67,11 +69,24 @@ class Coupon extends BaseCoupon
      * @throws \Exception
      */
     public function createOrUpdate(
-        $code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description,
-        $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule,
-        $locale, $freeShippingForCountries, $freeShippingForMethods,
-        $perCustomerUsageCount)
-    {
+        $code,
+        $title,
+        array $effects,
+        $type,
+        $isRemovingPostage,
+        $shortDescription,
+        $description,
+        $isEnabled,
+        $expirationDate,
+        $isAvailableOnSpecialOffers,
+        $isCumulative,
+        $maxUsage,
+        $defaultSerializedRule,
+        $locale,
+        $freeShippingForCountries,
+        $freeShippingForMethods,
+        $perCustomerUsageCount
+    ) {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -106,8 +121,9 @@ class Coupon extends BaseCoupon
             CouponModuleQuery::create()->filterByCouponId($this->id)->delete();
 
             foreach ($freeShippingForCountries as $countryId) {
-
-                if ($countryId <= 0) continue;
+                if ($countryId <= 0) {
+                    continue;
+                }
 
                 $couponCountry = new CouponCountry();
 
@@ -119,8 +135,9 @@ class Coupon extends BaseCoupon
             }
 
             foreach ($freeShippingForMethods as $moduleId) {
-
-                if ($moduleId <= 0) continue;
+                if ($moduleId <= 0) {
+                    continue;
+                }
 
                 $couponModule = new CouponModule();
 
@@ -132,9 +149,7 @@ class Coupon extends BaseCoupon
             }
 
             $con->commit();
-
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -184,7 +199,8 @@ class Coupon extends BaseCoupon
      */
     public function getAmount()
     {
-        $amount = $this->getEffects()['amount'];
+        // Amount is now optional
+        $amount = isset($this->getEffects()['amount']) ? $this->getEffects()['amount'] : 0;
 
         return floatval($amount);
     }
@@ -199,10 +215,6 @@ class Coupon extends BaseCoupon
     {
         $effects = $this->unserializeEffects($this->getSerializedEffects());
 
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect coming from database');
-        }
-
         return $effects;
     }
 
@@ -210,18 +222,12 @@ class Coupon extends BaseCoupon
      * Get the Coupon effects
      *
      * @param array $effects Effect ready to be serialized
-     *                       Needs at least the key 'amount'
-     *                       with the amount removed from the cart
      *
      * @throws Exception\InvalidArgumentException
      * @return $this
      */
     public function setEffects(array $effects)
     {
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
-        }
-
         $this->setSerializedEffects($this->serializeEffects($effects));
 
         return $this;
@@ -274,6 +280,10 @@ class Coupon extends BaseCoupon
         return CouponModuleQuery::create()->filterByCouponId($this->getId())->find();
     }
 
+    public function isUsageUnlimited()
+    {
+        return $this->getMaxUsage() == self::UNLIMITED_COUPON_USE;
+    }
     /**
      * Get coupon usage left, either overall, or per customer.
      *
@@ -286,14 +296,12 @@ class Coupon extends BaseCoupon
         $usageLeft = $this->getMaxUsage();
 
         if ($this->getPerCustomerUsageCount()) {
-
-             // Get usage left for current customer. If the record is not found,
+            // Get usage left for current customer. If the record is not found,
             // it means that the customer has not yes used this coupon.
             if (null !== $couponCustomerCount = CouponCustomerCountQuery::create()
                     ->filterByCouponId($this->getId())
                     ->filterByCustomerId($customerId)
                     ->findOne()) {
-
                 // The coupon has already been used -> remove this customer's usage count
                 $usageLeft -= $couponCustomerCount->getCount();
             }

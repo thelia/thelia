@@ -53,4 +53,16 @@ trait ModelEventDispatcherTrait
             $this->dispatcher->dispatch($eventName, $event);
         }
     }
+
+    public function __sleep()
+    {
+        $data = parent::__sleep();
+        $key = array_search("dispatcher", $data);
+
+        if (isset($data[$key])) {
+            unset($data[$key]);
+        }
+
+        return $data;
+    }
 }

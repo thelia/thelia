@@ -22,15 +22,18 @@
 /*************************************************************************************/
 
 namespace Front\Controller;
+
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Form\ContactForm;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
  * Class ContactController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContactController extends BaseFrontController
 {
@@ -39,35 +42,42 @@ class ContactController extends BaseFrontController
      */
     public function sendAction()
     {
-        $error_message = false;
-        $contactForm = new ContactForm($this->getRequest());
+        $contactForm = $this->createForm(FrontForm::CONTACT);
 
         try {
             $form = $this->validateForm($contactForm);
 
             $message = \Swift_Message::newInstance($form->get('subject')->getData())
-                ->addFrom($form->get('email')->getData(), $form->get('name')->getData())
-                ->addTo(ConfigQuery::read('store_email'), ConfigQuery::read('store_name'))
+                ->addFrom(ConfigQuery::getStoreEmail(), $form->get('name')->getData())
+                ->addReplyTo($form->get('email')->getData(), $form->get('name')->getData())
+                ->addTo(ConfigQuery::getStoreEmail(), ConfigQuery::getStoreName())
                 ->setBody($form->get('message')->getData())
             ;
 
             $this->getMailer()->send($message);
 
+            if ($contactForm->hasSuccessUrl()) {
+                return $this->generateSuccessRedirect($contactForm);
+            }
+
+            return $this->generateRedirectFromRoute('contact.success');
+
         } catch (FormValidationException $e) {
             $error_message = $e->getMessage();
         }
 
-        if ($error_message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
+        Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
 
-            $contactForm->setErrorMessage($error_message);
+        $contactForm->setErrorMessage($error_message);
 
-            $this->getParserContext()
-                ->addForm($contactForm)
-                ->setGeneralError($error_message)
-            ;
-        } else {
-            $this->redirectToRoute('contact.success');
+        $this->getParserContext()
+            ->addForm($contactForm)
+            ->setGeneralError($error_message)
+        ;
+
+        // Redirect to error URL if defined
+        if ($contactForm->hasErrorUrl()) {
+            return $this->generateErrorRedirect($contactForm);
         }
     }
 }

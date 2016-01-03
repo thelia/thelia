@@ -1,0 +1,11 @@
+<div class="search-container navbar-form navbar-left">
+    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
+    <label id="search-label" class="sr-only" for="q">{intl l="Search a product" d="hooksearch.fo.default"}</label>
+    <div class="input-group">
+        <input type="search" name="q" id="q" placeholder="{intl l="Search..." d="hooksearch.fo.default"}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters." d="hooksearch.fo.default"}">
+        <div class="input-group-btn">
+            <button type="submit" class="btn btn-search"><i class="fa fa-search"></i> <span class="sr-only">{intl l="Search" d="hooksearch.fo.default"}</span></button>
+        </div>
+    </div>
+    </form>
+</div>

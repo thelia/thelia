@@ -12,15 +12,15 @@
 
         <div class="form-container">
 
-            <form action="{$formAction}" {form_enctype form=$form} method="POST" >
+            <form action="{$formAction}" {form_enctype} method="POST" >
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
-                {form_field form=$form field='locale'}
+                {form_field field='locale'}
                     <input type="hidden" name="{$name}" value="{if $value}{$value}{else}{$edit_language_locale}{/if}" />
                 {/form_field}
 
-                {form_field form=$form field='success_url'}
+                {form_field field='success_url'}
                     <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}'}" />
                 {/form_field}
 
@@ -46,7 +46,7 @@
 
                 <div class="row">
                     <div class="col-md-3">
-                        {form_field form=$form field='code'}
+                        {form_field field='code'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label class="control-label" for="code">{intl l='Coupon code * :'}</label>
                                 <input required id="code" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='code'}">
@@ -54,117 +54,11 @@
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
-
-                        {form_field form=$form field='isEnabled'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="is-enabled" class="checkbox control-label">
-                                    <input id="is-enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
-                                    {if $error}{$message}{/if}
-                                    {intl l='Enabled'}
-                                </label>
-                            </div>
-                        {/form_field}
-
-                        {form_field form=$form field='isAvailableOnSpecialOffers'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="is-available-on-special-offers" class="checkbox control-label">
-                                    <input id="is-available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
-                                    {if $error}{$message}{/if}
-                                    {intl l='Valid on special offers'}
-                                </label>
-                            </div>
-                        {/form_field}
-
-                        {form_field form=$form field='isCumulative'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="is-cumulative" class="checkbox control-label">
-                                    <input id="is-cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
-                                    {if $error}{$message}{/if}
-                                    {intl l='Combinable with other promotions'}
-                                </label>
-                            </div>
-                        {/form_field}
-
-                        {form_field form=$form field='expirationDate'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="expiration-date" class="control-label">{intl l='Expiration date * :'}</label>
-                                {* Do not use 'date' input type, as some browsers enforce RFC339 date formats, which is not what we want *}
-                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
-                                {if $error}{$message}{/if}
-                            </div>
-                        {/form_field}
-
-                        {form_field form=$form field='maxUsage'}
-                            <div class="form-group {if $error}has-error{/if}">
-
-                                <label for="is-unlimited" class="checkbox control-label">
-                                    <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $value == '' || $value == -1}checked="checked"{/if}>
-                                    {intl l='Unlimited number of uses'}
-                                </label>
-                            </div>
-                        {/form_field}
-
-                        <div class="well well-sm" id="max-usage-data">
-                            {form_field form=$form field='maxUsage'}
-                                <div class="form-group {if $error}has-error{/if}">
-                                    <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Maximum usage count :'}</label>
-                                    <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if $value == ''}-1{else}{$value}{/if}" placeholder="{intl l='Usage count'}">
-                                    {if $error}{$message}{/if}
-                                </div>
-                            {/form_field}
-
-                            {form_field form=$form field='perCustomerUsageCount'}
-                                <div class="form-group {if $error}has-error{/if}" style="margin-bottom: 0;">
-                                    {foreach $choices as $choice}
-                                    <label class="radio-inline">
-                                        <input type="radio" name="{$name}" value="{$choice->value}" {if $value == $choice->data}checked="checked"{/if}>
-                                        {$choice->label}
-                                    </label>
-                                    {/foreach}
-                                </div>
-                            {/form_field}
-                        </div>
-
-                        {form_field form=$form field='isRemovingPostage'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="is-removing-postage" class="checkbox control-label">
-                                    <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
-                                    {if $error}{$message}{/if}
-                                    {intl l='Provides free shipping'}
-                                </label>
-                            </div>
-                        {/form_field}
-
-                        <div class="free-postage-conditions well well-sm" " style="display: none">
-                            {form_field form=$form field='freeShippingForCountries'}
-                            <div class="form-group {if $error}has-error{/if}">
-                                <label for="for-countries-only">{intl l="Free shipping to countries  :"}</label>
-                                <select multiple size="5" class="form-control" id="for-countries-only" name="{$name}">
-                                    {foreach $choices as $choice}
-                                        <option value="{$choice->value}" {if in_array($choice->value, $value)}selected="selected"{/if}>{$choice->label}</option>
-                                    {/foreach}
-                                </select>
-                                <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one country'}</span>
-                            </div>
-                            {/form_field}
-
-                            {form_field form=$form field='freeShippingForModules'}
-                                <div class="form-group {if $error}has-error{/if}" style="margin-bottom: 0;">
-                                    <label for="for-modules-only">{intl l="Free shipping for methods :"}</label>
-                                    <select multiple size="5" class="form-control" id="for-modules-only" name="{$name}">
-                                        {foreach $choices as $choice}
-                                            <option value="{$choice->value}" {if in_array($choice->value, $value)}selected="selected"{/if}>{$choice->label}</option>
-                                        {/foreach}
-                                    </select>
-                                    <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one shipping method'}</span>
-                                </div>
-                            {/form_field}
-                        </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-9">
                         <div id="coupon-type">
-                            {form_field form=$form field='type'}
+                            {form_field field='type'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="type" class="control-label">{intl l='Coupon type * :'}</label>
                                     <select required name="{$name}" id="type" class="col-md-12 form-control">
@@ -179,11 +73,123 @@
                                     <span class="help-block typeToolTip">{$availableCoupons.0.toolTip}</span>
                                 </div>
                             {/form_field}
+                        </div>
+                    </div>
+                </div>
 
+                <div class="row">
+                    <div class="col-md-3">
+                        {form_field field='isEnabled'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="is-enabled" class="checkbox control-label">
+                                    <input id="is-enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
+                                    {if $error}{$message}{/if}
+                                    {intl l='Enabled'}
+                                </label>
+                            </div>
+                        {/form_field}
+
+                        {form_field field='isAvailableOnSpecialOffers'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="is-available-on-special-offers" class="checkbox control-label">
+                                    <input id="is-available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
+                                    {if $error}{$message}{/if}
+                                    {intl l='Valid on special offers'}
+                                </label>
+                            </div>
+                        {/form_field}
+
+                        {form_field field='isCumulative'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="is-cumulative" class="checkbox control-label">
+                                    <input id="is-cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
+                                    {if $error}{$message}{/if}
+                                    {intl l='Combinable with other promotions'}
+                                </label>
+                            </div>
+                        {/form_field}
+
+                        {form_field field='expirationDate'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="expiration-date" class="control-label">{intl l='Expiration date * :'}</label>
+                                {* Do not use 'date' input type, as some browsers enforce RFC339 date formats, which is not what we want *}
+                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
+                                {if $error}{$message}{/if}
+                            </div>
+                        {/form_field}
+
+                        {form_field field='maxUsage'}
+                            <div class="form-group {if $error}has-error{/if}">
+
+                                <label for="is-unlimited" class="checkbox control-label">
+                                    <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $value == '' || $value == -1}checked="checked"{/if}>
+                                    {intl l='Unlimited number of uses'}
+                                </label>
+                            </div>
+                        {/form_field}
+
+                        <div class="well well-sm" id="max-usage-data">
+                            {form_field field='maxUsage'}
+                                <div class="form-group {if $error}has-error{/if}">
+                                    <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Maximum usage count :'}</label>
+                                    <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if $value == ''}-1{else}{$value}{/if}" placeholder="{intl l='Usage count'}">
+                                    {if $error}{$message}{/if}
+                                </div>
+                            {/form_field}
+
+                            {form_field field='perCustomerUsageCount'}
+                                <div class="form-group {if $error}has-error{/if}" style="margin-bottom: 0;">
+                                    {foreach $choices as $choice}
+                                    <label class="radio-inline">
+                                        <input type="radio" name="{$name}" value="{$choice->value}" {if $value == $choice->data}checked="checked"{/if}>
+                                        {$choice->label}
+                                    </label>
+                                    {/foreach}
+                                </div>
+                            {/form_field}
+                        </div>
+
+                        {form_field field='isRemovingPostage'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="is-removing-postage" class="checkbox control-label">
+                                    <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
+                                    {if $error}{$message}{/if}
+                                    {intl l='Provides free shipping'}
+                                </label>
+                            </div>
+                        {/form_field}
+
+                        <div class="free-postage-conditions well well-sm" " style="display: none">
+                            {form_field field='freeShippingForCountries'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="for-countries-only">{intl l="Free shipping to countries  :"}</label>
+                                <select multiple size="5" class="form-control" id="for-countries-only" name="{$name}">
+                                    {foreach $choices as $choice}
+                                        <option value="{$choice->value}" {if in_array($choice->value, $value)}selected="selected"{/if}>{$choice->label}</option>
+                                    {/foreach}
+                                </select>
+                                <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one country'}</span>
+                            </div>
+                            {/form_field}
+
+                            {form_field field='freeShippingForModules'}
+                                <div class="form-group {if $error}has-error{/if}" style="margin-bottom: 0;">
+                                    <label for="for-modules-only">{intl l="Free shipping for methods :"}</label>
+                                    <select multiple size="5" class="form-control" id="for-modules-only" name="{$name}">
+                                        {foreach $choices as $choice}
+                                            <option value="{$choice->value}" {if in_array($choice->value, $value)}selected="selected"{/if}>{$choice->label}</option>
+                                        {/foreach}
+                                    </select>
+                                    <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one shipping method'}</span>
+                                </div>
+                            {/form_field}
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div id="coupon-inputs">
                             <div class="inputs">
-                                {form_field form=$form field='amount'}
                                 {$couponInputsHtml nofilter}
-                                {/form_field}
                             </div>
                         </div>
                     </div>
@@ -191,7 +197,7 @@
                     <div class="col-md-6">
 
                         {loop type="lang" name="get-flag" id=$edit_language_id}
-                            {form_field form=$form field='title'}
+                            {form_field field='title'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="title" class="control-label" >{intl l='Title * :'}</label>
                                     <div class="input-group">
@@ -202,7 +208,7 @@
                                 </div>
                             {/form_field}
 
-                            {form_field form=$form field='shortDescription'}
+                            {form_field field='shortDescription'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="short-description" class="control-label">{intl l='Short description :'} <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></label>
                                     <textarea id="short-description" name="{$name}" class="form-control" placeholder="{intl l='short description'}" rows="3">{$value nofilter}</textarea>
@@ -210,7 +216,7 @@
                                 </div>
                             {/form_field}
 
-                            {form_field form=$form field='description'}
+                            {form_field field='description'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="description" class="control-label">{intl l='Long description :'} <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></label>
                                     <textarea id="description" name="{$name}" placeholder="{intl l='long description'}" class="form-control wysiwyg" rows="3">{$value nofilter}</textarea>
@@ -228,7 +234,7 @@
                 <div class="col-md-12">
                     <p class="title title-without-tabs">{intl l="Coupon conditions"}</p>
                     <br />
-                    {include file='includes/notifications.html' type='info' dismissable=false message={intl l='Please save this coupon first to define coupon conditions'}}
+                    {include file='includes/notifications.html' alert_type='info' dismissable=false message={intl l='Please save this coupon first to define coupon conditions'}}
                 </div>
             {else}
                 <div class="col-md-6">
@@ -253,7 +259,7 @@
 
                     <p class="title title-without-tabs">{intl l="Add a condition"}</p>
 
-                    <form id="condition-form" action="{$urlAjaxSaveConditions}" {form_enctype form=$form} method="POST" >
+                    <form id="condition-form" action="{$urlAjaxSaveConditions nofilter}" {form_enctype} method="POST" >
 
                         <div id="condition-add-type" class="form-group">
                             <label for="categoryCondition">{intl l='Condition category :'}</label>
@@ -270,7 +276,7 @@
 
                         </div>
 
-                        <a id="condition-save-btn" title="{intl l='Save this condition'}" class="btn btn-default btn-primary pull-right" data-toggle="confirm" data-script="">
+                        <a id="condition-save-btn" title="{intl l='Save this condition'}" class="btn btn-primary pull-right" data-toggle="confirm" data-script="">
                             <span class="glyphicon glyphicon-plus-sign"></span> {intl l='Save this condition'}
                         </a>
 

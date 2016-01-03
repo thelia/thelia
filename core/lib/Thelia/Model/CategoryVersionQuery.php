@@ -16,4 +16,5 @@ use Thelia\Model\Base\CategoryVersionQuery as BaseCategoryVersionQuery;
  */
 class CategoryVersionQuery extends BaseCategoryVersionQuery
 {
-} // CategoryVersionQuery
+}
+// CategoryVersionQuery

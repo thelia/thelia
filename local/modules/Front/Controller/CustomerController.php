@@ -23,70 +23,126 @@
 namespace Front\Controller;
 
 use Front\Front;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Thelia\Core\Translation\Translator;
-use Thelia\Form\CustomerCreateForm;
-use Thelia\Form\CustomerLogin;
-use Thelia\Form\CustomerLostPasswordForm;
-use Thelia\Form\CustomerPasswordUpdateForm;
-use Thelia\Form\CustomerProfileUpdateForm;
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\Customer;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\NewsletterQuery;
-use Thelia\Tools\URL;
-use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
+use Thelia\Form\CustomerLogin;
+use Thelia\Form\Definition\FrontForm;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Customer;
+use Thelia\Model\NewsletterQuery;
+use Thelia\Tools\RememberMeTrait;
+use Thelia\Tools\URL;
 
 /**
  * Class CustomerController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerController extends BaseFrontController
 {
-    use \Thelia\Cart\CartTrait;
+    use RememberMeTrait;
+
+    /**
+     * Display the register template if no customer logged
+     */
+    public function viewLoginAction()
+    {
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            // Redirect to home page
+            return $this->generateRedirect(URL::getInstance()->getIndexPage());
+        }
+
+        return $this->render("login");
+    }
+
+    /**
+     * Display the register template if no customer logged
+     */
+    public function viewRegisterAction()
+    {
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            // Redirect to home page
+            return $this->generateRedirect(URL::getInstance()->getIndexPage());
+        }
+
+        return $this->render("register");
+    }
 
     public function newPasswordAction()
     {
+        $passwordLost = $this->createForm(FrontForm::CUSTOMER_LOST_PASSWORD);
+
         if (! $this->getSecurityContext()->hasCustomerUser()) {
-            $message = false;
-
-            $passwordLost = new CustomerLostPasswordForm($this->getRequest());
-
             try {
-
                 $form = $this->validateForm($passwordLost);
 
                 $event = new LostPasswordEvent($form->get("email")->getData());
 
                 $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
 
+                return $this->generateSuccessRedirect($passwordLost);
+
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Please check your input: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occurred: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             }
 
             if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
-
-                $passwordLost->setErrorMessage($message);
-
-                $this->getParserContext()
-                    ->addForm($passwordLost)
-                    ->setGeneralError($message)
-                ;
+                Tlog::getInstance()->error(
+                    sprintf(
+                        "Error during customer creation process : %s. Exception was %s",
+                        $message,
+                        $e->getMessage()
+                    )
+                );
             }
+        } else {
+            $message = $this->getTranslator()->trans(
+                "You're currently logged in. Please log out before requesting a new password.",
+                [],
+                Front::MESSAGE_DOMAIN
+            );
         }
+
+        $passwordLost->setErrorMessage($message);
+
+        $this->getParserContext()
+            ->addForm($passwordLost)
+            ->setGeneralError($message)
+        ;
+
+        // Redirect to error URL if defined
+        if ($passwordLost->hasErrorUrl()) {
+            return $this->generateErrorRedirect($passwordLost);
+        }
+    }
+
+    public function newPasswordSentAction()
+    {
+        $this->getParser()->assign('password_sent', true);
     }
 
     /**
@@ -96,10 +152,7 @@ class CustomerController extends BaseFrontController
     public function createAction()
     {
         if (! $this->getSecurityContext()->hasCustomerUser()) {
-
-            $message = false;
-
-            $customerCreation = new CustomerCreateForm($this->getRequest());
+            $customerCreation = $this->createForm(FrontForm::CUSTOMER_CREATE);
 
             try {
                 $form = $this->validateForm($customerCreation, "post");
@@ -113,7 +166,10 @@ class CustomerController extends BaseFrontController
                 // Newsletter
                 if (true === $form->get('newsletter')->getData()) {
                     $newsletterEmail = $newCustomer->getEmail();
-                    $nlEvent = new NewsletterEvent($newsletterEmail, $this->getRequest()->getSession()->getLang()->getLocale());
+                    $nlEvent = new NewsletterEvent(
+                        $newsletterEmail,
+                        $this->getRequest()->getSession()->getLang()->getLocale()
+                    );
                     $nlEvent->setFirstname($newCustomer->getFirstname());
                     $nlEvent->setLastname($newCustomer->getLastname());
 
@@ -128,39 +184,63 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($customerCreateEvent->getCustomer());
 
-                $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
+                $cart = $this->getSession()->getSessionCart($this->getDispatcher());
                 if ($cart->getCartItems()->count() > 0) {
-                    $this->redirectToRoute('cart.view');
+                    $response = $this->generateRedirectFromRoute('cart.view');
                 } else {
-                    $this->redirectSuccess($customerCreation);
+                    $response = $this->generateSuccessRedirect($customerCreation);
                 }
+
+                return $response;
+
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Please check your input: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occured: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             }
 
-            if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(
+                sprintf(
+                    "Error during customer creation process : %s. Exception was %s",
+                    $message,
+                    $e->getMessage()
+                )
+            );
 
-                $customerCreation->setErrorMessage($message);
+            $customerCreation->setErrorMessage($message);
 
-                $this->getParserContext()
-                    ->addForm($customerCreation)
-                    ->setGeneralError($message)
-                ;
+            $this->getParserContext()
+                ->addForm($customerCreation)
+                ->setGeneralError($message)
+            ;
+
+            // Redirect to error URL if defined
+            if ($customerCreation->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerCreation);
             }
         }
     }
 
     /**
-     * Update customer data. On success, redirect to success_url if exists.
-     * Otherwise, display the same view again.
+     * Prepare customer data update.
      */
     public function viewAction()
     {
         $this->checkAuth();
 
+        /** @var Customer $customer */
         $customer = $this->getSecurityContext()->getCustomerUser();
         $data = array(
             'id'           => $customer->getId(),
@@ -168,10 +248,11 @@ class CustomerController extends BaseFrontController
             'firstname'    => $customer->getFirstName(),
             'lastname'     => $customer->getLastName(),
             'email'        => $customer->getEmail(),
+            'email_confirm'        => $customer->getEmail(),
             'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
-        $customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest(), 'form', $data);
+        $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE, 'form', $data);
 
         // Pass it to the parser
         $this->getParserContext()->addForm($customerProfileUpdateForm);
@@ -180,9 +261,7 @@ class CustomerController extends BaseFrontController
     public function updatePasswordAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
-            $message = false;
-
-            $customerPasswordUpdateForm = new CustomerPasswordUpdateForm($this->getRequest());
+            $customerPasswordUpdateForm = $this->createForm(FrontForm::CUSTOMER_PASSWORD_UPDATE);
 
             try {
                 $customer = $this->getSecurityContext()->getCustomerUser();
@@ -193,23 +272,43 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
-                $this->redirectSuccess($customerPasswordUpdateForm);
+                return $this->generateSuccessRedirect($customerPasswordUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Please check your input: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occured: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             }
 
-            if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer password modification process : %s.", $message));
+            Tlog::getInstance()->error(
+                sprintf(
+                    "Error during customer password modification process : %s.",
+                    $message
+                )
+            );
 
-                $customerPasswordUpdateForm->setErrorMessage($message);
+            $customerPasswordUpdateForm->setErrorMessage($message);
 
-                $this->getParserContext()
-                    ->addForm($customerPasswordUpdateForm)
-                    ->setGeneralError($message)
-                ;
+            $this->getParserContext()
+                ->addForm($customerPasswordUpdateForm)
+                ->setGeneralError($message)
+            ;
+
+            // Redirect to error URL if defined
+            if ($customerPasswordUpdateForm->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerPasswordUpdateForm);
             }
         }
     }
@@ -217,12 +316,10 @@ class CustomerController extends BaseFrontController
     public function updateAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
-
-            $message = false;
-
-            $customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest());
+            $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE);
 
             try {
+                /** @var Customer $customer */
                 $customer = $this->getSecurityContext()->getCustomerUser();
                 $newsletterOldEmail = $customer->getEmail();
 
@@ -230,13 +327,21 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
+
+                $customerChangeEvent->setEmailUpdateAllowed(
+                    (intval(ConfigQuery::read('customer_change_email', 0))) ? true : false
+                );
+
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();
 
                 // Newsletter
                 if (true === $form->get('newsletter')->getData()) {
-                    $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
+                    $nlEvent = new NewsletterEvent(
+                        $updatedCustomer->getEmail(),
+                        $this->getRequest()->getSession()->getLang()->getLocale()
+                    );
                     $nlEvent->setFirstname($updatedCustomer->getFirstname());
                     $nlEvent->setLastname($updatedCustomer->getLastname());
 
@@ -248,7 +353,10 @@ class CustomerController extends BaseFrontController
                     }
                 } else {
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
-                        $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
+                        $nlEvent = new NewsletterEvent(
+                            $updatedCustomer->getEmail(),
+                            $this->getRequest()->getSession()->getLang()->getLocale()
+                        );
                         $nlEvent->setId($newsletter->getId());
                         $this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $nlEvent);
                     }
@@ -256,23 +364,38 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($updatedCustomer);
 
-                $this->redirectSuccess($customerProfileUpdateForm);
+                return $this->generateSuccessRedirect($customerProfileUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Please check your input: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occured: %s",
+                    [
+                        '%s' => $e->getMessage()
+                    ],
+                    Front::MESSAGE_DOMAIN
+                );
             }
 
-            if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
+            Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
 
-                $customerProfileUpdateForm->setErrorMessage($message);
+            $customerProfileUpdateForm->setErrorMessage($message);
 
-                $this->getParserContext()
-                    ->addForm($customerProfileUpdateForm)
-                    ->setGeneralError($message)
-                ;
+            $this->getParserContext()
+                ->addForm($customerProfileUpdateForm)
+                ->setGeneralError($message)
+            ;
+
+            // Redirect to error URL if defined
+            if ($customerProfileUpdateForm->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerProfileUpdateForm);
             }
         }
     }
@@ -287,55 +410,86 @@ class CustomerController extends BaseFrontController
     public function loginAction()
     {
         if (! $this->getSecurityContext()->hasCustomerUser()) {
-            $message = false;
-
             $request = $this->getRequest();
             $customerLoginForm = new CustomerLogin($request);
 
             try {
-
                 $form = $this->validateForm($customerLoginForm, "post");
 
                 // If User is a new customer
                 if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
-                    $this->redirectToRoute("customer.create.process", array("email" => $form->get("email")->getData()));
+                    return $this->generateRedirectFromRoute(
+                        "customer.create.process",
+                        array(
+                            "email" => $form->get("email")->getData()
+                        )
+                    );
                 } else {
-
                     try {
-
                         $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
                         $customer = $authenticator->getAuthentifiedUser();
 
                         $this->processLogin($customer);
 
-                        $successUrl = $customerLoginForm->getSuccessUrl();
+                        if (intval($form->get('remember_me')->getData()) > 0) {
+                            // If a remember me field if present and set in the form, create
+                            // the cookie thant store "remember me" information
+                            $this->createRememberMeCookie(
+                                $customer,
+                                $this->getRememberMeCookieName(),
+                                $this->getRememberMeCookieExpiration()
+                            );
+                        }
 
-                        return RedirectResponse::create($successUrl);
+                        return $this->generateSuccessRedirect($customerLoginForm);
 
                     } catch (UsernameNotFoundException $e) {
-                        $message = "Wrong email or password. Please try again";
+                        $message = $this->getTranslator()->trans(
+                            "Wrong email or password. Please try again",
+                            [],
+                            Front::MESSAGE_DOMAIN
+                        );
                     } catch (WrongPasswordException $e) {
-                        $message = "Wrong email or password. Please try again";
+                        $message = $this->getTranslator()->trans(
+                            "Wrong email or password. Please try again",
+                            [],
+                            Front::MESSAGE_DOMAIN
+                        );
                     } catch (AuthenticationException $e) {
-                        $message = "Wrong email or password. Please try again";
+                        $message = $this->getTranslator()->trans(
+                            "Wrong email or password. Please try again",
+                            [],
+                            Front::MESSAGE_DOMAIN
+                        );
                     }
 
                 }
-
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Please check your input: %s",
+                    ['%s' => $e->getMessage()],
+                    Front::MESSAGE_DOMAIN
+                );
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occured: %s",
+                    ['%s' => $e->getMessage()],
+                    Front::MESSAGE_DOMAIN
+                );
             }
 
-            if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer login process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(
+                sprintf(
+                    "Error during customer login process : %s. Exception was %s",
+                    $message,
+                    $e->getMessage()
+                )
+            );
 
-                $customerLoginForm->setErrorMessage($message);
+            $customerLoginForm->setErrorMessage($message);
 
-                $this->getParserContext()->addForm($customerLoginForm);
-            }
+            $this->getParserContext()->addForm($customerLoginForm);
         }
     }
 
@@ -348,8 +502,10 @@ class CustomerController extends BaseFrontController
             $this->dispatch(TheliaEvents::CUSTOMER_LOGOUT);
         }
 
+        $this->clearRememberMeCookie($this->getRememberMeCookieName());
+
         // Redirect to home page
-        return RedirectResponse::create(URL::getInstance()->getIndexPage());
+        return $this->generateRedirect(URL::getInstance()->getIndexPage());
     }
 
     /**
@@ -387,9 +543,21 @@ class CustomerController extends BaseFrontController
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
             isset($data["company"])?$data["company"]:null,
-            null
+            null,
+            isset($data["state"])?$data["state"]:null
         );
 
         return $customerCreateEvent;
+    }
+
+
+    protected function getRememberMeCookieName()
+    {
+        return ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
+    }
+
+    protected function getRememberMeCookieExpiration()
+    {
+        return ConfigQuery::read('customer_remember_me_cookie_expiration', 2592000 /* 1 month */);
     }
 }

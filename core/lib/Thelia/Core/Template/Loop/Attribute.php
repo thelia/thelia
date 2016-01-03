@@ -16,18 +16,19 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\Attribute as AttributeModel;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\Map\AttributeTemplateTableMap;
+
 /**
  *
  * Attribute loop
@@ -36,6 +37,14 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * Class Attribute
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProduct()
+ * @method int[] getTemplate()
+ * @method int[] getExcludeTemplate()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -85,7 +94,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
-        $exclude_template = $this->getExcludeTemplate();
+        $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useAttributePosistion = true;
 
@@ -95,14 +104,18 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
             // Ignore if the product cannot be found.
             if ($products !== null) {
-
                 // Create template array
-                if ($template == null) $template = array();
+                if ($template == null) {
+                    $template = array();
+                }
 
+                /** @var ProductModel $product */
                 foreach ($products as $product) {
-                    $tpl_id = $product->getTemplateId();
+                    $tplId = $product->getTemplateId();
 
-                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                    if (! is_null($tplId)) {
+                        $template[] = $tplId;
+                    }
                 }
             }
 
@@ -114,7 +127,6 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (! empty($template)) {
-
             // Join with feature_template table to get position
             $search
                 ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
@@ -122,18 +134,13 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             ;
 
             $this->useAttributePosistion = false;
-        } elseif (null !== $exclude_template) {
-
+        } elseif (null !== $excludeTemplate) {
             // Join with attribute_template table to get position
-            $exclude_attributes = AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find();
+            $excludeAttributes = AttributeTemplateQuery::create()->filterByTemplateId($excludeTemplate)->select('attribute_id')->find();
 
             $search
-                ->joinAttributeTemplate(null, Criteria::LEFT_JOIN)
-                ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
-                ->filterById($exclude_attributes, Criteria::NOT_IN)
+                ->filterById($excludeAttributes, Criteria::NOT_IN)
             ;
-
-            $this->useAttributePosistion = false;
         }
 
         $orders  = $this->getOrder();
@@ -153,16 +160,18 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if ($this->useAttributePosistion)
+                    if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::ASC);
-                     else
+                    } else {
                         $search->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                    }
                     break;
                 case "manual_reverse":
-                    if ($this->useAttributePosistion)
+                    if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::DESC);
-                     else
+                    } else {
                         $search->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                    }
                     break;
             }
         }
@@ -172,22 +181,23 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var AttributeModel $attribute */
         foreach ($loopResult->getResultDataCollection() as $attribute) {
             $loopResultRow = new LoopResultRow($attribute);
             $loopResultRow->set("ID", $attribute->getId())
-                ->set("IS_TRANSLATED",$attribute->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$attribute->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $attribute->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $attribute->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
             ;
+            $this->addOutputFields($loopResultRow, $attribute);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

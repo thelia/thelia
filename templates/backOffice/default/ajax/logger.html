@@ -2,9 +2,7 @@
     <ul id="logger-content">
         {foreach $entries as $entry}
         <li class="entry">
-            <span class="head">{$entry.head}</span>
-            :
-            <span class="data">{$entry.data}</span>
+            <span class="head">{$entry.head}</span> <span class="data">{$entry.data}</span>
         </li>
         {foreachelse}
             <li class="no-entry">NO ENTRIES FOUND</li>

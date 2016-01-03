@@ -30,9 +30,6 @@
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
 
     {javascripts file='assets/js/json2.js'}
         <script src="{$asset_url}"></script>
@@ -45,15 +42,17 @@
     <script>
         $(function($){
             // Url alowing to get coupon inputs
-            $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs}";
-            $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again.'}';
-            $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?'}';
-            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?'}';
+            $.couponManager.urlAjaxAdminCouponDrawInputs = "{$urlAjaxAdminCouponDrawInputs nofilter}";
+            $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again.' js=1}';
+            $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?' js=1}';
+            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?' js=1}';
         });
     </script>
 
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='coupon-create-js'}
+    {hook name="coupon.create-js" location="coupon-create-js" }
+
+    {hook name="wysiwyg.js" location="wysiwyg-coupon-create-js" }
 {/block}

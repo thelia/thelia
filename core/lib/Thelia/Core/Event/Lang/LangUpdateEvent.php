@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Lang;
 /**
  * Class LangUpdateEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUpdateEvent extends LangCreateEvent
 {
@@ -51,5 +51,4 @@ class LangUpdateEvent extends LangCreateEvent
     {
         return $this->id;
     }
-
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
@@ -49,11 +50,8 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function setValue(ConfigUpdateEvent $event)
     {
-
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
-
             if ($event->getValue() !== $config->getValue()) {
-
                 $config->setDispatcher($event->getDispatcher())->setValue($event->getValue())->save();
 
                 $event->setConfig($config);
@@ -68,9 +66,7 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function modify(ConfigUpdateEvent $event)
     {
-
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
-
             $config->setDispatcher($event->getDispatcher())
                 ->setName($event->getEventName())
                 ->setValue($event->getValue())
@@ -94,11 +90,8 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function delete(ConfigDeleteEvent $event)
     {
-
         if (null !== ($config = ConfigQuery::create()->findPk($event->getConfigId()))) {
-
             if (!$config->getSecured()) {
-
                 $config->setDispatcher($event->getDispatcher())->delete();
 
                 $event->setConfig($config);

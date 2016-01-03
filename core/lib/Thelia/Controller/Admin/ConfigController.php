@@ -12,15 +12,14 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Config\ConfigDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
+use Thelia\Core\Event\Config\ConfigDeleteEvent;
+use Thelia\Core\Event\Config\ConfigUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
-use Thelia\Form\ConfigModificationForm;
-use Thelia\Form\ConfigCreationForm;
 
 /**
  * Manages variables
@@ -35,9 +34,7 @@ class ConfigController extends AbstractCrudController
             'variable',
             'name',
             'order',
-
             AdminResources::CONFIG,
-
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
             TheliaEvents::CONFIG_DELETE,
@@ -48,12 +45,12 @@ class ConfigController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new ConfigCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::CONFIG_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new ConfigModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::CONFIG_MODIFICATION);
     }
 
     protected function getCreationEvent($data)
@@ -119,7 +116,7 @@ class ConfigController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ConfigModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::CONFIG_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -161,26 +158,28 @@ class ConfigController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.variables.update",
-                array('variable_id' => $this->getRequest()->get('variable_id'))
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.variables.update",
+            array('variable_id' => $this->getRequest()->get('variable_id'))
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.variables.default');
+        return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
 
     /**
      * Change values modified directly from the variable list
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function changeValuesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $variables = $this->getRequest()->get('variable', array());
 
@@ -192,6 +191,6 @@ class ConfigController extends AbstractCrudController
             $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
         }
 
-        $this->redirectToRoute('admin.configuration.variables.default');
+        return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
 }

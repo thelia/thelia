@@ -2,11 +2,11 @@
 <module>
     <fullnamespace>Front\Front</fullnamespace>
     <descriptive locale="en_US">
-        <title>front integration</title>
+        <title>Front integration</title>
         <description></description>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>front office module</title>
+        <title>Front office module</title>
         <description></description>
     </descriptive>
     <version>0.1</version>

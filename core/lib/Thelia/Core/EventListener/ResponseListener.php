@@ -21,11 +21,10 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class ResponseListener
  * @package Thelia\Core\EventListener
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ResponseListener implements EventSubscriberInterface
 {
-
     public function beforeResponse(FilterResponseEvent $event)
     {
         $session = $event->getRequest()->getSession();
@@ -33,10 +32,10 @@ class ResponseListener implements EventSubscriberInterface
         if (null !== $id = $session->get("cart_use_cookie")) {
             $response = $event->getResponse();
             $response->headers->setCookie(new Cookie(
-                    "thelia_cart",
-                    $id,
-                    time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
-                    '/'
+                ConfigQuery::read("cart.cookie_name", 'thelia_cart'),
+                $id,
+                time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
+                '/'
             ));
 
             $session->set("cart_use_cookie", null);

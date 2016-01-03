@@ -3,6 +3,7 @@ local/config/config_db.php
 local/config/build
 local/config/database.yml
 local/config/database.yml.sample.save
+local/config/key
 core/vendor
 local/config/runtime-conf.xml
 cache/*
@@ -27,18 +28,42 @@ phpunit.phar
 phpmyadmin
 composer.phar
 web/.htaccess
+local/I18n/*.php
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
 !local/modules/Cheque/
+!local/modules/Carousel/
 !local/modules/Front/
-!local/modules/TheliaDebugBar/
 !local/modules/Tinymce/
 !local/modules/Colissimo/
+!local/modules/Hook*/
+!local/modules/VirtualProductDelivery/
+!local/modules/VirtualProductControl/
+!local/modules/TheliaSmarty/
+!local/modules/TheliaMigrateCountry/
+local/modules/HookTest/
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
-!templates/backOffice/
-!templates/email/
-!templates/frontOffice/
-!templates/pdf/
+!templates/frontOffice
+templates/frontOffice/*
+!templates/frontOffice/default
+!templates/backOffice
+templates/backOffice/*
+!templates/backOffice/default
+!templates/email
+templates/email/*
+!templates/email/default
+!templates/pdf
+templates/pdf/*
+!templates/pdf/default
+
+#Ignore CodeKit
+codekit-config.json
+config.codekit
+.codekit-cache
+
+# Ignore casperjs screenshots
+tests/functionnal/casperjs/screenshot/
+tests/phpunit/Thelia/Tests/Api/fixtures/visuel*.png

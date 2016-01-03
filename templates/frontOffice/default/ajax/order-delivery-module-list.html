@@ -2,24 +2,50 @@
 {default_translation_domain domain='fo.default'}
 
 {form name="thelia.order.delivery"}
-{loop type="delivery" name="deliveries" force_return="true" country=$country}
 
-{assign var="isDeliveryMethodChecked" value="0"}
-    <div class="radio">
-        {form_field form=$form field='delivery-module'}
-        {if $isPost}
-            {if $value == $ID}
-                {assign var="isDeliveryMethodChecked" value="1"}
-            {/if}
-        {elseif $LOOP_COUNT == 1}
-            {assign var="isDeliveryMethodChecked" value="1"}
-        {/if}
-            <label for="delivery-method_{$ID}">
-                <input type="radio" name="{$name}" id="delivery-method_{$ID}"{if $isDeliveryMethodChecked} checked="checked"{/if} value="{$ID}">
-                <strong>{$TITLE}</strong> / {$POSTAGE} {currency attr="symbol"}
-            </label>
-        {/form_field}
-    </div>
-{/loop}
-{elseloop rel="deliveries"}<div class="deliveries-warning">{intl l="<strong>Sorry!</strong> We are not able to give you a delivery method for your order."}</div>{/elseloop}
+{ifloop rel="deliveries"}
+<table class="table table-condensed table-delivery">
+    <tbody>
+    {loop type="delivery" name="deliveries" force_return="true" country=$country state=$state}
+
+        {assign var="isDeliveryMethodChecked" value="0"}
+        <tr>
+            <td>
+                <div class="radio">
+                    {form_field field='delivery-module'}
+                    {if $isPost}
+                        {if $value == $ID}
+                            {assign var="isDeliveryMethodChecked" value="1"}
+                        {/if}
+                    {elseif $LOOP_COUNT == 1}
+                        {assign var="isDeliveryMethodChecked" value="1"}
+                    {/if}
+                        <label for="delivery-method_{$ID}">
+                            <input type="radio" name="{$name}" id="delivery-method_{$ID}" class="js-change-delivery-method" {if $isDeliveryMethodChecked} checked="checked"{/if} value="{$ID}">
+                            <p>
+                                <strong>{$TITLE}</strong>
+                                <br>
+                                <span class="help-block">{$DESCRIPTION nofilter}</span>
+                            </p>
+                        </label>
+                    {/form_field}
+                </div>
+            </td>
+            <td class="image">
+                {loop type="image" name="deliveryspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
+                    <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
+                {/loop}
+            </td>
+            <td>
+                <div class="price">
+                    {format_money number=$POSTAGE}
+                </div>
+            </td>
+        </tr>
+
+        {hook name="order-delivery.extra" module="$ID"}
+        {hook name="order-delivery.javascript" module="$ID"}
+    {/loop}
+{/ifloop}
+{elseloop rel="deliveries"}<div class="alert alert-warning">{intl l="<strong>Sorry!</strong> We are not able to give you a delivery method for your order."}</div>{/elseloop}
 {/form}

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Routing;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -21,27 +22,29 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
+use Thelia\Model\LangQuery;
+use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**
  * Class RewritingRouter
  * @package Thelia\Core\Routing
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
-
     /**
      * @var RequestContext The context
      */
     protected $context;
 
     /**
-     * @var options, don't use for now but mandatory
+     * @var array options, don't use for now but mandatory
      */
     protected $options;
 
@@ -54,7 +57,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function setContext(RequestContext $context)
     {
-        // TODO: Implement setContext() method.
         $this->context = $context;
     }
 
@@ -67,7 +69,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function getContext()
     {
-        // TODO: Implement getContext() method.
         return $this->context;
     }
 
@@ -155,11 +156,15 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     public function matchRequest(Request $request)
     {
         if (ConfigQuery::isRewritingEnable()) {
+            $urlTool = URL::getInstance();
+
+            $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
+
             try {
-                $rewrittenUrlData = URL::getInstance()->resolve($request->getPathInfo());
+                $rewrittenUrlData = $urlTool->resolve($pathInfo);
             } catch (UrlRewritingException $e) {
                 switch ($e->getCode()) {
-                    case UrlRewritingException::URL_NOT_FOUND :
+                    case UrlRewritingException::URL_NOT_FOUND:
                         throw new ResourceNotFoundException();
                         break;
                     default:
@@ -167,10 +172,25 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 }
             }
 
-            /* is the URL redirected ? */
+            // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
+            // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
+            if (null ==! $requestedLocale = $request->get('lang')) {
+                if (null !== $requestedLang = LangQuery::create()->findOneByLocale($requestedLocale)) {
+                    if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
+                        $localizedUrl = $urlTool->retrieve(
+                            $rewrittenUrlData->view,
+                            $rewrittenUrlData->viewId,
+                            $requestedLang->getLocale()
+                        )->toString();
 
+                        $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
+                    }
+                }
+            }
+
+            /* is the URL redirected ? */
             if (null !== $rewrittenUrlData->redirectedToUrl) {
-                $this->redirect($rewrittenUrlData->redirectedToUrl, 301);
+                $this->redirect($urlTool->absoluteUrl($rewrittenUrlData->redirectedToUrl), 301);
             }
 
             /* define GET arguments in request */
@@ -181,15 +201,17 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                     $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
                 }
             }
+
             if (null !== $rewrittenUrlData->locale) {
-                $request->query->set('locale', $rewrittenUrlData->locale);
+                $this->manageLocale($rewrittenUrlData, $request);
             }
+
 
             foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
                 $request->query->set($parameter, $value);
             }
 
-            return array (
+            return array(
                 '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
                 '_route' => 'rewrite',
                 '_rewritten' => true,
@@ -198,8 +220,26 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         throw new ResourceNotFoundException();
     }
 
+    protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request)
+    {
+        $lang = LangQuery::create()
+            ->findOneByLocale($rewrittenUrlData->locale);
+
+        $langSession = $request->getSession()->getLang();
+
+        if ($lang != $langSession) {
+            if (ConfigQuery::isMultiDomainActivated()) {
+                $this->redirect(
+                    sprintf("%s/%s", $lang->getUrl(), $rewrittenUrlData->rewrittenUrl)
+                );
+            } else {
+                $request->getSession()->setLang($lang);
+            }
+        }
+    }
+
     protected function redirect($url, $status = 302)
     {
-        Redirect::exec($url, $status);
+        throw new RedirectException($url, $status);
     }
 }

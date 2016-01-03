@@ -14,10 +14,8 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\CategoryAssociatedContentQuery;
 
@@ -29,6 +27,12 @@ use Thelia\Model\CategoryAssociatedContentQuery;
  * Class AssociatedContent
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getProduct()
+ * @method int getCategory()
+ * @method int[] getExcludeProduct()
+ * @method int[] getExcludeCategory()
  */
 class AssociatedContent extends Content
 {
@@ -67,34 +71,36 @@ class AssociatedContent extends Content
         }
 
         if ($product !== null) {
+            /** @var ProductAssociatedContentQuery $search */
             $search = ProductAssociatedContentQuery::create();
 
             $search->filterByProductId($product, Criteria::EQUAL);
         } elseif ($category !== null) {
+            /** @var CategoryAssociatedContentQuery $search */
             $search = CategoryAssociatedContentQuery::create();
 
             $search->filterByCategoryId($category, Criteria::EQUAL);
         }
 
-        $exclude_product = $this->getExcludeProduct();
+        $excludeProduct = $this->getExcludeProduct();
 
         // If we have to filter by product, find all products assigned to this product, and filter by found IDs
-        if (null !== $exclude_product) {
+        if (null !== $excludeProduct) {
             // Exclude all contents related to the given product
             $search->filterById(
-                    ProductAssociatedContentQuery::create()->filterByProductId($exclude_product)->select('product_id')->find(),
-                    Criteria::NOT_IN
+                ProductAssociatedContentQuery::create()->filterByProductId($excludeProduct)->select('product_id')->find(),
+                Criteria::NOT_IN
             );
         }
 
-        $exclude_category = $this->getExcludeCategory();
+        $excludeCategory = $this->getExcludeCategory();
 
         // If we have to filter by category, find all contents assigned to this category, and filter by found IDs
-        if (null !== $exclude_category) {
+        if (null !== $excludeCategory) {
             // Exclure tous les attribut qui sont attachés aux templates indiqués
             $search->filterById(
-                    CategoryAssociatedContentQuery::create()->filterByProductId($exclude_category)->select('category_id')->find(),
-                    Criteria::NOT_IN
+                CategoryAssociatedContentQuery::create()->filterByProductId($excludeCategory)->select('category_id')->find(),
+                Criteria::NOT_IN
             );
         }
 
@@ -105,12 +111,12 @@ class AssociatedContent extends Content
         if ($orderByAssociatedContent !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAssociatedContent] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
         if ($orderByAssociatedContentReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAssociatedContentReverse] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
 
         $associatedContents = $this->search($search);
@@ -120,7 +126,6 @@ class AssociatedContent extends Content
         $this->contentPosition = $this->contentId = array();
 
         foreach ($associatedContents as $associatedContent) {
-
             $associatedContentId = $associatedContent->getContentId();
 
             array_push($associatedContentIdList, $associatedContentId);
@@ -132,9 +137,9 @@ class AssociatedContent extends Content
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue( implode(',', $associatedContentIdList) );
+            $this->args->get('id')->setValue(implode(',', $associatedContentIdList));
         } else {
-            $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $associatedContentIdList)) );
+            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $associatedContentIdList)));
         }
 
         return parent::buildModelCriteria();
@@ -145,13 +150,12 @@ class AssociatedContent extends Content
         $results = parent::parseResults($results);
 
         foreach ($results as $loopResultRow) {
-
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow
-                ->set("ID"        , $this->contentId[$relatedContentId])
+                ->set("ID", $this->contentId[$relatedContentId])
                 ->set("CONTENT_ID", $relatedContentId)
-                ->set("POSITION"  , $this->contentPosition[$relatedContentId])
+                ->set("POSITION", $this->contentPosition[$relatedContentId])
 
             ;
         }

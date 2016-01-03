@@ -12,16 +12,16 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Form\CurrencyModificationForm;
-use Thelia\Form\CurrencyCreationForm;
+use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateRateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Manages currencies
@@ -36,9 +36,7 @@ class CurrencyController extends AbstractCrudController
             'currency',
             'manual',
             'order',
-
             AdminResources::CURRENCY,
-
             TheliaEvents::CURRENCY_CREATE,
             TheliaEvents::CURRENCY_UPDATE,
             TheliaEvents::CURRENCY_DELETE,
@@ -49,12 +47,12 @@ class CurrencyController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new CurrencyCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::CURRENCY_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new CurrencyModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::CURRENCY_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -65,6 +63,7 @@ class CurrencyController extends AbstractCrudController
         ->setCurrencyName($formData['name'])
         ->setLocale($formData["locale"])
         ->setSymbol($formData['symbol'])
+        ->setFormat($formData['format'])
         ->setCode($formData['code'])
         ->setRate($formData['rate'])
         ;
@@ -81,6 +80,7 @@ class CurrencyController extends AbstractCrudController
         ->setCurrencyName($formData['name'])
         ->setLocale($formData["locale"])
         ->setSymbol($formData['symbol'])
+        ->setFormat($formData['format'])
         ->setCode($formData['code'])
         ->setRate($formData['rate'])
         ;
@@ -91,9 +91,9 @@ class CurrencyController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('currency_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('currency_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -116,11 +116,12 @@ class CurrencyController extends AbstractCrudController
                 'locale' => $object->getLocale(),
                 'code'   => $object->getCode(),
                 'symbol' => $object->getSymbol(),
+                'format' => $object->getFormat(),
                 'rate'   => $object->getRate()
         );
 
         // Setup the object form
-        return new CurrencyModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::CURRENCY_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -162,15 +163,17 @@ class CurrencyController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.currencies.update",
-                array('currency_id' => $this->getRequest()->get('currency_id'))
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.currencies.update",
+            [
+                'currency_id' => $this->getRequest()->get('currency_id'),
+            ]
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.currencies.default');
+        return $this->generateRedirectFromRoute('admin.configuration.currencies.default');
     }
 
     /**
@@ -179,16 +182,27 @@ class CurrencyController extends AbstractCrudController
     public function updateRatesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         try {
-            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
+            $event = new CurrencyUpdateRateEvent();
+
+            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $event);
+
+            if ($event->hasUndefinedRates()) {
+                return $this->render('currencies', [
+                    'undefined_rates' => $event->getUndefinedRates()
+                ]);
+            }
+
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**
@@ -197,12 +211,14 @@ class CurrencyController extends AbstractCrudController
     public function setDefaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
-        $changeEvent = new CurrencyUpdateEvent($this->getRequest()->get('currency_id', 0));
+        $changeEvent = new CurrencyUpdateEvent((int) $this->getRequest()->get('currency_id', 0));
 
         // Create and dispatch the change event
-        $changeEvent->setIsDefault(true);
+        $changeEvent->setIsDefault(true)->setVisible(1);
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_SET_DEFAULT, $changeEvent);
@@ -211,7 +227,31 @@ class CurrencyController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
+    /**
+     * Sets if the currency is visible for Front
+     */
+    public function setVisibleAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $changeEvent = new CurrencyUpdateEvent((int) $this->getRequest()->get('currency_id', 0));
+
+        // Create and dispatch the change event
+        $changeEvent->setVisible((int) $this->getRequest()->get('visible', 0));
+
+        try {
+            $this->dispatch(TheliaEvents::CURRENCY_SET_VISIBLE, $changeEvent);
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        return $this->redirectToListTemplate();
+    }
 }

@@ -1,0 +1,203 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'tools'}
+{/block}
+
+{block name="page-title"}{intl l='Imports'}{/block}
+
+{block name="check-resource"}admin.import{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    {if $category_order != "manual"}
+        {assign url_category "category_order="|cat:$category_order}
+    {/if}
+    {if $import_order != "manual"}
+        {assign url_import "import_order="|cat:$import_order}
+    {/if}
+
+    <div id="import-modal"></div>
+
+    <div class="configuration">
+
+        <div id="wrapper" class="container">
+
+            <nav>
+                <ul class="breadcrumb">
+                    <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+                    <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
+                    <li>{intl l="Imports"}</li>
+                </ul>
+            </nav>
+
+            {hook name="imports.top" location="imports-top" }
+
+            {loop name="import-category" type="import-category" order=$category_order}
+            {ifloop rel="import-categ-list"}
+                {assign category_title $TITLE}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="general-block-decorator">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-condensed table-left-aligned">
+                                        <caption class="clearfix">
+                                            {admin_position_block
+                                                resource="admin.import"
+                                                access="UPDATE"
+                                                path={url path="admin/import/position/category"}
+                                                url_parameter="id"
+                                                in_place_edit_class="importCategoryPositionChange"
+                                                position=$POSITION
+                                                id=$ID
+                                            }
+                                            {$TITLE}
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th class="col-md-1">
+                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=id{if $import_order == "id"}_reverse{/if}">
+                                                        {intl l="ID"}
+                                                    </a>
+                                                </th>
+                                                <th class="col-md-8">
+                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
+                                                        {intl l="Name"}
+                                                    </a>
+                                                </th>
+                                                <th class="col-md-2">
+                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
+                                                        {intl l="Position"}
+                                                    </a>
+                                                </th>
+                                                {hook name="import.table-header"}
+                                                <th class="col-md-1">
+                                                    {intl l="Actions"}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {loop name="import-categ-list" type="import" order=$import_order category=$ID}
+                                            <tr>
+                                                <td>
+                                                    {$ID}
+                                                </td>
+                                                <td>
+                                                    <a href="#category_{$category_title}" class="btn-show-import-modal" data-id="{$ID}" data-url="{$URL nofilter}">{$TITLE}</a>
+                                                </td>
+                                                <td>
+                                                    {admin_position_block
+                                                        resource="admin.import"
+                                                        access="UPDATE"
+                                                        path={url path="admin/import/position"}
+                                                        url_parameter="id"
+                                                        in_place_edit_class="importPositionChange"
+                                                        position=$POSITION
+                                                        id=$ID
+                                                    }
+                                                </td>
+                                                {hook name="import.table-row" import_id=$ID}
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a class="btn btn-default btn-xs btn-show-import-modal" href="#category_{$category_title}" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this import"}">
+                                                            <span class="glyphicon glyphicon-open"></span>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/loop}
+                                        {hook name="imports.row" category=$ID }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                {/ifloop}
+            {/loop}
+
+            {elseloop rel="import-category"}
+                <div class="alert alert-info">
+                    {intl l="You don't have any import"}
+                </div>
+            {/elseloop}
+
+            {hook name="imports.bottom" location="imports-bottom" }
+
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+{/block}
+
+{block name="javascript-last-call"}
+    <script>
+        $(document).ready(function() {
+
+            $('.importPositionChange').editable({
+                type        : 'text',
+                title       : "{intl l="Enter new import position"}",
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url noamp='1' path='/admin/import/position' id='__ID__' value='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id'))
+                            .replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
+
+            $('.importCategoryPositionChange').editable({
+                type        : 'text',
+                title       : "{intl l="Enter new import category position"}",
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url noamp='1' path='/admin/import/position/category' id='__ID__' value='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id'))
+                            .replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
+
+            var import_modal = $("#import-modal");
+
+            $(".btn-show-import-modal").click(function() {
+
+                var import_id = $(this).data("id");
+
+                /**
+                 * If we can't load the modal form, redirect to a page where the form is too.
+                 */
+                $.ajax(
+                    $(this).data("url")
+                ).success(function(data) {
+                    import_modal.html(data);
+                    $("#real-import-modal").modal();
+                }).fail(function() {
+                    window.location.replace("{url path='/admin/import/'}"+import_id);
+                });
+            });
+        });
+    </script>
+    {hook name="imports.js" location="imports-js" }
+{/block}

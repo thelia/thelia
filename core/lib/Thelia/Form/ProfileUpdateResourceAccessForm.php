@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Translation\Translator;
@@ -43,13 +42,13 @@ class ProfileUpdateResourceAccessForm extends BaseForm
                             ),
                         )
                     ),
-                )
+                ),
             ))
         ;
 
         foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
-                self::RESOURCE_ACCESS_FIELD_PREFIX . ':' . str_replace(".", ":", $resource->getCode()),
+                self::RESOURCE_ACCESS_FIELD_PREFIX.':'.str_replace(".", ":", $resource->getCode()),
                 "choice",
                 array(
                     "choices" => array(
@@ -65,7 +64,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
                     "multiple" => true,
                     "constraints" => array(
 
-                    )
+                    ),
                 )
             );
         }

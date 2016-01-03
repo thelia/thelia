@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -24,7 +25,6 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
-
     public function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();
@@ -34,14 +34,11 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Module $paymentModule */
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {
             $loopResultRow = new LoopResultRow($paymentModule);
 
-            $moduleInstance = $paymentModule->getModuleInstance($this->container);
-
-            if (false === $moduleInstance instanceof PaymentModuleInterface) {
-                throw new \RuntimeException(sprintf("payment module %s is not a Thelia\Module\PaymentModuleInterface", $paymentModule->getCode()));
-            }
+            $moduleInstance = $paymentModule->getPaymentModuleInstance($this->container);
 
             if (false === $moduleInstance->isValidPayment()) {
                 continue;
@@ -49,11 +46,13 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 
             $loopResultRow
                 ->set('ID', $paymentModule->getId())
+                ->set('CODE', $paymentModule->getCode())
                 ->set('TITLE', $paymentModule->getVirtualColumn('i18n_TITLE'))
                 ->set('CHAPO', $paymentModule->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $paymentModule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $paymentModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
+            $this->addOutputFields($loopResultRow, $paymentModule);
 
             $loopResult->addRow($loopResultRow);
         }

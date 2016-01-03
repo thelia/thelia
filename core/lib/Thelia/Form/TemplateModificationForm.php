@@ -28,8 +28,8 @@ class TemplateModificationForm extends TemplateCreationForm
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
-                        )
-                    )
+                        ),
+                    ),
             ))
             ;
     }

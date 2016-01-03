@@ -16,14 +16,13 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Model\TaxRule as TaxRuleModel;
 
 /**
  *
@@ -33,6 +32,11 @@ use Thelia\Model\TaxRuleQuery;
  * Class TaxRule
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -46,7 +50,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
-                new Argument(
+            new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
@@ -95,27 +99,27 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TaxRuleModel $taxRule */
         foreach ($loopResult->getResultDataCollection() as $taxRule) {
             $loopResultRow = new LoopResultRow($taxRule);
 
             $loopResultRow
-                ->set("ID"            , $taxRule->getId())
-                ->set("IS_TRANSLATED" , $taxRule->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $this->locale)
-                ->set("TITLE"         , $taxRule->getVirtualColumn('i18n_TITLE'))
-                ->set("DESCRIPTION"   , $taxRule->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("IS_DEFAULT"    , $taxRule->getIsDefault() ? '1' : '0')
+                ->set("ID", $taxRule->getId())
+                ->set("IS_TRANSLATED", $taxRule->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $taxRule->getVirtualColumn('i18n_TITLE'))
+                ->set("DESCRIPTION", $taxRule->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("IS_DEFAULT", $taxRule->getIsDefault() ? '1' : '0')
             ;
+            $this->addOutputFields($loopResultRow, $taxRule);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

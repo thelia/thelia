@@ -12,15 +12,17 @@
 
 namespace Thelia\Install;
 
+use PDO;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
+use Thelia\Log\Tlog;
 
 /**
  * Class Database
  * @package Thelia\Install
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Database
 {
@@ -49,7 +51,7 @@ class Database
         }
 
         if (!$connection instanceof \PDO) {
-            throw new \InvalidArgumentException("A PDO connection shoud be provided");
+            throw new \InvalidArgumentException("A PDO connection should be provided");
         }
 
         $this->connection = $connection;
@@ -73,8 +75,8 @@ class Database
         if (null === $extraSqlFiles) {
             $sql = array_merge(
                 $sql,
-                $this->prepareSql(file_get_contents(THELIA_ROOT . '/setup/thelia.sql')),
-                $this->prepareSql(file_get_contents(THELIA_ROOT . '/setup/insert.sql'))
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'thelia.sql')),
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql'))
             );
         } else {
             foreach ($extraSqlFiles as $fileToInsert) {
@@ -98,6 +100,7 @@ class Database
      * @param  string                          $sql  SQL query
      * @param  array                           $args SQL request parameters (PDO style)
      * @throws \RuntimeException|\PDOException if something goes wrong.
+     * @return \PDOStatement
      */
     public function execute($sql, $args = array())
     {
@@ -110,8 +113,10 @@ class Database
         $success = $stmt->execute($args);
 
         if ($success === false || $stmt->errorCode() != 0) {
-            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args,1).", error:".print_r($stmt->errorInfo(), 1));
+            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args, 1).", error:".print_r($stmt->errorInfo(), 1));
         }
+
+        return $stmt;
     }
 
     /**
@@ -138,6 +143,110 @@ class Database
     }
 
     /**
+     * Backup the db OR just a table
+     *
+     * @param string $filename
+     * @param string $tables
+     */
+    public function backupDb($filename, $tables = '*')
+    {
+        $data = [];
+
+        // get all of the tables
+        if ($tables == '*') {
+            $tables = array();
+            $result = $this->connection->prepare('SHOW TABLES');
+            $result->execute();
+            while ($row = $result->fetch(PDO::FETCH_NUM)) {
+                $tables[] = $row[0];
+            }
+        } else {
+            $tables = is_array($tables) ? $tables : explode(',', $tables);
+        }
+
+        $data[] = "\n";
+        $data[] = 'SET foreign_key_checks=0;';
+        $data[] = "\n\n";
+
+        foreach ($tables as $table) {
+            if (!preg_match("/^[\w_\-]+$/", $table)) {
+                Tlog::getInstance()->alert(
+                    sprintf(
+                        "Attempt to backup the db with this invalid table name: '%s'",
+                        $table
+                    )
+                );
+
+                continue;
+            }
+
+            $result = $this->execute('SELECT * FROM `' . $table . '`');
+
+            $fieldCount = $result->columnCount();
+
+            $data[] = 'DROP TABLE `' . $table . '`;';
+
+            $resultStruct = $this->execute('SHOW CREATE TABLE `' . $table . '`');
+
+            $rowStruct = $resultStruct->fetch(PDO::FETCH_NUM);
+
+            $data[] = "\n\n";
+            $data[] = $rowStruct[1];
+            $data[] = ";\n\n";
+
+            for ($i = 0; $i < $fieldCount; $i++) {
+                while ($row = $result->fetch(PDO::FETCH_NUM)) {
+                    $data[] = 'INSERT INTO `' . $table . '` VALUES(';
+                    for ($j = 0; $j < $fieldCount; $j++) {
+                        $row[$j] = addslashes($row[$j]);
+                        $row[$j] = str_replace("\n", "\\n", $row[$j]);
+                        if (isset($row[$j])) {
+                            $data[] = '"' . $row[$j] . '"';
+                        } else {
+                            $data[] = '""';
+                        }
+                        if ($j < ($fieldCount - 1)) {
+                            $data[] = ',';
+                        }
+                    }
+                    $data[] = ");\n";
+                }
+            }
+            $data[] = "\n\n\n";
+        }
+
+        $data[] = 'SET foreign_key_checks=1;';
+
+        //save filename
+        $this->writeFilename($filename, $data);
+    }
+
+
+    /**
+     * Restore a file in the current db
+     *
+     * @param string $filename the file containing sql queries
+     */
+    public function restoreDb($filename)
+    {
+        $this->insertSql(null, [$filename]);
+    }
+
+    /**
+     * Save an array of data to a filename
+     *
+     * @param string $filename
+     * @param array $data
+     */
+    private function writeFilename($filename, $data)
+    {
+        $f = fopen($filename, "w+");
+
+        fwrite($f, implode('', $data));
+        fclose($f);
+    }
+
+    /**
      * create database if not exists
      *
      * @param $dbName
@@ -150,5 +259,13 @@ class Database
                 $dbName
             )
         );
+    }
+
+    /**
+     * @return PDO
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 }

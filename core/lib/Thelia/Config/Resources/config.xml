@@ -9,9 +9,48 @@
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
         <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
         <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+
+        <!--
+        The list of Model classes which suppoorts image or document management.
+
+        The key should have form type.parent, where type is the file type (document or image)
+        and parent is the parent object of the file, form example product, brand, folder, etc.
+        -->
+
+        <parameter key="file_model.classes" type="collection">
+            <parameter key="document.product">Thelia\Model\ProductDocument</parameter>
+            <parameter key="image.product">Thelia\Model\ProductImage</parameter>
+
+            <parameter key="document.category">Thelia\Model\CategoryDocument</parameter>
+            <parameter key="image.category">Thelia\Model\CategoryImage</parameter>
+
+            <parameter key="document.content">Thelia\Model\ContentDocument</parameter>
+            <parameter key="image.content">Thelia\Model\ContentImage</parameter>
+
+            <parameter key="document.folder">Thelia\Model\FolderDocument</parameter>
+            <parameter key="image.folder">Thelia\Model\FolderImage</parameter>
+
+            <parameter key="document.brand">Thelia\Model\BrandDocument</parameter>
+            <parameter key="image.brand">Thelia\Model\BrandImage</parameter>
+
+            <parameter key="image.module">Thelia\Model\ModuleImage</parameter>
+        </parameter>
+
+        <parameter key="import.base_url">/admin/import</parameter>
+        <parameter key="export.base_url">/admin/export</parameter>
+
+        <parameter key="thelia.token_id">thelia.token_provider</parameter>
+        <parameter key="thelia.validator.translation_domain">validators</parameter>
+
+        <!-- Thelia logger class -->
+        <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
     </parameters>
 
+
     <services>
+
+        <!-- Thelia template helper -->
+        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" />
 
         <!--  URL maganement -->
         <service id="thelia.url.manager" class="Thelia\Tools\URL">
@@ -43,11 +82,48 @@
             <argument type="service" id="request" />
         </service>
 
-		<!--
-		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
-		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
-		We use it here to inject the service container in the admin base controller.
-		-->
+        <!--  The assets manager -->
+        <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <!-- The asset filters -->
+        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+            <tag name="thelia.asset.filter" key="less" />
+            <tag name="kernel.event_subscriber"/>
+            <argument>%kernel.environment%</argument>
+        </service>
+
+        <service id="less_legacy.assetic.filter" class="Assetic\Filter\LessphpFilter">
+            <argument key="identifier">less_legacy</argument>
+            <tag name="thelia.asset.filter" key="less_legacy" />
+        </service>
+
+        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
+            <tag name="thelia.asset.filter" key="sass"  />
+        </service>
+
+        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">
+            <tag name="thelia.asset.filter" key="cssembed" />
+        </service>
+
+        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">
+            <tag name="thelia.asset.filter" key="cssrewrite"/>
+        </service>
+
+        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">
+            <tag name="thelia.asset.filter" key="cssimport"/>
+        </service>
+
+        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">
+            <tag name="thelia.asset.filter" key="compass"/>
+        </service>
+
+        <!--
+        A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
+        thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
+        We use it here to inject the service container in the admin base controller.
+        -->
         <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
         	<argument type="service" id="service_container"/>
         </service>
@@ -58,33 +134,48 @@
 			<argument type="service" id="service_container"/>
 		</service>
 
+        <!--  Hook Helper -->
+
+        <service id="thelia.hookHelper" class="Thelia\Core\Hook\HookHelper" >
+            <argument type="service" id="thelia.parser.helper" />
+        </service>
+
 		<!-- Security context for front and back office -->
 
 		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">
             <argument type="service" id="request" />
 		</service>
 
-		<!--  Parser context -->
-
         <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
-        	<argument type="service" id="request" />
-        </service>
-
-		<!-- Parser configuration -->
-
-        <service id="thelia.parser" class="Thelia\Core\Template\Smarty\SmartyParser" scope="request">
             <argument type="service" id="request" />
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.parser.context"/>
-            <argument >%kernel.environment%</argument>
-            <argument >%kernel.debug%</argument>
+            <argument type="service" id="thelia.form_factory" />
+            <argument type="service" id="thelia.form_validator" />
         </service>
 
-        <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
+
+
+        <!-- The file manager -->
+        <service id="thelia.file_manager" class="Thelia\Files\FileManager">
+            <argument>%file_model.classes%</argument>
+        </service>
+
+        <service id="base_http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
         </service>
+
+        <service id="stack_factory" class="Stack\Builder" />
+
+        <service
+                id="http_kernel"
+                class="Thelia\Core\TheliaHttpKernel"
+                factory-service="stack_factory"
+                factory-method="resolve">
+
+            <argument id="base_http_kernel" type="service"/>
+        </service>
+
 
         <service id="request" scope="request" synthetic="true" />
 
@@ -93,8 +184,9 @@
         <service id="kernel" synthetic="true" />
 
 
-        <service id="mailer" class="Thelia\Mailer\MailerFactory">
+        <service id="mailer" class="Thelia\Mailer\MailerFactory" scope="request">
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="thelia.parser"/>
         </service>
 
         <service id="response.listener" class="Thelia\Core\EventListener\ResponseListener">
@@ -104,6 +196,107 @@
         <service id="session.listener" class="Thelia\Core\EventListener\SessionListener">
             <tag name="kernel.event_subscriber"/>
         </service>
-    </services>
 
+        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener" scope="request">
+            <argument type="service" id="thelia.securityContext"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener" scope="request">
+            <argument>%kernel.environment%</argument>
+            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="thelia.securityContext"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <!-- Archive builders -->
+
+        <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
+            <argument>%kernel.environment%</argument>
+        </service>
+
+        <!-- zip -->
+        <service id="thelia.archive_builder.zip" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- tar -->
+        <service id="thelia.archive_builder.tar" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- tar.gz -->
+        <service id="thelia.archive_builder.tar_gz" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- tar.bz2 -->
+        <service id="thelia.archive_builder.tar_bz2" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
+            <tag name="thelia.archive_builder" />
+        </service>
+
+        <!-- Formatters -->
+
+        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
+
+        <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+
+        <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+
+        <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
+            <tag name="thelia.formatter" />
+        </service>
+
+        <!-- Thelia simple token provider -->
+        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="thelia.translator" />
+            <argument>%thelia.token_id%</argument>
+        </service>
+
+        <!-- Forms services ( factory builder, Thelia form types ) -->
+        <service id="thelia.forms.validator_builder" class="Symfony\Component\Validator\ValidatorBuilder">
+            <call method="setTranslationDomain">
+                <argument>%thelia.validator.translation_domain%</argument>
+            </call>
+            <call method="setTranslator">
+                <argument type="service" id="thelia.translator" />
+            </call>
+        </service>
+
+        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" scope="request" />
+
+        <service id="thelia.forms.extension.http_foundation_extension" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension">
+            <tag name="thelia.forms.extension" />
+        </service>
+
+        <service id="thelia.forms.extension.core_extension" class="Symfony\Component\Form\Extension\Core\CoreExtension">
+            <tag name="thelia.forms.extension" />
+        </service>
+
+        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="service_container" />
+            <argument>%thelia.parser.forms%</argument>
+        </service>
+
+        <service id="thelia.form_validator" class="Thelia\Core\Form\TheliaFormValidator">
+            <argument type="service" id="thelia.translator" />
+            <argument>%kernel.environment%</argument>
+        </service>
+
+        <service id="currency.converter" class="Thelia\CurrencyConverter\CurrencyConverter" />
+
+        <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">
+            <tag name="currency.converter.provider" priority="0" />
+        </service>
+
+        <!-- Thelia logger -->
+        <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
+    </services>
 </config>

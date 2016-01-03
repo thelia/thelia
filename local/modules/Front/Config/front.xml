@@ -15,12 +15,20 @@
     </route>
 
     <!-- Register -->
+    <route id="customer.create.view" path="/register" methods="get">
+        <default key="_controller">Front\Controller\CustomerController::viewRegisterAction</default>
+    </route>
+
     <route id="customer.create.process" path="/register" methods="post">
         <default key="_controller">Front\Controller\CustomerController::createAction</default>
         <default key="_view">register</default>
     </route>
 
     <!-- Login -->
+    <route id="customer.login.view" path="/login" methods="get">
+        <default key="_controller">Front\Controller\CustomerController::viewLoginAction</default>
+    </route>
+
     <route id="customer.login.process" path="/login" methods="post">
         <default key="_controller">Front\Controller\CustomerController::loginAction</default>
         <default key="_view">login</default>
@@ -32,12 +40,23 @@
         <default key="_view">password</default>
     </route>
 
+    <route id="customer.password.retrieve.sent" path="/password-sent">
+        <default key="_controller">Front\Controller\CustomerController::newPasswordSentAction</default>
+        <default key="_view">password</default>
+    </route>
+
     <!-- Logout -->
     <route id="customer.logout.process" path="/logout">
         <default key="_controller">Front\Controller\CustomerController::logoutAction</default>
     </route>
 
     <!-- Account -->
+
+    <route id="customer.home" path="/account" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">account</default>
+    </route>
+
     <route id="customer.update.view" path="/account/update" methods="get">
         <default key="_controller">Front\Controller\CustomerController::viewAction</default>
         <default key="_view">account-update</default>
@@ -59,6 +78,11 @@
         <default key="_view">account-password</default>
     </route>
 
+    <route id="customer.order" path="/account/order/{order_id}">
+        <default key="_controller">Front\Controller\OrderController::viewAction</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
     <route id="customer.order.pdf.delivery" path="/account/order/pdf/delivery/{order_id}">
         <default key="_controller">Front\Controller\OrderController::generateDeliveryPdf</default>
         <requirement key="order_id">\d+</requirement>
@@ -67,6 +91,11 @@
     <route id="customer.order.pdf.invoice" path="/account/order/pdf/invoice/{order_id}">
         <default key="_controller">Front\Controller\OrderController::generateInvoicePdf</default>
         <requirement key="order_id">\d+</requirement>
+    </route>
+
+    <route id="customer.order.product.download" path="/account/download/{order_product_id}">
+        <default key="_controller">Front\Controller\OrderController::downloadVirtualProduct</default>
+        <requirement key="order_product_id">\d+</requirement>
     </route>
     <!-- end customer routes -->
 
@@ -100,6 +129,11 @@
         <default key="_controller">Front\Controller\AddressController::generateModalAction</default>
         <default key="_view">modal-address</default>
         <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <route id="address.make.default" path="/address/default/{addressId}" methods="get">
+        <default key="_controller">Front:Address:makeAddressDefault</default>
+        <requirement key="addressId">\d+</requirement>
     </route>
 
     <!-- end customer address routes -->
@@ -137,7 +171,7 @@
     </route>
 
     <route id="order.delivery" path="/order/delivery">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_controller">Front\Controller\OrderController::deliverView</default>
         <default key="_view">order-delivery</default>
     </route>
 
@@ -157,6 +191,11 @@
 
     <route id="order.coupon.process" path="/order/coupon" methods="post">
         <default key="_controller">Front\Controller\CouponController::consumeAction</default>
+        <default key="_view">order-invoice</default>
+    </route>
+
+    <route id="order.coupon.clear" path="/order/clear-coupons">
+        <default key="_controller">Front\Controller\CouponController::clearAllCouponsAction</default>
         <default key="_view">order-invoice</default>
     </route>
 
@@ -209,11 +248,15 @@
     </route>
     <!-- end feed generator -->
 
+    <!-- Route used to check if the rewrite engine is activated -->
+    <route id="empty" path="/empty">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::emptyRoute</default>
+    </route>
+
     <!-- Default Route -->
     <route id="default" path="/{_view}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">index</default>
-        <requirement key="_view">^(?!admin)[^/]+</requirement>
+        <requirement key="_view">^(?!admin|api)[^/]+</requirement>
     </route>
-
 </routes>

@@ -1,0 +1,152 @@
+{*
+This file bind a form field to an HTML representation. In addition to the standard form_field block output, this
+fragment uses the following additional variables :
+
+- field_template : the template style ('standard', or somethingelse)
+- field_value : the value of the input field, which is used if the form_field value is empty.
+- field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
+- show_label : if false, the field label and help line should not be displayed.
+- content : if this variable is not empty, we assume that it contains the input field definition. Used by the
+  custom_render_form_field block to pass a custom representation of the input field.
+*}
+
+{* Get standard fields attributes *}
+{capture assign=attributes}
+    {include file="forms/$field_template/form-field-attributes-renderer.html"}
+{/capture}
+
+{*
+Use the optionnal $field_value parameter if no value is defined
+ Do not use empty(), as empty(0), empty("0") are true
+*}
+{if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
+    {$value = $field_value}
+{/if}
+
+{if $type == 'hidden'}
+
+    {if $content == ''}
+        <input type="hidden" {$attributes nofilter} />
+    {else}
+        {$content nofilter}
+    {/if}
+
+{elseif $type == 'checkbox'}
+
+    <div class="checkbox {if $error}has-error{/if}">
+        <label>
+            {if $content == ''}
+                <input type="checkbox" {$attributes nofilter}>
+                {$label} {if $required} <span class="required">*</span>{/if}
+            {else}
+                {$content nofilter}
+            {/if}
+
+            {if $show_label}
+                {form_error field=$field_name}
+                    <br />
+                    <span class="error">{$message}</span>
+                {/form_error}
+            {/if}
+        </label>
+
+        {if $show_label  && ! empty($label_attr.help)}
+            <span class="help-block">{$label_attr.help}</span>
+        {/if}
+    </div>
+
+{elseif $type == 'radio'}
+
+    <div class="radio {if $error}has-error{/if}">
+        <label>
+            {if $content == ''}
+                <input type="radio" {$attributes nofilter}>
+                {$label} {if $required} <span class="required">*</span>{/if}
+            {else}
+                {$content nofilter}
+            {/if}
+
+            {if $show_label}
+                {form_error field=$field_name}
+                    <br />
+                    <span class="error">{$message}</span>
+                {/form_error}
+            {/if}
+        </label>
+
+        {if $show_label && ! empty($label_attr.help)}
+            <span class="help-block">{$label_attr.help}</span>
+        {/if}
+    </div>
+
+{else}
+
+    <div class="form-group {if $error}has-error{/if}">
+
+        {if $show_label}
+            <label for="{$label_attr.for}" class="control-label">
+                {$label} {if $required} <span class="required">*</span>{/if}
+
+                {form_error field=$field_name}
+                    <br />
+                    <span class="error">{$message}</span>
+                {/form_error}
+            </label>
+
+            {if $multiple}
+                <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one item'}</span>
+            {/if}
+        {/if}
+
+        {if $content == ''}
+
+            {if $type == 'choice'}
+
+                <select {$attributes nofilter}>
+                    {foreach $choices as $choice}
+                    <option value="{$choice->value}" {if (is_array($value) && in_array($choice->value, $value)) || $choice->value == $value}selected="selected"{/if}>{$choice->label}
+                        {/foreach}
+                </select>
+
+            {elseif $type == 'textarea'}
+
+                <textarea {$attributes nofilter}>{$value}</textarea>
+
+            {elseif $type == 'money'}
+
+                <div class="input-group">
+                    <input type="number" step="any" {$attributes nofilter} />
+                    <span class="input-group-addon">{loop name="input.addon" type="currency" default_only="true"}{$SYMBOL}{/loop}</span>
+                </div>
+
+            {else}
+
+                {$text_types = ['text', 'password', 'number', 'integer', 'time', 'date', 'datetime', 'email', 'url', 'file']}
+                {$thelia_types = ['country_id', 'currency_id', 'customer_id', 'customer_title_id', 'lang_id', 'category_id', 'product_id', 'product_sale_elements_id', 'folder_id', 'content_id', 'tax_id', 'tax_rule_id']}
+
+                {if in_array($type, $text_types)}
+                    {if $type == 'integer'}{$type='number'}{/if}
+
+                    <input type="{$type}" {$attributes nofilter} />
+                {elseif in_array($type, $thelia_types)}
+                    {if $attr and empty($attr.autocomplete)}
+                    <input type="number" {$attributes nofilter} />
+                    {else}
+                        {* You should implement the auto completion *}
+                        <input type="hidden" {$attributes nofilter} />
+                        <input type="text" data-widget="{$type}" data-rel="#{$label_attr.for}" class="form-control" />
+                    {/if}
+                {else}
+                    <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type={$type}}</div>
+                {/if}
+
+            {/if}
+        {else}
+            {$content nofilter}
+        {/if}
+
+        {if ! empty($label_attr.help)}
+            <span class="help-block">{$label_attr.help nofilter}</span>
+        {/if}
+    </div>
+{/if}

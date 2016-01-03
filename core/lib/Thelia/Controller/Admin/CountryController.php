@@ -11,37 +11,44 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Security\Resource\AdminResources;
+
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
+use Thelia\Core\Event\Country\CountryToggleVisibilityEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\CountryCreationForm;
-use Thelia\Form\CountryModificationForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Log\Tlog;
+use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Map\CountryTableMap;
+use Thelia\Model\Map\StateTableMap;
+use Thelia\Model\State;
+use Thelia\Model\StateQuery;
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryController extends AbstractCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'country',
             'manual',
             'country_order',
-
             AdminResources::COUNTRY,
-
             TheliaEvents::COUNTRY_CREATE,
             TheliaEvents::COUNTRY_UPDATE,
-            TheliaEvents::COUNTRY_DELETE
+            TheliaEvents::COUNTRY_DELETE,
+            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY
         );
     }
 
@@ -50,7 +57,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new CountryCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::COUNTRY_CREATION);
     }
 
     /**
@@ -58,7 +65,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new CountryModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::COUNTRY_MODIFICATION);
     }
 
     /**
@@ -71,13 +78,20 @@ class CountryController extends AbstractCrudController
         $data = array(
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
+            'visible' => $object->getVisible() ? true : false,
             'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
             'isocode' => $object->getIsocode(),
             'isoalpha2' => $object->getIsoalpha2(),
             'isoalpha3' => $object->getIsoalpha3(),
+            'has_states' => $object->getHasStates() ? true : false,
+            'need_zip_code' => $object->getNeedZipCode() ? true : false,
+            'zip_code_format' => $object->getZipCodeFormat(),
         );
 
-        return new CountryModificationForm($this->getRequest(), 'form', $data);
+        return $this->createForm(AdminForm::COUNTRY_MODIFICATION, 'form', $data);
     }
 
     /**
@@ -101,18 +115,30 @@ class CountryController extends AbstractCrudController
     {
         $event = new CountryUpdateEvent($formData['id']);
 
-        return $this->hydrateEvent($event, $formData);
+        $event = $this->hydrateEvent($event, $formData);
+
+        $event
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
+            ->setNeedZipCode($formData['need_zip_code'])
+            ->setZipCodeFormat($formData['zip_code_format'])
+        ;
+
+        return $event;
+
     }
 
     protected function hydrateEvent($event, $formData)
     {
         $event
             ->setLocale($formData['locale'])
+            ->setVisible($formData['visible'])
             ->setTitle($formData['title'])
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
-            ->setArea($formData['area'])
+            ->setHasStates($formData['has_states'])
         ;
 
         return $event;
@@ -211,9 +237,12 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute('admin.configuration.countries.update', array(), array(
+        return $this->generateRedirectFromRoute(
+            'admin.configuration.countries.update',
+            [],
+            [
                 "country_id" => $this->getRequest()->get('country_id', 0)
-            )
+            ]
         );
     }
 
@@ -222,13 +251,15 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.countries.default');
+        return $this->generateRedirectFromRoute('admin.configuration.countries.default');
     }
 
     public function toggleDefaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
-        $content = null;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         if (null !== $country_id = $this->getRequest()->get('country_id')) {
             $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
             try {
@@ -238,11 +269,72 @@ class CountryController extends AbstractCrudController
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {
-                $content = $ex->getMessage();
+                Tlog::getInstance()->error($ex->getMessage());
             }
-
         }
 
         return $this->nullResponse(500);
+    }
+
+    /**
+     * @return CountryToggleVisibilityEvent|void
+     */
+    protected function createToggleVisibilityEvent()
+    {
+        return new CountryToggleVisibilityEvent($this->getExistingObject());
+    }
+
+    public function getDataAction($visible = true, $locale = null)
+    {
+        $response = $this->checkAuth($this->resourceCode, array(), AccessManager::VIEW);
+        if (null !== $response) {
+            return $response;
+        }
+
+        if (null === $locale) {
+            $locale = $this->getCurrentEditionLocale();
+        }
+
+        $responseData = [];
+
+        /** @var CountryQuery $search */
+        $countries = CountryQuery::create()
+            ->_if($visible)
+                ->filterByVisible(true)
+            ->_endif()
+            ->joinWithI18n($locale)
+        ;
+
+        /** @var Country $country */
+        foreach ($countries as $country) {
+            $currentCountry = [
+                'id' => $country->getId(),
+                'title' => $country->getTitle(),
+                'hasStates' => $country->getHasStates(),
+                'states' => []
+            ];
+
+            if ($country->getHasStates()) {
+                $states = StateQuery::create()
+                    ->filterByCountryId($country->getId())
+                    ->_if($visible)
+                        ->filterByVisible(true)
+                    ->_endif()
+                    ->joinWithI18n($locale)
+                ;
+
+                /** @var State $state */
+                foreach ($states as $state) {
+                    $currentCountry['states'][] = [
+                        'id' => $state->getId(),
+                        'title' => $state->getTitle(),
+                    ];
+                }
+            }
+
+            $responseData[] = $currentCountry;
+        }
+
+        return $this->jsonResponse(json_encode($responseData));
     }
 }

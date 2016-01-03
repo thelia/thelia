@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/mailingSystem'}">{intl l="Mailing system"}</a></li>
         </ul>
 
-        {module_include location='mailing_system_top'}
+        {hook name="mailing-system.top" location="mailing_system_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -30,7 +30,7 @@
 
                     {form name="thelia.admin.mailing-system.update"}
 
-                    <form method="POST" action="{url path="/admin/configuration/mailingSystem/save"}" {form_enctype form=$form} >
+                    <form method="POST" action="{url path="/admin/configuration/mailingSystem/save"}" {form_enctype} >
 
                         <div class="row inner-toolbar">
                             <div class="col-md-12 inner-actions clearfix">
@@ -38,11 +38,11 @@
                             </div>
                         </div>
 
-                        {form_hidden_fields form=$form}
+                        {form_hidden_fields}
 
                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                        {form_field form=$form field='enabled'}
+                        {form_field field='enabled'}
                             <div class="form-group">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Enable remote SMTP use : "}</label>
 
@@ -54,59 +54,83 @@
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='host'}
+                        {form_field field='host'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Host :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Host"}" value="{if $form_error}{$value}{else}{config key="smtp.host"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='port'}
+                        {form_field field='port'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Port :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Port"}" value="{if $form_error}{$value}{else}{config key="smtp.port"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='encryption'}
+                        {form_field field='encryption'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Encryption :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Encryption"}" value="{if $form_error}{$value}{else}{config key="smtp.encryption"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='username'}
+                        {form_field field='username'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Username :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Username"}" value="{if $form_error}{$value}{else}{config key="smtp.username"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='password'}
+                        {form_field field='password'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Password :"}</label>
                                 <input type="password" class="form-control" id="{$label_attr.for}" name="{$name}" value="{if $form_error}{$value}{else}{config key="smtp.password"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='authmode'}
+                        {form_field field='authmode'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Auth Mode :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Auth Mode"}" value="{if $form_error}{$value}{else}{config key="smtp.authmode"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                        {form_field form=$form field='timeout'}
+                        {form_field field='timeout'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Timeout :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Timeout"}" value="{if $form_error}{$value}{else}{config key="smtp.timeout"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
-                            {form_field form=$form field='sourceip'}
+                            {form_field field='sourceip'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="label-control">{intl l="Source IP :"}</label>
                                 <input type="text" class="form-control" id="{$label_attr.for}" name="{$name}" placeholder="{intl l="Source IP"}" value="{if $form_error}{$value}{else}{config key="smtp.sourceip"}{/if}">
+                                {if ! empty($label_attr.help)}
+                                <span class="help-block">{$label_attr.help}</span>
+                                {/if}
                             </div>
                         {/form_field}
 
@@ -124,7 +148,25 @@
             </div>
         </div>
 
-        {module_include location='mailing_system_bottom'}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <div class="title title-without-tabs">{intl l="Test your configuration"}</div>
+
+                    <form id="test-configuration" class="form-inline" onsubmit="return false;" role="form">
+                        <div class="form-group">
+                            <label class="sr-only" for="test-email">{intl l="Your email"}</label>
+                            <input type="text" class="form-control" id="test-email" name="test-email" value="{config key="store_email"}">
+                        </div>
+                        <button type="button" id="test-send" class="btn btn-primary">{intl l="Send"}</button>
+                        <div>&nbsp;</div>
+                        <div id="test-result"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {hook name="mailing-system.bottom" location="mailing_system_bottom" }
 
     </div>
 </div>
@@ -141,11 +183,41 @@ jQuery(function($) {
     $('#enable-smtp').on('switch-change', function (e, data) {
         $('#smtp_enabled').val(data.value ? 1 : 0);
     });
+
+    $('#test-send').on("click", function(e){
+        e.preventDefault();
+
+        $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+        $.ajax({
+            url: '{url path="/admin/configuration/mailingSystem/test"}',
+            data: {
+                email: $('#test-email').val()
+            },
+            type: "GET",
+            dataType: "json"
+        }).done(function(data){
+            var messages = '',
+                    i = 0
+            $("#loading-event").remove();
+            if (data.success){
+                $("#test-result").removeClass("alert alert-danger").html(data.message);
+            } else {
+                $("#test-result").addClass("alert alert-danger").html(data.message);
+            }
+        })
+        .fail(function(jqXHR, textStatus, errorThrown){
+            $("#loading-event").remove();
+            $("#test-result").html(textStatus).addClass("alert alert-danger");
+        });
+
+    });
+
 });
 
 </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='mainling-system-js'}
+    {hook name="mailing-system.js" location="mainling-system-js" }
 {/block}

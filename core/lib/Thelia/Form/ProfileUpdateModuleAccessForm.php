@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Translation\Translator;
@@ -43,13 +42,13 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                             ),
                         )
                     ),
-                )
+                ),
             ))
         ;
 
         foreach (ModuleQuery::create()->find() as $module) {
             $this->formBuilder->add(
-                self::MODULE_ACCESS_FIELD_PREFIX . ':' . str_replace(".", ":", $module->getCode()),
+                self::MODULE_ACCESS_FIELD_PREFIX.':'.str_replace(".", ":", $module->getCode()),
                 "choice",
                 array(
                     "choices" => array(
@@ -65,7 +64,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                     "multiple" => true,
                     "constraints" => array(
 
-                    )
+                    ),
                 )
             );
         }

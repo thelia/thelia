@@ -1,0 +1,88 @@
+<div class="hook-modules table-responsive">
+    <table class="table table-striped table-condensed table-left-aligned">
+        <thead>
+            <tr>
+                <th>{intl l='ID'}</th>
+                <th> {intl l='Module name'}</th>
+                <th> {intl l='Module code'}</th>
+                <th class="text-center">{intl l='Enable/Disable'}</th>
+                <th class="text-center">{intl l='Position'}</th>
+                <th class="text-center">{intl l='Action'}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop type="module_hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1 lang=$lang_id}
+            {assign var="visible" value="{if $MODULE_ACTIVE && $HOOK_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}" }
+            <tr class="hook-module {if ! $MODULE_ACTIVE}inactive{/if}"
+                data-visible="{$visible}"
+                data-active="{if $ACTIVE}1{else}0{/if}"
+                data-hook-active="{if $HOOK_ACTIVE}1{else}0{/if}"
+                data-module-active="{if $MODULE_ACTIVE}1{else}0{/if}"
+                data-module-id="{$MODULE_ID}"
+                >
+                <td>{$ID}</td>
+                <td>{$MODULE_TITLE}</td>
+                <td>{$MODULE_CODE}</td>
+                <td class="text-center">
+                    {if ! $by_module }
+                        {if $MODULE_ACTIVE && $HOOK_ACTIVE && !$by_module}
+                        <div class="make-switch switch-small module-hook-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                            <input type="checkbox" {if $ACTIVE}checked{/if}>
+                        </div>
+                        <noscript>
+                            {if $ACTIVE}
+                            <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/%id" id=$ID}">{intl l="deactivation"}</a>
+                            {else}
+                            <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
+                            {/if}
+                        </noscript>
+                        {else}
+                            <i class='glyphicon glyphicon-remove-circle'> {intl l="deactivated"}
+                        {/if}
+                    {else}
+                        -
+                    {/if}
+                </td>
+                <td class="text-center">
+                    {if ! $by_module }
+                        {admin_position_block
+                            resource="admin.hooks"
+                            access="UPDATE"
+                            path={url path="admin/module-hooks/update-position"}
+                            url_parameter="module_hook_id"
+                            in_place_edit_class="moduleHookPositionChange"
+                            position=$POSITION
+                            id=$ID
+                        }
+                    {else}
+                    -
+                    {/if}
+                </td>
+                <td class="actions">
+                    <div class="btn-toolbar btn toolbar-primary">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </div>
+                    <div class="toolbar-options hidden">
+                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="UPDATE"}
+                        <a class="module-hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/module-hook/update/%id" id=$ID}">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                        {/loop}
+
+                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module-hook" access="DELETE"}
+                        <a class="module-hook-delete" title="{intl l='Delete this hook'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                        {/loop}
+                    </div>
+                </td>
+            </tr>
+            {/loop}
+            {elseloop rel="hook.{$hook_id}"}
+            <tr>
+                <td colspan="5">No modules hooked here</td>
+            </tr>
+            {/elseloop}
+        </tbody>
+    </table>
+</div>

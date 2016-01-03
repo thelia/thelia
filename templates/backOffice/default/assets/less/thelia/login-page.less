@@ -1,0 +1,60 @@
+.login-page {
+    border-top: 4px solid @brand-primary;
+
+    #logo {
+        margin-top: 100px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    form {
+        margin-top: 30px;
+    }
+
+    .form-control,
+    .input-group-addon {
+        font-size: @font-size-base;
+
+        &:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px @input-bg inset;
+            -webkit-text-fill-color: @input-color;
+        }
+    }
+
+    .btn-lg {
+        font-size: @font-size-base;
+        font-weight: normal;
+    }
+
+    .or {
+        text-align: center;
+        position: relative;
+
+        &:before,
+        &:after {
+            content: '';
+            width: 35%;
+            position: absolute;
+            top: 50%;
+            border-top: 1px solid @text-color;
+
+            @media (max-width: @screen-xs-max) {
+                width: 29%;
+            }
+        }
+
+        &:before {
+            left: 10px;
+        }
+
+        &:after {
+            right: 10px;
+        }
+
+        span {
+            overflow: hidden;
+            padding: 0 10px;
+        }
+    }
+}
+

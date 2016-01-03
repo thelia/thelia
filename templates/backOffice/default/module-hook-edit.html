@@ -1,0 +1,120 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a module hook'}{/block}
+
+{block name="check-resource"}admin.hook{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="module-hooks edit-module-hook">
+
+    <div id="wrapper" class="container">
+
+        {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/module-hooks'}">{intl l="Hook positions"}</a></li>
+            <li>{intl l='Editing hook for module "%name"' name="{$MODULE_TITLE}"}</li>
+        </ul>
+
+        {hook name="module-hook-edit.top" module_hook_id=$module_hook_id}
+
+        <div class="row">
+            <div class="col-md-12 general-block-decorator">
+                <div class="row">
+                    <div class="col-md-12 title title-without-tabs">
+                        {intl l='Editing hook for module "%name"' name="{$MODULE_TITLE}"}
+                    </div>
+
+                    <div class="form-container">
+                        <div class="col-md-12">
+                            {form name="thelia.admin.module-hook.modification"}
+                            <form method="POST" action="{url path="/admin/module-hook/save/%id" id=$ID}" {form_enctype} class="clearfix">
+                                {include
+                                file = "includes/inner-form-toolbar.html"
+                                hide_submit_buttons = false
+
+                                page_url  = {url path="/admin/module-hook/update/%id" id=$ID}
+                                close_url = {url path="/admin/module-hooks"}
+                                }
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {* Be sure to get the hook ID, even if the form could not be validated *}
+                                        <input type="hidden" name="module_hook_id" value="{$module_hook_id}" />
+
+                                        {form_hidden_fields}
+
+                                        {render_form_field field="success_url" value={url path="/admin/module-hooks"}}
+
+                                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                        {render_form_field field="module_id"}
+                                        {render_form_field field="hook_id"}
+                                        {render_form_field field="active"}
+                                    </div>
+                                    <div class="col-md-6">
+
+                                        {custom_render_form_field field='classname'}
+                                            <select {form_field_attributes field='classname'} >
+                                            </select>
+                                        {/custom_render_form_field}
+
+
+                                        {custom_render_form_field field='method'}
+                                            <select {form_field_attributes field='method'} >
+                                            </select>
+                                        {/custom_render_form_field}
+                                    </div>
+                                    <div class="col-md-12">
+
+                                        {render_form_field field="templates"}
+
+                                    </div>
+                                </div>
+                            </form>
+                            {/form}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {hook name="module-hook-edit.bottom" module_hook_id=$module_hook_id}
+
+        {/loop}
+
+        {elseloop rel="module_hook_edit"}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-error">
+                        {intl l="Sorry, module hook ID=%id was not found." id={$module_hook_id}}
+                    </div>
+                </div>
+            </div>
+        {/elseloop}
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+<script>
+(function($) {
+    // Declare current values for classname and method selects
+    {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
+        var currentClassname = "{$CLASSNAME}";
+        var currentMethod = "{$METHOD}";
+    {/loop}
+
+    {include file="includes/hook-edition.js.inc"}
+
+    $('#module_id').change();
+})(jQuery);
+</script>
+{/block}
+
+{block name="javascript-last-call"}
+{hook name="module-hook.edit-js" location="module-hook-edit-js" module_hook_id={$module_hook_id} }
+{/block}

@@ -1,0 +1,57 @@
+{strip}{*
+This file defines the standard fields attributes, depending on input types.
+
+In addition to the standard form_field block output, this fragment uses the following additional variables :
+
+- field_template : the template style ('standard', or somethingelse)
+- field_value : the value of the input field, which is used if the form_field value is empty.
+- field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
+*}
+
+{*
+Use the optionnal $field_value parameter if no value is defined
+ Do not use empty(), as empty(0), empty("0") are true
+*}
+{if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
+    {$value = $field_value}
+{/if}
+
+{* Synthetize an ID if none was given *}
+{if empty({$label_attr.for})}
+    {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
+{/if}
+
+{* If we have a value key, generates a unique ID based on the value key. *}
+{if ! empty($value_key)}
+    {$label_attr.for = "{$label_attr.for}_{$value_key}"}
+{/if}
+{if $disabled}
+    {$sDisabled = 'disabled'}
+{/if}
+
+{if $read_only}
+    {$sRead_only = 'readonly'}
+{/if}
+
+{if $max_length}
+    {$sMaxLength = "maxlength=\"{$max_length}\""}
+{/if}
+
+{if $required}
+    {$sRequired='aria-required="true" required'}
+{/if}
+
+{if $type == 'hidden'}
+   id="{$label_attr.for}" name="{$name}" value="{$value}" {$attr}
+{elseif $type == 'checkbox' || $type == 'radio'}true
+    id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'choice'}
+    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'collection'}
+    id="{$label_attr.for}" name="{$name}[]" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'textarea'}
+    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{else}
+    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{/if}
+{/strip}

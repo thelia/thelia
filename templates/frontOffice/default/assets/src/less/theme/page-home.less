@@ -1,0 +1,22 @@
+.page-home #carousel {
+    margin-bottom: @line-height-computed;;
+
+    .item {
+        text-align: center;
+    }
+    .carousel-control {
+        // Scale up controls for tablets and up
+        @media screen and (min-width: @screen-tablet) {
+
+            // Scale up the controls a smidge
+            .fa-caret-left,
+            .fa-caret-right {
+                font-size: 80px;
+                margin-top: -40px;
+                margin-left: -40px;
+                width: 80px;
+                height: 80px;
+            }
+        }
+    }
+}

@@ -1,0 +1,72 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
+{form name="thelia.admin.sale.modification"}
+{ifloop rel="product-list"}
+    <div class="alert alert-default">
+        {intl l="Select the products included in this sale operation. You can limit your selection to some product's attribute only, if required."}
+    </div>
+
+    <table class="table table-striped table-condensed table-responsive">
+        <thead>
+        <tr>
+            <th class="text-center">
+                ID
+            </th>
+            <th class="text-center">
+                <input type="checkbox" title="{intl l='Select or deselect all products'}" class="invert-selection">
+            </th>
+            <th>{intl l="Product title"}</th>
+            <th>{intl l="Reference"}</th>
+            <th class="text-right">{intl l="Best taxed price"}</th>
+            <th class="text-center">{intl l="Attributes"}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {* protect ourselves against empty $category_list, which causes all products to be displayed *}
+        {if empty($category_list)}{$category_list = '0'}{/if}
+        {loop type="product" name="product-list" category_default="{$category_list}" backend_context=1}
+            {$selected = in_array($ID, $product_list)}
+            <tr data-product-id="{$ID}"{if $selected} class="success"{/if}>
+                <td class="text-center">
+                    {$ID}
+                </td>
+
+                <td class="text-center">
+                   <input {if $selected}checked {/if}data-product-id="{$ID}" type="checkbox" {form_field_attributes field="products" value=$ID value_key=$ID extra_class="product-selector-checkbox"}>
+                </td>
+
+                <td>{$TITLE}</td>
+
+                <td><a target="_blank" title="{intl l='View this product in a new page'}" href="{url path="/admin/products/update" product_id=$ID current_tab=prices}">{$REF}</a></td>
+
+                <td class="text-right">{format_money number=$BEST_TAXED_PRICE}</td>
+
+                <td class="text-center">
+                    {$has_combinations = false}
+                    {loop name="product.sales.elements.test" type="product_sale_elements" product=$ID currency=$edit_currency_id backend_context="1"}
+                        {loop name="product.combinations" type="attribute_combination" product_sale_elements=$ID backend_context="1"}
+                            {$has_combinations = true}
+                        {/loop}
+                    {/loop}
+                    {if $has_combinations}
+                        <button {if ! $selected}disabled="disabled"{/if} title="{intl l='Product\'s attributes included in this sale operation'}" class="btn btn-primary btn-xs product-attribute-selector" data-product-id="{$ID}">{intl l='All'}</button>
+                        <input data-product-id="{$ID}" type="hidden" {form_field_attributes field="product_attributes" value="" value_key=$ID extra_class="product-selected-attributes-ids"}>
+                    {else}
+                        {intl l="No attributes."}
+                        <input type="hidden" {form_field_attributes field="product_attributes" value='' value_key=$ID}>
+                    {/if}
+                </td>
+            </tr>
+        {/loop}
+        </tbody>
+    </table>
+{/ifloop}
+
+{elseloop rel="product-list"}
+    <div class="alert alert-info">
+        {intl l="Please select one or more categories which contains some products"}
+    </div>
+{/elseloop}
+
+{/form}

@@ -12,26 +12,33 @@
 
 
 {block name="main-content"}
+
+    {* This page should not replace the current previous URL *}
+    {set_previous_url ignore_current="1"}
+
+    {hook name="login.top"}
     <div class="main">
+        {hook name="login.main-top"}
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
             {form name="thelia.front.customer.login"}
-            <form id="form-login" action="{url path="/login"}" method="post" {form_enctype form=$form} novalidate>
+            <form id="form-login" action="{url path="/login"}" method="post" {form_enctype} novalidate>
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-                {form_field form=$form field='success_url'}
-                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}"> {* the url the user is redirected to on login success *}
+                {form_field field='success_url'}
+                    <input type="hidden" name="{$name}" value="{navigate to="previous"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
 
-                {form_field form=$form field='error_message'}
+                {form_field field='error_message'}
                     <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
+                {hook name="login.form-top"}
                 <fieldset>
-                    {form_field form=$form field="email"}
+                    {form_field field="email"}
                         <div class="form-group group-email{if $error} has-error{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <div class="control-input">
-                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
+                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control input-sm" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
                             {if $error}
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -43,7 +50,7 @@
                     {/form_field}
 
                     <fieldset>
-                        {form_field form=$form field="account"}
+                        {form_field field="account"}
                         <legend>{intl l="Do you have an account?"}</legend>
                             {foreach $choices as $choice}
                             <div class="radio radio-account{$choice->value}">
@@ -53,26 +60,51 @@
                             </div>
                             {/foreach}
                         {/form_field}
-                        {form_field form=$form field="password"}
-                        <div class="form-group group-password{if $error} has-error{/if}">
-                            <label for="{$label_attr.for}" class="sr-only">{$label}</label>
-                            <div class="control-input">
-                            <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" autocomplete="off"{if !isset($error_focus)} autofocus{/if}>
-                            {if $error}
-                                <span class="help-block">{$message}</span>
-                            {/if}
+                        <div class="group-password">
+                            {form_field field="password"}
+                            <div class="form-group {if $error} has-error{/if}">
+                                <label for="{$label_attr.for}" class="sr-only">{$label}</label>
+                                <div class="control-input">
+                                    <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control input-sm" maxlength="255" autocomplete="off"{if !isset($error_focus)} autofocus{/if}>
+                                    {if $error}
+                                        <span class="help-block">{$message}</span>
+                                    {/if}
+                                </div>
+                                <span class="help-block">
+                                    <a href="{url path="/password"}" data-toggle="confirmation" class="forgot-password">{intl l="Forgot your Password?"}</a>
+                                </span>
                             </div>
+                            {/form_field}
+                            {form_field field='remember_me'}
+                            <div class="checkbox pull-right">
+                                <label for="{$label_attr.for}">
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {$label}
+                                </label>
+                            </div>
+                            {/form_field}
                         </div>
-                        {/form_field}
                     </fieldset>
                 </fieldset>
-
+                {hook name="login.form-bottom"}
                 <div class="group-btn">
-                    <a href="{url path="/password"}" data-toggle="confirmation" class="forgot-password">{intl l="Forgot your Password?"}</a>
-                    <button type="submit" class="btn btn-login">{intl l="Next"}</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Next"}</button>
                 </div>
             </form>
             {/form}
         </article>
+        {hook name="login.main-bottom"}
     </div>
+    {hook name="login.bottom"}
+{/block}
+
+{block name="stylesheet"}
+{hook name="login.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="login.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="login.javascript-initialization"}
 {/block}

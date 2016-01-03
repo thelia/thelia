@@ -12,102 +12,137 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\HttpFoundation\Response;
+use Doctrine\Common\Cache\FilesystemCache;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
 
 class HomeController extends BaseAdminController
 {
+    /**
+     * Folder name for stats cache
+     */
+    const STATS_CACHE_DIR = "stats";
+
+    /**
+     * Key prefix for stats cache
+     */
+    const STATS_CACHE_KEY = "stats";
+
     const RESOURCE_CODE = "admin.home";
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // Render the edition template.
         return $this->render('home');
     }
 
-    /**
-     * Get the latest available Thelia version from the Thelia web site.
-     *
-     * @return Thelia\Core\HttpFoundation\Response the response
-     */
-    public function getLatestTheliaVersion()
-    {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
-
-        // get the latest version
-        $version = @file_get_contents("http://thelia.net/version.php");
-
-        if ($version === false)
-            $version = $this->getTranslator()->trans("Not found");
-        else if (! preg_match("/^[0-9.]*$/", $version))
-            $version = $this->getTranslator()->trans("Unavailable");
-
-        return Response::create($version);
-    }
-
     public function loadStatsAjaxAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
-        $data = new \stdClass();
+        $cacheExpire = ConfigQuery::getAdminCacheHomeStatsTTL();
 
-        $data->title = $this->getTranslator()->trans("Stats on %month/%year", array('%month' => $this->getRequest()->query->get('month', date('m')), '%year' => $this->getRequest()->query->get('year', date('Y'))));
+        $cacheContent = false;
 
-        /* sales */
-        $saleSeries = new \stdClass();
-        $saleSeries->color = $this->getRequest()->query->get('sales_color', '#adadad');
-        $saleSeries->data = OrderQuery::getMonthlySaleStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+        $month = (int) $this->getRequest()->query->get('month', date('m'));
+        $year = (int) $this->getRequest()->query->get('year', date('Y'));
 
-        /* new customers */
-        $newCustomerSeries = new \stdClass();
-        $newCustomerSeries->color = $this->getRequest()->query->get('customers_color', '#f39922');
-        $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+        if ($cacheExpire) {
+            $context = "_" . $month . "_" . $year;
 
-        /* orders */
-        $orderSeries = new \stdClass();
-        $orderSeries->color = $this->getRequest()->query->get('orders_color', '#5cb85c');
-        $orderSeries->data = OrderQuery::getMonthlyOrdersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+            $cacheKey = self::STATS_CACHE_KEY . $context;
 
-        /* first order */
-        $firstOrderSeries = new \stdClass();
-        $firstOrderSeries->color = $this->getRequest()->query->get('first_orders_color', '#5bc0de');
-        $firstOrderSeries->data = OrderQuery::getFirstOrdersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+            $cacheDriver = new FilesystemCache($this->getCacheDir());
 
-        /* cancelled orders */
-        $cancelledOrderSeries = new \stdClass();
-        $cancelledOrderSeries->color = $this->getRequest()->query->get('cancelled_orders_color', '#d9534f');
-        $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y')),
-            array(5)
-        );
+            if (!$this->getRequest()->query->get('flush', "0")) {
+                $cacheContent = $cacheDriver->fetch($cacheKey);
+            } else {
+                $cacheDriver->delete($cacheKey);
+            }
+        }
 
-        $data->series = array(
-            $saleSeries,
-            $newCustomerSeries,
-            $orderSeries,
-            $firstOrderSeries,
-            $cancelledOrderSeries,
-        );
+        if ($cacheContent === false) {
+            $data = new \stdClass();
 
-        $json = json_encode($data);
+            $data->title = $this->getTranslator()->trans(
+                "Stats on %month/%year",
+                ['%month' => $month, '%year' => $year]
+            );
 
-        return $this->jsonResponse($json);
+            /* sales */
+            $saleSeries = new \stdClass();
+            $saleSeries->color = self::testHexColor('sales_color', '#adadad');
+            $saleSeries->data = OrderQuery::getMonthlySaleStats($month, $year);
+
+            /* new customers */
+            $newCustomerSeries = new \stdClass();
+            $newCustomerSeries->color = self::testHexColor('customers_color', '#f39922');
+            $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats($month, $year);
+
+            /* orders */
+            $orderSeries = new \stdClass();
+            $orderSeries->color = self::testHexColor('orders_color', '#5cb85c');
+            $orderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year);
+
+            /* first order */
+            $firstOrderSeries = new \stdClass();
+            $firstOrderSeries->color = self::testHexColor('first_orders_color', '#5bc0de');
+            $firstOrderSeries->data = OrderQuery::getFirstOrdersStats($month, $year);
+
+            /* cancelled orders */
+            $cancelledOrderSeries = new \stdClass();
+            $cancelledOrderSeries->color = self::testHexColor('cancelled_orders_color', '#d9534f');
+            $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year, array(5));
+
+            $data->series = array(
+                $saleSeries,
+                $newCustomerSeries,
+                $orderSeries,
+                $firstOrderSeries,
+                $cancelledOrderSeries,
+            );
+
+            $cacheContent = json_encode($data);
+
+            if ($cacheExpire) {
+                $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
+            }
+        }
+
+        return $this->jsonResponse($cacheContent);
+    }
+
+    /**
+     * get the cache directory for sitemap
+     *
+     * @return mixed|string
+     */
+    protected function getCacheDir()
+    {
+        $cacheDir = $this->container->getParameter("kernel.cache_dir");
+        $cacheDir = rtrim($cacheDir, '/');
+        $cacheDir .= DIRECTORY_SEPARATOR . self::STATS_CACHE_DIR . DIRECTORY_SEPARATOR;
+
+        return $cacheDir;
+    }
+
+    /**
+     * @param string $key
+     * @param string $default
+     * @return string hexadecimal color or default argument
+     */
+    protected function testHexColor($key, $default)
+    {
+        $hexColor = $this->getRequest()->query->get($key, $default);
+
+        return preg_match('/^#[a-f0-9]{6}$/i', $hexColor) ? $hexColor : $default;
     }
 }

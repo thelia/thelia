@@ -14,7 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Security\AccessManager;
-
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\SeoForm;
 
@@ -43,23 +43,21 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
      * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
      * @param string $updateSeoEventIdentifier        the dispatched update SEO change TheliaEvent identifier, or null if the object has no SEO. Example: TheliaEvents::MESSAGE_UPDATE_SEO
-    */
+     * @param string $moduleCode The module code for ACL
+     */
     public function __construct(
         $objectName,
-
-        $defaultListOrder = null,
-        $orderRequestParameterName = null,
-
+        $defaultListOrder,
+        $orderRequestParameterName,
         $resourceCode,
-
         $createEventIdentifier,
         $updateEventIdentifier,
         $deleteEventIdentifier,
         $visibilityToggleEventIdentifier = null,
         $changePositionEventIdentifier = null,
-        $updateSeoEventIdentifier = null
-    )
-    {
+        $updateSeoEventIdentifier = null,
+        $moduleCode = null
+    ) {
         parent::__construct(
             $objectName,
             $defaultListOrder,
@@ -69,11 +67,11 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $updateEventIdentifier,
             $deleteEventIdentifier,
             $visibilityToggleEventIdentifier,
-            $changePositionEventIdentifier
+            $changePositionEventIdentifier,
+            $moduleCode
         );
 
         $this->updateSeoEventIdentifier = $updateSeoEventIdentifier;
-
     }
 
     /**
@@ -92,7 +90,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      */
     protected function getUpdateSeoForm()
     {
-        return new SeoForm($this->getRequest());
+        return $this->createForm(AdminForm::SEO);
     }
 
     /**
@@ -103,7 +101,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      */
     protected function getUpdateSeoEvent($formData)
     {
-
         $updateSeoEvent = new UpdateSeoEvent($formData['id']);
 
         $updateSeoEvent
@@ -121,7 +118,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Hydrate the SEO form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param mixed $object
      */
     protected function hydrateSeoForm($object)
     {
@@ -136,7 +133,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             'meta_keywords'     => $object->getMetaKeywords()
         );
 
-        $seoForm = new SeoForm($this->getRequest(), "form", $data);
+        $seoForm = $this->createForm(AdminForm::SEO, "form", $data);
         $this->getParserContext()->addForm($seoForm);
 
         // URL based on the language
@@ -151,7 +148,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     public function processUpdateSeoAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -165,7 +162,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $this->getRequest()->attributes->set($this->objectName . '_id', $this->getRequest()->get('current_id'));
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($updateSeoForm, "POST");
 
@@ -185,11 +181,11 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($this->getRequest()->get('save_mode') == 'stay') {
-                    $this->redirectToEditionTemplate($this->getRequest());
+                    return $this->redirectToEditionTemplate($this->getRequest());
                 }
 
                 // Redirect to the success URL
-                $this->redirect($updateSeoForm->getSuccessUrl());
+                return $this->generateSuccessRedirect($updateSeoForm);
             } else {
                 return $response;
             }
@@ -203,7 +199,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
         // Load object if exist
         if (null !== $object = $this->getExistingObject()) {
-
             // Hydrate the form abd pass it to the parser
             $changeForm = $this->hydrateObjectForm($object);
 

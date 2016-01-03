@@ -53,5 +53,4 @@ class FeatureCreateEvent extends FeatureEvent
 
         return $this;
     }
-
 }

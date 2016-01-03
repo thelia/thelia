@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Front\Controller;
 
+use Front\Front;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,17 +31,17 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CartAdd;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Module\Exception\DeliveryException;
 use Thelia\Tools\URL;
 
 class CartController extends BaseFrontController
 {
-    use \Thelia\Cart\CartTrait;
-
     public function addItem()
     {
         $request = $this->getRequest();
@@ -52,29 +53,29 @@ class CartController extends BaseFrontController
             $form = $this->validateForm($cartAdd);
 
             $cartEvent = $this->getCartEvent();
-            $cartEvent->setNewness($form->get("newness")->getData());
-            $cartEvent->setAppend($form->get("append")->getData());
-            $cartEvent->setQuantity($form->get("quantity")->getData());
-            $cartEvent->setProductSaleElementsId($form->get("product_sale_elements_id")->getData());
-            $cartEvent->setProduct($form->get("product")->getData());
+
+            $cartEvent->bindForm($form);
 
             $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
 
             $this->afterModifyCart();
 
-            $this->redirectSuccess();
+
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                $this->changeViewForAjax();
+            } elseif (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
+                return $response;
+            }
 
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
-            $message = "Failed to add this article to your cart, please try again";
+            $message = $this->getTranslator()->trans(
+                "Failed to add this article to your cart, please try again",
+                [],
+                Front::MESSAGE_DOMAIN
+            );
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
-        }
-
-        // If Ajax Request
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $request = $this->getRequest();
-            $request->attributes->set('_view', "includes/mini-cart");
         }
 
         if ($message) {
@@ -86,15 +87,25 @@ class CartController extends BaseFrontController
     public function changeItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+        $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
         $cartEvent->setQuantity($this->getRequest()->get("quantity"));
 
         try {
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get('_token')
+            );
+
             $this->dispatch(TheliaEvents::CART_UPDATEITEM, $cartEvent);
 
             $this->afterModifyCart();
 
-            $this->redirectSuccess();
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                $this->changeViewForAjax();
+            } elseif (null !== $response = $this->generateSuccessRedirect()) {
+                return $response;
+            }
+
+
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
@@ -104,19 +115,38 @@ class CartController extends BaseFrontController
     public function deleteItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+        $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
 
         try {
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get('_token')
+            );
+
             $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
 
             $this->afterModifyCart();
 
-            $this->redirectSuccess();
+            if (null !== $response = $this->generateSuccessRedirect()) {
+                return $response;
+            }
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
+        $this->changeViewForAjax();
+    }
+
+    protected function changeViewForAjax()
+    {
+        // If Ajax Request
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $request = $this->getRequest();
+
+            $view = $request->get('ajax-view', "includes/mini-cart");
+
+            $request->attributes->set('_view', $view);
+        }
     }
 
     public function changeCountry()
@@ -129,17 +159,18 @@ class CartController extends BaseFrontController
 
         $cookie = new Cookie($cookieName, $deliveryId, time() + $cookieExpires, '/');
 
-        $this->redirect($redirectUrl, 302, array($cookie));
+        $response = $this->generateRedirect($redirectUrl);
+        $response->headers->setCookie($cookie);
+
+        return $response;
     }
 
     /**
-     * use Thelia\Cart\CartTrait for searching current cart or create a new one
-     *
      * @return \Thelia\Core\Event\Cart\CartEvent
      */
     protected function getCartEvent()
     {
-        $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
 
         return new CartEvent($cart);
     }
@@ -153,15 +184,16 @@ class CartController extends BaseFrontController
     private function getAddCartForm(Request $request)
     {
         if ($request->isMethod("post")) {
-            $cartAdd = new CartAdd($request);
+            $cartAdd = $this->createForm(FrontForm::CART_ADD);
         } else {
-            $cartAdd = new CartAdd(
-                $request,
+            $cartAdd = $this->createForm(
+                FrontForm::CART_ADD,
                 "form",
                 array(),
                 array(
                     'csrf_protection'   => false,
-                )
+                ),
+                $this->container
             );
         }
 
@@ -177,18 +209,21 @@ class CartController extends BaseFrontController
             $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
 
             if (null !== $deliveryModule && null !== $deliveryAddress) {
-                $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+                $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
                 $orderEvent = new OrderEvent($order);
 
                 try {
-                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+                    $postage = OrderPostage::loadFromPostage(
+                        $moduleInstance->getPostage($deliveryAddress->getCountry())
+                    );
 
-                    $orderEvent->setPostage($postage);
+                    $orderEvent->setPostage($postage->getAmount());
+                    $orderEvent->setPostageTax($postage->getAmountTax());
+                    $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                }
-                catch (DeliveryException $ex) {
+                } catch (DeliveryException $ex) {
                     // The postage has been chosen, but changes in the cart causes an exception.
                     // Reset the postage data in the order
                     $orderEvent->setDeliveryModule(0);

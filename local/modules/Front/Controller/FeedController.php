@@ -17,11 +17,10 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Log\Tlog;
+use Thelia\Model\BrandQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Folder;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
@@ -56,6 +55,7 @@ class FeedController extends BaseFrontController {
      * @param $id string        The id of the parent element. The id of the main parent category for catalog context.
      *                          The id of the content folder for content context
      * @return Response
+     * @throws \RuntimeException
      */
     public function generateAction($context, $lang, $id)
     {
@@ -66,7 +66,7 @@ class FeedController extends BaseFrontController {
         // context
         if ("" === $context){
             $context = "catalog";
-        } else if (! in_array($context, array("catalog", "content")) ){
+        } else if (! in_array($context, array("catalog", "content", "brand")) ){
             $this->pageNotFound();
         }
 
@@ -189,6 +189,9 @@ class FeedController extends BaseFrontController {
             if ("catalog" === $context){
                 $cat = CategoryQuery::create()->findPk($id);
                 $ret = (null !== $cat && $cat->getVisible());
+            } elseif ("brand" === $context) {
+                $brand = BrandQuery::create()->findPk($id);
+                $ret = (null !== $brand && $brand->getVisible());
             } else {
                 $folder = FolderQuery::create()->findPk($id);
                 $ret = (null !== $folder && $folder->getVisible());
@@ -196,5 +199,4 @@ class FeedController extends BaseFrontController {
         }
         return $ret;
     }
-
-} 
+}

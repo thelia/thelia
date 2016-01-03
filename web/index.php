@@ -11,13 +11,25 @@
 /*************************************************************************************/
 
 //use Thelia\Core\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\ClassLoader\ApcClassLoader;
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 
 //use Symfony\Component\DependencyInjection;
 
 $env = 'prod';
-require __DIR__ . '/../core/bootstrap.php';
+$loader = require __DIR__ . '/../core/vendor/autoload.php';
+
+// Enable APC for autoloading to improve performance.
+// You should change the ApcClassLoader first argument to a unique prefix
+// in order to prevent cache key conflicts with other applications
+// also using APC.
+/*
+$cacheLoader = new ApcClassLoader(sha1(__FILE__), $loader);
+$loader->unregister();
+$cacheLoader->register(true);
+*/
+
 
 $request = Request::createFromGlobals();
 

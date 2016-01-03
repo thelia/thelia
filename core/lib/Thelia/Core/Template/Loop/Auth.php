@@ -17,7 +17,6 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Type\AlphaNumStringListType;
@@ -29,6 +28,12 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method string[] getRole()
+ * @method string[] getResource()
+ * @method int[] getModule()
+ * @method string[] getAccess()
  */
 class Auth extends BaseLoop implements ArraySearchLoopInterface
 {
@@ -61,7 +66,7 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
                     new EnumListType(array(AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE))
                 )
             )
-         );
+        );
     }
 
     public function buildArray()
@@ -78,12 +83,12 @@ class Auth extends BaseLoop implements ArraySearchLoopInterface
 
         try {
             if (true === $this->securityContext->isGranted(
-                    $roles,
-                    $resource === null ? array() : $resource,
-                    $module === null ? array() : $module,
-                    $access === null ? array() : $access)
+                $roles,
+                $resource === null ? array() : $resource,
+                $module === null ? array() : $module,
+                $access === null ? array() : $access
+            )
             ) {
-
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());
             }

@@ -14,5 +14,4 @@ namespace Thelia\Core\Template\Element\Exception;
 
 class ElementNotFoundException extends \RuntimeException
 {
-
 }

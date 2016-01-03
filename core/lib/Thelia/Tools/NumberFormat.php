@@ -32,14 +32,18 @@ class NumberFormat
      * Get a standard number, with '.' as decimal point and no thousands separator
      * so that this number can be used to perform calculations.
      *
-     * @param float  $number   the number
+     * @param float $number   the number
      * @param string $decimals number of decimal figures
+     * @return string
      */
     public function formatStandardNumber($number, $decimals = null)
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals == null) $decimals = $lang->getDecimals();
+        if ($decimals === null) {
+            $decimals = $lang->getDecimals();
+        }
+
         return number_format($number, $decimals, '.', '');
     }
 
@@ -47,9 +51,15 @@ class NumberFormat
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals == null) $decimals = $lang->getDecimals();
-        if ($decPoint == null) $decPoint = $lang->getDecimalSeparator();
-        if ($thousandsSep == null) $thousandsSep = $lang->getThousandsSeparator();
+        if ($decimals == null) {
+            $decimals = $lang->getDecimals();
+        }
+        if ($decPoint == null) {
+            $decPoint = $lang->getDecimalSeparator();
+        }
+        if ($thousandsSep == null) {
+            $thousandsSep = $lang->getThousandsSeparator();
+        }
         return number_format($number, $decimals, $decPoint, $thousandsSep);
     }
 }

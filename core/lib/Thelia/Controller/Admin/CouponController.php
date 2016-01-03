@@ -13,22 +13,21 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
+use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
-use Thelia\Condition\ConditionCollection;
-use Thelia\Coupon\Type\CouponAbstract;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXPercent;
-use Thelia\Form\CouponCreationForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
@@ -37,6 +36,7 @@ use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\Rest\ResponseRest;
+use Thelia\Tools\URL;
 
 /**
  * Control View and Action (Model) via Events
@@ -80,11 +80,13 @@ class CouponController extends BaseAdminController
         $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
-            $this->validateCreateOrUpdateForm(
+            if (null !== $response = $this->validateCreateOrUpdateForm(
                 $eventToDispatch,
                 'created',
                 'creation'
-            );
+            )) {
+                return $response;
+            }
         } else {
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
@@ -123,7 +125,6 @@ class CouponController extends BaseAdminController
         $coupon = CouponQuery::create()->findPk($couponId);
         if (null === $coupon) {
             return $this->pageNotFound();
-
         }
 
         $coupon->setLocale($this->getCurrentEditionLocale());
@@ -139,12 +140,14 @@ class CouponController extends BaseAdminController
 
         // Update
         if ($this->getRequest()->isMethod('POST')) {
-            $this->validateCreateOrUpdateForm(
+            if (null !== $response = $this->validateCreateOrUpdateForm(
                 $eventToDispatch,
                 'updated',
                 'update',
                 $coupon
-            );
+            )) {
+                return $response;
+            }
         } else {
             // Display
             // Prepare the data that will hydrate the form
@@ -166,8 +169,12 @@ class CouponController extends BaseAdminController
                 $freeShippingForModules[] = $item->getModuleId();
             }
 
-            if (empty($freeShippingForCountries)) $freeShippingForCountries[] = 0;
-            if (empty($freeShippingForModules)) $freeShippingForModules[] = 0;
+            if (empty($freeShippingForCountries)) {
+                $freeShippingForCountries[] = 0;
+            }
+            if (empty($freeShippingForModules)) {
+                $freeShippingForModules[] = 0;
+            }
 
             $data = [
                 'code' => $coupon->getCode(),
@@ -192,13 +199,14 @@ class CouponController extends BaseAdminController
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);
 
             // Setup the object form
-            $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
+            $changeForm = $this->createForm(AdminForm::COUPON_CREATION, 'form', $data);
 
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
 
         $args['couponCode'] = $coupon->getCode();
+        $args['couponType'] = $coupon->getType();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['couponInputsHtml'] = $couponManager->drawBackOfficeInputs();
         $args['urlAjaxAdminCouponDrawInputs'] = $this->getRoute(
@@ -244,6 +252,8 @@ class CouponController extends BaseAdminController
 
         $args['dateFormat'] = $this->getDefaultDateFormat();
 
+        $args['couponId'] = $couponId;
+
         return $this->render('coupon-update', $args);
     }
 
@@ -263,7 +273,6 @@ class CouponController extends BaseAdminController
         $this->checkXmlHttpRequest();
 
         if (! empty($conditionId)) {
-
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
@@ -343,7 +352,8 @@ class CouponController extends BaseAdminController
         }
 
         return $this->render(
-            'coupon/condition-input-ajax', [
+            'coupon/condition-input-ajax',
+            [
                 'inputsDrawn' => $condition->drawBackOfficeInputs(),
                 'conditionServiceId' => $condition->getServiceId(),
                 'conditionIndex' => $conditionIndex,
@@ -474,8 +484,8 @@ class CouponController extends BaseAdminController
     protected function validateCreateOrUpdateForm($eventToDispatch, $log, $action, Coupon $model = null)
     {
         // Create the form from the request
-        $couponForm = new CouponCreationForm($this->getRequest());
-
+        $couponForm = $this->getForm($action, $model);
+        $response = null;
         $message = false;
         try {
             // Check the form against conditions violations
@@ -490,33 +500,31 @@ class CouponController extends BaseAdminController
             );
 
             $this->adminLogAppend(
-                AdminResources::COUPON, AccessManager::UPDATE,
+                AdminResources::COUPON,
+                AccessManager::UPDATE,
                 sprintf(
                     'Coupon %s (ID ) ' . $log,
                     $couponEvent->getTitle(),
                     $couponEvent->getCouponModel()->getId()
-                )
+                ),
+                $couponEvent->getCouponModel()->getId()
             );
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirect(
-                    str_replace(
-                        '{id}',
-                        $couponEvent->getCouponModel()->getId(),
-                        $couponForm->getSuccessUrl()
-                    )
+                $response = RedirectResponse::create(str_replace(
+                    '{id}',
+                    $couponEvent->getCouponModel()->getId(),
+                    $couponForm->getSuccessUrl()
+                ));
+            } else {
+                // Redirect to the success URL
+                $response = RedirectResponse::create(
+                    URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
                 );
-
-                exit();
             }
-
-            // Redirect to the success URL
-            $this->redirectToRoute('admin.coupon.list');
-
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $message = $this->createStandardFormValidationErrorMessage($ex);
-
         } catch (\Exception $ex) {
             // Any other error
             $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $ex->getMessage()]);
@@ -534,7 +542,7 @@ class CouponController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
-        return $this;
+        return $response;
     }
 
     /**
@@ -577,7 +585,7 @@ class CouponController extends BaseAdminController
             $condition['serviceId'] = $availableCoupon->getServiceId();
             $condition['name'] = $availableCoupon->getName();
             $condition['toolTip'] = $availableCoupon->getToolTip();
-            // $condition['inputName'] = $availableCoupon->getInputName();
+
             $cleanedCoupons[] = $condition;
         }
 
@@ -624,16 +632,22 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        $this->checkXmlHttpRequest();
+        if (! empty($couponServiceId)) {
+            $this->checkXmlHttpRequest();
 
-        /** @var CouponInterface $coupon */
-        $couponManager = $this->container->get($couponServiceId);
+            /** @var CouponInterface $coupon */
+            $couponManager = $this->container->get($couponServiceId);
 
-        if (!$couponManager instanceof CouponInterface) {
-            $this->pageNotFound();
+            if (!$couponManager instanceof CouponInterface) {
+                $this->pageNotFound();
+            }
+
+            $response = new ResponseRest($couponManager->drawBackOfficeInputs());
+        } else {
+            // Return an empty response if the service ID is not defined
+            // Typically, when the user chooses "Please select a coupon type"
+            $response = new ResponseRest('');
         }
-
-        $response = new ResponseRest($couponManager->drawBackOfficeInputs());
 
         return $response;
     }
@@ -658,7 +672,6 @@ class CouponController extends BaseAdminController
         $coupon = CouponQuery::create()->findPk($couponId);
         if (null === $coupon) {
             return $this->pageNotFound();
-
         }
 
         /** @var CouponFactory $couponFactory */
@@ -673,36 +686,6 @@ class CouponController extends BaseAdminController
         $args['conditions'] = $this->cleanConditionForTemplate($couponManager->getConditions());
 
         return $this->render('coupon/conditions', $args);
-
-    }
-
-    /**
-     * Add percentage logic if found in the Coupon post data
-     *
-     * @param array $effects            Effect parameters to populate
-     * @param array $extendedInputNames Extended Inputs to manage
-     *
-     * @return array Populated effect with percentage
-     */
-    protected function addExtendedLogic(array $effects, array $extendedInputNames)
-    {
-        /** @var Request $request */
-        $request = $this->container->get('request');
-        $postData = $request->request;
-        // Validate quantity input
-
-        if ($postData->has(RemoveXPercent::INPUT_EXTENDED__NAME)) {
-            $extentedPostData = $postData->get(RemoveXPercent::INPUT_EXTENDED__NAME);
-
-            foreach ($extendedInputNames as $extendedInputName) {
-                if (isset($extentedPostData[$extendedInputName])) {
-                    $inputValue = $extentedPostData[$extendedInputName];
-                    $effects[$extendedInputName] = $inputValue;
-                }
-            }
-        }
-
-        return $effects;
     }
 
     /**
@@ -718,16 +701,15 @@ class CouponController extends BaseAdminController
         // Get the form field values
         $data = $form->getData();
         $serviceId = $data['type'];
-        /** @var CouponInterface $couponManager */
-        $couponManager = $this->container->get($serviceId);
-        $effects = [CouponAbstract::INPUT_AMOUNT_NAME => $data[CouponAbstract::INPUT_AMOUNT_NAME]];
-        $effects = $this->addExtendedLogic($effects, $couponManager->getExtendedInputs());
+
+        /** @var CouponInterface $coupon */
+        $coupon = $this->container->get($serviceId);
 
         $couponEvent = new CouponCreateOrUpdateEvent(
             $data['code'],
             $serviceId,
             $data['title'],
-            $effects,
+            $coupon->getEffects($data),
             $data['shortDescription'],
             $data['description'],
             $data['isEnabled'],
@@ -813,17 +795,78 @@ class CouponController extends BaseAdminController
         );
 
         $this->adminLogAppend(
-            AdminResources::COUPON, AccessManager::UPDATE,
+            AdminResources::COUPON,
+            AccessManager::UPDATE,
             sprintf(
                 'Coupon %s (ID %s) conditions updated',
                 $couponEvent->getCouponModel()->getTitle(),
                 $couponEvent->getCouponModel()->getType()
-            )
+            ),
+            $couponEvent->getCouponModel()->getId()
         );
     }
 
     protected function getDefaultDateFormat()
     {
         return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+    }
+
+    protected function getForm($action, $coupon)
+    {
+        $options["validation_groups"] = ["Default", $action];
+
+        $data = array();
+
+        if (null !== $coupon) {
+            $data["code"] = $coupon->getCode();
+        }
+
+        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, $options);
+    }
+
+    public function deleteAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) {
+            return $response;
+        }
+
+        try {
+            // Check token
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get("_token")
+            );
+
+            // Retrieve coupon
+            $coupon = CouponQuery::create()
+                ->findPk($couponId = $this->getRequest()->request->get("coupon_id"))
+            ;
+            $deleteEvent = new CouponDeleteEvent($couponId, $coupon);
+
+            $this->dispatch(TheliaEvents::COUPON_DELETE, $deleteEvent);
+
+            if (null !== $deletedObject = $deleteEvent->getCoupon()) {
+                $this->adminLogAppend(
+                    AdminResources::COUPON,
+                    AccessManager::DELETE,
+                    sprintf(
+                        "Coupon %s (ID %s) deleted",
+                        $deletedObject->getCode(),
+                        $deletedObject->getId()
+                    ),
+                    $deletedObject->getId()
+                );
+            }
+
+            return $response = RedirectResponse::create(
+                URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
+            );
+        } catch (\Exception $e) {
+            $this->getParserContext()
+                ->setGeneralError($e->getMessage())
+            ;
+
+            return $this->browseAction();
+        }
     }
 }

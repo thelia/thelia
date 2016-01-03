@@ -19,6 +19,8 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Admin as ChildAdmin;
 use Thelia\Model\AdminQuery as ChildAdminQuery;
+use Thelia\Model\Api as ChildApi;
+use Thelia\Model\ApiQuery as ChildApiQuery;
 use Thelia\Model\Profile as ChildProfile;
 use Thelia\Model\ProfileI18n as ChildProfileI18n;
 use Thelia\Model\ProfileI18nQuery as ChildProfileI18nQuery;
@@ -108,6 +110,12 @@ abstract class Profile implements ActiveRecordInterface
     protected $collProfileModulesPartial;
 
     /**
+     * @var        ObjectCollection|ChildApi[] Collection to store aggregation of ChildApi objects.
+     */
+    protected $collApis;
+    protected $collApisPartial;
+
+    /**
      * @var        ObjectCollection|ChildProfileI18n[] Collection to store aggregation of ChildProfileI18n objects.
      */
     protected $collProfileI18ns;
@@ -163,6 +171,12 @@ abstract class Profile implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $profileModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $apisScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -703,6 +717,8 @@ abstract class Profile implements ActiveRecordInterface
 
             $this->collProfileModules = null;
 
+            $this->collApis = null;
+
             $this->collProfileI18ns = null;
 
             $this->collResources = null;
@@ -918,6 +934,24 @@ abstract class Profile implements ActiveRecordInterface
                 }
             }
 
+            if ($this->apisScheduledForDeletion !== null) {
+                if (!$this->apisScheduledForDeletion->isEmpty()) {
+                    foreach ($this->apisScheduledForDeletion as $api) {
+                        // need to save related object because we set the relation to null
+                        $api->save($con);
+                    }
+                    $this->apisScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collApis !== null) {
+            foreach ($this->collApis as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->profileI18nsScheduledForDeletion !== null) {
                 if (!$this->profileI18nsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\ProfileI18nQuery::create()
@@ -1119,6 +1153,9 @@ abstract class Profile implements ActiveRecordInterface
             if (null !== $this->collProfileModules) {
                 $result['ProfileModules'] = $this->collProfileModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collApis) {
+                $result['Apis'] = $this->collApis->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collProfileI18ns) {
                 $result['ProfileI18ns'] = $this->collProfileI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1301,6 +1338,12 @@ abstract class Profile implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getApis() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addApi($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getProfileI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addProfileI18n($relObj->copy($deepCopy));
@@ -1356,6 +1399,9 @@ abstract class Profile implements ActiveRecordInterface
         }
         if ('ProfileModule' == $relationName) {
             return $this->initProfileModules();
+        }
+        if ('Api' == $relationName) {
+            return $this->initApis();
         }
         if ('ProfileI18n' == $relationName) {
             return $this->initProfileI18ns();
@@ -2073,6 +2119,224 @@ abstract class Profile implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collApis collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addApis()
+     */
+    public function clearApis()
+    {
+        $this->collApis = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collApis collection loaded partially.
+     */
+    public function resetPartialApis($v = true)
+    {
+        $this->collApisPartial = $v;
+    }
+
+    /**
+     * Initializes the collApis collection.
+     *
+     * By default this just sets the collApis collection to an empty array (like clearcollApis());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initApis($overrideExisting = true)
+    {
+        if (null !== $this->collApis && !$overrideExisting) {
+            return;
+        }
+        $this->collApis = new ObjectCollection();
+        $this->collApis->setModel('\Thelia\Model\Api');
+    }
+
+    /**
+     * Gets an array of ChildApi objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProfile is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildApi[] List of ChildApi objects
+     * @throws PropelException
+     */
+    public function getApis($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collApisPartial && !$this->isNew();
+        if (null === $this->collApis || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collApis) {
+                // return empty collection
+                $this->initApis();
+            } else {
+                $collApis = ChildApiQuery::create(null, $criteria)
+                    ->filterByProfile($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collApisPartial && count($collApis)) {
+                        $this->initApis(false);
+
+                        foreach ($collApis as $obj) {
+                            if (false == $this->collApis->contains($obj)) {
+                                $this->collApis->append($obj);
+                            }
+                        }
+
+                        $this->collApisPartial = true;
+                    }
+
+                    reset($collApis);
+
+                    return $collApis;
+                }
+
+                if ($partial && $this->collApis) {
+                    foreach ($this->collApis as $obj) {
+                        if ($obj->isNew()) {
+                            $collApis[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collApis = $collApis;
+                $this->collApisPartial = false;
+            }
+        }
+
+        return $this->collApis;
+    }
+
+    /**
+     * Sets a collection of Api objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $apis A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProfile The current object (for fluent API support)
+     */
+    public function setApis(Collection $apis, ConnectionInterface $con = null)
+    {
+        $apisToDelete = $this->getApis(new Criteria(), $con)->diff($apis);
+
+
+        $this->apisScheduledForDeletion = $apisToDelete;
+
+        foreach ($apisToDelete as $apiRemoved) {
+            $apiRemoved->setProfile(null);
+        }
+
+        $this->collApis = null;
+        foreach ($apis as $api) {
+            $this->addApi($api);
+        }
+
+        $this->collApis = $apis;
+        $this->collApisPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Api objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Api objects.
+     * @throws PropelException
+     */
+    public function countApis(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collApisPartial && !$this->isNew();
+        if (null === $this->collApis || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collApis) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getApis());
+            }
+
+            $query = ChildApiQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProfile($this)
+                ->count($con);
+        }
+
+        return count($this->collApis);
+    }
+
+    /**
+     * Method called to associate a ChildApi object to this object
+     * through the ChildApi foreign key attribute.
+     *
+     * @param    ChildApi $l ChildApi
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
+     */
+    public function addApi(ChildApi $l)
+    {
+        if ($this->collApis === null) {
+            $this->initApis();
+            $this->collApisPartial = true;
+        }
+
+        if (!in_array($l, $this->collApis->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddApi($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Api $api The api object to add.
+     */
+    protected function doAddApi($api)
+    {
+        $this->collApis[]= $api;
+        $api->setProfile($this);
+    }
+
+    /**
+     * @param  Api $api The api object to remove.
+     * @return ChildProfile The current object (for fluent API support)
+     */
+    public function removeApi($api)
+    {
+        if ($this->getApis()->contains($api)) {
+            $this->collApis->remove($this->collApis->search($api));
+            if (null === $this->apisScheduledForDeletion) {
+                $this->apisScheduledForDeletion = clone $this->collApis;
+                $this->apisScheduledForDeletion->clear();
+            }
+            $this->apisScheduledForDeletion[]= $api;
+            $api->setProfile(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collProfileI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2523,6 +2787,11 @@ abstract class Profile implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collApis) {
+                foreach ($this->collApis as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collProfileI18ns) {
                 foreach ($this->collProfileI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2542,6 +2811,7 @@ abstract class Profile implements ActiveRecordInterface
         $this->collAdmins = null;
         $this->collProfileResources = null;
         $this->collProfileModules = null;
+        $this->collApis = null;
         $this->collProfileI18ns = null;
         $this->collResources = null;
     }

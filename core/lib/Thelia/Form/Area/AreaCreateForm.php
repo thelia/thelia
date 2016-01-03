@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Area;
+
 use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
@@ -18,42 +19,29 @@ use Thelia\Form\BaseForm;
 /**
  * Class AreaCreateForm
  * @package Thelia\Form\Shipping
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaCreateForm extends BaseForm
 {
-
-    /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
-     */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('name', 'text', array(
-                'constraints' => array(
-                    new NotBlank()
-                ),
-                'label_attr' => array('for' => 'shipping_name'),
-                'label' => Translator::getInstance()->trans('Shipping zone name')
-            ))
-
+            ->add(
+                'name',
+                'text',
+                [
+                    'constraints' => [
+                        new NotBlank(),
+                    ],
+                    'label' => Translator::getInstance()->trans('Shipping zone name'),
+                    'label_attr' => [
+                        'for' => 'shipping_name'
+                    ],
+                    'attr' => [
+                        'placeholder' => Translator::getInstance()->trans("A name such as Europe or Overseas"),
+                    ],
+                ]
+            )
         ;
     }
 

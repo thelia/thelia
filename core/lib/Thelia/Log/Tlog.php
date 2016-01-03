@@ -22,15 +22,15 @@ use Thelia\Core\Translation\Translator;
  * Allow to define different level and output.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
-class Tlog Implements LoggerInterface
+class Tlog implements LoggerInterface
 {
     // Nom des variables de configuration
-    const VAR_LEVEL 		= "tlog_level";
-    const VAR_DESTINATIONS 	= "tlog_destinations";
-    const VAR_PREFIXE 		= "tlog_prefix";
-    const VAR_FILES 		= "tlog_files";
+    const VAR_LEVEL        = "tlog_level";
+    const VAR_DESTINATIONS    = "tlog_destinations";
+    const VAR_PREFIXE        = "tlog_prefix";
+    const VAR_FILES        = "tlog_files";
     const VAR_IP                = "tlog_ip";
     const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
@@ -57,11 +57,11 @@ class Tlog Implements LoggerInterface
     );
 
     // default values
-    const DEFAULT_LEVEL     	= self::DEBUG;
+    const DEFAULT_LEVEL         = self::ERROR;
     const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationRotatingFile";
-    const DEFAUT_PREFIXE 	= "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
-    const DEFAUT_FILES 		= "*";
-    const DEFAUT_IP 		= "";
+    const DEFAUT_PREFIXE    = "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
+    const DEFAUT_FILES        = "*";
+    const DEFAUT_IP        = "";
     const DEFAUT_SHOW_REDIRECT  = 0;
 
     /**
@@ -78,7 +78,7 @@ class Tlog Implements LoggerInterface
 
     protected $mode_back_office = false;
     protected $level = self::MUET;
-    protected $prefixe = "";
+    protected $prefix = "";
     protected $files = array();
     protected $all_files = false;
     protected $show_redirect = false;
@@ -93,7 +93,9 @@ class Tlog Implements LoggerInterface
     /**
      *
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      *
@@ -132,7 +134,6 @@ class Tlog Implements LoggerInterface
      */
     protected function init()
     {
-
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
         $this->dir_destinations = array(
@@ -160,7 +161,6 @@ class Tlog Implements LoggerInterface
     public function setDestinations($destinations)
     {
         if (! empty($destinations)) {
-
             $this->destinations = array();
 
             $classes_destinations = explode(';', $destinations);
@@ -194,9 +194,9 @@ class Tlog Implements LoggerInterface
         return $this;
     }
 
-    public function setPrefix($prefixe)
+    public function setPrefix($prefix)
     {
-        $this->prefixe = $prefixe;
+        $this->prefix = $prefix;
 
         return $this;
     }
@@ -213,7 +213,9 @@ class Tlog Implements LoggerInterface
     public function setIp($ips)
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
-        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
+        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) {
+            $this->level = self::MUET;
+        }
         return $this;
     }
 
@@ -228,7 +230,7 @@ class Tlog Implements LoggerInterface
     public function setConfig($destination, $param, $valeur)
     {
         if (isset($this->destinations[$destination])) {
-                $this->destinations[$destination]->setConfig($param, $valeur);
+            $this->destinations[$destination]->setConfig($param, $valeur);
         }
 
         return $this;
@@ -238,7 +240,7 @@ class Tlog Implements LoggerInterface
     public function getConfig($destination, $param)
     {
         if (isset($this->destinations[$destination])) {
-                return $this->destinations[$destination]->getConfig($param);
+            return $this->destinations[$destination]->getConfig($param);
         }
 
         return false;
@@ -510,9 +512,9 @@ class Tlog Implements LoggerInterface
      */
     public function log($level, $message, array $context = array())
     {
-        if($this->level > $level || array_key_exists($level, $this->levels) === false)
-
+        if ($this->level > $level || array_key_exists($level, $this->levels) === false) {
             return;
+        }
 
         $this->out($this->levels[$level], $message, $context);
     }
@@ -529,10 +531,12 @@ class Tlog Implements LoggerInterface
         $this->done = true;
 
         // Muet ? On ne fait rien
-        if ($this->level == self::MUET) return;
+        if ($this->level == self::MUET) {
+            return;
+        }
 
         foreach ($this->destinations as $dest) {
-                $dest->write($res);
+            $dest->write($res);
         }
     }
 
@@ -543,19 +547,18 @@ class Tlog Implements LoggerInterface
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
         if ($this->done === false) {
+            $res = "";
 
-                $res = "";
+            $this->write($res);
 
-                $this->write($res);
-
-                echo $res;
+            echo $res;
         }
     }
 
     public function showRedirect($url)
     {
         if ($this->level != self::MUET && $this->show_redirect) {
-                echo "
+            echo "
 <html>
 <head><title>".Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
@@ -564,9 +567,9 @@ class Tlog Implements LoggerInterface
 </html>
 ";
 
-                return true;
+            return true;
         } else {
-                return false;
+            return false;
         }
     }
 
@@ -580,13 +583,12 @@ class Tlog Implements LoggerInterface
     public function isActivated($level)
     {
         if ($this->level <= $level) {
-
             $origin = $this->findOrigin();
 
             $file = basename($origin['file']);
 
             if ($this->isActivedFile($file)) {
-                    return true;
+                return true;
             }
         }
 
@@ -609,10 +611,9 @@ class Tlog Implements LoggerInterface
 
     private function findOrigin()
     {
-        $origine = array();
+        $origin = array();
 
         if (function_exists('debug_backtrace')) {
-
             $trace = debug_backtrace();
             $prevHop = null;
             // make a downsearch to identify the caller
@@ -623,31 +624,30 @@ class Tlog Implements LoggerInterface
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
-                    if (! empty($className) && ($className == ltrim(__CLASS__,'\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
-                            $origine['line'] = $hop['line'];
-                            $origine['file'] = $hop['file'];
-                            break;
+                    if (! empty($className) && ($className == ltrim(__CLASS__, '\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__, '\\'))) {
+                        $origin['line'] = $hop['line'];
+                        $origin['file'] = $hop['file'];
+                        break;
                     }
                 }
                 $prevHop = $hop;
                 $hop = array_pop($trace);
             }
 
-            $origine['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
+            $origin['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
 
-            if(isset($prevHop['function']) &&
+            if (isset($prevHop['function']) &&
                 $prevHop['function'] !== 'include' &&
                 $prevHop['function'] !== 'include_once' &&
                 $prevHop['function'] !== 'require' &&
                 $prevHop['function'] !== 'require_once') {
-
-                $origine['function'] = $prevHop['function'];
+                $origin['function'] = $prevHop['function'];
             } else {
-                $origine['function'] = 'main';
+                $origin['function'] = 'main';
             }
         }
 
-        return $origine;
+        return $origin;
     }
 
     protected function interpolate($message, array $context = array())
@@ -676,22 +676,21 @@ class Tlog Implements LoggerInterface
 
         $text = $this->interpolate($text, $context);
 
-        $origine = $this->findOrigin();
+        $origin = $this->findOrigin();
 
-        $file = basename($origine['file']);
+        $file = basename($origin['file']);
 
         if ($this->isActivedFile($file)) {
+            $function = $origin['function'];
+            $line = $origin['line'];
 
-            $function = $origine['function'];
-            $line = $origine['line'];
-
-            $prefixe = str_replace(
+            $prefix = str_replace(
                 array("#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"),
                 array(1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")),
-                $this->prefixe
+                $this->prefix
             );
 
-            $trace = $prefixe . $text;
+            $trace = $prefix . $text;
 
             foreach ($this->destinations as $dest) {
                 $dest->add($trace);
@@ -706,7 +705,7 @@ class Tlog Implements LoggerInterface
      * @param type  $destinations
      * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */
-    protected function loadDestinations(&$destinations, array $actives = NULL)
+    protected function loadDestinations(&$destinations, array $actives = null)
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {

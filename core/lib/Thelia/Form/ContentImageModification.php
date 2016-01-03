@@ -27,7 +27,6 @@ use Thelia\Form\Image\ImageModification;
  */
 class ContentImageModification extends ImageModification
 {
-
     /**
      * Get form name
      * This name must be unique

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Config;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Config;
 

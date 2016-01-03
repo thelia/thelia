@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Folder;
 /**
  * Class FolderUpdateEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderUpdateEvent extends FolderCreateEvent
 {
@@ -101,5 +101,4 @@ class FolderUpdateEvent extends FolderCreateEvent
     {
         return $this->postscriptum;
     }
-
 }

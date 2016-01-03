@@ -21,19 +21,25 @@ class TemplateCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("name"   , "text"  , array(
+            ->add(
+                "name",
+                "text",
+                array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Template Name *"),
                 "label_attr" => array(
-                    "for" => "name"
-                ))
+                    "for" => "name",
+                ), )
             )
-            ->add("locale" , "text"  , array(
+            ->add(
+                "locale",
+                "text",
+                array(
                 "constraints" => array(
-                    new NotBlank()
-                ))
+                    new NotBlank(),
+                ), )
             )
         ;
     }

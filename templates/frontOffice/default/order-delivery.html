@@ -27,22 +27,26 @@
 
             {include file="misc/checkout-progress.tpl" step="delivery"}
 
-            {form name="thelia.order.delivery"}
-            {assign var="isPost" value="{$smarty.post|count}"}
-            <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" {form_enctype form=$form}>
+            {hook name="order-delivery.top"}
 
-                {form_hidden_fields form=$form}
+            {form name="thelia.order.delivery"}
+            {assign var="isPost" value={$smarty.post|count}}
+            <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" {form_enctype}>
+
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                {form_field form=$form field='delivery-address'}
+                {hook name="order-delivery.form-top"}
 
-                <div id="delivery-address" class="panel">
+                {form_field field='delivery-address'}
+
+                <div id="delivery-address" class="panel panel-default">
                     <div class="panel-heading clearfix">
-                        <a href="{url path="/address/create"}" class="btn btn-add-address">{intl l="Add a new address"}</a>
+                        <a href="{url path="/address/create" next={navigate to='current'} }" class="btn btn-link pull-right"><i class="fa fa-plus"></i> {intl l="Add a new address"}</a>
                         {intl l="Choose your delivery address"}
                         {if $error}
-                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                            <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
                         {/if}
                     </div>
                     <div class="panel-body">
@@ -62,17 +66,22 @@
                                     <div class="radio">
                                         <label for="delivery-address_{$ID}">
                                             <input type="radio" class="js-change-delivery-address" data-country="{$COUNTRY}" name="{$name}" value="{$ID}"{if $isDeliveryAddressChecked} checked="checked"{/if} id="delivery-address_{$ID}">
-                                            {$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}
+                                            {if $isDeliveryAddressChecked}
+                                                {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
+                                                <span class="label label-info   ">{intl l="Main Address"}</span>
+                                            {else}
+                                                {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
+                                            {/if}
                                         </label>
                                     </div>
                                 </th>
                                 <td>
-                                    <ul class="list-address">
-                                        <li>
+                                    <ul class="list-address list-unstyled row">
+                                        <li class="col-sm-4">
                                             <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
                                             <span class="org">{$COMPANY}</span>
                                         </li>
-                                        <li>
+                                        <li class="col-sm-4">
                                             <address class="adr">
                                                 <span class="street-address">{$ADDRESS1}</span>
                                                 {if $ADDRESS2 != ""}
@@ -82,10 +91,12 @@
                                                     <br><span class="street-address">{$ADDRESS3}</span>
                                                 {/if}
                                                 <br><span class="postal-code">{$ZIPCODE}</span>
-                                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                <span class="locality">{$CITY},
+                                                <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
                                             </address>
                                         </li>
-                                        <li>
+                                        <li class="col-sm-4">
                                             {if $CELLPHONE != ""}
                                                 <span class="tel">{$CELLPHONE}</span>
                                             {/if}
@@ -97,9 +108,9 @@
                                 </td>
                                 <td>
                                     <div class="group-btn">
-                                        <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                        <a href="{url path="/address/update/%id" id=$ID next={navigate to="current"}}" class="btn btn-primary" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="fa fa-pencil"></i> {intl l="Edit"}</a>
                                         {if $DEFAULT != 1}
-                                            <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                            <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-primary" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="fa fa-remove"></i> {intl l="Delete"}</a>
                                         {/if}
                                     </div>
                                 </td>
@@ -112,13 +123,13 @@
 
                 {/form_field}
 
-                {form_field form=$form field='delivery-module'}
+                {form_field field='delivery-module'}
 
-                <div id="delivery-method" class="panel">
+                <div id="delivery-method" class="panel panel-default">
                     <div class="panel-heading">
                         {intl l="Choose your delivery method"}
                         {if $error}
-                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                            <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
                         {/if}
                     </div>
                     <div class="panel-body" id="delivery-module-list-block"></div>
@@ -126,11 +137,15 @@
 
                 {/form_field}
 
-                <a href="{url path="/cart"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
+                {hook name="order-delivery.form-bottom"}
+
+                <a href="{url path="/cart"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Back"}</a>
+                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Next Step"}</button>
 
             </form>
             {/form}
+
+            {hook name="order-delivery.bottom"}
 
         </article>
     </div>
@@ -145,14 +160,27 @@
             $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');
 
             $('.js-change-delivery-address').change(function(e) {
-                $('#delivery-module-list-block').load(
-                    '{url path="/order/deliveryModuleList"}',
-{literal}
-                    {country_id: $(this).data('country')}
-{/literal}
-                );
+                if (this.checked) {
+                    $('#delivery-module-list-block').load(
+                        '{url path="/order/deliveryModuleList"}',
+    {literal}
+                        {
+                            country_id: $(this).data('country'),
+                            address_id: $(this).attr('value')
+                        }
+    {/literal}
+                    );
+                }
             });
         });
     </script>
+    {hook name="order-delivery.javascript-initialization"}
+{/block}
 
+{block name="stylesheet"}
+{hook name="order-delivery.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order-delivery.after-javascript-include"}
 {/block}

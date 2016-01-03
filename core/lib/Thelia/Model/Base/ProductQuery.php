@@ -28,6 +28,8 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildProductQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductQuery orderByTemplateId($order = Criteria::ASC) Order by the template_id column
+ * @method     ChildProductQuery orderByBrandId($order = Criteria::ASC) Order by the brand_id column
+ * @method     ChildProductQuery orderByVirtual($order = Criteria::ASC) Order by the virtual column
  * @method     ChildProductQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildProductQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -40,6 +42,8 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery groupByVisible() Group by the visible column
  * @method     ChildProductQuery groupByPosition() Group by the position column
  * @method     ChildProductQuery groupByTemplateId() Group by the template_id column
+ * @method     ChildProductQuery groupByBrandId() Group by the brand_id column
+ * @method     ChildProductQuery groupByVirtual() Group by the virtual column
  * @method     ChildProductQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildProductQuery groupByVersion() Group by the version column
@@ -57,6 +61,10 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery leftJoinTemplate($relationAlias = null) Adds a LEFT JOIN clause to the query using the Template relation
  * @method     ChildProductQuery rightJoinTemplate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Template relation
  * @method     ChildProductQuery innerJoinTemplate($relationAlias = null) Adds a INNER JOIN clause to the query using the Template relation
+ *
+ * @method     ChildProductQuery leftJoinBrand($relationAlias = null) Adds a LEFT JOIN clause to the query using the Brand relation
+ * @method     ChildProductQuery rightJoinBrand($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Brand relation
+ * @method     ChildProductQuery innerJoinBrand($relationAlias = null) Adds a INNER JOIN clause to the query using the Brand relation
  *
  * @method     ChildProductQuery leftJoinProductCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductCategory relation
  * @method     ChildProductQuery rightJoinProductCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductCategory relation
@@ -94,6 +102,10 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery rightJoinProductAssociatedContent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductAssociatedContent relation
  * @method     ChildProductQuery innerJoinProductAssociatedContent($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductAssociatedContent relation
  *
+ * @method     ChildProductQuery leftJoinSaleProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the SaleProduct relation
+ * @method     ChildProductQuery rightJoinSaleProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SaleProduct relation
+ * @method     ChildProductQuery innerJoinSaleProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the SaleProduct relation
+ *
  * @method     ChildProductQuery leftJoinProductI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductI18n relation
  * @method     ChildProductQuery rightJoinProductI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductI18n relation
  * @method     ChildProductQuery innerJoinProductI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductI18n relation
@@ -111,6 +123,8 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProduct findOneByVisible(int $visible) Return the first ChildProduct filtered by the visible column
  * @method     ChildProduct findOneByPosition(int $position) Return the first ChildProduct filtered by the position column
  * @method     ChildProduct findOneByTemplateId(int $template_id) Return the first ChildProduct filtered by the template_id column
+ * @method     ChildProduct findOneByBrandId(int $brand_id) Return the first ChildProduct filtered by the brand_id column
+ * @method     ChildProduct findOneByVirtual(int $virtual) Return the first ChildProduct filtered by the virtual column
  * @method     ChildProduct findOneByCreatedAt(string $created_at) Return the first ChildProduct filtered by the created_at column
  * @method     ChildProduct findOneByUpdatedAt(string $updated_at) Return the first ChildProduct filtered by the updated_at column
  * @method     ChildProduct findOneByVersion(int $version) Return the first ChildProduct filtered by the version column
@@ -123,6 +137,8 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     array findByVisible(int $visible) Return ChildProduct objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildProduct objects filtered by the position column
  * @method     array findByTemplateId(int $template_id) Return ChildProduct objects filtered by the template_id column
+ * @method     array findByBrandId(int $brand_id) Return ChildProduct objects filtered by the brand_id column
+ * @method     array findByVirtual(int $virtual) Return ChildProduct objects filtered by the virtual column
  * @method     array findByCreatedAt(string $created_at) Return ChildProduct objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProduct objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildProduct objects filtered by the version column
@@ -223,7 +239,7 @@ abstract class ProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `POSITION`, `TEMPLATE_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `VISIBLE`, `POSITION`, `TEMPLATE_ID`, `BRAND_ID`, `VIRTUAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -548,6 +564,90 @@ abstract class ProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductTableMap::TEMPLATE_ID, $templateId, $comparison);
+    }
+
+    /**
+     * Filter the query on the brand_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBrandId(1234); // WHERE brand_id = 1234
+     * $query->filterByBrandId(array(12, 34)); // WHERE brand_id IN (12, 34)
+     * $query->filterByBrandId(array('min' => 12)); // WHERE brand_id > 12
+     * </code>
+     *
+     * @see       filterByBrand()
+     *
+     * @param     mixed $brandId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByBrandId($brandId = null, $comparison = null)
+    {
+        if (is_array($brandId)) {
+            $useMinMax = false;
+            if (isset($brandId['min'])) {
+                $this->addUsingAlias(ProductTableMap::BRAND_ID, $brandId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($brandId['max'])) {
+                $this->addUsingAlias(ProductTableMap::BRAND_ID, $brandId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ProductTableMap::BRAND_ID, $brandId, $comparison);
+    }
+
+    /**
+     * Filter the query on the virtual column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVirtual(1234); // WHERE virtual = 1234
+     * $query->filterByVirtual(array(12, 34)); // WHERE virtual IN (12, 34)
+     * $query->filterByVirtual(array('min' => 12)); // WHERE virtual > 12
+     * </code>
+     *
+     * @param     mixed $virtual The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByVirtual($virtual = null, $comparison = null)
+    {
+        if (is_array($virtual)) {
+            $useMinMax = false;
+            if (isset($virtual['min'])) {
+                $this->addUsingAlias(ProductTableMap::VIRTUAL, $virtual['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($virtual['max'])) {
+                $this->addUsingAlias(ProductTableMap::VIRTUAL, $virtual['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ProductTableMap::VIRTUAL, $virtual, $comparison);
     }
 
     /**
@@ -897,6 +997,81 @@ abstract class ProductQuery extends ModelCriteria
         return $this
             ->joinTemplate($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Template', '\Thelia\Model\TemplateQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Brand object
+     *
+     * @param \Thelia\Model\Brand|ObjectCollection $brand The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByBrand($brand, $comparison = null)
+    {
+        if ($brand instanceof \Thelia\Model\Brand) {
+            return $this
+                ->addUsingAlias(ProductTableMap::BRAND_ID, $brand->getId(), $comparison);
+        } elseif ($brand instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ProductTableMap::BRAND_ID, $brand->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByBrand() only accepts arguments of type \Thelia\Model\Brand or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Brand relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function joinBrand($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Brand');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Brand');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Brand relation Brand object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\BrandQuery A secondary query class using the current class as primary query
+     */
+    public function useBrandQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinBrand($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Brand', '\Thelia\Model\BrandQuery');
     }
 
     /**
@@ -1554,6 +1729,79 @@ abstract class ProductQuery extends ModelCriteria
         return $this
             ->joinProductAssociatedContent($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ProductAssociatedContent', '\Thelia\Model\ProductAssociatedContentQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\SaleProduct object
+     *
+     * @param \Thelia\Model\SaleProduct|ObjectCollection $saleProduct  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterBySaleProduct($saleProduct, $comparison = null)
+    {
+        if ($saleProduct instanceof \Thelia\Model\SaleProduct) {
+            return $this
+                ->addUsingAlias(ProductTableMap::ID, $saleProduct->getProductId(), $comparison);
+        } elseif ($saleProduct instanceof ObjectCollection) {
+            return $this
+                ->useSaleProductQuery()
+                ->filterByPrimaryKeys($saleProduct->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySaleProduct() only accepts arguments of type \Thelia\Model\SaleProduct or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SaleProduct relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function joinSaleProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SaleProduct');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SaleProduct');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SaleProduct relation SaleProduct object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\SaleProductQuery A secondary query class using the current class as primary query
+     */
+    public function useSaleProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinSaleProduct($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SaleProduct', '\Thelia\Model\SaleProductQuery');
     }
 
     /**

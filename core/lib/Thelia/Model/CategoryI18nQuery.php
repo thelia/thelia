@@ -16,4 +16,5 @@ use Thelia\Model\Base\CategoryI18nQuery as BaseCategoryI18nQuery;
  */
 class CategoryI18nQuery extends BaseCategoryI18nQuery
 {
-} // CategoryI18nQuery
+}
+// CategoryI18nQuery

@@ -64,5 +64,4 @@ class Template extends BaseTemplate
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETETEMPLATE, new TemplateEvent($this));
     }
-
 }

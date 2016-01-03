@@ -3,8 +3,8 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
-
 use Thelia\TaxEngine\Calculator;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
@@ -13,7 +13,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
 
-class Product extends BaseProduct
+class Product extends BaseProduct implements FileModelParentInterface
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
@@ -24,7 +24,7 @@ class Product extends BaseProduct
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'product';
     }
@@ -61,15 +61,15 @@ class Product extends BaseProduct
      */
     public function getDefaultSaleElements()
     {
-        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->find();
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->findOne();
     }
 
     /**
      * Return PSE count fir this product.
      */
-    public function countSaleElements()
+    public function countSaleElements($con = null)
     {
-        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->count();
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->count($con);
     }
 
     /**
@@ -115,7 +115,9 @@ class Product extends BaseProduct
     public function updateDefaultCategory($defaultCategoryId)
     {
         // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
-        if ($defaultCategoryId <= 0) $defaultCategoryId = NULL;
+        if ($defaultCategoryId <= 0) {
+            $defaultCategoryId = null;
+        }
 
         // Update the default category
         $productCategory = ProductCategoryQuery::create()
@@ -125,9 +127,10 @@ class Product extends BaseProduct
         ;
 
         if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
-
             // Delete the old default category
-            if ($productCategory !== null) $productCategory->delete();
+            if ($productCategory !== null) {
+                $productCategory->delete();
+            }
 
             // Add the new default category
             $productCategory = new ProductCategory();
@@ -144,14 +147,16 @@ class Product extends BaseProduct
     /**
      * Create a new product, along with the default category ID
      *
-     * @param int   $defaultCategoryId the default category ID of this product
-     * @param float $basePrice         the product base price
-     * @param int   $priceCurrencyId   the price currency Id
-     * @param int   $taxRuleId         the product tax rule ID
-     * @param float $baseWeight        base weight in Kg
+     * @param  int        $defaultCategoryId the default category ID of this product
+     * @param  float      $basePrice         the product base price
+     * @param  int        $priceCurrencyId   the price currency Id
+     * @param  int        $taxRuleId         the product tax rule ID
+     * @param  float      $baseWeight        base weight in Kg
+     * @param  int        $baseQuantity     the product quantity (default: 0)
+     * @throws \Exception
      */
 
-    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight)
+    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0)
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
@@ -159,7 +164,6 @@ class Product extends BaseProduct
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 
         try {
-
             // Create the product
             $this->save($con);
 
@@ -172,14 +176,13 @@ class Product extends BaseProduct
             $this->setTaxRuleId($taxRuleId);
 
             // Create the default product sale element of this product
-            $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true);
+            $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true, false, false, $baseQuantity);
 
             // Store all the stuff !
             $con->commit();
 
             $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -192,9 +195,9 @@ class Product extends BaseProduct
     public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false)
     {
         // Create an empty product sale element
-        $sale_elements = new ProductSaleElements();
+        $saleElements = new ProductSaleElements();
 
-        $sale_elements
+        $saleElements
             ->setProduct($this)
             ->setRef($ref == false ? $this->getRef() : $ref)
             ->setPromo($isPromo)
@@ -207,10 +210,10 @@ class Product extends BaseProduct
         ;
 
         // Create an empty product price in the provided currency
-        $product_price = new ProductPrice();
+        $productPrice = new ProductPrice();
 
-        $product_price
-            ->setProductSaleElements($sale_elements)
+        $productPrice
+            ->setProductSaleElements($saleElements)
             ->setPromoPrice($salePrice)
             ->setPrice($basePrice)
             ->setCurrencyId($currencyId)
@@ -218,7 +221,7 @@ class Product extends BaseProduct
             ->save($con)
         ;
 
-        return $sale_elements;
+        return $saleElements;
     }
 
     /**
@@ -234,7 +237,9 @@ class Product extends BaseProduct
             ->find();
 
         // Filtrer la requete sur ces produits
-        if ($produits != null) $query->filterById($produits, Criteria::IN);
+        if ($produits != null) {
+            $query->filterById($produits, Criteria::IN);
+        }
     }
 
     public function preUpdate(ConnectionInterface $con = null)
@@ -267,7 +272,7 @@ class Product extends BaseProduct
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }

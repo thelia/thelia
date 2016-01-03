@@ -11,12 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Lang;
+
 use Thelia\Core\Event\ActionEvent;
 
 /**
  * Class LangUrlEvent
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUrlEvent extends ActionEvent
 {

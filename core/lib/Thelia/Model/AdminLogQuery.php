@@ -54,4 +54,5 @@ class AdminLogQuery extends BaseAdminLogQuery
 
         return $search->find();
     }
-} // AdminLogQuery
+}
+// AdminLogQuery

@@ -5,13 +5,13 @@
     convertErrorsToExceptions= "true"
     convertNoticesToExceptions= "true"
     convertWarningsToExceptions= "true"
-    bootstrap="core/lib/Thelia/Tests/bootstrap.php"
+    bootstrap="tests/phpunit/Thelia/Tests/bootstrap.php"
     verbose="true"
     backupGlobals="false"
 >
     <testsuites>
 	    <testsuite name="Thelia">
-	        <directory>core/lib/Thelia/Tests</directory>
+	        <directory>tests/phpunit/Thelia/Tests</directory>
             <directory>local/modules/*/Tests</directory>
 	    </testsuite>
     </testsuites>

@@ -11,17 +11,17 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Lang;
+
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class LangUpdateForm
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUpdateForm extends LangCreateForm
 {
-
     public function buildForm()
     {
         parent::buildForm();
@@ -30,8 +30,8 @@ class LangUpdateForm extends LangCreateForm
             ->add('id', 'hidden', array(
                 'constraints' => array(
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0))
-                )
+                    new GreaterThan(array('value' => 0)),
+                ),
             ));
     }
 

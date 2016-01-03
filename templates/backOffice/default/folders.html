@@ -16,7 +16,7 @@
 
     {include file="includes/folder-breadcrumb.html" folder_id=$parent }
 
-    {module_include location='folders_top'}
+    {hook name="folders.top" location="folders_top" }
 
     <div class="row">
         <div class="col-md-12">
@@ -33,10 +33,10 @@
                                 {intl l="Top level folders"}
                             {/elseloop}
 
-                            {module_include location='folder_list_caption'}
+                            {hook name="folders.caption" location="folder_list_caption" }
 
                             {loop type="auth" name="can_create" role="ADMIN" resource="admin.folder" access="CREATE"}
-                                <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new folder'}" href="#folder_creation_dialog" data-toggle="modal">
+                                <a class="btn btn-primary action-btn" title="{intl l='Add a new folder'}" href="#folder_creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
                             {/loop}
@@ -69,7 +69,7 @@
                                     }
                                 </th>
 
-                                {module_include location='folder_list_header'}
+                                {hook name="folders.header" location="folder_list_header" }
 
                                 <th>
                                     {admin_sortable_header
@@ -104,7 +104,7 @@
 
                                     <td>
                                         {loop type="image" name="folder_image" source="folder" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path='admin/folders' parent=$OBJECT_ID}" title="{intl l='Browse this folder'}"><img class="img-thumbnail" src="{$IMAGE_URL}" alt="{$TITLE}" /></a>
+                                            <a href="{url path='admin/folders' parent=$OBJECT_ID}" title="{intl l='Browse this folder'}"><img class="img-thumbnail" src="{$IMAGE_URL nofilter}" alt="{$TITLE}" /></a>
                                         {/loop}
                                     </td>
 
@@ -114,7 +114,7 @@
                                         </a>
                                     </td>
 
-                                    {module_include location='folder_list_row'}
+                                    {hook name="folders.row" location="folder_list_row" folder_id={$ID} }
 
                                     <td>
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
@@ -143,15 +143,18 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-group">
-                                            <a class="btn btn-default btn-xs" title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
+                                            <a title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
 
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
-                                                <a class="btn btn-default btn-xs folder-delete" title="{intl l='Delete this folder and all its contents'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="folder-delete" title="{intl l='Delete this folder and all its contents'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -202,9 +205,9 @@
                             {intl l="Top level Contents"}
                             {/elseloop}
 
-                            {module_include location='content_list_caption'}
+                            {hook name="contents.caption" location="content_list_caption" }
 
-                            <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new content'}" href="#content_creation_dialog" data-toggle="modal">
+                            <a class="btn btn-primary action-btn" title="{intl l='Add a new content'}" href="#content_creation_dialog" data-toggle="modal">
                                 <span class="glyphicon glyphicon-plus-sign"></span>
                             </a>
                         </caption>
@@ -232,7 +235,7 @@
                                     label="{intl l='Content title'}"
                                     }
 
-                                    {module_include location='content_list_header'}
+                                    {hook name="contents.header" location="content_list_header" }
 
                                 <th>
                                     {admin_sortable_header
@@ -265,14 +268,14 @@
 
                                     <td>
                                         {loop type="image" name="folder_image" source="content" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path="admin/content/update/$OBJECT_ID"}" title="{intl l='Edit this content'}">
-                                                <img src="{$IMAGE_URL}" alt="{$TITLE}" />
+                                            <a href="{url path="admin/content/update/%id" id=$OBJECT_ID}" title="{intl l='Edit this content'}">
+                                                <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                             </a>
                                         {/loop}
 
-                                    <td class="object-title"><a href="{url path="/admin/content/update/$ID"}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
+                                    <td class="object-title"><a href="{url path="/admin/content/update/%id" id=$ID}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
 
-                                    {module_include location='content_list_row'}
+                                    {hook name="contents.row" location="content_list_row" }
 
                                     <td>
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
@@ -300,14 +303,17 @@
                                         }
                                     </td>
 
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="admin/content/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this content'}" href="{url path="admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
-                                                <a class="btn btn-default btn-xs content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -333,7 +339,7 @@
         <div class="alert alert-info">{intl l="To create a new content, select an existing folder, or create a new one."}</div>
     {/if}
 
-    {module_include location='folders_bottom'}
+    {hook name="folders.bottom" location="folders_bottom" }
 
     </div>
 
@@ -347,18 +353,18 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "folder_creation_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
         {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
             <input type="hidden" name="{$name}" value="{url path='/admin/folders/update/_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='parent'}
+        {form_field field='parent'}
             <input type="hidden" name="{$name}" value="{$parent}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 {loop type="lang" name="default-lang" default_only="1"}
@@ -367,19 +373,19 @@
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l='Enter here the folder name in the default language (%title)' title="$TITLE"}</div>
+                    <div class="help-block">{intl l='Enter here the folder name in the default language (%title)' title="{$TITLE}"}</div>
 
                 {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {form_field form=$form field='locale'}
+                {form_field field='locale'}
                     <input type="hidden" name="{$name}" value="{$LOCALE}" />
                 {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='visible'}
+        {form_field field='visible'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox">
                     <label>
@@ -390,7 +396,7 @@
             </div>
         {/form_field}
 
-        {module_include location='folder_create_form'}
+        {hook name="folder.create-form" location="folder_create_form" }
 
     {/capture}
 
@@ -404,7 +410,7 @@
     dialog_ok_label     = {intl l="Create this folder"}
 
     form_action        = {url path='/admin/folders/create'}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = $form_error_message
     }
     {/form}
@@ -416,21 +422,21 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "content_creation_dialog"}
 
-{form_hidden_fields form=$form}
+{form_hidden_fields}
 
 {* Be sure to get the folder_id, even if the form could not be validated *}
 <input type="hidden" name="parent" value="{$parent}" />
 
-    {form_field form=$form field='success_url'}
+    {form_field field='success_url'}
     {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
         <input type="hidden" name="{$name}" value="{url path='/admin/content/update/_ID_' }" />
     {/form_field}
 
-    {form_field form=$form field='default_folder'}
+    {form_field field='default_folder'}
         <input type="hidden" name="{$name}" value="{$parent}" />
     {/form_field}
 
-    {form_field form=$form field='title'}
+    {form_field field='title'}
 <div class="form-group {if $error}has-error{/if}">
     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
     {loop type="lang" name="default-lang" default_only="1"}
@@ -439,19 +445,19 @@
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                             </div>
 
-                            <div class="help-block">{intl l='Enter here the content name in the default language (%title)' title="$TITLE"}</div>
+                            <div class="help-block">{intl l='Enter here the content name in the default language (%title)' title="{$TITLE}"}</div>
 
                             {* Switch edition to the current locale *}
                             <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='visible'}
+        {form_field field='visible'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox">
                     <label>
@@ -462,7 +468,7 @@
             </div>
         {/form_field}
 
-        {module_include location='content_create_form'}
+        {hook name="content.create-form" location="content_create_form" }
 
     {/capture}
 
@@ -476,7 +482,7 @@
                             dialog_ok_label     = {intl l="Create this content"}
 
                             form_action        = {url path='/admin/content/create'}
-                            form_enctype       = {form_enctype form=$form}
+                            form_enctype       = {form_enctype}
                             form_error_message = $form_error_message
                             }
 {/form}
@@ -486,7 +492,7 @@
 {capture "folder_delete_dialog"}
     <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
 
-    {module_include location='folder_delete_form'}
+    {hook name="folder.delete-form" location="folder_delete_form" }
 
 {/capture}
 
@@ -497,7 +503,7 @@
                             dialog_title    = {intl l="Delete folder"}
                             dialog_message  = {intl l="Do you really want to delete this folder and all its content ?"}
 
-                            form_action         = {url path='/admin/folders/delete'}
+                            form_action         = {token_url path='/admin/folders/delete'}
                             form_content        = {$smarty.capture.folder_delete_dialog nofilter}
                             }
 
@@ -507,7 +513,7 @@
     <input type="hidden" name="content_id" id="content_delete_id" value="" />
     <input type="hidden" name="folder_id" value="{$parent}" />
 
-    {module_include location='content_delete_form'}
+    {hook name="content.delete-form" location="content_delete_form" }
 
 {/capture}
 
@@ -518,7 +524,7 @@
                             dialog_title    = {intl l="Delete content"}
                             dialog_message  = {intl l="Do you really want to delete this content ?"}
 
-                            form_action         = {url path='/admin/content/delete'}
+                            form_action         = {token_url path='/admin/content/delete'}
                             form_content        = {$smarty.capture.content_delete_dialog nofilter}
                             }
 {/block}
@@ -592,7 +598,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/folders/update-position' folder_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp=1 path='/admin/folders/update-position' folder_id='__ID__' position='__POS__'}";
 
                             // Perform subtitutions
                             url = url.replace('__ID__', $(this).data('id'))
@@ -611,7 +617,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/contents/update-position' content_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp=1 path='/admin/content/update-position' content_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))
@@ -639,5 +645,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='folders-js'}
+    {hook name="folders.js" location="folders-js" }
 {/block}

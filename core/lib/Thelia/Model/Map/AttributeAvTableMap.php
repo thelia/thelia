@@ -169,6 +169,7 @@ class AttributeAvTableMap extends TableMap
     {
         $this->addRelation('Attribute', '\\Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
+        $this->addRelation('SaleProduct', '\\Thelia\\Model\\SaleProduct', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT', 'SaleProducts');
         $this->addRelation('AttributeAvI18n', '\\Thelia\\Model\\AttributeAvI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'AttributeAvI18ns');
     } // buildRelations()
 
@@ -193,6 +194,7 @@ class AttributeAvTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 AttributeCombinationTableMap::clearInstancePool();
+                SaleProductTableMap::clearInstancePool();
                 AttributeAvI18nTableMap::clearInstancePool();
             }
 

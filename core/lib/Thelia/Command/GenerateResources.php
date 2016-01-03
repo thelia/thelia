@@ -15,9 +15,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Thelia\Core\Security\Resource\AdminResources;
-
 use Thelia\Model\Map\ResourceI18nTableMap;
 use Thelia\Model\Map\ResourceTableMap;
 
@@ -40,7 +38,6 @@ class GenerateResources extends ContainerAwareCommand
                 null
             )
         ;
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -65,7 +62,7 @@ class GenerateResources extends ContainerAwareCommand
                     }
                     $compteur++;
                     $output->writeln(
-                        "($compteur, '$value', NOW(), NOW())" . ($constant === key( array_slice( $constants, -1, 1, true ) ) ? ';' : ',')
+                        "($compteur, '$value', NOW(), NOW())" . ($constant === key(array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
                 break;
@@ -81,17 +78,17 @@ class GenerateResources extends ContainerAwareCommand
 
                     $compteur++;
 
-                    $title = ucwords( str_replace('.', ' / ', str_replace('admin.', '', $value) ) );
+                    $title = ucwords(str_replace('.', ' / ', str_replace('admin.', '', $value)));
 
                     $output->writeln(
                         "($compteur, 'en_US', '$title'),"
                     );
                     $output->writeln(
-                        "($compteur, 'fr_FR', '$title')" . ($constant === key( array_slice( $constants, -1, 1, true ) ) ? ';' : ',')
+                        "($compteur, 'fr_FR', '$title')" . ($constant === key(array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
                 break;
-            default :
+            default:
                 foreach ($constants as $constant => $value) {
                     if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
@@ -101,5 +98,4 @@ class GenerateResources extends ContainerAwareCommand
                 break;
         }
     }
-
 }

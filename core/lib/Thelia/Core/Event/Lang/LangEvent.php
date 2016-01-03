@@ -11,13 +11,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Lang;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Lang;
 
 /**
  * Class LangEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangEvent extends ActionEvent
 {
@@ -57,5 +58,4 @@ class LangEvent extends ActionEvent
     {
         return null !== $this->lang;
     }
-
 }

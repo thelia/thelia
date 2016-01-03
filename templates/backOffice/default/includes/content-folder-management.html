@@ -24,7 +24,7 @@
 
                             <select name="additional_folder_id" id="additional_folder_id" class="form-control">
                                 <option value="">{intl l='Select a folder...'}</option>
-                                {loop name="folders" type="folder-tree" folder="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id"}
+                                {loop name="folders" type="folder-tree" folder="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id" return_url=false}
                                     <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_FOLDER==$ID}disabled="disabled"{/if}>
                                         {$TITLE} {if $DEFAULT_FOLDER==$ID}{intl l=' (default)'}{/if}
                                     </option>
@@ -32,7 +32,7 @@
                             </select>
 
                                     <span class="input-group-btn" id="content_add_button">
-                                       <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+                                       <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
                                     </span>
 
                         </div>
@@ -54,14 +54,14 @@
 
                             <th>{intl l='Folder title'}</th>
 
-                            {module_include location='product_folders_table_header'}
+                            {hook name="product.folders-table-header" location="product_folders_table_header" }
 
                             <th class="actions">{intl l="Actions"}</th>
                         </tr>
                         </thead>
 
                         <tbody>
-                        {loop name="additional_folders" type="folder" content=$content_id exclude=$DEFAULT_FOLDER backend_context="1" lang="$edit_language_id"}
+                        {loop name="additional_folders" type="folder" content=$content_id exclude=$DEFAULT_FOLDER backend_context="1" lang="$edit_language_id" return_url=false}
                             <tr>
                                 <td>{$ID}</td>
 
@@ -69,16 +69,14 @@
                                     {$TITLE}
                                 </td>
 
-                                {module_include location='product_folders_table_row'}
+                                {hook name="product.folders-table-row" location="product_folders_table_row" }
 
                                 <td class="actions">
-                                    <div class="btn-group">
-                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs delete-folder" title="{intl l='Remove the product from this category'}" href="#delete_folder_dialog" data-id="{$ID}" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </a>
-                                        {/loop}
-                                    </div>
+                                    {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs delete-folder" title="{intl l='Remove the product from this category'}" href="#delete_folder_dialog" data-id="{$ID}" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    {/loop}
                                 </td>
                             </tr>
                         {/loop}

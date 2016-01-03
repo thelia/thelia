@@ -22,9 +22,9 @@ use Thelia\Model\CustomerQuery;
 /**
  * Class CustomerLostPasswordForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
-class CustomerLostPasswordForm extends BaseForm
+class CustomerLostPasswordForm extends FirewallForm
 {
     /**
      *
@@ -56,14 +56,14 @@ class CustomerLostPasswordForm extends BaseForm
                     new Callback(array(
                         "methods" => array(
                             array($this,
-                                "verifyExistingEmail")
-                        )
-                    ))
+                                "verifyExistingEmail", ),
+                        ),
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
                 "label_attr" => array(
-                    "for" => "forgot-email"
-                )
+                    "for" => "forgot-email",
+                ),
             ));
     }
 

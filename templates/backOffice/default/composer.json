@@ -1,0 +1,10 @@
+{
+    "name": "thelia/backoffice-default-template",
+    "type": "thelia-backoffice-template",
+    "require": {
+        "thelia/installer": "~1.1"
+    },
+    "extra": {
+        "installer-name": "default"
+    }
+}

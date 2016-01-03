@@ -22,10 +22,18 @@ use Thelia\Model\AttributeCombinationQuery as ChildAttributeCombinationQuery;
 use Thelia\Model\CartItem as ChildCartItem;
 use Thelia\Model\CartItemQuery as ChildCartItemQuery;
 use Thelia\Model\Product as ChildProduct;
+use Thelia\Model\ProductDocument as ChildProductDocument;
+use Thelia\Model\ProductDocumentQuery as ChildProductDocumentQuery;
+use Thelia\Model\ProductImage as ChildProductImage;
+use Thelia\Model\ProductImageQuery as ChildProductImageQuery;
 use Thelia\Model\ProductPrice as ChildProductPrice;
 use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
 use Thelia\Model\ProductQuery as ChildProductQuery;
 use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsProductDocument as ChildProductSaleElementsProductDocument;
+use Thelia\Model\ProductSaleElementsProductDocumentQuery as ChildProductSaleElementsProductDocumentQuery;
+use Thelia\Model\ProductSaleElementsProductImage as ChildProductSaleElementsProductImage;
+use Thelia\Model\ProductSaleElementsProductImageQuery as ChildProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
@@ -157,12 +165,46 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     protected $collProductPricesPartial;
 
     /**
+     * @var        ObjectCollection|ChildProductSaleElementsProductImage[] Collection to store aggregation of ChildProductSaleElementsProductImage objects.
+     */
+    protected $collProductSaleElementsProductImages;
+    protected $collProductSaleElementsProductImagesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProductSaleElementsProductDocument[] Collection to store aggregation of ChildProductSaleElementsProductDocument objects.
+     */
+    protected $collProductSaleElementsProductDocuments;
+    protected $collProductSaleElementsProductDocumentsPartial;
+
+    /**
+     * @var        ChildProductImage[] Collection to store aggregation of ChildProductImage objects.
+     */
+    protected $collProductImages;
+
+    /**
+     * @var        ChildProductDocument[] Collection to store aggregation of ChildProductDocument objects.
+     */
+    protected $collProductDocuments;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $productImagesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $productDocumentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -181,6 +223,18 @@ abstract class ProductSaleElements implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $productPricesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $productSaleElementsProductImagesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $productSaleElementsProductDocumentsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -1008,6 +1062,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
             $this->collProductPrices = null;
 
+            $this->collProductSaleElementsProductImages = null;
+
+            $this->collProductSaleElementsProductDocuments = null;
+
+            $this->collProductImages = null;
+            $this->collProductDocuments = null;
         } // if (deep)
     }
 
@@ -1153,6 +1213,60 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->productImagesScheduledForDeletion !== null) {
+                if (!$this->productImagesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->productImagesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+
+                    ProductSaleElementsProductImageQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->productImagesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getProductImages() as $productImage) {
+                    if ($productImage->isModified()) {
+                        $productImage->save($con);
+                    }
+                }
+            } elseif ($this->collProductImages) {
+                foreach ($this->collProductImages as $productImage) {
+                    if ($productImage->isModified()) {
+                        $productImage->save($con);
+                    }
+                }
+            }
+
+            if ($this->productDocumentsScheduledForDeletion !== null) {
+                if (!$this->productDocumentsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->productDocumentsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+
+                    ProductSaleElementsProductDocumentQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->productDocumentsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getProductDocuments() as $productDocument) {
+                    if ($productDocument->isModified()) {
+                        $productDocument->save($con);
+                    }
+                }
+            } elseif ($this->collProductDocuments) {
+                foreach ($this->collProductDocuments as $productDocument) {
+                    if ($productDocument->isModified()) {
+                        $productDocument->save($con);
+                    }
+                }
+            }
+
             if ($this->attributeCombinationsScheduledForDeletion !== null) {
                 if (!$this->attributeCombinationsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\AttributeCombinationQuery::create()
@@ -1198,6 +1312,40 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
                 if ($this->collProductPrices !== null) {
             foreach ($this->collProductPrices as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productSaleElementsProductImagesScheduledForDeletion !== null) {
+                if (!$this->productSaleElementsProductImagesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductSaleElementsProductImageQuery::create()
+                        ->filterByPrimaryKeys($this->productSaleElementsProductImagesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productSaleElementsProductImagesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collProductSaleElementsProductImages !== null) {
+            foreach ($this->collProductSaleElementsProductImages as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productSaleElementsProductDocumentsScheduledForDeletion !== null) {
+                if (!$this->productSaleElementsProductDocumentsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductSaleElementsProductDocumentQuery::create()
+                        ->filterByPrimaryKeys($this->productSaleElementsProductDocumentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productSaleElementsProductDocumentsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collProductSaleElementsProductDocuments !== null) {
+            foreach ($this->collProductSaleElementsProductDocuments as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1461,6 +1609,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
             if (null !== $this->collProductPrices) {
                 $result['ProductPrices'] = $this->collProductPrices->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collProductSaleElementsProductImages) {
+                $result['ProductSaleElementsProductImages'] = $this->collProductSaleElementsProductImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collProductSaleElementsProductDocuments) {
+                $result['ProductSaleElementsProductDocuments'] = $this->collProductSaleElementsProductDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1682,6 +1836,18 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getProductSaleElementsProductImages() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductSaleElementsProductImage($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getProductSaleElementsProductDocuments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductSaleElementsProductDocument($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1782,6 +1948,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         }
         if ('ProductPrice' == $relationName) {
             return $this->initProductPrices();
+        }
+        if ('ProductSaleElementsProductImage' == $relationName) {
+            return $this->initProductSaleElementsProductImages();
+        }
+        if ('ProductSaleElementsProductDocument' == $relationName) {
+            return $this->initProductSaleElementsProductDocuments();
         }
     }
 
@@ -2571,6 +2743,858 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collProductSaleElementsProductImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductSaleElementsProductImages()
+     */
+    public function clearProductSaleElementsProductImages()
+    {
+        $this->collProductSaleElementsProductImages = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProductSaleElementsProductImages collection loaded partially.
+     */
+    public function resetPartialProductSaleElementsProductImages($v = true)
+    {
+        $this->collProductSaleElementsProductImagesPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductSaleElementsProductImages collection.
+     *
+     * By default this just sets the collProductSaleElementsProductImages collection to an empty array (like clearcollProductSaleElementsProductImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductSaleElementsProductImages($overrideExisting = true)
+    {
+        if (null !== $this->collProductSaleElementsProductImages && !$overrideExisting) {
+            return;
+        }
+        $this->collProductSaleElementsProductImages = new ObjectCollection();
+        $this->collProductSaleElementsProductImages->setModel('\Thelia\Model\ProductSaleElementsProductImage');
+    }
+
+    /**
+     * Gets an array of ChildProductSaleElementsProductImage objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProductSaleElements is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProductSaleElementsProductImage[] List of ChildProductSaleElementsProductImage objects
+     * @throws PropelException
+     */
+    public function getProductSaleElementsProductImages($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductSaleElementsProductImagesPartial && !$this->isNew();
+        if (null === $this->collProductSaleElementsProductImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductSaleElementsProductImages) {
+                // return empty collection
+                $this->initProductSaleElementsProductImages();
+            } else {
+                $collProductSaleElementsProductImages = ChildProductSaleElementsProductImageQuery::create(null, $criteria)
+                    ->filterByProductSaleElements($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProductSaleElementsProductImagesPartial && count($collProductSaleElementsProductImages)) {
+                        $this->initProductSaleElementsProductImages(false);
+
+                        foreach ($collProductSaleElementsProductImages as $obj) {
+                            if (false == $this->collProductSaleElementsProductImages->contains($obj)) {
+                                $this->collProductSaleElementsProductImages->append($obj);
+                            }
+                        }
+
+                        $this->collProductSaleElementsProductImagesPartial = true;
+                    }
+
+                    reset($collProductSaleElementsProductImages);
+
+                    return $collProductSaleElementsProductImages;
+                }
+
+                if ($partial && $this->collProductSaleElementsProductImages) {
+                    foreach ($this->collProductSaleElementsProductImages as $obj) {
+                        if ($obj->isNew()) {
+                            $collProductSaleElementsProductImages[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductSaleElementsProductImages = $collProductSaleElementsProductImages;
+                $this->collProductSaleElementsProductImagesPartial = false;
+            }
+        }
+
+        return $this->collProductSaleElementsProductImages;
+    }
+
+    /**
+     * Sets a collection of ProductSaleElementsProductImage objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $productSaleElementsProductImages A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function setProductSaleElementsProductImages(Collection $productSaleElementsProductImages, ConnectionInterface $con = null)
+    {
+        $productSaleElementsProductImagesToDelete = $this->getProductSaleElementsProductImages(new Criteria(), $con)->diff($productSaleElementsProductImages);
+
+
+        $this->productSaleElementsProductImagesScheduledForDeletion = $productSaleElementsProductImagesToDelete;
+
+        foreach ($productSaleElementsProductImagesToDelete as $productSaleElementsProductImageRemoved) {
+            $productSaleElementsProductImageRemoved->setProductSaleElements(null);
+        }
+
+        $this->collProductSaleElementsProductImages = null;
+        foreach ($productSaleElementsProductImages as $productSaleElementsProductImage) {
+            $this->addProductSaleElementsProductImage($productSaleElementsProductImage);
+        }
+
+        $this->collProductSaleElementsProductImages = $productSaleElementsProductImages;
+        $this->collProductSaleElementsProductImagesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProductSaleElementsProductImage objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductSaleElementsProductImage objects.
+     * @throws PropelException
+     */
+    public function countProductSaleElementsProductImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductSaleElementsProductImagesPartial && !$this->isNew();
+        if (null === $this->collProductSaleElementsProductImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductSaleElementsProductImages) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProductSaleElementsProductImages());
+            }
+
+            $query = ChildProductSaleElementsProductImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProductSaleElements($this)
+                ->count($con);
+        }
+
+        return count($this->collProductSaleElementsProductImages);
+    }
+
+    /**
+     * Method called to associate a ChildProductSaleElementsProductImage object to this object
+     * through the ChildProductSaleElementsProductImage foreign key attribute.
+     *
+     * @param    ChildProductSaleElementsProductImage $l ChildProductSaleElementsProductImage
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function addProductSaleElementsProductImage(ChildProductSaleElementsProductImage $l)
+    {
+        if ($this->collProductSaleElementsProductImages === null) {
+            $this->initProductSaleElementsProductImages();
+            $this->collProductSaleElementsProductImagesPartial = true;
+        }
+
+        if (!in_array($l, $this->collProductSaleElementsProductImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductSaleElementsProductImage($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProductSaleElementsProductImage $productSaleElementsProductImage The productSaleElementsProductImage object to add.
+     */
+    protected function doAddProductSaleElementsProductImage($productSaleElementsProductImage)
+    {
+        $this->collProductSaleElementsProductImages[]= $productSaleElementsProductImage;
+        $productSaleElementsProductImage->setProductSaleElements($this);
+    }
+
+    /**
+     * @param  ProductSaleElementsProductImage $productSaleElementsProductImage The productSaleElementsProductImage object to remove.
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function removeProductSaleElementsProductImage($productSaleElementsProductImage)
+    {
+        if ($this->getProductSaleElementsProductImages()->contains($productSaleElementsProductImage)) {
+            $this->collProductSaleElementsProductImages->remove($this->collProductSaleElementsProductImages->search($productSaleElementsProductImage));
+            if (null === $this->productSaleElementsProductImagesScheduledForDeletion) {
+                $this->productSaleElementsProductImagesScheduledForDeletion = clone $this->collProductSaleElementsProductImages;
+                $this->productSaleElementsProductImagesScheduledForDeletion->clear();
+            }
+            $this->productSaleElementsProductImagesScheduledForDeletion[]= clone $productSaleElementsProductImage;
+            $productSaleElementsProductImage->setProductSaleElements(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
+     * been saved, it will retrieve related ProductSaleElementsProductImages from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ProductSaleElements.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProductSaleElementsProductImage[] List of ChildProductSaleElementsProductImage objects
+     */
+    public function getProductSaleElementsProductImagesJoinProductImage($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProductSaleElementsProductImageQuery::create(null, $criteria);
+        $query->joinWith('ProductImage', $joinBehavior);
+
+        return $this->getProductSaleElementsProductImages($query, $con);
+    }
+
+    /**
+     * Clears out the collProductSaleElementsProductDocuments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductSaleElementsProductDocuments()
+     */
+    public function clearProductSaleElementsProductDocuments()
+    {
+        $this->collProductSaleElementsProductDocuments = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProductSaleElementsProductDocuments collection loaded partially.
+     */
+    public function resetPartialProductSaleElementsProductDocuments($v = true)
+    {
+        $this->collProductSaleElementsProductDocumentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductSaleElementsProductDocuments collection.
+     *
+     * By default this just sets the collProductSaleElementsProductDocuments collection to an empty array (like clearcollProductSaleElementsProductDocuments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductSaleElementsProductDocuments($overrideExisting = true)
+    {
+        if (null !== $this->collProductSaleElementsProductDocuments && !$overrideExisting) {
+            return;
+        }
+        $this->collProductSaleElementsProductDocuments = new ObjectCollection();
+        $this->collProductSaleElementsProductDocuments->setModel('\Thelia\Model\ProductSaleElementsProductDocument');
+    }
+
+    /**
+     * Gets an array of ChildProductSaleElementsProductDocument objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProductSaleElements is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProductSaleElementsProductDocument[] List of ChildProductSaleElementsProductDocument objects
+     * @throws PropelException
+     */
+    public function getProductSaleElementsProductDocuments($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductSaleElementsProductDocumentsPartial && !$this->isNew();
+        if (null === $this->collProductSaleElementsProductDocuments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductSaleElementsProductDocuments) {
+                // return empty collection
+                $this->initProductSaleElementsProductDocuments();
+            } else {
+                $collProductSaleElementsProductDocuments = ChildProductSaleElementsProductDocumentQuery::create(null, $criteria)
+                    ->filterByProductSaleElements($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProductSaleElementsProductDocumentsPartial && count($collProductSaleElementsProductDocuments)) {
+                        $this->initProductSaleElementsProductDocuments(false);
+
+                        foreach ($collProductSaleElementsProductDocuments as $obj) {
+                            if (false == $this->collProductSaleElementsProductDocuments->contains($obj)) {
+                                $this->collProductSaleElementsProductDocuments->append($obj);
+                            }
+                        }
+
+                        $this->collProductSaleElementsProductDocumentsPartial = true;
+                    }
+
+                    reset($collProductSaleElementsProductDocuments);
+
+                    return $collProductSaleElementsProductDocuments;
+                }
+
+                if ($partial && $this->collProductSaleElementsProductDocuments) {
+                    foreach ($this->collProductSaleElementsProductDocuments as $obj) {
+                        if ($obj->isNew()) {
+                            $collProductSaleElementsProductDocuments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductSaleElementsProductDocuments = $collProductSaleElementsProductDocuments;
+                $this->collProductSaleElementsProductDocumentsPartial = false;
+            }
+        }
+
+        return $this->collProductSaleElementsProductDocuments;
+    }
+
+    /**
+     * Sets a collection of ProductSaleElementsProductDocument objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $productSaleElementsProductDocuments A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function setProductSaleElementsProductDocuments(Collection $productSaleElementsProductDocuments, ConnectionInterface $con = null)
+    {
+        $productSaleElementsProductDocumentsToDelete = $this->getProductSaleElementsProductDocuments(new Criteria(), $con)->diff($productSaleElementsProductDocuments);
+
+
+        $this->productSaleElementsProductDocumentsScheduledForDeletion = $productSaleElementsProductDocumentsToDelete;
+
+        foreach ($productSaleElementsProductDocumentsToDelete as $productSaleElementsProductDocumentRemoved) {
+            $productSaleElementsProductDocumentRemoved->setProductSaleElements(null);
+        }
+
+        $this->collProductSaleElementsProductDocuments = null;
+        foreach ($productSaleElementsProductDocuments as $productSaleElementsProductDocument) {
+            $this->addProductSaleElementsProductDocument($productSaleElementsProductDocument);
+        }
+
+        $this->collProductSaleElementsProductDocuments = $productSaleElementsProductDocuments;
+        $this->collProductSaleElementsProductDocumentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProductSaleElementsProductDocument objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductSaleElementsProductDocument objects.
+     * @throws PropelException
+     */
+    public function countProductSaleElementsProductDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductSaleElementsProductDocumentsPartial && !$this->isNew();
+        if (null === $this->collProductSaleElementsProductDocuments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductSaleElementsProductDocuments) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProductSaleElementsProductDocuments());
+            }
+
+            $query = ChildProductSaleElementsProductDocumentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProductSaleElements($this)
+                ->count($con);
+        }
+
+        return count($this->collProductSaleElementsProductDocuments);
+    }
+
+    /**
+     * Method called to associate a ChildProductSaleElementsProductDocument object to this object
+     * through the ChildProductSaleElementsProductDocument foreign key attribute.
+     *
+     * @param    ChildProductSaleElementsProductDocument $l ChildProductSaleElementsProductDocument
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function addProductSaleElementsProductDocument(ChildProductSaleElementsProductDocument $l)
+    {
+        if ($this->collProductSaleElementsProductDocuments === null) {
+            $this->initProductSaleElementsProductDocuments();
+            $this->collProductSaleElementsProductDocumentsPartial = true;
+        }
+
+        if (!in_array($l, $this->collProductSaleElementsProductDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductSaleElementsProductDocument($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProductSaleElementsProductDocument $productSaleElementsProductDocument The productSaleElementsProductDocument object to add.
+     */
+    protected function doAddProductSaleElementsProductDocument($productSaleElementsProductDocument)
+    {
+        $this->collProductSaleElementsProductDocuments[]= $productSaleElementsProductDocument;
+        $productSaleElementsProductDocument->setProductSaleElements($this);
+    }
+
+    /**
+     * @param  ProductSaleElementsProductDocument $productSaleElementsProductDocument The productSaleElementsProductDocument object to remove.
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function removeProductSaleElementsProductDocument($productSaleElementsProductDocument)
+    {
+        if ($this->getProductSaleElementsProductDocuments()->contains($productSaleElementsProductDocument)) {
+            $this->collProductSaleElementsProductDocuments->remove($this->collProductSaleElementsProductDocuments->search($productSaleElementsProductDocument));
+            if (null === $this->productSaleElementsProductDocumentsScheduledForDeletion) {
+                $this->productSaleElementsProductDocumentsScheduledForDeletion = clone $this->collProductSaleElementsProductDocuments;
+                $this->productSaleElementsProductDocumentsScheduledForDeletion->clear();
+            }
+            $this->productSaleElementsProductDocumentsScheduledForDeletion[]= clone $productSaleElementsProductDocument;
+            $productSaleElementsProductDocument->setProductSaleElements(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
+     * been saved, it will retrieve related ProductSaleElementsProductDocuments from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ProductSaleElements.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProductSaleElementsProductDocument[] List of ChildProductSaleElementsProductDocument objects
+     */
+    public function getProductSaleElementsProductDocumentsJoinProductDocument($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProductSaleElementsProductDocumentQuery::create(null, $criteria);
+        $query->joinWith('ProductDocument', $joinBehavior);
+
+        return $this->getProductSaleElementsProductDocuments($query, $con);
+    }
+
+    /**
+     * Clears out the collProductImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductImages()
+     */
+    public function clearProductImages()
+    {
+        $this->collProductImages = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProductImagesPartial = null;
+    }
+
+    /**
+     * Initializes the collProductImages collection.
+     *
+     * By default this just sets the collProductImages collection to an empty collection (like clearProductImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProductImages()
+    {
+        $this->collProductImages = new ObjectCollection();
+        $this->collProductImages->setModel('\Thelia\Model\ProductImage');
+    }
+
+    /**
+     * Gets a collection of ChildProductImage objects related by a many-to-many relationship
+     * to the current object by way of the product_sale_elements_product_image cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProductSaleElements is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildProductImage[] List of ChildProductImage objects
+     */
+    public function getProductImages($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collProductImages || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductImages) {
+                // return empty collection
+                $this->initProductImages();
+            } else {
+                $collProductImages = ChildProductImageQuery::create(null, $criteria)
+                    ->filterByProductSaleElements($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collProductImages;
+                }
+                $this->collProductImages = $collProductImages;
+            }
+        }
+
+        return $this->collProductImages;
+    }
+
+    /**
+     * Sets a collection of ProductImage objects related by a many-to-many relationship
+     * to the current object by way of the product_sale_elements_product_image cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $productImages A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function setProductImages(Collection $productImages, ConnectionInterface $con = null)
+    {
+        $this->clearProductImages();
+        $currentProductImages = $this->getProductImages();
+
+        $this->productImagesScheduledForDeletion = $currentProductImages->diff($productImages);
+
+        foreach ($productImages as $productImage) {
+            if (!$currentProductImages->contains($productImage)) {
+                $this->doAddProductImage($productImage);
+            }
+        }
+
+        $this->collProductImages = $productImages;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildProductImage objects related by a many-to-many relationship
+     * to the current object by way of the product_sale_elements_product_image cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildProductImage objects
+     */
+    public function countProductImages($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collProductImages || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductImages) {
+                return 0;
+            } else {
+                $query = ChildProductImageQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProductSaleElements($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductImages);
+        }
+    }
+
+    /**
+     * Associate a ChildProductImage object to this object
+     * through the product_sale_elements_product_image cross reference table.
+     *
+     * @param  ChildProductImage $productImage The ChildProductSaleElementsProductImage object to relate
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function addProductImage(ChildProductImage $productImage)
+    {
+        if ($this->collProductImages === null) {
+            $this->initProductImages();
+        }
+
+        if (!$this->collProductImages->contains($productImage)) { // only add it if the **same** object is not already associated
+            $this->doAddProductImage($productImage);
+            $this->collProductImages[] = $productImage;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    ProductImage $productImage The productImage object to add.
+     */
+    protected function doAddProductImage($productImage)
+    {
+        $productSaleElementsProductImage = new ChildProductSaleElementsProductImage();
+        $productSaleElementsProductImage->setProductImage($productImage);
+        $this->addProductSaleElementsProductImage($productSaleElementsProductImage);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$productImage->getProductSaleElementss()->contains($this)) {
+            $foreignCollection   = $productImage->getProductSaleElementss();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildProductImage object to this object
+     * through the product_sale_elements_product_image cross reference table.
+     *
+     * @param ChildProductImage $productImage The ChildProductSaleElementsProductImage object to relate
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function removeProductImage(ChildProductImage $productImage)
+    {
+        if ($this->getProductImages()->contains($productImage)) {
+            $this->collProductImages->remove($this->collProductImages->search($productImage));
+
+            if (null === $this->productImagesScheduledForDeletion) {
+                $this->productImagesScheduledForDeletion = clone $this->collProductImages;
+                $this->productImagesScheduledForDeletion->clear();
+            }
+
+            $this->productImagesScheduledForDeletion[] = $productImage;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collProductDocuments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductDocuments()
+     */
+    public function clearProductDocuments()
+    {
+        $this->collProductDocuments = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProductDocumentsPartial = null;
+    }
+
+    /**
+     * Initializes the collProductDocuments collection.
+     *
+     * By default this just sets the collProductDocuments collection to an empty collection (like clearProductDocuments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProductDocuments()
+    {
+        $this->collProductDocuments = new ObjectCollection();
+        $this->collProductDocuments->setModel('\Thelia\Model\ProductDocument');
+    }
+
+    /**
+     * Gets a collection of ChildProductDocument objects related by a many-to-many relationship
+     * to the current object by way of the product_sale_elements_product_document cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProductSaleElements is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildProductDocument[] List of ChildProductDocument objects
+     */
+    public function getProductDocuments($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collProductDocuments || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductDocuments) {
+                // return empty collection
+                $this->initProductDocuments();
+            } else {
+                $collProductDocuments = ChildProductDocumentQuery::create(null, $criteria)
+                    ->filterByProductSaleElements($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collProductDocuments;
+                }
+                $this->collProductDocuments = $collProductDocuments;
+            }
+        }
+
+        return $this->collProductDocuments;
+    }
+
+    /**
+     * Sets a collection of ProductDocument objects related by a many-to-many relationship
+     * to the current object by way of the product_sale_elements_product_document cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $productDocuments A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function setProductDocuments(Collection $productDocuments, ConnectionInterface $con = null)
+    {
+        $this->clearProductDocuments();
+        $currentProductDocuments = $this->getProductDocuments();
+
+        $this->productDocumentsScheduledForDeletion = $currentProductDocuments->diff($productDocuments);
+
+        foreach ($productDocuments as $productDocument) {
+            if (!$currentProductDocuments->contains($productDocument)) {
+                $this->doAddProductDocument($productDocument);
+            }
+        }
+
+        $this->collProductDocuments = $productDocuments;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildProductDocument objects related by a many-to-many relationship
+     * to the current object by way of the product_sale_elements_product_document cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildProductDocument objects
+     */
+    public function countProductDocuments($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collProductDocuments || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductDocuments) {
+                return 0;
+            } else {
+                $query = ChildProductDocumentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProductSaleElements($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductDocuments);
+        }
+    }
+
+    /**
+     * Associate a ChildProductDocument object to this object
+     * through the product_sale_elements_product_document cross reference table.
+     *
+     * @param  ChildProductDocument $productDocument The ChildProductSaleElementsProductDocument object to relate
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function addProductDocument(ChildProductDocument $productDocument)
+    {
+        if ($this->collProductDocuments === null) {
+            $this->initProductDocuments();
+        }
+
+        if (!$this->collProductDocuments->contains($productDocument)) { // only add it if the **same** object is not already associated
+            $this->doAddProductDocument($productDocument);
+            $this->collProductDocuments[] = $productDocument;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    ProductDocument $productDocument The productDocument object to add.
+     */
+    protected function doAddProductDocument($productDocument)
+    {
+        $productSaleElementsProductDocument = new ChildProductSaleElementsProductDocument();
+        $productSaleElementsProductDocument->setProductDocument($productDocument);
+        $this->addProductSaleElementsProductDocument($productSaleElementsProductDocument);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$productDocument->getProductSaleElementss()->contains($this)) {
+            $foreignCollection   = $productDocument->getProductSaleElementss();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildProductDocument object to this object
+     * through the product_sale_elements_product_document cross reference table.
+     *
+     * @param ChildProductDocument $productDocument The ChildProductSaleElementsProductDocument object to relate
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function removeProductDocument(ChildProductDocument $productDocument)
+    {
+        if ($this->getProductDocuments()->contains($productDocument)) {
+            $this->collProductDocuments->remove($this->collProductDocuments->search($productDocument));
+
+            if (null === $this->productDocumentsScheduledForDeletion) {
+                $this->productDocumentsScheduledForDeletion = clone $this->collProductDocuments;
+                $this->productDocumentsScheduledForDeletion->clear();
+            }
+
+            $this->productDocumentsScheduledForDeletion[] = $productDocument;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2621,11 +3645,35 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collProductSaleElementsProductImages) {
+                foreach ($this->collProductSaleElementsProductImages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductSaleElementsProductDocuments) {
+                foreach ($this->collProductSaleElementsProductDocuments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductImages) {
+                foreach ($this->collProductImages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductDocuments) {
+                foreach ($this->collProductDocuments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collAttributeCombinations = null;
         $this->collCartItems = null;
         $this->collProductPrices = null;
+        $this->collProductSaleElementsProductImages = null;
+        $this->collProductSaleElementsProductDocuments = null;
+        $this->collProductImages = null;
+        $this->collProductDocuments = null;
         $this->aProduct = null;
     }
 

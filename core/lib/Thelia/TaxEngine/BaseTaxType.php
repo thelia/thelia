@@ -98,7 +98,6 @@ abstract class BaseTaxType
         }
 
         foreach ($requirements as $requirement) {
-
             $requirementName = $requirement->getName();
 
             if (! array_key_exists($requirementName, $requirementsValues)) {

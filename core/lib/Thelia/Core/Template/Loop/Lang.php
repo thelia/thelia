@@ -16,14 +16,13 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**
  * Language loop, to get a list of available languages
@@ -34,6 +33,17 @@ use Thelia\Type;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string[] getCode()
+ * @method string[] getLocale()
+ * @method int[] getExclude()
+ * @method bool getActive()
+ * @method bool getVisible()
+ * @method bool getDefaultOnly()
+ * @method bool getExcludeDefault()
+ * @method string[] getOrder()
  */
 class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -45,34 +55,59 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('id', null),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createAnyListTypeArgument('code'),
+            Argument::createAnyListTypeArgument('locale'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanOrBothTypeArgument('active', true),
+            Argument::createBooleanOrBothTypeArgument('visible', true),
             Argument::createBooleanTypeArgument('default_only', false),
-            new Argument(
+            Argument::createBooleanTypeArgument('exclude_default', false),
+            Argument::createEnumListTypeArgument(
                 'order',
-                new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'position', 'position_reverse'))
-                ),
+                [
+                    'id', 'id_reverse',
+                    'alpha', 'alpha_reverse',
+                    'position', 'position_reverse'
+                ],
                 'position'
             )
         );
-     }
+    }
 
     public function buildModelCriteria()
     {
-        $id      = $this->getId();
-        $exclude = $this->getExclude();
-        $default_only = $this->getDefaultOnly();
-
         $search = LangQuery::create();
 
-        if (! is_null($id))
-            $search->filterById($id);
+        if (null !== $id = $this->getId()) {
+            $search->filterById($id, Criteria::IN);
+        }
 
-        if ($default_only)
+        if (null !== $code = $this->getCode()) {
+            $search->filterByCode($code, Criteria::IN);
+        }
+
+        if (null !== $locale = $this->getLocale()) {
+            $search->filterByLocale($locale, Criteria::IN);
+        }
+
+        if (!$this->getBackendContext() && Type\BooleanOrBothType::ANY !== $visible = $this->getVisible()) {
+            $search->filterByVisible($visible);
+        }
+
+        if (Type\BooleanOrBothType::ANY !== $active = $this->getActive()) {
+            $search->filterByActive($active);
+        }
+
+        if ($this->getDefaultOnly()) {
             $search->filterByByDefault(true);
+        }
 
-        if (! is_null($exclude)) {
+        if ($this->getExcludeDefault()) {
+            $search->filterByByDefault(false);
+        }
+
+        if (null !== $exclude = $this->getExclude()) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -102,30 +137,36 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Lang $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
                 ->set("ID", $result->getId())
-                ->set("TITLE",$result->getTitle())
+                ->set("TITLE", $result->getTitle())
                 ->set("CODE", $result->getCode())
                 ->set("LOCALE", $result->getLocale())
                 ->set("URL", $result->getUrl())
+                ->set("ACTIVE", $result->getActive())
+                ->set("VISIBLE", $result->getVisible())
                 ->set("IS_DEFAULT", $result->getByDefault())
                 ->set("DATE_FORMAT", $result->getDateFormat())
                 ->set("TIME_FORMAT", $result->getTimeFormat())
+                ->set("DECIMAL_SEPARATOR", $result->getDecimalSeparator())
+                ->set("THOUSANDS_SEPARATOR", $result->getThousandsSeparator())
+                ->set("DECIMAL_COUNT", $result->getDecimals())
                 ->set("POSITION", $result->getPosition())
             ;
+
+            $this->addOutputFields($loopResultRow, $result);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

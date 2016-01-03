@@ -11,7 +11,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
@@ -19,19 +22,21 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Model\FolderDocumentQuery;
+use Thelia\Model\FolderImageQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Folder as FolderModel;
+use Thelia\Model\Map\FolderTableMap;
 
 /**
  * Class Folder
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Folder extends BaseAction implements EventSubscriberInterface
 {
     public function update(FolderUpdateEvent $event)
     {
-
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
             $folder->setDispatcher($event->getDispatcher());
 
@@ -65,10 +70,38 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function delete(FolderDeleteEvent $event)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
-            $folder->setDispatcher($event->getDispatcher())
-                ->delete();
+            $con = Propel::getWriteConnection(FolderTableMap::DATABASE_NAME);
+            $con->beginTransaction();
 
-            $event->setFolder($folder);
+            try {
+                // Get folder's files to delete after folder deletion
+                $fileList['images']['list'] = FolderImageQuery::create()
+                    ->findByFolderId($event->getFolderId());
+                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+                $fileList['documentList']['list'] = FolderDocumentQuery::create()
+                    ->findByFolderId($event->getFolderId());
+                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+                // Delete folder
+                $folder->setDispatcher($event->getDispatcher())
+                    ->delete($con);
+
+                $event->setFolder($folder);
+
+                // Dispatch delete folder's files event
+                foreach ($fileList as $fileTypeList) {
+                    foreach ($fileTypeList['list'] as $fileToDelete) {
+                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                    }
+                }
+
+                $con->commit();
+            } catch (\Exception $e) {
+                $con->rollback();
+                throw $e;
+            }
         }
     }
 
@@ -100,7 +133,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setFolder($folder);
-
     }
 
     public function updatePosition(UpdatePositionEvent $event)

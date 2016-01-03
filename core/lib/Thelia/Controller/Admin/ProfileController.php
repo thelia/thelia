@@ -12,13 +12,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\ProfileCreationForm;
-use Thelia\Form\ProfileModificationForm;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
 use Thelia\Form\ProfileUpdateResourceAccessForm;
 use Thelia\Model\ProfileQuery;
@@ -31,9 +30,7 @@ class ProfileController extends AbstractCrudController
             'profile',
             'manual',
             'order',
-
             AdminResources::PROFILE,
-
             TheliaEvents::PROFILE_CREATE,
             TheliaEvents::PROFILE_UPDATE,
             TheliaEvents::PROFILE_DELETE
@@ -42,12 +39,12 @@ class ProfileController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new ProfileCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::PROFILE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new ProfileModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::PROFILE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -105,7 +102,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ProfileModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::PROFILE_MODIFICATION, "form", $data);
     }
 
     protected function hydrateResourceUpdateForm($object)
@@ -115,7 +112,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ProfileUpdateResourceAccessForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, "form", $data);
     }
 
     protected function hydrateModuleUpdateForm($object)
@@ -125,7 +122,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ProfileUpdateModuleAccessForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -185,7 +182,7 @@ class ProfileController extends AbstractCrudController
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
         // We always return to the feature edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.profiles.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
@@ -200,7 +197,7 @@ class ProfileController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.profiles.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getProfile()->getId())
@@ -209,19 +206,18 @@ class ProfileController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.profiles.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.profiles.list");
     }
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $object = $this->getExistingObject();
 
         if ($object != null) {
-
             // Hydrate the form and pass it to the parser
             $resourceAccessForm = $this->hydrateResourceUpdateForm($object);
             $moduleAccessForm = $this->hydrateModuleUpdateForm($object);
@@ -264,7 +260,7 @@ class ProfileController extends AbstractCrudController
 
             $explosion = explode(':', $data);
 
-            $prefix = array_shift ( $explosion );
+            $prefix = array_shift($explosion);
 
             if ($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
                 continue;
@@ -286,7 +282,7 @@ class ProfileController extends AbstractCrudController
 
             $explosion = explode(':', $data);
 
-            $prefix = array_shift ( $explosion );
+            $prefix = array_shift($explosion);
 
             if ($prefix != ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX) {
                 continue;
@@ -301,12 +297,14 @@ class ProfileController extends AbstractCrudController
     public function processUpdateResourceAccess()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
         // Create the form from the request
-        $changeForm = new ProfileUpdateResourceAccessForm($this->getRequest());
+        $changeForm = $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS);
 
         try {
             // Check the form against constraints violations
@@ -319,17 +317,29 @@ class ProfileController extends AbstractCrudController
 
             $this->dispatch(TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE, $changeEvent);
 
-            if (! $this->eventContainsObject($changeEvent))
+            if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
+                );
+            }
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::UPDATE,
+                    sprintf(
+                        "%s %s (ID %s) modified",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($changedObject),
+                        $this->getObjectId($changedObject)
+                    ),
+                    $this->getObjectId($changedObject)
+                );
             }
 
             if ($response == null) {
-                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
             } else {
                 return $response;
             }
@@ -350,12 +360,14 @@ class ProfileController extends AbstractCrudController
     public function processUpdateModuleAccess()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
         // Create the form from the request
-        $changeForm = new ProfileUpdateModuleAccessForm($this->getRequest());
+        $changeForm = $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS);
 
         try {
             // Check the form against constraints violations
@@ -368,17 +380,29 @@ class ProfileController extends AbstractCrudController
 
             $this->dispatch(TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE, $changeEvent);
 
-            if (! $this->eventContainsObject($changeEvent))
+            if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
+                );
+            }
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::UPDATE,
+                    sprintf(
+                        "%s %s (ID %s) modified",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($changedObject),
+                        $this->getObjectId($changedObject)
+                    ),
+                    $this->getObjectId($changedObject)
+                );
             }
 
             if ($response == null) {
-                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
             } else {
                 return $response;
             }

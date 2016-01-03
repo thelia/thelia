@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Content;
 /**
  * Class ContentCreateEvent
  * @package Thelia\Core\Event\Content
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentCreateEvent extends ContentEvent
 {
@@ -103,5 +103,4 @@ class ContentCreateEvent extends ContentEvent
     {
         return $this->title;
     }
-
 }

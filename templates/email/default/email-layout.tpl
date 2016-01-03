@@ -1,4 +1,5 @@
 {default_translation_domain domain='email.default'}
+{default_locale locale={$locale}}
 {declare_assets directory='assets'}
 {assign var="url_site" value="{config key="url_site"}"}
 {assign var="company_name" value="{config key="store_name"}"}
@@ -346,13 +347,16 @@ body,#bodyTable{
     font-weight:normal;
 }
 {/literal}
-</style></head>
+</style>
+{hook name="email-html.layout.css"}
+</head>
 <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="margin: 0;padding: 0;background-color: #444444;">
 <center>
     <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;margin: 0;padding: 0;background-color: #444444;border-collapse: collapse !important;height: 100% !important;width: 100% !important;">
         <tr>
             <td align="center" valign="top" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
+                    {block name="pre-header"}
                     <tr>
                         <td align="center" valign="top" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;background-color: #f5f5f5;border-top: 10px solid #f5f5f5;border-bottom: 0;border-collapse: collapse !important;">
@@ -374,6 +378,9 @@ body,#bodyTable{
                             </table>
                         </td>
                     </tr>
+                    {/block}
+
+                    {block name="logo-header"}
                     <tr>
                         <td align="center" valign="top" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;background-color: #FFFFFF;border-top: 10px solid #f5f5f5;border-bottom: 0;border-collapse: collapse !important;">
@@ -382,7 +389,7 @@ body,#bodyTable{
                                         <table border="0" cellpadding="0" cellspacing="0" class="templateContainer" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 600px;border-collapse: collapse !important;">
                                             <tr>
                                                 <td class="headerContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #202020;font-family: Helvetica;font-size: 20px;font-weight: bold;line-height: 100%;padding-top: 40px;padding-right: 0;padding-bottom: 20px;padding-left: 0;text-align: left;vertical-align: middle;border-collapse: collapse !important;">
-                                                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$company_name}" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 75px;width: 135px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;" width="135" height="75">{/images}
+                                                    <img src="{image file='assets/img/logo.gif'}" alt="{$company_name}" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 75px;width: 135px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;" width="135" height="75">
                                                 </td>
                                             </tr>
                                         </table>
@@ -391,6 +398,7 @@ body,#bodyTable{
                             </table>
                         </td>
                     </tr>
+                    {/block}
                     <tr>
                         <td align="center" valign="top" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;background-color: #FFFFFF;border-top: 0;border-bottom: 0;border-collapse: collapse !important;">
@@ -411,11 +419,13 @@ body,#bodyTable{
                                             <tr>
                                                 <td align="center" valign="top" style="padding-bottom: 40px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
                                                     <table border="0" cellpadding="10" cellspacing="0" width="100%" class="bodyContentBlock" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;background-color: #FFFFFF;border-top: 0;border-bottom: 1px solid #E5E5E5;border-collapse: collapse !important;">
+                                                        {block name="image-header"}
                                                         <tr>
                                                             <td class="bodyContent" style="padding-bottom: 20px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #505050;font-family: Helvetica;font-size: 16px;line-height: 150%;padding-top: 20px;text-align: left;border-collapse: collapse !important;">
-                                                                {images file='assets/img/header.jpg'}<img class="bodyImage" src="{$asset_url}" alt="" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 188px;width: 580px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;display: inline;max-width: 600px;" width="580" height="188">{/images}
+                                                                <img class="bodyImage" src="{image file='assets/img/header.jpg'}" alt="" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 188px;width: 580px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;display: inline;max-width: 600px;" width="580" height="188">
                                                             </td>
                                                         </tr>
+                                                        {/block}
                                                         <tr>
                                                             <td valign="top" class="bodyContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #505050;font-family: Helvetica;font-size: 14px;line-height: 150%;padding-top: 0px;padding-bottom: 20px;text-align: left;border-collapse: collapse !important;">
                                                                 {block name="email-content"}{/block}
@@ -435,23 +445,25 @@ body,#bodyTable{
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooter" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-top: 0;border-collapse: collapse !important;">
                                 <tr>
                                     <td align="center" valign="top" style="padding-bottom: 40px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
+                                        {hook name="email-html.layout.footer"}
+                                        {elsehook rel="email.layout.footer"}
                                         <table border="0" cellpadding="0" cellspacing="0" class="templateContainer" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 600px;border-collapse: collapse !important;">
-                                            <tr>
-                                                <td valign="top" class="footerContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #808080;font-family: Helvetica;font-size: 10px;line-height: 150%;padding-top: 20px;text-align: left;border-collapse: collapse !important;">
-                                                    <a href="http://twitter.com/theliaecommerce" style="color: #ffffff;font-weight: normal;text-decoration: underline;">Follow on Twitter</a>&nbsp;&nbsp;&nbsp;<a href="http://www.facebook.com/theliaecommerce" style="color: #ffffff;font-weight: normal;text-decoration: underline;">Friend on Facebook</a>&nbsp;
-                                                </td>
-                                            </tr>
                                             <tr>
                                                 <td valign="top" class="footerContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #808080;font-family: Helvetica;font-size: 10px;line-height: 150%;padding-top: 20px;text-align: left;border-collapse: collapse !important;">
                                                     <strong>{intl l="Our mailing address is:"}</strong>
                                                     <br>
-                                                    Street name of my business 75000 City, France
+                                                    {config key="store_address1"} {config key="store_address2"} {config key="store_address3"}<br>
+                                                    {config key="store_zipcode"} {config key="store_city"},
+                                                    {if {config key="store_country"} }
+                                                        {loop type="country" name="address.country.title" id={config key="store_country"}}, {$TITLE}{/loop}
+                                                    {/if}
                                                     <br>
                                                     <br>
                                                     <em>{intl l="Copyright"} &copy; {'Y'|date} {$company_name}, {intl l="All rights reserved."}</em>
                                                 </td>
                                             </tr>
                                         </table>
+                                        {/elsehook}
                                     </td>
                                 </tr>
                             </table>

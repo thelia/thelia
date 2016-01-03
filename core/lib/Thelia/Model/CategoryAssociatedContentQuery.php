@@ -16,4 +16,5 @@ use Thelia\Model\Base\CategoryAssociatedContentQuery as BaseCategoryAssociatedCo
  */
 class CategoryAssociatedContentQuery extends BaseCategoryAssociatedContentQuery
 {
-} // CategoryAssociatedContentQuery
+}
+// CategoryAssociatedContentQuery

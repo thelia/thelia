@@ -23,13 +23,15 @@
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
+            {hook name="order-failed.top"}
+
             {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="failed-order" id=$failed_order_id}
 
-            <div id="payment-failure" class="panel">
+            <div id="payment-failure" class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
                 </div>
                 <div class="panel-body">
                     <h3>{intl l="We're sorry, a problem occured and your payment was not successful."}</h3>
@@ -37,14 +39,29 @@
                         <p>{$failed_order_message}</p>
                     {/if}
 
-                    <a href="{url path="/order/invoice"}" role="button" class="btn btn-checkout"><span>{intl l="Try again"}</span></a>
+                    <a href="{url path="/order/invoice"}" role="button" class="btn btn-primary">{intl l="Try again"}</a>
                 </div>
             </div>
 
             {/loop}
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
+            {hook name="order-failed.bottom"}
+
+            <a href="{navigate to="index"}" role="button" class="btn btn-default">{intl l="Go home"}</a>
 
         </article>
     </div>
+{/block}
+
+
+{block name="stylesheet"}
+{hook name="order-failed.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order-failed.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="order-failed.javascript-initialization"}
 {/block}

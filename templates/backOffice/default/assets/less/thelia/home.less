@@ -1,0 +1,30 @@
+.stats {
+    border-right: 1px solid @table-border-color;
+    text-align: center;
+    
+    &:last-child {
+        border-right: none;
+    }
+
+    h2 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-size: 30px;
+    }
+
+    p {
+        margin-top: 0;
+        text-transform: uppercase;
+        font-size: @font-size-base - 1; // 12px
+    }
+}
+
+@media (max-width: @screen-sm-max) {
+    .stats {
+        margin-bottom: 10px;
+
+        &:nth-child(3) {
+            border-right: none;
+        }
+    }
+}

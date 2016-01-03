@@ -24,6 +24,10 @@ final class AdminResources
 {
     private static $selfReflection = null;
 
+    /**
+     * @param $name
+     * @return string the constant value
+     */
     public static function retrieve($name)
     {
         $constantName = strtoupper($name);
@@ -51,6 +55,8 @@ final class AdminResources
 
     const ATTRIBUTE = "admin.configuration.attribute";
 
+    const BRAND = "admin.brand";
+
     const CATEGORY = "admin.category";
 
     const CONFIG = "admin.configuration";
@@ -58,6 +64,8 @@ final class AdminResources
     const CONTENT = "admin.content";
 
     const COUNTRY = "admin.configuration.country";
+
+    const STATE = "admin.configuration.state";
 
     const COUPON = "admin.coupon";
 
@@ -78,6 +86,10 @@ final class AdminResources
     const MESSAGE = "admin.configuration.message";
 
     const MODULE = "admin.module";
+
+    const HOOK = "admin.hook";
+
+    const MODULE_HOOK = "admin.module-hook";
 
     const ORDER = "admin.order";
 
@@ -103,7 +115,13 @@ final class AdminResources
 
     const EXPORT = "admin.export";
 
-    const EXPORT_CUSTOMER_NEWSLETTER = "admin.export.customer.newsletter";
+    const IMPORT = "admin.import";
 
     const TOOLS = "admin.tools";
+
+    const SALES = "admin.sales";
+
+    const API = "admin.configuration.api";
+
+    const TITLE = "admin.customer.title";
 }

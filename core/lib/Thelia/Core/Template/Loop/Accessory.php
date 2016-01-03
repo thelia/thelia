@@ -14,10 +14,8 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\AccessoryQuery;
 
 /**
@@ -28,6 +26,12 @@ use Thelia\Model\AccessoryQuery;
  * Class Accessory
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getProduct()
+ * @method string[] getOrder()
+ *
+ * @link http://doc.thelia.net/en/documentation/loop/accessory.html
  */
 class Accessory extends Product
 {
@@ -42,7 +46,7 @@ class Accessory extends Product
         $argumentCollection = parent::getArgDefinitions();
 
         $argumentCollection->addArgument(
-            Argument::createIntTypeArgument('product', null, true)
+            Argument::createIntListTypeArgument('product', null, true)
         );
 
         $argumentCollection->get('order')->default = "accessory";
@@ -67,12 +71,12 @@ class Accessory extends Product
         if ($orderByAccessory !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAccessory] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
         if ($orderByAccessoryReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAccessoryReverse] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
 
         $accessories = $this->search($search);
@@ -81,7 +85,6 @@ class Accessory extends Product
         $this->accessoryPosition = $this->accessoryId = array();
 
         foreach ($accessories as $accessory) {
-
             $accessoryProductId = $accessory->getAccessory();
 
             array_push($this->accessoryIdList, $accessoryProductId);
@@ -94,9 +97,9 @@ class Accessory extends Product
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue( implode(',', $this->accessoryIdList) );
+            $this->args->get('id')->setValue(implode(',', $this->accessoryIdList));
         } else {
-            $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $this->accessoryIdList)) );
+            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $this->accessoryIdList)));
         }
 
         return parent::buildModelCriteria();
@@ -107,11 +110,10 @@ class Accessory extends Product
         $results = parent::parseResults($results);
 
         foreach ($results as $loopResultRow) {
-
             $accessoryProductId = $loopResultRow->get('ID');
             \Thelia\Log\Tlog::getInstance()->notice($this->accessoryId);
             $loopResultRow
-                ->set("ID"      , $this->accessoryId[$accessoryProductId])
+                ->set("ID", $this->accessoryId[$accessoryProductId])
                 ->set("POSITION", $this->accessoryPosition[$accessoryProductId])
                 ->set("ACCESSORY_ID", $accessoryProductId)
                 ;

@@ -16,42 +16,33 @@ namespace Thelia\Coupon\Type;
  * Allow to remove an amount from the checkout total
  *
  * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  *
  */
-class RemoveXAmount extends CouponAbstract
+class RemoveXAmount extends AbstractRemove
 {
+    use AmountCouponTrait;
+
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.remove_x_amount';
 
+    protected function getAmountFieldName()
+    {
+        return self::AMOUNT_FIELD_NAME;
+    }
+
     /**
-     * Get I18n name
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName()
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Fixed Amount Discount', array(), 'coupon');
+            ->trans('Fixed Amount Discount', array());
     }
 
     /**
-     * Get I18n amount input name
-     *
-     * @return string
-     */
-    public function getInputName()
-    {
-        return $this->facade
-            ->getTranslator()
-            ->trans('Discount amount', array(), 'coupon');
-    }
-
-    /**
-     * Get I18n tooltip
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getToolTip()
     {
@@ -59,19 +50,25 @@ class RemoveXAmount extends CouponAbstract
             ->getTranslator()
             ->trans(
                 'This coupon will subtracts a set amount from the total cost of an order. If the discount is greater than the total order corst, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                array(),
-                'coupon'
+                array()
             );
 
         return $toolTip;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function exec()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/type-fragments/remove-x-amount.html', [
-                'label'     => $this->getInputName(),
-                'fieldName' => self::INPUT_AMOUNT_NAME,
-                'value'     => $this->amount
-            ]);
+        return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-x-amount.html');
     }
 }

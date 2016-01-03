@@ -11,116 +11,19 @@
 {* Hide breadcrumb *}
 {block name='breadcrumb'}{/block}
 
+{* Main content *}
 {block name="main-content"}
-    <section class="carousel-container">
-        <div id="carousel" class="carousel slide">
-            <div class="carousel-wrapper">
-                <div class="carousel-inner">
-                    <figure class="item active">
-                        {images file='assets/img/carousel/slider1.jpg'}<img src="{$asset_url}" alt="Slider image 1">{/images}
-                    </figure>
-                    <figure class="item">
-                        {images file='assets/img/carousel/slider2.jpg'}<img src="{$asset_url}" alt="Slider image 2">{/images}
-                    </figure>
-                    <figure class="item">
-                        {images file='assets/img/carousel/slider3.jpg'}<img src="{$asset_url}" alt="Slider image 3">{/images}
-                    </figure>
-                </div>
-            </div>
-            <a class="left carousel-control" href="#carousel" data-slide="prev"><span class="icon-prev"></span></a>
-            <a class="right carousel-control" href="#carousel" data-slide="next"><span class="icon-next"></span></a>
-        </div>
-    </section><!-- #carousel -->
+    {hook name="home.body"}
+{/block}
 
-    {if {count type="product"} eq 0}
-        {include file="includes/product-empty.html"}
-    {else}
-        {ifloop rel="product_new"}
-        <section id="products-new">
-            <div class="products-heading">
-                <h2>{intl l="Latest"} <a href="{url path="/view_all"  type="new"}" class="btn-all">{intl l="+ View All"}</a></h2>
-            </div>
+{block name="stylesheet"}
+{hook name="home.stylesheet"}
+{/block}
 
-            <div class="products-content">
-                <ul class="products-grid product-col-4">
-                    {loop name="product_new" type="product" limit="4" new="yes"}
-                    <li class="item">
-                        <article itemscope itemtype="http://schema.org/Product">
-                            <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-                            {$product_id=$ID}
-                            {loop name="brand.feature" type="feature" product="{$ID}" title="brand"}
-                                {loop name="brand.value" type="feature_value" feature="{$ID}" product="$product_id"}
-                                    <meta itemprop="brand" content="{$TITLE}">
-                                {/loop}
-                            {/loop}
-                            {loop name="brand.feature" type="feature" product=$ID title="isbn"}
-                                {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
-                                    <meta itemprop="productID" content="isbn:{$TITLE}">
-                                {/loop}
-                            {/loop}
+{block name="after-javascript-include"}
+{hook name="home.after-javascript-include"}
+{/block}
 
-                            <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
-                                {ifloop rel="image_product_new" }
-                                    <img itemprop="image"
-                                {loop name="image_product_new" type="image" limit="1" product="{$ID}" force_return="true" width="280" height="196" resize_mode="borders"}
-                                    src="{$IMAGE_URL}"
-                                {/loop}
-                                    alt="Product #{$LOOP_COUNT}" >
-                                {/ifloop}
-                                {elseloop rel="image_product_new"}
-                                    {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
-                                {/elseloop}
-                                <span class="mask"></span>
-                            </a>
-
-                            <a href="{$URL}" class="product-info">
-                                <h3 class="name"><span itemprop="name">{$TITLE}</span></h3>
-                                <div class="short-description" itemprop="description">{$CHAPO}</div>
-
-                                <div class="product-price">
-                                    <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                        {loop type="category" name="category_tag" id=$DEFAULT_CATEGORY}
-                                            <meta itemprop="category" content="{$TITLE}">
-                                        {/loop}
-                                        <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                                        <meta itemprop="priceCurrency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                                        <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
-
-                                        <!-- List of availibility :
-                                                out_of_stock : http://schema.org/OutOfStock
-                                                in_stock : http://schema.org/InStock
-                                                instore_only : http://schema.org/InStoreOnly
-                                                preorder : http://schema.org/PreOrder
-                                                online_only : http://schema.org/OnlineOnly
-                                        -->
-                                        <span class="regular-price"><span itemprop="price" class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
-                                    </div>
-                                </div>
-                            </a>
-                        </article><!-- /product -->
-                    </li>
-                    {/loop}
-                </ul>
-            </div>
-        </section><!-- #products-new -->
-        {/ifloop}
-
-        {ifloop rel="product_promo"}
-        <section id="products-offer">
-            <div class="products-heading">
-                <h2>{intl l="Offers"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All"}</a></h2>
-            </div>
-
-            <div class="products-content">
-                <ul class="products-grid product-col-5 hover-effect">
-                    {loop name="product_promo" type="product" limit="5" promo="yes"}
-                        {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
-                    {/loop}
-                </ul>
-            </div>
-        </section><!-- #products-offer -->
-        {/ifloop}
-    {/if}
-
-
+{block name="javascript-initialization"}
+{hook name="home.javascript-initialization"}
 {/block}

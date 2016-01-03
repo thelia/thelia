@@ -6,24 +6,26 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
-
 use Thelia\Model\Map\ContentTableMap;
-
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
-class Content extends BaseContent
+class Content extends BaseContent implements FileModelParentInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use PositionManagementTrait;
 
-    use \Thelia\Model\Tools\UrlRewritingTrait;
+    use UrlRewritingTrait;
 
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'content';
     }
@@ -40,7 +42,9 @@ class Content extends BaseContent
             ->find();
 
         // Filtrer la requete sur ces produits
-        if ($contents != null) $query->filterById($contents, Criteria::IN);
+        if ($contents != null) {
+            $query->filterById($contents, Criteria::IN);
+        }
     }
 
     public function getDefaultFolderId()
@@ -79,7 +83,7 @@ class Content extends BaseContent
     {
         // Allow uncategorized content (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultFolderId <= 0) {
-            $defaultFolderId = NULL;
+            $defaultFolderId = null;
         }
 
         if ($defaultFolderId == $this->getDefaultFolderId()) {
@@ -104,7 +108,6 @@ class Content extends BaseContent
 
         $contentFolder->setDefaultFolder(true)
             ->save();
-
     }
 
     /**
@@ -113,7 +116,10 @@ class Content extends BaseContent
      * Here pre and post insert event are fired
      *
      * @param $defaultFolderId
+     *
      * @throws \Exception
+     *
+     * @return $this Return $this, allow chaining
      */
     public function create($defaultFolderId)
     {
@@ -136,13 +142,14 @@ class Content extends BaseContent
 
             $con->commit();
 
-            $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT,new ContentEvent($this));
+            $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT, new ContentEvent($this));
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
         }
+
+        return $this;
     }
 
     public function preUpdate(ConnectionInterface $con = null)
@@ -166,7 +173,7 @@ class Content extends BaseContent
 
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONTENT, new ContentEvent($this));
     }

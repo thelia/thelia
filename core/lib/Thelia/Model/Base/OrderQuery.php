@@ -34,12 +34,18 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery orderByInvoiceRef($order = Criteria::ASC) Order by the invoice_ref column
  * @method     ChildOrderQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildOrderQuery orderByPostage($order = Criteria::ASC) Order by the postage column
+ * @method     ChildOrderQuery orderByPostageTax($order = Criteria::ASC) Order by the postage_tax column
+ * @method     ChildOrderQuery orderByPostageTaxRuleTitle($order = Criteria::ASC) Order by the postage_tax_rule_title column
  * @method     ChildOrderQuery orderByPaymentModuleId($order = Criteria::ASC) Order by the payment_module_id column
  * @method     ChildOrderQuery orderByDeliveryModuleId($order = Criteria::ASC) Order by the delivery_module_id column
  * @method     ChildOrderQuery orderByStatusId($order = Criteria::ASC) Order by the status_id column
  * @method     ChildOrderQuery orderByLangId($order = Criteria::ASC) Order by the lang_id column
+ * @method     ChildOrderQuery orderByCartId($order = Criteria::ASC) Order by the cart_id column
  * @method     ChildOrderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildOrderQuery orderByVersion($order = Criteria::ASC) Order by the version column
+ * @method     ChildOrderQuery orderByVersionCreatedAt($order = Criteria::ASC) Order by the version_created_at column
+ * @method     ChildOrderQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method     ChildOrderQuery groupById() Group by the id column
  * @method     ChildOrderQuery groupByRef() Group by the ref column
@@ -54,12 +60,18 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery groupByInvoiceRef() Group by the invoice_ref column
  * @method     ChildOrderQuery groupByDiscount() Group by the discount column
  * @method     ChildOrderQuery groupByPostage() Group by the postage column
+ * @method     ChildOrderQuery groupByPostageTax() Group by the postage_tax column
+ * @method     ChildOrderQuery groupByPostageTaxRuleTitle() Group by the postage_tax_rule_title column
  * @method     ChildOrderQuery groupByPaymentModuleId() Group by the payment_module_id column
  * @method     ChildOrderQuery groupByDeliveryModuleId() Group by the delivery_module_id column
  * @method     ChildOrderQuery groupByStatusId() Group by the status_id column
  * @method     ChildOrderQuery groupByLangId() Group by the lang_id column
+ * @method     ChildOrderQuery groupByCartId() Group by the cart_id column
  * @method     ChildOrderQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildOrderQuery groupByVersion() Group by the version column
+ * @method     ChildOrderQuery groupByVersionCreatedAt() Group by the version_created_at column
+ * @method     ChildOrderQuery groupByVersionCreatedBy() Group by the version_created_by column
  *
  * @method     ChildOrderQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildOrderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -105,6 +117,10 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery rightJoinOrderCoupon($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCoupon relation
  * @method     ChildOrderQuery innerJoinOrderCoupon($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCoupon relation
  *
+ * @method     ChildOrderQuery leftJoinOrderVersion($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderVersion relation
+ * @method     ChildOrderQuery rightJoinOrderVersion($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderVersion relation
+ * @method     ChildOrderQuery innerJoinOrderVersion($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderVersion relation
+ *
  * @method     ChildOrder findOne(ConnectionInterface $con = null) Return the first ChildOrder matching the query
  * @method     ChildOrder findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOrder matching the query, or a new ChildOrder object populated from the query conditions when no match is found
  *
@@ -119,14 +135,20 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneByTransactionRef(string $transaction_ref) Return the first ChildOrder filtered by the transaction_ref column
  * @method     ChildOrder findOneByDeliveryRef(string $delivery_ref) Return the first ChildOrder filtered by the delivery_ref column
  * @method     ChildOrder findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrder filtered by the invoice_ref column
- * @method     ChildOrder findOneByDiscount(double $discount) Return the first ChildOrder filtered by the discount column
- * @method     ChildOrder findOneByPostage(double $postage) Return the first ChildOrder filtered by the postage column
+ * @method     ChildOrder findOneByDiscount(string $discount) Return the first ChildOrder filtered by the discount column
+ * @method     ChildOrder findOneByPostage(string $postage) Return the first ChildOrder filtered by the postage column
+ * @method     ChildOrder findOneByPostageTax(string $postage_tax) Return the first ChildOrder filtered by the postage_tax column
+ * @method     ChildOrder findOneByPostageTaxRuleTitle(string $postage_tax_rule_title) Return the first ChildOrder filtered by the postage_tax_rule_title column
  * @method     ChildOrder findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrder filtered by the payment_module_id column
  * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
  * @method     ChildOrder findOneByStatusId(int $status_id) Return the first ChildOrder filtered by the status_id column
  * @method     ChildOrder findOneByLangId(int $lang_id) Return the first ChildOrder filtered by the lang_id column
+ * @method     ChildOrder findOneByCartId(int $cart_id) Return the first ChildOrder filtered by the cart_id column
  * @method     ChildOrder findOneByCreatedAt(string $created_at) Return the first ChildOrder filtered by the created_at column
  * @method     ChildOrder findOneByUpdatedAt(string $updated_at) Return the first ChildOrder filtered by the updated_at column
+ * @method     ChildOrder findOneByVersion(int $version) Return the first ChildOrder filtered by the version column
+ * @method     ChildOrder findOneByVersionCreatedAt(string $version_created_at) Return the first ChildOrder filtered by the version_created_at column
+ * @method     ChildOrder findOneByVersionCreatedBy(string $version_created_by) Return the first ChildOrder filtered by the version_created_by column
  *
  * @method     array findById(int $id) Return ChildOrder objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildOrder objects filtered by the ref column
@@ -139,18 +161,31 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     array findByTransactionRef(string $transaction_ref) Return ChildOrder objects filtered by the transaction_ref column
  * @method     array findByDeliveryRef(string $delivery_ref) Return ChildOrder objects filtered by the delivery_ref column
  * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrder objects filtered by the invoice_ref column
- * @method     array findByDiscount(double $discount) Return ChildOrder objects filtered by the discount column
- * @method     array findByPostage(double $postage) Return ChildOrder objects filtered by the postage column
+ * @method     array findByDiscount(string $discount) Return ChildOrder objects filtered by the discount column
+ * @method     array findByPostage(string $postage) Return ChildOrder objects filtered by the postage column
+ * @method     array findByPostageTax(string $postage_tax) Return ChildOrder objects filtered by the postage_tax column
+ * @method     array findByPostageTaxRuleTitle(string $postage_tax_rule_title) Return ChildOrder objects filtered by the postage_tax_rule_title column
  * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrder objects filtered by the payment_module_id column
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
  * @method     array findByStatusId(int $status_id) Return ChildOrder objects filtered by the status_id column
  * @method     array findByLangId(int $lang_id) Return ChildOrder objects filtered by the lang_id column
+ * @method     array findByCartId(int $cart_id) Return ChildOrder objects filtered by the cart_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrder objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrder objects filtered by the updated_at column
+ * @method     array findByVersion(int $version) Return ChildOrder objects filtered by the version column
+ * @method     array findByVersionCreatedAt(string $version_created_at) Return ChildOrder objects filtered by the version_created_at column
+ * @method     array findByVersionCreatedBy(string $version_created_by) Return ChildOrder objects filtered by the version_created_by column
  *
  */
 abstract class OrderQuery extends ModelCriteria
 {
+
+    // versionable behavior
+
+    /**
+     * Whether the versioning is enabled
+     */
+    static $isVersioningEnabled = true;
 
     /**
      * Initializes internal state of \Thelia\Model\Base\OrderQuery object.
@@ -235,7 +270,7 @@ abstract class OrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CREATED_AT`, `UPDATED_AT` FROM `order` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `POSTAGE_TAX`, `POSTAGE_TAX_RULE_TITLE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CART_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `order` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -820,6 +855,76 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the postage_tax column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPostageTax(1234); // WHERE postage_tax = 1234
+     * $query->filterByPostageTax(array(12, 34)); // WHERE postage_tax IN (12, 34)
+     * $query->filterByPostageTax(array('min' => 12)); // WHERE postage_tax > 12
+     * </code>
+     *
+     * @param     mixed $postageTax The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByPostageTax($postageTax = null, $comparison = null)
+    {
+        if (is_array($postageTax)) {
+            $useMinMax = false;
+            if (isset($postageTax['min'])) {
+                $this->addUsingAlias(OrderTableMap::POSTAGE_TAX, $postageTax['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($postageTax['max'])) {
+                $this->addUsingAlias(OrderTableMap::POSTAGE_TAX, $postageTax['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::POSTAGE_TAX, $postageTax, $comparison);
+    }
+
+    /**
+     * Filter the query on the postage_tax_rule_title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPostageTaxRuleTitle('fooValue');   // WHERE postage_tax_rule_title = 'fooValue'
+     * $query->filterByPostageTaxRuleTitle('%fooValue%'); // WHERE postage_tax_rule_title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $postageTaxRuleTitle The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByPostageTaxRuleTitle($postageTaxRuleTitle = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($postageTaxRuleTitle)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $postageTaxRuleTitle)) {
+                $postageTaxRuleTitle = str_replace('*', '%', $postageTaxRuleTitle);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::POSTAGE_TAX_RULE_TITLE, $postageTaxRuleTitle, $comparison);
+    }
+
+    /**
      * Filter the query on the payment_module_id column
      *
      * Example usage:
@@ -992,6 +1097,47 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the cart_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCartId(1234); // WHERE cart_id = 1234
+     * $query->filterByCartId(array(12, 34)); // WHERE cart_id IN (12, 34)
+     * $query->filterByCartId(array('min' => 12)); // WHERE cart_id > 12
+     * </code>
+     *
+     * @param     mixed $cartId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByCartId($cartId = null, $comparison = null)
+    {
+        if (is_array($cartId)) {
+            $useMinMax = false;
+            if (isset($cartId['min'])) {
+                $this->addUsingAlias(OrderTableMap::CART_ID, $cartId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($cartId['max'])) {
+                $this->addUsingAlias(OrderTableMap::CART_ID, $cartId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::CART_ID, $cartId, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -1075,6 +1221,119 @@ abstract class OrderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the version column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersion(1234); // WHERE version = 1234
+     * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
+     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * </code>
+     *
+     * @param     mixed $version The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByVersion($version = null, $comparison = null)
+    {
+        if (is_array($version)) {
+            $useMinMax = false;
+            if (isset($version['min'])) {
+                $this->addUsingAlias(OrderTableMap::VERSION, $version['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($version['max'])) {
+                $this->addUsingAlias(OrderTableMap::VERSION, $version['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::VERSION, $version, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedAt('2011-03-14'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt('now'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt(array('max' => 'yesterday')); // WHERE version_created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $versionCreatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedAt($versionCreatedAt = null, $comparison = null)
+    {
+        if (is_array($versionCreatedAt)) {
+            $useMinMax = false;
+            if (isset($versionCreatedAt['min'])) {
+                $this->addUsingAlias(OrderTableMap::VERSION_CREATED_AT, $versionCreatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($versionCreatedAt['max'])) {
+                $this->addUsingAlias(OrderTableMap::VERSION_CREATED_AT, $versionCreatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::VERSION_CREATED_AT, $versionCreatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_by column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedBy('fooValue');   // WHERE version_created_by = 'fooValue'
+     * $query->filterByVersionCreatedBy('%fooValue%'); // WHERE version_created_by LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $versionCreatedBy The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedBy($versionCreatedBy = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($versionCreatedBy)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $versionCreatedBy)) {
+                $versionCreatedBy = str_replace('*', '%', $versionCreatedBy);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::VERSION_CREATED_BY, $versionCreatedBy, $comparison);
     }
 
     /**
@@ -1824,6 +2083,79 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\OrderVersion object
+     *
+     * @param \Thelia\Model\OrderVersion|ObjectCollection $orderVersion  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByOrderVersion($orderVersion, $comparison = null)
+    {
+        if ($orderVersion instanceof \Thelia\Model\OrderVersion) {
+            return $this
+                ->addUsingAlias(OrderTableMap::ID, $orderVersion->getId(), $comparison);
+        } elseif ($orderVersion instanceof ObjectCollection) {
+            return $this
+                ->useOrderVersionQuery()
+                ->filterByPrimaryKeys($orderVersion->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderVersion() only accepts arguments of type \Thelia\Model\OrderVersion or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderVersion relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function joinOrderVersion($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderVersion');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderVersion');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderVersion relation OrderVersion object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderVersionQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderVersionQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderVersion($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderVersion', '\Thelia\Model\OrderVersionQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildOrder $order Object to remove from the list of results
@@ -1978,6 +2310,34 @@ abstract class OrderQuery extends ModelCriteria
     public function firstCreatedFirst()
     {
         return $this->addAscendingOrderByColumn(OrderTableMap::CREATED_AT);
+    }
+
+    // versionable behavior
+
+    /**
+     * Checks whether versioning is enabled
+     *
+     * @return boolean
+     */
+    static public function isVersioningEnabled()
+    {
+        return self::$isVersioningEnabled;
+    }
+
+    /**
+     * Enables versioning
+     */
+    static public function enableVersioning()
+    {
+        self::$isVersioningEnabled = true;
+    }
+
+    /**
+     * Disables versioning
+     */
+    static public function disableVersioning()
+    {
+        self::$isVersioningEnabled = false;
     }
 
 } // OrderQuery

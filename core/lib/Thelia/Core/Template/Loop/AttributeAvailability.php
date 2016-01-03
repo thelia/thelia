@@ -13,15 +13,17 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeAv as AttributeAvModel;
+use Thelia\Model\Map\AttributeCombinationTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -32,6 +34,13 @@ use Thelia\Type;
  * Class AttributeAvailability
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getAttribute()
+ * @method int getProduct()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -45,6 +54,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('attribute'),
+            Argument::createIntTypeArgument('product'),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
@@ -81,6 +91,35 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
             $search->filterByAttributeId($attribute, Criteria::IN);
         }
 
+        $product = $this->getProduct();
+
+        if (null !== $product) {
+            // Return only Attributes Av that are part on a product's combination
+
+            /* The request is:
+            select * from attribute_av aav
+            left join attribute_combination ac on ac.attribute_av_id = aav.id
+            left join product_sale_elements pse on pse.id = ac.product_sale_elements_id
+            where aav.attribute_id=3 and pse.product_id = 279
+            group by aav.id
+             */
+
+            $pseJoin = new Join();
+            $pseJoin->addCondition(
+                AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID,
+                ProductSaleElementsTableMap::ID,
+                Criteria::EQUAL
+            );
+            $pseJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search
+                ->leftJoinAttributeCombination('attribute_combination')
+                ->groupById()
+                ->addJoinObject($pseJoin)
+                ->where(ProductSaleElementsTableMap::PRODUCT_ID."=?", $product, \PDO::PARAM_INT)
+            ;
+        }
+
         $orders  = $this->getOrder();
 
         foreach ($orders as $order) {
@@ -107,29 +146,29 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var AttributeAvModel $attributeAv */
         foreach ($loopResult->getResultDataCollection() as $attributeAv) {
             $loopResultRow = new LoopResultRow($attributeAv);
             $loopResultRow
-                ->set("ID"           , $attributeAv->getId())
-                ->set("ATTRIBUTE_ID" , $attributeAv->getAttributeId())
+                ->set("ID", $attributeAv->getId())
+                ->set("ATTRIBUTE_ID", $attributeAv->getAttributeId())
                 ->set("IS_TRANSLATED", $attributeAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"       , $this->locale)
-                ->set("TITLE"        , $attributeAv->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"        , $attributeAv->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"  , $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM" , $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION"     , $attributeAv->getPosition())
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $attributeAv->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $attributeAv->getPosition())
             ;
+            $this->addOutputFields($loopResultRow, $attributeAv);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

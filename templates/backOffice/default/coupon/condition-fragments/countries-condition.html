@@ -1,3 +1,4 @@
+{default_translation_domain domain='bo.default'}
 <div class="form-group">
     <label for="operator">{$countryLabel}</label>
     {$operatorSelectHtml nofilter}
@@ -6,7 +7,7 @@
 <div class="form-group">
     <label for="{$countries_field_name}-value">{intl l="The selected countries :"}</label>
     <select required multiple size="5" class="form-control" id="{$countries_field_name}-value" name="{$countries_field_name}[value][]">
-        {loop type="country" name="list-of-countries" order="alpha" backend_context=1}
+        {loop type="country" name="list-of-countries" order="alpha" backend_context=1 visible="*"}
             <option style="padding-left: {$LEVEL * 20}px" value="{$ID}" {if in_array($ID, $values)}selected="selected"{/if}>{$TITLE}</option>
         {/loop}
     </select>

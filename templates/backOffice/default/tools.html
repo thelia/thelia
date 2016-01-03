@@ -21,7 +21,7 @@
                 </ul>
             </nav>
 
-            {module_include location='tools_top'}
+            {hook name="tools.top" location="tools_top" }
 
             <div class="row">
 
@@ -31,12 +31,26 @@
                             <table class="table table-striped table-condensed">
                                 <caption>{intl l='General tools'}</caption>
 
-                                {module_include location='tools_col1_top'}
+                                {hook name="tools.col1-top" location="tools_col1_top" }
 
                                 {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/coupon'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+
+                                {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales"  access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/sales'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+
+                                {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand"  access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/brand'}">{intl l="Brands"}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/brand'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
@@ -47,18 +61,24 @@
                                     </tr>
                                 {/loop}
 
-                                {module_include location='tools_col1_bottom'}
+                                {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/import'}">{intl l="Import"}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/import'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+                                {hook name="tools.col1-bottom" location="tools_col1_bottom" }
                             </table>
                         </div>
                     </div>
                 </div>
 
-                {module_include location='configuration_bottom'}
+                {hook name="tools.bottom" location="tools_bottom" }
             </div>
         </div>
     </div>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='configuration-js'}
+    {hook name="tools.js" location="tools-js" }
 {/block}

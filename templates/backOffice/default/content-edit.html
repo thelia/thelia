@@ -10,13 +10,15 @@
 {block name="page-title"}{intl l='Edit content'}{/block}
 
 {block name="main-content"}
-    <div class="folder edit-folder">
+    <div class="content edit-content">
         <div id="wrapper" class="container">
 
             {include file="includes/folder-breadcrumb.html" editing_content="true"}
 
+            {hook name="content-edit.top" content_id=$content_id}
+
             <div class="row">
-                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
+                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id" with_prev_next_info="true"}
                     <div class="col-md-12 general-block-decorator">
                         <div class="row">
                             <div class="col-md-7 title">
@@ -26,15 +28,15 @@
                             <div class="col-md-5 actions">
 
                                 {if $HAS_PREVIOUS != 0}
-                                    <a href="{url path="/admin/content/update/$PREVIOUS"}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                    <a href="{url path="/admin/content/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                                 {else}
                                     <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
                                 {/if}
 
-                                <a href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                                <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview content page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
 
                                 {if $HAS_NEXT != 0}
-                                    <a href="{url path="/admin/content/update/$NEXT"}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                    <a href="{url path="/admin/content/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                                 {else}
                                     <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
                                 {/if}
@@ -44,6 +46,34 @@
                         <div class="row">
                             <div class="col-md-12">
 
+                                {hookblock name="content.tab" id="{$content_id}" fields="id,title,href,content"}
+
+                                    {capture "content_tab_tab"}
+                                        {forhook rel="content.tab"}
+                                        <li>
+                                            <a href="#{$id}"
+                                                {if $href}data-href="{$href}"{/if}
+                                                data-toggle="tab">{$title}
+                                            </a>
+                                        </li>
+                                        {/forhook}
+                                    {/capture}
+
+                                    {capture "content_tab_content"}
+                                        {forhook rel="content.tab"}
+                                        <div class="tab-pane fade" id="{$id}">
+                                            {if $href}
+                                                {* ajax *}
+                                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                            {else}
+                                                {$content nofilter}
+                                            {/if}
+                                        </div>
+                                        {/forhook}
+                                    {/capture}
+
+                                {/hookblock}
+
                                 <ul class="nav nav-tabs" id="tabbed-menu">
                                     <li class="active">
                                         <a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
@@ -51,6 +81,7 @@
                                     <li><a href="#association" data-toggle="tab">{intl l="Associations"}</a></li>
                                     <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
                                     <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+                                    {$smarty.capture.content_tab_tab nofilter}
                                     <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
                                 </ul>
 
@@ -61,7 +92,7 @@
                                         <div class="form-container">
 
                                             {form name="thelia.admin.content.modification"}
-                                                <form method="POST" action="{url path='/admin/content/save'}" {form_enctype form=$form} class="clearfix">
+                                                <form method="POST" action="{url path='/admin/content/save'}" {form_enctype} class="clearfix">
 
                                                     {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"}
 
@@ -70,13 +101,13 @@
 
                                                     <input type="hidden" name="current_tab" value="general"/>
 
-                                                    {form_hidden_fields form=$form}
+                                                    {form_hidden_fields}
 
-                                                    {form_field form=$form field='success_url'}
-                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update{$ID}"}"/>
+                                                    {form_field field='success_url'}
+                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update/%id" id=$ID}"/>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='locale'}
+                                                    {form_field field='locale'}
                                                         <input type="hidden" name="{$name}" value="{$edit_language_locale}"/>
                                                     {/form_field}
 
@@ -90,7 +121,9 @@
 
                                                         <div class="col-md-4">
 
-                                                            {form_field form=$form field='default_folder'}
+                                                            {hook name="content.modification.form-right.top" content_id=$content_id}
+
+                                                            {form_field field='default_folder'}
                                                                 <div class="form-group {if $error}has-error{/if}">
 
                                                                     <label for="{$label_attr.for}" class="control-label">
@@ -98,7 +131,7 @@
                                                                     </label>
 
                                                                     <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                                                                        <option value="0">{intl l="Top level"}</option>
+                                                                        <option value="0" disabled>{intl l="Top level"}</option>
 
                                                                         {$myparent=$DEFAULT_FOLDER}
                                                                         {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
@@ -109,7 +142,7 @@
                                                                 </div>
                                                             {/form_field}
 
-                                                            {form_field form=$form field='visible'}
+                                                            {form_field field='visible'}
                                                                 <div class="form-group {if $error}has-error{/if}">
                                                                     <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
 
@@ -121,6 +154,8 @@
                                                                     </div>
                                                                 </div>
                                                             {/form_field}
+
+                                                            {hook name="content.modification.form-right.bottom" content_id=$content_id}
                                                         </div>
                                                     </div>
 
@@ -140,14 +175,14 @@
                                     </div>
 
                                     <div class="tab-pane fade" id="seo">
-                                        {form name="thelia.admin.seo"}
-                                            {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/content/seo/save'}"
-                                            closeUrl = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
-                                            current_id = $content_id
-                                            }
-                                        {/form}
+                                        {include file="includes/seo-tab.html"
+                                            formAction  = "{url path='/admin/content/seo/save'}"
+                                            pageUrl     = "{url path='/admin/content/update'}/$content_id"
+                                            closeUrl    = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                            success_url = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                            current_id  = $content_id
+                                            seoType     = 'content'
+                                        }
                                     </div>
 
                                     <div class="tab-pane fade" id="association">
@@ -155,12 +190,14 @@
                                     </div>
 
                                     <div class="tab-pane fade" id="images">
-                                        {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id}
+                                        {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id resource="admin.content"}
                                     </div>
 
                                     <div class="tab-pane fade" id="documents">
-                                        {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id}
+                                        {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id resource="admin.content"}
                                     </div>
+
+                                    {$smarty.capture.content_tab_content nofilter}
 
                                     <div class="tab-pane fade" id="modules">
                                         <div class="form-container">
@@ -172,8 +209,8 @@
                                             current_tab = "modules"
                                             }
                                         </div>
-
-                                        {include file="includes/module-tab-content.html" location="content-edit"}
+                                        {* ugly fix : {hook name="content.tab-content" id="{$content_id}" view="content"} *}
+                                        {include file="includes/module-tab-content.html" hook="content.tab-content" location="content-edit" id="{$content_id}" view="content"}
                                     </div>
                                 </div>
                             </div>
@@ -181,6 +218,9 @@
                     </div>
                 {/loop}
             </div>
+
+            {hook name="content-edit.bottom" content_id=$content_id}
+
         </div>
     </div>
     {* Delete category confirmation dialog *}
@@ -198,7 +238,7 @@
     dialog_title    = {intl l="Remove associated folder"}
     dialog_message  = {intl l="Do you really want to remove the content from this folder ?"}
 
-form_action     = {url path='/admin/content/folder/delete'}
+form_action     = {token_url path='/admin/content/folder/delete'}
 form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 }
 {/block}
@@ -220,6 +260,17 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
     {/javascripts}
     <script>
         $(function() {
+            // Atomatic ajax tab load, if data-href is defined.
+            $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+                var $this = $(this);
+                $($this.attr('href')).load($this.data('href'), function(ev) {
+                    if($this.data('callback')) {
+                        eval($this.data('callback') + '();');
+                    }
+                });
+
+            });
+
             // Load active tab
 
             $.imageUploadManager.initImageDropZone();
@@ -249,7 +300,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
             // Load content on folder selection
             $('#folder_id').change(function(event) {
                 $.ajax({
-                    url: '{url path="/admin/folder/$folder_id/available-related-content/"}' + $(this).val() + '.xml',
+                    url: '{url path="/admin/folder/%id/available-related-content/" id=$folder_id}' + $(this).val() + '.xml',
                     type: 'get',
                     dataType: 'json',
                     success: function(json) {
@@ -282,5 +333,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='content-edit-js'}
+    {hook name="content.edit-js" location="content-edit-js" content_id={$content_id} }
+
+    {hook name="wysiwyg.js" location="wysiwyg-content-edit-js" }
 {/block}

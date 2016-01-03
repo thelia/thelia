@@ -11,10 +11,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Coupon;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Model\Coupon;
-use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
  * Occurring when a Coupon is created or updated
@@ -105,11 +105,23 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param boolean   $perCustomerUsageCount      Usage count is per customer
      */
     public function __construct(
-        $code, $serviceId, $title, array $effects, $shortDescription, $description,
-        $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative,
-        $isRemovingPostage, $maxUsage, $locale, $freeShippingForCountries, $freeShippingForMethods,
-        $perCustomerUsageCount)
-    {
+        $code,
+        $serviceId,
+        $title,
+        array $effects,
+        $shortDescription,
+        $description,
+        $isEnabled,
+        \DateTime $expirationDate,
+        $isAvailableOnSpecialOffers,
+        $isCumulative,
+        $isRemovingPostage,
+        $maxUsage,
+        $locale,
+        $freeShippingForCountries,
+        $freeShippingForMethods,
+        $perCustomerUsageCount
+    ) {
         $this->code = $code;
         $this->description = $description;
         $this->expirationDate = $expirationDate;
@@ -327,10 +339,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     public function setEffects(array $effects)
     {
-        if (null === $effects['amount']) {
-            throw new InvalidArgumentException('Missing key \'amount\' in Coupon effect ready to be serialized array');
-        }
-        $this->amount = $effects['amount'];
+        // Amount is now optionnal.
+        $this->amount = isset($effects['amount']) ? $effects['amount'] : 0;
+
         $this->effects = $effects;
     }
 
@@ -429,5 +440,4 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 
         return $this;
     }
-
 }

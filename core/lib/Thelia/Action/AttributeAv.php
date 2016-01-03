@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeAv as AttributeAvModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
@@ -55,9 +52,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeAvUpdateEvent $event)
     {
-
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
-
             $attribute
                 ->setDispatcher($event->getDispatcher())
 
@@ -80,9 +75,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function delete(AttributeAvDeleteEvent $event)
     {
-
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
-
             $attribute
                 ->setDispatcher($event->getDispatcher())
                 ->delete()

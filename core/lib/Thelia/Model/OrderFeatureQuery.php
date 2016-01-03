@@ -16,4 +16,5 @@ use Thelia\Model\Base\OrderFeatureQuery as BaseOrderFeatureQuery;
  */
 class OrderFeatureQuery extends BaseOrderFeatureQuery
 {
-} // OrderFeatureQuery
+}
+// OrderFeatureQuery

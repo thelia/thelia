@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Product;
+
 use Thelia\Model\Product;
 
 class ProductSetTemplateEvent extends ProductEvent
@@ -18,7 +19,7 @@ class ProductSetTemplateEvent extends ProductEvent
     protected $template_id = null;
     protected $currency_id = 0;
 
-    public function __construct(Product $product = null, $template_id, $currency_id)
+    public function __construct(Product $product = null, $template_id = null, $currency_id = null)
     {
         parent::__construct($product);
 

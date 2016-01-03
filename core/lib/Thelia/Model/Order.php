@@ -9,6 +9,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
@@ -17,8 +18,11 @@ class Order extends BaseOrder
     protected $choosenDeliveryAddress = null;
     protected $choosenInvoiceAddress = null;
 
+    protected $disableVersioning = false;
+
     /**
-     * @param null $choosenDeliveryAddress
+     * @param Address $choosenDeliveryAddress
+     * @return $this
      */
     public function setChoosenDeliveryAddress($choosenDeliveryAddress)
     {
@@ -28,7 +32,32 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return null
+     * @param boolean $disableVersioning
+     * @return $this
+     */
+    public function setDisableVersioning($disableVersioning)
+    {
+        $this->disableVersioning = (bool) $disableVersioning;
+
+        return $this;
+    }
+
+    public function isVersioningDisable()
+    {
+        return $this->disableVersioning;
+    }
+
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->isVersioningDisable()) {
+            return false;
+        } else {
+            return parent::isVersioningNecessary($con);
+        }
+    }
+
+    /**
+     * @return Address
      */
     public function getChoosenDeliveryAddress()
     {
@@ -36,7 +65,8 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param null $choosenInvoiceAddress
+     * @param Address $choosenInvoiceAddress
+     * @return $this
      */
     public function setChoosenInvoiceAddress($choosenInvoiceAddress)
     {
@@ -46,11 +76,21 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return null
+     * @return Address
      */
     public function getChoosenInvoiceAddress()
     {
         return $this->choosenInvoiceAddress;
+    }
+
+    public function preSave(ConnectionInterface $con = null)
+    {
+        if ($this->isPaid(false) && null === $this->getInvoiceDate()) {
+            $this
+                ->setInvoiceDate(time());
+        }
+
+        return parent::preSave($con);
     }
 
     /**
@@ -69,29 +109,21 @@ class Order extends BaseOrder
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->setRef($this->generateRef())
+            ->setDisableVersioning(true)
             ->save($con);
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
     }
 
-    public function postSave(ConnectionInterface $con = null)
-    {
-        if ($this->isPaid() && null === $this->getInvoiceDate()) {
-            $this
-                ->setInvoiceDate(time())
-                ->save($con);
-        }
-    }
-
     public function generateRef()
     {
-       return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
+        return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
     }
 
     /**
      * Compute this order amount.
      *
-     * The order amount amount is only avaible once the order is persisted in database.
-     * Duting invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     * The order amount is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
      *
      * @param  float|int $tax             (output only) returns the tax amount for this order
      * @param  bool      $includePostage  if true, the postage cost is included to the total
@@ -115,8 +147,9 @@ class Order extends BaseOrder
 
             $taxAmount = $taxAmountQuery->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
                 ->findOne();
-            $amount += ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice()) * $orderProduct->getQuantity();
-            $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();
+            $price = ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice());
+            $amount += $price * $orderProduct->getQuantity();
+            $tax += $taxAmount->getVirtualColumn('total_tax') * $orderProduct->getQuantity();
         }
 
         $total = $amount + $tax;
@@ -134,9 +167,61 @@ class Order extends BaseOrder
 
         if (false !== $includePostage) {
             $total += $this->getPostage();
+            $tax += $this->getPostageTax();
         }
 
         return $total;
+    }
+
+    /**
+     * Compute this order weight.
+     *
+     * The order weight is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @return float
+     */
+    public function getWeight()
+    {
+        $weight = 0;
+
+        /* browse all products */
+        foreach ($this->getOrderProducts() as $orderProduct) {
+            $weight += $orderProduct->getQuantity() * (double)$orderProduct->getWeight();
+        }
+
+        return $weight;
+    }
+
+    /**
+     * Return the postage without tax
+     * @return float|int
+     */
+    public function getUntaxedPostage()
+    {
+        if (0 < $this->getPostageTax()) {
+            $untaxedPostage =  round($this->getPostage() - $this->getPostageTax(), 2);
+        } else {
+            $untaxedPostage = $this->getPostage();
+        }
+        
+        return $untaxedPostage;
+    }
+
+    /**
+     * Check if the current order contains at less 1 virtual product with a file to download
+     *
+     * @return bool true if this order have at less 1 file to download, false otherwise.
+     */
+    public function hasVirtualProduct()
+    {
+        $virtualProductCount = OrderProductQuery::create()
+            ->filterByOrderId($this->getId())
+            ->filterByVirtual(1, Criteria::EQUAL)
+            ->count()
+        ;
+
+        return ($virtualProductCount !== 0);
     }
 
     /**
@@ -168,11 +253,17 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PAID
      *
+     * @param bool $exact if true, the method will check if the current status is exactly OrderStatus::CODE_PAID.
+     * if false, it will check if the order has been paid, whatever the current status is. The default is true.
      * @return bool true if this order is PAID, false otherwise.
      */
-    public function isPaid()
+    public function isPaid($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_PAID);
+        return $this->hasStatusHelper(
+            $exact ?
+            OrderStatus::CODE_PAID :
+            [ OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
+        );
     }
 
     /**
@@ -230,6 +321,24 @@ class Order extends BaseOrder
     }
 
     /**
+     * Set the status of the current order to REFUNDED
+     */
+    public function setRefunded()
+    {
+        $this->setStatusHelper(OrderStatus::CODE_REFUNDED);
+    }
+
+    /**
+     * Check if the current status of this order is REFUNDED
+     *
+     * @return bool true if this order is CANCELED, false otherwise.
+     */
+    public function isRefunded()
+    {
+        return $this->hasStatusHelper(OrderStatus::CODE_REFUNDED);
+    }
+
+    /**
      * Set the status of the current order to the provided status
      *
      * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
@@ -242,14 +351,18 @@ class Order extends BaseOrder
     }
 
     /**
-     * Check if the current status of this order is $statusCode
+     * Check if the current status of this order is $statusCode or, if $statusCode is an array, if the current
+     * status is in the $statusCode array.
      *
-     * @param  string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     * @param  string|array $statusCode the status code, one of OrderStatus::CODE_xxx constants.
      * @return bool   true if this order have the provided status, false otherwise.
      */
     public function hasStatusHelper($statusCode)
     {
-        return $this->getOrderStatus()->getCode() == $statusCode;
+        if (is_array($statusCode)) {
+            return in_array($this->getOrderStatus()->getCode(), $statusCode);
+        } else {
+            return $this->getOrderStatus()->getCode() == $statusCode;
+        }
     }
-
 }

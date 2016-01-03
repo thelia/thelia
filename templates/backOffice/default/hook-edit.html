@@ -1,0 +1,98 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a hook'}{/block}
+
+{block name="check-resource"}admin.hook{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="hooks edit-hook">
+
+    <div id="wrapper" class="container">
+
+        {loop name="hook_edit" type="hook" id="$hook_id" backend_context="1" lang="$edit_language_id"}
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/hooks'}">{intl l="Hooks"}</a></li>
+            <li>{intl l='Editing hook "%name"' name="{$TITLE}"}</li>
+        </ul>
+
+        {hook name="hook-edit.top" hook_id=$hook_id}
+
+        <div class="row">
+            <div class="col-md-12 general-block-decorator">
+                <div class="row">
+
+                    <div class="col-md-12 title title-without-tabs">
+                        {intl l='Edit hook "%name"' name="{$TITLE}"}
+                    </div>
+
+                    <div class="form-container">
+                        <div class="col-md-12">
+
+                            {form name="thelia.admin.hook.modification"}
+                                <form method="POST" action="{url path="/admin/hook/save/%id" id=$ID}" {form_enctype} class="clearfix">
+                                {include
+                                file = "includes/inner-form-toolbar.html"
+                                hide_submit_buttons = false
+
+                                page_url  = {url path="/admin/hook/update/%id" id=$ID}
+                                close_url = {url path="/admin/hooks"}
+                                }
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {* Be sure to get the hook ID, even if the form could not be validated *}
+                                        <input type="hidden" name="hook_id" value="{$hook_id}" />
+
+                                        {form_hidden_fields}
+
+                                        {render_form_field field="success_url" value={url path="/admin/hooks"}}
+                                        {render_form_field field="locale" value={$edit_language_locale}}
+
+                                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                        {render_form_field field='code'}
+                                        {render_form_field field='type'}
+                                        {render_form_field field='by_module'}
+                                        {render_form_field field='block'}
+                                        {render_form_field field='active'}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        {render_form_field field='title'}
+                                        {render_form_field field="chapo"}
+                                        {render_form_field field="description" extra_class="wysiwyg"}
+                                    </div>
+                                    </form>
+                                </div>
+                            {/form}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {hook name="hook-edit.bottom" hook_id=$hook_id}
+
+        {/loop}
+
+        {elseloop rel="hook_edit"}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-error">
+                    {intl l="Sorry, hook ID=%id was not found." id={$hook_id}}
+                </div>
+            </div>
+        </div>
+        {/elseloop}
+
+    </div>
+</div>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="hook.edit-js" location="hook-edit-js" hook_id={$hook_id} }
+    {hook name="wysiwyg.js" location="wysiwyg-hook-edit-js" }
+{/block}

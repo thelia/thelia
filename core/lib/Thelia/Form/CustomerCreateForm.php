@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
@@ -22,11 +21,10 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class CustomerCreateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerCreateForm extends AddressCreateForm
 {
-
     protected function buildForm()
     {
         parent::buildForm();
@@ -46,57 +44,64 @@ class CustomerCreateForm extends AddressCreateForm
                     new Constraints\Callback(array(
                         "methods" => array(
                             array($this,
-                                "verifyExistingEmail")
-                        )
-                    ))
+                                "verifyExistingEmail", ),
+                        ),
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Email Address"),
                 "label_attr" => array(
-                    "for" => "email"
-                )
+                    "for" => "email",
+                ),
             ))
             // Add Login Information
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
                 ),
                 "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array(
-                    "for" => "password"
-                )
+                    "for" => "password",
+                ),
             ))
             ->add("password_confirm", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
                     new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyPasswordField")
-                    )))
+                        array($this, "verifyPasswordField"),
+                    ))),
                 ),
                 "label" => Translator::getInstance()->trans("Password confirmation"),
                 "label_attr" => array(
-                    "for" => "password_confirmation"
-                )
+                    "for" => "password_confirmation",
+                ),
             ))
             // Add Newsletter
             ->add("newsletter", "checkbox", array(
                 "label" => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
                 "label_attr" => array(
-                    "for" => "newsletter"
+                    "for" => "newsletter",
                 ),
-                "required" => false
-            ))
-            // Add terms & conditions
-            ->add("agreed", "checkbox", array(
-                "constraints" => array(
-                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")))
-                ),
-                "label"=>"Test",
-                "label_attr" => array(
-                    "for" => "agreed"
-                )
+                "required" => false,
             ));
+
+        //confirm email
+        if (intval(ConfigQuery::read("customer_confirm_email", 0))) {
+            $this->formBuilder->add("email_confirm", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email(),
+                    new Constraints\Callback(array("methods" => array(
+                        array($this, "verifyEmailField"),
+                    ))),
+                ),
+                "label" => Translator::getInstance()->trans("Confirm Email Address"),
+                "label_attr" => array(
+                    "for" => "email_confirm",
+                ),
+            ));
+        }
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)
@@ -105,6 +110,15 @@ class CustomerCreateForm extends AddressCreateForm
 
         if ($data["password"] != $data["password_confirm"]) {
             $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
+        }
+    }
+
+    public function verifyEmailField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if ($data["email"] != $data["email_confirm"]) {
+            $context->addViolation(Translator::getInstance()->trans("email confirmation is not the same as email field"));
         }
     }
 

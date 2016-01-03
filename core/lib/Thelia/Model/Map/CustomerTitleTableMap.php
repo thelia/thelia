@@ -169,6 +169,7 @@ class CustomerTitleTableMap extends TableMap
     {
         $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), 'RESTRICT', 'RESTRICT', 'Customers');
         $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), 'RESTRICT', 'RESTRICT', 'Addresses');
+        $this->addRelation('OrderAddress', '\\Thelia\\Model\\OrderAddress', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'RESTRICT', 'RESTRICT', 'OrderAddresses');
         $this->addRelation('CustomerTitleI18n', '\\Thelia\\Model\\CustomerTitleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerTitleI18ns');
     } // buildRelations()
 

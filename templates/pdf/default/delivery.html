@@ -15,33 +15,39 @@
 <style>
     h1, h2, h3, h4 {
         color:#f6993c;
+        margin: .5em 0;
     }
 
     h1 {
-        font-size: 60px;
+        font-size: 48px;
+    }
+
+    h2 {
+        font-size: 16px;
     }
 
     h3 {
         font-size: 14px;
     }
 
-    p {
-        font-size: 9px;
+    h4 {
+        color:#58585a;
+        font-size: 12px;
     }
 
     p, td {
         color:#58585a;
+        font-size: 9px;
     }
 
-    li {
-        list-style: none;
+    p {
+        margin: .5em 0;
     }
 
-    footer p{
-        color: #bcbdc0;
+    span {
+        font-size: 9px;
     }
 
-    <!--
     table {
         border-collapse: collapse;
         width: 100%;
@@ -50,6 +56,62 @@
     tr {
         width: 100%;
     }
+
+    td {
+        vertical-align: top;
+    }
+
+    .table-info h3 {
+        font-size: 18px;
+        color: #58585a;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    .table-info h3 span {
+        font-size: 18px;
+        color: #f6993c;
+    }
+
+    .table-1 td {
+        background: #f1f3f4;
+        border:solid 1px #bcbdc0;
+    }
+
+    .table-2 td {
+        border:solid 1px #bcbdc0;
+    }
+
+
+    .table-3-1, .table-3-2 {
+        border: solid 1px #bcbdc0;
+    }
+    .table-3-1 p {
+        font-size: 10px;
+    }
+    .table-3-2 p {
+        font-size: 9px;
+        color: #747475;
+    }
+
+    .table-3-module h3 {
+        margin-top: 1.5em;
+    }
+
+    .table-3-module span {
+        font-size: 11px;
+    }
+
+    .align-left {
+        text-align: left;
+    }
+    .align-center {
+        text-align: center;
+    }
+    .align-right{
+        text-align: right;
+    }
+
     .clear {
         padding: 0.5%;
         border-bottom:solid 1px #dddddd;
@@ -59,105 +121,126 @@
         padding: 0.5%;
     }
 
+    {hook name="delivery.css"}
 </style>
 {/literal}
 <page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
     <page_header>
+        {hook name="delivery.header" order=$order_id}
     </page_header>
 
     <page_footer>
+        {hook name="delivery.footer-top" order=$order_id}
         <table>
-            <col style="width: 80%; padding: 3mm; border: none; text-align: left;" />
-            <col style="width: 20%; padding: 3mm; border: none; text-align: right;" />
+            <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
+            <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
             <tbody>
             <tr>
-                <td>
-                    <h1 style="color:#58585a;font-size:34px;">{intl l="THANK YOU"}</h1>
+		    	<td>
+					{hook name="delivery.imprint" order=$order_id}
+					{elsehook rel="delivery.imprint"}
+		                <!-- Imprint -->
+		                {config key="store_name"}
+		                {$addresses="{config key='store_address1'} {config key='store_address2'} {config key='store_address3'}"}
+		                {$city="{config key='store_zipcode'} {config key='store_city'}"}
+		                {if $addresses != "  "}- {$addresses}{/if}
+		                {if $city != " " }- {$city}{/if}
+		                {if {config key="store_country"} }
+		                {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+		                {/if}
+		                {if {config key="store_business_id"} }
+		                - {config key="store_business_id"}
+		                {/if}
+		                <br>
+		                {if {config key="store_phone"} }
+		                {intl l="Phone: "}{config key="store_phone"}
+		                {/if}
+		                {if {config key="store_email"} }
+		                {intl l="Email: "}{config key="store_email"}
+		                {/if}
+					{/elsehook}
                 </td>
-                <td style="text-align:right;">
-                    <h4>{config key="store_name"}</h4>
-                </td>
-            </tr>
-            <tr>
-                <td><!-- Insérer ici les mentions légales --></td>
                 <td>{intl l="page"} [[page_cu]]/[[page_nb]]</td>
             </tr>
             </tbody>
         </table>
+		{hook name="delivery.footer-bottom" order=$order_id}
     </page_footer>
 
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-    {assign "orderCurrency" $SYMBOL}
-    {/loop}
 
-<table style="padding-top: 5mm;">
-    <col style="width: 50%;" />
-    <col style="width: 50%;" />
+    <table class="table-info">
+        <col style="width: 100%; padding: 0mm;" />
+        <tr>
+            <td>
+                <h1>{intl l="DELIVERY"}</h1>
+            </td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Invoice date"} : <span>{format_date date=$INVOICE_DATE output="date"}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Invoice REF"} : <span>{$REF}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>
+        </tr>
+        {hookblock name="delivery.information" order=$order_id fields="title,value"}
+        {forhook rel="delivery.information"}
+        <tr>
+            <td><h3>{$title} : <span>{$value}</span></h3></td>
+        </tr>
+        {/forhook}
+        {/hookblock}
+    </table>
+	
+	{hook name="delivery.after-information" order=$order_id}
 
-    <tr >
-        <td colspan="2">
-            <h1>{intl l="DELIVERY"}</h1>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <h3>{intl l="Invoice date"}</h3>
-            <p>{format_date date=$INVOICE_DATE}</p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <h3>{intl l="Invoice REF"}</h3>
-            <p>{$REF}</p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <h3>{intl l="Custmer Number"}</h3>
-            <p>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</p>
-        </td>
-    </tr>
-
-    <tr>
-        <td class="clear" colspan="2"></td>
-        <td class="clear"></td>
-    </tr>
-    <tr>
-        <td class="clear-none" colspan="2"></td>
-        <td class="clear-none"></td>
-    </tr>
-
-    <tr>
-        <td style="border-left:solid 3px #f6993c;" >
-            <h3 style="margin-left:1%">{intl l="delivery adress"}</h3>
-            <p style="margin-left:1%">
-                {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                {$ZIPCODE} {$CITY}<br/>
-                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-                {/loop}
-            </p>
-        </td>
-        <td style="border-left:solid 3px #f6993c;">
-            <h3 style="margin-left:1%">{intl l="invoice address"}</h3>
-            <p style="margin-left:1%">
-                {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
-                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                {$ZIPCODE} {$CITY}<br/>
-                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-                {/loop}
-            </p>
-        </td>
-    </tr>
+    <table class="table-address">
+        <col style="width: 50%; padding: 3mm;" />
+        <col style="padding: 3mm;" />
+        <tr>
+            <td style="border-left: solid 1mm #f6993c;" >
+                <h3>{intl l="Delivery address"}</h3>
+				{ifhook rel="delivery.delivery-address"}
+                {* delivery module can customize the delivery address *}
+                {hook name="delivery.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+                {/ifhook}
+                {elsehook rel="delivery.delivery-address"}                
+				<p>
+                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
+                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                    {$ZIPCODE} {$CITY}<br/>
+                    {loop type="country" visible="*" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}
+                    {/loop}
+                </p>
+                {/elsehook}
+            </td>
+            <td style="border-left: solid 1mm #f6993c;">
+                <h3>{intl l="Invoice address"}</h3>
+                <p>
+                    {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
+                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                    {$ZIPCODE} {$CITY}<br/>
+                    {loop type="country" visible="*" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                    -{if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}
+                    {/loop}
+                </p>
+            </td>
+        </tr>
     </table>
 
+    {hook name="delivery.after-addresses" order=$order_id}
+
     <table style="padding-top: 5mm;">
-        <col style="width: 40%; padding: 3mm;" />
-        <col style="width: 40%; padding: 3mm;" />
-        <col style="width: 20%; padding: 3mm;" />
+        <col style="width: 23%; padding: 3mm;" />
+        <col style="width: 65%; padding: 3mm;" />
+        <col style="width: 12%; padding: 3mm;" />
         <tr>
             <td style="border:solid 1px #dddddd;background:#f1f3f4;" >
                 <h3 style="color:#58585a;">{intl l="Ref"}</h3>
@@ -166,7 +249,7 @@
                 <h3 style="color:#58585a;">{intl l="product"}</h3>
             </td>
             <td style="border:solid 1px #dddddd;background-color:#f6993c;">
-                <h3 style="color:white;">{intl l="Quantity"}</h3>
+                <h3 style="color:white; text-align:center;">{intl l="Quantity"}</h3>
             </td>
         </tr>
         {loop type="order_product" name="order-products" order=$ID}
@@ -176,23 +259,39 @@
             </td>
             <td style="border:solid 1px #dddddd;">
                 <p>{$TITLE}</p>
+                    {ifloop rel="combinations"}
+                    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                        {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
+                    {/loop}
+                    {/ifloop}
             </td>
-            <td style="border:solid 1px #dddddd;">
+            <td style="border:solid 1px #dddddd; text-align:center;">
                 <p>{$QUANTITY}</p>
             </td>
         </tr>
+
+            {hook name="delivery.order-product" order="{$order_id}" order_product="{$ID}"}
         {/loop}
+    </table>
 
-    <tr>
-        <td style="border-left:solid 3px #f6993c;padding-top: 2mm">
-            <h3>{intl l='Delivery module'}</h3>
-            <p>{$DELIVERY_REF}</p>
-        </td>
-    </tr>
-    <tr>
-        <td class="clear-none"></td>
-    </tr>
+    <table style="padding-top: 5mm;">
+        <col style="width: 40%; padding: 3mm;" />
+        <tr>
+            <td  class="table-3-module" style="border-left:solid 3px #f6993c; padding-top: 2mm">
+                <h3>{intl l="Delivery module"}</h3>
+                <p>
+                    <span>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</span>
+                </p>
 
-</table>
+                {hook name="delivery.after-delivery-module" order=$order_id module_id=$DELIVERY_MODULE}
+            </td>
+        </tr>
+        <tr>
+            <td class="clear-none"></td>
+        </tr>
+    </table>
+
+{hook name="delivery.after-summary" order=$order_id}
+
 {/loop}
 </page>

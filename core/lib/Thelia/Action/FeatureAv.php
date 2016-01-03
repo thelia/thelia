@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureAv as FeatureAvModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
@@ -55,9 +52,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureAvUpdateEvent $event)
     {
-
         if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
-
             $feature
                 ->setDispatcher($event->getDispatcher())
 
@@ -80,9 +75,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function delete(FeatureAvDeleteEvent $event)
     {
-
         if (null !== ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
-
             $feature
                 ->setDispatcher($event->getDispatcher())
                 ->delete()

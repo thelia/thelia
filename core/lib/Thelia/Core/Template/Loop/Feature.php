@@ -16,13 +16,12 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\FeatureI18nQuery;
 use Thelia\Model\FeatureQuery;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -30,6 +29,7 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\Map\FeatureTemplateTableMap;
+use Thelia\Model\Feature as FeatureModel;
 
 /**
  *
@@ -39,6 +39,16 @@ use Thelia\Model\Map\FeatureTemplateTableMap;
  * Class Feature
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProduct()
+ * @method int[] getTemplate()
+ * @method int[] getExcludeTemplate()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string getTitle()
+ * @method string[] getOrder()
  */
 class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -90,29 +100,34 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $visible = $this->getVisible();
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
-        $exclude_template = $this->getExcludeTemplate();
+        $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useFeaturePosition = true;
 
         if (null !== $product) {
-
             // Find all template assigned to the products.
             $products = ProductQuery::create()->findById($product);
 
             // Ignore if the product cannot be found.
             if ($products !== null) {
-
                 // Create template array
-                if ($template == null) $template = array();
+                if ($template == null) {
+                    $template = array();
+                }
 
+                /** @var ProductModel $product */
                 foreach ($products as $product) {
-                    $tpl_id = $product->getTemplateId();
+                    $tplId = $product->getTemplateId();
 
-                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                    if (! is_null($tplId)) {
+                        $template[] = $tplId;
+                    }
                 }
             }
 
@@ -124,7 +139,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (! empty($template)) {
-
             // Join with feature_template table to get position
             $search
                 ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
@@ -134,16 +148,13 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             $this->useFeaturePosition = false;
         }
 
-        if (null !== $exclude_template) {
-            $exclude_features = FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find();
-
+        if (null !== $excludeTemplate) {
             $search
-                ->joinFeatureTemplate(null, Criteria::LEFT_JOIN)
-                ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
-                ->filterById($exclude_features, Criteria::NOT_IN)
+                ->filterById(
+                    FeatureTemplateQuery::create()->filterByTemplateId($excludeTemplate)->select('feature_id')->find(),
+                    Criteria::NOT_IN
+                )
             ;
-
-            $this->useFeaturePosition = false;
         }
 
         $title = $this->getTitle();
@@ -180,43 +191,44 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if ($this->useFeaturePosition)
+                    if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::ASC);
-                     else
+                    } else {
                         $search->addAscendingOrderByColumn(FeatureTemplateTableMap::POSITION);
+                    }
                     break;
                 case "manual_reverse":
-                    if ($this->useFeaturePosition)
+                    if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::DESC);
-                     else
+                    } else {
                         $search->addDescendingOrderByColumn(FeatureTemplateTableMap::POSITION);
+                    }
                     break;
             }
-
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var FeatureModel $feature */
         foreach ($loopResult->getResultDataCollection() as $feature) {
             $loopResultRow = new LoopResultRow($feature);
             $loopResultRow->set("ID", $feature->getId())
-                ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $feature->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $feature->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'))
             ;
+            $this->addOutputFields($loopResultRow, $feature);
 
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

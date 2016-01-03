@@ -1,0 +1,7 @@
+<nav class="nav-footer" role="navigation">
+    <ul class="list-unstyled list-inline">
+        {loop name="footer_links" type="content" folder=$bottomFolderId limit=4}
+        <li><a href="{$URL}">{$TITLE}</a></li>
+        {/loop}
+    </ul>
+</nav>

@@ -14,8 +14,10 @@ namespace Thelia\TaxEngine;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\State;
 
 /**
  * Class TaxEngine
@@ -26,6 +28,7 @@ use Thelia\Core\HttpFoundation\Request;
 class TaxEngine
 {
     protected $taxCountry = null;
+    protected $taxState = null;
     protected $typeList = null;
 
     protected $taxTypesDirectories = array();
@@ -34,6 +37,7 @@ class TaxEngine
      * @var Session $session
      */
     protected $session = null;
+
 
     public function __construct(Request $request)
     {
@@ -69,18 +73,14 @@ class TaxEngine
     public function getTaxTypeList()
     {
         if ($this->typeList === null) {
-
             $this->typeList = array();
 
             foreach ($this->taxTypesDirectories as $namespace => $directory) {
-
                 try {
                     $directoryIterator = new \DirectoryIterator($directory);
 
                     foreach ($directoryIterator as $fileinfo) {
-
                         if ($fileinfo->isFile()) {
-
                             $fileName  = $fileinfo->getFilename();
                             $className = substr($fileName, 0, (1+strlen($fileinfo->getExtension())) * -1);
 
@@ -112,29 +112,51 @@ class TaxEngine
      * Then look at the current customer default address country
      * Else look at the default website country
 
-     * @return null|TaxEngine
+     * @return null|Country
      */
     public function getDeliveryCountry()
     {
         if (null === $this->taxCountry) {
-
             /* is there a logged in customer ? */
             if (null !== $customer = $this->session->getCustomerUser()) {
                 if (null !== $this->session->getOrder()
                         && null !== $this->session->getOrder()->getChoosenDeliveryAddress()
                         && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->session->getOrder()->getChoosenDeliveryAddress())) {
                     $this->taxCountry = $currentDeliveryAddress->getCountry();
+                    $this->taxState = $currentDeliveryAddress->getState();
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();
                     $this->taxCountry = $customerDefaultAddress->getCountry();
+                    $this->taxState = $customerDefaultAddress->getState();
                 }
             }
 
             if (null == $this->taxCountry) {
                 $this->taxCountry = CountryQuery::create()->findOneByByDefault(1);
+                $this->taxState = null;
             }
         }
 
         return $this->taxCountry;
+    }
+
+    /**
+     * Find Tax State Id
+     *
+     * First look for a picked delivery address state
+     * Then look at the current customer default address state
+     * Else null
+
+     * @return null|State
+     * @since 2.3.0-alpha1
+     */
+    public function getDeliveryState()
+    {
+        if (null === $this->taxCountry) {
+            /* is there a logged in customer ? */
+            $this->getDeliveryCountry();
+        }
+
+        return $this->taxState;
     }
 }

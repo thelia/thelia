@@ -1,0 +1,10 @@
+{
+    "name": "thelia/frontoffice-default-template",
+    "type": "thelia-frontoffice-template",
+    "require": {
+        "thelia/installer": "~1.1"
+    },
+    "extra": {
+        "installer-name": "default"
+    }
+}

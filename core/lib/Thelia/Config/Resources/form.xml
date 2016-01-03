@@ -31,6 +31,7 @@
         <form name="thelia.admin.category.document.modification" class="Thelia\Form\CategoryDocumentModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.clone" class="Thelia\Form\ProductCloneForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
         <form name="thelia.admin.product.details.modification" class="Thelia\Form\ProductDetailsModificationForm"/>
         <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
@@ -51,6 +52,11 @@
         <form name="thelia.admin.content.modification" class="Thelia\Form\ContentModificationForm"/>
         <form name="thelia.admin.content.image.modification" class="Thelia\Form\ContentImageModification"/>
         <form name="thelia.admin.content.document.modification" class="Thelia\Form\ContentDocumentModification"/>
+
+        <form name="thelia.admin.brand.creation" class="Thelia\Form\Brand\BrandCreationForm"/>
+        <form name="thelia.admin.brand.modification" class="Thelia\Form\Brand\BrandModificationForm"/>
+        <form name="thelia.admin.brand.image.modification" class="Thelia\Form\Brand\BrandImageModification"/>
+        <form name="thelia.admin.brand.document.modification" class="Thelia\Form\Brand\BrandDocumentModification"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
@@ -78,6 +84,7 @@
         <form name="thelia.admin.feature.modification" class="Thelia\Form\FeatureModificationForm"/>
 
         <form name="thelia.admin.attributeav.creation" class="Thelia\Form\AttributeAvCreationForm"/>
+        <form name="thelia.admin.attributeav.modification" class="Thelia\Form\AttributeAvCreationForm"/>
 
         <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
 
@@ -105,12 +112,18 @@
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
 
+        <form name="thelia.admin.state.creation" class="Thelia\Form\State\StateCreationForm"/>
+        <form name="thelia.admin.state.modification" class="Thelia\Form\State\StateModificationForm"/>
+
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
         <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>
+        <form name="thelia.admin.area.delete.country" class="Thelia\Form\Area\AreaDeleteCountryForm"/>
         <form name="thelia.admin.area.postage" class="Thelia\Form\Area\AreaPostageForm"/>
 
+        <!-- thelia.shopping_zone_area is a typo, and will be removed in a future version -->
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
+        <form name="thelia.shipping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
 
         <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>
@@ -122,10 +135,29 @@
         <form name="thelia.system-logs.configuration" class="Thelia\Form\SystemLogConfigurationForm"/>
 
         <form name="thelia.admin.module.modification" class="Thelia\Form\ModuleModificationForm"/>
+        <form name="thelia.admin.module.image.modification" class="Thelia\Form\ModuleImageModification"/>
+        <form name="thelia.admin.module.install" class="Thelia\Form\ModuleInstallForm"/>
+
+        <form name="thelia.admin.hook.creation" class="Thelia\Form\HookCreationForm"/>
+        <form name="thelia.admin.hook.modification" class="Thelia\Form\HookModificationForm"/>
+
+        <form name="thelia.admin.module-hook.creation" class="Thelia\Form\ModuleHookCreationForm"/>
+        <form name="thelia.admin.module-hook.modification" class="Thelia\Form\ModuleHookModificationForm"/>
 
         <form name="thelia.cache.flush" class="Thelia\Form\Cache\CacheFlushForm"/>
         <form name="thelia.assets.flush" class="Thelia\Form\Cache\AssetsFlushForm"/>
         <form name="thelia.images-and-documents-cache.flush" class="Thelia\Form\Cache\ImagesAndDocumentsCacheFlushForm"/>
+
+        <form name="thelia.export" class="Thelia\Form\ExportForm" />
+        <form name="thelia.import" class="Thelia\Form\ImportForm" />
+
+        <form name="thelia.admin.sale.creation" class="Thelia\Form\Sale\SaleCreationForm"/>
+        <form name="thelia.admin.sale.modification" class="Thelia\Form\Sale\SaleModificationForm"/>
+
+        <form name="thelia.empty" class="Thelia\Form\EmptyForm"/>
+
+        <form name="thelia_api_create" class="Thelia\Form\Api\ApiCreateForm"/>
+        <form name="thelia_api_update" class="Thelia\Form\Api\ApiUpdateForm"/>
 
     </forms>
 

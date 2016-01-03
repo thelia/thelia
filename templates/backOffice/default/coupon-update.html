@@ -18,21 +18,18 @@
                 <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
                 <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
                 <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
-                <li>{intl l='Editing coupon "%title"' title="$couponCode"}</li>
+                <li>{intl l='Editing coupon "%title"' title="{$couponCode}"}</li>
             </ul>
         </nav>
 
         {form name="thelia.admin.coupon.creation"}
-            {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noConditions=false title={intl l='Editing coupon "%title"' title=$couponCode}}
+            {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=false title={intl l='Editing coupon "%title"' title={$couponCode}}}
         {/form}
     </div> <!-- #wrapper -->
 </div>
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
 
     {javascripts file='assets/js/json2.js'}
         <script src="{$asset_url}"></script>
@@ -47,22 +44,32 @@
         $(function($){
 
             // Url alowing to get coupon inputs
-            $.couponManager.urlAjaxSaveConditions = '{$urlAjaxSaveConditions}';
-            $.couponManager.urlAjaxDeleteConditions = '{$urlAjaxDeleteConditions}';
-            $.couponManager.urlAjaxGetConditionSummaries = '{$urlAjaxGetConditionSummaries}';
-            $.couponManager.urlAjaxAdminCouponDrawInputs = '{$urlAjaxAdminCouponDrawInputs}';
-            $.couponManager.urlAjaxGetConditionInputFromServiceId = '{$urlAjaxGetConditionInputFromServiceId}';
-            $.couponManager.urlAjaxGetConditionInputFromConditionInterface = '{$urlAjaxGetConditionInputFromConditionInterface}';
-            $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again'}';
-            $.couponManager.intlPleaseSelectAnotherCondition = '{intl l='Please select another condition'}';
-            $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?'}';
-            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?'}';
+            $.couponManager.urlAjaxSaveConditions = '{$urlAjaxSaveConditions nofilter}';
+            $.couponManager.urlAjaxDeleteConditions = '{$urlAjaxDeleteConditions nofilter}';
+            $.couponManager.urlAjaxGetConditionSummaries = '{$urlAjaxGetConditionSummaries nofilter}';
+            $.couponManager.urlAjaxAdminCouponDrawInputs = '{$urlAjaxAdminCouponDrawInputs nofilter}';
+            $.couponManager.urlAjaxGetConditionInputFromServiceId = '{$urlAjaxGetConditionInputFromServiceId nofilter}';
+            $.couponManager.urlAjaxGetConditionInputFromConditionInterface = '{$urlAjaxGetConditionInputFromConditionInterface nofilter}';
+            $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again' js=1}';
+            $.couponManager.intlPleaseSelectAnotherCondition = '{intl l='Please select another condition' js=1}';
+            $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?' js=1}';
+            $.couponManager.intlDoYouReallyWantToDeleteThisCondition = '{intl l='Do you really want to delete this condition ?' js=1}';
 
             $('#condition-save-btn').hide();
+
+            // Invoke the coupon setup function if defined.
+            try {
+                couponInputFormSetup();
+            }
+            catch (ex) {
+                // Ignore the error
+            }
         });
     </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='coupon-update-js'}
+    {hook name="coupon.update-js" location="coupon-update-js" coupon_id={$couponId} }
+
+    {hook name="wysiwyg.js" location="wysiwyg-coupon-update-js" }
 {/block}

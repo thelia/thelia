@@ -14,9 +14,10 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\MailingSystemModificationForm;
 use Thelia\Model\ConfigQuery;
 
 class MailingSystemController extends BaseAdminController
@@ -25,7 +26,9 @@ class MailingSystemController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // Hydrate the form abd pass it to the parser
         $data = array(
@@ -41,7 +44,7 @@ class MailingSystemController extends BaseAdminController
         );
 
         // Setup the object form
-        $form = new MailingSystemModificationForm($this->getRequest(), "form", $data);
+        $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION, "form", $data);
 
         // Pass it to the parser
         $this->getParserContext()->addForm($form);
@@ -53,15 +56,16 @@ class MailingSystemController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
         // Create the form from the request
-        $form = new MailingSystemModificationForm($this->getRequest());
+        $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION);
 
         try {
-
             // Check the form against constraints violations
             $formData = $this->validateForm($form, "POST");
 
@@ -80,7 +84,7 @@ class MailingSystemController extends BaseAdminController
             $this->dispatch(TheliaEvents::MAILING_SYSTEM_UPDATE, $event);
 
             // Redirect to the success URL
-            $this->redirectToRoute("admin.configuration.mailing-system.view");
+            $response = $this->generateRedirectFromRoute("admin.configuration.mailing-system.view");
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -89,14 +93,64 @@ class MailingSystemController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("mailing system modification", array()),
-            $error_msg,
-            $form,
-            $ex
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("mailing system modification", array()),
+                $error_msg,
+                $form,
+                $ex
+            );
+
+            // At this point, the form has errors, and should be redisplayed.
+            $response = $this->render('mailing-system');
+        }
+
+        return $response;
+    }
+
+    public function testAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $contactEmail = ConfigQuery::read('store_email');
+        $storeName = ConfigQuery::read('store_name', 'Thelia');
+
+        $json_data = array(
+            "success" => false,
+            "message" => "",
         );
 
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->render('mailing-system');
+        if ($contactEmail) {
+            $emailTest = $this->getRequest()->get("email", $contactEmail);
+
+            $message = $this->getTranslator()->trans("Email test from : %store%", array("%store%" => $storeName));
+
+            $htmlMessage = "<p>$message</p>";
+
+            $instance = \Swift_Message::newInstance()
+                ->addTo($emailTest, $storeName)
+                ->addFrom($contactEmail, $storeName)
+                ->setSubject($message)
+                ->setBody($message, 'text/plain')
+                ->setBody($htmlMessage, 'text/html')
+            ;
+
+            try {
+                $this->getMailer()->send($instance);
+                $json_data["success"] = true;
+                $json_data["message"] = $this->getTranslator()->trans("Your configuration seems to be ok. Checked out your mailbox : %email%", array("%email%" => $emailTest));
+            } catch (\Exception $ex) {
+                $json_data["message"] = $ex->getMessage();
+            }
+        } else {
+            $json_data["message"] = $this->getTranslator()->trans("You have to configure your store email first !");
+        }
+
+        $response = JsonResponse::create($json_data);
+
+        return $response;
     }
 }

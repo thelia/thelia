@@ -17,13 +17,12 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\ResourceQuery;
 use Thelia\Type;
+use Thelia\Model\Resource as ResourceModel;
 
 /**
  *
@@ -33,6 +32,10 @@ use Thelia\Type;
  * Class Resource
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getProfile()
+ * @method string[] getCode()
  */
 class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -78,18 +81,18 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
         $search->orderById(Criteria::ASC);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var ResourceModel $resource */
         foreach ($loopResult->getResultDataCollection() as $resource) {
             $loopResultRow = new LoopResultRow($resource);
             $loopResultRow->set("ID", $resource->getId())
-                ->set("IS_TRANSLATED",$resource->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("CODE",$resource->getCode())
-                ->set("TITLE",$resource->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $resource->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("CODE", $resource->getCode())
+                ->set("TITLE", $resource->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $resource->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $resource->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))
@@ -105,10 +108,11 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
             }
 
+            $this->addOutputFields($loopResultRow, $resource);
+
             $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
-
     }
 }

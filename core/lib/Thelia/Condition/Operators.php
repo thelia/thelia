@@ -24,21 +24,21 @@ use Thelia\Core\Translation\Translator;
 abstract class Operators
 {
     /** Param1 is inferior to Param2 */
-    CONST INFERIOR          =    '<';
+    const INFERIOR          =    '<';
     /** Param1 is inferior to Param2 */
-    CONST INFERIOR_OR_EQUAL =    '<=';
+    const INFERIOR_OR_EQUAL =    '<=';
     /** Param1 is equal to Param2 */
-    CONST EQUAL             =     '==';
+    const EQUAL             =     '==';
     /** Param1 is superior to Param2 */
-    CONST SUPERIOR_OR_EQUAL =     '>=';
+    const SUPERIOR_OR_EQUAL =     '>=';
     /** Param1 is superior to Param2 */
-    CONST SUPERIOR          =     '>';
+    const SUPERIOR          =     '>';
     /** Param1 is different to Param2 */
-    CONST DIFFERENT         =     '!=';
+    const DIFFERENT         =     '!=';
     /** Param1 is in Param2 */
-    CONST IN                =     'in';
+    const IN                =     'in';
     /** Param1 is not in Param2 */
-    CONST OUT               =     'out';
+    const OUT               =     'out';
 
     /**
      * Get operator translation
@@ -52,63 +52,55 @@ abstract class Operators
     {
         $ret = $operator;
         switch ($operator) {
-        case self::INFERIOR:
-            $ret = $translator->trans(
-                'Less than',
-                [],
-                'condition'
-            );
-            break;
-        case self::INFERIOR_OR_EQUAL:
-            $ret = $translator->trans(
-                'Less than or equals',
-                [],
-                'condition'
-            );
-            break;
-        case self::EQUAL:
-            $ret = $translator->trans(
-                'Equal to',
-                [],
-                'condition'
-            );
-            break;
-        case self::SUPERIOR_OR_EQUAL:
-            $ret = $translator->trans(
-                'Greater than or equals',
-                [],
-                'condition'
-            );
-            break;
-        case self::SUPERIOR:
-            $ret = $translator->trans(
-                'Greater than',
-                [],
-                'condition'
-            );
-            break;
-        case self::DIFFERENT:
-            $ret = $translator->trans(
-                'Not equal to',
-                [],
-                'condition'
-            );
-            break;
-        case self::IN:
-            $ret = $translator->trans(
-                'In',
-                [],
-                'condition'
-            );
-            break;
-        case self::OUT:
-            $ret = $translator->trans(
-                'Not in',
-                [],
-                'condition'
-            );
-            break;
-        default:
+            case self::INFERIOR:
+                $ret = $translator->trans(
+                    'Less than',
+                    []
+                );
+                break;
+            case self::INFERIOR_OR_EQUAL:
+                $ret = $translator->trans(
+                    'Less than or equals',
+                    []
+                );
+                break;
+            case self::EQUAL:
+                $ret = $translator->trans(
+                    'Equal to',
+                    []
+                );
+                break;
+            case self::SUPERIOR_OR_EQUAL:
+                $ret = $translator->trans(
+                    'Greater than or equals',
+                    []
+                );
+                break;
+            case self::SUPERIOR:
+                $ret = $translator->trans(
+                    'Greater than',
+                    []
+                );
+                break;
+            case self::DIFFERENT:
+                $ret = $translator->trans(
+                    'Not equal to',
+                    []
+                );
+                break;
+            case self::IN:
+                $ret = $translator->trans(
+                    'In',
+                    []
+                );
+                break;
+            case self::OUT:
+                $ret = $translator->trans(
+                    'Not in',
+                    []
+                );
+                break;
+            default:
         }
 
         return $ret;

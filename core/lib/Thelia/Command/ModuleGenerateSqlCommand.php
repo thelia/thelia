@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateSqlCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateSqlCommand extends BaseModuleGenerate
 {
@@ -44,7 +44,7 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . DS . $this->module;
+        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
 
         $fs = new Filesystem();
 
@@ -70,10 +70,9 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
 
         $output->renderBlock(array(
             '',
-            'Sql generated successfuly',
+            'Sql generated successfully',
             'File available in your module config directory',
             ''
         ), 'bg=green;fg=black');
-
     }
 }

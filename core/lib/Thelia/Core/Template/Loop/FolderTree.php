@@ -11,14 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\FolderQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -34,6 +33,12 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getFolder()
+ * @method int getDepth()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
  */
 class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -43,17 +48,19 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-                Argument::createIntTypeArgument('folder', null, true),
-                Argument::createIntTypeArgument('depth', PHP_INT_MAX),
-                Argument::createBooleanOrBothTypeArgument('visible', true, false),
-                Argument::createIntListTypeArgument('exclude', array())
+            Argument::createIntTypeArgument('folder', null, true),
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
+            Argument::createIntListTypeArgument('exclude', array())
         );
     }
 
     // changement de rubrique
-    protected function buildFolderTree($parent, $visible, $level, $max_level, $exclude, &$resultsList)
+    protected function buildFolderTree($parent, $visible, $level, $maxLevel, $exclude, &$resultsList)
     {
-        if ($level > $max_level) return;
+        if ($level > $maxLevel) {
+            return;
+        }
 
         $search = FolderQuery::create();
 
@@ -63,27 +70,30 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $search->filterByParent($parent);
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
-        if ($exclude != null) $search->filterById($exclude, Criteria::NOT_IN);
+        if ($exclude != null) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
 
         $search->orderByPosition(Criteria::ASC);
 
         $results = $search->find();
 
         foreach ($results as $result) {
-
             $resultsList[] = array(
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                 "PARENT" => $result->getParent(),
-                "URL" => $result->getUrl($this->locale),
+                "URL" => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
                 "VISIBLE" => $result->getVisible() ? "1" : "0",
                 "LEVEL" => $level,
                 'CHILD_COUNT' => $result->countChild(),
             );
 
-            $this->buildFolderTree($result->getId(), $visible, 1 + $level, $max_level, $exclude, $resultsList);
+            $this->buildFolderTree($result->getId(), $visible, 1 + $level, $maxLevel, $exclude, $resultsList);
         }
     }
 

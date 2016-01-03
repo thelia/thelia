@@ -11,12 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Lang;
+
 use Thelia\Core\Event\ActionEvent;
 
 /**
  * Class LangDefaultBehaviorEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangDefaultBehaviorEvent extends ActionEvent
 {
@@ -45,5 +46,4 @@ class LangDefaultBehaviorEvent extends ActionEvent
     {
         return $this->defaultBehavior;
     }
-
 }

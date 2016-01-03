@@ -82,13 +82,15 @@ abstract class OrderProductTax implements ActiveRecordInterface
 
     /**
      * The value for the amount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $amount;
 
     /**
      * The value for the promo_amount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $promo_amount;
 
@@ -118,10 +120,24 @@ abstract class OrderProductTax implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->amount = '0.000000';
+        $this->promo_amount = '0.000000';
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\OrderProductTax object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -422,7 +438,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Get the [amount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getAmount()
     {
@@ -433,7 +449,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Get the [promo_amount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPromoAmount()
     {
@@ -572,13 +588,13 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Set the value of [amount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\OrderProductTax The current object (for fluent API support)
      */
     public function setAmount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->amount !== $v) {
@@ -593,13 +609,13 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Set the value of [promo_amount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\OrderProductTax The current object (for fluent API support)
      */
     public function setPromoAmount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->promo_amount !== $v) {
@@ -663,6 +679,14 @@ abstract class OrderProductTax implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->amount !== '0.000000') {
+                return false;
+            }
+
+            if ($this->promo_amount !== '0.000000') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -703,10 +727,10 @@ abstract class OrderProductTax implements ActiveRecordInterface
             $this->description = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderProductTaxTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->amount = (null !== $col) ? (double) $col : null;
+            $this->amount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderProductTaxTableMap::translateFieldName('PromoAmount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->promo_amount = (null !== $col) ? (double) $col : null;
+            $this->promo_amount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderProductTaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -1428,6 +1452,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

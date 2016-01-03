@@ -26,7 +26,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-
     public $kernel;
 
     public function __construct(KernelInterface $kernel)
@@ -34,6 +33,8 @@ class Application extends BaseApplication
         $this->kernel = $kernel;
 
         parent::__construct("Thelia", Thelia::THELIA_VERSION);
+
+        $this->kernel->boot();
 
         $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
@@ -53,13 +54,15 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
+        /** @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->setDispatcher($eventDispatcher);
+
         return parent::doRun($input, $output);
     }
 
     protected function registerCommands()
     {
-        $this->kernel->boot();
-
         $container = $this->kernel->getContainer();
 
         foreach ($container->getParameter("command.definition") as $command) {
@@ -69,6 +72,5 @@ class Application extends BaseApplication
                 $this->add($r->newInstance());
             }
         }
-
     }
 }

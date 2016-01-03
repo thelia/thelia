@@ -11,25 +11,44 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Type\EnumType;
 use Thelia\Log\Tlog;
 
 /**
  * The document loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method bool|string getVisible()
+ * @method int getLang()
+ * @method int getCategory()
+ * @method int getProduct()
+ * @method int getFolder()
+ * @method int getContent()
+ * @method string getSource()
+ * @method int getSourceId()
+ * @method bool getNewsletter()
+ * @method string getQueryNamespace()
+ * @method string[] getOrder()
  */
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -39,9 +58,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     protected $timestampable = true;
 
     /**
-     * @var array Possible document sources
+     * @var array Possible standard document sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content');
+    protected $possible_sources = array('category', 'product', 'folder', 'content', 'brand');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -49,31 +68,25 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         $collection = new ArgumentCollection(
-
-                Argument::createIntListTypeArgument('id'),
-                Argument::createIntListTypeArgument('exclude'),
-                new Argument(
-                        'order',
-                        new TypeCollection(
-                                new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
-                        ),
-                        'manual'
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanOrBothTypeArgument('visible', 1),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
                 ),
-                Argument::createIntTypeArgument('lang'),
-
-                Argument::createIntTypeArgument('category'),
-                Argument::createIntTypeArgument('product'),
-                Argument::createIntTypeArgument('folder'),
-                Argument::createIntTypeArgument('content'),
-
-                new Argument(
-                        'source',
-                        new TypeCollection(
-                                new EnumType($this->possible_sources)
-                        )
-                ),
-                Argument::createIntTypeArgument('source_id'),
-                Argument::createBooleanTypeArgument('force_return', true)
+                'manual'
+            ),
+            Argument::createIntTypeArgument('lang'),
+            Argument::createIntTypeArgument('category'),
+            Argument::createIntTypeArgument('product'),
+            Argument::createIntTypeArgument('folder'),
+            Argument::createIntTypeArgument('content'),
+            Argument::createAnyTypeArgument('source'),
+            Argument::createIntTypeArgument('source_id'),
+            Argument::createBooleanTypeArgument('force_return', true),
+            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model')
         );
 
         // Add possible document sources
@@ -95,7 +108,13 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $object = ucfirst($source);
 
-        $queryClass   = sprintf("\Thelia\Model\%sDocumentQuery", $object);
+        $ns = $this->getQueryNamespace();
+
+        if ('\\' !== $ns[0]) {
+            $ns = '\\'.$ns;
+        }
+
+        $queryClass   = sprintf("%s\\%sDocumentQuery", $ns, $object);
         $filterMethod = sprintf("filterBy%sId", $object);
 
         // xxxDocumentQuery::create()
@@ -151,12 +170,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         $source = $this->getSource();
 
         if (! is_null($source)) {
-
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
             if (is_null($source_id) && is_null($id)) {
-                            throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
+                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -166,11 +184,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
-
                 $argValue = intval($this->getArgValue($source));
 
                 if ($argValue > 0) {
-
                     $search = $this->createSearchQuery($source, $argValue);
 
                     $object_type = $source;
@@ -181,8 +197,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if ($search == null)
+        if ($search == null) {
             throw new \InvalidArgumentException(sprintf("Unable to find document source. Valid sources are %s", implode(',', $this->possible_sources)));
+        }
 
         return $search;
     }
@@ -192,6 +209,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         // Select the proper query to use, and get the object type
         $this->objectType = $this->objectId = null;
 
+        /** @var ProductDocumentQuery $search */
         $search = $this->getSearchQuery($this->objectType, $this->objectId);
 
         /* manage translations */
@@ -204,28 +222,41 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $exclude = $this->getExclude();
-        if (!is_null($exclude))
+        if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $visible = $this->getVisible();
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        $baseSourceFilePath = ConfigQuery::read('documents_library_path');
+        if ($baseSourceFilePath === null) {
+            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+        } else {
+            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+        }
+
+        /** @var ProductDocument $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Create document processing event
             $event = new DocumentEvent($this->request);
 
             // Put source document file path
-            $source_filepath = sprintf("%s%s/%s/%s",
-                THELIA_ROOT,
-                ConfigQuery::read('documents_library_path', 'local/media/documents'),
+            $sourceFilePath = sprintf(
+                '%s/%s/%s',
+                $baseSourceFilePath,
                 $this->objectType,
                 $result->getFile()
             );
 
-            $event->setSourceFilepath($source_filepath);
+            $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory($this->objectType);
 
             try {
@@ -235,19 +266,22 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($result);
 
                 $loopResultRow
-                    ->set("ID"                    , $result->getId())
-                    ->set("LOCALE"                , $this->locale)
-                    ->set("DOCUMENT_URL"          , $event->getDocumentUrl())
-                    ->set("DOCUMENT_PATH"         , $event->getDocumentPath())
-                    ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
-                    ->set("TITLE"                 , $result->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"                 , $result->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"           , $result->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM"          , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("POSITION"              , $result->getPosition())
-                    ->set("OBJECT_TYPE"           , $this->objectType)
-                    ->set("OBJECT_ID"             , $this->objectId)
+                    ->set("ID", $result->getId())
+                    ->set("LOCALE", $this->locale)
+                    ->set("DOCUMENT_FILE", $result->getFile())
+                    ->set("DOCUMENT_URL", $event->getDocumentUrl())
+                    ->set("DOCUMENT_PATH", $event->getDocumentPath())
+                    ->set("ORIGINAL_DOCUMENT_PATH", $sourceFilePath)
+                    ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("VISIBLE", $result->getVisible())
+                    ->set("POSITION", $result->getPosition())
+                    ->set("OBJECT_TYPE", $this->objectType)
+                    ->set("OBJECT_ID", $this->objectId)
                 ;
+                $this->addOutputFields($loopResultRow, $result);
 
                 $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {
@@ -257,6 +291,5 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

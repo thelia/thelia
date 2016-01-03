@@ -29,7 +29,7 @@ class Argument
 
     private $value;
 
-    public function __construct($name, \Thelia\Type\TypeCollection $type,  $default = null, $mandatory = false, $empty = true, $value = null)
+    public function __construct($name, \Thelia\Type\TypeCollection $type, $default = null, $mandatory = false, $empty = true, $value = null)
     {
         $this->name         = $name;
         $this->type         = $type;
@@ -64,7 +64,7 @@ class Argument
         }
     }
 
-    public static function createAnyTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createAnyTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,
@@ -77,7 +77,7 @@ class Argument
         );
     }
 
-    public static function createIntTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createIntTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,
@@ -90,7 +90,7 @@ class Argument
         );
     }
 
-    public static function createFloatTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createFloatTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,
@@ -103,7 +103,7 @@ class Argument
         );
     }
 
-    public static function createBooleanTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createBooleanTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,
@@ -116,20 +116,20 @@ class Argument
         );
     }
 
-    public static function createBooleanOrBothTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createBooleanOrBothTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
-                $name,
-                new TypeCollection(
-                        new Type\BooleanOrBothType()
-                ),
-                $default,
-                $mandatory,
-                $empty
+            $name,
+            new TypeCollection(
+                new Type\BooleanOrBothType()
+            ),
+            $default,
+            $mandatory,
+            $empty
         );
     }
 
-    public static function createIntListTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createIntListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,
@@ -142,4 +142,38 @@ class Argument
         );
     }
 
+    /**
+     * This method is available from Thelia 2.2 version
+     *
+     * @param $name
+     * @param null $default
+     * @param bool $mandatory
+     * @param bool $empty
+     * @return Argument
+     */
+    public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\AnyListType()
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
+    public static function createEnumListTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\EnumListType($entries)
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
 }

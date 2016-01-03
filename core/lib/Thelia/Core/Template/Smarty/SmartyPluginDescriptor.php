@@ -12,79 +12,15 @@
 
 namespace Thelia\Core\Template\Smarty;
 
+use TheliaSmarty\Template\SmartyPluginDescriptor as BaseSmartyPluginDescriptor;
+
 /**
- * Class allowing to describe a smarty plugin
- *
- * Class SmartyPluginDescriptor
+ * Class SmartyPluginDescriptpor
  * @package Thelia\Core\Template\Smarty
+ * @author Manuel Raynaud <manu@raynaud.io>
+ *
+ * @deprecated this class is now present in module TheliaSmarty and will be removed in Thelia 2.3
  */
-class SmartyPluginDescriptor
+class SmartyPluginDescriptor extends BaseSmartyPluginDescriptor
 {
-    /**
-     * @var string Smarty plugin type (block, function, etc.)
-     */
-    protected $type;
-
-    /**
-     * @var string Smarty plugin name. This name will be used in Smarty templates.
-     */
-    protected $name;
-
-    /**
-     * @var AbstractSmartyPlugin plugin implmentation class
-     */
-    protected $class;
-
-    /**
-     * @var string plugin implmentation method in $class
-     */
-    protected $method;
-
-    public function __construct($type, $name, $class, $method)
-    {
-        $this->type = $type;
-        $this->name = $name;
-        $this->class = $class;
-        $this->method = $method;
-    }
-
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setClass($class)
-    {
-        $this->class = $class;
-    }
-
-    public function getClass()
-    {
-        return $this->class;
-    }
-
-    public function setMethod($method)
-    {
-        $this->method = $method;
-    }
-
-    public function getMethod()
-    {
-        return $this->method;
-    }
 }

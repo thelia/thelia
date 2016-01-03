@@ -23,7 +23,7 @@ class Image
             return true;
         }
 
-        if (in_array($imageType , $allowedImageTypes)) {
+        if (in_array($imageType, $allowedImageTypes)) {
             return true;
         }
 

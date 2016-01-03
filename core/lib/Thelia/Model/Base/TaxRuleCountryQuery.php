@@ -21,15 +21,19 @@ use Thelia\Model\Map\TaxRuleCountryTableMap;
  *
  *
  *
+ * @method     ChildTaxRuleCountryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildTaxRuleCountryQuery orderByTaxRuleId($order = Criteria::ASC) Order by the tax_rule_id column
  * @method     ChildTaxRuleCountryQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
+ * @method     ChildTaxRuleCountryQuery orderByStateId($order = Criteria::ASC) Order by the state_id column
  * @method     ChildTaxRuleCountryQuery orderByTaxId($order = Criteria::ASC) Order by the tax_id column
  * @method     ChildTaxRuleCountryQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildTaxRuleCountryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildTaxRuleCountryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
+ * @method     ChildTaxRuleCountryQuery groupById() Group by the id column
  * @method     ChildTaxRuleCountryQuery groupByTaxRuleId() Group by the tax_rule_id column
  * @method     ChildTaxRuleCountryQuery groupByCountryId() Group by the country_id column
+ * @method     ChildTaxRuleCountryQuery groupByStateId() Group by the state_id column
  * @method     ChildTaxRuleCountryQuery groupByTaxId() Group by the tax_id column
  * @method     ChildTaxRuleCountryQuery groupByPosition() Group by the position column
  * @method     ChildTaxRuleCountryQuery groupByCreatedAt() Group by the created_at column
@@ -51,18 +55,26 @@ use Thelia\Model\Map\TaxRuleCountryTableMap;
  * @method     ChildTaxRuleCountryQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
  * @method     ChildTaxRuleCountryQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
  *
+ * @method     ChildTaxRuleCountryQuery leftJoinState($relationAlias = null) Adds a LEFT JOIN clause to the query using the State relation
+ * @method     ChildTaxRuleCountryQuery rightJoinState($relationAlias = null) Adds a RIGHT JOIN clause to the query using the State relation
+ * @method     ChildTaxRuleCountryQuery innerJoinState($relationAlias = null) Adds a INNER JOIN clause to the query using the State relation
+ *
  * @method     ChildTaxRuleCountry findOne(ConnectionInterface $con = null) Return the first ChildTaxRuleCountry matching the query
  * @method     ChildTaxRuleCountry findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTaxRuleCountry matching the query, or a new ChildTaxRuleCountry object populated from the query conditions when no match is found
  *
+ * @method     ChildTaxRuleCountry findOneById(int $id) Return the first ChildTaxRuleCountry filtered by the id column
  * @method     ChildTaxRuleCountry findOneByTaxRuleId(int $tax_rule_id) Return the first ChildTaxRuleCountry filtered by the tax_rule_id column
  * @method     ChildTaxRuleCountry findOneByCountryId(int $country_id) Return the first ChildTaxRuleCountry filtered by the country_id column
+ * @method     ChildTaxRuleCountry findOneByStateId(int $state_id) Return the first ChildTaxRuleCountry filtered by the state_id column
  * @method     ChildTaxRuleCountry findOneByTaxId(int $tax_id) Return the first ChildTaxRuleCountry filtered by the tax_id column
  * @method     ChildTaxRuleCountry findOneByPosition(int $position) Return the first ChildTaxRuleCountry filtered by the position column
  * @method     ChildTaxRuleCountry findOneByCreatedAt(string $created_at) Return the first ChildTaxRuleCountry filtered by the created_at column
  * @method     ChildTaxRuleCountry findOneByUpdatedAt(string $updated_at) Return the first ChildTaxRuleCountry filtered by the updated_at column
  *
+ * @method     array findById(int $id) Return ChildTaxRuleCountry objects filtered by the id column
  * @method     array findByTaxRuleId(int $tax_rule_id) Return ChildTaxRuleCountry objects filtered by the tax_rule_id column
  * @method     array findByCountryId(int $country_id) Return ChildTaxRuleCountry objects filtered by the country_id column
+ * @method     array findByStateId(int $state_id) Return ChildTaxRuleCountry objects filtered by the state_id column
  * @method     array findByTaxId(int $tax_id) Return ChildTaxRuleCountry objects filtered by the tax_id column
  * @method     array findByPosition(int $position) Return ChildTaxRuleCountry objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildTaxRuleCountry objects filtered by the created_at column
@@ -114,10 +126,10 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34, 56), $con);
+     * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param array[$tax_rule_id, $country_id, $tax_id] $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildTaxRuleCountry|array|mixed the result, formatted by the current formatter
@@ -127,7 +139,7 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = TaxRuleCountryTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
+        if ((null !== ($obj = TaxRuleCountryTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -155,12 +167,10 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `TAX_RULE_ID`, `COUNTRY_ID`, `TAX_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule_country` WHERE `TAX_RULE_ID` = :p0 AND `COUNTRY_ID` = :p1 AND `TAX_ID` = :p2';
+        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `COUNTRY_ID`, `STATE_ID`, `TAX_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule_country` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
-            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
-            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -170,7 +180,7 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildTaxRuleCountry();
             $obj->hydrate($row);
-            TaxRuleCountryTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
+            TaxRuleCountryTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -199,7 +209,7 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
+     * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -229,11 +239,8 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(TaxRuleCountryTableMap::TAX_RULE_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(TaxRuleCountryTableMap::COUNTRY_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(TaxRuleCountryTableMap::TAX_ID, $key[2], Criteria::EQUAL);
 
-        return $this;
+        return $this->addUsingAlias(TaxRuleCountryTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -245,19 +252,49 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-        if (empty($keys)) {
-            return $this->add(null, '1<>1', Criteria::CUSTOM);
-        }
-        foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(TaxRuleCountryTableMap::TAX_RULE_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(TaxRuleCountryTableMap::COUNTRY_ID, $key[1], Criteria::EQUAL);
-            $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(TaxRuleCountryTableMap::TAX_ID, $key[2], Criteria::EQUAL);
-            $cton0->addAnd($cton2);
-            $this->addOr($cton0);
+
+        return $this->addUsingAlias(TaxRuleCountryTableMap::ID, $keys, Criteria::IN);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxRuleCountryQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(TaxRuleCountryTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(TaxRuleCountryTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
-        return $this;
+        return $this->addUsingAlias(TaxRuleCountryTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -344,6 +381,49 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaxRuleCountryTableMap::COUNTRY_ID, $countryId, $comparison);
+    }
+
+    /**
+     * Filter the query on the state_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStateId(1234); // WHERE state_id = 1234
+     * $query->filterByStateId(array(12, 34)); // WHERE state_id IN (12, 34)
+     * $query->filterByStateId(array('min' => 12)); // WHERE state_id > 12
+     * </code>
+     *
+     * @see       filterByState()
+     *
+     * @param     mixed $stateId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxRuleCountryQuery The current query, for fluid interface
+     */
+    public function filterByStateId($stateId = null, $comparison = null)
+    {
+        if (is_array($stateId)) {
+            $useMinMax = false;
+            if (isset($stateId['min'])) {
+                $this->addUsingAlias(TaxRuleCountryTableMap::STATE_ID, $stateId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($stateId['max'])) {
+                $this->addUsingAlias(TaxRuleCountryTableMap::STATE_ID, $stateId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TaxRuleCountryTableMap::STATE_ID, $stateId, $comparison);
     }
 
     /**
@@ -742,6 +822,81 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\State object
+     *
+     * @param \Thelia\Model\State|ObjectCollection $state The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxRuleCountryQuery The current query, for fluid interface
+     */
+    public function filterByState($state, $comparison = null)
+    {
+        if ($state instanceof \Thelia\Model\State) {
+            return $this
+                ->addUsingAlias(TaxRuleCountryTableMap::STATE_ID, $state->getId(), $comparison);
+        } elseif ($state instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(TaxRuleCountryTableMap::STATE_ID, $state->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByState() only accepts arguments of type \Thelia\Model\State or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the State relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildTaxRuleCountryQuery The current query, for fluid interface
+     */
+    public function joinState($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('State');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'State');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the State relation State object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\StateQuery A secondary query class using the current class as primary query
+     */
+    public function useStateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinState($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'State', '\Thelia\Model\StateQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildTaxRuleCountry $taxRuleCountry Object to remove from the list of results
@@ -751,10 +906,7 @@ abstract class TaxRuleCountryQuery extends ModelCriteria
     public function prune($taxRuleCountry = null)
     {
         if ($taxRuleCountry) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(TaxRuleCountryTableMap::TAX_RULE_ID), $taxRuleCountry->getTaxRuleId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(TaxRuleCountryTableMap::COUNTRY_ID), $taxRuleCountry->getCountryId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(TaxRuleCountryTableMap::TAX_ID), $taxRuleCountry->getTaxId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
+            $this->addUsingAlias(TaxRuleCountryTableMap::ID, $taxRuleCountry->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

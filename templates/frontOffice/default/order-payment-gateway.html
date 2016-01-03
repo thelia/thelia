@@ -26,40 +26,48 @@
             {include file="misc/checkout-progress.tpl"  step="last"}
 
             {loop type="order" name="placed-order" id=$order_id}
+            {ifhook rel="order-payment-gateway.body"}
+                {hook name="order-payment-gateway.body" module="$PAYMENT_MODULE"}
+            {/ifhook}
+            {elsehook rel="order-payment-gateway.body"}
+                <div id="payment-success" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    </div>
 
-            <div id="payment-success" class="panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    <div class="panel-body">
+                        {if $cart_count > 0}
+                            <div class="panel-heading clearfix">
+                                {intl l="Connecting to the secure payment server, please wait a few seconds..."}
+                            </div>
+
+                            <div class="panel-body">
+                                <form action="{$gateway_url nofilter}" method="post" id="payement_gateway_form">
+                                    {foreach from=$payment_form_data key='name' item='value'}
+                                        <input type="hidden" name="{$name}" value="{$value}" />
+                                    {/foreach}
+
+                                    <p>{intl l='If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.'}</p>
+                                </form>
+                            </div>
+                        {else}
+                            {intl l="Sorry, your cart is empty. There's nothing to pay."}
+                        {/if}
+                    </div>
                 </div>
-
-                <div class="panel-body">
-                    {if $cart_count > 0}
-                        <div class="panel-heading clearfix">
-                            {intl l="Connecting to the secure payment server, please wait a few seconds..."}
-                        </div>
-
-                        <div class="panel-body">
-
-                            <form action="{$gateway_url}" method="post" id="payement_gateway_form">
-                                {foreach from=$payment_form_data key='name' item='value'}
-                                    <input type="hidden" name="{$name}" value="{$value}" />
-                                {/foreach}
-
-                                <p>{intl l='If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.'}</p>
-                            </form>
-                        </div>
-                    {else}
-                        {intl l="Sorry, your cart is empty. There's nothing to pay."}
-                    {/if}
-                </div>
-            </div>
+            {/elsehook}
             {/loop}
+
         </article>
 
     </div>
 {/block}
 
 {block name="javascript-initialization"}
+{ifhook rel="order-payment-gateway.javascript"}
+   {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
+{/ifhook}
+{elsehook rel="order-payment-gateway.javascript"}
     <script type="text/javascript">
         jQuery(function($) {
             $('#payement_gateway_form').submit();
@@ -71,6 +79,14 @@
             });
         });
      </script>
+{/elsehook}
+{hook name="order-payment-gateway.javascript-initialization"}
 {/block}
 
+{block name="stylesheet"}
+{hook name="order-payment-gateway.stylesheet"}
+{/block}
 
+{block name="after-javascript-include"}
+{hook name="order-payment-gateway.after-javascript-include"}
+{/block}

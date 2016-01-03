@@ -9,7 +9,7 @@ Variables Config à initialiser:
 - active_template: chemin du template front relatif au repertoire template (ex. default)
 - thelia_version: la version de Thelia (ex. 2.0.0 alpha)
 - cart.priceEOF : durée de vie d'un prix dans le panier (par défaut 1 mois 60*60*24*30)
-- cart.session_only : pour rattacher le panier uniquement à la session (défaut 0 donc cookie crée)
+- use_persistent_cookie : pour rendre le panier persistent via un cookie (défaut 1 donc cookie crée)
 - cart.cookie_lifetime : durée de vie du cookie du panier (défaut 1 an 60*60*24*365)
 - one_domain_foreach_lang : un domaine par langue, défaut 0
 - session_config.default : laisser la configuration par défaut de la session

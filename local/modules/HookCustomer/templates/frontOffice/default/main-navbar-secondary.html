@@ -1,0 +1,43 @@
+<ul class="nav navbar-nav navbar-customer navbar-right">
+    {loop type="auth" name="customer_info_block" role="CUSTOMER"}
+    <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!" d="hookcustomer.fo.default"}</a></li>
+    <li><a href="{url path="/account"}" class="account">{intl l="My Account" d="hookcustomer.fo.default"}</a></li>
+    {/loop}
+    {elseloop rel="customer_info_block"}
+    <li><a href="{url path="/register"}" class="register">{intl l="Register!" d="hookcustomer.fo.default"}</a></li>
+    <li class="dropdown">
+        <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!" d="hookcustomer.fo.default"}</a>
+        <div class="dropdown-menu">
+            {form name="thelia.front.customer.login"}
+            <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype}>
+            {form_hidden_fields}
+            {form_field field="success_url"}
+            <input type="hidden" name="{$name}" value="{navigate to="current"}">
+            {/form_field}
+            {form_field field="email"}
+            <div class="form-group group-email">
+                <label for="{$label_attr.for}-mini">{intl l="Email address" d="hookcustomer.fo.default"}</label>
+                <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control input-sm" maxlength="255" aria-required="true" required>
+            </div>
+            {/form_field}
+            {form_field field="password"}
+            <div class="form-group group-password">
+                <label for="{$label_attr.for}-mini">{intl l="Password" d="hookcustomer.fo.default"}</label>
+                <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control input-sm" maxlength="255" aria-required="true" required>
+            </div>
+            {/form_field}
+            {form_field field="account"}
+            <input type="hidden" name="{$name}" value="1">
+            {/form_field}
+            <div class="form-group group-btn">
+                <button type="submit" class="btn btn-login-mini btn-sm btn-primary"><i class="fa fa-sign-in"></i> {intl l="Sign In" d="hookcustomer.fo.default"}</button>
+                <a href="{url path="/register"}" class="btn btn-register-mini btn-default btn-sm"><i class="fa fa-user-plus"></i> {intl l="Register" d="hookcustomer.fo.default"}</a>
+            </div>
+
+            <a href="{url path="/password"}" class="mini-forgot-password">{intl l="Forgot your Password?" d="hookcustomer.fo.default"}</a>
+            </form>
+            {/form}
+        </div>
+    </li>
+    {/elseloop}
+</ul>

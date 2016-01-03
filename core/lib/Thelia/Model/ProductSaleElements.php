@@ -39,7 +39,7 @@ class ProductSaleElements extends BaseProductSaleElements
         return $amount;
     }
 
-    public function getTaxedPrice(Country $country , $virtualColumnName = 'price_PRICE', $discount = 0)
+    public function getTaxedPrice(Country $country, $virtualColumnName = 'price_PRICE', $discount = 0)
     {
         $taxCalculator = new Calculator();
 
@@ -103,5 +103,4 @@ class ProductSaleElements extends BaseProductSaleElements
 
         return $productPriceTools;
     }
-
 }

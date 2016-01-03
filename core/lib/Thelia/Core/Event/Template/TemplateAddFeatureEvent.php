@@ -13,13 +13,13 @@
 namespace Thelia\Core\Event\Template;
 
 use Thelia\Model\Template;
+
 class TemplateAddFeatureEvent extends TemplateEvent
 {
     protected $feature_id;
 
     public function __construct(Template $template, $feature_id)
     {
-
         parent::__construct($template);
 
         $this->feature_id = $feature_id;
@@ -36,5 +36,4 @@ class TemplateAddFeatureEvent extends TemplateEvent
 
         return $this;
     }
-
 }

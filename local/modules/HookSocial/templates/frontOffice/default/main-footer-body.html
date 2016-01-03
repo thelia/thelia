@@ -1,0 +1,86 @@
+<ul role="presentation">
+    {if {config key="hooksocial_facebook"} }
+    <li>
+        <a href="http://facebook.com/{config key="hooksocial_facebook"}" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top"
+           title="{intl l="Facebook" d="hooksocial.fo.default"}" target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-facebook fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="Facebook" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+    {if {config key="hooksocial_twitter"} }
+    <li>
+        <a href="https://twitter.com/{config key="hooksocial_twitter"}" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top"
+           title="{intl l="Twitter" d="hooksocial.fo.default"}" target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-twitter fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="Twitter" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+    {if {config key="hooksocial_pinterest"} }
+    <li>
+        <a href="https://www.pinterest.com/{config key="hooksocial_pinterest"}" class="pinterest" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="Pinterest" d="hooksocial.fo.default"}"
+        target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-pinterest fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="Pinterest" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+    {if {config key="hooksocial_instagram"} }
+    <li>
+        <a href="http://instagram.com/{config key="hooksocial_instagram"}" rel="nofollow" class="instagram" data-toggle="tooltip" data-placement="top"
+           title="{intl l="Instagram" d="hooksocial.fo.default"}" target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-instagram fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="Instagram" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+    {if {config key="hooksocial_google"} }
+    <li>
+        <a href="http://plus.google.com/{config key="hooksocial_google"}" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top"
+           title="{intl l="Google+" d="hooksocial.fo.default"}" target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-google-plus fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="Google+" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+    {if {config key="hooksocial_youtube"} }
+    <li>
+        <a href="{config key="hooksocial_youtube"}" rel="nofollow" class="youtube" data-toggle="tooltip" data-placement="top"
+           title="{intl l="Youtube" d="hooksocial.fo.default"}" target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-youtube fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="Youtube" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+    {if {config key="hooksocial_rss"} }
+    <li>
+        <a href="{config key="hooksocial_rss"}" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS" d="hooksocial.fo.default"}"
+        target="_blank">
+            <span class="fa-stack fa-lg">
+                <span class="fa fa-circle fa-stack-2x"></span>
+                <span class="fa fa-rss fa-stack-1x fa-inverse"></span>
+            </span>
+            <span class="visible-print">{intl l="RSS" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
+</ul>

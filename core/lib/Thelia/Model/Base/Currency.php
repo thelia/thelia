@@ -27,6 +27,8 @@ use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\ProductPrice as ChildProductPrice;
 use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
+use Thelia\Model\SaleOffsetCurrency as ChildSaleOffsetCurrency;
+use Thelia\Model\SaleOffsetCurrencyQuery as ChildSaleOffsetCurrencyQuery;
 use Thelia\Model\Map\CurrencyTableMap;
 
 abstract class Currency implements ActiveRecordInterface
@@ -82,10 +84,23 @@ abstract class Currency implements ActiveRecordInterface
     protected $symbol;
 
     /**
+     * The value for the format field.
+     * @var        string
+     */
+    protected $format;
+
+    /**
      * The value for the rate field.
      * @var        double
      */
     protected $rate;
+
+    /**
+     * The value for the visible field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $visible;
 
     /**
      * The value for the position field.
@@ -95,6 +110,7 @@ abstract class Currency implements ActiveRecordInterface
 
     /**
      * The value for the by_default field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $by_default;
@@ -128,6 +144,12 @@ abstract class Currency implements ActiveRecordInterface
      */
     protected $collProductPrices;
     protected $collProductPricesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildSaleOffsetCurrency[] Collection to store aggregation of ChildSaleOffsetCurrency objects.
+     */
+    protected $collSaleOffsetCurrencies;
+    protected $collSaleOffsetCurrenciesPartial;
 
     /**
      * @var        ObjectCollection|ChildCurrencyI18n[] Collection to store aggregation of ChildCurrencyI18n objects.
@@ -179,13 +201,33 @@ abstract class Currency implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
+    protected $saleOffsetCurrenciesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
     protected $currencyI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->visible = 0;
+        $this->by_default = 0;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Currency object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -473,6 +515,17 @@ abstract class Currency implements ActiveRecordInterface
     }
 
     /**
+     * Get the [format] column value.
+     *
+     * @return   string
+     */
+    public function getFormat()
+    {
+
+        return $this->format;
+    }
+
+    /**
      * Get the [rate] column value.
      *
      * @return   double
@@ -481,6 +534,17 @@ abstract class Currency implements ActiveRecordInterface
     {
 
         return $this->rate;
+    }
+
+    /**
+     * Get the [visible] column value.
+     *
+     * @return   int
+     */
+    public function getVisible()
+    {
+
+        return $this->visible;
     }
 
     /**
@@ -609,6 +673,27 @@ abstract class Currency implements ActiveRecordInterface
     } // setSymbol()
 
     /**
+     * Set the value of [format] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Currency The current object (for fluent API support)
+     */
+    public function setFormat($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->format !== $v) {
+            $this->format = $v;
+            $this->modifiedColumns[CurrencyTableMap::FORMAT] = true;
+        }
+
+
+        return $this;
+    } // setFormat()
+
+    /**
      * Set the value of [rate] column.
      *
      * @param      double $v new value
@@ -628,6 +713,27 @@ abstract class Currency implements ActiveRecordInterface
 
         return $this;
     } // setRate()
+
+    /**
+     * Set the value of [visible] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Currency The current object (for fluent API support)
+     */
+    public function setVisible($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->visible !== $v) {
+            $this->visible = $v;
+            $this->modifiedColumns[CurrencyTableMap::VISIBLE] = true;
+        }
+
+
+        return $this;
+    } // setVisible()
 
     /**
      * Set the value of [position] column.
@@ -723,6 +829,14 @@ abstract class Currency implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->visible !== 0) {
+                return false;
+            }
+
+            if ($this->by_default !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -759,22 +873,28 @@ abstract class Currency implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CurrencyTableMap::translateFieldName('Symbol', TableMap::TYPE_PHPNAME, $indexType)];
             $this->symbol = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CurrencyTableMap::translateFieldName('Rate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CurrencyTableMap::translateFieldName('Format', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->format = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CurrencyTableMap::translateFieldName('Rate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->rate = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CurrencyTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CurrencyTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->visible = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CurrencyTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CurrencyTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CurrencyTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->by_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CurrencyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CurrencyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CurrencyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CurrencyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -787,7 +907,7 @@ abstract class Currency implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = CurrencyTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = CurrencyTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Currency object", 0, $e);
@@ -853,6 +973,8 @@ abstract class Currency implements ActiveRecordInterface
             $this->collCarts = null;
 
             $this->collProductPrices = null;
+
+            $this->collSaleOffsetCurrencies = null;
 
             $this->collCurrencyI18ns = null;
 
@@ -1040,6 +1162,23 @@ abstract class Currency implements ActiveRecordInterface
                 }
             }
 
+            if ($this->saleOffsetCurrenciesScheduledForDeletion !== null) {
+                if (!$this->saleOffsetCurrenciesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\SaleOffsetCurrencyQuery::create()
+                        ->filterByPrimaryKeys($this->saleOffsetCurrenciesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->saleOffsetCurrenciesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collSaleOffsetCurrencies !== null) {
+            foreach ($this->collSaleOffsetCurrencies as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->currencyI18nsScheduledForDeletion !== null) {
                 if (!$this->currencyI18nsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\CurrencyI18nQuery::create()
@@ -1092,8 +1231,14 @@ abstract class Currency implements ActiveRecordInterface
         if ($this->isColumnModified(CurrencyTableMap::SYMBOL)) {
             $modifiedColumns[':p' . $index++]  = '`SYMBOL`';
         }
+        if ($this->isColumnModified(CurrencyTableMap::FORMAT)) {
+            $modifiedColumns[':p' . $index++]  = '`FORMAT`';
+        }
         if ($this->isColumnModified(CurrencyTableMap::RATE)) {
             $modifiedColumns[':p' . $index++]  = '`RATE`';
+        }
+        if ($this->isColumnModified(CurrencyTableMap::VISIBLE)) {
+            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
         }
         if ($this->isColumnModified(CurrencyTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
@@ -1127,8 +1272,14 @@ abstract class Currency implements ActiveRecordInterface
                     case '`SYMBOL`':
                         $stmt->bindValue($identifier, $this->symbol, PDO::PARAM_STR);
                         break;
+                    case '`FORMAT`':
+                        $stmt->bindValue($identifier, $this->format, PDO::PARAM_STR);
+                        break;
                     case '`RATE`':
                         $stmt->bindValue($identifier, $this->rate, PDO::PARAM_STR);
+                        break;
+                    case '`VISIBLE`':
+                        $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
@@ -1214,18 +1365,24 @@ abstract class Currency implements ActiveRecordInterface
                 return $this->getSymbol();
                 break;
             case 3:
-                return $this->getRate();
+                return $this->getFormat();
                 break;
             case 4:
-                return $this->getPosition();
+                return $this->getRate();
                 break;
             case 5:
-                return $this->getByDefault();
+                return $this->getVisible();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 7:
+                return $this->getByDefault();
+                break;
+            case 8:
+                return $this->getCreatedAt();
+                break;
+            case 9:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1260,11 +1417,13 @@ abstract class Currency implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getSymbol(),
-            $keys[3] => $this->getRate(),
-            $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getByDefault(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[3] => $this->getFormat(),
+            $keys[4] => $this->getRate(),
+            $keys[5] => $this->getVisible(),
+            $keys[6] => $this->getPosition(),
+            $keys[7] => $this->getByDefault(),
+            $keys[8] => $this->getCreatedAt(),
+            $keys[9] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1280,6 +1439,9 @@ abstract class Currency implements ActiveRecordInterface
             }
             if (null !== $this->collProductPrices) {
                 $result['ProductPrices'] = $this->collProductPrices->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSaleOffsetCurrencies) {
+                $result['SaleOffsetCurrencies'] = $this->collSaleOffsetCurrencies->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCurrencyI18ns) {
                 $result['CurrencyI18ns'] = $this->collCurrencyI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1328,18 +1490,24 @@ abstract class Currency implements ActiveRecordInterface
                 $this->setSymbol($value);
                 break;
             case 3:
-                $this->setRate($value);
+                $this->setFormat($value);
                 break;
             case 4:
-                $this->setPosition($value);
+                $this->setRate($value);
                 break;
             case 5:
-                $this->setByDefault($value);
+                $this->setVisible($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 7:
+                $this->setByDefault($value);
+                break;
+            case 8:
+                $this->setCreatedAt($value);
+                break;
+            case 9:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1369,11 +1537,13 @@ abstract class Currency implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSymbol($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setRate($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setByDefault($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[3], $arr)) $this->setFormat($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setRate($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setVisible($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setByDefault($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
     }
 
     /**
@@ -1388,7 +1558,9 @@ abstract class Currency implements ActiveRecordInterface
         if ($this->isColumnModified(CurrencyTableMap::ID)) $criteria->add(CurrencyTableMap::ID, $this->id);
         if ($this->isColumnModified(CurrencyTableMap::CODE)) $criteria->add(CurrencyTableMap::CODE, $this->code);
         if ($this->isColumnModified(CurrencyTableMap::SYMBOL)) $criteria->add(CurrencyTableMap::SYMBOL, $this->symbol);
+        if ($this->isColumnModified(CurrencyTableMap::FORMAT)) $criteria->add(CurrencyTableMap::FORMAT, $this->format);
         if ($this->isColumnModified(CurrencyTableMap::RATE)) $criteria->add(CurrencyTableMap::RATE, $this->rate);
+        if ($this->isColumnModified(CurrencyTableMap::VISIBLE)) $criteria->add(CurrencyTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(CurrencyTableMap::POSITION)) $criteria->add(CurrencyTableMap::POSITION, $this->position);
         if ($this->isColumnModified(CurrencyTableMap::BY_DEFAULT)) $criteria->add(CurrencyTableMap::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(CurrencyTableMap::CREATED_AT)) $criteria->add(CurrencyTableMap::CREATED_AT, $this->created_at);
@@ -1458,7 +1630,9 @@ abstract class Currency implements ActiveRecordInterface
     {
         $copyObj->setCode($this->getCode());
         $copyObj->setSymbol($this->getSymbol());
+        $copyObj->setFormat($this->getFormat());
         $copyObj->setRate($this->getRate());
+        $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setByDefault($this->getByDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1484,6 +1658,12 @@ abstract class Currency implements ActiveRecordInterface
             foreach ($this->getProductPrices() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addProductPrice($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getSaleOffsetCurrencies() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSaleOffsetCurrency($relObj->copy($deepCopy));
                 }
             }
 
@@ -1542,6 +1722,9 @@ abstract class Currency implements ActiveRecordInterface
         }
         if ('ProductPrice' == $relationName) {
             return $this->initProductPrices();
+        }
+        if ('SaleOffsetCurrency' == $relationName) {
+            return $this->initSaleOffsetCurrencies();
         }
         if ('CurrencyI18n' == $relationName) {
             return $this->initCurrencyI18ns();
@@ -2481,6 +2664,252 @@ abstract class Currency implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collSaleOffsetCurrencies collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addSaleOffsetCurrencies()
+     */
+    public function clearSaleOffsetCurrencies()
+    {
+        $this->collSaleOffsetCurrencies = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collSaleOffsetCurrencies collection loaded partially.
+     */
+    public function resetPartialSaleOffsetCurrencies($v = true)
+    {
+        $this->collSaleOffsetCurrenciesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSaleOffsetCurrencies collection.
+     *
+     * By default this just sets the collSaleOffsetCurrencies collection to an empty array (like clearcollSaleOffsetCurrencies());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSaleOffsetCurrencies($overrideExisting = true)
+    {
+        if (null !== $this->collSaleOffsetCurrencies && !$overrideExisting) {
+            return;
+        }
+        $this->collSaleOffsetCurrencies = new ObjectCollection();
+        $this->collSaleOffsetCurrencies->setModel('\Thelia\Model\SaleOffsetCurrency');
+    }
+
+    /**
+     * Gets an array of ChildSaleOffsetCurrency objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCurrency is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildSaleOffsetCurrency[] List of ChildSaleOffsetCurrency objects
+     * @throws PropelException
+     */
+    public function getSaleOffsetCurrencies($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleOffsetCurrenciesPartial && !$this->isNew();
+        if (null === $this->collSaleOffsetCurrencies || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSaleOffsetCurrencies) {
+                // return empty collection
+                $this->initSaleOffsetCurrencies();
+            } else {
+                $collSaleOffsetCurrencies = ChildSaleOffsetCurrencyQuery::create(null, $criteria)
+                    ->filterByCurrency($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collSaleOffsetCurrenciesPartial && count($collSaleOffsetCurrencies)) {
+                        $this->initSaleOffsetCurrencies(false);
+
+                        foreach ($collSaleOffsetCurrencies as $obj) {
+                            if (false == $this->collSaleOffsetCurrencies->contains($obj)) {
+                                $this->collSaleOffsetCurrencies->append($obj);
+                            }
+                        }
+
+                        $this->collSaleOffsetCurrenciesPartial = true;
+                    }
+
+                    reset($collSaleOffsetCurrencies);
+
+                    return $collSaleOffsetCurrencies;
+                }
+
+                if ($partial && $this->collSaleOffsetCurrencies) {
+                    foreach ($this->collSaleOffsetCurrencies as $obj) {
+                        if ($obj->isNew()) {
+                            $collSaleOffsetCurrencies[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSaleOffsetCurrencies = $collSaleOffsetCurrencies;
+                $this->collSaleOffsetCurrenciesPartial = false;
+            }
+        }
+
+        return $this->collSaleOffsetCurrencies;
+    }
+
+    /**
+     * Sets a collection of SaleOffsetCurrency objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $saleOffsetCurrencies A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCurrency The current object (for fluent API support)
+     */
+    public function setSaleOffsetCurrencies(Collection $saleOffsetCurrencies, ConnectionInterface $con = null)
+    {
+        $saleOffsetCurrenciesToDelete = $this->getSaleOffsetCurrencies(new Criteria(), $con)->diff($saleOffsetCurrencies);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->saleOffsetCurrenciesScheduledForDeletion = clone $saleOffsetCurrenciesToDelete;
+
+        foreach ($saleOffsetCurrenciesToDelete as $saleOffsetCurrencyRemoved) {
+            $saleOffsetCurrencyRemoved->setCurrency(null);
+        }
+
+        $this->collSaleOffsetCurrencies = null;
+        foreach ($saleOffsetCurrencies as $saleOffsetCurrency) {
+            $this->addSaleOffsetCurrency($saleOffsetCurrency);
+        }
+
+        $this->collSaleOffsetCurrencies = $saleOffsetCurrencies;
+        $this->collSaleOffsetCurrenciesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SaleOffsetCurrency objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related SaleOffsetCurrency objects.
+     * @throws PropelException
+     */
+    public function countSaleOffsetCurrencies(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collSaleOffsetCurrenciesPartial && !$this->isNew();
+        if (null === $this->collSaleOffsetCurrencies || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSaleOffsetCurrencies) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSaleOffsetCurrencies());
+            }
+
+            $query = ChildSaleOffsetCurrencyQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCurrency($this)
+                ->count($con);
+        }
+
+        return count($this->collSaleOffsetCurrencies);
+    }
+
+    /**
+     * Method called to associate a ChildSaleOffsetCurrency object to this object
+     * through the ChildSaleOffsetCurrency foreign key attribute.
+     *
+     * @param    ChildSaleOffsetCurrency $l ChildSaleOffsetCurrency
+     * @return   \Thelia\Model\Currency The current object (for fluent API support)
+     */
+    public function addSaleOffsetCurrency(ChildSaleOffsetCurrency $l)
+    {
+        if ($this->collSaleOffsetCurrencies === null) {
+            $this->initSaleOffsetCurrencies();
+            $this->collSaleOffsetCurrenciesPartial = true;
+        }
+
+        if (!in_array($l, $this->collSaleOffsetCurrencies->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSaleOffsetCurrency($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param SaleOffsetCurrency $saleOffsetCurrency The saleOffsetCurrency object to add.
+     */
+    protected function doAddSaleOffsetCurrency($saleOffsetCurrency)
+    {
+        $this->collSaleOffsetCurrencies[]= $saleOffsetCurrency;
+        $saleOffsetCurrency->setCurrency($this);
+    }
+
+    /**
+     * @param  SaleOffsetCurrency $saleOffsetCurrency The saleOffsetCurrency object to remove.
+     * @return ChildCurrency The current object (for fluent API support)
+     */
+    public function removeSaleOffsetCurrency($saleOffsetCurrency)
+    {
+        if ($this->getSaleOffsetCurrencies()->contains($saleOffsetCurrency)) {
+            $this->collSaleOffsetCurrencies->remove($this->collSaleOffsetCurrencies->search($saleOffsetCurrency));
+            if (null === $this->saleOffsetCurrenciesScheduledForDeletion) {
+                $this->saleOffsetCurrenciesScheduledForDeletion = clone $this->collSaleOffsetCurrencies;
+                $this->saleOffsetCurrenciesScheduledForDeletion->clear();
+            }
+            $this->saleOffsetCurrenciesScheduledForDeletion[]= clone $saleOffsetCurrency;
+            $saleOffsetCurrency->setCurrency(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related SaleOffsetCurrencies from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildSaleOffsetCurrency[] List of ChildSaleOffsetCurrency objects
+     */
+    public function getSaleOffsetCurrenciesJoinSale($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildSaleOffsetCurrencyQuery::create(null, $criteria);
+        $query->joinWith('Sale', $joinBehavior);
+
+        return $this->getSaleOffsetCurrencies($query, $con);
+    }
+
+    /**
      * Clears out the collCurrencyI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2713,13 +3142,16 @@ abstract class Currency implements ActiveRecordInterface
         $this->id = null;
         $this->code = null;
         $this->symbol = null;
+        $this->format = null;
         $this->rate = null;
+        $this->visible = null;
         $this->position = null;
         $this->by_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2752,6 +3184,11 @@ abstract class Currency implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collSaleOffsetCurrencies) {
+                foreach ($this->collSaleOffsetCurrencies as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCurrencyI18ns) {
                 foreach ($this->collCurrencyI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2766,6 +3203,7 @@ abstract class Currency implements ActiveRecordInterface
         $this->collOrders = null;
         $this->collCarts = null;
         $this->collProductPrices = null;
+        $this->collSaleOffsetCurrencies = null;
         $this->collCurrencyI18ns = null;
     }
 

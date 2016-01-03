@@ -1,0 +1,93 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
+<div class="modal fade" id="pse-image-document-assoc-modal" tabindex="-1" role="dialog" aria-labelledby="associate_images_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="associate_images_label">{$modal_title}</h4>
+            </div>
+            <div class="modal-body">
+                {if empty($items)}
+                    <div class="alert alert-danger">
+                        {if $error_message}
+                            {$error_message}
+                        {else}
+                            {intl l="An unknow error happend"}
+                        {/if}
+                    </div>
+                {else}
+                    {if $type == "image"}
+                        <div class='images-container'>
+                            <div class="row">
+                            {foreach from=$items key=key item=item}
+                                {if ($key % 4 == 0) && $key != 0}
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                {/if}
+                                <div class='col-md-3'>
+                                    <div class='product-pse-image-container'>
+                                        {if $item.is_associated}
+                                            <i class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></i>
+                                        {/if}
+                                        <img data-id='{$item.id}' class='img-responsive do-associate {if $item.is_associated}is-associated{/if}' src='{$item.url nofilter}' alt='{$item.title}' />
+                                    </div>
+                                </div>
+
+                            {/foreach}
+                            </div>
+                        </div>
+                    {elseif $type == "document" || $type == "virtual" }
+                        <div class='documents-container'>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                {intl l="ID"}
+                                            </th>
+                                            <th>
+                                                {intl l="Filename"}
+                                            </th>
+                                            <th>
+                                                {intl l="Title"}
+                                            </th>
+                                            <th>
+                                                {intl l="Associated"}
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {foreach from=$items item=item}
+                                            <tr>
+                                                <td>{$item.id}</td>
+                                                <td>{$item.filename}</td>
+                                                <td>{$item.title}</td>
+                                                <td>
+                                                    <div class="switch-small do-associate document-switch" data-id="{$item.id}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                                        <input type="checkbox" {if $item.is_associated}checked{/if}>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/foreach}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    {/if}
+                {/if}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".document-switch").bootstrapSwitch();
+</script>

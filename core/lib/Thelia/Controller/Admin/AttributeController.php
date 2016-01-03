@@ -12,19 +12,17 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
-use Thelia\Core\Event\Attribute\AttributeCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\AttributeQuery;
-use Thelia\Form\AttributeModificationForm;
-use Thelia\Form\AttributeCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
-
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
+use Thelia\Core\Event\Attribute\AttributeCreateEvent;
+use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
 use Thelia\Core\Event\Attribute\AttributeEvent;
+use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\AttributeQuery;
 
 /**
  * Manages attributes
@@ -39,9 +37,7 @@ class AttributeController extends AbstractCrudController
             'attribute',
             'manual',
             'order',
-
             AdminResources::ATTRIBUTE,
-
             TheliaEvents::ATTRIBUTE_CREATE,
             TheliaEvents::ATTRIBUTE_UPDATE,
             TheliaEvents::ATTRIBUTE_DELETE,
@@ -52,12 +48,12 @@ class AttributeController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new AttributeCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::ATTRIBUTE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new AttributeModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -99,9 +95,7 @@ class AttributeController extends AbstractCrudController
         $attr_values = $this->getRequest()->get('attribute_values', null);
 
         if ($attr_values !== null) {
-
             foreach ($attr_values as $id => $value) {
-
                 $event = new AttributeAvUpdateEvent($id);
 
                 $event->setTitle($value);
@@ -117,9 +111,9 @@ class AttributeController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('attribute_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('attribute_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -135,7 +129,6 @@ class AttributeController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-
         $data = array(
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
@@ -146,7 +139,7 @@ class AttributeController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new AttributeModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -184,28 +177,28 @@ class AttributeController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render(
-                'attribute-edit',
-                array(
-                        'attribute_id' => $this->getRequest()->get('attribute_id'),
-                        'attributeav_order' => $this->getAttributeAvListOrder()
-                )
+            'attribute-edit',
+            array(
+                'attribute_id' => $this->getRequest()->get('attribute_id'),
+                'attributeav_order' => $this->getAttributeAvListOrder()
+            )
         );
     }
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.attributes.update",
-                array(
-                        'attribute_id' => $this->getRequest()->get('attribute_id'),
-                        'attributeav_order' => $this->getAttributeAvListOrder()
-                )
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.attributes.update",
+            [
+                'attribute_id' => $this->getRequest()->get('attribute_id'),
+                'attributeav_order' => $this->getAttributeAvListOrder()
+            ]
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.attributes.default');
+        return $this->generateRedirectFromRoute('admin.configuration.attributes.default');
     }
 
     /**
@@ -216,9 +209,9 @@ class AttributeController extends AbstractCrudController
     protected function getAttributeAvListOrder()
     {
         return $this->getListOrderFromSession(
-                'attributeav',
-                'attributeav_order',
-                'manual'
+            'attributeav',
+            'attributeav_order',
+            'manual'
         );
     }
 
@@ -228,11 +221,12 @@ class AttributeController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         try {
             if (null !== $object = $this->getExistingObject()) {
-
                 $event = new AttributeEvent($object);
 
                 $this->dispatch($eventType, $event);
@@ -242,7 +236,7 @@ class AttributeController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**

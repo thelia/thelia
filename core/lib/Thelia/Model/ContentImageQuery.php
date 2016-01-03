@@ -16,5 +16,5 @@ use Thelia\Model\Base\ContentImageQuery as BaseContentImageQuery;
  */
 class ContentImageQuery extends BaseContentImageQuery
 {
-
-} // ContentImageQuery
+}
+// ContentImageQuery

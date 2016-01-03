@@ -11,6 +11,7 @@
 
 {block name="main-content"}
     {assign order_page {$smarty.get.page|default:1}}
+    {assign view_status {$smarty.get.status}}
     {assign status_filter {$smarty.get.status|assertType:'IntListType'}}
 <div class="orders">
 
@@ -21,7 +22,7 @@
             <li><a href="#">{intl l="Orders"}</a></li>
         </ul>
 
-        {module_include location='orders_top'}
+        {hook name="orders.top" location="orders_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -98,19 +99,15 @@
                                         label="{intl l='Status'}"
                                     } </th>
 
-	                               {module_include location='orders_table_header'}
+	                               {hook name="orders.table-header" location="orders_table_header" }
 
 	                               <th class="actions">{intl l="Actions"}</th>
 		                        </tr>
 	                        </thead>
 
-	                        <tbody>
+                            <tbody>
 
-                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit={#max_displayed_orders#} status=$status_filter|default:'*'}
-
-                                    {loop type="currency" name="order-currency" id=$CURRENCY}
-                                        {$orderCurrency=$SYMBOL}
-                                    {/loop}
+                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
 
                                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
@@ -120,30 +117,38 @@
 
                                     {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
-                                        {assign "orderStatusLabel" "order_$CODE"}
+                                        {assign "orderStatusCode" "order_$CODE"}
+                                        {if #$orderStatusCode# == ''}
+                                            {assign "defaultLabel" "label-default"}
+                                            {assign "orderStatusLabel" $CODE}
+                                        {else}
+                                            {assign "defaultLabel" ''}
+                                            {assign "orderStatusLabel" #$orderStatusCode#}
+                                        {/if}
                                     {/loop}
 
-		                            <tr>
+                                    <tr>
+                                        <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$ID}</a></td>
+                                       	<td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
+                                       	<td>{format_date date=$CREATE_DATE}</td>
+                                       	<td>{$orderInvoiceCompany}</td>
+                                       	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                       	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</td>
+                                        <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
+                                        {* *}
+                                        {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
-                                        <td><a href="{url path="/admin/order/update/$ID"}">{$ID}</a></td>
-		                               	<td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
-		                               	<td>{format_date date=$CREATE_DATE}</td>
-		                               	<td>{$orderInvoiceCompany}</td>
-		                               	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-		                               	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
-		                               	<td class="text-center"><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
-
-		                                {module_include location='orders_table_row'}
-
-		                                <td>
-		                                    <div class="btn-group">
-
-				                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                        <td>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
+                                                    <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                     {if $STATUS !== 5}
-				                                        <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                        <a class="order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
                                                     {/if}
-				                                {/loop}
+                                                {/loop}
 				                            </div>
 		                                </td>
 		                            </tr>
@@ -153,28 +158,36 @@
 	                        </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="100">
                                         {include
                                             file = "includes/pagination.html"
 
                                             loop_ref       = "order-list"
                                             max_page_count = 10
-                                            page_url       = "{url path="/admin/orders" orders_order=$orders_order}"
+                                            page_url       = "{url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}"
                                         }
 
                                     </td>
                                 </tr>
                             </tfoot>
-
                             {/ifloop}
 
+                            {elseloop rel="order-list"}
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="alert alert-info">
+                                            {intl l='You have no orders for the moment.'}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/elseloop}
 	                    </table>
 	                </div>
                 </div>
             </div>
         </div>
 
-        {module_include location='orders_bottom'}
+        {hook name="orders.bottom" location="orders_bottom" }
 
     </div>
 </div>
@@ -183,6 +196,8 @@
 
 {capture "cancel_order_dialog"}
     <input type="hidden" name="order_page" value="{$order_page}">
+    <input type="hidden" name="status" value="{$view_status}">
+
     <input type="hidden" name="order_id" id="cancel_order_id" />
     <input type="hidden" name="status_id" value="5" />
 {/capture}
@@ -194,7 +209,7 @@
     dialog_title    = {intl l="Delete an order"}
     dialog_message  = {intl l="Do you really want to cancel this order ?"}
 
-    form_action         = {url path='/admin/order/update/status'}
+    form_action         = {token_url path='/admin/order/update/status'}
     form_content        = {$smarty.capture.cancel_order_dialog nofilter}
     form_id             = "cancel-order-form"
 }
@@ -212,5 +227,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='orders-js'}
+    {hook name="orders.js" location="orders-js" }
 {/block}

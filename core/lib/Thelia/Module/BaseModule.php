@@ -17,13 +17,23 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Event\Hook\HookCreateAllEvent;
+use Thelia\Core\Event\Hook\HookUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ModuleException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
+use Thelia\Model\HookQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleI18n;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModuleImage;
@@ -34,17 +44,22 @@ use Thelia\Tools\Image;
 
 class BaseModule extends ContainerAware implements BaseModuleInterface
 {
-    const CLASSIC_MODULE_TYPE = 1;
+    const CLASSIC_MODULE_TYPE  = 1;
     const DELIVERY_MODULE_TYPE = 2;
-    const PAYMENT_MODULE_TYPE = 3;
+    const PAYMENT_MODULE_TYPE  = 3;
 
-    const IS_ACTIVATED = 1;
+    const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
+
+    const IS_ACTIVATED     = 1;
     const IS_NOT_ACTIVATED = 0;
 
     protected $reflected;
 
     protected $dispatcher = null;
     protected $request = null;
+
+    // Do no use this attribute directly, use getModuleModel() instead.
+    private $moduleModel = null;
 
     public function activate($moduleModel = null)
     {
@@ -56,6 +71,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
+                $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
                     $moduleModel->setActivate(self::IS_ACTIVATED);
                     $moduleModel->save($con);
@@ -66,6 +82,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 $con->rollBack();
                 throw $e;
             }
+
+            $this->registerHooks();
         }
     }
 
@@ -89,7 +107,6 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 $con->rollBack();
                 throw $e;
             }
-
         }
     }
 
@@ -146,8 +163,17 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return EventDispatcherInterface
+     * @throws \RuntimeException
+     */
     public function getDispatcher()
     {
+        if ($this->hasDispatcher() === false) {
+            // Try to get dispatcher from container.
+            $this->setDispatcher($this->getContainer()->get('event_dispatcher'));
+        }
+
         if ($this->hasDispatcher() === false) {
             throw new \RuntimeException("Sorry, the dispatcher is not available in this context");
         }
@@ -165,7 +191,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     {
         if (is_array($titles)) {
             foreach ($titles as $locale => $title) {
-                $moduleI18n = ModuleI18nQuery::create()->filterById($module->getId())->filterByLocale($locale)->findOne();
+                $moduleI18n = ModuleI18nQuery::create()
+                    ->filterById($module->getId())->filterByLocale($locale)
+                    ->findOne();
+
                 if (null === $moduleI18n) {
                     $moduleI18n = new ModuleI18n();
                     $moduleI18n
@@ -180,6 +209,36 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 }
             }
         }
+    }
+
+    /**
+     * Get a module's configuration variable
+     *
+     * @param  string $variableName the variable name
+     * @param  string $defaultValue the default value, if variable is not defined
+     * @param  null   $valueLocale  the required locale, or null to get default one
+     * @return string the variable value
+     */
+    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null)
+    {
+        return ModuleConfigQuery::create()
+            ->getConfigValue(self::getModuleId(), $variableName, $defaultValue, $valueLocale);
+    }
+
+    /**
+     * Set module configuration variable, creating it if required
+     *
+     * @param  string          $variableName      the variable name
+     * @param  string          $variableValue     the variable value
+     * @param  null            $valueLocale       the locale, or null if not required
+     * @param  bool            $createIfNotExists if true, the variable will be created if not already defined
+     * @throws \LogicException if variable does not exists and $createIfNotExists is false
+     * @return $this;
+     */
+    public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true)
+    {
+        ModuleConfigQuery::create()
+            ->setConfigValue(self::getModuleId(), $variableName, $variableValue, $valueLocale, $createIfNotExists);
     }
 
     /**
@@ -214,13 +273,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
-
                 $fileName = $directoryContent->getFilename();
                 $filePath = $directoryContent->getPathName();
 
                 /* is it a picture ? */
-                if ( Image::isImage($filePath) ) {
-
+                if (Image::isImage($filePath)) {
                     $con->beginTransaction();
 
                     $image = new ModuleImage();
@@ -228,12 +285,18 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                     $image->setPosition($imagePosition);
                     $image->save($con);
 
-                    $imageDirectory = sprintf("%s/../../../../local/media/images/module", __DIR__);
+                    $imageDirectory = sprintf("%s/media/images/module", THELIA_LOCAL_DIR);
                     $imageFileName = sprintf("%s-%d-%s", $module->getCode(), $image->getId(), $fileName);
 
                     $increment = 0;
                     while (file_exists($imageDirectory . '/' . $imageFileName)) {
-                        $imageFileName = sprintf("%s-%d-%d-%s", $module->getCode(), $image->getId(), $increment, $fileName);
+                        $imageFileName = sprintf(
+                            "%s-%d-%d-%s",
+                            $module->getCode(),
+                            $image->getId(),
+                            $increment,
+                            $fileName
+                        );
                         $increment++;
                     }
 
@@ -242,13 +305,19 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                     if (! is_dir($imageDirectory)) {
                         if (! @mkdir($imageDirectory, 0777, true)) {
                             $con->rollBack();
-                            throw new ModuleException(sprintf("Cannot create directory : %s", $imageDirectory), ModuleException::CODE_NOT_FOUND);
+                            throw new ModuleException(
+                                sprintf("Cannot create directory : %s", $imageDirectory),
+                                ModuleException::CODE_NOT_FOUND
+                            );
                         }
                     }
 
                     if (! @copy($filePath, $imagePath)) {
                         $con->rollBack();
-                        throw new ModuleException(sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath), ModuleException::CODE_NOT_FOUND);
+                        throw new ModuleException(
+                            sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath),
+                            ModuleException::CODE_NOT_FOUND
+                        );
                     }
 
                     $image->setFile($imageFileName);
@@ -267,22 +336,63 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      */
     public function getModuleModel()
     {
-        $moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
+        if (null === $this->moduleModel) {
+            $this->moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
 
-        if (null === $moduleModel) {
-            throw new ModuleException(sprintf("Module Code `%s` not found", $this->getCode()), ModuleException::CODE_NOT_FOUND);
+            if (null === $this->moduleModel) {
+                throw new ModuleException(
+                    sprintf("Module Code `%s` not found", $this->getCode()),
+                    ModuleException::CODE_NOT_FOUND
+                );
+            }
         }
 
-        return $moduleModel;
+        return $this->moduleModel;
     }
 
-    public function getCode()
+
+    /**
+     * Module A may use static method from module B, thus we have to cache
+     * a couple (module code => module id).
+     *
+     * @return int The module id, in a static way, with a cache
+     */
+    private static $moduleIds = [];
+
+    public static function getModuleId()
     {
-        if (null === $this->reflected) {
-            $this->reflected = new \ReflectionObject($this);
+        $code = self::getModuleCode();
+
+        if (! isset(self::$moduleIds[$code])) {
+            if (null === $module = ModuleQuery::create()->findOneByCode($code)) {
+                throw new ModuleException(
+                    sprintf("Module Code `%s` not found", $code),
+                    ModuleException::CODE_NOT_FOUND
+                );
+            }
+
+            self::$moduleIds[$code] = $module->getId();
         }
 
-        return basename(dirname($this->reflected->getFileName()));
+        return self::$moduleIds[$code];
+    }
+
+    /**
+     * @return string The module code, in a static wayord
+     */
+    public static function getModuleCode()
+    {
+        $fullClassName = explode('\\', get_called_class());
+
+        return end($fullClassName);
+    }
+
+    /*
+     * The module code
+     */
+    public function getCode()
+    {
+        return self::getModuleCode();
     }
 
     /**
@@ -329,7 +439,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $session = $this->getRequest()->getSession();
 
         /** @var Cart $cart */
-        $cart = $session->getCart();
+        $cart = $session->getSessionCart($this->getDispatcher());
 
         /** @var Order $order */
         $order = $session->getOrder();
@@ -343,7 +453,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
 
         if ($with_postage) {
-            $amount += $order->getPostage();
+            if ($with_tax) {
+                $amount += $order->getPostage();
+            } else {
+                $amount += $order->getPostage() - $order->getPostageTax();
+            }
         }
 
         return $amount;
@@ -357,7 +471,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *  - arrays
      *  - one or many instance(s) of \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface
      *
-     * in the first case, your array must contains 2 indexes. The first is the compiler instance and the second the compilerPass type.
+     * in the first case, your array must contains 2 indexes.
+     * The first is the compiler instance and the second the compilerPass type.
      * Example :
      * return array(
      *  array(
@@ -390,12 +505,23 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     }
 
     /**
-     * This method is called when the plugin is installed for the first time, using
-     * zip upload method.
+     * This method is called when the plugin is installed for the first time
      *
      * @param ConnectionInterface $con
      */
     public function install(ConnectionInterface $con = null)
+    {
+        // Override this method to do something useful.
+    }
+
+    /**
+     * This method is called when a newer version of the plugin is installed
+     *
+     * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
+     * @param string $newVersion the new module version, as defined in the module.xml file
+     * @param ConnectionInterface $con
+     */
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
     }
@@ -450,5 +576,295 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
         // Override this method to do something useful.
+    }
+
+    /**
+     * @return array
+     *
+     * This method must be used when your module defines hooks.
+     * Override this and return an array of your hooks names to register them
+     *
+     * This returned value must be like the example, only type and code are mandatory
+     *
+     * Example:
+     *
+     * return array(
+     *
+     *      // Only register the title in the default language
+     *      array(
+     *          "type" => TemplateDefinition::BACK_OFFICE,
+     *          "code" => "my_super_hook_name",
+     *          "title" => "My hook",
+     *          "description" => "My hook is really, really great",
+     *      ),
+     *
+     *      // Manage i18n
+     *      array(
+     *          "type" => TemplateDefinition::FRONT_OFFICE,
+     *          "code" => "my_hook_name",
+     *          "title" => array(
+     *              "fr_FR" => "Mon Hook",
+     *              "en_US" => "My hook",
+     *          ),
+     *          "description" => array(
+     *              "fr_FR" => "Mon hook est vraiment super",
+     *              "en_US" => "My hook is really, really great",
+     *          ),
+     *          "chapo" => array(
+     *              "fr_FR" => "Mon hook est vraiment super",
+     *              "en_US" => "My hook is really, really great",
+     *          ),
+     *          "block" => true,
+     *          "active" => true
+     *      )
+     * );
+     */
+    public function getHooks()
+    {
+        return array();
+    }
+
+    public function registerHooks()
+    {
+        $moduleHooks = $this->getHooks();
+
+        if (is_array($moduleHooks) && !empty($moduleHooks)) {
+            $allowedTypes = (array) TemplateDefinition::getStandardTemplatesSubdirsIterator();
+            $defaultLang = Lang::getDefaultLanguage();
+            $defaultLocale = $defaultLang->getLocale();
+
+            /**
+             * @var EventDispatcherInterface $dispatcher
+             */
+            $dispatcher = $this->container->get("event_dispatcher");
+
+            foreach ($moduleHooks as $hook) {
+                $isValid = is_array($hook) &&
+                    isset($hook["type"]) &&
+                    array_key_exists($hook["type"], $allowedTypes) &&
+                    isset($hook["code"]) &&
+                    is_string($hook["code"]) &&
+                    !empty($hook["code"])
+                ;
+
+                if (!$isValid) {
+                    Tlog::getInstance()->notice("The module ".$this->getCode()." tried to register an invalid hook");
+
+                    continue;
+                }
+
+                /**
+                 * Create or update hook db entry.
+                 *
+                 * @var \Thelia\Model\Hook $hookModel
+                 */
+                list($hookModel, $updateData) = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
+
+                /**
+                 * Update translations
+                 */
+                $event = new HookUpdateEvent($hookModel->getId());
+
+                foreach ($updateData as $locale => $data) {
+                    $event
+                        ->setCode($hookModel->getCode())
+                        ->setNative($hookModel->getNative())
+                        ->setByModule($hookModel->getByModule())
+                        ->setActive($hookModel->getActivate())
+                        ->setBlock($hookModel->getBlock())
+                        ->setNative($hookModel->getNative())
+                        ->setType($hookModel->getType())
+                        ->setLocale($locale)
+                        ->setChapo($data["chapo"])
+                        ->setTitle($data["title"])
+                        ->setDescription($data["description"])
+                    ;
+
+                    $dispatcher->dispatch(TheliaEvents::HOOK_UPDATE, $event);
+                }
+            }
+        }
+    }
+
+    protected function createOrUpdateHook(array $hook, EventDispatcherInterface $dispatcher, $defaultLocale)
+    {
+        $hookModel = HookQuery::create()->filterByCode($hook["code"])->findOne();
+
+        if ($hookModel === null) {
+            $event = new HookCreateAllEvent();
+        } else {
+            $event = new HookUpdateEvent($hookModel->getId());
+        }
+
+        /**
+         * Get used I18n variables
+         */
+        $locale = $defaultLocale;
+
+        list($titles, $descriptions, $chapos) = $this->getHookI18nInfo($hook, $defaultLocale);
+
+        /**
+         * If the default locale exists
+         * extract it to save it in create action
+         *
+         * otherwise take the first
+         */
+        if (isset($titles[$defaultLocale])) {
+            $title = $titles[$defaultLocale];
+
+            unset($titles[$defaultLocale]);
+        } else {
+            reset($titles);
+
+            $locale = key($titles);
+            $title = array_shift($titles);
+        }
+
+        $description = $this->arrayKeyPop($locale, $descriptions);
+        $chapo = $this->arrayKeyPop($locale, $chapos);
+
+        /**
+         * Set data
+         */
+        $event
+            ->setBlock(isset($hook["block"]) && (bool) $hook["block"])
+            ->setLocale($locale)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setChapo($chapo)
+            ->setType($hook["type"])
+            ->setCode($hook["code"])
+            ->setNative(false)
+            ->setByModule(isset($hook["module"]) && (bool) $hook["module"])
+            ->setActive(isset($hook["active"]) && (bool) $hook["active"])
+        ;
+
+        /**
+         * Dispatch the event
+         */
+        $dispatcher->dispatch(
+            (
+            $hookModel === null ?
+                TheliaEvents::HOOK_CREATE_ALL :
+                TheliaEvents::HOOK_UPDATE
+            ),
+            $event
+        );
+
+        return [
+            $event->getHook(),
+            $this->formatHookDataForI18n($titles, $descriptions, $chapos)
+        ];
+    }
+
+    protected function formatHookDataForI18n(array $titles, array $descriptions, array $chapos)
+    {
+        $locales = array_merge(
+            array_keys($titles),
+            array_keys($descriptions),
+            array_keys($chapos)
+        );
+
+        $locales = array_unique($locales);
+
+        $data = array();
+
+        foreach ($locales as $locale) {
+            $data[$locale] = [
+                'title' => !isset($titles[$locale]) ? null : $titles[$locale],
+                'description' => !isset($descriptions[$locale]) ? null: $descriptions[$locale],
+                'chapo' => !isset($chapos[$locale]) ? null : $chapos[$locale]
+            ];
+        }
+
+        return $data;
+    }
+
+    protected function getHookI18nInfo(array $hook, $defaultLocale)
+    {
+        $titles = array();
+        $descriptions = array();
+        $chapos = array();
+
+        /**
+         * Get the defined titles
+         */
+        if (isset($hook["title"])) {
+            $titles = $this->extractI18nValues($hook["title"], $defaultLocale);
+        }
+
+        /**
+         * Then the defined descriptions
+         */
+        if (isset($hook["description"])) {
+            $descriptions = $this->extractI18nValues($hook["description"], $defaultLocale);
+        }
+
+        /**
+         * Then the short descriptions
+         */
+        if (isset($hook["chapo"])) {
+            $chapos = $this->extractI18nValues($hook["chapo"], $defaultLocale);
+        }
+
+        return [$titles, $descriptions, $chapos];
+    }
+
+    protected function extractI18nValues($data, $defaultLocale)
+    {
+        $returnData = array();
+
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if (!is_string($key)) {
+                    continue;
+                }
+
+                $returnData[$key] = $value;
+            }
+        } elseif (is_scalar($data)) {
+            $returnData[$defaultLocale] = $data;
+        }
+
+        return $returnData;
+    }
+
+    protected function arrayKeyPop($key, array &$array)
+    {
+        $value = null;
+
+        if (array_key_exists($key, $array)) {
+            $value = $array[$key];
+
+            unset($array[$key]);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Add core translations of the module to use in `preActivation` and `postActivation`
+     * when the module is not yest activated and translations are not available
+     */
+    private function initializeCoreI18n()
+    {
+        if ($this->hasContainer()) {
+            /** @var Translator $translator */
+            $translator = $this->container->get('thelia.translator');
+
+            if (null !== $translator) {
+                $i18nPath = sprintf('%s%s/I18n/', THELIA_MODULE_DIR, $this->getCode());
+                $languages = LangQuery::create()->find();
+
+                foreach ($languages as $language) {
+                    $locale = $language->getLocale();
+                    $i18nFile = sprintf('%s%s.php', $i18nPath, $locale);
+
+                    if (is_file($i18nFile) && is_readable($i18nFile)) {
+                        $translator->addResource('php', $i18nFile, $locale, strtolower(self::getModuleCode()));
+                    }
+                }
+            }
+        }
     }
 }

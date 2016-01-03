@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <services>
+        <service id="session.middleware" class="Thelia\Core\Stack\SessionMiddleware">
+            <argument type="service" id="event_dispatcher" />
+            <argument>%kernel.cache_dir%</argument>
+            <argument>%kernel.debug%</argument>
+            <argument>%kernel.environment%</argument>
+
+            <tag name="stack_middleware" priority="1000" />
+        </service>
+        <service id="initParam.middleware" class="Thelia\Core\Stack\ParamInitMiddleware">
+            <argument type="service" id="thelia.url.manager" />
+            <argument type="service" id="thelia.translator" />
+            <argument type="service" id="event_dispatcher" />
+
+            <tag name="stack_middleware" priority="999" />
+        </service>
+    </services>
+</config>

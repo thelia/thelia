@@ -22,7 +22,7 @@
                 </ul>
             </div>
 
-            {module_include location='taxes_rules_top'}
+            {hook name="taxes-rules.top" location="taxes_rules_top" }
 
             <div class="row">
                 <div class="col-md-12">
@@ -47,13 +47,20 @@
                         <p>{intl l="you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not."}</p>
                     </div>
 
+
+                    {if $general_error}
+                        <div class="alert alert-danger">
+                            {$general_error}
+                        </div>
+                    {/if}
+
                     <div class="general-block-decorator">
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l="Taxes"}
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.tax" access="CREATE"}
-                                        <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax'}" href="#tax_create_dialog" data-toggle="modal">
+                                        <a class="btn btn-primary pull-right" title="{intl l='Create a new tax'}" href="#tax_create_dialog" data-toggle="modal">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     {/loop}
@@ -72,14 +79,17 @@
                                     <tr>
                                         <td>{$TITLE}</td>
                                         <td>{$DESCRIPTION}</td>
-                                        <td>
-                                            <div class="btn-group">
+                                        <td class="actions">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                                    <a class="btn btn-default btn-xs" title="{intl l='Change this tax'}" href="{url path="/admin/configuration/taxes/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                    <a title="{intl l='Change this tax'}" href="{url path="/admin/configuration/taxes/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                 {/loop}
 
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                                    <a class="btn btn-default btn-xs js-delete-tax" title="{intl l='Delete this tax'}" href="#tax_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                    <a class="js-delete-tax" title="{intl l='Delete this tax'}" href="#tax_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                 {/loop}
                                             </div>
                                         </td>
@@ -98,7 +108,7 @@
                                 <caption class="clearfix">
                                     {intl l="Taxes rules"}
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                        <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
+                                        <a class="btn btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     {/loop}
@@ -123,15 +133,18 @@
                                                 <span class="glyphicon glyphicon-ok"></span>
                                             {/if}
                                         </td>
-                                        <td>
-                                            <div class="btn-group">
+                                        <td class="actions">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                                    <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                    <a class="btn btn-default btn-xs" title="{intl l='Set as default tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/set_default/$ID"}" {if $IS_DEFAULT == 1}disabled{/if}><span class="glyphicon glyphicon-star"></span></a>
+                                                    <a title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                    <a title="{intl l='Set as default tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/set_default/%id" id=$ID}" {if $IS_DEFAULT == 1}disabled{/if}><span class="glyphicon glyphicon-star"></span></a>
                                                 {/loop}
 
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="DELETE"}
-                                                    <a class="btn btn-default btn-xs js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.tax" access="DELETE"}
+                                                    <a class="js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                 {/loop}
                                             </div>
                                         </td>
@@ -146,7 +159,7 @@
                 </div>
             </div>
 
-            {module_include location='taxes_rules_bottom'}
+            {hook name="taxes-rules.bottom" location="taxes_rules_bottom" }
 
         </div>
     </div>
@@ -163,20 +176,20 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "tax_create_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='locale'}
+        {form_field field='locale'}
             <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
             </div>
         {/form_field}
 
-        {form_field form=$form field='description'}
+        {form_field field='description'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">
                     {$label} :
@@ -187,7 +200,7 @@
             </div>
         {/form_field}
 
-        {form_field form=$form field='type'}
+        {form_field field='type'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">
                     {$label} :
@@ -207,7 +220,7 @@
             </div>
         {/form_field}
 
-        {form_tagged_fields form=$form tag='requirements'}
+        {form_tagged_fields tag='requirements'}
             <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$attr_list.tax_type}" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}style="display: none"{/if}>
                 <label for="{$label_attr.for}" class="control-label">
                     {$label}
@@ -225,7 +238,7 @@
             </div>
         {/form_tagged_fields}
 
-        {module_include location='tax_create_form'}
+        {hook name="tax.create-form" location="tax_create_form" }
 
     {/capture}
 
@@ -240,7 +253,7 @@
     dialog_cancel_label = {intl l="Cancel"}
 
     form_action        = {url path="/admin/configuration/taxes/add"}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = $form_error_message
     }
 
@@ -251,7 +264,7 @@
     {capture "tax_delete_dialog"}
         <input type="hidden" name="tax_id" id="tax_delete_id" value="" />
 
-        {module_include location='tax_delete_form'}
+        {hook name="tax.delete-form" location="tax_delete_form" }
 
     {/capture}
 
@@ -262,7 +275,7 @@
     dialog_title    = {intl l="Delete tax"}
     dialog_message  = {intl l="Do you really want to delete this tax ?"}
 
-form_action         = {url path='/admin/configuration/taxes/delete'}
+form_action         = {token_url path='/admin/configuration/taxes/delete'}
 form_content        = {$smarty.capture.tax_delete_dialog nofilter}
 }
 
@@ -278,22 +291,22 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "tax_rule_create_dialog"}
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='locale'}
+        {form_field field='locale'}
             <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
         {/form_field}
 
         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{/if}">
             </div>
         {/form_field}
 
-        {form_field form=$form field='description'}
+        {form_field field='description'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">
                     {$label} :
@@ -303,7 +316,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
                 <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{/if}</textarea>
             </div>
         {/form_field}
-        {module_include location='tax_rule_create_form'}
+        {hook name="tax-rule.create-form" location="tax_rule_create_form" }
     {/capture}
 
         {include
@@ -317,7 +330,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     dialog_cancel_label = {intl l="Cancel"}
 
     form_action        = {url path="/admin/configuration/taxes_rules/add"}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = $form_error_message
     }
 
@@ -328,7 +341,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     {capture "tax_rule_delete_dialog"}
         <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
 
-        {module_include location='tax_rule_delete_form'}
+        {hook name="tax-rule.delete-form" location="tax_rule_delete_form" }
 
     {/capture}
 
@@ -339,8 +352,8 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     dialog_title    = {intl l="Delete tax rule"}
     dialog_message  = {intl l="Do you really want to delete this tax rule ?"}
 
-form_action         = {url path='/admin/configuration/taxes_rules/delete'}
-form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
+    form_action         = {token_url path='/admin/configuration/taxes_rules/delete'}
+    form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 }
 
 {/block}
@@ -348,10 +361,6 @@ form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 {block name="javascript-initialization"}
 
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
-        <script src='{$asset_url}'></script>
-    {/javascripts}
-
-    {javascripts file='assets/js/main.js'}
         <script src='{$asset_url}'></script>
     {/javascripts}
 
@@ -387,5 +396,6 @@ form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='taxes-rules-js'}
+    {hook name="taxes-rules.js" location="taxes-rules-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-tax-rules-js" }
 {/block}

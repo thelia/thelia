@@ -16,10 +16,8 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CategoryQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -33,18 +31,16 @@ use Thelia\Type\BooleanOrBothType;
  * - level is the exact level to return. Example: if level = 2 and the path is c1 -> c2 -> c3 -> c4, the loop will return c2
  * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
  *
- * example :
- *
- * <THELIA_cat type="category-path" category="3">
- *      <a href="#URL">#TITLE</a>
- * </THELIA_cat>
- *
- *
  * Class CategoryPath
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getCategory()
+ * @method int getDepth()
+ * @method bool|string getVisible()
  */
-class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
+class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
     /**
      * @return ArgumentCollection
@@ -68,7 +64,9 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
         $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
         $results = array();
 
@@ -78,7 +76,6 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
             $category = $search->findOne();
 
             if ($category != null) {
-
                 $results[] = array(
                     "ID" => $category->getId(),
                     "TITLE" => $category->getVirtualColumn('i18n_TITLE'),
@@ -89,7 +86,6 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
                 $parent = $category->getParent();
 
                 if ($parent > 0) {
-
                     // Prevent circular refererences
                     if (in_array($parent, $ids)) {
                         throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
@@ -102,7 +98,9 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
                     $this->configureI18nProcessing($search, array('TITLE'));
 
                     $search->filterById($parent);
-                    if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+                    if ($visible != BooleanOrBothType::ANY) {
+                        $search->filterByVisible($visible);
+                    }
                 }
             }
         } while ($category != null && $parent > 0);

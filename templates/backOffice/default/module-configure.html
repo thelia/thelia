@@ -6,8 +6,9 @@
 
 {block name="page-title"}{intl l='Modules'}{/block}
 
-{block name="check-resource"}admin.module{/block}
-{block name="check-access"}view{/block}
+{block name="check-auth"}
+    {check_auth role="ADMIN" module=$module_code access="view" login_tpl="/admin/login"}
+{/block}
 
 {block name="main-content"}
 <div class="modules-configure">
@@ -21,7 +22,7 @@
             </ul>
         </div>
 
-        {module_include location='module_configuration' module=$module_code}
+        {hook name="module.configuration" location="module_configuration"  modulecode="$module_code"}
 
     </div>
 </div>
@@ -29,5 +30,7 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='module-config-js'}
+    {hook name="module.config-js" location="module-config-js" modulecode="$module_code"}
+
+    {hook name="wysiwyg.js" location="wysiwyg-module-config-js" }
 {/block}

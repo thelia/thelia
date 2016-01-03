@@ -15,7 +15,7 @@
 		        {/loop}
 		    </select>
 		    <span class="input-group-btn">
-		       <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+		       <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
 		    </span>
 	    </div>
 
@@ -38,7 +38,7 @@
 
             <th class="text-center">{intl l='Position'}</th>
 
-            {module_include location='template_features_table_header'}
+            {hook name="template.features-table-header" location="template_features_table_header" }
 
             <th class="actions">{intl l="Actions"}</th>
         </tr>
@@ -65,16 +65,14 @@
              }
             </td>
 
-            {module_include location='template_features_table_row'}
+            {hook name="template.features-table-row" location="template_features_table_row" }
 
             <td class="actions">
-                <div class="btn-group">
-                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
-                       <a class="btn btn-default btn-xs delete-feature" title="{intl l='Delete this feature'}" href="#delete_feature_dialog" data-id="{$ID}" data-toggle="modal">
+                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
+                    <a class="btn btn-default btn-xs delete-feature" title="{intl l='Delete this feature'}" href="#delete_feature_dialog" data-id="{$ID}" data-toggle="modal">
                         <span class="glyphicon glyphicon-trash"></span>
-                       </a>
-                    {/loop}
-                </div>
+                    </a>
+                {/loop}
             </td>
         </tr>
          {/loop}
@@ -106,7 +104,7 @@
     dialog_title    = {intl l="Remove feature"}
     dialog_message  = {intl l="Do you really want to remove this feature from the template ?"}
 
-    form_action     = {url path='/admin/configuration/templates/features/delete'}
+    form_action     = {token_url path='/admin/configuration/templates/features/delete'}
     form_content    = {$smarty.capture.delete_feature_dialog nofilter}
 }
 

@@ -153,6 +153,18 @@ abstract class CouponVersion implements ActiveRecordInterface
     protected $version;
 
     /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
+
+    /**
      * @var        Coupon
      */
     protected $aCoupon;
@@ -640,6 +652,37 @@ abstract class CouponVersion implements ActiveRecordInterface
     }
 
     /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->version_created_at;
+        } else {
+            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return   string
+     */
+    public function getVersionCreatedBy()
+    {
+
+        return $this->version_created_by;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
@@ -1028,6 +1071,48 @@ abstract class CouponVersion implements ActiveRecordInterface
     } // setVersion()
 
     /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\CouponVersion The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            if ($dt !== $this->version_created_at) {
+                $this->version_created_at = $dt;
+                $this->modifiedColumns[CouponVersionTableMap::VERSION_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CouponVersion The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[CouponVersionTableMap::VERSION_CREATED_BY] = true;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1124,6 +1209,15 @@ abstract class CouponVersion implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CouponVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : CouponVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : CouponVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1132,7 +1226,7 @@ abstract class CouponVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 16; // 16 = CouponVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 18; // 18 = CouponVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CouponVersion object", 0, $e);
@@ -1401,6 +1495,12 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->isColumnModified(CouponVersionTableMap::VERSION)) {
             $modifiedColumns[':p' . $index++]  = '`VERSION`';
         }
+        if ($this->isColumnModified(CouponVersionTableMap::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(CouponVersionTableMap::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `coupon_version` (%s) VALUES (%s)',
@@ -1459,6 +1559,12 @@ abstract class CouponVersion implements ActiveRecordInterface
                         break;
                     case '`VERSION`':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1563,6 +1669,12 @@ abstract class CouponVersion implements ActiveRecordInterface
             case 15:
                 return $this->getVersion();
                 break;
+            case 16:
+                return $this->getVersionCreatedAt();
+                break;
+            case 17:
+                return $this->getVersionCreatedBy();
+                break;
             default:
                 return null;
                 break;
@@ -1608,6 +1720,8 @@ abstract class CouponVersion implements ActiveRecordInterface
             $keys[13] => $this->getCreatedAt(),
             $keys[14] => $this->getUpdatedAt(),
             $keys[15] => $this->getVersion(),
+            $keys[16] => $this->getVersionCreatedAt(),
+            $keys[17] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1700,6 +1814,12 @@ abstract class CouponVersion implements ActiveRecordInterface
             case 15:
                 $this->setVersion($value);
                 break;
+            case 16:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 17:
+                $this->setVersionCreatedBy($value);
+                break;
         } // switch()
     }
 
@@ -1740,6 +1860,8 @@ abstract class CouponVersion implements ActiveRecordInterface
         if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
         if (array_key_exists($keys[15], $arr)) $this->setVersion($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setVersionCreatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setVersionCreatedBy($arr[$keys[17]]);
     }
 
     /**
@@ -1767,6 +1889,8 @@ abstract class CouponVersion implements ActiveRecordInterface
         if ($this->isColumnModified(CouponVersionTableMap::CREATED_AT)) $criteria->add(CouponVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CouponVersionTableMap::UPDATED_AT)) $criteria->add(CouponVersionTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(CouponVersionTableMap::VERSION)) $criteria->add(CouponVersionTableMap::VERSION, $this->version);
+        if ($this->isColumnModified(CouponVersionTableMap::VERSION_CREATED_AT)) $criteria->add(CouponVersionTableMap::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(CouponVersionTableMap::VERSION_CREATED_BY)) $criteria->add(CouponVersionTableMap::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -1853,6 +1977,8 @@ abstract class CouponVersion implements ActiveRecordInterface
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1952,6 +2078,8 @@ abstract class CouponVersion implements ActiveRecordInterface
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();

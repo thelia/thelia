@@ -1,8 +1,9 @@
-<input type="hidden" name="thelia_coupon_creation[{$typeKey}]" value="0"/>
-<div class="form-group input-{$fieldId}">
-    <label for="{$fieldId}" class="control-label">{$label}</label>
+<div class="form-group input-coupon-percent">
+
+    <label for="coupon-percent" class="control-label">{intl l='Percent Discount'}</label>
+
     <div class="input-group">
-        <input id="{$fieldId}" class="form-control" name="{$fieldName}[{$fieldId}]" type="text" value="{$value}"/>
+        <input id="coupon-percent" class="form-control" name="{$percentage_field_name}" type="text" value="{$percentage_value}"/>
         <div class="input-group-addon">%</div>
     </div>
 </div>

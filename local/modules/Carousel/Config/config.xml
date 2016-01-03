@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <loop name="carousel" class="Carousel\Loop\CarouselLoop" />
+    </loops>
+
+    <forms>
+        <form name="carousel.image" class="Carousel\Form\CarouselImageForm" />
+        <form name="carousel.update" class="Carousel\Form\CarouselUpdateForm" />
+    </forms>
+
+    <hooks>
+        <hook id="carousel.hook">
+            <tag name="hook.event_listener" event="home.body" type="front" templates="render:carousel.html" />
+            <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" templates="js:assets/js/module-configuration.js" />
+        </hook>
+        <hook id="carousel.hook.back" class="Carousel\Hook\BackHook">
+            <tag name="hook.event_listener" event="main.top-menu-tools" type="back" />
+        </hook>
+    </hooks>
+</config>

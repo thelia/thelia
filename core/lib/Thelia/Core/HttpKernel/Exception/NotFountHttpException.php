@@ -12,9 +12,10 @@
 namespace Thelia\Core\HttpKernel\Exception;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
+
 /**
  * Class NotFountHttpException
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NotFountHttpException extends BaseNotFountHttpException
 {
@@ -30,6 +31,5 @@ class NotFountHttpException extends BaseNotFountHttpException
     public function isAdminContext()
     {
         return $this->adminContext === true;
-
     }
 }

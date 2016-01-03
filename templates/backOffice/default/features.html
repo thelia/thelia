@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/features'}">{intl l="Product features"}</a></li>
         </ul>
 
-        {module_include location='features_top'}
+        {hook name="features.top" location="features_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -32,7 +32,7 @@
     	                           {intl l='Thelia product features'}
 
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product feature'}" href="#creation_dialog" data-toggle="modal">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new product feature'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                     {/loop}
@@ -69,7 +69,7 @@
                                             }
                                         </th>
 
-                                        {module_include location='features_table_header'}
+                                        {hook name="features.table-header" location="features_table_header" }
 
                                         <th class="actions">{intl l="Actions"}</th>
                                     </tr>
@@ -101,27 +101,29 @@
                                             }
                                         </td>
 
-                                        {module_include location='features_table_row'}
+                                        {hook name="features.table-row" location="features_table_row" feature_id={$ID} }
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-                                            <div class="btn-group">
-                                                <a class="btn btn-default btn-xs feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-minus"></span>
-                                                </a>
-                                                <a class="btn btn-default btn-xs feature-add-to-all" title="{intl l='Add this feature to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-plus"></span>
-                                                </a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
                                             </div>
-                                            {/loop}
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
 
-                                            <div class="btn-group">
+                                                    <a class="feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                    </a>
+                                                    <a class="feature-add-to-all" title="{intl l='Add this feature to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                    </a>
+                                                {/loop}
+
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+    	                                            <a class="feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+    	                                            <a class="feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>
                                         </td>
@@ -145,7 +147,7 @@
             </div>
         </div>
 
-        {module_include location='features_bottom'}
+        {hook name="features.bottom" location="features_bottom" }
 
     </div>
 </div>
@@ -156,14 +158,14 @@
 
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
               {* on success, redirect to the edition page, _ID_ is replaced with the created feature ID, see controller  *}
               <input type="hidden" name="{$name}" value="{url path='/admin/configuration/features/update' feature_id='_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -178,14 +180,14 @@
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='add_to_all'}
+        {form_field field='add_to_all'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">
@@ -197,7 +199,7 @@
             </div>
         {/form_field}
 
-        {module_include location='feature_create_form'}
+        {hook name="feature.create-form" location="feature_create_form" }
 
     {/capture}
 
@@ -211,7 +213,7 @@
         dialog_ok_label     = {intl l="Create this feature"}
 
         form_action        = {url path='/admin/configuration/features/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
@@ -221,7 +223,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="feature_id" id="feature_delete_id" value="" />
 
-    {module_include location='feature_delete_form'}
+    {hook name="feature.delete-form" location="feature_delete_form" }
 
 {/capture}
 
@@ -232,7 +234,7 @@
     dialog_title    = {intl l="Delete feature"}
     dialog_message  = {intl l="Do you really want to delete this feature ? It will be removed from all product templates."}
 
-    form_action     = {url path='/admin/configuration/features/delete'}
+    form_action     = {token_url path='/admin/configuration/features/delete'}
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 
@@ -242,7 +244,7 @@
 {capture "add_to_all_dialog"}
     <input type="hidden" name="feature_id" id="feature_add_to_all_id" value="" />
 
-    {module_include location='feature_add_to_all_form'}
+    {hook name="feature.add-to-all-form" location="feature_add_to_all_form" }
 
 {/capture}
 
@@ -253,7 +255,7 @@
     dialog_title    = {intl l="Add to all product templates"}
     dialog_message  = {intl l="Do you really want to add this feature to all product templates ?"}
 
-    form_action         = {url path='/admin/configuration/features/add-to-all-templates'}
+    form_action         = {token_url path='/admin/configuration/features/add-to-all-templates'}
     form_content        = {$smarty.capture.add_to_all_dialog nofilter}
 }
 
@@ -262,7 +264,7 @@
 {capture "remove_from_all_dialog"}
     <input type="hidden" name="feature_id" id="feature_remove_from_all_id" value="" />
 
-    {module_include location='feature_add_to_all_form'}
+    {hook name="feature.remove-to-all-form" location="feature_remove_to_all_form" }
 
 {/capture}
 
@@ -273,7 +275,7 @@
     dialog_title    = {intl l="Remove from all product templates"}
     dialog_message  = {intl l="Do you really want to remove this feature from all product templates ? You'll loose all product related data for this feature."}
 
-    form_action         = {url path='/admin/configuration/features/remove-from-all-templates'}
+    form_action         = {token_url path='/admin/configuration/features/remove-from-all-templates'}
     form_content        = {$smarty.capture.remove_from_all_dialog nofilter}
 }
 
@@ -334,5 +336,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='features-js'}
+    {hook name="features.js" location="features-js" }
 {/block}

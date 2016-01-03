@@ -16,12 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Address as AddressModel;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -33,6 +32,12 @@ use Thelia\Type;
  * Class Address
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method bool|string getDefault()
+ * @method string getCustomer()
+ * @method int[] getExclude()
  */
 class Address extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -108,11 +113,11 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var AddressModel $address */
         foreach ($loopResult->getResultDataCollection() as $address) {
             $loopResultRow = new LoopResultRow($address);
             $loopResultRow
@@ -129,10 +134,12 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 ->set("ZIPCODE", $address->getZipcode())
                 ->set("CITY", $address->getCity())
                 ->set("COUNTRY", $address->getCountryId())
+                ->set("STATE", $address->getStateId())
                 ->set("PHONE", $address->getPhone())
                 ->set("CELLPHONE", $address->getCellphone())
                 ->set("DEFAULT", $address->getIsDefault())
             ;
+            $this->addOutputFields($loopResultRow, $address);
 
             $loopResult->addRow($loopResultRow);
         }

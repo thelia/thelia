@@ -37,7 +37,9 @@ class TokenAuthenticator implements AuthenticatorInterface
 
         $user = $this->userProvider->getUser($keyData);
 
-        if ($user === null) throw new TokenAuthenticationException("No user matches the provided token");
+        if ($user === null) {
+            throw new TokenAuthenticationException("No user matches the provided token");
+        }
         return $user;
     }
 }

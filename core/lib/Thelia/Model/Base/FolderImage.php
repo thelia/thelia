@@ -78,6 +78,13 @@ abstract class FolderImage implements ActiveRecordInterface
     protected $file;
 
     /**
+     * The value for the visible field.
+     * Note: this column has a database default value of: 1
+     * @var        int
+     */
+    protected $visible;
+
+    /**
      * The value for the position field.
      * @var        int
      */
@@ -135,10 +142,23 @@ abstract class FolderImage implements ActiveRecordInterface
     protected $folderImageI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->visible = 1;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\FolderImage object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -426,6 +446,17 @@ abstract class FolderImage implements ActiveRecordInterface
     }
 
     /**
+     * Get the [visible] column value.
+     *
+     * @return   int
+     */
+    public function getVisible()
+    {
+
+        return $this->visible;
+    }
+
+    /**
      * Get the [position] column value.
      *
      * @return   int
@@ -544,6 +575,27 @@ abstract class FolderImage implements ActiveRecordInterface
     } // setFile()
 
     /**
+     * Set the value of [visible] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FolderImage The current object (for fluent API support)
+     */
+    public function setVisible($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->visible !== $v) {
+            $this->visible = $v;
+            $this->modifiedColumns[FolderImageTableMap::VISIBLE] = true;
+        }
+
+
+        return $this;
+    } // setVisible()
+
+    /**
      * Set the value of [position] column.
      *
      * @param      int $v new value
@@ -616,6 +668,10 @@ abstract class FolderImage implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->visible !== 1) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -652,16 +708,19 @@ abstract class FolderImage implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FolderImageTableMap::translateFieldName('File', TableMap::TYPE_PHPNAME, $indexType)];
             $this->file = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FolderImageTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FolderImageTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->visible = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FolderImageTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FolderImageTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FolderImageTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FolderImageTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FolderImageTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -674,7 +733,7 @@ abstract class FolderImage implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = FolderImageTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = FolderImageTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\FolderImage object", 0, $e);
@@ -938,6 +997,9 @@ abstract class FolderImage implements ActiveRecordInterface
         if ($this->isColumnModified(FolderImageTableMap::FILE)) {
             $modifiedColumns[':p' . $index++]  = '`FILE`';
         }
+        if ($this->isColumnModified(FolderImageTableMap::VISIBLE)) {
+            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
+        }
         if ($this->isColumnModified(FolderImageTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
         }
@@ -966,6 +1028,9 @@ abstract class FolderImage implements ActiveRecordInterface
                         break;
                     case '`FILE`':
                         $stmt->bindValue($identifier, $this->file, PDO::PARAM_STR);
+                        break;
+                    case '`VISIBLE`':
+                        $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
@@ -1048,12 +1113,15 @@ abstract class FolderImage implements ActiveRecordInterface
                 return $this->getFile();
                 break;
             case 3:
-                return $this->getPosition();
+                return $this->getVisible();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1088,9 +1156,10 @@ abstract class FolderImage implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getFolderId(),
             $keys[2] => $this->getFile(),
-            $keys[3] => $this->getPosition(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[3] => $this->getVisible(),
+            $keys[4] => $this->getPosition(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1148,12 +1217,15 @@ abstract class FolderImage implements ActiveRecordInterface
                 $this->setFile($value);
                 break;
             case 3:
-                $this->setPosition($value);
+                $this->setVisible($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1183,9 +1255,10 @@ abstract class FolderImage implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setFolderId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setFile($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1200,6 +1273,7 @@ abstract class FolderImage implements ActiveRecordInterface
         if ($this->isColumnModified(FolderImageTableMap::ID)) $criteria->add(FolderImageTableMap::ID, $this->id);
         if ($this->isColumnModified(FolderImageTableMap::FOLDER_ID)) $criteria->add(FolderImageTableMap::FOLDER_ID, $this->folder_id);
         if ($this->isColumnModified(FolderImageTableMap::FILE)) $criteria->add(FolderImageTableMap::FILE, $this->file);
+        if ($this->isColumnModified(FolderImageTableMap::VISIBLE)) $criteria->add(FolderImageTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(FolderImageTableMap::POSITION)) $criteria->add(FolderImageTableMap::POSITION, $this->position);
         if ($this->isColumnModified(FolderImageTableMap::CREATED_AT)) $criteria->add(FolderImageTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FolderImageTableMap::UPDATED_AT)) $criteria->add(FolderImageTableMap::UPDATED_AT, $this->updated_at);
@@ -1268,6 +1342,7 @@ abstract class FolderImage implements ActiveRecordInterface
     {
         $copyObj->setFolderId($this->getFolderId());
         $copyObj->setFile($this->getFile());
+        $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1613,11 +1688,13 @@ abstract class FolderImage implements ActiveRecordInterface
         $this->id = null;
         $this->folder_id = null;
         $this->file = null;
+        $this->visible = null;
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

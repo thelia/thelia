@@ -21,25 +21,34 @@ class FeatureCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title"   , "text"  , array(
+            ->add(
+                "title",
+                "text",
+                array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Title *"),
                 "label_attr" => array(
-                    "for" => "title"
-                ))
+                    "for" => "title",
+                ), )
             )
-            ->add("locale" , "text"  , array(
+            ->add(
+                "locale",
+                "text",
+                array(
                 "constraints" => array(
-                    new NotBlank()
-                ))
+                    new NotBlank(),
+                ), )
             )
-            ->add("add_to_all"   , "checkbox"  , array(
+            ->add(
+                "add_to_all",
+                "checkbox",
+                array(
                 "label" => Translator::getInstance()->trans("Add to all product templates"),
                 "label_attr" => array(
-                    "for" => "add_to_all"
-                ))
+                    "for" => "add_to_all",
+                ), )
             )
         ;
     }

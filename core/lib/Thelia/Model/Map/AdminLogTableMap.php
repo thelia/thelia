@@ -58,7 +58,7 @@ class AdminLogTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 10;
+    const NUM_COLUMNS = 11;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class AdminLogTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 10;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /**
      * the column name for the ID field
@@ -94,6 +94,11 @@ class AdminLogTableMap extends TableMap
      * the column name for the RESOURCE field
      */
     const RESOURCE = 'admin_log.RESOURCE';
+
+    /**
+     * the column name for the RESOURCE_ID field
+     */
+    const RESOURCE_ID = 'admin_log.RESOURCE_ID';
 
     /**
      * the column name for the ACTION field
@@ -132,12 +137,12 @@ class AdminLogTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AdminLogin', 'AdminFirstname', 'AdminLastname', 'Resource', 'Action', 'Message', 'Request', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'adminLogin', 'adminFirstname', 'adminLastname', 'resource', 'action', 'message', 'request', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AdminLogTableMap::ID, AdminLogTableMap::ADMIN_LOGIN, AdminLogTableMap::ADMIN_FIRSTNAME, AdminLogTableMap::ADMIN_LASTNAME, AdminLogTableMap::RESOURCE, AdminLogTableMap::ACTION, AdminLogTableMap::MESSAGE, AdminLogTableMap::REQUEST, AdminLogTableMap::CREATED_AT, AdminLogTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ADMIN_LOGIN', 'ADMIN_FIRSTNAME', 'ADMIN_LASTNAME', 'RESOURCE', 'ACTION', 'MESSAGE', 'REQUEST', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'admin_login', 'admin_firstname', 'admin_lastname', 'resource', 'action', 'message', 'request', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id', 'AdminLogin', 'AdminFirstname', 'AdminLastname', 'Resource', 'ResourceId', 'Action', 'Message', 'Request', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'adminLogin', 'adminFirstname', 'adminLastname', 'resource', 'resourceId', 'action', 'message', 'request', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AdminLogTableMap::ID, AdminLogTableMap::ADMIN_LOGIN, AdminLogTableMap::ADMIN_FIRSTNAME, AdminLogTableMap::ADMIN_LASTNAME, AdminLogTableMap::RESOURCE, AdminLogTableMap::RESOURCE_ID, AdminLogTableMap::ACTION, AdminLogTableMap::MESSAGE, AdminLogTableMap::REQUEST, AdminLogTableMap::CREATED_AT, AdminLogTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ADMIN_LOGIN', 'ADMIN_FIRSTNAME', 'ADMIN_LASTNAME', 'RESOURCE', 'RESOURCE_ID', 'ACTION', 'MESSAGE', 'REQUEST', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'admin_login', 'admin_firstname', 'admin_lastname', 'resource', 'resource_id', 'action', 'message', 'request', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -147,12 +152,12 @@ class AdminLogTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AdminLogin' => 1, 'AdminFirstname' => 2, 'AdminLastname' => 3, 'Resource' => 4, 'Action' => 5, 'Message' => 6, 'Request' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'adminLogin' => 1, 'adminFirstname' => 2, 'adminLastname' => 3, 'resource' => 4, 'action' => 5, 'message' => 6, 'request' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
-        self::TYPE_COLNAME       => array(AdminLogTableMap::ID => 0, AdminLogTableMap::ADMIN_LOGIN => 1, AdminLogTableMap::ADMIN_FIRSTNAME => 2, AdminLogTableMap::ADMIN_LASTNAME => 3, AdminLogTableMap::RESOURCE => 4, AdminLogTableMap::ACTION => 5, AdminLogTableMap::MESSAGE => 6, AdminLogTableMap::REQUEST => 7, AdminLogTableMap::CREATED_AT => 8, AdminLogTableMap::UPDATED_AT => 9, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ADMIN_LOGIN' => 1, 'ADMIN_FIRSTNAME' => 2, 'ADMIN_LASTNAME' => 3, 'RESOURCE' => 4, 'ACTION' => 5, 'MESSAGE' => 6, 'REQUEST' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'admin_login' => 1, 'admin_firstname' => 2, 'admin_lastname' => 3, 'resource' => 4, 'action' => 5, 'message' => 6, 'request' => 7, 'created_at' => 8, 'updated_at' => 9, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AdminLogin' => 1, 'AdminFirstname' => 2, 'AdminLastname' => 3, 'Resource' => 4, 'ResourceId' => 5, 'Action' => 6, 'Message' => 7, 'Request' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'adminLogin' => 1, 'adminFirstname' => 2, 'adminLastname' => 3, 'resource' => 4, 'resourceId' => 5, 'action' => 6, 'message' => 7, 'request' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        self::TYPE_COLNAME       => array(AdminLogTableMap::ID => 0, AdminLogTableMap::ADMIN_LOGIN => 1, AdminLogTableMap::ADMIN_FIRSTNAME => 2, AdminLogTableMap::ADMIN_LASTNAME => 3, AdminLogTableMap::RESOURCE => 4, AdminLogTableMap::RESOURCE_ID => 5, AdminLogTableMap::ACTION => 6, AdminLogTableMap::MESSAGE => 7, AdminLogTableMap::REQUEST => 8, AdminLogTableMap::CREATED_AT => 9, AdminLogTableMap::UPDATED_AT => 10, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ADMIN_LOGIN' => 1, 'ADMIN_FIRSTNAME' => 2, 'ADMIN_LASTNAME' => 3, 'RESOURCE' => 4, 'RESOURCE_ID' => 5, 'ACTION' => 6, 'MESSAGE' => 7, 'REQUEST' => 8, 'CREATED_AT' => 9, 'UPDATED_AT' => 10, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'admin_login' => 1, 'admin_firstname' => 2, 'admin_lastname' => 3, 'resource' => 4, 'resource_id' => 5, 'action' => 6, 'message' => 7, 'request' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -176,6 +181,7 @@ class AdminLogTableMap extends TableMap
         $this->addColumn('ADMIN_FIRSTNAME', 'AdminFirstname', 'VARCHAR', false, 255, null);
         $this->addColumn('ADMIN_LASTNAME', 'AdminLastname', 'VARCHAR', false, 255, null);
         $this->addColumn('RESOURCE', 'Resource', 'VARCHAR', false, 255, null);
+        $this->addColumn('RESOURCE_ID', 'ResourceId', 'INTEGER', false, null, null);
         $this->addColumn('ACTION', 'Action', 'VARCHAR', false, 255, null);
         $this->addColumn('MESSAGE', 'Message', 'LONGVARCHAR', false, null, null);
         $this->addColumn('REQUEST', 'Request', 'CLOB', false, null, null);
@@ -346,6 +352,7 @@ class AdminLogTableMap extends TableMap
             $criteria->addSelectColumn(AdminLogTableMap::ADMIN_FIRSTNAME);
             $criteria->addSelectColumn(AdminLogTableMap::ADMIN_LASTNAME);
             $criteria->addSelectColumn(AdminLogTableMap::RESOURCE);
+            $criteria->addSelectColumn(AdminLogTableMap::RESOURCE_ID);
             $criteria->addSelectColumn(AdminLogTableMap::ACTION);
             $criteria->addSelectColumn(AdminLogTableMap::MESSAGE);
             $criteria->addSelectColumn(AdminLogTableMap::REQUEST);
@@ -357,6 +364,7 @@ class AdminLogTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ADMIN_FIRSTNAME');
             $criteria->addSelectColumn($alias . '.ADMIN_LASTNAME');
             $criteria->addSelectColumn($alias . '.RESOURCE');
+            $criteria->addSelectColumn($alias . '.RESOURCE_ID');
             $criteria->addSelectColumn($alias . '.ACTION');
             $criteria->addSelectColumn($alias . '.MESSAGE');
             $criteria->addSelectColumn($alias . '.REQUEST');

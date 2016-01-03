@@ -14,6 +14,7 @@ namespace Thelia\Model\Tools;
 
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrlQuery;
@@ -21,6 +22,7 @@ use Thelia\Model\RewritingUrl;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 use Thelia\Model\ConfigQuery;
+
 /**
  * A trait for managing Rewritten URLs from model classes
  */
@@ -29,7 +31,7 @@ trait UrlRewritingTrait
     /**
      * @returns string the view name of the rewritten object (e.g., 'category', 'product')
      */
-    abstract protected function getRewrittenUrlViewName();
+    abstract public function getRewrittenUrlViewName();
 
     /**
      * Get the object URL for the given locale, rewritten if rewriting is enabled.
@@ -84,7 +86,7 @@ trait UrlRewritingTrait
             $i=0;
             while (URL::getInstance()->resolve($urlFilePart)) {
                 $i++;
-                $urlFilePart = sprintf("%s-%d.html",$cleanString, $i);
+                $urlFilePart = sprintf("%s-%d.html", $cleanString, $i);
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();
@@ -97,7 +99,6 @@ trait UrlRewritingTrait
         }
 
         return $urlFilePart;
-
     }
 
     /**
@@ -128,7 +129,7 @@ trait UrlRewritingTrait
     /**
      * Mark the current URL as obseolete
      */
-    public function markRewritenUrlObsolete()
+    public function markRewrittenUrlObsolete()
     {
         RewritingUrlQuery::create()
             ->filterByView($this->getRewrittenUrlViewName())
@@ -167,18 +168,18 @@ trait UrlRewritingTrait
 
                     if ($resolver->locale != $locale) {
                         /* it is an url related to this product for another locale */
-                        throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                        throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
                     if (count($resolver->otherParameters) > 0) {
                         /* it is an url related to this product but with more arguments */
-                        throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                        throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
                     /* here it must be a deprecated url */
                 } else {
                     /* already related to another object */
-                    throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                    throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                 }
             }
         } catch (UrlRewritingException $e) {

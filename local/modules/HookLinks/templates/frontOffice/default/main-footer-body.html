@@ -1,0 +1,15 @@
+<ul>
+    {loop name="footer_links" type="content" folder="2"}
+    <li><a href="{$URL}">{$TITLE}</a></li>
+    {/loop}
+    {loop type="auth" name="customer_is_logged" role="CUSTOMER"}
+    <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!" d="hooklinks.fo.default"}</a></li>
+    <li><a href="{url path="/account"}" class="account">{intl l="My Account" d="hooklinks.fo.default"}</a></li>
+    {/loop}
+    {elseloop rel="customer_is_logged"}
+    <li><a href="{url path="/login"}">{intl l="Login" d="hooklinks.fo.default"}</a></li>
+    <li><a href="{url path="/register"}">{intl l="Register" d="hooklinks.fo.default"}</a></li>
+    {/elseloop}
+    <li><a href="{url path="/cart"}">{intl l="Cart" d="hooklinks.fo.default"}</a></li>
+    <li><a href="{url path="/order/delivery"}">{intl l="Checkout" d="hooklinks.fo.default"}</a></li>
+</ul>

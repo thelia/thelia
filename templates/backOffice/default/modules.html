@@ -20,26 +20,42 @@
                 <li>{intl l="Modules"}</li>
             </ul>
 {*            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
-                <a class="btn btn-default btn-primary pull-right" title="{intl l='Install a new module'}" href="#install_dialog" data-toggle="modal">
+                <a class="btn btn-primary pull-right" title="{intl l='Install a new module'}" href="#install_dialog" data-toggle="modal">
                     <span class="glyphicon glyphicon-import"></span> {intl l="Install a new module"}
                 </a>
             {/loop}
 *}
         </div>
 
-        {module_include location='modules_top'}
+        {hook name="modules.top" location="modules_top" }
 
         <div class="row">
+
+            {if $module_errors}
+            {include file="includes/module-errors.html"}
+            {/if}
+
+            {include file="includes/module-install.html"}
+
             <div class="col-md-12">
             {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
-            {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
+                
             {include file="includes/module-block.html" module_type="2" caption_title={intl l='Delivery modules'}}
             {include file="includes/module-block.html" module_type="3" caption_title={intl l='Payment modules'}}
+            {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
 
+            </div>
+
+
+            <div class="col-md-12">
+                <div class="text-right">
+                    <a href="{url path='/admin/hooks'}" class="btn btn-primary">{intl l="Manage hooks"} <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a href="{url path='/admin/module-hooks'}" class="btn btn-primary">{intl l="Manage modules attachements"}  <span class="glyphicon glyphicon-chevron-right"></span></a>
+                </div>
             </div>
         </div>
 
-        {module_include location='modules_bottom'}
+        {hook name="modules.bottom" location="modules_bottom" }
 
     </div>
 </div>
@@ -71,7 +87,7 @@
     dialog_title    = {intl l="Delete a module"}
     dialog_message  = {intl l="Do you really want to delete this module ?"}
 
-    form_action         = {url path='/admin/module/delete'}
+    form_action         = {token_url path='/admin/module/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 
@@ -85,6 +101,26 @@
             </div>
             <div class="modal-body" id="module-failed-body">
 
+            </div>
+        </div>
+    </div>
+</div>
+
+{* Module information dialog *}
+<div class="modal fade" id="module-information" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 id="module-information-title"></h3>
+            </div>
+
+            <div class="modal-body" id="module-information-body">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{intl l='Close'}</button>
             </div>
         </div>
     </div>
@@ -104,6 +140,13 @@
 
     <script>
         $(document).ready(function() {
+
+            $("#module-install").on("submit", function(event) {
+                var $loader = $('<div class="loader"></div>');
+                $('body').append($loader);
+                $loader.show();
+            });
+
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
 
@@ -114,19 +157,16 @@
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
                $.ajax({
                     url: url_management+$(this).data('id')
-               }).done(function(){
+               }).always(function(){
                    $("#loading-event").remove();
-               })
-               .success(function() {
+               }).done(function() {
             	   if (is_checked)
-            		   $('#config-btn-' + module_id).removeClass('disabled');
+            		   $('.config-btn-' + module_id).removeClass('disabled');
             	   else
-                       $('#config-btn-' + module_id).addClass('disabled');
+                       $('.config-btn-' + module_id).addClass('disabled');
 
-               })
-               .fail(function(jqXHR, textStatus, errorThrown){
+               }).fail(function(jqXHR, textStatus, errorThrown){
                     checkbox.bootstrapSwitch('toggleState', true);
-                    $("#loading-event").remove();
                     $('#module-failed-body').html(jqXHR.responseJSON.error);
                     $("#module-failed").modal("show");
                });
@@ -158,11 +198,48 @@
                }
            });
 
+            {* module errors *}
+
+            $('.module-error-more').on('click', function(event){
+                event.preventDefault();
+
+                $(event.currentTarget).next('.more').toggleClass('hidden');
+            });
+
+            $('.module-information').click(function(event) {
+                showModuleInformation(
+                        '{url path='/admin/module/information/__ID__'}'.replace('__ID__', $(this).data('id'))
+                );
+
+                event.preventDefault();
+            });
+
+            $('.module-documentation').click(function(event) {
+                showModuleInformation(
+                        '{url path='/admin/module/documentation/__ID__'}'.replace('__ID__', $(this).data('id'))
+                );
+
+                event.preventDefault();
+            });
+
+            function showModuleInformation(url) {
+                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+                $.ajax({
+                    url: url
+                }).always(function(){
+                    $("#loading-event").remove();
+                }).success(function(data) {
+                    $('#module-information-title').html(data.title);
+                    $('#module-information-body').html(data.body);
+                    $("#module-information").modal("show");
+                });
+            }
         });
     </script>
 
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='modules-js'}
+    {hook name="modules.js" location="modules-js" }
 {/block}

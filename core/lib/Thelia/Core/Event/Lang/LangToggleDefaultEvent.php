@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Lang;
 /**
  * Class LangToggleDefaultEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangToggleDefaultEvent extends LangEvent
 {
@@ -51,5 +51,4 @@ class LangToggleDefaultEvent extends LangEvent
     {
         return $this->lang_id;
     }
-
 }

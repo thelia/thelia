@@ -10,21 +10,30 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
         <h1 id="main-label" class="page-header">{intl l="Contact Us"}</h1>
 
+        {ifhook rel="contact.top"}
+           {hook name="contact.top"}
+        {/ifhook}
+        {elsehook rel="contact.top"}
         <div id="google-map">
-            <iframe class="map" width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.co.uk/maps?f=q&source=s_q&hl=en&geocode=&q=london&aq=&sll=52.8382,-2.327815&sspn=9.377429,22.126465&ie=UTF8&hq=&hnear=London,+United+Kingdom&t=m&z=10&ll=51.511214,-0.119824&output=embed&iwloc=near"></iframe>
+            {assign var="address" value="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, {config key="store_city"}, {config key="store_country"}"}
+            <iframe class="map" width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?f=q&source=s_q&geocode=&q={$address|escape:'url'}&output=embed"></iframe>
         </div><!-- / #google-map-->
+        {/elsehook}
 
         {block name="contact-form"}
             {form name="thelia.front.contact"}
             <form id="form-contact" action="{url path="/contact"}" method="post">
-                {form_hidden_fields form=$form}
-                <fieldset id="contact-info" class="panel">
+                {form_hidden_fields}
+
+                {hook name="contact.form-top"}
+
+                <fieldset id="contact-info" class="panel panel-default">
                     <div class="panel-heading">
                         {intl l="Send us a message"}
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                        {form_field form=$form field="name"}
+                        {form_field field="name"}
                             <div class="form-group group-name col-sm-6{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -33,12 +42,12 @@
                                         <span class="help-block">{$message}</span>
                                         {assign var="error_focus" value="true"}
                                     {elseif $value != "" && !$error}
-                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                        <span class="help-block"><i class="fa fa-check"></i></span>
                                     {/if}
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-                        {form_field form=$form field="email"}
+                        {form_field field="email"}
                             <div class="form-group group-email col-sm-6{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -51,7 +60,7 @@
                             </div><!--/.form-group-->
                         {/form_field}
                         </div>
-                        {form_field form=$form field="subject"}
+                        {form_field field="subject"}
                             <div class="form-group group-firstname{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -63,7 +72,7 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-                        {form_field form=$form field="message"}
+                        {form_field field="message"}
                             <div class="form-group group-message{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -75,17 +84,35 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-
-                        <div class="form-group group-btn">
-                            <div class="control-btn">
-                                <button type="submit" class="btn btn-contact">{intl l="Send"}</button>
-                            </div>
-                        </div><!--/.form-group-->
                     </div>
                 </fieldset>
+
+                {hook name="contact.form-bottom"}
+
+                <div class="form-group group-btn">
+                    <div class="control-btn">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Send"}</button>
+                    </div>
+                </div><!--/.form-group-->
+
             </form>
             {/form}
         {/block}
+
+        {hook name="contact.bottom"}
+
         </article>
     </div>
+{/block}
+
+{block name="stylesheet"}
+{hook name="contact.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="contact.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="contact.javascript-initialization"}
 {/block}

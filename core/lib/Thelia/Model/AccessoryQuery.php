@@ -16,4 +16,5 @@ use Thelia\Model\Base\AccessoryQuery as BaseAccessoryQuery;
  */
 class AccessoryQuery extends BaseAccessoryQuery
 {
-} // AccessoryQuery
+}
+// AccessoryQuery

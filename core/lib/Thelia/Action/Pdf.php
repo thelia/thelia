@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -18,15 +19,22 @@ use Thelia\Core\Event\TheliaEvents;
 /**
  * Class Pdf
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Pdf extends BaseAction implements EventSubscriberInterface
 {
-
     public function generatePdf(PdfEvent $event)
     {
+        $html2pdf = new \HTML2PDF(
+            $event->getOrientation(),
+            $event->getFormat(),
+            $event->getLang(),
+            $event->getUnicode(),
+            $event->getEncoding(),
+            $event->getMarges()
+        );
 
-        $html2pdf = new \HTML2PDF($event->getOrientation(), $event->getFormat(), $event->getLang(), $event->getUnicode(), $event->getEncoding(), $event->getMarges());
+        $html2pdf->setDefaultFont($event->getFontName());
 
         $html2pdf->pdf->SetDisplayMode('real');
 

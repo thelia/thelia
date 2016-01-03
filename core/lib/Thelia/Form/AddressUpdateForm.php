@@ -15,15 +15,13 @@ namespace Thelia\Form;
 /**
  * Class AddressUpdateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressUpdateForm extends AddressCreateForm
 {
-
     protected function buildForm()
     {
         parent::buildForm();
-
     }
 
     /**

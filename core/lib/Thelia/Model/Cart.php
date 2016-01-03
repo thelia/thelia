@@ -3,7 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
@@ -14,12 +14,24 @@ class Cart extends BaseCart
     /**
      * Duplicate the current existing cart. Only the token is changed
      *
-     * @param $token
-     * @param  Customer $customer
+     * @param string $token
+     * @param Customer $customer
+     * @param Currency $currency
+     * @param EventDispatcherInterface $dispatcher
      * @return Cart
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function duplicate($token, Customer $customer = null, Currency $currency = null, EventDispatcherInterface $dispatcher)
-    {
+    public function duplicate(
+        $token,
+        Customer $customer = null,
+        Currency $currency = null,
+        EventDispatcherInterface $dispatcher = null
+    ) {
+        if (!$dispatcher) {
+            return false;
+        }
+
         $cartItems = $this->getCartItems();
 
         $cart = new Cart();
@@ -44,17 +56,13 @@ class Cart extends BaseCart
         }
 
         $cart->save();
-        $currentDateTime = new \DateTime();
         foreach ($cartItems as $cartItem) {
-
             $product = $cartItem->getProduct();
             $productSaleElements = $cartItem->getProductSaleElements();
             if ($product &&
                 $productSaleElements &&
                 $product->getVisible() == 1 &&
-                ($productSaleElements->getQuantity() > $cartItem->getQuantity() || ! ConfigQuery::checkAvailableStock()))
-            {
-
+                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock())) {
                 $item = new CartItem();
                 $item->setCart($cart);
                 $item->setProductId($cartItem->getProductId());
@@ -69,9 +77,13 @@ class Cart extends BaseCart
                 $item->save();
                 $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
-
         }
-        $this->delete();
+
+        try {
+            $this->delete();
+        } catch (\Exception $e) {
+            // just fail silently in some cases
+        }
 
         return $cart;
     }
@@ -102,16 +114,19 @@ class Cart extends BaseCart
      * @param  bool      $discount
      * @return float|int
      */
-    public function getTaxedAmount(Country $country, $discount = true)
+    public function getTaxedAmount(Country $country, $discount = true, State $state = null)
     {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getRealTaxedPrice($country) * $cartItem->getQuantity();
+            $total += $cartItem->getTotalRealTaxedPrice($country, $state);
         }
 
         if ($discount) {
             $total -= $this->getDiscount();
+            if ($total < 0) {
+                $total = 0;
+            }
         }
 
         return $total;
@@ -142,6 +157,15 @@ class Cart extends BaseCart
     }
 
     /**
+     * Return the VAT of all items
+     * @return float|int
+     */
+    public function getTotalVAT($taxCountry, $taxState = null)
+    {
+        return ($this->getTaxedAmount($taxCountry) - $this->getTotalAmount());
+    }
+
+    /**
      * Retrieve the total weight for all products in cart
      *
      * @return float|int
@@ -158,5 +182,26 @@ class Cart extends BaseCart
         }
 
         return $weight;
+    }
+
+    /**
+     * Tell if the cart contains only virtual products
+     *
+     * @return bool
+     */
+    public function isVirtual()
+    {
+        foreach ($this->getCartItems() as $cartItem) {
+            if (0 < $cartItem->getProductSaleElements()->getWeight()) {
+                return false;
+            }
+
+            $product = $cartItem->getProductSaleElements()->getProduct();
+            if (!$product->getVirtual()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -11,13 +11,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Country;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Country;
 
 /**
  * Class CountryEvent
  * @package Thelia\Core\Event\Country
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryEvent extends ActionEvent
 {
@@ -56,5 +57,4 @@ class CountryEvent extends ActionEvent
     {
         return null !== $this->country;
     }
-
 }

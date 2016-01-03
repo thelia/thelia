@@ -16,8 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseController
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Exception\AdminAccessDenied;
+use Thelia\Controller\BaseController;
 
 /**
  * ControllerResolver that supports "a:b:c", "service:method" and class::method" notations in routes definition
@@ -59,7 +58,9 @@ class ControllerResolver extends BaseControllerResolver
             $count = substr_count($controller, ':');
             if (2 == $count) {
                 // controller in the a:b:c notation then
-                $controller = $this->parser->parse($controller);
+                list($moduleName, $controllerName, $method) = explode(':', $controller, 3);
+                $class = $moduleName . '\\Controller\\' . $controllerName . 'Controller';
+                $method .= 'Action';
             } elseif (1 == $count) {
                 // controller in the service:method notation
                 list($service, $method) = explode(':', $controller, 2);
@@ -68,26 +69,23 @@ class ControllerResolver extends BaseControllerResolver
             } else {
                 throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
             }
+        } else {
+            list($class, $method) = explode('::', $controller, 2);
         }
-
-        list($class, $method) = explode('::', $controller, 2);
 
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
+        /** @var BaseController $controller */
         $controller = new $class();
+
+        $this->container->get('request')->setControllerType(
+            $controller->getControllerType()
+        );
+
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
-        }
-
-        //check if an admin is logged in
-        if ($controller instanceof BaseAdminController) {
-            $securityContext = $this->container->get('thelia.securityContext');
-            $request = $this->container->get('request');
-            if (false === $securityContext->hasAdminUser() && $request->attributes->get('not-logged') != 1) {
-            throw new AdminAccessDenied();
-            }
         }
 
         return array($controller, $method);

@@ -16,4 +16,5 @@ use Thelia\Model\Base\TaxRuleCountryQuery as BaseTaxRuleCountryQuery;
  */
 class TaxRuleCountryQuery extends BaseTaxRuleCountryQuery
 {
-} // TaxRuleCountryQuery
+}
+// TaxRuleCountryQuery

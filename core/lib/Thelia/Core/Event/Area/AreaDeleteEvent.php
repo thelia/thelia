@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Area;
 /**
  * Class AreaDeleteEvent
  * @package Thelia\Core\Event\Area
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaDeleteEvent extends AreaEvent
 {
@@ -48,5 +48,4 @@ class AreaDeleteEvent extends AreaEvent
     {
         return $this->area_id;
     }
-
 }

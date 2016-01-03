@@ -15,7 +15,7 @@ namespace Thelia\Core\Event;
 /**
  * Class GenerateRewrittenUrlEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class GenerateRewrittenUrlEvent extends ActionEvent
 {
@@ -44,5 +44,4 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     {
         return $this->url;
     }
-
 }

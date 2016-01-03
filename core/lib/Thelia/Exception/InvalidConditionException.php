@@ -30,7 +30,6 @@ class InvalidConditionException extends \RuntimeException
      */
     public function __construct($className)
     {
-
         $message = 'Invalid Condition given to ' . $className;
         Tlog::getInstance()->addError($message);
 

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Tax;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\TaxRule;
 
@@ -23,6 +24,7 @@ class TaxRuleEvent extends ActionEvent
     protected $title;
     protected $description;
     protected $countryList;
+    protected $countryDeletedList;
     protected $taxList;
 
     public function __construct(TaxRule $taxRule = null)
@@ -105,6 +107,17 @@ class TaxRuleEvent extends ActionEvent
     public function getCountryList()
     {
         return $this->countryList;
+    }
+
+    public function getCountryDeletedList()
+    {
+        return $this->countryDeletedList;
+    }
+
+    public function setCountryDeletedList($countryDeletedList)
+    {
+        $this->countryDeletedList = $countryDeletedList;
+        return $this;
     }
 
     public function setTaxList($taxList)

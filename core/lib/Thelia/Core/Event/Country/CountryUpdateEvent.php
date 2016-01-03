@@ -15,11 +15,17 @@ namespace Thelia\Core\Event\Country;
 /**
  * Class CountryUpdateEvent
  * @package Thelia\Core\Event\Country
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
     protected $country_id;
+
+    /** @var bool */
+    protected $needZipCode;
+    /** @var string */
+    protected $zipCodeFormat;
+    /** @var int area zone */
 
     protected $chapo;
     protected $description;
@@ -102,4 +108,37 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->country_id;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isNeedZipCode()
+    {
+        return $this->needZipCode;
+    }
+
+    /**
+     * @param boolean $needZipCode
+     */
+    public function setNeedZipCode($needZipCode)
+    {
+        $this->needZipCode = $needZipCode;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getZipCodeFormat()
+    {
+        return $this->zipCodeFormat;
+    }
+
+    /**
+     * @param string $zipCodeFormat
+     */
+    public function setZipCodeFormat($zipCodeFormat)
+    {
+        $this->zipCodeFormat = $zipCodeFormat;
+        return $this;
+    }
 }

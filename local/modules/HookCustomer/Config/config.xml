@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <hooks>
+        <hook id="hookcustomer.hook.front">
+            <tag name="hook.event_listener" event="main.head-bottom" templates="css:assets/css/styles.css"/>
+            <tag name="hook.event_listener" event="main.navbar-secondary" templates="render:main-navbar-secondary.html"/>
+        </hook>
+    </hooks>
+
+</config>

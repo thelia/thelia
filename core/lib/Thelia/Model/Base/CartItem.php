@@ -93,13 +93,15 @@ abstract class CartItem implements ActiveRecordInterface
 
     /**
      * The value for the price field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $price;
 
     /**
      * The value for the promo_price field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $promo_price;
 
@@ -159,6 +161,8 @@ abstract class CartItem implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->quantity = 1;
+        $this->price = '0.000000';
+        $this->promo_price = '0.000000';
     }
 
     /**
@@ -479,7 +483,7 @@ abstract class CartItem implements ActiveRecordInterface
     /**
      * Get the [price] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPrice()
     {
@@ -490,7 +494,7 @@ abstract class CartItem implements ActiveRecordInterface
     /**
      * Get the [promo_price] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPromoPrice()
     {
@@ -689,13 +693,13 @@ abstract class CartItem implements ActiveRecordInterface
     /**
      * Set the value of [price] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setPrice($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->price !== $v) {
@@ -710,13 +714,13 @@ abstract class CartItem implements ActiveRecordInterface
     /**
      * Set the value of [promo_price] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setPromoPrice($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->promo_price !== $v) {
@@ -826,6 +830,14 @@ abstract class CartItem implements ActiveRecordInterface
                 return false;
             }
 
+            if ($this->price !== '0.000000') {
+                return false;
+            }
+
+            if ($this->promo_price !== '0.000000') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -869,10 +881,10 @@ abstract class CartItem implements ActiveRecordInterface
             $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CartItemTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price = (null !== $col) ? (double) $col : null;
+            $this->price = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartItemTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->promo_price = (null !== $col) ? (double) $col : null;
+            $this->promo_price = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartItemTableMap::translateFieldName('PriceEndOfLife', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {

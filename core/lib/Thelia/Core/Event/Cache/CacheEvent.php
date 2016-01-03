@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class CacheEvent
  * @package Thelia\Core\Event\Cache
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CacheEvent extends ActionEvent
 {
@@ -50,5 +50,4 @@ class CacheEvent extends ActionEvent
     {
         return $this->dir;
     }
-
 }

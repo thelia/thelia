@@ -11,16 +11,16 @@
 /*************************************************************************************/
 
 namespace Thelia\Command;
+
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Install\Database;
 
 /**
  * Class ReloadDatabasesCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ReloadDatabaseCommand extends BaseModuleGenerate
 {

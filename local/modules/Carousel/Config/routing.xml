@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <!--
+
+    if a /admin/module/carousel/ route is provided, a "Configuration" button will be displayed
+    for the module in the module list. Clicking this button will invoke this route.
+
+    <route id="my_route_id" path="/admin/module/carousel">
+        <default key="_controller">Carousel\Full\Class\Name\Of\YourConfigurationController::methodName</default>
+    </route>
+
+    <route id="my_route_id" path="/admin/module/carousel/route-name">
+        <default key="_controller">Carousel\Full\Class\Name\Of\YourAdminController::methodName</default>
+    </route>
+
+    <route id="my_route_id" path="/my/route/name">
+        <default key="_controller">Carousel\Full\Class\Name\Of\YourOtherController::methodName</default>
+    </route>
+
+    ...add as many routes as required.
+
+    <route>
+    ...
+    </route>
+    -->
+    <route id="carousel.upload.image" path="/admin/module/carousel/upload" methods="post">
+        <default key="_controller">Carousel\Controller\ConfigurationController::uploadImage</default>
+    </route>
+
+    <route id="carousel.update" path="/admin/module/carousel/update" methods="post">
+        <default key="_controller">Carousel\Controller\ConfigurationController::updateAction</default>
+    </route>
+
+    <route id="carousel.delete" path="/admin/module/carousel/delete" methods="post">
+        <default key="_controller">Carousel\Controller\ConfigurationController::deleteAction</default>
+    </route>
+
+</routes>

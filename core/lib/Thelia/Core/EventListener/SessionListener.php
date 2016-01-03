@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\EventListener;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
@@ -24,22 +25,27 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class SessionListener
  * @package Thelia\Core\EventListener
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class SessionListener implements EventSubscriberInterface
 {
-
     public function prodSession(SessionEvent $event)
     {
-        $storage = new NativeSessionStorage();
-        $storage->setSaveHandler(new NativeFileSessionHandler(ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
+        $storage = new NativeSessionStorage(
+            [ 'cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0) ]
+        );
+        $storage->setSaveHandler(
+            new NativeFileSessionHandler(
+                ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')
+            )
+        );
         $event->setSession($this->getSession($storage));
     }
 
     public function testSession(SessionEvent $event)
     {
         if ($event->getEnv() == 'test') {
-            $storage = new MockFileSessionStorage($event->getContainer()->getParameter('kernel.cache_dir') . DS . 'sessions');
+            $storage = new MockFileSessionStorage($event->getCacheDir() . DS . 'sessions');
             $event->setSession($this->getSession($storage));
             $event->stopPropagation();
         }

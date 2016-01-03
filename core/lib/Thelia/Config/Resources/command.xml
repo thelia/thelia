@@ -14,11 +14,16 @@
         <command class="Thelia\Command\ModuleRefreshCommand"/>
         <command class="Thelia\Command\ModuleActivateCommand"/>
         <command class="Thelia\Command\ModuleDeactivateCommand"/>
+        <command class="Thelia\Command\ModuleListCommand"/>
+        <command class="Thelia\Command\ModulePositionCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
         <command class="Thelia\Command\GenerateResources"/>
         <command class="Thelia\Command\AdminUpdatePasswordCommand"/>
-        <command class="Thelia\Command\UpdateCommand"/>
+        <command class="Thelia\Command\ConfigCommand"/>
+        <command class="Thelia\Command\SaleCheckActivationCommand"/>
+        <command class="Thelia\Command\GenerateSQLCommand"/>
+        <command class="Thelia\Command\HookCleanCommand"/>
     </commands>
 
 </config>

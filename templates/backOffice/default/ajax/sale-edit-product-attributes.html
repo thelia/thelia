@@ -1,0 +1,33 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
+{loop type="product" name="product-info" id=$product_id}
+    <p>{intl l="Select the attributes values of \"%title\" that should be included in this sale operation." title={$TITLE}}</p>
+{/loop}
+
+<form>
+    <input type="hidden" name="attribute-selector-product-id" value="{$product_id}">
+
+    <table class="table table-bordered table-condensed table-striped">
+    {loop name="product-attributes" type="attribute" product="{$product_id}"}
+            {ifloop rel="product-attributes-av"}
+            <tr>
+                <th>{intl l="Attribute %title" title={$TITLE}}</th>
+            </tr>
+            <tr>
+                <td>
+                {loop name="product-attributes-av" type="attribute_availability" attribute="{$ID}" product="{$product_id}"}
+                    {$selected = in_array($ID, $selected_attributes_av_id)}
+                    <div class="checkbox">
+                        <label>
+                            <input {if $selected}checked {/if}type="checkbox" class="attribute-selector-box" value="{$ID}" name="attr[]"> {$TITLE}
+                        </label>
+                    </div>
+                {/loop}
+                </td>
+            </tr>
+            {/ifloop}
+        </tr>
+    {/loop}
+    </table>
+</form>

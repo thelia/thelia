@@ -12,6 +12,7 @@
 
 namespace Thelia\Tools;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Lang;
 
 /**
@@ -27,6 +28,8 @@ use Thelia\Model\Lang;
  */
 class I18n
 {
+    protected static $defaultLocale;
+
     /**
      * Create a \DateTime from a date picker form input
      * The date format is the same as the one from the current User Session
@@ -63,8 +66,10 @@ class I18n
                     Lang::getDefaultLanguage()->getLocale()
                 )->findOne();
         }
-        if (null === $i18n) { // @todo something else ?
-            $i18n = new $i18nClass();;
+        if (null === $i18n) {
+            // @todo something else ?
+            $i18n = new $i18nClass();
+            ;
             $i18n->setId($id);
             foreach ($needed as $need) {
                 $method = sprintf('set%s', $need);
@@ -77,5 +82,61 @@ class I18n
         }
 
         return $i18n;
+    }
+
+    public static function addI18nCondition(
+        ModelCriteria $query,
+        $i18nTableName,
+        $tableIdColumn,
+        $i18nIdColumn,
+        $localeColumn,
+        $locale
+    ) {
+        if (null === static::$defaultLocale) {
+            static::$defaultLocale = Lang::getDefaultLanguage()->getLocale();
+        }
+
+        $locale = static::realEscape($locale);
+        $defaultLocale = static::realEscape(static::$defaultLocale);
+
+        $query
+            ->_and()
+            ->where(
+                "CASE WHEN ".$tableIdColumn." IN".
+                "(SELECT DISTINCT ".$i18nIdColumn." ".
+                "FROM `".$i18nTableName."` ".
+                "WHERE locale=$locale) ".
+                "THEN ".$localeColumn." = $locale ".
+                "ELSE ".$localeColumn." = $defaultLocale ".
+                "END"
+            )
+        ;
+    }
+
+    /**
+     * @param $str
+     * @return string
+     *
+     * Really escapes a string for SQL query.
+     */
+    public static function realEscape($str)
+    {
+        $str = trim($str, "\"'");
+
+        $return = "CONCAT(";
+        $len = strlen($str);
+
+        for ($i = 0; $i < $len; ++$i) {
+            $return .= "CHAR(".ord($str[$i])."),";
+        }
+
+        if ($i > 0) {
+            $return = substr($return, 0, -1);
+        } else {
+            $return = "\"\"";
+        }
+        $return .= ")";
+
+        return $return;
     }
 }

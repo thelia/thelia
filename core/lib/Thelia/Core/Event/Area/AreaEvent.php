@@ -11,12 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Area;
+
 use Thelia\Core\Event\ActionEvent;
 
 /**
  * Class AreaEvent
  * @package Thelia\Core\Event\Shipping
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaEvent extends ActionEvent
 {

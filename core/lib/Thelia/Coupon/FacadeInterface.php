@@ -18,6 +18,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 
 /**
@@ -29,7 +30,6 @@ use Thelia\Model\Coupon;
  */
 interface FacadeInterface
 {
-
     /**
      * Constructor
      *
@@ -52,6 +52,11 @@ interface FacadeInterface
     public function getDeliveryAddress();
 
     /**
+     * @return Country the delivery country
+     */
+    public function getDeliveryCountry();
+
+    /**
      * Return an Customer a CouponManager can process
      *
      * @return \Thelia\Model\Customer
@@ -68,17 +73,19 @@ interface FacadeInterface
     /**
      * Return Products total price
      * CartTotalPrice = Checkout total - discount - postage
+     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise.
      *
      * @return float
      */
-    public function getCartTotalPrice();
+    public function getCartTotalPrice($withItemsInPromo = true);
 
     /**
      * Return Product total tax price
+     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise.
      *
      * @return float
      */
-    public function getCartTotalTaxPrice();
+    public function getCartTotalTaxPrice($withItemsInPromo = true);
 
     /**
      * Return the Checkout currency EUR|USD
@@ -172,5 +179,4 @@ interface FacadeInterface
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     public function getDispatcher();
-
 }

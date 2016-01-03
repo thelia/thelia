@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Event\Image;
 
+use Imagine\Image\ImageInterface;
 use Thelia\Core\Event\CachedFileEvent;
 
 class ImageEvent extends CachedFileEvent
@@ -72,12 +73,20 @@ class ImageEvent extends CachedFileEvent
     protected $quality = null;
 
     /**
+     * @var ImageInterface
+     */
+    protected $imageObject;
+
+    /** @var  bool */
+    protected $allowZoom;
+
+    /**
      * @return boolean true if the required image is the original image (resize_mode and background_color are not significant)
      */
     public function isOriginalImage()
     {
         return empty($this->width) && empty($this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-                && empty($this->effects) && empty($this->rotation) && empty($this->quality);
+        && empty($this->effects) && empty($this->rotation) && empty($this->quality);
     }
 
     /**
@@ -86,8 +95,9 @@ class ImageEvent extends CachedFileEvent
     public function getOptionsHash()
     {
         return md5(
-                $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
-                        . $this->rotation);
+            $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
+            . $this->rotation . $this->allowZoom
+        );
     }
 
     public function getCategory()
@@ -206,6 +216,44 @@ class ImageEvent extends CachedFileEvent
     public function setCacheOriginalFilepath($cache_original_filepath)
     {
         $this->cache_original_filepath = $cache_original_filepath;
+
+        return $this;
+    }
+
+    /**
+     * @param  ImageInterface $imageObject
+     * @return $this
+     */
+    public function setImageObject($imageObject)
+    {
+        $this->imageObject = $imageObject;
+
+        return $this;
+    }
+
+    /**
+     * @return ImageInterface
+     */
+    public function getImageObject()
+    {
+        return $this->imageObject;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowZoom()
+    {
+        return $this->allowZoom;
+    }
+
+    /**
+     * @param bool $allowZoom
+     * @return $this
+     */
+    public function setAllowZoom($allowZoom)
+    {
+        $this->allowZoom = $allowZoom;
 
         return $this;
     }

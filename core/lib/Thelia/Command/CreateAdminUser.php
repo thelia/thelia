@@ -15,7 +15,6 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Thelia\Model\Admin;
 
 class CreateAdminUser extends ContainerAwareCommand
@@ -65,7 +64,6 @@ class CreateAdminUser extends ContainerAwareCommand
                 null
             )
         ;
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -124,7 +122,6 @@ class CreateAdminUser extends ContainerAwareCommand
             $password_again = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password (again): ", "Please enter the password again.", true);
 
             if (! empty($password) && $password == $password_again) {
-
                 $admin->setPassword($password);
 
                 break;
@@ -142,5 +139,4 @@ class CreateAdminUser extends ContainerAwareCommand
     {
         return sprintf("<info>%s</info>", $text);
     }
-
 }

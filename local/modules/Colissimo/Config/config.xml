@@ -15,18 +15,6 @@
         <form name="colissimo.export.form" class="Colissimo\Form\Export" />
     </forms>
 
-    <commands>
-        <!--
-        <command class="MyModule\Command\MySuperCommand" />
-        -->
-    </commands>
-
-    <templateDirectives>
-        <!-- Sample definition
-        <templateDirectives class="MyModule\Directive\MyTemplateDirective" name="my_filter"/>
-        -->
-    </templateDirectives>
-
     <services>
         <service id="send.colissimo.mail" class="Colissimo\Listener\SendMail" scope="request">
             <argument type="service" id="thelia.parser" />
@@ -34,4 +22,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>
+
+    <hooks>
+        <hook id="colissimo.hook">
+            <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" templates="render:assets/js/module-configuration-js.html" />
+        </hook>
+    </hooks>
 </config>

@@ -12,53 +12,40 @@
 
 namespace Thelia\Controller\Front;
 
-use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
-use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
 {
-    /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string $routeId a route ID, as defines in Config/Resources/routing/front.xml
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
-    {
-        return $this->getRouteFromRouter('router.front', $routeId, $parameters, $referenceType);
-    }
+    const CONTROLLER_TYPE = 'front';
 
-    /**
-     * Redirect to à route ID related URL
-     *
-     * @param string $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array  $urlParameters the URL parametrs, as a var/value pair array
-     * @param bool   $referenceType
-     */
-    public function redirectToRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
-    {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters, $referenceType), $urlParameters));
-    }
+    protected $currentRouter = "router.front";
 
     public function checkAuth()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute('customer.login.process');
+            throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
     }
 
     protected function checkCartNotEmpty()
     {
-        $cart = $this->getSession()->getCart();
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
         if ($cart===null || $cart->countCartItems() == 0) {
-            $this->redirectToRoute('cart.view');
+            throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }
     }
 
@@ -74,7 +61,7 @@ class BaseFrontController extends BaseController
             null === AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())
             ||
             null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
-            $this->redirectToRoute("order.delivery");
+            throw new RedirectException($this->retrieveUrlFromRouteId('order.delivery'));
         }
     }
 
@@ -90,19 +77,24 @@ class BaseFrontController extends BaseController
             null === AddressQuery::create()->findPk($order->getChoosenInvoiceAddress())
             ||
             null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
-            $this->redirectToRoute("order.invoice");
+            throw new RedirectException($this->retrieveUrlFromRouteId('order.invoice'));
         }
     }
 
     /**
-     * @return TemplateDefinition the template
+     * @param TemplateDefinition $template the template to process, or null for using the front template
+     *
+     * @return ParserInterface the Thelia parser²
      */
     protected function getParser($template = null)
     {
         $parser = $this->container->get("thelia.parser");
 
         // Define the template that should be used
-        $parser->setTemplateDefinition($template ?: TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $parser->setTemplateDefinition(
+            $template ?: $this->getTemplateHelper()->getActiveFrontTemplate(),
+            $this->useFallbackTemplate
+        );
 
         return $parser;
     }
@@ -123,15 +115,14 @@ class BaseFrontController extends BaseController
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
-     * @param array $args        the template arguments
-     * @param null  $templateDir
+     * @param string $templateName the complete template name, with extension
+     * @param array  $args         the template arguments
+     * @param string$templateDir
      *
      * @return string
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
-
         // Add the template standard extension
         $templateName .= '.html';
 
@@ -150,6 +141,5 @@ class BaseFrontController extends BaseController
         $data = $this->getParser($templateDir)->render($templateName, $args);
 
         return $data;
-
     }
 }

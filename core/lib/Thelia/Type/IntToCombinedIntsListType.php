@@ -29,16 +29,16 @@ class IntToCombinedIntsListType extends BaseType
     {
         foreach (explode(',', $values) as $intToCombinedInts) {
             $parts = explode(':', $intToCombinedInts);
-            if(count($parts) != 2)
-
+            if (count($parts) != 2) {
                 return false;
-            if(filter_var($parts[0], FILTER_VALIDATE_INT) === false)
-
+            }
+            if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
                 return false;
+            }
 
-            if(false === $this->checkLogicalFormat($parts[1]))
-
+            if (false === $this->checkLogicalFormat($parts[1])) {
                 return false;
+            }
         }
 
         return true;
@@ -46,7 +46,7 @@ class IntToCombinedIntsListType extends BaseType
 
     public function getFormattedValue($values)
     {
-        if ( $this->isValid($values) ) {
+        if ($this->isValid($values)) {
             $return = '';
 
             $values = preg_replace('#[\s]#', '', $values);
@@ -54,7 +54,7 @@ class IntToCombinedIntsListType extends BaseType
                 $parts = explode(':', $intToCombinedInts);
 
                 $return[trim($parts[0])] = array(
-                    "values"        =>  preg_split( "#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
+                    "values"        =>  preg_split("#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
                     "expression"    =>  $parts[1],
                 );
             }
@@ -71,9 +71,9 @@ class IntToCombinedIntsListType extends BaseType
         $noSpaceString = preg_replace('#[\s]#', '', $string);
         $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
 
-        if(!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', $noParentheseString))
-
+        if (!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', $noParentheseString)) {
             return false;
+        }
 
         /* check parenteses use */
         $openingParenthesesCount = 0;

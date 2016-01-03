@@ -12,22 +12,17 @@
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
-
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\OrderException;
-use Thelia\Tools\Redirect;
-
-use Thelia\Core\Security\Exception\AuthenticationException;
 
 /**
  *
@@ -35,7 +30,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
  *
  * @TODO Look if it's possible to block this definition in dependency-injection
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 class ViewListener implements EventSubscriberInterface
@@ -65,9 +60,9 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-
         $parser = $this->container->get('thelia.parser');
-        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $templateHelper = $this->container->get('thelia.template_helper');
+        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
         $request = $this->container->get('request');
         $response = null;
         try {
@@ -78,13 +73,8 @@ class ViewListener implements EventSubscriberInterface
             } else {
                 $response = new Response($content, $parser->getStatus() ?: 200);
             }
-
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
-        } catch (AuthenticationException $ex) {
-
-            // Redirect to the login template
-            $response = RedirectResponse::create($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
         } catch (OrderException $e) {
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
@@ -111,7 +101,6 @@ class ViewListener implements EventSubscriberInterface
         if (null === $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
         }
-
     }
 
     public function findView(Request $request)

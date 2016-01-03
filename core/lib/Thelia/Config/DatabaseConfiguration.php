@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class DatabaseConfiguration implements ConfigurationInterface
 {
-
     /**
      * Generates the configuration tree builder.
      *
@@ -34,10 +33,6 @@ class DatabaseConfiguration implements ConfigurationInterface
                     ->children()
                         ->scalarNode("driver")
                             ->defaultValue("mysql")
-                            ->validate()
-                            ->ifNotInArray(array("mysql", "sqlite", "pgsql"))
-                                ->thenInvalid("Invalid driver database %s")
-                            ->end()
                         ->end()
                         ->scalarNode("user")
                             ->defaultValue("root")
@@ -49,7 +44,7 @@ class DatabaseConfiguration implements ConfigurationInterface
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode("classname")
-                            ->defaultValue("\Propel\Runtime\Connection\ConnectionWrapper")
+                            ->defaultValue('\Propel\Runtime\Connection\ConnectionWrapper')
                         ->end()
                     ->end()
                 ->end()

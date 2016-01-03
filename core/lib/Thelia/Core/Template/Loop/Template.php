@@ -12,17 +12,14 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
-use Thelia\Type;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Type;
 
 /**
  *
@@ -31,6 +28,8 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
  */
 class Template extends BaseLoop implements ArraySearchLoopInterface
 {
@@ -58,29 +57,30 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     {
         $type = $this->getArg('template-type')->getValue();
 
-        if ($type == 'front-office')
+        if ($type == 'front-office') {
             $templateType = TemplateDefinition::FRONT_OFFICE;
-        else if ($type == 'back-office')
+        } elseif ($type == 'back-office') {
             $templateType = TemplateDefinition::BACK_OFFICE;
-        else if ($type == 'pdf')
+        } elseif ($type == 'pdf') {
             $templateType = TemplateDefinition::PDF;
-        else if ($type == 'email')
+        } elseif ($type == 'email') {
             $templateType = TemplateDefinition::EMAIL;
+        }
 
-        return TemplateHelper::getInstance()->getList($templateType);
+        return $this->container->get('thelia.template_helper')->getList($templateType);
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $template) {
-
             $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow
-                ->set("NAME"          , $template->getName())
-                ->set("RELATIVE_PATH" , $template->getPath())
-                ->set("ABSOLUTE_PATH" , $template->getAbsolutePath())
+                ->set("NAME", $template->getName())
+                ->set("RELATIVE_PATH", $template->getPath())
+                ->set("ABSOLUTE_PATH", $template->getAbsolutePath())
             ;
+            $this->addOutputFields($loopResultRow, $template);
 
             $loopResult->addRow($loopResultRow);
         }

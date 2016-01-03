@@ -5,44 +5,124 @@
 
 // COMMON STYLES
 // -------------
+@media (min-width: @screen-sm){
+    .sidebar {
+        z-index: 1;
+        position: absolute;
+        width: 250px;
+        margin-top: 52px;
+    }
+}
 
-// Base class and wrapper
-.navbar {
-    margin-bottom: 0;
-    .dropdown-menu {
-      > li {
-        > a > .label {
-          font-size: 15px;
+.sidebar {
+    .sidebar-nav.navbar-collapse {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .sidebar-search {
+        padding: 15px;
+    }
+
+    .nav {
+        .menu-links();
+    }
+
+    .active {
+        .caret {
+            .rotate(-180deg);
         }
-      }
-
     }
-  .navbar-nav > li:hover{
-    background-color: @active-menu;
-  }
-}
 
-// Inner for background effects
-// Gradient is applied to its own element because overflow visible is not honored by IE when filter is present
-.navbar-inner {
-    border-top: none;
-    border-radius: 0;
+    .sidebar-search {
 
-    .container{
-        width: 1170px;
     }
 }
 
-// Navbar button for toggling navbar items in responsive layouts
-// These definitions need to come after '.navbar .btn'
-.navbar .btn {
-	.button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
+.navbar-default {
+    .navbar-toggle {
+        margin-top: 25px;
+
+        &,
+        &:hover,
+        &:focus {
+            background: none;
+            border: none;
+        }
+
+        span {
+            transform: rotate(45deg);
+
+            &,
+            &:before,
+            &:after {
+                cursor: pointer;
+                border-radius: 1px;
+                height: 1px;
+                width: 15px;
+                background: white;
+                position: absolute;
+                top: 8px;
+                right: 0px;
+                margin: 0 auto;
+                display: block;
+                content: '';
+                .transition(all 0.3s ease-in-out);
+            }
+
+            &:after {
+                transform: rotate(90deg);
+                top: 0;
+                right: 0;
+            }
+
+            &:before {
+                .transition(opacity 0s);
+                .opacity(0);
+            }
+
+        }
+
+        &.collapsed {
+            span {
+                transform: rotate(0deg);
+
+                &:before {
+                    top: -6px;
+                    width: 10px;
+                    .opacity(1);
+                }
+
+                &:after {
+                    top: 6px;
+                    width: 20px;
+                }
+
+                &:before,
+                &:after {
+                    right: 0;
+                    transform: rotate(0deg);
+                }
+            }
+        }
+
+    }
 }
 
-.navbar-default .navbar-toggle .icon-bar{
-	background-color: @btn-primary-color;
-}
+.navbar-brand {
+    padding-top: 10px;
+    padding-bottom: 10px;
 
-.navbar-form{
-	padding: 0;
+    > img {
+        vertical-align: top;
+    }
+
+    > span {
+        color: #888;
+        font-size: 11px;
+        font-weight: bold;
+        display: inline-block;
+        margin-left: 10px;
+        margin-top: 16px;
+    }
 }

@@ -2,7 +2,39 @@
 if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }
-require __DIR__ . '/../core/bootstrap.php';
+
+$bootstrapToggle = false;
+$bootstraped = false;
+
+// Autoload bootstrap
+
+foreach ($argv as $arg) {
+    if ($arg === '-b') {
+        $bootstrapToggle = true;
+
+        continue;
+    }
+
+    if ($bootstrapToggle) {
+        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
+
+        $bootstraped = true;
+    }
+}
+
+if (!$bootstraped) {
+    if (isset($bootstrapFile)) {
+        require $bootstrapFile;
+    } elseif (is_file($file = __DIR__ . '/../core/vendor/autoload.php')) {
+        require $file;
+    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+        // Here we are on a thelia/thelia-project
+        require $file;
+    } else {
+        echo "No autoload file found. Please use the -b argument to include yours";
+        exit(1);
+    }
+}
 
 $thelia = new Thelia\Core\Thelia("dev", true);
 
@@ -154,7 +186,7 @@ try {
 
 function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )
 {
-    $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+    $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
 
     foreach ($localeList as $locale) {
         $object->setLocale($locale);

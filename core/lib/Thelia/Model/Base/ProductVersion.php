@@ -94,6 +94,19 @@ abstract class ProductVersion implements ActiveRecordInterface
     protected $template_id;
 
     /**
+     * The value for the brand_id field.
+     * @var        int
+     */
+    protected $brand_id;
+
+    /**
+     * The value for the virtual field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $virtual;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -147,6 +160,7 @@ abstract class ProductVersion implements ActiveRecordInterface
     {
         $this->visible = 0;
         $this->position = 0;
+        $this->virtual = 0;
         $this->version = 0;
     }
 
@@ -477,6 +491,28 @@ abstract class ProductVersion implements ActiveRecordInterface
     }
 
     /**
+     * Get the [brand_id] column value.
+     *
+     * @return   int
+     */
+    public function getBrandId()
+    {
+
+        return $this->brand_id;
+    }
+
+    /**
+     * Get the [virtual] column value.
+     *
+     * @return   int
+     */
+    public function getVirtual()
+    {
+
+        return $this->virtual;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -689,6 +725,48 @@ abstract class ProductVersion implements ActiveRecordInterface
     } // setTemplateId()
 
     /**
+     * Set the value of [brand_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     */
+    public function setBrandId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->brand_id !== $v) {
+            $this->brand_id = $v;
+            $this->modifiedColumns[ProductVersionTableMap::BRAND_ID] = true;
+        }
+
+
+        return $this;
+    } // setBrandId()
+
+    /**
+     * Set the value of [virtual] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     */
+    public function setVirtual($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->virtual !== $v) {
+            $this->virtual = $v;
+            $this->modifiedColumns[ProductVersionTableMap::VIRTUAL] = true;
+        }
+
+
+        return $this;
+    } // setVirtual()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -811,6 +889,10 @@ abstract class ProductVersion implements ActiveRecordInterface
                 return false;
             }
 
+            if ($this->virtual !== 0) {
+                return false;
+            }
+
             if ($this->version !== 0) {
                 return false;
             }
@@ -860,28 +942,34 @@ abstract class ProductVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductVersionTableMap::translateFieldName('TemplateId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->template_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductVersionTableMap::translateFieldName('BrandId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->brand_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductVersionTableMap::translateFieldName('Virtual', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->virtual = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ProductVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -891,7 +979,7 @@ abstract class ProductVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 11; // 11 = ProductVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 13; // 13 = ProductVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductVersion object", 0, $e);
@@ -1130,6 +1218,12 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->isColumnModified(ProductVersionTableMap::TEMPLATE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`TEMPLATE_ID`';
         }
+        if ($this->isColumnModified(ProductVersionTableMap::BRAND_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`BRAND_ID`';
+        }
+        if ($this->isColumnModified(ProductVersionTableMap::VIRTUAL)) {
+            $modifiedColumns[':p' . $index++]  = '`VIRTUAL`';
+        }
         if ($this->isColumnModified(ProductVersionTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1173,6 +1267,12 @@ abstract class ProductVersion implements ActiveRecordInterface
                         break;
                     case '`TEMPLATE_ID`':
                         $stmt->bindValue($identifier, $this->template_id, PDO::PARAM_INT);
+                        break;
+                    case '`BRAND_ID`':
+                        $stmt->bindValue($identifier, $this->brand_id, PDO::PARAM_INT);
+                        break;
+                    case '`VIRTUAL`':
+                        $stmt->bindValue($identifier, $this->virtual, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1263,18 +1363,24 @@ abstract class ProductVersion implements ActiveRecordInterface
                 return $this->getTemplateId();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getBrandId();
                 break;
             case 7:
-                return $this->getUpdatedAt();
+                return $this->getVirtual();
                 break;
             case 8:
-                return $this->getVersion();
+                return $this->getCreatedAt();
                 break;
             case 9:
-                return $this->getVersionCreatedAt();
+                return $this->getUpdatedAt();
                 break;
             case 10:
+                return $this->getVersion();
+                break;
+            case 11:
+                return $this->getVersionCreatedAt();
+                break;
+            case 12:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1312,11 +1418,13 @@ abstract class ProductVersion implements ActiveRecordInterface
             $keys[3] => $this->getVisible(),
             $keys[4] => $this->getPosition(),
             $keys[5] => $this->getTemplateId(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
-            $keys[8] => $this->getVersion(),
-            $keys[9] => $this->getVersionCreatedAt(),
-            $keys[10] => $this->getVersionCreatedBy(),
+            $keys[6] => $this->getBrandId(),
+            $keys[7] => $this->getVirtual(),
+            $keys[8] => $this->getCreatedAt(),
+            $keys[9] => $this->getUpdatedAt(),
+            $keys[10] => $this->getVersion(),
+            $keys[11] => $this->getVersionCreatedAt(),
+            $keys[12] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1380,18 +1488,24 @@ abstract class ProductVersion implements ActiveRecordInterface
                 $this->setTemplateId($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setBrandId($value);
                 break;
             case 7:
-                $this->setUpdatedAt($value);
+                $this->setVirtual($value);
                 break;
             case 8:
-                $this->setVersion($value);
+                $this->setCreatedAt($value);
                 break;
             case 9:
-                $this->setVersionCreatedAt($value);
+                $this->setUpdatedAt($value);
                 break;
             case 10:
+                $this->setVersion($value);
+                break;
+            case 11:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 12:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -1424,11 +1538,13 @@ abstract class ProductVersion implements ActiveRecordInterface
         if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setTemplateId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setVersion($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedAt($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setVersionCreatedBy($arr[$keys[10]]);
+        if (array_key_exists($keys[6], $arr)) $this->setBrandId($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVirtual($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setVersion($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setVersionCreatedAt($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setVersionCreatedBy($arr[$keys[12]]);
     }
 
     /**
@@ -1446,6 +1562,8 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->isColumnModified(ProductVersionTableMap::VISIBLE)) $criteria->add(ProductVersionTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(ProductVersionTableMap::POSITION)) $criteria->add(ProductVersionTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ProductVersionTableMap::TEMPLATE_ID)) $criteria->add(ProductVersionTableMap::TEMPLATE_ID, $this->template_id);
+        if ($this->isColumnModified(ProductVersionTableMap::BRAND_ID)) $criteria->add(ProductVersionTableMap::BRAND_ID, $this->brand_id);
+        if ($this->isColumnModified(ProductVersionTableMap::VIRTUAL)) $criteria->add(ProductVersionTableMap::VIRTUAL, $this->virtual);
         if ($this->isColumnModified(ProductVersionTableMap::CREATED_AT)) $criteria->add(ProductVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductVersionTableMap::UPDATED_AT)) $criteria->add(ProductVersionTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(ProductVersionTableMap::VERSION)) $criteria->add(ProductVersionTableMap::VERSION, $this->version);
@@ -1527,6 +1645,8 @@ abstract class ProductVersion implements ActiveRecordInterface
         $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setTemplateId($this->getTemplateId());
+        $copyObj->setBrandId($this->getBrandId());
+        $copyObj->setVirtual($this->getVirtual());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -1621,6 +1741,8 @@ abstract class ProductVersion implements ActiveRecordInterface
         $this->visible = null;
         $this->position = null;
         $this->template_id = null;
+        $this->brand_id = null;
+        $this->virtual = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;

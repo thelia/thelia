@@ -1,0 +1,16 @@
+.alert-warning {
+    clear: both;
+    margin-bottom: 0;
+    text-align: center;
+
+    > a {
+        color: inherit;
+    }
+
+    &:before {
+        .fa-icon();
+        content: @fa-var-warning;
+        display: block;
+        font-size: 2.2em;
+    }
+}

@@ -1,0 +1,39 @@
+{ifloop rel="current-sales"}
+    <section id="products-offer" class="grid">
+    {loop name="current-sales" type="sale" limit="2"}
+        <section id="product-sale-{$ID}">
+            <div class="products-heading">
+                <h2>{$SALE_LABEL} <a href="{url path="/sale" sale=$ID}" class="btn-all">{intl l="+ View All" d="hookproductsoffer.fo.default"}</a></h2>
+                <div class="short-description" itemprop="description">{$CHAPO}</div>
+            </div>
+
+            <div class="products-content">
+                <ul class="products-grid list-unstyled row">
+                    {loop name="products_in_sale" type="product" limit="4" sale=$ID}
+                        {include file="includes/single-product.html" colClass="col-md-3 col-sm-4" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
+                    {/loop}
+                </ul>
+            </div>
+        </section><!-- #products-sale-XX -->
+    {/loop}
+    </section>
+{/ifloop}
+{* Display "regular" promos, if any, only if we don't have active sales *}
+
+{elseloop rel="current-sales"}
+{ifloop rel="product_promo"}
+    <section id="products-offer" class="grid">
+        <div class="products-heading">
+            <h2>{intl l="Offers" d="hookproductsoffer.fo.default"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All" d="hookproductsoffer.fo.default"}</a></h2>
+        </div>
+
+        <div class="products-content">
+            <ul class="products-grid list-unstyled row">
+                {loop name="product_promo" type="product" limit="4" promo="yes"}
+                    {include file="includes/single-product.html" colClass="col-md-3 col-sm-4" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
+                {/loop}
+            </ul>
+        </div>
+    </section><!-- #products-offer -->
+{/ifloop}
+{/elseloop}

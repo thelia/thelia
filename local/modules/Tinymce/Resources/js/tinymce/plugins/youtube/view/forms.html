@@ -1,0 +1,65 @@
+<form action="#" method="get" class="form-horizontal">
+    <div class="row">
+        <div class="col-xs-10">
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="youtubeID" id="youtubeurl">{{youtubeurl}}:</label>
+                <div class="col-xs-10">
+                    <input class="form-control" id="youtubeID" name="youtubeID" type="text" />
+                    <p class="help-block alert alert-info">{{youtubeID}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-10">
+            <div class="form-group">
+                <label class="col-xs-2 control-label" for="youtubeWidth">{{youtubeWidth}}:</label>
+                <div class="col-xs-2">
+                    <input class="form-control" id="youtubeWidth" name="youtubeWidth" type="text" value="640" />
+                </div>
+                <label class="col-xs-2 control-label" for="youtubeHeight">{{youtubeHeight}}:</label>
+                <div class="col-xs-2">
+                    <input class="form-control" id="youtubeHeight" name="youtubeHeight" type="text" value="385">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" id="youtubeAutoplay" name="youtubeAutoplay" value="1">
+                    {{youtubeAutoplay}}
+                </label>
+            </div>
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" id="youtubeREL" name="youtubeREL" value="1">
+                    {{youtubeREL}}
+                </label>
+            </div>
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" id="youtubeHD" name="youtubeHD" value="1">
+                    {{youtubeHD}}
+                </label>
+            </div>
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" id="video" name="video" value="1">
+                    {{HTML5}}
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-11">
+            <div class="col-xs-9">
+                <div id="preview" class="thumbnail pull-left"></div>
+            </div>
+            <div class="col-xs-3">
+                <button id="insert-btn" class="btn btn-primary btn-lg btn-block" type="button">{{Insert}}</button>
+            </div>
+        </div>
+    </div>
+</form>

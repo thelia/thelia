@@ -23,6 +23,7 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     ChildAdminLogQuery orderByAdminFirstname($order = Criteria::ASC) Order by the admin_firstname column
  * @method     ChildAdminLogQuery orderByAdminLastname($order = Criteria::ASC) Order by the admin_lastname column
  * @method     ChildAdminLogQuery orderByResource($order = Criteria::ASC) Order by the resource column
+ * @method     ChildAdminLogQuery orderByResourceId($order = Criteria::ASC) Order by the resource_id column
  * @method     ChildAdminLogQuery orderByAction($order = Criteria::ASC) Order by the action column
  * @method     ChildAdminLogQuery orderByMessage($order = Criteria::ASC) Order by the message column
  * @method     ChildAdminLogQuery orderByRequest($order = Criteria::ASC) Order by the request column
@@ -34,6 +35,7 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     ChildAdminLogQuery groupByAdminFirstname() Group by the admin_firstname column
  * @method     ChildAdminLogQuery groupByAdminLastname() Group by the admin_lastname column
  * @method     ChildAdminLogQuery groupByResource() Group by the resource column
+ * @method     ChildAdminLogQuery groupByResourceId() Group by the resource_id column
  * @method     ChildAdminLogQuery groupByAction() Group by the action column
  * @method     ChildAdminLogQuery groupByMessage() Group by the message column
  * @method     ChildAdminLogQuery groupByRequest() Group by the request column
@@ -52,6 +54,7 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     ChildAdminLog findOneByAdminFirstname(string $admin_firstname) Return the first ChildAdminLog filtered by the admin_firstname column
  * @method     ChildAdminLog findOneByAdminLastname(string $admin_lastname) Return the first ChildAdminLog filtered by the admin_lastname column
  * @method     ChildAdminLog findOneByResource(string $resource) Return the first ChildAdminLog filtered by the resource column
+ * @method     ChildAdminLog findOneByResourceId(int $resource_id) Return the first ChildAdminLog filtered by the resource_id column
  * @method     ChildAdminLog findOneByAction(string $action) Return the first ChildAdminLog filtered by the action column
  * @method     ChildAdminLog findOneByMessage(string $message) Return the first ChildAdminLog filtered by the message column
  * @method     ChildAdminLog findOneByRequest(string $request) Return the first ChildAdminLog filtered by the request column
@@ -63,6 +66,7 @@ use Thelia\Model\Map\AdminLogTableMap;
  * @method     array findByAdminFirstname(string $admin_firstname) Return ChildAdminLog objects filtered by the admin_firstname column
  * @method     array findByAdminLastname(string $admin_lastname) Return ChildAdminLog objects filtered by the admin_lastname column
  * @method     array findByResource(string $resource) Return ChildAdminLog objects filtered by the resource column
+ * @method     array findByResourceId(int $resource_id) Return ChildAdminLog objects filtered by the resource_id column
  * @method     array findByAction(string $action) Return ChildAdminLog objects filtered by the action column
  * @method     array findByMessage(string $message) Return ChildAdminLog objects filtered by the message column
  * @method     array findByRequest(string $request) Return ChildAdminLog objects filtered by the request column
@@ -156,7 +160,7 @@ abstract class AdminLogQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ADMIN_LOGIN`, `ADMIN_FIRSTNAME`, `ADMIN_LASTNAME`, `RESOURCE`, `ACTION`, `MESSAGE`, `REQUEST`, `CREATED_AT`, `UPDATED_AT` FROM `admin_log` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `ADMIN_LOGIN`, `ADMIN_FIRSTNAME`, `ADMIN_LASTNAME`, `RESOURCE`, `RESOURCE_ID`, `ACTION`, `MESSAGE`, `REQUEST`, `CREATED_AT`, `UPDATED_AT` FROM `admin_log` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -400,6 +404,47 @@ abstract class AdminLogQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AdminLogTableMap::RESOURCE, $resource, $comparison);
+    }
+
+    /**
+     * Filter the query on the resource_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByResourceId(1234); // WHERE resource_id = 1234
+     * $query->filterByResourceId(array(12, 34)); // WHERE resource_id IN (12, 34)
+     * $query->filterByResourceId(array('min' => 12)); // WHERE resource_id > 12
+     * </code>
+     *
+     * @param     mixed $resourceId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminLogQuery The current query, for fluid interface
+     */
+    public function filterByResourceId($resourceId = null, $comparison = null)
+    {
+        if (is_array($resourceId)) {
+            $useMinMax = false;
+            if (isset($resourceId['min'])) {
+                $this->addUsingAlias(AdminLogTableMap::RESOURCE_ID, $resourceId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($resourceId['max'])) {
+                $this->addUsingAlias(AdminLogTableMap::RESOURCE_ID, $resourceId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AdminLogTableMap::RESOURCE_ID, $resourceId, $comparison);
     }
 
     /**

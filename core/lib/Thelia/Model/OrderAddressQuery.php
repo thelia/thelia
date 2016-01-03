@@ -16,4 +16,5 @@ use Thelia\Model\Base\OrderAddressQuery as BaseOrderAddressQuery;
  */
 class OrderAddressQuery extends BaseOrderAddressQuery
 {
-} // OrderAddressQuery
+}
+// OrderAddressQuery

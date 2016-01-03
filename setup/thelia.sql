@@ -12,9 +12,10 @@ DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `parent` INTEGER,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
+    `default_template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -39,6 +40,8 @@ CREATE TABLE `product`
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
+    `brand_id` INTEGER,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -48,6 +51,7 @@ CREATE TABLE `product`
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_tax_rule_id` (`tax_rule_id`),
     INDEX `fk_product_template_id` (`template_id`),
+    INDEX `fk_product_brand1_idx` (`brand_id`),
     CONSTRAINT `fk_product_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -56,6 +60,12 @@ CREATE TABLE `product`
     CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_product_brand`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -96,22 +106,42 @@ DROP TABLE IF EXISTS `country`;
 CREATE TABLE `country`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `area_id` INTEGER,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
+    `has_states` TINYINT DEFAULT 0,
+    `need_zip_code` TINYINT DEFAULT 0,
+    `zip_code_format` VARCHAR(20),
     `by_default` TINYINT DEFAULT 0,
     `shop_country` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_country_area_id` (`area_id`),
-    INDEX `idx_country_by_default` (`by_default`),
-    CONSTRAINT `fk_country_area_id`
-        FOREIGN KEY (`area_id`)
-        REFERENCES `area` (`id`)
+    INDEX `idx_country_by_default` (`by_default`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- state
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `state`;
+
+CREATE TABLE `state`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
+    `isocode` VARCHAR(4) NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `FI_state_country_id` (`country_id`),
+    CONSTRAINT `fk_state_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -153,16 +183,19 @@ DROP TABLE IF EXISTS `tax_rule_country`;
 
 CREATE TABLE `tax_rule_country`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `tax_rule_id` INTEGER NOT NULL,
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `tax_id` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`tax_rule_id`,`country_id`,`tax_id`),
+    PRIMARY KEY (`id`),
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
+    INDEX `idx_tax_rule_country_state_id` (`state_id`),
     INDEX `idx_tax_rule_country_tax_rule_id_country_id_position` (`tax_rule_id`, `country_id`, `position`),
     CONSTRAINT `fk_tax_rule_country_tax_id`
         FOREIGN KEY (`tax_id`)
@@ -177,6 +210,11 @@ CREATE TABLE `tax_rule_country`
     CONSTRAINT `fk_tax_rule_country_country_id`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_tax_rule_country_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
@@ -283,6 +321,8 @@ CREATE TABLE `feature_template`
     CONSTRAINT `fk_feature_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -411,6 +451,8 @@ CREATE TABLE `attribute_template`
     CONSTRAINT `fk_attribute_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -451,11 +493,14 @@ CREATE TABLE `customer`
     `reseller` TINYINT,
     `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
-    `discount` FLOAT,
+    `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_customer_customer_title_id` (`title_id`),
@@ -487,6 +532,7 @@ CREATE TABLE `address`
     `zipcode` VARCHAR(10) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
     `is_default` TINYINT DEFAULT 0,
@@ -496,6 +542,7 @@ CREATE TABLE `address`
     INDEX `idx_address_customer_id` (`customer_id`),
     INDEX `idx_address_customer_title_id` (`title_id`),
     INDEX `idx_address_country_id` (`country_id`),
+    INDEX `FI_address_state_id` (`state_id`),
     CONSTRAINT `fk_address_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -509,6 +556,11 @@ CREATE TABLE `address`
     CONSTRAINT `fk_address_country_id`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_address_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
@@ -548,6 +600,8 @@ CREATE TABLE `lang`
     `decimal_separator` VARCHAR(45),
     `thousands_separator` VARCHAR(45),
     `decimals` VARCHAR(45),
+    `active` TINYINT(1) DEFAULT 0,
+    `visible` TINYINT DEFAULT 0,
     `by_default` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -565,7 +619,7 @@ DROP TABLE IF EXISTS `folder`;
 CREATE TABLE `folder`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `parent` INTEGER NOT NULL,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -606,6 +660,7 @@ CREATE TABLE `product_image`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -630,6 +685,7 @@ CREATE TABLE `product_document`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -655,20 +711,26 @@ CREATE TABLE `order`
     `customer_id` INTEGER NOT NULL,
     `invoice_order_address_id` INTEGER NOT NULL,
     `delivery_order_address_id` INTEGER NOT NULL,
-    `invoice_date` DATE,
+    `invoice_date` DATETIME,
     `currency_id` INTEGER NOT NULL,
     `currency_rate` FLOAT NOT NULL,
     `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
     `delivery_ref` VARCHAR(100) COMMENT 'delivery reference - usually use to identify a delivery progress on a distant delivery tracker website',
     `invoice_ref` VARCHAR(100) COMMENT 'the invoice reference',
-    `discount` FLOAT,
-    `postage` FLOAT NOT NULL,
+    `discount` DECIMAL(16,6) DEFAULT 0.000000,
+    `postage` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `postage_tax` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `postage_tax_rule_title` VARCHAR(255),
     `payment_module_id` INTEGER NOT NULL,
     `delivery_module_id` INTEGER NOT NULL,
     `status_id` INTEGER NOT NULL,
     `lang_id` INTEGER NOT NULL,
+    `cart_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_order_currency_id` (`currency_id`),
@@ -679,6 +741,7 @@ CREATE TABLE `order`
     INDEX `fk_order_payment_module_id_idx` (`payment_module_id`),
     INDEX `fk_order_delivery_module_id_idx` (`delivery_module_id`),
     INDEX `fk_order_lang_id_idx` (`lang_id`),
+    INDEX `idx_order_cart_fk` (`cart_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
@@ -732,9 +795,11 @@ CREATE TABLE `currency`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45),
     `symbol` VARCHAR(45),
+    `format` CHAR(10),
     `rate` FLOAT,
+    `visible` TINYINT DEFAULT 0,
     `position` INTEGER,
-    `by_default` TINYINT,
+    `by_default` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -761,10 +826,30 @@ CREATE TABLE `order_address`
     `zipcode` VARCHAR(10) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(20),
+    `cellphone` VARCHAR(20),
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `fk_order_address_customer_title_id_idx` (`customer_title_id`),
+    INDEX `fk_order_address_country_id_idx` (`country_id`),
+    INDEX `FI_order_address_state_id` (`state_id`),
+    CONSTRAINT `fk_order_address_customer_title_id`
+        FOREIGN KEY (`customer_title_id`)
+        REFERENCES `customer_title` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_address_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_address_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -779,13 +864,14 @@ CREATE TABLE `order_product`
     `order_id` INTEGER NOT NULL,
     `product_ref` VARCHAR(255) NOT NULL,
     `product_sale_elements_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_id` INTEGER,
     `title` VARCHAR(255),
     `chapo` TEXT,
     `description` LONGTEXT,
     `postscriptum` TEXT,
     `quantity` FLOAT NOT NULL,
-    `price` FLOAT NOT NULL,
-    `promo_price` VARCHAR(45),
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000,
     `was_new` TINYINT NOT NULL,
     `was_in_promo` TINYINT NOT NULL,
     `weight` VARCHAR(45),
@@ -793,6 +879,8 @@ CREATE TABLE `order_product`
     `tax_rule_title` VARCHAR(255),
     `tax_rule_description` LONGTEXT,
     `parent` INTEGER COMMENT 'not managed yet',
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
+    `virtual_document` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -859,7 +947,9 @@ CREATE TABLE `module`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(55) NOT NULL,
+    `version` VARCHAR(10) DEFAULT '' NOT NULL,
     `type` TINYINT NOT NULL,
+    `category` VARCHAR(50) DEFAULT 'classic' NOT NULL,
     `activate` TINYINT,
     `position` INTEGER,
     `full_namespace` VARCHAR(255),
@@ -1111,6 +1201,8 @@ CREATE TABLE `coupon`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`),
     INDEX `idx_is_enabled` (`is_enabled`),
@@ -1136,6 +1228,7 @@ CREATE TABLE `admin_log`
     `admin_firstname` VARCHAR(255),
     `admin_lastname` VARCHAR(255),
     `resource` VARCHAR(255),
+    `resource_id` INTEGER,
     `action` VARCHAR(255),
     `message` TEXT,
     `request` LONGTEXT,
@@ -1187,7 +1280,7 @@ CREATE TABLE `cart`
     `address_delivery_id` INTEGER,
     `address_invoice_id` INTEGER,
     `currency_id` INTEGER,
-    `discount` FLOAT DEFAULT 0,
+    `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1231,8 +1324,8 @@ CREATE TABLE `cart_item`
     `product_id` INTEGER NOT NULL,
     `quantity` FLOAT DEFAULT 1,
     `product_sale_elements_id` INTEGER NOT NULL,
-    `price` FLOAT,
-    `promo_price` FLOAT,
+    `price` DECIMAL(16,6) DEFAULT 0.000000,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000,
     `price_end_of_life` DATETIME,
     `promo` INTEGER,
     `created_at` DATETIME,
@@ -1268,8 +1361,8 @@ CREATE TABLE `product_price`
 (
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
-    `price` FLOAT DEFAULT 0 NOT NULL,
-    `promo_price` FLOAT DEFAULT 0 NOT NULL,
+    `price` DECIMAL(16,6) DEFAULT 0.000000,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000,
     `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1297,6 +1390,7 @@ CREATE TABLE `category_image`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `category_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1321,6 +1415,7 @@ CREATE TABLE `folder_image`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `folder_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1345,6 +1440,7 @@ CREATE TABLE `content_image`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `content_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1369,6 +1465,7 @@ CREATE TABLE `category_document`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `category_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1392,6 +1489,7 @@ CREATE TABLE `content_document`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `content_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1415,6 +1513,7 @@ CREATE TABLE `folder_document`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `folder_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1494,7 +1593,7 @@ DROP TABLE IF EXISTS `rewriting_url`;
 CREATE TABLE `rewriting_url`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `url` VARCHAR(255) NOT NULL,
+    `url` VARBINARY(255) NOT NULL,
     `view` VARCHAR(255),
     `view_id` VARCHAR(255),
     `view_locale` VARCHAR(255),
@@ -1504,6 +1603,7 @@ CREATE TABLE `rewriting_url`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `url_UNIQUE` (`url`),
     INDEX `idx_rewriting_url_redirected` (`redirected`),
+    INDEX `idx_rewriting_url` (`view_locale`, `view`, `view_id`, `redirected`),
     CONSTRAINT `fk_rewriting_url_redirected`
         FOREIGN KEY (`redirected`)
         REFERENCES `rewriting_url` (`id`)
@@ -1558,6 +1658,7 @@ CREATE TABLE `module_image`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `module_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1583,8 +1684,8 @@ CREATE TABLE `order_product_tax`
     `order_product_id` INTEGER NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `description` LONGTEXT,
-    `amount` FLOAT NOT NULL,
-    `promo_amount` FLOAT,
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_amount` DECIMAL(16,6) DEFAULT 0.000000,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1627,7 +1728,7 @@ CREATE TABLE `order_coupon`
     `order_id` INTEGER NOT NULL,
     `code` VARCHAR(45) NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `amount` FLOAT NOT NULL,
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
@@ -1751,10 +1852,494 @@ CREATE TABLE `coupon_customer_count`
     CONSTRAINT `fk_coupon_customer_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
         ON DELETE CASCADE,
     CONSTRAINT `fk_coupon_customer_coupon_id`
         FOREIGN KEY (`coupon_id`)
         REFERENCES `coupon` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- brand
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand`;
+
+CREATE TABLE `brand`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `visible` TINYINT,
+    `position` INTEGER,
+    `logo_image_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_brand_brand_image_idx` (`logo_image_id`),
+    CONSTRAINT `fk_logo_image_id_brand_image`
+        FOREIGN KEY (`logo_image_id`)
+        REFERENCES `brand_image` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- brand_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document`;
+
+CREATE TABLE `brand_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `brand_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_brand_document_brand_id` (`brand_id`),
+    CONSTRAINT `fk_brand_document_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- brand_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image`;
+
+CREATE TABLE `brand_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `brand_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `visible` TINYINT DEFAULT 1 NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_brand_image_brand_id` (`brand_id`),
+    CONSTRAINT `fk_brand_image_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- form_firewall
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `form_firewall`;
+
+CREATE TABLE `form_firewall`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `form_name` VARCHAR(255) NOT NULL,
+    `ip_address` VARCHAR(15) NOT NULL,
+    `attempts` TINYINT DEFAULT 1,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_form_firewall_form_name` (`form_name`),
+    INDEX `idx_form_firewall_ip_address` (`ip_address`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- sale
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale`;
+
+CREATE TABLE `sale`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `active` TINYINT(1) DEFAULT 0 NOT NULL,
+    `display_initial_price` TINYINT(1) DEFAULT 1 NOT NULL,
+    `start_date` DATETIME,
+    `end_date` DATETIME,
+    `price_offset_type` TINYINT,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_sales_active_start_end_date` (`active`, `start_date`, `end_date`),
+    INDEX `idx_sales_active` (`active`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- sale_offset_currency
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_offset_currency`;
+
+CREATE TABLE `sale_offset_currency`
+(
+    `sale_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price_offset_value` FLOAT DEFAULT 0,
+    PRIMARY KEY (`sale_id`,`currency_id`),
+    INDEX `fk_sale_offset_currency_currency1_idx` (`currency_id`),
+    CONSTRAINT `fk_sale_offset_currency_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_offset_currency_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- sale_product
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_product`;
+
+CREATE TABLE `sale_product`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_id` INTEGER NOT NULL,
+    `product_id` INTEGER NOT NULL,
+    `attribute_av_id` INTEGER,
+    PRIMARY KEY (`id`),
+    INDEX `fk_sale_product_product_idx` (`product_id`),
+    INDEX `fk_sale_product_attribute_av_idx` (`attribute_av_id`),
+    INDEX `idx_sale_product_sales_id_product_id` (`sale_id`, `product_id`),
+    CONSTRAINT `fk_sale_product_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_product_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_product_attribute_av_id`
+        FOREIGN KEY (`attribute_av_id`)
+        REFERENCES `attribute_av` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- export_category
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export_category`;
+
+CREATE TABLE `export_category`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- export
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export`;
+
+CREATE TABLE `export`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
+    `position` INTEGER NOT NULL,
+    `export_category_id` INTEGER NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    INDEX `fk_export_1_idx` (`export_category_id`),
+    CONSTRAINT `fk_export_export_category_id`
+        FOREIGN KEY (`export_category_id`)
+        REFERENCES `export_category` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- import_category
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import_category`;
+
+CREATE TABLE `import_category`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- import
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import`;
+
+CREATE TABLE `import`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(255) NOT NULL,
+    `position` INTEGER NOT NULL,
+    `import_category_id` INTEGER NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    INDEX `fk_export_1_idx` (`import_category_id`),
+    CONSTRAINT `fk_import_import_category_id`
+        FOREIGN KEY (`import_category_id`)
+        REFERENCES `import_category` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- product_sale_elements_product_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_sale_elements_product_image`;
+
+CREATE TABLE `product_sale_elements_product_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_image_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_pse_product_image_product_image_id_idx` (`product_image_id`),
+    INDEX `fk_pse_product_image_product_sale_element_idx` (`product_sale_elements_id`),
+    CONSTRAINT `fk_pse_product_image_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_pse_product_image_product_image_id`
+        FOREIGN KEY (`product_image_id`)
+        REFERENCES `product_image` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- product_sale_elements_product_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_sale_elements_product_document`;
+
+CREATE TABLE `product_sale_elements_product_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_document_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_pse_product_document_product_document__idx` (`product_document_id`),
+    INDEX `fk_pse_product_document_product_sale_elem_idx` (`product_sale_elements_id`),
+    CONSTRAINT `fk_pse_product_document_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_pse_product_document_product_document_id`
+        FOREIGN KEY (`product_document_id`)
+        REFERENCES `product_document` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook`;
+
+CREATE TABLE `hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(255) NOT NULL,
+    `type` TINYINT,
+    `by_module` TINYINT(1),
+    `native` TINYINT(1),
+    `activate` TINYINT(1),
+    `block` TINYINT(1),
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `code_UNIQUE` (`code`, `type`),
+    INDEX `idx_module_activate` (`activate`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- module_hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_hook`;
+
+CREATE TABLE `module_hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `hook_id` INTEGER NOT NULL,
+    `classname` VARCHAR(255),
+    `method` VARCHAR(255),
+    `active` TINYINT(1) NOT NULL,
+    `hook_active` TINYINT(1) NOT NULL,
+    `module_active` TINYINT(1) NOT NULL,
+    `position` INTEGER NOT NULL,
+    `templates` TEXT,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_hook_active` (`active`),
+    INDEX `fk_module_hook_module_id_idx` (`module_id`),
+    INDEX `fk_module_hook_hook_id_idx` (`hook_id`),
+    CONSTRAINT `fk_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- meta_data
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `meta_data`;
+
+CREATE TABLE `meta_data`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `meta_key` VARCHAR(100) NOT NULL,
+    `element_key` VARCHAR(100) NOT NULL,
+    `element_id` INTEGER NOT NULL,
+    `is_serialized` TINYINT(1) NOT NULL,
+    `value` LONGTEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `meta_data_key_element_idx` (`meta_key`, `element_key`, `element_id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- module_config
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_config`;
+
+CREATE TABLE `module_config`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_id_name` (`module_id`, `name`),
+    CONSTRAINT `fk_module_config_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- api
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `api`;
+
+CREATE TABLE `api`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `label` VARCHAR(255),
+    `api_key` VARCHAR(100),
+    `profile_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_api_profile_id` (`profile_id`),
+    CONSTRAINT `fk_api_profile_id`
+        FOREIGN KEY (`profile_id`)
+        REFERENCES `profile` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- country_area
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `country_area`;
+
+CREATE TABLE `country_area`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
+    `area_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `country_area_area_id_idx` (`area_id`),
+    INDEX `fk_country_area_country_id_idx` (`country_id`),
+    INDEX `fk_country_area_state_id_idx` (`state_id`),
+    CONSTRAINT `fk_country_area_area_id`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `area` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_country_area_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- ignored_module_hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ignored_module_hook`;
+
+CREATE TABLE `ignored_module_hook`
+(
+    `module_id` INTEGER NOT NULL,
+    `hook_id` INTEGER NOT NULL,
+    `method` VARCHAR(255),
+    `classname` VARCHAR(255),
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    INDEX `fk_deleted_module_hook_module_id_idx` (`module_id`),
+    INDEX `fk_deleted_module_hook_hook_id_idx` (`hook_id`),
+    CONSTRAINT `fk_deleted_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_deleted_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
@@ -1824,6 +2409,24 @@ CREATE TABLE `country_i18n`
     CONSTRAINT `country_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `country` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- state_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `state_i18n`;
+
+CREATE TABLE `state_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `state_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `state` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
@@ -2388,6 +2991,206 @@ CREATE TABLE `module_image_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- brand_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_i18n`;
+
+CREATE TABLE `brand_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    `meta_title` VARCHAR(255),
+    `meta_description` TEXT,
+    `meta_keywords` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `brand_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `brand` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- brand_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_document_i18n`;
+
+CREATE TABLE `brand_document_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `brand_document_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `brand_document` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- brand_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `brand_image_i18n`;
+
+CREATE TABLE `brand_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `brand_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `brand_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- sale_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_i18n`;
+
+CREATE TABLE `sale_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    `sale_label` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `sale_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `sale` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- export_category_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export_category_i18n`;
+
+CREATE TABLE `export_category_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `export_category_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `export_category` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- export_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `export_i18n`;
+
+CREATE TABLE `export_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `export_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `export` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- import_category_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import_category_i18n`;
+
+CREATE TABLE `import_category_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `import_category_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `import_category` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- import_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `import_i18n`;
+
+CREATE TABLE `import_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `import_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `import` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- hook_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook_i18n`;
+
+CREATE TABLE `hook_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `hook_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `hook` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- module_config_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_config_i18n`;
+
+CREATE TABLE `module_config_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `value` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `module_config_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `module_config` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_version
 -- ---------------------------------------------------------------------
 
@@ -2396,9 +3199,10 @@ DROP TABLE IF EXISTS `category_version`;
 CREATE TABLE `category_version`
 (
     `id` INTEGER NOT NULL,
-    `parent` INTEGER,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
+    `default_template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -2425,6 +3229,8 @@ CREATE TABLE `product_version`
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
+    `brand_id` INTEGER,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -2438,6 +3244,42 @@ CREATE TABLE `product_version`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- customer_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_version`;
+
+CREATE TABLE `customer_version`
+(
+    `id` INTEGER NOT NULL,
+    `ref` VARCHAR(50),
+    `title_id` INTEGER NOT NULL,
+    `firstname` VARCHAR(255) NOT NULL,
+    `lastname` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255),
+    `password` VARCHAR(255),
+    `algo` VARCHAR(128),
+    `reseller` TINYINT,
+    `lang` VARCHAR(10),
+    `sponsor` VARCHAR(50),
+    `discount` DECIMAL(16,6) DEFAULT 0.000000,
+    `remember_me_token` VARCHAR(255),
+    `remember_me_serial` VARCHAR(255),
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    `order_ids` TEXT,
+    `order_versions` TEXT,
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `customer_version_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `customer` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- folder_version
 -- ---------------------------------------------------------------------
 
@@ -2446,7 +3288,7 @@ DROP TABLE IF EXISTS `folder_version`;
 CREATE TABLE `folder_version`
 (
     `id` INTEGER NOT NULL,
-    `parent` INTEGER NOT NULL,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -2481,6 +3323,47 @@ CREATE TABLE `content_version`
     CONSTRAINT `content_version_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- order_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_version`;
+
+CREATE TABLE `order_version`
+(
+    `id` INTEGER NOT NULL,
+    `ref` VARCHAR(45),
+    `customer_id` INTEGER NOT NULL,
+    `invoice_order_address_id` INTEGER NOT NULL,
+    `delivery_order_address_id` INTEGER NOT NULL,
+    `invoice_date` DATETIME,
+    `currency_id` INTEGER NOT NULL,
+    `currency_rate` FLOAT NOT NULL,
+    `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
+    `delivery_ref` VARCHAR(100) COMMENT 'delivery reference - usually use to identify a delivery progress on a distant delivery tracker website',
+    `invoice_ref` VARCHAR(100) COMMENT 'the invoice reference',
+    `discount` DECIMAL(16,6) DEFAULT 0.000000,
+    `postage` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `postage_tax` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `postage_tax_rule_title` VARCHAR(255),
+    `payment_module_id` INTEGER NOT NULL,
+    `delivery_module_id` INTEGER NOT NULL,
+    `status_id` INTEGER NOT NULL,
+    `lang_id` INTEGER NOT NULL,
+    `cart_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
+    `customer_id_version` INTEGER DEFAULT 0,
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `order_version_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `order` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
@@ -2535,6 +3418,8 @@ CREATE TABLE `coupon_version`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
+    `version_created_at` DATETIME,
+    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
     CONSTRAINT `coupon_version_FK_1`
         FOREIGN KEY (`id`)

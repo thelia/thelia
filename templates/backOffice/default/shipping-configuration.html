@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping zones management"}</a></li>
         </ul>
 
-        {module_include location='shipping_configuration_top'}
+        {hook name="shipping-configuration.top" location="shipping_configuration_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -30,7 +30,7 @@
                             <caption class="clearfix">
                                 {intl l='Shipping zones management'}
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.shipping-configuration" access="CREATE"}
-                                <a class="btn btn-default btn-primary pull-right" title="{intl l='Add a new shipping zone'}" href="#creation_dialog" data-toggle="modal">
+                                <a class="btn btn-primary pull-right" title="{intl l='Add a new shipping zone'}" href="#creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
                                 {/loop}                        
@@ -38,9 +38,10 @@
                             <thead>
     	                        <tr>	                           
                                    <th>{intl l="Zone name"}</th>
-                                   <th>{intl l="Associated countries"}</th>
+                                   <th>{intl l="Included countries"}</th>
+                                   <th>{intl l="Assigned modules"}</th>
 
-                                   {module_include location='shipping_configuration_table_header'}
+                                   {hook name="shipping-configuration.table-header" location="shipping_configuration_table_header" }
 
                                    <th class="text-center">{intl l="Actions"}</th>
     	                        </tr>
@@ -49,15 +50,15 @@
                             <tbody>
                                 {loop name="area-list" type="area" backend_context="1"}
                                 <tr>
-                                    <td><a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}">{$NAME}</a></td>
+                                    <td nowrap><a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}">{$NAME}</a></td>
                                     <td>
-                                        {loop name="country-area" type="country" area=$ID backend_context="1" limit="6"}
+                                        {loop name="country-area" type="country" area=$ID backend_context="1" limit="6" visible="*"}
                                             {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
                                         {/loop}
 
                                         {ifloop rel="country-area-more"}
                                             {$countries = ''}
-                                            {loop name="country-area-more" type="country" area=$ID backend_context="1" offset="6"}
+                                            {loop name="country-area-more" type="country" area=$ID backend_context="1" offset="6" visible="*"}
                                                 {$countries = "$countries, $TITLE"}
                                                 {$ctry_count=$LOOP_COUNT}
                                             {/loop}
@@ -65,17 +66,31 @@
 
                                             <span class="badge" title="{$countries}">{intl l="%count more..." count={$ctry_count}}</span>
                                         {/ifloop}
+                                        {elseloop rel="country-area"}
+                                            <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
+                                        {/elseloop}
+                                    </td>
+                                    <td>
+                                        {loop name="module-area" type="module" area=$ID backend_context="1"}
+                                            {$CODE} - {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL}<br />{/if}
+                                        {/loop}
+                                        {elseloop rel="module-area"}
+                                            <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
+                                        {/elseloop}
                                     </td>
 
-                                    {module_include location='shipping_configuration_table_row'}
+                                    {hook name="shipping-configuration.table-row" location="shipping_configuration_table_row" area_id={$ID} }
 
-                                    <td class="text-center">
-                                        <div class="btn-group">
+                                    <td nowrap class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-configuration" access="UPDATE"}
-                                               <a class="btn btn-default btn-xs area-configuration-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="area-configuration-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.shipping-configuration" access="DELETE"}
-                                                <a class="btn btn-default btn-xs area-configuration-delete" title="{intl l='Delete this shipping zone'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="area-configuration-delete" title="{intl l='Delete this shipping zone'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -88,7 +103,7 @@
             </div>
         </div>
 
-        {module_include location='shipping_configuration_bottom'}
+        {hook name="shipping-configuration.bottom" location="shipping_configuration_bottom" }
 
     </div>
 </div>
@@ -98,21 +113,13 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
         {form name="thelia.admin.area.create"}
-        {form_hidden_fields form=$form}
+            {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
-        {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-            <input type="hidden" name="{$name}" value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}" />
-        {/form_field}
-        {form_field form=$form field="name"}
-        <div class="form-group">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="Name"}" placeholder="{intl l='Shipping zone name'}">
-        </div>
-        {/form_field}
-       
+            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+            {render_form_field field='success_url' value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}"}
+            {render_form_field field='name'}
 
-        {module_include location='shipping_configuration_create_form'}
+            {hook name="shipping-configuration.create-form" location="shipping_configuration_create_form" }
         {/form}
     {/capture}
 
@@ -136,8 +143,7 @@
     {capture "delete_dialog"}
         <input type="hidden" name="area_id" id="shipping_configuration_delete_id" value="" />
 
-        {module_include location='shipping_configuration_delete_form'}
-
+        {hook name="shipping-configuration.delete-form" location="shipping_configuration_delete_form" }
     {/capture}
 
     {include
@@ -147,7 +153,7 @@
         dialog_title    = {intl l="Delete shipping zone"}
         dialog_message  = {intl l="Do you really want to delete this shipping zone ?"}
 
-        form_action         = {url path='/admin/configuration/shipping_configuration/delete'}
+        form_action         = {token_url path='/admin/configuration/shipping_configuration/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}
@@ -163,5 +169,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='shipping-configuration-js'}
+    {hook name="shipping-configuration.js" location="shipping-configuration-js" }
 {/block}

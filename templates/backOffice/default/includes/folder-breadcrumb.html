@@ -11,7 +11,7 @@
 				   {if $editing_folder == true}
                        {intl l='Editing %fold' fold="{$TITLE}"}
 				   {else}
-                       {$TITLE} <a href="{url path="/admin/folders/update/$ID"}" title="{intl l='Edit this folder'}">{intl l="(edit)"}</a>
+                       {$TITLE} <a href="{url path="/admin/folders/update/%id" id=$ID}" title="{intl l='Edit this folder'}">{intl l="(edit)"}</a>
 			        {/if}
 				</li>
 			{else}
@@ -22,7 +22,7 @@
 
     {if $editing_content == true}
         {loop name="content_path" type="content" visible="*" id=$content_id}
-            <li>{intl l="Editing %title" title="$TITLE"}</li>
+            <li>{intl l="Editing %title" title="{$TITLE}"}</li>
         {/loop}
     {/if}
 </ul>

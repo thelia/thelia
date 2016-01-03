@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Area;
 /**
  * Class AreaUpdatePostageEvent
  * @package Thelia\Core\Event\Area
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaUpdatePostageEvent extends AreaEvent
 {
@@ -66,5 +66,4 @@ class AreaUpdatePostageEvent extends AreaEvent
     {
         return $this->postage;
     }
-
 }

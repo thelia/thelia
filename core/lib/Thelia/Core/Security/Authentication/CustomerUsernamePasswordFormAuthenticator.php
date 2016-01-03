@@ -13,7 +13,6 @@
 namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
-
 use Thelia\Form\CustomerLogin;
 use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 

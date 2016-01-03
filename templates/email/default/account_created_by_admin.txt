@@ -1,0 +1,16 @@
+{default_translation_domain domain='email.default'}
+{intl l="Hello,"}
+
+{intl l="An account at %store_name has been created by one of our managers." store_name={config key="store_name"}}.
+
+{loop name="cust_info" type="customer" id={$customer_id} current="false"}
+    {intl l="To login, please use the email address <span style=\"font-family: courier, fixed; font-size: 120%\">%email</span>" email={$EMAIL}}
+{/loop}
+
+{intl l="Your password is <span style=\"font-family: courier, fixed; font-size: 120%\">%pass</span>" pass={$password}}
+
+{intl l='You can change your password and your account details at any time in our store at %url.' url={url path="/account"}}.
+
+{intl l='Kind regards'},
+{intl l="The %store team." store={config key="store_name"}}
+

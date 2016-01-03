@@ -37,13 +37,13 @@ use Thelia\Model\Map\AreaTableMap;
  * @method     ChildAreaQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildAreaQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildAreaQuery leftJoinCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the Country relation
- * @method     ChildAreaQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
- * @method     ChildAreaQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
- *
  * @method     ChildAreaQuery leftJoinAreaDeliveryModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the AreaDeliveryModule relation
  * @method     ChildAreaQuery rightJoinAreaDeliveryModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AreaDeliveryModule relation
  * @method     ChildAreaQuery innerJoinAreaDeliveryModule($relationAlias = null) Adds a INNER JOIN clause to the query using the AreaDeliveryModule relation
+ *
+ * @method     ChildAreaQuery leftJoinCountryArea($relationAlias = null) Adds a LEFT JOIN clause to the query using the CountryArea relation
+ * @method     ChildAreaQuery rightJoinCountryArea($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CountryArea relation
+ * @method     ChildAreaQuery innerJoinCountryArea($relationAlias = null) Adds a INNER JOIN clause to the query using the CountryArea relation
  *
  * @method     ChildArea findOne(ConnectionInterface $con = null) Return the first ChildArea matching the query
  * @method     ChildArea findOneOrCreate(ConnectionInterface $con = null) Return the first ChildArea matching the query, or a new ChildArea object populated from the query conditions when no match is found
@@ -434,79 +434,6 @@ abstract class AreaQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Country object
-     *
-     * @param \Thelia\Model\Country|ObjectCollection $country  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAreaQuery The current query, for fluid interface
-     */
-    public function filterByCountry($country, $comparison = null)
-    {
-        if ($country instanceof \Thelia\Model\Country) {
-            return $this
-                ->addUsingAlias(AreaTableMap::ID, $country->getAreaId(), $comparison);
-        } elseif ($country instanceof ObjectCollection) {
-            return $this
-                ->useCountryQuery()
-                ->filterByPrimaryKeys($country->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCountry() only accepts arguments of type \Thelia\Model\Country or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Country relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildAreaQuery The current query, for fluid interface
-     */
-    public function joinCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Country');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Country');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Country relation Country object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
-     */
-    public function useCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinCountry($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Country', '\Thelia\Model\CountryQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\AreaDeliveryModule object
      *
      * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule  the related object to use as filter
@@ -577,6 +504,96 @@ abstract class AreaQuery extends ModelCriteria
         return $this
             ->joinAreaDeliveryModule($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'AreaDeliveryModule', '\Thelia\Model\AreaDeliveryModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CountryArea object
+     *
+     * @param \Thelia\Model\CountryArea|ObjectCollection $countryArea  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAreaQuery The current query, for fluid interface
+     */
+    public function filterByCountryArea($countryArea, $comparison = null)
+    {
+        if ($countryArea instanceof \Thelia\Model\CountryArea) {
+            return $this
+                ->addUsingAlias(AreaTableMap::ID, $countryArea->getAreaId(), $comparison);
+        } elseif ($countryArea instanceof ObjectCollection) {
+            return $this
+                ->useCountryAreaQuery()
+                ->filterByPrimaryKeys($countryArea->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCountryArea() only accepts arguments of type \Thelia\Model\CountryArea or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CountryArea relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildAreaQuery The current query, for fluid interface
+     */
+    public function joinCountryArea($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CountryArea');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CountryArea');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CountryArea relation CountryArea object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CountryAreaQuery A secondary query class using the current class as primary query
+     */
+    public function useCountryAreaQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCountryArea($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CountryArea', '\Thelia\Model\CountryAreaQuery');
+    }
+
+    /**
+     * Filter the query by a related Country object
+     * using the country_area table as cross reference
+     *
+     * @param Country $country the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAreaQuery The current query, for fluid interface
+     */
+    public function filterByCountry($country, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useCountryAreaQuery()
+            ->filterByCountry($country, $comparison)
+            ->endUse();
     }
 
     /**

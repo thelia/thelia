@@ -14,7 +14,6 @@ namespace Colissimo\Controller;
 
 use Colissimo\Colissimo;
 use Colissimo\Model\ColissimoQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,15 +26,12 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CustomerTitleQuery;
-use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
-
 
 /**
  * Class Export
  * @package Colissimo\Controller
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Export extends BaseAdminController
 {
@@ -63,7 +59,7 @@ class Export extends BaseAdminController
                 ->find();
 
             $export = "";
-            $store_name = ConfigQuery::read("store_name");
+            $store_name = ConfigQuery::getStoreName();
             /** @var $order \Thelia\Model\Order */
             foreach ($orders as $order) {
 
@@ -116,23 +112,36 @@ class Export extends BaseAdminController
                         $weight+=(double) $product->getWeight();
                     }
 
-                    $export .= "\"".$order->getRef()."\";\"".$address->getLastname()."\";\"".$address->getFirstname()."\";\"".$address->getAddress1()."\";\"".$address->getAddress2()."\";\"".$address->getAddress3()."\";\"".$address->getZipcode()."\";\"".$address->getCity()."\";\"".$country->getTitle()."\";\"".$phone."\";\"".$cellphone."\";\"".$weight."\";\"\";\"\";\"".$store_name."\";\"DOM\";\r\n";
+                    $export .=
+                        "\"".$order->getRef()
+                        ."\";\"".$address->getLastname()
+                        ."\";\"".$address->getFirstname()
+                        ."\";\"".$address->getAddress1()
+                        ."\";\"".$address->getAddress2()
+                        ."\";\"".$address->getAddress3()
+                        ."\";\"".$address->getZipcode()
+                        ."\";\"".$address->getCity()
+                        ."\";\"".$country->getTitle()
+                        ."\";\"".$phone
+                        ."\";\"".$cellphone
+                        ."\";\"".$weight
+                        ."\";\"".$customer->getEmail()
+                        ."\";\"\";\"".$store_name
+                        ."\";\"DOM\";\r\n";
 
                     if ($status) {
                         $event = new OrderEvent($order);
                         $event->setStatus($status->getId());
                         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
                     }
-
-
                 }
-
             }
 
             return Response::create(
-                $export,
+                utf8_decode($export),
                 200,
                 array(
+                    "Content-Encoding"=>"ISO-8889-1",
                     "Content-Type"=>"application/csv-tab-delimited-table",
                     "Content-disposition"=>"filename=export.csv"
                 )
@@ -154,5 +163,4 @@ class Export extends BaseAdminController
             );
         }
     }
-
-} 
+}

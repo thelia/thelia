@@ -11,11 +11,12 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Security\Resource\AdminResources;
+
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ShippingZone\ShippingZoneAddArea;
 use Thelia\Form\ShippingZone\ShippingZoneRemoveArea;
@@ -23,7 +24,7 @@ use Thelia\Form\ShippingZone\ShippingZoneRemoveArea;
 /**
  * Class ShippingZoneController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ShippingZoneController extends BaseAdminController
 {
@@ -31,16 +32,22 @@ class ShippingZoneController extends BaseAdminController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
         return $this->render("shipping-zones", array("display_shipping_zone" => 20));
     }
 
     public function updateAction($delivery_module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) return $response;
-        return $this->render("shipping-zones-edit", array(
-            "delivery_module_id" => $delivery_module_id
-        ));
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
+        return $this->render(
+            "shipping-zones-edit",
+            ["delivery_module_id" => $delivery_module_id]
+        );
     }
 
     /**
@@ -48,7 +55,9 @@ class ShippingZoneController extends BaseAdminController
      */
     public function addArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
         $error_msg = null;
@@ -64,8 +73,7 @@ class ShippingZoneController extends BaseAdminController
             $this->dispatch(TheliaEvents::SHIPPING_ZONE_ADD_AREA, $event);
 
             // Redirect to the success URL
-            $this->redirect($shippingAreaForm->getSuccessUrl());
-
+            return $this->generateSuccessRedirect($shippingAreaForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -75,7 +83,10 @@ class ShippingZoneController extends BaseAdminController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)), $error_msg, $shippingAreaForm);
+            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+            $error_msg,
+            $shippingAreaForm
+        );
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();
@@ -83,7 +94,9 @@ class ShippingZoneController extends BaseAdminController
 
     public function removeArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $shippingAreaForm = new ShippingZoneRemoveArea($this->getRequest());
         $error_msg = null;
@@ -99,8 +112,7 @@ class ShippingZoneController extends BaseAdminController
             $this->dispatch(TheliaEvents::SHIPPING_ZONE_REMOVE_AREA, $event);
 
             // Redirect to the success URL
-            $this->redirect($shippingAreaForm->getSuccessUrl());
-
+            return $this->generateSuccessRedirect($shippingAreaForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -110,7 +122,10 @@ class ShippingZoneController extends BaseAdminController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)), $error_msg, $shippingAreaForm);
+            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+            $error_msg,
+            $shippingAreaForm
+        );
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();
@@ -121,14 +136,14 @@ class ShippingZoneController extends BaseAdminController
      */
     protected function renderEditionTemplate()
     {
-        return $this->render("shipping-zones-edit", array(
-            "delivery_module_id" => $this->getDeliveryModuleId()
-        ));
+        return $this->render(
+            "shipping-zones-edit",
+            ["delivery_module_id" => $this->getDeliveryModuleId()]
+        );
     }
 
     protected function getDeliveryModuleId()
     {
         return $this->getRequest()->get('delivery_module_id', 0);
     }
-
 }

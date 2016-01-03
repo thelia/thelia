@@ -8,13 +8,67 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Country\CountryEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Country as BaseCountry;
-
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Core\Translation\Translator;
 
 class Country extends BaseCountry
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+    protected static $defaultCountry = null;
+
+
+    /**
+     * get a regex pattern according to the zip code format field
+     * to match a zip code for this country.
+     *
+     * zip code format :
+     * - N : number
+     * - L : letter
+     * - C : iso of a state
+     *
+     * @return string|null will return a regex to match the zip code, otherwise null will be return
+     *                     if zip code format is not defined
+     */
+    public function getZipCodeRE()
+    {
+        $zipCodeFormat = $this->getZipCodeFormat();
+
+        if (empty($zipCodeFormat)) {
+            return null;
+        }
+
+
+        $zipCodeRE = preg_replace("/\\s+/", ' ', $zipCodeFormat);
+
+        $trans = [
+            "N" => "\\d",
+            "L" => "[a-zA-Z]",
+            "C" => ".+",
+            " " => " +"
+        ];
+
+        $zipCodeRE = "#^" . strtr($zipCodeRE, $trans) . "$#";
+
+        return $zipCodeRE;
+    }
+
+    /**
+     * This method ensure backward compatibility to Thelia 2.1, where a country belongs to one and
+     * only one shipping zone.
+     *
+     * @deprecated a country may belong to several Areas (shipping zones). Use CountryArea queries instead
+     */
+    public function getAreaId()
+    {
+        $firstAreaCountry = CountryAreaQuery::create()->findOneByCountryId($this->getId());
+
+        if (null !== $firstAreaCountry) {
+            return $firstAreaCountry->getAreaId();
+        }
+
+        return null;
+    }
 
     /**
      *
@@ -47,7 +101,6 @@ class Country extends BaseCountry
             $con->rollBack();
             throw $e;
         }
-
     }
 
     public function preInsert(ConnectionInterface $con = null)
@@ -93,16 +146,19 @@ class Country extends BaseCountry
     /**
      * Return the default country
      *
-     * @throws LogicException if no default country is defined
+     * @throws \LogicException if no default country is defined
      */
     public static function getDefaultCountry()
     {
-        $dc = CountryQuery::create()->findOneByByDefault(true);
+        if (null === self::$defaultCountry) {
+            self::$defaultCountry = CountryQuery::create()->findOneByByDefault(true);
 
-        if ($dc == null)
-            throw new \LogicException(Translator::getInstance()->trans("Cannot find a default country. Please define one."));
+            if (null === self::$defaultCountry) {
+                throw new \LogicException(Translator::getInstance()->trans("Cannot find a default country. Please define one."));
+            }
+        }
 
-        return $dc;
+        return self::$defaultCountry;
     }
 
     /**
@@ -114,8 +170,9 @@ class Country extends BaseCountry
     {
         $dc = CountryQuery::create()->findOneByShopCountry(true);
 
-        if ($dc == null)
+        if ($dc == null) {
             throw new \LogicException(Translator::getInstance()->trans("Cannot find the shop country. Please select a shop country."));
+        }
 
         return $dc;
     }

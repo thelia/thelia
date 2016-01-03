@@ -9,9 +9,6 @@
 h3, h4 {
     color: #5a6876;
     text-align: left;
-    background: -webkit-gradient(linear, left top, left bottom, from(#42505d), to(#72808e));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 h3 {
@@ -38,4 +35,80 @@ hr {
     margin: 0 auto;
     clear: both;
     margin-top: 20px;
+}
+
+// Padding
+
+.u-no-padding {
+    padding: 0 !important;
+}
+
+.u-padding {
+    padding: @padding-base-vertical @padding-base-horizontal;
+}
+.u-padding-bottom {
+    padding-bottom: @padding-base-vertical;
+}
+.u-padding-top {
+    padding-top: @padding-base-vertical;
+}
+.u-padding-left {
+    padding-left: @padding-base-horizontal;
+}
+.u-padding-right {
+    padding-right: @padding-base-horizontal;
+}
+
+.u-padding-lg {
+    padding: @padding-large-vertical @padding-large-horizontal;
+}
+.u-padding-bottom-lg {
+    padding-bottom: @padding-large-vertical;
+}
+.u-padding-top-lg {
+    padding-top: @padding-large-vertical;
+}
+.u-padding-left-lg {
+    padding-left: @padding-large-horizontal;
+}
+.u-padding-right-lg {
+    padding-right: @padding-large-horizontal;
+}
+
+.u-padding-sm {
+    padding: @padding-small-vertical @padding-small-horizontal;
+}
+.u-padding-bottom-sm {
+    padding-bottom: @padding-small-vertical;
+}
+.u-padding-top-sm {
+    padding-top: @padding-small-vertical;
+}
+.u-padding-left-sm {
+    padding-left: @padding-small-horizontal;
+}
+.u-padding-right-sm {
+    padding-right: @padding-small-horizontal;
+}
+
+// margin
+
+.u-no-margin {
+    padding: 0 !important;
+}
+
+.u-margin {
+    margin: @line-height-computed;
+}
+.u-margin-bottom {
+    margin-bottom: @line-height-computed;
+}
+.u-margin-top {
+    margin-top: @line-height-computed;
+}
+.u-margin-left {
+    margin-left: @line-height-computed;
+}
+.u-margin-right {
+    margin-right: @line-height-computed;
 }

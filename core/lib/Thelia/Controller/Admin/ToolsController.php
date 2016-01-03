@@ -18,7 +18,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 /**
  * Class ToolsController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ToolsController extends BaseAdminController
 {

@@ -25,7 +25,7 @@ use Thelia\Core\Template\Loop\Order;
 /**
  * Class NotSendLoop
  * @package Colissimo\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NotSendLoop extends Order
 {

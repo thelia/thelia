@@ -13,7 +13,7 @@
     <div class="customers edit-customer">
 
         <div id="wrapper" class="container">
-            {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" with_prev_next_info="true" lang="$edit_language_id"}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -21,19 +21,36 @@
                     <li>{intl l="Edit customer %firstname %lastname" firstname={$FIRSTNAME} lastname={$LASTNAME}}</li>
                 </ul>
 
+            {hook name="customer-edit.top" customer_id=$customer_id}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
 
-        					<div class="col-md-12 title title-without-tabs">
+        					<div class="col-md-6 title title-without-tabs">
                                 {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname={$FIRSTNAME} lastname={$LASTNAME} ref={$REF}}
         					</div>
 
+                            <div class="col-md-6 actions">
+
+                                {if $HAS_PREVIOUS != 0}
+                                <a href="{url path="/admin/customer/update?customer_id=%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous customer'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {/if}
+                                {if $HAS_NEXT != 0}
+                                <a href="{url path="/admin/customer/update?customer_id=%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next customer'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {/if}
+                            </div>
+
+
                             <div class="form-container">
                                 <div class="col-md-12">
-
+                                    <br>
         						    {form name="thelia.admin.customer.update"}
-        						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype form=$form} class="clearfix">
+        						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype} class="clearfix">
 
                                             {include
                                                 file="includes/inner-form-toolbar.html"
@@ -41,12 +58,12 @@
                                                 close_url  = {url path='/admin/customers'}
                                             }
 
-         						        	{form_hidden_fields form=$form}
+         						        	{form_hidden_fields}
 
                                             <input type="hidden" name="page" value="{$page}" />
                                             <input type="hidden" name="customer_id" value="{$customer_id}" />
 
-        						        	{form_field form=$form field='success_url'}
+        						        	{form_field field='success_url'}
         						        		<input type="hidden" name="{$name}" value="{url path='/admin/customers' page=$page}" />
         						        	{/form_field}
 
@@ -55,7 +72,7 @@
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs">{intl l="Customer informations"}</p>
 
-                                                {form_field form=$form field='title'}
+                                                {form_field field='title'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
 
@@ -67,35 +84,46 @@
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='firstname'}
+                                                {form_field field='firstname'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='lastname'}
+                                                {form_field field='lastname'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='email'}
+                                                {form_field field='email'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='discount'}
+                                                {form_field field='discount'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='permanent discount'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='password'}
+                                                {form_field field='reseller'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                            <div class="checkbox">
+                                                                <label>
+                                                                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                                                    {$label}
+                                                                </label>
+                                                            </div>
+                                                    </div>
+                                                {/form_field}
+
+                                                {form_field field='password'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label} (leave blank to keep current customer password) {if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Password'}">
@@ -106,68 +134,81 @@
 
                                                     <p class="title title-without-tabs">{intl l="Default address"}</p>
 
-                                                    {form_field form=$form field='company'}
+                                                    {form_field field='company'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='address1'}
+                                                    {form_field field='address1'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='address2'}
+                                                    {form_field field='address2'}
                                                         <div class="form-group">
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='address3'}
+                                                    {form_field field='address3'}
                                                         <div class="form-group">
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='zipcode'}
+                                                    {form_field field='zipcode'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='city'}
+                                                    {form_field field='city'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='country'}
+                                                    {form_field field='country'}
+                                                        {$countryFieldId=$label_attr.for}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                                                                {loop type="country" name="country1"}
+                                                                {loop type="country" name="country1" visible="*"}
                                                                     <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='phone'}
-                                                        <div class="form-group {if $error}has-error{/if}">
+                                                    {form_field field='state'}
+                                                        <div class="form-group group-state{if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
+                                                            <select name="{$name}" id="{$label_attr.for}" class="form-control"
+                                                                    data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state">
+                                                                {loop type="state" name="state1" visible="*"}
+                                                                    <option value="{$ID}" {if {$value} == $ID}selected{/if} data-country="{$COUNTRY}">{$TITLE}</option>
+                                                                {/loop}
+                                                            </select>
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='cellphone'}
+                                                    {form_field field='phone'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Phone'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field field='cellphone'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Cellphone'}">
                                                         </div>
                                                     {/form_field}
 
@@ -179,7 +220,7 @@
                                                 <p class="title title-without-tabs clearfix">
                                                     {intl l="Other addresses"}
                                                     <span class="pull-right">
-                                                        <a class="btn btn-default btn-primary" title="{intl l='Add a new address'}" href="#address_creation_dialog" data-toggle="modal">
+                                                        <a class="btn btn-primary" title="{intl l='Add a new address'}" href="#address_creation_dialog" data-toggle="modal">
                                                             <span class="glyphicon glyphicon-plus-sign"></span>
                                                         </a>
                                                     </span>
@@ -205,9 +246,11 @@
                                                                         {if $ADDRESS2}<br />{$ADDRESS2}{/if}
                                                                         {if $ADDRESS3}<br />{$ADDRESS3}{/if}
                                                                         <br>{$ZIPCODE} {$CITY}
-                                                                        {loop name="address.country" type="country" id=$COUNTRY}
+                                                                        {loop name="address.country" type="country" id=$COUNTRY visible="*"}
                                                                             <br>{$TITLE}
                                                                         {/loop}
+                                                                        {if $STATE}{loop type="state" name="address.state" id=$STATE}, {$TITLE}{/loop}{/if}
+
                                                                         {if $PHONE}
                                                                             <br>{intl l="Phone"}: {$PHONE}
                                                                         {/if}
@@ -227,7 +270,7 @@
                                                                             <span class="glyphicon glyphicon-pushpin"></span>
                                                                         </a>
 
-                                                                        <a class="btn btn-default btn-xs customer-address-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_address_dialog" data-id="{$ID}" data-toggle="modal">
+                                                                        <a class="btn btn-default btn-xs customer-address-delete" title="{intl l='Delete this customer address'}"  href="#delete_address_dialog" data-id="{$ID}" data-toggle="modal">
                                                                             <span class="glyphicon glyphicon-trash"></span>
                                                                         </a>
 
@@ -270,26 +313,53 @@
                                         <tr>
                                             <th>{intl l="Order n°"}</th>
                                             <th>{intl l="Date & Hour"}</th>
-                                            <th>{intl l="Amount"}</th>
+                                            <th class="text-right">{intl l="Amount"}</th>
                                             <th>{intl l="Status"}</th>
+                                            {hook name="customer.orders-table-header" location="orders_table_header" customer_id=$customer_id }
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*'}
+                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page_order} limit=10}
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}
                                         {/loop}
                                             <tr>
-                                                <td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
+                                                <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
                                                 <td>{format_date date=$CREATE_DATE}</td>
-                                                <td>{$TOTAL_TAXED_AMOUNT}</td>
+                                                <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT}</td>
                                                 <td>
                                                     <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
                                                 </td>
+                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id }
                                             </tr>
                                         {/loop}
+
+                                        {elseloop rel="order-list"}
+                                            <tr>
+                                                <td colspan="4">
+                                                    <div class="alert alert-info">
+                                                        {intl l="No orders fo this customer."}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/elseloop}
+
                                         </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <td colspan="7">
+                                                {include
+                                                file = "includes/pagination.html"
+                                                page_param_name = "order_page"
+                                                loop_ref       = "order-list"
+                                                max_page_count = 10
+                                                page_url       = "{url path="/admin/customer/update" customer_id=$customer_id page=$page}"
+                                                page_param_name = "page_order"
+                                                }
+                                            </td>
+                                        </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -297,7 +367,9 @@
                     </div>
                 </div>
 
-            {module_include location='customer-edit'}
+            {hook name="customer.edit" location="customer-edit" customer_id=$customer_id}
+
+            {hook name="customer-edit.bottom" customer_id=$customer_id}
 
     		{/loop}
 
@@ -305,7 +377,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-error">
-                            {intl l="Sorry, customer ID=%id was not found." id=$customer_id}
+                            {intl l="Sorry, customer ID=%id was not found." id={$customer_id}}
                         </div>
                     </div>
                 </div>
@@ -321,9 +393,9 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "address_creation_dialog"}
 
-        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
+        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page dialog_type="new"}
 
-        {module_include location='customer_address_create_form'}
+        {hook name="customer.address-create-form" location="customer_address_create_form" customer_id=$customer_id page=$page}
 
     {/capture}
 
@@ -338,7 +410,7 @@
         dialog_cancel_label = {intl l="Cancel"}
 
         form_action        = {url path='/admin/address/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 
@@ -354,8 +426,8 @@
 	    {capture "address_update_dialog"}
 	        <input type="hidden" name="address_id" id="address_update_id" value="{$address_id}" />
 
-	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
-            {module_include location='customer_address_update_form'}
+	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page dialog_type="update"}
+            {hook name="customer.address-update-form" location="customer_address_update_form" customer_id=$customer_id page=$page}
 	    {/capture}
 
 	    {include
@@ -369,7 +441,7 @@
 	        dialog_cancel_label = {intl l="Cancel"}
 
 	        form_action        = {url path="/admin/address/save"}
-	        form_enctype       = {form_enctype form=$form}
+	        form_enctype       = {form_enctype}
 	        form_error_message = $form_error_message
 	    }
 
@@ -404,7 +476,7 @@
     <input type="hidden" name="customer_id" value="{$customer_id}">
     <input type="hidden" name="page" value="{$page}">
 
-    {module_include location='customer_address_delete_form'}
+    {hook name="customer.address-delete-form" location="customer_address_delete_form" customer_id=$customer_id page=$page}
 {/capture}
 
 {include
@@ -414,18 +486,16 @@
     dialog_title    = {intl l="Delete address"}
     dialog_message  = {intl l="Do you really want to delete this address ?"}
 
-    form_action         = {url path='/admin/address/delete'}
+    form_action         = {token_url path='/admin/address/delete'}
     form_content        = {$smarty.capture.delete_address_dialog nofilter}
 }
 {/block}
 
 
 {block name="javascript-initialization"}
-
-    {javascripts file='assets/js/main.js'}
+    {javascripts file='assets/js/thelia-states.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-
     <script>
         $(function() {
 
@@ -465,5 +535,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='customer-edit-js'}
+    {hook name="customer.edit-js" location="customer-edit-js" customer_id=$customer_id}
 {/block}

@@ -1,0 +1,67 @@
+{default_translation_domain domain='bo.default'}
+
+{block name="discount-field"}{/block}
+
+<div class="form-group input-coupon-category-id">
+
+    <label for="coupon-category-id">{intl l="Select product category :"}</label>
+
+    <select required class="form-control" id="coupon-category-id" name="{$category_id_field_name}">
+        <option value="0">{intl l="Please select..."}</option>
+        {loop type="category-tree" category=0 name="list-of-category" backend_context="1"}
+            <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if $ID == $category_id_value}selected="selected"{/if}>{$TITLE}</option>
+        {/loop}
+    </select>
+</div>
+
+<div class="loading" id="input-coupon-products-id-loading" style="display: none"></div>
+
+<div class="form-group" id="input-coupon-products-id" {if $category_id_value == 0}style="display: none"{/if}>
+
+    <label for="coupon-products-id">{intl l="Applies to products :"}</label>
+
+    <select required multiple size="10" class="form-control" id="coupon-products-id" name="{$products_field_name}[]">
+        {loop type="product" category=$category_id_value|default:0 name="list-of-products" backend_context="1"}
+            <option value="{$ID}" {if in_array($ID, $products_values)}selected="selected"{/if}>{$TITLE}</option>
+        {/loop}
+    </select>
+
+    <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one product'}</span>
+</div>
+
+<script>
+    function couponInputFormSetup() {
+
+        var $catSelect = $('#coupon-category-id');
+
+        $catSelect.change(function(ev) {
+
+            var $category_id = $(this).val();
+
+            $('#input-coupon-products-id').hide();
+            $('#coupon-products-id').html('');
+
+            if ($category_id != 0) {
+
+                $('#input-coupon-products-id-loading').show();
+
+                $.ajax({
+                    url: "{url path='/admin/coupon/type-fragments/ajax-products-list'}",
+                    type: 'POST',
+                    data: {
+                        category_id: $category_id
+                    },
+                    success: function(options) {
+                        $('#coupon-products-id').html(options);
+                        $('#input-coupon-products-id').show();
+                    },
+                    complete: function() {
+                        $('#input-coupon-products-id-loading').hide();
+                    }
+                });
+            }
+        });
+
+        {block name="javascript-init"}{/block}
+    }
+</script>

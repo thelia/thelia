@@ -58,7 +58,7 @@ class AddressTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 18;
+    const NUM_COLUMNS = 19;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class AddressTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 18;
+    const NUM_HYDRATE_COLUMNS = 19;
 
     /**
      * the column name for the ID field
@@ -136,6 +136,11 @@ class AddressTableMap extends TableMap
     const COUNTRY_ID = 'address.COUNTRY_ID';
 
     /**
+     * the column name for the STATE_ID field
+     */
+    const STATE_ID = 'address.STATE_ID';
+
+    /**
      * the column name for the PHONE field
      */
     const PHONE = 'address.PHONE';
@@ -172,12 +177,12 @@ class AddressTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Label', 'CustomerId', 'TitleId', 'Company', 'Firstname', 'Lastname', 'Address1', 'Address2', 'Address3', 'Zipcode', 'City', 'CountryId', 'Phone', 'Cellphone', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'label', 'customerId', 'titleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'countryId', 'phone', 'cellphone', 'isDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AddressTableMap::ID, AddressTableMap::LABEL, AddressTableMap::CUSTOMER_ID, AddressTableMap::TITLE_ID, AddressTableMap::COMPANY, AddressTableMap::FIRSTNAME, AddressTableMap::LASTNAME, AddressTableMap::ADDRESS1, AddressTableMap::ADDRESS2, AddressTableMap::ADDRESS3, AddressTableMap::ZIPCODE, AddressTableMap::CITY, AddressTableMap::COUNTRY_ID, AddressTableMap::PHONE, AddressTableMap::CELLPHONE, AddressTableMap::IS_DEFAULT, AddressTableMap::CREATED_AT, AddressTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LABEL', 'CUSTOMER_ID', 'TITLE_ID', 'COMPANY', 'FIRSTNAME', 'LASTNAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ZIPCODE', 'CITY', 'COUNTRY_ID', 'PHONE', 'CELLPHONE', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'label', 'customer_id', 'title_id', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'country_id', 'phone', 'cellphone', 'is_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
+        self::TYPE_PHPNAME       => array('Id', 'Label', 'CustomerId', 'TitleId', 'Company', 'Firstname', 'Lastname', 'Address1', 'Address2', 'Address3', 'Zipcode', 'City', 'CountryId', 'StateId', 'Phone', 'Cellphone', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'label', 'customerId', 'titleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'countryId', 'stateId', 'phone', 'cellphone', 'isDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AddressTableMap::ID, AddressTableMap::LABEL, AddressTableMap::CUSTOMER_ID, AddressTableMap::TITLE_ID, AddressTableMap::COMPANY, AddressTableMap::FIRSTNAME, AddressTableMap::LASTNAME, AddressTableMap::ADDRESS1, AddressTableMap::ADDRESS2, AddressTableMap::ADDRESS3, AddressTableMap::ZIPCODE, AddressTableMap::CITY, AddressTableMap::COUNTRY_ID, AddressTableMap::STATE_ID, AddressTableMap::PHONE, AddressTableMap::CELLPHONE, AddressTableMap::IS_DEFAULT, AddressTableMap::CREATED_AT, AddressTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LABEL', 'CUSTOMER_ID', 'TITLE_ID', 'COMPANY', 'FIRSTNAME', 'LASTNAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ZIPCODE', 'CITY', 'COUNTRY_ID', 'STATE_ID', 'PHONE', 'CELLPHONE', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'label', 'customer_id', 'title_id', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'country_id', 'state_id', 'phone', 'cellphone', 'is_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
     );
 
     /**
@@ -187,12 +192,12 @@ class AddressTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Label' => 1, 'CustomerId' => 2, 'TitleId' => 3, 'Company' => 4, 'Firstname' => 5, 'Lastname' => 6, 'Address1' => 7, 'Address2' => 8, 'Address3' => 9, 'Zipcode' => 10, 'City' => 11, 'CountryId' => 12, 'Phone' => 13, 'Cellphone' => 14, 'IsDefault' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'label' => 1, 'customerId' => 2, 'titleId' => 3, 'company' => 4, 'firstname' => 5, 'lastname' => 6, 'address1' => 7, 'address2' => 8, 'address3' => 9, 'zipcode' => 10, 'city' => 11, 'countryId' => 12, 'phone' => 13, 'cellphone' => 14, 'isDefault' => 15, 'createdAt' => 16, 'updatedAt' => 17, ),
-        self::TYPE_COLNAME       => array(AddressTableMap::ID => 0, AddressTableMap::LABEL => 1, AddressTableMap::CUSTOMER_ID => 2, AddressTableMap::TITLE_ID => 3, AddressTableMap::COMPANY => 4, AddressTableMap::FIRSTNAME => 5, AddressTableMap::LASTNAME => 6, AddressTableMap::ADDRESS1 => 7, AddressTableMap::ADDRESS2 => 8, AddressTableMap::ADDRESS3 => 9, AddressTableMap::ZIPCODE => 10, AddressTableMap::CITY => 11, AddressTableMap::COUNTRY_ID => 12, AddressTableMap::PHONE => 13, AddressTableMap::CELLPHONE => 14, AddressTableMap::IS_DEFAULT => 15, AddressTableMap::CREATED_AT => 16, AddressTableMap::UPDATED_AT => 17, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LABEL' => 1, 'CUSTOMER_ID' => 2, 'TITLE_ID' => 3, 'COMPANY' => 4, 'FIRSTNAME' => 5, 'LASTNAME' => 6, 'ADDRESS1' => 7, 'ADDRESS2' => 8, 'ADDRESS3' => 9, 'ZIPCODE' => 10, 'CITY' => 11, 'COUNTRY_ID' => 12, 'PHONE' => 13, 'CELLPHONE' => 14, 'IS_DEFAULT' => 15, 'CREATED_AT' => 16, 'UPDATED_AT' => 17, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'label' => 1, 'customer_id' => 2, 'title_id' => 3, 'company' => 4, 'firstname' => 5, 'lastname' => 6, 'address1' => 7, 'address2' => 8, 'address3' => 9, 'zipcode' => 10, 'city' => 11, 'country_id' => 12, 'phone' => 13, 'cellphone' => 14, 'is_default' => 15, 'created_at' => 16, 'updated_at' => 17, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Label' => 1, 'CustomerId' => 2, 'TitleId' => 3, 'Company' => 4, 'Firstname' => 5, 'Lastname' => 6, 'Address1' => 7, 'Address2' => 8, 'Address3' => 9, 'Zipcode' => 10, 'City' => 11, 'CountryId' => 12, 'StateId' => 13, 'Phone' => 14, 'Cellphone' => 15, 'IsDefault' => 16, 'CreatedAt' => 17, 'UpdatedAt' => 18, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'label' => 1, 'customerId' => 2, 'titleId' => 3, 'company' => 4, 'firstname' => 5, 'lastname' => 6, 'address1' => 7, 'address2' => 8, 'address3' => 9, 'zipcode' => 10, 'city' => 11, 'countryId' => 12, 'stateId' => 13, 'phone' => 14, 'cellphone' => 15, 'isDefault' => 16, 'createdAt' => 17, 'updatedAt' => 18, ),
+        self::TYPE_COLNAME       => array(AddressTableMap::ID => 0, AddressTableMap::LABEL => 1, AddressTableMap::CUSTOMER_ID => 2, AddressTableMap::TITLE_ID => 3, AddressTableMap::COMPANY => 4, AddressTableMap::FIRSTNAME => 5, AddressTableMap::LASTNAME => 6, AddressTableMap::ADDRESS1 => 7, AddressTableMap::ADDRESS2 => 8, AddressTableMap::ADDRESS3 => 9, AddressTableMap::ZIPCODE => 10, AddressTableMap::CITY => 11, AddressTableMap::COUNTRY_ID => 12, AddressTableMap::STATE_ID => 13, AddressTableMap::PHONE => 14, AddressTableMap::CELLPHONE => 15, AddressTableMap::IS_DEFAULT => 16, AddressTableMap::CREATED_AT => 17, AddressTableMap::UPDATED_AT => 18, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LABEL' => 1, 'CUSTOMER_ID' => 2, 'TITLE_ID' => 3, 'COMPANY' => 4, 'FIRSTNAME' => 5, 'LASTNAME' => 6, 'ADDRESS1' => 7, 'ADDRESS2' => 8, 'ADDRESS3' => 9, 'ZIPCODE' => 10, 'CITY' => 11, 'COUNTRY_ID' => 12, 'STATE_ID' => 13, 'PHONE' => 14, 'CELLPHONE' => 15, 'IS_DEFAULT' => 16, 'CREATED_AT' => 17, 'UPDATED_AT' => 18, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'label' => 1, 'customer_id' => 2, 'title_id' => 3, 'company' => 4, 'firstname' => 5, 'lastname' => 6, 'address1' => 7, 'address2' => 8, 'address3' => 9, 'zipcode' => 10, 'city' => 11, 'country_id' => 12, 'state_id' => 13, 'phone' => 14, 'cellphone' => 15, 'is_default' => 16, 'created_at' => 17, 'updated_at' => 18, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
     );
 
     /**
@@ -224,6 +229,7 @@ class AddressTableMap extends TableMap
         $this->addColumn('ZIPCODE', 'Zipcode', 'VARCHAR', true, 10, null);
         $this->addColumn('CITY', 'City', 'VARCHAR', true, 255, null);
         $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
+        $this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', false, null, null);
         $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
         $this->addColumn('CELLPHONE', 'Cellphone', 'VARCHAR', false, 20, null);
         $this->addColumn('IS_DEFAULT', 'IsDefault', 'TINYINT', false, null, 0);
@@ -239,6 +245,7 @@ class AddressTableMap extends TableMap
         $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_ONE, array('state_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('CartRelatedByAddressDeliveryId', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery_id', ), 'RESTRICT', 'RESTRICT', 'CartsRelatedByAddressDeliveryId');
         $this->addRelation('CartRelatedByAddressInvoiceId', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice_id', ), 'RESTRICT', 'RESTRICT', 'CartsRelatedByAddressInvoiceId');
     } // buildRelations()
@@ -407,6 +414,7 @@ class AddressTableMap extends TableMap
             $criteria->addSelectColumn(AddressTableMap::ZIPCODE);
             $criteria->addSelectColumn(AddressTableMap::CITY);
             $criteria->addSelectColumn(AddressTableMap::COUNTRY_ID);
+            $criteria->addSelectColumn(AddressTableMap::STATE_ID);
             $criteria->addSelectColumn(AddressTableMap::PHONE);
             $criteria->addSelectColumn(AddressTableMap::CELLPHONE);
             $criteria->addSelectColumn(AddressTableMap::IS_DEFAULT);
@@ -426,6 +434,7 @@ class AddressTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ZIPCODE');
             $criteria->addSelectColumn($alias . '.CITY');
             $criteria->addSelectColumn($alias . '.COUNTRY_ID');
+            $criteria->addSelectColumn($alias . '.STATE_ID');
             $criteria->addSelectColumn($alias . '.PHONE');
             $criteria->addSelectColumn($alias . '.CELLPHONE');
             $criteria->addSelectColumn($alias . '.IS_DEFAULT');

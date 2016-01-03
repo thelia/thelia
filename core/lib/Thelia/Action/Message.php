@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Message as MessageModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
@@ -57,9 +54,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function modify(MessageUpdateEvent $event)
     {
-
         if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
-
             $message
                 ->setDispatcher($event->getDispatcher())
 
@@ -92,9 +87,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function delete(MessageDeleteEvent $event)
     {
-
         if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
-
             $message
                 ->setDispatcher($event->getDispatcher())
                 ->delete()

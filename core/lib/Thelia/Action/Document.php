@@ -12,18 +12,11 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
-use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Document\DocumentEvent;
-use Thelia\Core\Event\UpdateFilePositionEvent;
-use Thelia\Exception\ImageException;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\FileManager;
-use Thelia\Tools\URL;
-
-use Thelia\Exception\DocumentException;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\DocumentException;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -49,11 +42,16 @@ use Thelia\Core\Event\TheliaEvents;
 class Document extends BaseCachedFile implements EventSubscriberInterface
 {
     /**
+     * @var string Config key for document delivery mode
+     */
+    const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
+
+    /**
      * @return string root of the document cache directory in web space
      */
     protected function getCacheDirFromWebRoot()
     {
-        return ConfigQuery::read('document_cache_dir_from_web_root', 'cache');
+        return ConfigQuery::read('document_cache_dir_from_web_root', 'cache' . DS . 'documents');
     }
 
     /**
@@ -71,7 +69,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function processDocument(DocumentEvent $event)
     {
-        $subdir      = $event->getCacheSubdirectory();
+        $subdir     = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
         if (null == $subdir || null == $sourceFile) {
@@ -81,16 +79,15 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
         if (! file_exists($originalDocumentPathInCache)) {
-
             if (! file_exists($sourceFile)) {
                 throw new DocumentException(sprintf("Source document file %s does not exists.", $sourceFile));
             }
 
-            $mode = ConfigQuery::read('original_document_delivery_mode', 'symlink');
+            $mode = ConfigQuery::read(self::CONFIG_DELIVERY_MODE, 'symlink');
 
             if ($mode == 'symlink') {
                 if (false == symlink($sourceFile, $originalDocumentPathInCache)) {
-                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
             } else {
                 // mode = 'copy'
@@ -108,97 +105,18 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE));
     }
 
-    /**
-     * Take care of saving document in the database and file storage
-     *
-     * @param \Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent $event Document event
-     *
-     * @throws \Thelia\Exception\ImageException
-     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function saveDocument(DocumentCreateOrUpdateEvent $event)
-    {
-        $fileManager = new FileManager();
-        $model = $event->getModelDocument();
-
-        $nbModifiedLines = $model->save();
-
-        $event->setModelDocument($model);
-
-        if (!$nbModifiedLines) {
-            throw new ImageException(
-                sprintf(
-                    'Document "%s" with parent id %s (%s) failed to be saved',
-                    $event->getParentName(),
-                    $event->getParentId(),
-                    $event->getDocumentType()
-                )
-            );
-        }
-
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
-        $event->setUploadedFile($newUploadedFile);
-    }
-
-    /**
-     * Take care of updating document in the database and file storage
-     *
-     * @param \Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent $event Document event
-     *
-     * @throws \Thelia\Exception\ImageException
-     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function updateDocument(DocumentCreateOrUpdateEvent $event)
-    {
-        if (null !== $event->getUploadedFile()) {
-            $event->getModelDocument()->setTitle($event->getUploadedFile()->getClientOriginalName());
-        }
-
-        $fileManager = new FileManager();
-        // Copy and save file
-        if ($event->getUploadedFile()) {
-            // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS) . '/' . $event->getOldModelDocument()->getFile();
-            unlink(str_replace('..', '', $url));
-
-            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
-            $event->setUploadedFile($newUploadedFile);
-        }
-
-        // Update document modifications
-        $event->getModelDocument()->save();
-        $event->setModelDocument($event->getModelDocument());
-    }
-
-    public function updatePosition(UpdateFilePositionEvent $event)
-    {
-        $this->genericUpdatePosition($event->getQuery(), $event);
-    }
-
-    /**
-     * Take care of deleting document in the database and file storage
-     *
-     * @param \Thelia\Core\Event\Document\DocumentDeleteEvent $event Image event
-     *
-     * @throws \Exception
-     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
-     */
-    public function deleteDocument(DocumentDeleteEvent $event)
-    {
-        $fileManager = new FileManager();
-
-        $fileManager->deleteFile($event->getDocumentToDelete(), $event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS);
-    }
-
     public static function getSubscribedEvents()
     {
         return array(
             TheliaEvents::DOCUMENT_PROCESS => array("processDocument", 128),
+
+            // Implemented in parent class BaseCachedFile
             TheliaEvents::DOCUMENT_CLEAR_CACHE => array("clearCache", 128),
-            TheliaEvents::DOCUMENT_DELETE => array("deleteDocument", 128),
-            TheliaEvents::DOCUMENT_SAVE => array("saveDocument", 128),
-            TheliaEvents::DOCUMENT_UPDATE => array("updateDocument", 128),
+            TheliaEvents::DOCUMENT_DELETE => array("deleteFile", 128),
+            TheliaEvents::DOCUMENT_SAVE => array("saveFile", 128),
+            TheliaEvents::DOCUMENT_UPDATE => array("updateFile", 128),
             TheliaEvents::DOCUMENT_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
         );
     }
 }

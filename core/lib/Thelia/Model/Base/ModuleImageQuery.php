@@ -25,6 +25,7 @@ use Thelia\Model\Map\ModuleImageTableMap;
  * @method     ChildModuleImageQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildModuleImageQuery orderByModuleId($order = Criteria::ASC) Order by the module_id column
  * @method     ChildModuleImageQuery orderByFile($order = Criteria::ASC) Order by the file column
+ * @method     ChildModuleImageQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildModuleImageQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildModuleImageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildModuleImageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -32,6 +33,7 @@ use Thelia\Model\Map\ModuleImageTableMap;
  * @method     ChildModuleImageQuery groupById() Group by the id column
  * @method     ChildModuleImageQuery groupByModuleId() Group by the module_id column
  * @method     ChildModuleImageQuery groupByFile() Group by the file column
+ * @method     ChildModuleImageQuery groupByVisible() Group by the visible column
  * @method     ChildModuleImageQuery groupByPosition() Group by the position column
  * @method     ChildModuleImageQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildModuleImageQuery groupByUpdatedAt() Group by the updated_at column
@@ -54,6 +56,7 @@ use Thelia\Model\Map\ModuleImageTableMap;
  * @method     ChildModuleImage findOneById(int $id) Return the first ChildModuleImage filtered by the id column
  * @method     ChildModuleImage findOneByModuleId(int $module_id) Return the first ChildModuleImage filtered by the module_id column
  * @method     ChildModuleImage findOneByFile(string $file) Return the first ChildModuleImage filtered by the file column
+ * @method     ChildModuleImage findOneByVisible(int $visible) Return the first ChildModuleImage filtered by the visible column
  * @method     ChildModuleImage findOneByPosition(int $position) Return the first ChildModuleImage filtered by the position column
  * @method     ChildModuleImage findOneByCreatedAt(string $created_at) Return the first ChildModuleImage filtered by the created_at column
  * @method     ChildModuleImage findOneByUpdatedAt(string $updated_at) Return the first ChildModuleImage filtered by the updated_at column
@@ -61,6 +64,7 @@ use Thelia\Model\Map\ModuleImageTableMap;
  * @method     array findById(int $id) Return ChildModuleImage objects filtered by the id column
  * @method     array findByModuleId(int $module_id) Return ChildModuleImage objects filtered by the module_id column
  * @method     array findByFile(string $file) Return ChildModuleImage objects filtered by the file column
+ * @method     array findByVisible(int $visible) Return ChildModuleImage objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildModuleImage objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildModuleImage objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildModuleImage objects filtered by the updated_at column
@@ -152,7 +156,7 @@ abstract class ModuleImageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `MODULE_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `module_image` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `MODULE_ID`, `FILE`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `module_image` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -352,6 +356,47 @@ abstract class ModuleImageQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ModuleImageTableMap::FILE, $file, $comparison);
+    }
+
+    /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleImageQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(ModuleImageTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(ModuleImageTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ModuleImageTableMap::VISIBLE, $visible, $comparison);
     }
 
     /**

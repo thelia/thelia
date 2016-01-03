@@ -2,20 +2,18 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
-
 use Thelia\Model\Base\Customer as BaseCustomer;
-
 use Thelia\Model\Exception\InvalidArgumentException;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
-
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -33,35 +31,58 @@ class Customer extends BaseCustomer implements UserInterface
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
-     * @param  int                                       $titleId       customer title id (from customer_title table)
-     * @param  string                                    $firstname     customer first name
-     * @param  string                                    $lastname      customer last name
-     * @param  string                                    $address1      customer address
-     * @param  string                                    $address2      customer adress complement 1
-     * @param  string                                    $address3      customer adress complement 2
-     * @param  string                                    $phone         customer phone number
-     * @param  string                                    $cellphone     customer cellphone number
-     * @param  string                                    $zipcode       customer zipcode
+     * @param  int                                       $titleId          customer title id (from customer_title table)
+     * @param  string                                    $firstname        customer first name
+     * @param  string                                    $lastname         customer last name
+     * @param  string                                    $address1         customer address
+     * @param  string                                    $address2         customer adress complement 1
+     * @param  string                                    $address3         customer adress complement 2
+     * @param  string                                    $phone            customer phone number
+     * @param  string                                    $cellphone        customer cellphone number
+     * @param  string                                    $zipcode          customer zipcode
      * @param  string                                    $city
-     * @param  int                                       $countryId     customer country id (from Country table)
-     * @param  string                                    $email         customer email, must be unique
-     * @param  string                                    $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param  int                                       $countryId        customer country id (from Country table)
+     * @param  string                                    $email            customer email, must be unique
+     * @param  string                                    $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
      * @param  string                                    $lang
      * @param  int                                       $reseller
      * @param  null                                      $sponsor
      * @param  int                                       $discount
      * @param  null                                      $company
      * @param  null                                      $ref
+     * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
+     * @param  int                                       $stateId          customer state id (from State table)
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null, $ref = null)
-    {
+    public function createOrUpdate(
+        $titleId,
+        $firstname,
+        $lastname,
+        $address1,
+        $address2,
+        $address3,
+        $phone,
+        $cellphone,
+        $zipcode,
+        $city,
+        $countryId,
+        $email = null,
+        $plainPassword = null,
+        $lang = null,
+        $reseller = 0,
+        $sponsor = null,
+        $discount = 0,
+        $company = null,
+        $ref = null,
+        $forceEmailUpdate = false,
+        $stateId = null
+    ) {
         $this
             ->setTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
-            ->setEmail($email)
+            ->setEmail($email, $forceEmailUpdate)
             ->setPassword($plainPassword)
             ->setReseller($reseller)
             ->setSponsor($sponsor)
@@ -80,7 +101,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = new Address();
 
                 $address
-                    ->setLabel("default")
+                    ->setLabel(Translator::getInstance()->trans("Main address"))
                     ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
@@ -93,11 +114,11 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setZipcode($zipcode)
                     ->setCity($city)
                     ->setCountryId($countryId)
+                    ->setStateId($stateId)
                     ->setIsDefault(1)
                     ;
 
                 $this->addAddress($address);
-
             } else {
                 $address = $this->getDefaultAddress();
 
@@ -114,22 +135,51 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setZipcode($zipcode)
                     ->setCity($city)
                     ->setCountryId($countryId)
+                    ->setStateId($stateId)
                     ->save($con)
                 ;
             }
             $this->save($con);
 
             $con->commit();
-
         } catch (PropelException $e) {
             $con->rollback();
             throw $e;
         }
     }
 
+    /**
+     * Return the customer lang, or the default one if none is defined.
+     *
+     * @return Lang the customer lang
+     */
+    public function getCustomerLang()
+    {
+        if ($this->getLang() !== null) {
+            $lang = LangQuery::create()
+                ->findPk($this->getLang());
+        } else {
+            $lang = LangQuery::create()
+                ->filterByByDefault(1)
+                ->findOne();
+        }
+
+        return $lang;
+    }
+
     protected function generateRef()
     {
-        return sprintf('CUS%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
+        $lastCustomer = CustomerQuery::create()
+            ->orderById(Criteria::DESC)
+            ->findOne()
+        ;
+
+        $id = 1;
+        if (null !== $lastCustomer) {
+            $id = $lastCustomer->getId() + 1;
+        }
+
+        return sprintf('CUS%s', str_pad($id, 12, 0, STR_PAD_LEFT));
     }
 
     /**
@@ -168,7 +218,7 @@ class Customer extends BaseCustomer implements UserInterface
         if ($password !== null && trim($password) != "") {
             $this->setAlgo("PASSWORD_BCRYPT");
 
-            return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
+            parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
 
         return $this;
@@ -189,8 +239,8 @@ class Customer extends BaseCustomer implements UserInterface
     {
         $email = trim($email);
 
-        if ($this->isNew() && ($email === null || $email == "")) {
-            throw new InvalidArgumentException("customer email is mandatory on creation");
+        if (($this->isNew() || $force === true) && ($email === null || $email == "")) {
+            throw new InvalidArgumentException("customer email is mandatory");
         }
 
         if (!$this->isNew() && $force === false) {
@@ -282,6 +332,10 @@ class Customer extends BaseCustomer implements UserInterface
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 
+        if (null === $this->getRef()) {
+            $this->setRef($this->generateRef());
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -292,11 +346,6 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        if (null === $this->getRef()) {
-            $this->setRef($this->generateRef())
-                ->save($con);
-        }
-
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
     }
 

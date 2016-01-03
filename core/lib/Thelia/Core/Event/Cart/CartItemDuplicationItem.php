@@ -18,7 +18,7 @@ use Thelia\Model\CartItem;
 /**
  * Class CartItemDuplicationItem
  * @package Thelia\Core\Event\Cart
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CartItemDuplicationItem extends ActionEvent
 {
@@ -53,5 +53,4 @@ class CartItemDuplicationItem extends ActionEvent
     {
         return $this->oldItem;
     }
-
 }

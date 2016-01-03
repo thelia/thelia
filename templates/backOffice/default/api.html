@@ -1,0 +1,243 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='API list access'}{/block}
+
+{block name="check-resource"}admin.configuration.api{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div>
+    <div id="wrapper" class="container">
+
+        <div class="clearfix">
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li>{intl l="API users"}</li>
+            </ul>
+        </div>
+
+        {hook name="api.top" location='api_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l="Api"}
+                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.api" access="CREATE"}
+                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new API access'}" href="#api_create_dialog" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                {/loop}
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>{intl l="Label"}</th>
+                                <th>{intl l="Api key"}</th>
+                                <th>{intl l="Secure key"}</th>
+                                <th>{intl l="profile"}</th>
+                                <th class="col-md-1">{intl l="Actions"}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {foreach $api_list as $api}
+
+
+
+                                <tr>
+                                    <td >{$api.Label}</td>
+                                    <td >{$api.ApiKey}</td>
+                                    <td >
+                                        <a href="{url path="/admin/configuration/api/secure_key/{$api.Id}"}">{intl l="download"}</a>
+                                    </td>
+                                    <td >
+                                        {if $api.ProfileId}
+                                            {loop type="profile" name="admin-profile" id={$api.ProfileId}}
+                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>
+                                            {/loop}
+                                        {else}
+                                            {intl l='Superadministrator'}
+                                        {/if}
+                                    </td>
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
+                                                <a title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}
+                                                <a class="js-delete-api" title="{intl l='Delete this api access'}" href="#api_delete_dialog" data-id="{$api.Id}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {/foreach}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        {hook name="api.bottom" location='api_bottom'}
+
+    </div>
+</div>
+
+{form name="thelia_api_create"}
+    {capture name="api_create_dialog"}
+        {form_hidden_fields}
+
+        {form_field field="success_url"}
+            <input type="hidden" name="{$name}" value="{url path="/admin/configuration/api"}">
+        {/form_field}
+
+        {form_field field="label"}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control" value="{if $form_error}{$value}{/if}">
+            </div>
+        {/form_field}
+
+        {form_field field='profile'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+                <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0">{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}">{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+
+            </div>
+        {/form_field}
+    {/capture}
+
+
+{include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "api_create_dialog"
+    dialog_title = {intl l="Create a new API access"}
+    dialog_body  = {$smarty.capture.api_create_dialog nofilter}
+
+    dialog_ok_label     = {intl l="Create"}
+    dialog_cancel_label = {intl l="Cancel"}
+
+    form_action        = {url path="/admin/configuration/api"}
+    form_enctype       = {form_enctype}
+    form_error_message = $form_error_message
+}
+{/form}
+
+    {capture "api_delete_dialog"}
+        <input type="hidden" name="api_id" id="api_delete_id" value="" />
+
+        {hook name="api.delete-form" location='api_delete_form'}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "api_delete_dialog"
+        dialog_title    = {intl l="Delete api access"}
+        dialog_message  = {intl l="Do you really want to delete this api access ?"}
+
+        form_action         = {url path='/admin/configuration/api/delete'}
+        form_content        = {$smarty.capture.api_delete_dialog nofilter}
+    }
+
+{if $api_id > 0}
+    {form name="thelia_api_update"}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+
+    {capture "api_update_dialog"}
+        {form_field field='profile'}
+            {form_hidden_fields}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label} :</label>
+
+                <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0" {if $value == null}selected{/if}>{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}" {if $value == $ID}selected{/if}>{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+
+            </div>
+        {/form_field}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "api_update_dialog"
+        dialog_title = {intl l="Edit api access"}
+        dialog_body  = {$smarty.capture.api_update_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Save"}
+        dialog_cancel_label = {intl l="Cancel"}
+
+        form_action        = {url path="/admin/configuration/api/update/%id" id={$api_id}}
+        form_enctype       = {form_enctype}
+        form_error_message = $form_error_message
+    }
+
+    {/form}
+{/if}
+
+
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src='{$asset_url}'></script>
+    {/javascripts}
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $(".js-delete-api").click(function(e){
+            $('#api_delete_id').val($(this).data('id'))
+        });
+
+        {if $api_id > 0}
+
+        // JS stuff for update form
+            {include
+                file      = "includes/generic-js-dialog.html"
+                dialog_id = "api_update_dialog"
+                form_name = "thelia_api_update"
+            }
+
+            $('#api_update_dialog').modal();
+        {/if}
+    });
+
+</script>
+
+{/block}

@@ -17,11 +17,10 @@ use Thelia\Form\BaseForm;
 /**
  * Class CacheFlushForm
  * @package Thelia\Form\Cache
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ImagesAndDocumentsCacheFlushForm extends BaseForm
 {
-
     /**
      * @inheritdoc
      */

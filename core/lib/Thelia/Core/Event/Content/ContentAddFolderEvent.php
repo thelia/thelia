@@ -11,16 +11,16 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Content;
+
 use Thelia\Model\Content;
 
 /**
  * Class ContentAddFolderEvent
  * @package Thelia\Core\Event\Content
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContentAddFolderEvent extends ContentEvent
 {
-
     /**
      * @var int folder id
      */
@@ -48,5 +48,4 @@ class ContentAddFolderEvent extends ContentEvent
     {
         return $this->folderId;
     }
-
 }

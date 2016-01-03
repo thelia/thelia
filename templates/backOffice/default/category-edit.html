@@ -16,8 +16,10 @@
 
             {include file="includes/catalog-breadcrumb.html" editing_category="true"}
 
+            {hook name="category-edit.top" category_id=$category_id}
+
             <div class="row">
-                {loop name="category_edit" type="category" visible="*" id="{$category_id}" backend_context="1" lang="$edit_language_id"}
+                {loop name="category_edit" type="category" visible="*" id="{$category_id}" backend_context="1" with_prev_next_info="true" lang="$edit_language_id"}
 
                 {* Define close url *}
                 {if $PARENT gt 0}
@@ -35,7 +37,7 @@
 
                         <div class="col-md-5 actions">
                             <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/categories/update' category_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous category'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                            <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview category page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                            <a  href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview category page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
                             <a {if $HAS_NEXT != 0}href="{url path='/admin/categories/update' category_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next category'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                         </div>
                     </div>
@@ -43,12 +45,41 @@
                     <div class="row">
                         <div class="col-md-12">
 
+                            {hookblock name="category.tab" id="{$category_id}" fields="id,title,href,content"}
+
+                                {capture "category_tab_tab"}
+                                    {forhook rel="category.tab"}
+                                    <li>
+                                        <a href="#{$id}"
+                                            {if $href}data-href="{$href}"{/if}
+                                            data-toggle="tab">{$title}
+                                        </a>
+                                    </li>
+                                    {/forhook}
+                                {/capture}
+
+                                {capture "category_tab_content"}
+                                    {forhook rel="category.tab"}
+                                    <div class="tab-pane fade" id="{$id}">
+                                        {if $href}
+                                            {* ajax *}
+                                            <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                        {else}
+                                            {$content nofilter}
+                                        {/if}
+                                    </div>
+                                    {/forhook}
+                                {/capture}
+
+                            {/hookblock}
+
                             <ul class="nav nav-tabs" id="tabbed-menu">
                                 <li><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
                                 <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
                                 <li><a href="#associations" data-toggle="tab">{intl l="Associations"}</a></li>
                                 <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
                                 <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+                                {$smarty.capture.category_tab_tab nofilter}
                                 <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
                             </ul>
 
@@ -59,7 +90,7 @@
                                     <div class="form-container">
 
                                         {form name="thelia.admin.category.modification"}
-                                        <form method="POST" action="{url path='/admin/categories/save'}" {form_enctype form=$form} class="clearfix">
+                                        <form method="POST" action="{url path='/admin/categories/save'}" {form_enctype} class="clearfix">
 
                                             {include
                                                 file="includes/inner-form-toolbar.html"
@@ -70,11 +101,9 @@
                                             <input type="hidden" name="category_id" value="{$ID}" />
                                             <input type="hidden" name="current_tab" value="general" />
 
-                                            {form_hidden_fields form=$form}
+                                            {form_hidden_fields exclude="parent"}
 
-                                            {form_field form=$form field='success_url'}
-                                                <input type="hidden" name="{$name}" value="{$close_url}">
-                                            {/form_field}
+                                            {render_form_field field='success_url' value={$close_url}}
 
                                             {* Display error message if exist *}
                                             {include file='includes/notifications.html' message=$form_error_message}
@@ -85,36 +114,28 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    {form_field form=$form field='parent'}
-                                                        <div class="form-group {if $error}has-error{/if}">
+                                                    {hook name="category.modification.form-right.top" category_id=$category_id}
 
-                                                            <label for="{$label_attr.for}" class="control-label">
-                                                                {$label} :
-                                                            </label>
+                                                    {custom_render_form_field field='parent'}
+                                                         <select {form_field_attributes field='parent' extra_class="form_control"}>
+                                                              <option value="0">{intl l="Top level"}</option>
+                                                              {$myparent=$PARENT}
+                                                              {loop name="cat-parent" type="category-tree" visible="*" category="0"}
+                                                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                                                              {/loop}
+                                                        </select>
+                                                    {/custom_render_form_field}
 
-                                                            <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                                                                  <option value="0">{intl l="Top level"}</option>
+                                                    {render_form_field field="default_template_id"}
 
-                                                                  {$myparent=$PARENT}
-                                                                  {loop name="cat-parent" type="category-tree" visible="*" category="0"}
-                                                                       <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
-                                                                  {/loop}
+                                                    {form_field field="visible"}
 
-                                                            </select>
-                                                         </div>
+                                                    <label class="checkbox">
+                                                        <input type="checkbox" {if $value != 0}checked{/if} name="{$name}" value="1"> {$label}
+                                                    </label>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='visible'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
-                                                            <div class="checkbox">
-                                                                <label>
-                                                                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-                                                                    {$label}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    {/form_field}
+                                                    {hook name="category.modification.form-right.bottom" category_id=$category_id}
                                                 </div>
                                             </div>
 
@@ -133,14 +154,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="seo">
-                                    {form name="thelia.admin.seo"}
-                                        {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/categories/seo/save'}"
-                                            current_id=$ID
-                                            closeUrl = $close_url
-                                        }
-                                    {/form}
+                                    {include file="includes/seo-tab.html"
+                                        formAction  = "{url path='/admin/categories/seo/save'}"
+                                        pageUrl     = "{url path='/admin/categories/update' category_id=$ID}"
+                                        current_id  = $ID
+                                        closeUrl    = $close_url
+                                        success_url = $close_url
+                                        seoType     = 'category'
+                                    }
                                 </div>
 
                                 <div class="tab-pane fade" id="associations">
@@ -182,7 +203,7 @@
                                                                     <option value="">{intl l='Select a folder content...'}</option>
                                                                 </select>
                                                                 <span class="input-group-btn" id="content_add_button">
-                                                                   <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+                                                                   <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
                                                                 </span>
                                                             </div>
 
@@ -214,7 +235,7 @@
 
                                                         <th>{intl l='Content title'}</th>
 
-                                                        {module_include location='category_contents_table_header'}
+                                                        {hook name="category.contents-table-header" location="category_contents_table_header" }
 
                                                         <th class="actions">{intl l="Actions"}</th>
                                                     </tr>
@@ -225,18 +246,16 @@
                                                     <tr>
                                                         <td>{$CONTENT_ID}</td>
 
-                                                        <td><a href="{url path="/admin/content/update/{$CONTENT_ID}"}">{$TITLE}</a></td>
+                                                        <td><a href="{url path="/admin/content/update/%id" id=$CONTENT_ID}">{$TITLE}</a></td>
 
-                                                        {module_include location='category_contents_table_row'}
+                                                        {hook name="category.contents-table-row" location="category_contents_table_row" }
 
                                                         <td class="actions">
-                                                            <div class="btn-group">
-                                                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.category" access="UPDATE"}
-                                                                   <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
-                                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                                   </a>
-                                                                {/loop}
-                                                            </div>
+                                                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.category" access="UPDATE"}
+                                                               <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
+                                                                   <span class="glyphicon glyphicon-trash"></span>
+                                                               </a>
+                                                            {/loop}
                                                         </td>
                                                     </tr>
                                                      {/loop}
@@ -257,12 +276,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="images">
-                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$ID}
+                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$ID resource="admin.category"}
                                 </div>
 
                                 <div class="tab-pane fade" id="documents">
-                                    {include file='includes/document-upload-form.html' documentType='category' parentId=$ID}
+                                    {include file='includes/document-upload-form.html' documentType='category' parentId=$ID resource="admin.category"}
                                 </div>
+
+                                {$smarty.capture.category_tab_content nofilter}
 
                                 <div class="tab-pane fade" id="modules">
                                     <div class="form-container">
@@ -274,9 +295,8 @@
                                         current_tab = "modules"
                                         }
                                     </div>
-
-                                    {include file="includes/module-tab-content.html" location="category-edit"}
-
+                                    {* ugly fix : {hook name="category.tab-content" id="{$category_id}" view="category"} *}
+                                    {include file="includes/module-tab-content.html" hook="category.tab-content" location="category-edit" id="{$category_id}" view="category"}
                                 </div>
                              </div>
                         </div>
@@ -284,6 +304,9 @@
                 </div>
                 {/loop}
             </div>
+
+            {hook name="category-edit.bottom" category_id=$category_id}
+
         </div>
     </div>
 
@@ -305,7 +328,7 @@
         dialog_title    = {intl l="Remove related content"}
         dialog_message  = {intl l="Do you really want to remove this related content ?"}
 
-        form_action     = {url path='/admin/categories/related-content/delete'}
+        form_action     = {token_url path='/admin/categories/related-content/delete'}
         form_content    = {$smarty.capture.delete_content_dialog nofilter}
     }
 {/block}
@@ -327,6 +350,17 @@
 <script>
 
 $(function() {
+    // Atomatic ajax tab load, if data-href is defined.
+    $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+        var $this = $(this);
+        $($this.attr('href')).load($this.data('href'), function(ev) {
+            if($this.data('callback')) {
+                eval($this.data('callback') + '();');
+            }
+        });
+
+    });
+
     $.imageUploadManager.initImageDropZone();
     $.documentUploadManager.initDocumentDropZone();
 
@@ -352,7 +386,7 @@ $(function() {
 
         if (val != "") {
 	        $.ajax({
-	             url      : '{url path="/admin/category/$category_id/available-related-content/"}' + val + '.xml',
+	             url      : '{url path="/admin/category/%id/available-related-content/" id=$category_id}' + val + '.xml',
 	             type     : 'get',
 	             dataType : 'json',
 	             success  : function(json) {
@@ -394,5 +428,7 @@ $(function() {
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='category-edit-js'}
+    {hook name="category.edit-js" location="category-edit-js" category_id=$category_id}
+
+    {hook name="wysiwyg.js" location="wysiwyg-category-edit-js" }
 {/block}

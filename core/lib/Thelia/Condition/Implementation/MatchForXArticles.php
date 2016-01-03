@@ -26,7 +26,7 @@ use Thelia\Exception\InvalidConditionValueException;
 class MatchForXArticles extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    CONST CART_QUANTITY = 'quantity';
+    const CART_QUANTITY = 'quantity';
 
     /**
      * @inheritdoc
@@ -63,7 +63,8 @@ class MatchForXArticles extends ConditionAbstract
 
         if (intval($values[self::CART_QUANTITY]) <= 0) {
             throw new InvalidConditionValueException(
-                get_class(), 'quantity'
+                get_class(),
+                'quantity'
             );
         }
 
@@ -103,8 +104,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart item count',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -115,8 +115,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'The cart item count should match the condition',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -128,7 +127,8 @@ class MatchForXArticles extends ConditionAbstract
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::CART_QUANTITY]
+            $this->translator,
+            $this->operators[self::CART_QUANTITY]
         );
 
         $toolTip = $this->translator->trans(
@@ -136,8 +136,7 @@ class MatchForXArticles extends ConditionAbstract
             array(
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY]
-            ),
-            'condition'
+            )
         );
 
         return $toolTip;
@@ -164,7 +163,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $labelQuantity = $this->facade
             ->getTranslator()
-            ->trans('Cart item count is', [], 'condition');
+            ->trans('Cart item count is');
 
         $html = $this->drawBackOfficeBaseInputsText($labelQuantity, self::CART_QUANTITY);
 
@@ -176,7 +175,9 @@ class MatchForXArticles extends ConditionAbstract
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/cart-item-count-condition.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/cart-item-count-condition.html',
+            [
                 'label'              => $label,
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators($inputKey),
                 'quantitySelectHtml' => $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1)

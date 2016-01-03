@@ -16,12 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\ProfileQuery;
+use Thelia\Model\Profile as ProfileModel;
 
 /**
  *
@@ -31,6 +30,9 @@ use Thelia\Model\ProfileQuery;
  * Class Profile
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
  */
 class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -62,22 +64,23 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
         $search->orderById(Criteria::ASC);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var ProfileModel $profile */
         foreach ($loopResult->getResultDataCollection() as $profile) {
             $loopResultRow = new LoopResultRow($profile);
             $loopResultRow->set("ID", $profile->getId())
-                ->set("IS_TRANSLATED",$profile->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("CODE",$profile->getCode())
-                ->set("TITLE",$profile->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $profile->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("CODE", $profile->getCode())
+                ->set("TITLE", $profile->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $profile->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $profile->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
+            $this->addOutputFields($loopResultRow, $profile);
 
             $loopResult->addRow($loopResultRow);
         }

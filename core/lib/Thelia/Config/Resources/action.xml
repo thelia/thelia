@@ -11,9 +11,18 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.hook" class="Thelia\Action\Hook">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.moduleHook" class="Thelia\Action\ModuleHook">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.order" class="Thelia\Action\Order" scope="request">
             <argument type="service" id="request"/>
-            <argument type="service" id="thelia.parser"/>
             <argument type="service" id="mailer"/>
             <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
@@ -30,13 +39,17 @@
         </service>
 
         <service id="thelia.action.httpException" class="Thelia\Action\HttpException" scope="request">
-            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="thelia.parser" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.RedirectException" class="Thelia\Action\RedirectException">
+            <argument type="service" id="thelia.url.manager" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
             <argument type="service" id="thelia.securityContext"/>
-            <argument type="service" id="thelia.parser"/>
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -50,14 +63,22 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.cart" class="Thelia\Action\Cart">
+        <service id="thelia.action.cart" class="Thelia\Action\Cart" scope="request">
+            <argument type="service" id="request"/>
+            <argument type="service" id="thelia.token_provider"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.file" class="Thelia\Action\File">
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.image" class="Thelia\Action\Image">
-             <tag name="kernel.event_subscriber"/>
+            <argument type="service" id="thelia.file_manager"/>
+            <tag name="kernel.event_subscriber"/>
         </service>
         <service id="thelia.action.document" class="Thelia\Action\Document">
+            <argument type="service" id="thelia.file_manager"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -82,6 +103,7 @@
         </service>
 
         <service id="thelia.action.currency" class="Thelia\Action\Currency">
+            <argument type="service" id="currency.converter" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -121,12 +143,20 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.brand" class="Thelia\Action\Brand">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.pdf" class="Thelia\Action\Pdf">
 
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.country" class="Thelia\Action\Country">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.state" class="Thelia\Action\State">
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -154,9 +184,43 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.lang" class="Thelia\Action\Lang">
+        <service id="thelia.action.lang" class="Thelia\Action\Lang" scope="request">
+            <argument type="service" id="thelia.template_helper" />
+            <argument type="service" id="request"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="thelia.export.change_position" class="Thelia\Action\Export">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="thelia.import.change_position" class="Thelia\Action\Import">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="thelia.action.sale" class="Thelia\Action\Sale">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.metadata" class="Thelia\Action\MetaData">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="thelia.action.api" class="Thelia\Action\Api">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.customer_title" class="Thelia\Action\CustomerTitle">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.translation" class="Thelia\Action\Translation">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 
 </config>

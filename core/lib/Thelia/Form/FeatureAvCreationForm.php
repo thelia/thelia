@@ -21,25 +21,25 @@ class FeatureAvCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title"   , "text"  , array(
+            ->add("title", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Title *"),
                 "label_attr" => array(
-                    "for" => "title"
-                ))
-            )
-            ->add("locale" , "text"  , array(
+                    "for" => "title",
+                ),
+            ))
+            ->add("locale", "text", array(
                 "constraints" => array(
-                    new NotBlank()
-                ))
-            )
+                    new NotBlank(),
+                ),
+            ))
             ->add("feature_id", "hidden", array(
                 "constraints" => array(
-                        new NotBlank()
-                ))
-            )
+                        new NotBlank(),
+                ),
+            ))
         ;
     }
 

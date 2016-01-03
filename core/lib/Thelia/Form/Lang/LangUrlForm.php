@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Lang;
+
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
@@ -18,7 +19,7 @@ use Thelia\Model\LangQuery;
 /**
  * Class LangUrlForm
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUrlForm extends BaseForm
 {
@@ -48,16 +49,16 @@ class LangUrlForm extends BaseForm
     {
         foreach (LangQuery::create()->find() as $lang) {
             $this->formBuilder->add(
-                self::LANG_PREFIX . $lang->getId(),
+                self::LANG_PREFIX.$lang->getId(),
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
+                        new NotBlank(),
                     ),
                     "attr" => array(
                         "tag" => "url",
                         "url_id" => $lang->getId(),
-                        "url_title" => $lang->getTitle()
+                        "url_title" => $lang->getTitle(),
                     ),
 
                 )

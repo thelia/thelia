@@ -68,9 +68,19 @@ class OrderAddressEvent extends ActionEvent
     protected $country;
 
     /**
+     * @var int|null state id
+     */
+    protected $state;
+
+    /**
      * @var string phone
      */
     protected $phone;
+
+    /**
+     * @var string cellphone
+     */
+    protected $cellphone;
 
     /**
      * @var \Thelia\Model\OrderAddress
@@ -82,17 +92,32 @@ class OrderAddressEvent extends ActionEvent
      */
     protected $order;
 
-    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $phone, $company)
-    {
+    public function __construct(
+        $title,
+        $firstname,
+        $lastname,
+        $address1,
+        $address2,
+        $address3,
+        $zipcode,
+        $city,
+        $country,
+        $phone,
+        $company,
+        $cellphone = null,
+        $state = null
+    ) {
         $this->address1 = $address1;
         $this->address2 = $address2;
         $this->address3 = $address3;
         $this->city = $city;
         $this->company = $company;
         $this->country = $country;
+        $this->state= $state;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->phone = $phone;
+        $this->cellphone = $cellphone;
         $this->title = $title;
         $this->zipcode = $zipcode;
     }
@@ -146,6 +171,14 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
+     * @return int|null
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
      * @return string
      */
     public function getFirstname()
@@ -167,6 +200,14 @@ class OrderAddressEvent extends ActionEvent
     public function getPhone()
     {
         return $this->phone;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCellphone()
+    {
+        return $this->cellphone;
     }
 
     /**

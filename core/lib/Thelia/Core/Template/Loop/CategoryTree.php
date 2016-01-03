@@ -11,15 +11,15 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CategoryQuery;
+use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -34,6 +34,14 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getCategory()
+ * @method int getDepth()
+ * @method bool getNeedCountChild()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -42,47 +50,89 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
      */
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection(Argument::createIntTypeArgument('category', null, true),
-                Argument::createIntTypeArgument('depth', PHP_INT_MAX),
-                Argument::createBooleanOrBothTypeArgument('visible', true, false),
-                Argument::createIntListTypeArgument('exclude', array()));
+        return new ArgumentCollection(
+            Argument::createIntTypeArgument('category', null, true),
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+            Argument::createBooleanTypeArgument('need_count_child', false),
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
+            Argument::createIntListTypeArgument('exclude', array()),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'))
+                ),
+                'position'
+            )
+        );
     }
 
     // changement de rubrique
-    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $max_level, $exclude, &$resultsList)
+    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $maxLevel, $exclude, &$resultsList)
     {
-        if ($level > $max_level) return;
+        if ($level > $maxLevel) {
+            return;
+        }
 
         $search = CategoryQuery::create();
-
-        $this->configureI18nProcessing($search, array(
-                    'TITLE'
-                ));
+        $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterByParent($parent);
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
-        if ($exclude != null) $search->filterById($exclude, Criteria::NOT_IN);
+        if ($exclude != null) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
 
-        $search->orderByPosition(Criteria::ASC);
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "position":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "position_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+            }
+        }
 
         $results = $search->find();
 
-        foreach ($results as $result) {
+        $needCountChild = $this->getNeedCountChild();
 
-            $resultsList[] = array(
+        foreach ($results as $result) {
+            $row = array(
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                 "PARENT" => $result->getParent(),
-                "URL" => $result->getUrl($this->locale),
+                "URL" => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
                 "VISIBLE" => $result->getVisible() ? "1" : "0",
                 "LEVEL" => $level,
-                'CHILD_COUNT' => $result->countChild(),
                 'PREV_LEVEL' => $previousLevel,
             );
 
-            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $max_level, $exclude, $resultsList);
+            if ($needCountChild) {
+                $row['CHILD_COUNT'] = $result->countChild();
+            }
+
+            $resultsList[] = $row;
+
+            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $maxLevel, $exclude, $resultsList);
         }
     }
 

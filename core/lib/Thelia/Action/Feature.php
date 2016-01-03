@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\Feature as FeatureModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
@@ -63,9 +60,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureUpdateEvent $event)
     {
-
         if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
-
             $feature
                 ->setDispatcher($event->getDispatcher())
 
@@ -88,9 +83,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
      */
     public function delete(FeatureDeleteEvent $event)
     {
-
         if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
-
             $feature
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
@@ -115,7 +108,6 @@ class Feature extends BaseAction implements EventSubscriberInterface
         $templates = TemplateQuery::create()->find();
 
         foreach ($templates as $template) {
-
             $feature_template = new FeatureTemplate();
 
             if (null === FeatureTemplateQuery::create()->filterByFeature($feature)->filterByTemplate($template)->findOne()) {

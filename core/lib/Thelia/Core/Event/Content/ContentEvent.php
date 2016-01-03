@@ -11,13 +11,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Content;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Content;
 
 /**
  * Class ContentEvent
  * @package Thelia\Core\Event\Content
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentEvent extends ActionEvent
 {

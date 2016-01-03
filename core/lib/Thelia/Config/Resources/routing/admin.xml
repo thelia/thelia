@@ -16,10 +16,6 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.view" path="/admin/latest-thelia-version">
-        <default key="_controller">Thelia\Controller\Admin\HomeController::getLatestTheliaVersion</default>
-    </route>
-
     <route id="admin.home.stats" path="/admin/home/stats">
         <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
     </route>
@@ -77,6 +73,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.toggle.process" path="/admin/image/type/{parentType}/{documentId}/toggle">
+        <default key="_controller">Thelia\Controller\Admin\FileController::toggleVisibilityImageAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="documentId">\d+</requirement>
+    </route>
     <route id="admin.image.update.view" path="/admin/image/type/{parentType}/{imageId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewImageAction</default>
         <requirement key="parentType">.*</requirement>
@@ -112,6 +113,11 @@
         <default key="_controller">Thelia\Controller\Admin\FileController::updateDocumentPositionAction</default>
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
+    </route>
+    <route id="admin.document.toggle.process" path="/admin/document/type/{parentType}/{documentId}/toggle">
+        <default key="_controller">Thelia\Controller\Admin\FileController::toggleVisibilityDocumentAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="documentId">\d+</requirement>
     </route>
     <route id="admin.document.update.view" path="/admin/document/type/{parentType}/{documentId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewDocumentAction</default>
@@ -204,13 +210,17 @@
         <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
     </route>
 
-    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}">
+    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}/{browser}">
         <default key="_controller">Thelia\Controller\Admin\OrderController::generateInvoicePdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1]</requirement>
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <route id="admin.order.pdf.delivery" path="/admin/order/pdf/delivery/{order_id}">
+    <route id="admin.order.pdf.delivery" path="/admin/order/pdf/delivery/{order_id}/{browser}">
         <default key="_controller">Thelia\Controller\Admin\OrderController::generateDeliveryPdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1]</requirement>
         <requirement key="order_id">\d+</requirement>
     </route>
 
@@ -267,11 +277,6 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
-    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
-        <requirement key="_format">xml|json</requirement>
-    </route>
-
     <!--  Product Management -->
 
     <route id="admin.products.default" path="/admin/products">
@@ -280,6 +285,10 @@
 
     <route id="admin.products.create" path="/admin/products/create">
         <default key="_controller">Thelia\Controller\Admin\ProductController::createAction</default>
+    </route>
+
+    <route id="admin.products.clone" path="/admin/products/clone">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::cloneAction</default>
     </route>
 
     <route id="admin.products.update" path="/admin/products/update">
@@ -304,11 +313,6 @@
 
     <route id="admin.products.update-position" path="/admin/products/update-position">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
-    </route>
-
-
-    <route id="admin.products.general.tab" path="/admin/products/general/tab">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
     </route>
 
     <!-- Product categories, content and accessories -->
@@ -347,7 +351,7 @@
     </route>
 
     <route id="admin.product.calculate-price" path="/admin/product/calculate-price">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCalculator</default>
     </route>
 
     <route id="admin.product.calculate-raw-price" path="/admin/product/calculate-raw-price">
@@ -423,7 +427,26 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductDefaultSaleElementAction</default>
     </route>
 
+    <!-- Associate a product_sale_elements with a product document / image -->
 
+    <route id="admin.product_sale_elements.document_image_assoc" path="/admin/product_sale_elements/{pseId}/{type}/{typeId}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::productSaleElementsProductImageDocumentAssociation</default>
+        <requirement key="pseId">\d+</requirement>
+        <requirement key="type">.+</requirement>
+        <requirement key="typeId">\d+</requirement>
+    </route>
+
+    <route id="admin.product_sale_elements.document_image_assoc.get_assoc" path="/admin/product_sale_elements/ajax/{type}/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAjaxProductSaleElementsImagesDocuments</default>
+        <requirement key="id">\d+</requirement>
+        <requirement key="type">.+</requirement>
+    </route>
+
+    <route id="admin.product.virtual_documents" path="/admin/product/virtual-documents/{productId}/{pseId}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getVirtualDocumentListAjaxAction</default>
+        <requirement key="productId">\d+</requirement>
+        <requirement key="pseId">\d+</requirement>
+    </route>
 
 
     <!--  Folder routes management -->
@@ -466,7 +489,7 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
     </route>
 
-    <route id="admin.content.update" path="admin/content/update/{content_id}">
+    <route id="admin.content.update" path="/admin/content/update/{content_id}">
         <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
         <requirement key="content_id">\d+</requirement>
     </route>
@@ -512,6 +535,9 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
+    <route id="admin.coupon.delete" path="/admin/coupon/delete">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::deleteAction</default>
+    </route>
     <route id="admin.coupon.draw.inputs.ajax" path="/admin/coupon/draw/inputs/{couponServiceId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeInputsAjaxAction</default>
         <requirement key="couponServiceId">.*</requirement>
@@ -537,10 +563,6 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::deleteConditionsAction</default>
         <requirement key="couponId">\d+</requirement>
         <requirement key="conditionIndex">\d+</requirement>
-    </route>
-    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
-        <requirement key="couponCode">.*</requirement>
     </route>
 
     <!-- Routes to the Config (system variables) controller -->
@@ -638,6 +660,10 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.currencies.set-visible" path="/admin/configuration/currencies/set-visible">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::setVisibleAction</default>
+    </route>
+
     <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
@@ -648,10 +674,6 @@
 
     <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
-    </route>
-
-    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
-        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
 
 
@@ -798,8 +820,13 @@
         <default key="_controller">Thelia\Controller\Admin\AreaController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}" methods="get">
+    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}">
         <default key="_controller">Thelia\Controller\Admin\AreaController::updateAction</default>
+        <requirement key="area_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.save" path="/admin/configuration/shipping_configuration/save/{area_id}">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::processUpdateAction</default>
         <requirement key="area_id">\d+</requirement>
     </route>
 
@@ -822,6 +849,10 @@
 
     <route id="admin.configuration.shipping-configuration.country.remove" path="/admin/configuration/shipping_configuration/country/remove" methods="post">
         <default key="_controller">Thelia\Controller\Admin\AreaController::removeCountry</default>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.countries.remove" path="/admin/configuration/shipping_configuration/countries/remove" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::removeCountries</default>
     </route>
 
     <!-- end shipping routes management -->
@@ -854,7 +885,45 @@
         <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.countries.toggle-online" path="/admin/configuration/country/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.data" path="/admin/configuration/countries/data">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::getDataAction</default>
+    </route>
+
     <!-- end countries routes management -->
+
+    <!-- States routes management -->
+
+    <route id="admin.configuration.states.default" path="/admin/configuration/states">
+        <default key="_controller">Thelia\Controller\Admin\StateController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.states.create" path="/admin/configuration/states/create">
+        <default key="_controller">Thelia\Controller\Admin\StateController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.states.update" path="/admin/configuration/state/update/{state_id}">
+        <default key="_controller">Thelia\Controller\Admin\StateController::updateAction</default>
+        <requirement key="state_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.states.save" path="/admin/configuration/state/save/{state_id}">
+        <default key="_controller">Thelia\Controller\Admin\StateController::processUpdateAction</default>
+        <requirement key="state_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.states.delete" path="/admin/configuration/states/delete">
+        <default key="_controller">Thelia\Controller\Admin\StateController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.states.toggle-online" path="/admin/configuration/state/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\StateController::setToggleVisibilityAction</default>
+    </route>
+
+    <!-- end states routes management -->
 
     <!-- profiles management -->
 
@@ -918,6 +987,10 @@
 
     <route id="admin.configuration.mailing-system.save" path="/admin/configuration/mailingSystem/save">
         <default key="_controller">Thelia\Controller\Admin\MailingSystemController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.mailing-system.test" path="/admin/configuration/mailingSystem/test">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::testAction</default>
     </route>
 
     <!-- end mailing-system management -->
@@ -1008,6 +1081,30 @@
         <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushImagesAndDocumentsAction</default>
     </route>
 
+    <route id="admin.configuration.api" path="/admin/configuration/api" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.api.create" path="/admin/configuration/api" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.api.downloadSecure" path="/admin/configuration/api/secure_key/{api_id}">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::downloadAction</default>
+    </route>
+
+    <route id="admin.configuration.api.delete" path="/admin/configuration/api/delete">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.api.update" path="/admin/configuration/api/update/{api_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.api.update.process" path="/admin/configuration/api/update/{api_id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ApiController::processUpdateAction</default>
+    </route>
+
     <!-- and cache route management -->
 
     <!-- Modules rule management -->
@@ -1038,6 +1135,20 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
     </route>
 
+    <route id="admin.module.install" path="/admin/module/install" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::installAction</default>
+    </route>
+
+    <route id="admin.module.information" path="/admin/module/information/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::informationAction</default>
+        <requirement key="module_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module.documentation" path="/admin/module/documentation/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::documentationAction</default>
+        <requirement key="module_id">\d+</requirement>
+    </route>
+
     <!--
         Generic module route.
         Will be use if module route is not define in module own config file.
@@ -1046,7 +1157,90 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::configureAction</default>
     </route>
 
+
+
     <!-- end Modules rule management -->
+
+    <!-- Hooks rule management -->
+
+    <route id="admin.hook" path="/admin/hooks">
+        <default key="_controller">Thelia\Controller\Admin\HookController::indexAction</default>
+    </route>
+
+    <route id="admin.hook.discover" path="/admin/hooks/discover">
+        <default key="_controller">Thelia\Controller\Admin\HookController::discoverAction</default>
+    </route>
+
+    <route id="admin.hook.discover.save" path="/admin/hooks/discover/save">
+        <default key="_controller">Thelia\Controller\Admin\HookController::discoverSaveAction</default>
+    </route>
+
+    <route id="admin.hook.create" path="/admin/hooks/create">
+        <default key="_controller">Thelia\Controller\Admin\HookController::createAction</default>
+    </route>
+
+    <route id="admin.hook.update" path="/admin/hook/update/{hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\HookController::updateAction</default>
+        <requirement key="hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.hook.save" path="/admin/hook/save/{hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\HookController::processUpdateAction</default>
+        <requirement key="hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.hook.delete" path="/admin/hooks/delete">
+        <default key="_controller">Thelia\Controller\Admin\HookController::deleteAction</default>
+    </route>
+
+    <route id="admin.hook.toggle-activation" path="/admin/hook/toggle-activation">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleActivationAction</default>
+    </route>
+
+    <route id="admin.hook.toggle-native" path="/admin/hook/toggle-native">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleNativeAction</default>
+    </route>
+
+    <route id="admin.module-hook" path="/admin/module-hooks">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::indexAction</default>
+    </route>
+
+    <route id="admin.module-hook.create" path="/admin/module-hooks/create">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::createAction</default>
+    </route>
+
+    <route id="admin.module-hook.update" path="/admin/module-hook/update/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updateAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module-hook.save" path="/admin/module-hook/save/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::processUpdateAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module-hook.delete" path="/admin/module-hooks/delete">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::deleteAction</default>
+    </route>
+
+    <route id="admin.module-hook.toggle-activation" path="/admin/module-hooks/toggle-activation/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::toggleActivationAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module-hook.update-position" path="/admin/module-hooks/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.module-hook.get-module-hook-classnames" path="/admin/module-hooks/get-module-hook-classnames/{moduleId}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::getModuleHookClassnames</default>
+    </route>
+
+    <route id="admin.module-hook.get-module-hook-methods" path="/admin/module-hooks/get-module-hook-methods/{moduleId}/{className}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::getModuleHookMethods</default>
+    </route>
+
+    <!-- end Hooks rule management -->
 
     <!-- tax management -->
 
@@ -1101,6 +1295,11 @@
         <requirement key="tax_rule_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.taxes-rules.get" path="/admin/configuration/taxes_rules/specs/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::specsAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
     <!-- end tax rules management -->
 
     <!-- language management -->
@@ -1121,6 +1320,16 @@
 
     <route id="admin.configuration.languages.toggleDefault" path="/admin/configuration/languages/toggleDefault/{lang_id}">
         <default key="_controller">Thelia\Controller\Admin\LangController::toggleDefaultAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleActive" path="/admin/configuration/languages/toggleActive/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleActiveAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleVisible" path="/admin/configuration/languages/toggleVisible/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleVisibleAction</default>
         <requirement key="lang_id">\d+</requirement>
     </route>
 
@@ -1158,14 +1367,147 @@
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
     </route>
 
+    <!-- Routes to the Brands controller -->
+
+    <route id="admin.brand.default" path="/admin/brand">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::defaultAction</default>
+    </route>
+
+    <route id="admin.brand.create" path="/admin/brand/create">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::createAction</default>
+    </route>
+
+    <route id="admin.brand.update" path="/admin/brand/update/{brand_id}">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::updateAction</default>
+        <requirement key="brand_id">\d+</requirement>
+    </route>
+
+    <route id="admin.brand.save" path="/admin/brand/save/{brand_id}">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::processUpdateAction</default>
+        <requirement key="brand_id">\d+</requirement>
+    </route>
+
+    <route id="admin.brand.seo.save" path="/admin/brand/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::processUpdateSeoAction</default>
+    </route>
+
+    <route id="admin.brand.toggle-online" path="/admin/brand/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.brand.update-position" path="/admin/brand/update-position">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.brand.delete" path="/admin/brand/delete">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::deleteAction</default>
+    </route>
+
     <!-- export management -->
 
-    <route id="export.main" path="/admin/export">
+    <route id="export.list" path="/admin/export">
         <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
     </route>
 
-    <route id="export.customer.newsletter" path="/admin/export/customer/newsletter">
-        <default key="_controller">Thelia\Controller\Admin\CustomerExportController::NewsletterExportAction</default>
+    <route id="export.position" path="/admin/export/position">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changePosition</default>
+    </route>
+
+    <route id="export.category.position" path="/admin/export/position/category">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
+    </route>
+
+    <route id="export.mode" path="/admin/export/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="export.view" path="/admin/export/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::exportView</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <!-- import management -->
+
+    <route id="import.list" path="/admin/import">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
+    </route>
+
+    <route id="import.position" path="/admin/import/position">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changePosition</default>
+    </route>
+
+    <route id="import.category.position" path="/admin/import/position/category">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPosition</default>
+    </route>
+
+    <route id="import.mode" path="/admin/import/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="import.view" path="/admin/import/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <!-- Routes to the sales & promotions management -->
+
+    <route id="admin.sale.default" path="/admin/sales">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::defaultAction</default>
+    </route>
+
+    <route id="admin.sale.reset" path="/admin/sales/reset">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::resetSaleStatus</default>
+    </route>
+
+    <route id="admin.sale.check-activation" path="/admin/sales/check-activation">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::checkSalesActivationStatus</default>
+    </route>
+
+    <route id="admin.sale.create" path="/admin/sale/create">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::createAction</default>
+    </route>
+
+    <route id="admin.sale.update" path="/admin/sale/update/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateAction</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.save" path="/admin/sale/save/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::processUpdateAction</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.delete" path="/admin/sale/delete">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::deleteAction</default>
+    </route>
+
+    <route id="admin.sale.update.product.list" path="/admin/sale/update-product-list/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateProductList</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.update.product.attribute.list" path="/admin/sale/update-product-attribute-list/{sale_id}/{product_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateProductAttributes</default>
+        <requirement key="sale_id">\d+</requirement>
+        <requirement key="product_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.toggleActivity" path="/admin/sale/toggle-activity/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::toggleActivity</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <!-- Preview message -->
+    <route id="admin.email.preview_html" path="/admin/message/preview/{messageId}" methods="get">
+        <default key="_controller">Thelia:Admin\Message:previewAsHtml</default>
+        <requirement key="messageId">\d+</requirement>
+    </route>
+
+    <route id="admin.email.preview_text" path="/admin/message/preview/text/{messageId}" methods="get">
+        <default key="_controller">Thelia:Admin\Message:previewAsText</default>
+        <requirement key="messageId">\d+</requirement>
     </route>
 
     <!-- The default route, to display a template -->

@@ -14,10 +14,13 @@ namespace Thelia\Core\Translation;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
-use Thelia\Log\Tlog;
 
 class Translator extends BaseTranslator
 {
+    const GLOBAL_FALLBACK_DOMAIN = 'global';
+
+    const GLOBAL_FALLBACK_KEY = '%s.%s';
+
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
@@ -46,7 +49,9 @@ class Translator extends BaseTranslator
      */
     public static function getInstance()
     {
-        if (self::$instance == null) throw new \RuntimeException("Translator instance is not initialized.");
+        if (self::$instance == null) {
+            throw new \RuntimeException("Translator instance is not initialized.");
+        }
         return self::$instance;
     }
 
@@ -64,8 +69,14 @@ class Translator extends BaseTranslator
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = 'core', $locale = null, $return_default_if_not_available = true)
-    {
+    public function trans(
+        $id,
+        array $parameters = array(),
+        $domain = 'core',
+        $locale = null,
+        $return_default_if_not_available = true,
+        $useFallback = true
+    ) {
         if (null === $locale) {
             $locale = $this->getLocale();
         }
@@ -74,19 +85,28 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        if (! $this->catalogues[$locale]->has((string) $id, $domain)) {
+        // global translations
+        if ($useFallback) {
+            $fallbackId = sprintf(self::GLOBAL_FALLBACK_KEY, $domain, (string) $id);
 
+            if ($this->catalogues[$locale]->has($fallbackId, self::GLOBAL_FALLBACK_DOMAIN)) {
+                return parent::trans($fallbackId, $parameters, self::GLOBAL_FALLBACK_DOMAIN, $locale);
+            }
+
+            if ($this->catalogues[$locale]->has($id, self::GLOBAL_FALLBACK_DOMAIN)) {
+                // global translations
+                return parent::trans($id, $parameters, self::GLOBAL_FALLBACK_DOMAIN, $locale);
+            }
         }
 
         if ($this->catalogues[$locale]->has((string) $id, $domain)) {
             return parent::trans($id, $parameters, $domain, $locale);
         } else {
-            //Tlog::getInstance()->addWarning("Undefined translation: locale: $locale, domain: $domain, ID: $id");
-
-            if ($return_default_if_not_available)
+            if ($return_default_if_not_available) {
                 return strtr($id, $parameters);
-            else
+            } else {
                 return '';
+            }
         }
     }
 }

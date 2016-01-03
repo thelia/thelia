@@ -69,8 +69,8 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItem findOneByProductId(int $product_id) Return the first ChildCartItem filtered by the product_id column
  * @method     ChildCartItem findOneByQuantity(double $quantity) Return the first ChildCartItem filtered by the quantity column
  * @method     ChildCartItem findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildCartItem filtered by the product_sale_elements_id column
- * @method     ChildCartItem findOneByPrice(double $price) Return the first ChildCartItem filtered by the price column
- * @method     ChildCartItem findOneByPromoPrice(double $promo_price) Return the first ChildCartItem filtered by the promo_price column
+ * @method     ChildCartItem findOneByPrice(string $price) Return the first ChildCartItem filtered by the price column
+ * @method     ChildCartItem findOneByPromoPrice(string $promo_price) Return the first ChildCartItem filtered by the promo_price column
  * @method     ChildCartItem findOneByPriceEndOfLife(string $price_end_of_life) Return the first ChildCartItem filtered by the price_end_of_life column
  * @method     ChildCartItem findOneByPromo(int $promo) Return the first ChildCartItem filtered by the promo column
  * @method     ChildCartItem findOneByCreatedAt(string $created_at) Return the first ChildCartItem filtered by the created_at column
@@ -81,8 +81,8 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     array findByProductId(int $product_id) Return ChildCartItem objects filtered by the product_id column
  * @method     array findByQuantity(double $quantity) Return ChildCartItem objects filtered by the quantity column
  * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildCartItem objects filtered by the product_sale_elements_id column
- * @method     array findByPrice(double $price) Return ChildCartItem objects filtered by the price column
- * @method     array findByPromoPrice(double $promo_price) Return ChildCartItem objects filtered by the promo_price column
+ * @method     array findByPrice(string $price) Return ChildCartItem objects filtered by the price column
+ * @method     array findByPromoPrice(string $promo_price) Return ChildCartItem objects filtered by the promo_price column
  * @method     array findByPriceEndOfLife(string $price_end_of_life) Return ChildCartItem objects filtered by the price_end_of_life column
  * @method     array findByPromo(int $promo) Return ChildCartItem objects filtered by the promo column
  * @method     array findByCreatedAt(string $created_at) Return ChildCartItem objects filtered by the created_at column

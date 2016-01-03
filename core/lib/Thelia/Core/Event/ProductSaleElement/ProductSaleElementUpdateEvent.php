@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\ProductSaleElement;
+
 use Thelia\Model\Product;
 
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
@@ -172,6 +173,9 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
         return $this;
     }
 
+    /**
+     * @return Product
+     */
     public function getProduct()
     {
         return $this->product;
@@ -207,5 +211,4 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
         return $this;
     }
-
 }

@@ -23,7 +23,15 @@ use Thelia\Model\Coupon as ChildCoupon;
 use Thelia\Model\CouponModule as ChildCouponModule;
 use Thelia\Model\CouponModuleQuery as ChildCouponModuleQuery;
 use Thelia\Model\CouponQuery as ChildCouponQuery;
+use Thelia\Model\Hook as ChildHook;
+use Thelia\Model\HookQuery as ChildHookQuery;
+use Thelia\Model\IgnoredModuleHook as ChildIgnoredModuleHook;
+use Thelia\Model\IgnoredModuleHookQuery as ChildIgnoredModuleHookQuery;
 use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleConfig as ChildModuleConfig;
+use Thelia\Model\ModuleConfigQuery as ChildModuleConfigQuery;
+use Thelia\Model\ModuleHook as ChildModuleHook;
+use Thelia\Model\ModuleHookQuery as ChildModuleHookQuery;
 use Thelia\Model\ModuleI18n as ChildModuleI18n;
 use Thelia\Model\ModuleI18nQuery as ChildModuleI18nQuery;
 use Thelia\Model\ModuleImage as ChildModuleImage;
@@ -86,10 +94,24 @@ abstract class Module implements ActiveRecordInterface
     protected $code;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: ''
+     * @var        string
+     */
+    protected $version;
+
+    /**
      * The value for the type field.
      * @var        int
      */
     protected $type;
+
+    /**
+     * The value for the category field.
+     * Note: this column has a database default value of: 'classic'
+     * @var        string
+     */
+    protected $category;
 
     /**
      * The value for the activate field.
@@ -164,6 +186,24 @@ abstract class Module implements ActiveRecordInterface
     protected $collOrderCouponModulesPartial;
 
     /**
+     * @var        ObjectCollection|ChildModuleHook[] Collection to store aggregation of ChildModuleHook objects.
+     */
+    protected $collModuleHooks;
+    protected $collModuleHooksPartial;
+
+    /**
+     * @var        ObjectCollection|ChildModuleConfig[] Collection to store aggregation of ChildModuleConfig objects.
+     */
+    protected $collModuleConfigs;
+    protected $collModuleConfigsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildIgnoredModuleHook[] Collection to store aggregation of ChildIgnoredModuleHook objects.
+     */
+    protected $collIgnoredModuleHooks;
+    protected $collIgnoredModuleHooksPartial;
+
+    /**
      * @var        ObjectCollection|ChildModuleI18n[] Collection to store aggregation of ChildModuleI18n objects.
      */
     protected $collModuleI18ns;
@@ -178,6 +218,11 @@ abstract class Module implements ActiveRecordInterface
      * @var        ChildOrderCoupon[] Collection to store aggregation of ChildOrderCoupon objects.
      */
     protected $collOrderCoupons;
+
+    /**
+     * @var        ChildHook[] Collection to store aggregation of ChildHook objects.
+     */
+    protected $collHooks;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -212,6 +257,12 @@ abstract class Module implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $orderCouponsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $hooksScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -259,13 +310,45 @@ abstract class Module implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
+    protected $moduleHooksScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $moduleConfigsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $ignoredModuleHooksScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
     protected $moduleI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->version = '';
+        $this->category = 'classic';
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Module object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -542,6 +625,17 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Get the [version] column value.
+     *
+     * @return   string
+     */
+    public function getVersion()
+    {
+
+        return $this->version;
+    }
+
+    /**
      * Get the [type] column value.
      *
      * @return   int
@@ -550,6 +644,17 @@ abstract class Module implements ActiveRecordInterface
     {
 
         return $this->type;
+    }
+
+    /**
+     * Get the [category] column value.
+     *
+     * @return   string
+     */
+    public function getCategory()
+    {
+
+        return $this->category;
     }
 
     /**
@@ -668,6 +773,27 @@ abstract class Module implements ActiveRecordInterface
     } // setCode()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[ModuleTableMap::VERSION] = true;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
      * Set the value of [type] column.
      *
      * @param      int $v new value
@@ -687,6 +813,27 @@ abstract class Module implements ActiveRecordInterface
 
         return $this;
     } // setType()
+
+    /**
+     * Set the value of [category] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setCategory($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->category !== $v) {
+            $this->category = $v;
+            $this->modifiedColumns[ModuleTableMap::CATEGORY] = true;
+        }
+
+
+        return $this;
+    } // setCategory()
 
     /**
      * Set the value of [activate] column.
@@ -803,6 +950,14 @@ abstract class Module implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->version !== '') {
+                return false;
+            }
+
+            if ($this->category !== 'classic') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -836,25 +991,31 @@ abstract class Module implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ModuleTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
             $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ModuleTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ModuleTableMap::translateFieldName('Activate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ModuleTableMap::translateFieldName('Category', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->category = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ModuleTableMap::translateFieldName('Activate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->activate = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ModuleTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_namespace = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -867,7 +1028,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Module object", 0, $e);
@@ -942,10 +1103,17 @@ abstract class Module implements ActiveRecordInterface
 
             $this->collOrderCouponModules = null;
 
+            $this->collModuleHooks = null;
+
+            $this->collModuleConfigs = null;
+
+            $this->collIgnoredModuleHooks = null;
+
             $this->collModuleI18ns = null;
 
             $this->collCoupons = null;
             $this->collOrderCoupons = null;
+            $this->collHooks = null;
         } // if (deep)
     }
 
@@ -1133,6 +1301,33 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            if ($this->hooksScheduledForDeletion !== null) {
+                if (!$this->hooksScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->hooksScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+
+                    IgnoredModuleHookQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->hooksScheduledForDeletion = null;
+                }
+
+                foreach ($this->getHooks() as $hook) {
+                    if ($hook->isModified()) {
+                        $hook->save($con);
+                    }
+                }
+            } elseif ($this->collHooks) {
+                foreach ($this->collHooks as $hook) {
+                    if ($hook->isModified()) {
+                        $hook->save($con);
+                    }
+                }
+            }
+
             if ($this->ordersRelatedByPaymentModuleIdScheduledForDeletion !== null) {
                 if (!$this->ordersRelatedByPaymentModuleIdScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\OrderQuery::create()
@@ -1252,6 +1447,57 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            if ($this->moduleHooksScheduledForDeletion !== null) {
+                if (!$this->moduleHooksScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ModuleHookQuery::create()
+                        ->filterByPrimaryKeys($this->moduleHooksScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleHooksScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collModuleHooks !== null) {
+            foreach ($this->collModuleHooks as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->moduleConfigsScheduledForDeletion !== null) {
+                if (!$this->moduleConfigsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ModuleConfigQuery::create()
+                        ->filterByPrimaryKeys($this->moduleConfigsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleConfigsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collModuleConfigs !== null) {
+            foreach ($this->collModuleConfigs as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->ignoredModuleHooksScheduledForDeletion !== null) {
+                if (!$this->ignoredModuleHooksScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\IgnoredModuleHookQuery::create()
+                        ->filterByPrimaryKeys($this->ignoredModuleHooksScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->ignoredModuleHooksScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collIgnoredModuleHooks !== null) {
+            foreach ($this->collIgnoredModuleHooks as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->moduleI18nsScheduledForDeletion !== null) {
                 if (!$this->moduleI18nsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\ModuleI18nQuery::create()
@@ -1301,8 +1547,14 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::CODE)) {
             $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
+        if ($this->isColumnModified(ModuleTableMap::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
         if ($this->isColumnModified(ModuleTableMap::TYPE)) {
             $modifiedColumns[':p' . $index++]  = '`TYPE`';
+        }
+        if ($this->isColumnModified(ModuleTableMap::CATEGORY)) {
+            $modifiedColumns[':p' . $index++]  = '`CATEGORY`';
         }
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) {
             $modifiedColumns[':p' . $index++]  = '`ACTIVATE`';
@@ -1336,8 +1588,14 @@ abstract class Module implements ActiveRecordInterface
                     case '`CODE`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_STR);
+                        break;
                     case '`TYPE`':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_INT);
+                        break;
+                    case '`CATEGORY`':
+                        $stmt->bindValue($identifier, $this->category, PDO::PARAM_STR);
                         break;
                     case '`ACTIVATE`':
                         $stmt->bindValue($identifier, $this->activate, PDO::PARAM_INT);
@@ -1423,21 +1681,27 @@ abstract class Module implements ActiveRecordInterface
                 return $this->getCode();
                 break;
             case 2:
-                return $this->getType();
+                return $this->getVersion();
                 break;
             case 3:
-                return $this->getActivate();
+                return $this->getType();
                 break;
             case 4:
-                return $this->getPosition();
+                return $this->getCategory();
                 break;
             case 5:
-                return $this->getFullNamespace();
+                return $this->getActivate();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 7:
+                return $this->getFullNamespace();
+                break;
+            case 8:
+                return $this->getCreatedAt();
+                break;
+            case 9:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1471,12 +1735,14 @@ abstract class Module implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->getType(),
-            $keys[3] => $this->getActivate(),
-            $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getFullNamespace(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[2] => $this->getVersion(),
+            $keys[3] => $this->getType(),
+            $keys[4] => $this->getCategory(),
+            $keys[5] => $this->getActivate(),
+            $keys[6] => $this->getPosition(),
+            $keys[7] => $this->getFullNamespace(),
+            $keys[8] => $this->getCreatedAt(),
+            $keys[9] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1504,6 +1770,15 @@ abstract class Module implements ActiveRecordInterface
             }
             if (null !== $this->collOrderCouponModules) {
                 $result['OrderCouponModules'] = $this->collOrderCouponModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collModuleHooks) {
+                $result['ModuleHooks'] = $this->collModuleHooks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collModuleConfigs) {
+                $result['ModuleConfigs'] = $this->collModuleConfigs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collIgnoredModuleHooks) {
+                $result['IgnoredModuleHooks'] = $this->collIgnoredModuleHooks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collModuleI18ns) {
                 $result['ModuleI18ns'] = $this->collModuleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1549,21 +1824,27 @@ abstract class Module implements ActiveRecordInterface
                 $this->setCode($value);
                 break;
             case 2:
-                $this->setType($value);
+                $this->setVersion($value);
                 break;
             case 3:
-                $this->setActivate($value);
+                $this->setType($value);
                 break;
             case 4:
-                $this->setPosition($value);
+                $this->setCategory($value);
                 break;
             case 5:
-                $this->setFullNamespace($value);
+                $this->setActivate($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 7:
+                $this->setFullNamespace($value);
+                break;
+            case 8:
+                $this->setCreatedAt($value);
+                break;
+            case 9:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1592,12 +1873,14 @@ abstract class Module implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setActivate($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setFullNamespace($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[2], $arr)) $this->setVersion($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setType($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCategory($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setActivate($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setFullNamespace($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
     }
 
     /**
@@ -1611,7 +1894,9 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->isColumnModified(ModuleTableMap::ID)) $criteria->add(ModuleTableMap::ID, $this->id);
         if ($this->isColumnModified(ModuleTableMap::CODE)) $criteria->add(ModuleTableMap::CODE, $this->code);
+        if ($this->isColumnModified(ModuleTableMap::VERSION)) $criteria->add(ModuleTableMap::VERSION, $this->version);
         if ($this->isColumnModified(ModuleTableMap::TYPE)) $criteria->add(ModuleTableMap::TYPE, $this->type);
+        if ($this->isColumnModified(ModuleTableMap::CATEGORY)) $criteria->add(ModuleTableMap::CATEGORY, $this->category);
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) $criteria->add(ModuleTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModuleTableMap::POSITION)) $criteria->add(ModuleTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
@@ -1681,7 +1966,9 @@ abstract class Module implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
+        $copyObj->setVersion($this->getVersion());
         $copyObj->setType($this->getType());
+        $copyObj->setCategory($this->getCategory());
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setFullNamespace($this->getFullNamespace());
@@ -1732,6 +2019,24 @@ abstract class Module implements ActiveRecordInterface
             foreach ($this->getOrderCouponModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addOrderCouponModule($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getModuleHooks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleHook($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getModuleConfigs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleConfig($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getIgnoredModuleHooks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addIgnoredModuleHook($relObj->copy($deepCopy));
                 }
             }
 
@@ -1802,6 +2107,15 @@ abstract class Module implements ActiveRecordInterface
         }
         if ('OrderCouponModule' == $relationName) {
             return $this->initOrderCouponModules();
+        }
+        if ('ModuleHook' == $relationName) {
+            return $this->initModuleHooks();
+        }
+        if ('ModuleConfig' == $relationName) {
+            return $this->initModuleConfigs();
+        }
+        if ('IgnoredModuleHook' == $relationName) {
+            return $this->initIgnoredModuleHooks();
         }
         if ('ModuleI18n' == $relationName) {
             return $this->initModuleI18ns();
@@ -3744,6 +4058,710 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collModuleHooks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleHooks()
+     */
+    public function clearModuleHooks()
+    {
+        $this->collModuleHooks = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collModuleHooks collection loaded partially.
+     */
+    public function resetPartialModuleHooks($v = true)
+    {
+        $this->collModuleHooksPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleHooks collection.
+     *
+     * By default this just sets the collModuleHooks collection to an empty array (like clearcollModuleHooks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleHooks($overrideExisting = true)
+    {
+        if (null !== $this->collModuleHooks && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleHooks = new ObjectCollection();
+        $this->collModuleHooks->setModel('\Thelia\Model\ModuleHook');
+    }
+
+    /**
+     * Gets an array of ChildModuleHook objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildModuleHook[] List of ChildModuleHook objects
+     * @throws PropelException
+     */
+    public function getModuleHooks($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleHooksPartial && !$this->isNew();
+        if (null === $this->collModuleHooks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleHooks) {
+                // return empty collection
+                $this->initModuleHooks();
+            } else {
+                $collModuleHooks = ChildModuleHookQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleHooksPartial && count($collModuleHooks)) {
+                        $this->initModuleHooks(false);
+
+                        foreach ($collModuleHooks as $obj) {
+                            if (false == $this->collModuleHooks->contains($obj)) {
+                                $this->collModuleHooks->append($obj);
+                            }
+                        }
+
+                        $this->collModuleHooksPartial = true;
+                    }
+
+                    reset($collModuleHooks);
+
+                    return $collModuleHooks;
+                }
+
+                if ($partial && $this->collModuleHooks) {
+                    foreach ($this->collModuleHooks as $obj) {
+                        if ($obj->isNew()) {
+                            $collModuleHooks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleHooks = $collModuleHooks;
+                $this->collModuleHooksPartial = false;
+            }
+        }
+
+        return $this->collModuleHooks;
+    }
+
+    /**
+     * Sets a collection of ModuleHook objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $moduleHooks A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setModuleHooks(Collection $moduleHooks, ConnectionInterface $con = null)
+    {
+        $moduleHooksToDelete = $this->getModuleHooks(new Criteria(), $con)->diff($moduleHooks);
+
+
+        $this->moduleHooksScheduledForDeletion = $moduleHooksToDelete;
+
+        foreach ($moduleHooksToDelete as $moduleHookRemoved) {
+            $moduleHookRemoved->setModule(null);
+        }
+
+        $this->collModuleHooks = null;
+        foreach ($moduleHooks as $moduleHook) {
+            $this->addModuleHook($moduleHook);
+        }
+
+        $this->collModuleHooks = $moduleHooks;
+        $this->collModuleHooksPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ModuleHook objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ModuleHook objects.
+     * @throws PropelException
+     */
+    public function countModuleHooks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleHooksPartial && !$this->isNew();
+        if (null === $this->collModuleHooks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleHooks) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getModuleHooks());
+            }
+
+            $query = ChildModuleHookQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collModuleHooks);
+    }
+
+    /**
+     * Method called to associate a ChildModuleHook object to this object
+     * through the ChildModuleHook foreign key attribute.
+     *
+     * @param    ChildModuleHook $l ChildModuleHook
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addModuleHook(ChildModuleHook $l)
+    {
+        if ($this->collModuleHooks === null) {
+            $this->initModuleHooks();
+            $this->collModuleHooksPartial = true;
+        }
+
+        if (!in_array($l, $this->collModuleHooks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleHook($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModuleHook $moduleHook The moduleHook object to add.
+     */
+    protected function doAddModuleHook($moduleHook)
+    {
+        $this->collModuleHooks[]= $moduleHook;
+        $moduleHook->setModule($this);
+    }
+
+    /**
+     * @param  ModuleHook $moduleHook The moduleHook object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeModuleHook($moduleHook)
+    {
+        if ($this->getModuleHooks()->contains($moduleHook)) {
+            $this->collModuleHooks->remove($this->collModuleHooks->search($moduleHook));
+            if (null === $this->moduleHooksScheduledForDeletion) {
+                $this->moduleHooksScheduledForDeletion = clone $this->collModuleHooks;
+                $this->moduleHooksScheduledForDeletion->clear();
+            }
+            $this->moduleHooksScheduledForDeletion[]= clone $moduleHook;
+            $moduleHook->setModule(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related ModuleHooks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildModuleHook[] List of ChildModuleHook objects
+     */
+    public function getModuleHooksJoinHook($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildModuleHookQuery::create(null, $criteria);
+        $query->joinWith('Hook', $joinBehavior);
+
+        return $this->getModuleHooks($query, $con);
+    }
+
+    /**
+     * Clears out the collModuleConfigs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleConfigs()
+     */
+    public function clearModuleConfigs()
+    {
+        $this->collModuleConfigs = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collModuleConfigs collection loaded partially.
+     */
+    public function resetPartialModuleConfigs($v = true)
+    {
+        $this->collModuleConfigsPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleConfigs collection.
+     *
+     * By default this just sets the collModuleConfigs collection to an empty array (like clearcollModuleConfigs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleConfigs($overrideExisting = true)
+    {
+        if (null !== $this->collModuleConfigs && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleConfigs = new ObjectCollection();
+        $this->collModuleConfigs->setModel('\Thelia\Model\ModuleConfig');
+    }
+
+    /**
+     * Gets an array of ChildModuleConfig objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildModuleConfig[] List of ChildModuleConfig objects
+     * @throws PropelException
+     */
+    public function getModuleConfigs($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleConfigsPartial && !$this->isNew();
+        if (null === $this->collModuleConfigs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleConfigs) {
+                // return empty collection
+                $this->initModuleConfigs();
+            } else {
+                $collModuleConfigs = ChildModuleConfigQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleConfigsPartial && count($collModuleConfigs)) {
+                        $this->initModuleConfigs(false);
+
+                        foreach ($collModuleConfigs as $obj) {
+                            if (false == $this->collModuleConfigs->contains($obj)) {
+                                $this->collModuleConfigs->append($obj);
+                            }
+                        }
+
+                        $this->collModuleConfigsPartial = true;
+                    }
+
+                    reset($collModuleConfigs);
+
+                    return $collModuleConfigs;
+                }
+
+                if ($partial && $this->collModuleConfigs) {
+                    foreach ($this->collModuleConfigs as $obj) {
+                        if ($obj->isNew()) {
+                            $collModuleConfigs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleConfigs = $collModuleConfigs;
+                $this->collModuleConfigsPartial = false;
+            }
+        }
+
+        return $this->collModuleConfigs;
+    }
+
+    /**
+     * Sets a collection of ModuleConfig objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $moduleConfigs A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setModuleConfigs(Collection $moduleConfigs, ConnectionInterface $con = null)
+    {
+        $moduleConfigsToDelete = $this->getModuleConfigs(new Criteria(), $con)->diff($moduleConfigs);
+
+
+        $this->moduleConfigsScheduledForDeletion = $moduleConfigsToDelete;
+
+        foreach ($moduleConfigsToDelete as $moduleConfigRemoved) {
+            $moduleConfigRemoved->setModule(null);
+        }
+
+        $this->collModuleConfigs = null;
+        foreach ($moduleConfigs as $moduleConfig) {
+            $this->addModuleConfig($moduleConfig);
+        }
+
+        $this->collModuleConfigs = $moduleConfigs;
+        $this->collModuleConfigsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ModuleConfig objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ModuleConfig objects.
+     * @throws PropelException
+     */
+    public function countModuleConfigs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleConfigsPartial && !$this->isNew();
+        if (null === $this->collModuleConfigs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleConfigs) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getModuleConfigs());
+            }
+
+            $query = ChildModuleConfigQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collModuleConfigs);
+    }
+
+    /**
+     * Method called to associate a ChildModuleConfig object to this object
+     * through the ChildModuleConfig foreign key attribute.
+     *
+     * @param    ChildModuleConfig $l ChildModuleConfig
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addModuleConfig(ChildModuleConfig $l)
+    {
+        if ($this->collModuleConfigs === null) {
+            $this->initModuleConfigs();
+            $this->collModuleConfigsPartial = true;
+        }
+
+        if (!in_array($l, $this->collModuleConfigs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleConfig($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModuleConfig $moduleConfig The moduleConfig object to add.
+     */
+    protected function doAddModuleConfig($moduleConfig)
+    {
+        $this->collModuleConfigs[]= $moduleConfig;
+        $moduleConfig->setModule($this);
+    }
+
+    /**
+     * @param  ModuleConfig $moduleConfig The moduleConfig object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeModuleConfig($moduleConfig)
+    {
+        if ($this->getModuleConfigs()->contains($moduleConfig)) {
+            $this->collModuleConfigs->remove($this->collModuleConfigs->search($moduleConfig));
+            if (null === $this->moduleConfigsScheduledForDeletion) {
+                $this->moduleConfigsScheduledForDeletion = clone $this->collModuleConfigs;
+                $this->moduleConfigsScheduledForDeletion->clear();
+            }
+            $this->moduleConfigsScheduledForDeletion[]= clone $moduleConfig;
+            $moduleConfig->setModule(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collIgnoredModuleHooks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addIgnoredModuleHooks()
+     */
+    public function clearIgnoredModuleHooks()
+    {
+        $this->collIgnoredModuleHooks = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collIgnoredModuleHooks collection loaded partially.
+     */
+    public function resetPartialIgnoredModuleHooks($v = true)
+    {
+        $this->collIgnoredModuleHooksPartial = $v;
+    }
+
+    /**
+     * Initializes the collIgnoredModuleHooks collection.
+     *
+     * By default this just sets the collIgnoredModuleHooks collection to an empty array (like clearcollIgnoredModuleHooks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initIgnoredModuleHooks($overrideExisting = true)
+    {
+        if (null !== $this->collIgnoredModuleHooks && !$overrideExisting) {
+            return;
+        }
+        $this->collIgnoredModuleHooks = new ObjectCollection();
+        $this->collIgnoredModuleHooks->setModel('\Thelia\Model\IgnoredModuleHook');
+    }
+
+    /**
+     * Gets an array of ChildIgnoredModuleHook objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildIgnoredModuleHook[] List of ChildIgnoredModuleHook objects
+     * @throws PropelException
+     */
+    public function getIgnoredModuleHooks($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collIgnoredModuleHooksPartial && !$this->isNew();
+        if (null === $this->collIgnoredModuleHooks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collIgnoredModuleHooks) {
+                // return empty collection
+                $this->initIgnoredModuleHooks();
+            } else {
+                $collIgnoredModuleHooks = ChildIgnoredModuleHookQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collIgnoredModuleHooksPartial && count($collIgnoredModuleHooks)) {
+                        $this->initIgnoredModuleHooks(false);
+
+                        foreach ($collIgnoredModuleHooks as $obj) {
+                            if (false == $this->collIgnoredModuleHooks->contains($obj)) {
+                                $this->collIgnoredModuleHooks->append($obj);
+                            }
+                        }
+
+                        $this->collIgnoredModuleHooksPartial = true;
+                    }
+
+                    reset($collIgnoredModuleHooks);
+
+                    return $collIgnoredModuleHooks;
+                }
+
+                if ($partial && $this->collIgnoredModuleHooks) {
+                    foreach ($this->collIgnoredModuleHooks as $obj) {
+                        if ($obj->isNew()) {
+                            $collIgnoredModuleHooks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collIgnoredModuleHooks = $collIgnoredModuleHooks;
+                $this->collIgnoredModuleHooksPartial = false;
+            }
+        }
+
+        return $this->collIgnoredModuleHooks;
+    }
+
+    /**
+     * Sets a collection of IgnoredModuleHook objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $ignoredModuleHooks A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setIgnoredModuleHooks(Collection $ignoredModuleHooks, ConnectionInterface $con = null)
+    {
+        $ignoredModuleHooksToDelete = $this->getIgnoredModuleHooks(new Criteria(), $con)->diff($ignoredModuleHooks);
+
+
+        $this->ignoredModuleHooksScheduledForDeletion = $ignoredModuleHooksToDelete;
+
+        foreach ($ignoredModuleHooksToDelete as $ignoredModuleHookRemoved) {
+            $ignoredModuleHookRemoved->setModule(null);
+        }
+
+        $this->collIgnoredModuleHooks = null;
+        foreach ($ignoredModuleHooks as $ignoredModuleHook) {
+            $this->addIgnoredModuleHook($ignoredModuleHook);
+        }
+
+        $this->collIgnoredModuleHooks = $ignoredModuleHooks;
+        $this->collIgnoredModuleHooksPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related IgnoredModuleHook objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related IgnoredModuleHook objects.
+     * @throws PropelException
+     */
+    public function countIgnoredModuleHooks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collIgnoredModuleHooksPartial && !$this->isNew();
+        if (null === $this->collIgnoredModuleHooks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collIgnoredModuleHooks) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getIgnoredModuleHooks());
+            }
+
+            $query = ChildIgnoredModuleHookQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collIgnoredModuleHooks);
+    }
+
+    /**
+     * Method called to associate a ChildIgnoredModuleHook object to this object
+     * through the ChildIgnoredModuleHook foreign key attribute.
+     *
+     * @param    ChildIgnoredModuleHook $l ChildIgnoredModuleHook
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addIgnoredModuleHook(ChildIgnoredModuleHook $l)
+    {
+        if ($this->collIgnoredModuleHooks === null) {
+            $this->initIgnoredModuleHooks();
+            $this->collIgnoredModuleHooksPartial = true;
+        }
+
+        if (!in_array($l, $this->collIgnoredModuleHooks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddIgnoredModuleHook($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param IgnoredModuleHook $ignoredModuleHook The ignoredModuleHook object to add.
+     */
+    protected function doAddIgnoredModuleHook($ignoredModuleHook)
+    {
+        $this->collIgnoredModuleHooks[]= $ignoredModuleHook;
+        $ignoredModuleHook->setModule($this);
+    }
+
+    /**
+     * @param  IgnoredModuleHook $ignoredModuleHook The ignoredModuleHook object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeIgnoredModuleHook($ignoredModuleHook)
+    {
+        if ($this->getIgnoredModuleHooks()->contains($ignoredModuleHook)) {
+            $this->collIgnoredModuleHooks->remove($this->collIgnoredModuleHooks->search($ignoredModuleHook));
+            if (null === $this->ignoredModuleHooksScheduledForDeletion) {
+                $this->ignoredModuleHooksScheduledForDeletion = clone $this->collIgnoredModuleHooks;
+                $this->ignoredModuleHooksScheduledForDeletion->clear();
+            }
+            $this->ignoredModuleHooksScheduledForDeletion[]= clone $ignoredModuleHook;
+            $ignoredModuleHook->setModule(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related IgnoredModuleHooks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildIgnoredModuleHook[] List of ChildIgnoredModuleHook objects
+     */
+    public function getIgnoredModuleHooksJoinHook($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildIgnoredModuleHookQuery::create(null, $criteria);
+        $query->joinWith('Hook', $joinBehavior);
+
+        return $this->getIgnoredModuleHooks($query, $con);
+    }
+
+    /**
      * Clears out the collModuleI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -4335,13 +5353,198 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collHooks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addHooks()
+     */
+    public function clearHooks()
+    {
+        $this->collHooks = null; // important to set this to NULL since that means it is uninitialized
+        $this->collHooksPartial = null;
+    }
+
+    /**
+     * Initializes the collHooks collection.
+     *
+     * By default this just sets the collHooks collection to an empty collection (like clearHooks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initHooks()
+    {
+        $this->collHooks = new ObjectCollection();
+        $this->collHooks->setModel('\Thelia\Model\Hook');
+    }
+
+    /**
+     * Gets a collection of ChildHook objects related by a many-to-many relationship
+     * to the current object by way of the ignored_module_hook cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildHook[] List of ChildHook objects
+     */
+    public function getHooks($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collHooks || null !== $criteria) {
+            if ($this->isNew() && null === $this->collHooks) {
+                // return empty collection
+                $this->initHooks();
+            } else {
+                $collHooks = ChildHookQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collHooks;
+                }
+                $this->collHooks = $collHooks;
+            }
+        }
+
+        return $this->collHooks;
+    }
+
+    /**
+     * Sets a collection of Hook objects related by a many-to-many relationship
+     * to the current object by way of the ignored_module_hook cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $hooks A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function setHooks(Collection $hooks, ConnectionInterface $con = null)
+    {
+        $this->clearHooks();
+        $currentHooks = $this->getHooks();
+
+        $this->hooksScheduledForDeletion = $currentHooks->diff($hooks);
+
+        foreach ($hooks as $hook) {
+            if (!$currentHooks->contains($hook)) {
+                $this->doAddHook($hook);
+            }
+        }
+
+        $this->collHooks = $hooks;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildHook objects related by a many-to-many relationship
+     * to the current object by way of the ignored_module_hook cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildHook objects
+     */
+    public function countHooks($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collHooks || null !== $criteria) {
+            if ($this->isNew() && null === $this->collHooks) {
+                return 0;
+            } else {
+                $query = ChildHookQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByModule($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collHooks);
+        }
+    }
+
+    /**
+     * Associate a ChildHook object to this object
+     * through the ignored_module_hook cross reference table.
+     *
+     * @param  ChildHook $hook The ChildIgnoredModuleHook object to relate
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function addHook(ChildHook $hook)
+    {
+        if ($this->collHooks === null) {
+            $this->initHooks();
+        }
+
+        if (!$this->collHooks->contains($hook)) { // only add it if the **same** object is not already associated
+            $this->doAddHook($hook);
+            $this->collHooks[] = $hook;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    Hook $hook The hook object to add.
+     */
+    protected function doAddHook($hook)
+    {
+        $ignoredModuleHook = new ChildIgnoredModuleHook();
+        $ignoredModuleHook->setHook($hook);
+        $this->addIgnoredModuleHook($ignoredModuleHook);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$hook->getModules()->contains($this)) {
+            $foreignCollection   = $hook->getModules();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildHook object to this object
+     * through the ignored_module_hook cross reference table.
+     *
+     * @param ChildHook $hook The ChildIgnoredModuleHook object to relate
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeHook(ChildHook $hook)
+    {
+        if ($this->getHooks()->contains($hook)) {
+            $this->collHooks->remove($this->collHooks->search($hook));
+
+            if (null === $this->hooksScheduledForDeletion) {
+                $this->hooksScheduledForDeletion = clone $this->collHooks;
+                $this->hooksScheduledForDeletion->clear();
+            }
+
+            $this->hooksScheduledForDeletion[] = $hook;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
         $this->code = null;
+        $this->version = null;
         $this->type = null;
+        $this->category = null;
         $this->activate = null;
         $this->position = null;
         $this->full_namespace = null;
@@ -4349,6 +5552,7 @@ abstract class Module implements ActiveRecordInterface
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -4401,6 +5605,21 @@ abstract class Module implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collModuleHooks) {
+                foreach ($this->collModuleHooks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collModuleConfigs) {
+                foreach ($this->collModuleConfigs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collIgnoredModuleHooks) {
+                foreach ($this->collIgnoredModuleHooks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collModuleI18ns) {
                 foreach ($this->collModuleI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -4413,6 +5632,11 @@ abstract class Module implements ActiveRecordInterface
             }
             if ($this->collOrderCoupons) {
                 foreach ($this->collOrderCoupons as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collHooks) {
+                foreach ($this->collHooks as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -4429,9 +5653,13 @@ abstract class Module implements ActiveRecordInterface
         $this->collModuleImages = null;
         $this->collCouponModules = null;
         $this->collOrderCouponModules = null;
+        $this->collModuleHooks = null;
+        $this->collModuleConfigs = null;
+        $this->collIgnoredModuleHooks = null;
         $this->collModuleI18ns = null;
         $this->collCoupons = null;
         $this->collOrderCoupons = null;
+        $this->collHooks = null;
     }
 
     /**

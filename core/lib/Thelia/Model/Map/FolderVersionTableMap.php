@@ -167,7 +167,7 @@ class FolderVersionTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'folder', 'ID', true, null, null);
-        $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, null);
+        $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, 0);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

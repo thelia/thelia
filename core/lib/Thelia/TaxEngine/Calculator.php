@@ -16,6 +16,7 @@ use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Country;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
+use Thelia\Model\State;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\I18n;
@@ -39,16 +40,20 @@ class Calculator
 
     protected $product = null;
     protected $country = null;
+    protected $state = null;
+
 
     public function __construct()
     {
         $this->taxRuleQuery = new TaxRuleQuery();
     }
 
-    public function load(Product $product, Country $country)
+    public function load(Product $product, Country $country, State $state = null)
     {
         $this->product = null;
         $this->country = null;
+        $this->state = null;
+
         $this->taxRulesCollection = null;
 
         if ($product->getId() === null) {
@@ -60,13 +65,14 @@ class Calculator
 
         $this->product = $product;
         $this->country = $country;
+        $this->state = $state;
 
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product->getTaxRule(), $country);
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product->getTaxRule(), $country, $state);
 
         return $this;
     }
 
-    public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product)
+    public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null)
     {
         $this->product = null;
         $this->country = null;
@@ -84,13 +90,14 @@ class Calculator
 
         $this->country = $country;
         $this->product = $product;
+        $this->state = $state;
 
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule, $country);
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule, $country, $state);
 
         return $this;
     }
 
-    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country)
+    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
         $this->product = null;
         $this->country = null;
@@ -105,8 +112,9 @@ class Calculator
 
         $this->country = $country;
         $this->product = new Product();
+        $this->state = $state;
 
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule, $country);
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule, $country, $state);
 
         return $this;
     }
@@ -154,7 +162,6 @@ class Calculator
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
             $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
 
             if ($currentPosition !== $position) {
                 $taxedPrice += $currentTax;
@@ -162,7 +169,7 @@ class Calculator
                 $currentPosition = $position;
             }
 
-            $taxAmount = round($taxType->calculate($this->product, $taxedPrice), 2);
+            $taxAmount = $taxType->calculate($this->product, $taxedPrice);
             $currentTax += $taxAmount;
 
             if (null !== $taxCollection) {
@@ -209,7 +216,6 @@ class Calculator
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
             $taxType = $taxRule->getTypeInstance();
-            $taxType->loadRequirements( $taxRule->getRequirements() );
 
             if ($currentPosition !== $position) {
                 $untaxedPrice -= $currentFixTax;
@@ -221,7 +227,6 @@ class Calculator
 
             $currentFixTax += $taxType->fixAmountRetriever($this->product);
             $currentTaxFactor += $taxType->pricePercentRetriever();
-
         } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;

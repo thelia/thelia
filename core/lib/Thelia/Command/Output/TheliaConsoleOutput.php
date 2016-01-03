@@ -40,5 +40,4 @@ class TheliaConsoleOutput extends ConsoleOutput
 
         $this->writeln($output);
     }
-
 }

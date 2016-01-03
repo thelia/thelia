@@ -23,5 +23,4 @@ use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
  */
 class NotImplementedException extends BadMethodCallException
 {
-
 }

@@ -15,11 +15,14 @@ namespace Thelia\Core;
 /**
  * Class TheliaKernelEvents
  * @package Thelia\Core
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 final class TheliaKernelEvents
 {
-
     const SESSION = "thelia_kernel.session";
 
+
+    // -- Kernel Error Message Handle ---------------------------
+
+    const THELIA_HANDLE_ERROR = "thelia_kernel.handle_error";
 }

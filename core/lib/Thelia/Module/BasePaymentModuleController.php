@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Log\Tlog;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
@@ -40,7 +41,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
     abstract protected function getModuleCode();
 
     /**
-     * Initialize a module-specific logger.
+     * Returns the module-specific logger, initializing it if required.
      *
      * @return Tlog a Tlog instance
      */
@@ -49,14 +50,23 @@ abstract class BasePaymentModuleController extends BaseFrontController
         if ($this->log == null) {
             $this->log = Tlog::getNewInstance();
 
-            $logFilePath = sprintf(THELIA_ROOT."log".DS."%s.log", strtolower($this->getModuleCode()));
+            $logFilePath = $this->getLogFilePath();
 
             $this->log->setPrefix("#LEVEL: #DATE #HOUR: ");
             $this->log->setDestinations("\\Thelia\\Log\\Destination\\TlogDestinationFile");
             $this->log->setConfig("\\Thelia\\Log\\Destination\\TlogDestinationFile", 0, $logFilePath);
+            $this->log->setLevel(Tlog::INFO);
         }
 
         return $this->log;
+    }
+
+    /**
+     * @return string The path to the module's log file.
+     */
+    protected function getLogFilePath()
+    {
+        return sprintf(THELIA_ROOT."log".DS."%s.log", strtolower($this->getModuleCode()));
     }
 
     /**
@@ -64,6 +74,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * once the module has performed the required checks to confirm a valid payment.
      *
      * @param int $order_id the order ID
+     * @throws \Exception
      */
     public function confirmPayment($order_id)
     {
@@ -71,10 +82,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $order_id = intval($order_id);
 
             if (null !== $order = $this->getOrder($order_id)) {
-
                 $this->getLog()->addInfo(
-                    $this->getTranslator()->trans("Processing confirmation of order ref. %ref, ID %id",
-                    array('%ref' => $order->getRef(), '%id' => $order->getId()))
+                    $this->getTranslator()->trans(
+                        "Processing confirmation of order ref. %ref, ID %id",
+                        array('%ref' => $order->getRef(), '%id' => $order->getId())
+                    )
                 );
 
                 $event = new OrderEvent($order);
@@ -84,13 +96,16 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
 
                 $this->getLog()->addInfo(
-                    $this->getTranslator()->trans("Order ref. %ref, ID %id has been successfully paid.",
-                        array('%ref' => $order->getRef(), '%id' => $order->getId()))
+                    $this->getTranslator()->trans(
+                        "Order ref. %ref, ID %id has been successfully paid.",
+                        array('%ref' => $order->getRef(), '%id' => $order->getId())
+                    )
                 );
             }
         } catch (\Exception $ex) {
             $this->getLog()->addError(
-                $this->getTranslator()->trans("Error occured while processing order ref. %ref, ID %id: %err",
+                $this->getTranslator()->trans(
+                    "Error occured while processing order ref. %ref, ID %id: %err",
                     array(
                         '%err' => $ex->getMessage(),
                         '%ref' => ! isset($order) ? "?" : $order->getRef(),
@@ -115,8 +130,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
         if (null !== $order = $this->getOrder($order_id)) {
             $this->getLog()->addInfo(
-                $this->getTranslator()->trans("Processing cancelation of payment for order ref. %ref",
-                    array('%ref' => $order->getRef()))
+                $this->getTranslator()->trans(
+                    "Processing cancelation of payment for order ref. %ref",
+                    array('%ref' => $order->getRef())
+                )
             );
 
             $event = new OrderEvent($order);
@@ -124,8 +141,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $event->setStatus(OrderStatus::CODE_NOT_PAID);
 
             $this->getLog()->addInfo(
-                $this->getTranslator()->trans("Order ref. %ref is now unpaid.",
-                    array('%ref' => $order->getRef()))
+                $this->getTranslator()->trans(
+                    "Order ref. %ref is now unpaid.",
+                    array('%ref' => $order->getRef())
+                )
             );
 
             $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
@@ -140,7 +159,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
     protected function getOrder($order_id)
     {
         if (null == $order = OrderQuery::create()->findPk($order_id)) {
-            $this->getLog()->addError($this->getTranslator()->trans("Unknown order ID:  %id", array('%id' => $order_id)));
+            $this->getLog()->addError(
+                $this->getTranslator()->trans("Unknown order ID:  %id", array('%id' => $order_id))
+            );
         }
 
         return $order;
@@ -154,13 +175,15 @@ abstract class BasePaymentModuleController extends BaseFrontController
     {
         $this->getLog()->addInfo("Redirecting customer to payment success page");
 
-        $this->redirectToRoute(
-            'order.placed',
-            [],
-            [
-                'order_id' => $order_id
-            ],
-            Router::ABSOLUTE_PATH
+        throw new RedirectException(
+            $this->retrieveUrlFromRouteId(
+                'order.placed',
+                [],
+                [
+                    'order_id' => $order_id
+                ],
+                Router::ABSOLUTE_PATH
+            )
         );
     }
 
@@ -174,14 +197,16 @@ abstract class BasePaymentModuleController extends BaseFrontController
     {
         $this->getLog()->addInfo("Redirecting customer to payment failure page");
 
-        $this->redirectToRoute(
-            'order.failed',
-            [],
-            [
-                'order_id' => $order_id,
-                'message' => $message
-            ],
-            Router::ABSOLUTE_PATH
+        throw new RedirectException(
+            $this->retrieveUrlFromRouteId(
+                'order.failed',
+                [],
+                [
+                    'order_id' => $order_id,
+                    'message' => $message
+                ],
+                Router::ABSOLUTE_PATH
+            )
         );
     }
 }

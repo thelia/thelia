@@ -14,7 +14,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop name="currency_edit" type="currency" id="$currency_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="currency_edit" type="currency" id="$currency_id" backend_context="1" visible="*" lang="$edit_language_id"}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -22,6 +22,8 @@
                     <li><a href="{url path='/admin/configuration/currencies'}">{intl l="Currencies"}</a></li>
                     <li>{intl l='Editing currency "%name"' name="{$NAME}"}</li>
                 </ul>
+
+			{hook name="currency-edit.top" currency_id=$currency_id}
 
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
@@ -35,20 +37,20 @@
                                 <div class="col-md-12">
 
         						    {form name="thelia.admin.currency.modification"}
-        						    	<form method="POST" action="{url path='/admin/configuration/currencies/save'}" {form_enctype form=$form} class="clearfix">
+        						    	<form method="POST" action="{url path='/admin/configuration/currencies/save'}" {form_enctype} class="clearfix">
 
         	                                {* Be sure to get the currency ID, even if the form could not be validated *}
         	                                <input type="hidden" name="currency_id" value="{$currency_id}" />
 
                                         	{include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/currencies'}"}
 
-        						        	{form_hidden_fields form=$form}
+        						        	{form_hidden_fields}
 
-        						        	{form_field form=$form field='success_url'}
+        						        	{form_field field='success_url'}
         						        		<input type="hidden" name="{$name}" value="{url path='/admin/configuration/currencies'}" />
         						        	{/form_field}
 
-        			                        {form_field form=$form field='locale'}
+        			                        {form_field field='locale'}
         			                        	<input type="hidden" name="{$name}" value="{$edit_language_locale}" />
         			                        {/form_field}
 
@@ -56,22 +58,16 @@
 
         	                                <div class="col-md-6">
 
-        										{form_field form=$form field='name'}
-        								            <div class="form-group {if $error}has-error{/if}">
-        								                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-        												<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Currency name'}" placeholder="{intl l='Currency name'}" class="form-control">
-                                                        <span class="help-block">&nbsp;</span>
-        								            </div>
-        							            {/form_field}
+												{render_form_field field='name'}
 
-        										{form_field form=$form field='code'}
+        										{form_field field='code'}
         		                                    <div class="form-group {if $error}has-error{/if}">
-        		                                        <label for="{$label_attr.for}" class="control-label">
-                                                            {$label} :
-        		                                       	</label>
-                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Currency ISO 4217 Code'}" placeholder="{intl l='Code'}" class="form-control">
+														<label for="{$label_attr.for}" class="control-label">
+															{$label}{if $required} *{/if}
+														</label>
+                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder}" class="form-control">
                                                         <span class="help-block">
-                                                            <a title="{intl l='More information about ISO 4217'}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">List of ISO 4217 code</a>
+                                                            <a title="{$label_attr.help}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">{$label_attr.help}</a>
                                                         </span>
         		                                    </div>
         		                               	{/form_field}
@@ -79,27 +75,21 @@
         	                                </div>
 
                                             <div class="col-md-6">
+                                                {render_form_field field='symbol'}
 
-                                                {form_field form=$form field='symbol'}
-            	                                    <div class="form-group {if $error}has-error{/if}">
-            	                                        <label for="{$label_attr.for}" class="control-label">
-            	                                           {$label} :
-            	                                        </label>
-                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}" class="form-control">
-                                                        <span class="help-block">{intl l='The symbol, such as &#36;, £, &euro;...'}</span>
-            	                                    </div>
-                                                {/form_field}
+												{form_field field='format'}
+													<div class="form-group {if $error}has-error{/if}">
+														<label for="{$label_attr.for}" class="control-label">
+															{$label}{if $required} *{/if}
+														</label>
+														<input type="text" size="10" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder}" class="form-control">
+                                                        <span class="help-block">
+															{$label_attr.help}
+                                                        </span>
+													</div>
+												{/form_field}
 
-                                                {form_field form=$form field='rate'}
-            	                                    <div class="form-group {if $error}has-error{/if}">
-            	                                        <label for="{$label_attr.for}" class="control-label">
-            	                                           {$label} :
-             	                                        </label>
-                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Rate from Euro'}" placeholder="{intl l='Rate'}" class="form-control">
-                                                        <span class="help-block">The rate from Euro: Price in Euro x rate = Price in this currency</span>
-            	                                    </div>
-                                                {/form_field}
-
+												{render_form_field field='rate'}
                                             </div>
 
                                         </form>
@@ -112,6 +102,8 @@
         			</div>
 
         		</div>
+
+			{hook name="currency-edit.bottom" currency_id=$currency_id}
 
     		{/loop}
 
@@ -130,5 +122,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='currency-edit-js'}
+    {hook name="currency.edit-js" location="currency-edit-js" currency_id={$currency_id} }
 {/block}

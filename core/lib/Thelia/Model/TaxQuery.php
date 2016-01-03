@@ -16,4 +16,5 @@ use Thelia\Model\Base\TaxQuery as BaseTaxQuery;
  */
 class TaxQuery extends BaseTaxQuery
 {
-} // TaxQuery
+}
+// TaxQuery

@@ -13,12 +13,15 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
+use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -62,10 +65,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /** @var ConditionFactory $conditionFactory */
     protected $conditionFactory;
 
-    public function __construct(Request $request,
-        CouponFactory $couponFactory, CouponManager $couponManager,
-        ConditionInterface $noConditionRule, ConditionFactory $conditionFactory)
-    {
+    public function __construct(
+        Request $request,
+        CouponFactory $couponFactory,
+        CouponManager $couponManager,
+        ConditionInterface $noConditionRule,
+        ConditionFactory $conditionFactory
+    ) {
         $this->request = $request;
         $this->couponFactory = $couponFactory;
         $this->couponManager = $couponManager;
@@ -97,6 +103,24 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdate($coupon, $event);
     }
 
+    public function delete(CouponDeleteEvent $event)
+    {
+        $coupon = $event->getCoupon();
+
+        if (null === $coupon) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "The coupon id '%d' doesn't exist",
+                    $event->getCouponId()
+                )
+            );
+        }
+
+        $coupon->delete();
+
+        $event->setCoupon(null);
+    }
+
     /**
      * Occurring when a Coupon condition is about to be updated
      *
@@ -107,6 +131,21 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $modelCoupon = $event->getCouponModel();
 
         $this->createOrUpdateCondition($modelCoupon, $event);
+    }
+
+    /**
+     * Clear all coupons in session.
+     *
+     * @param Event $event
+     */
+    public function clearAllCoupons(Event $event)
+    {
+        // Tell coupons to clear any data they may have stored
+        $this->couponManager->clear();
+
+        $this->request->getSession()->setConsumedCoupons(array());
+
+        $this->updateOrderDiscount($event);
     }
 
     /**
@@ -123,7 +162,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $this->couponFactory->buildCouponFromCode($event->getCode());
 
         if ($coupon) {
-
             $isValid = $coupon->isMatching();
 
             if ($isValid) {
@@ -134,25 +172,25 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 if (!isset($consumedCoupons[$event->getCode()])) {
-
                     // Prevent accumulation of the same Coupon on a Checkout
                     $consumedCoupons[$event->getCode()] = $event->getCode();
 
                     $this->request->getSession()->setConsumedCoupons($consumedCoupons);
-
-                    $totalDiscount = $this->couponManager->getDiscount();
-
-                    $this->request
-                        ->getSession()
-                        ->getCart()
-                        ->setDiscount($totalDiscount)
-                        ->save();
-                    $this->request
-                        ->getSession()
-                        ->getOrder()
-                        ->setDiscount($totalDiscount)
-                    ;
                 }
+
+                $totalDiscount = $this->couponManager->getDiscount();
+
+                $this->request
+                    ->getSession()
+                    ->getSessionCart($event->getDispatcher())
+                    ->setDiscount($totalDiscount)
+                    ->save();
+
+                $this->request
+                    ->getSession()
+                    ->getOrder()
+                    ->setDiscount($totalDiscount)
+                ;
             }
         }
 
@@ -160,13 +198,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setDiscount($totalDiscount);
     }
 
-    public function updateOrderDiscount(/** @noinspection PhpUnusedParameterInspection */ $event)
+    public function updateOrderDiscount(Event $event)
     {
         $discount = $this->couponManager->getDiscount();
 
         $this->request
             ->getSession()
-            ->getCart()
+            ->getSessionCart($event->getDispatcher())
             ->setDiscount($discount)
             ->save();
 
@@ -251,7 +289,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $order = $event->getOrder();
 
         if ($this->couponManager->isCouponRemovingPostage($order)) {
-
             $order->setPostage(0);
 
             $event->setOrder($order);
@@ -270,7 +307,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
         if (is_array($consumedCoupons)) {
-
             $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
             $con->beginTransaction();
 
@@ -339,7 +375,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        $this->request->getSession()->setConsumedCoupons(array());
+        // Clear all coupons.
+        $event->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**
@@ -367,7 +404,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
+            TheliaEvents::COUPON_DELETE => array("delete", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
+            TheliaEvents::COUPON_CLEAR_ALL => array("clearAllCoupons", 128),
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
             TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 132),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),

@@ -41,7 +41,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function getDescription()
     {
-            return "Display logs in HTML format, on top of generated pages.";
+        return "Display logs in HTML format, on top of generated pages.";
     }
 
     public function getConfigs()
@@ -59,7 +59,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function write(&$res)
     {
-        $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->_logs)));
+        $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->logs)));
 
         $this->insertAfterBody($res, $block);
     }

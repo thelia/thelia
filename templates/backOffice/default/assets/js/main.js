@@ -2,45 +2,68 @@
     
     $(function(){
 
-        // -- Init datepicker --
-        if($('.date').length){
-            //$('.date').datepicker();
+        $('#side-menu').metisMenu();
+        
+        $(window).bind("load resize", function() {
+            topOffset = 52;
+            width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
+            if (width < 768) {
+                $('div.navbar-collapse').addClass('collapse');
+                topOffset = 104;
+            } else {
+                $('div.navbar-collapse').removeClass('collapse');
+            }
+
+            height = ((this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height) - 1;
+            height = height - topOffset;
+
+
+            if (height < 1) height = 1;
+            if (height > topOffset) {
+                $("#page-wrapper").css("min-height", (height - topOffset - 25) + "px");
+            }
+        });
+
+        var testModal = $(".modal-force-show");
+        if(testModal.length > 0) {
+            testModal.modal("show");
         }
 
-        // -- Init tablesorter --
-        /*if($('.tablesorter').length){
-            $('.tablesorter').tablesorter({                
-                widgets: ["filter", "stickyHeaders"],
-                widthFixed : false,
-                widgetOptions : {
-                    filter_cssFilter : 'input-medium form-control',
-                    filter_formatter : {
-                        
-                        2 : function($cell, indx){                            
-                            return $.tablesorter.filterFormatter.uiDateCompare( $cell, indx, {
-                                dateFormat: "dd/mm/yy",
-                                changeMonth : true,
-                                changeYear : true,
-                                compare : '='
-                            });
-                        },
-                        
-                        3 : function($cell, indx){
-                            return $.tablesorter.filterFormatter.uiRange( $cell, indx, {
-                                value: 1,
-                                min: 1,
-                                max: 50,
-                                delayed: true,
-                                valueToHeader: false,
-                                exactMatch: false
-                            });
-                        }
-                    }
+        // Autofocus first form field on modal
+        var $modal = $('.modal');
+        if ($modal.length > 0) {
+            $modal.on('shown.bs.modal', function() {
+                var $firstField = $('input:visible:first', $modal);
+                $firstField.focus();
+            });
+        }
+
+        // Init event trigger
+        var event = 'hover';
+
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            event = 'click';
+        }
+
+        // Toolbar managment
+        $('.btn-toolbar').each(function() {
+            var $btn = $(this),
+                $content = $btn.next('.toolbar-options');
+
+            $btn.toolbar({
+                event: event,
+                content: $content,
+                style: 'info',
+                position: 'right'
+            });
+
+            $('a', '.tool-items').on('click', function(){
+                // If you want to prevent a link is followed, add .no-follow-link class to your link
+                if (!$(this).attr('data-toggle') && !$(this).is('.no-follow-link')) {
+                    window.location = $(this).attr('href');
                 }
             });
-        }*/
-
-
+        });
 
         // -- Bootstrap tooltip --
         if($('[rel="tooltip"]').length){            
@@ -146,7 +169,7 @@
                 console.log('An error occurred while reading from JSON file');
             });
 
-        }
+        }                    
 
     });
     

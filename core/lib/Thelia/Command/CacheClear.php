@@ -15,18 +15,17 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Symfony\Component\Filesystem\Exception\IOException;
-
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ConfigQuery;
 
 /**
  * clear the cache
  *
  * Class CacheClear
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  *
  */
 class CacheClear extends ContainerAwareCommand
@@ -46,26 +45,46 @@ class CacheClear extends ContainerAwareCommand
                 'with-images',
                 null,
                 InputOption::VALUE_NONE,
-                'clear images generated in web/cache directory'
+                'clear images generated in `image_cache_dir_from_web_root` or web/cache/images directory'
+            )
+            ->addOption(
+                'with-documents',
+                null,
+                InputOption::VALUE_NONE,
+                'clear documents generated in `document_cache_dir_from_web_root` or web/cache/documents directory'
             )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
         $this->clearCache($cacheDir, $output);
 
-        if (!$input->getOption("without-assets")) {
-            $this->clearCache(THELIA_WEB_DIR . "assets", $output);
+        if (!$input->getOption('without-assets')) {
+            $this->clearCache(THELIA_WEB_DIR . ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
         }
 
         if ($input->getOption('with-images')) {
-            $this->clearCache(THELIA_CACHE_DIR, $output);
+            $this->clearCache(
+                THELIA_WEB_DIR . ConfigQuery::read(
+                    'image_cache_dir_from_web_root',
+                    'cache' . DS . 'images'
+                ),
+                $output
+            );
         }
 
+        if ($input->getOption('with-documents')) {
+            $this->clearCache(
+                THELIA_WEB_DIR . ConfigQuery::read(
+                    'document_cache_dir_from_web_root',
+                    'cache' . DS . 'documents'
+                ),
+                $output
+            );
+        }
     }
 
     protected function clearCache($dir, OutputInterface $output)
@@ -74,10 +93,7 @@ class CacheClear extends ContainerAwareCommand
 
         try {
             $cacheEvent = new CacheEvent($dir);
-            $this->
-                getContainer()
-                ->get('event_dispatcher')
-                ->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+            $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {
@@ -92,6 +108,5 @@ class CacheClear extends ContainerAwareCommand
         }
 
         $output->writeln(sprintf("<info>%s cache directory cleared successfully</info>", $dir));
-
     }
 }

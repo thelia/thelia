@@ -16,4 +16,5 @@ use Thelia\Model\Base\ContentQuery as BaseContentQuery;
  */
 class ContentQuery extends BaseContentQuery
 {
-} // ContentQuery
+}
+// ContentQuery

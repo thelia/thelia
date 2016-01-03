@@ -24,7 +24,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Form
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderPayment extends BaseForm
+class OrderPayment extends FirewallForm
 {
     protected function buildForm()
     {
@@ -35,10 +35,10 @@ class OrderPayment extends BaseForm
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyInvoiceAddress")
-                        )
-                    ))
-                )
+                            array($this, "verifyInvoiceAddress"),
+                        ),
+                    )),
+                ),
             ))
             ->add("payment-module", "integer", array(
                 "required" => true,
@@ -46,10 +46,20 @@ class OrderPayment extends BaseForm
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyPaymentModule")
-                        )
-                    ))
-                )
+                            array($this, "verifyPaymentModule"),
+                        ),
+                    )),
+                ),
+            ))
+            // Add terms & conditions
+            ->add("agreed", "checkbox", array(
+                "constraints" => array(
+                    new Constraints\IsTrue(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register."))),
+                ),
+                "label" => "Agreed",
+                "label_attr" => array(
+                    "for" => "agreed",
+                ),
             ));
     }
 

@@ -16,5 +16,5 @@ use Thelia\Model\Base\CartQuery as BaseCartQuery;
  */
 class CartQuery extends BaseCartQuery
 {
-
-} // CartQuery
+}
+// CartQuery

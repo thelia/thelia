@@ -1,6 +1,9 @@
+{hook name="tab-seo.top" id=$current_id type=$seoType}
+
+{form name="thelia.admin.seo"}
 <div class="form-container">
 
-    <form method="POST" action="{$formAction}" {form_enctype form=$form} class="clearfix">
+    <form method="POST" action="{$formAction}" {form_enctype} class="clearfix">
 
         {include
             file = "includes/inner-form-toolbar.html"
@@ -14,61 +17,25 @@
         <input type="hidden" name="current_id" value="{$current_id}">
         <input type="hidden" name="current_tab" value="seo">
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{$closeUrl}">
-        {/form_field}
+        {render_form_field field="success_url" value="{$success_url nofilter}"}
 
         {* Display error message if exist *}
-        {include file='includes/notifications.html' message=$form_error_message}
+        {include file='includes/notifications.html' message=$form_error_message alert_type="danger"}
 
-        {form_field form=$form field='url'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
-                    {$label} :{if $required} <span class="required">*</span>{/if}
-                </label>
-                <div class="input-group">
-                    <span class="input-group-addon">{$url_language|default:{config key="url_site"}}</span>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value}" title="{intl l='Rewritten URL'}" {if $required} aria-required="true" required{/if} class="form-control" placeholder="{intl l='Use the keyword phrase in your URL.'}">
-                </div>
+        {custom_render_form_field field='url'}
+            <div class="input-group">
+                <span class="input-group-addon">{$url_language|default:{config key="url_site"} nofilter}/</span>
+                <input type="text" {form_field_attributes field='url'}>
             </div>
-        {/form_field}
+        {/custom_render_form_field}
 
+        {render_form_field field="meta_title"}
+        {render_form_field field="meta_description"}
+        {render_form_field field="meta_keywords"}
 
-        {form_field form=$form field='meta_title'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
-                    {$label} :{if $required} <span class="required">*</span>{/if}
-                    <span class="label-help-block">{intl l='The HTML TITLE element is the most important element on your web page.'}</span>
-                </label>
-                <div class="control-input">
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Make sure that your title is clear, and contains many of the keywords within the page itself.'}">
-                </div>
-            </div>
-        {/form_field}
-
-        {form_field form=$form field='meta_description'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
-                    {$label} :{if $required} <span class="required">*</span>{/if}
-                    <span class="label-help-block">{intl l='Keep the most important part of your description in the first 150-160 characters.'}</span>
-                </label>
-
-                <textarea name="{$name}" id="{$label_attr.for}" rows="6"{if $required} aria-required="true" required{/if} placeholder="{intl l='Make sure it uses keywords found within the page itself.'}" class="form-control">{$value}</textarea>
-            </div>
-        {/form_field}
-
-        {form_field form=$form field='meta_keywords'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
-                    {$label} :{if $required} <span class="required">*</span>{/if}
-                    <span class="label-help-block">{intl l='You don\'t need to use commas or other punctuations.'}</span>
-                </label>
-
-                <textarea name="{$name}" id="{$label_attr.for}" rows="3"{if $required} aria-required="true" required{/if} placeholder="{intl l='Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.'}" class="form-control">{$value}</textarea>
-            </div>
-        {/form_field}
+        {hook name="tab-seo.update-form" id=$current_id type=$seoType}
 
         {include
             file = "includes/inner-form-toolbar.html"
@@ -80,3 +47,6 @@
 
     </form>
 </div>
+{/form}
+
+{hook name="tab-seo.bottom" id=$current_id type=$seoType}

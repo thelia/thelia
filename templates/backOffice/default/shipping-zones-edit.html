@@ -20,8 +20,10 @@
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping configuration for module "%name"' name="{$TITLE}"}</li>
+            <li>{intl l='Editing shipping configuration for module "%name"' name="{$CODE} - {$TITLE}"}</li>
         </ul>
+
+        {hook name="shipping-zones-edit.top" delivery_module_id=$delivery_module_id}
 
         <div class="row">
             <div class="col-md-12">
@@ -42,19 +44,19 @@
                     <div class="form-container clearfix">
                         <div class="col-md-4">
                             {ifloop rel="area.module.not_associated"}
-                            {form name="thelia.shopping_zone_area"}
+                            {form name="thelia.shipping_zone_area"}
                             <form method="POST" action="{url path="/admin/configuration/shipping_zones/area/add"}">
-                                {form_hidden_fields form=$form}
+                                {form_hidden_fields}
 
-                                {form_field form=$form field='success_url'}
-                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
+                                {form_field field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/%id" id=$delivery_module_id}" /> {* the url the user is redirected to on login success *}
                                 {/form_field}
 
-                                {form_field form=$form field='shipping_zone_id'}
+                                {form_field field='shipping_zone_id'}
                                 <input type="hidden" name="{$name}" value="{$delivery_module_id}" />
                                 {/form_field}
 
-                                {form_field form=$form field='area_id'}
+                                {form_field field='area_id'}
                                 <label class="control-label" for="{$label_attr.for}">{$label}</label>
                                 <div class="input-group">                                    
                                     <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
@@ -63,7 +65,7 @@
                                         {/loop}
                                     </select>
                                     <span class="input-group-btn">
-                                        <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add"}</button>
+                                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add"}</button>
                                     </span>
                                 </div>                                    
                                 {/form_field}
@@ -116,6 +118,8 @@
             </div>
         </div>
 
+        {hook name="shipping-zones-edit.bottom" delivery_module_id=$delivery_module_id}
+
         {/loop}
     </div>
 </div>  
@@ -124,20 +128,20 @@
 
     {capture "delete_zone_dialog"}
         {form name="thelia.shopping_zone_remove_area"}
-            {form_hidden_fields form=$form}
+            {form_hidden_fields}
 
-            {form_field form=$form field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
+            {form_field field='success_url'}
+                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/%id" id=$delivery_module_id}" /> {* the url the user is redirected to on login success *}
             {/form_field}
 
-            {form_field form=$form field='shipping_zone_id'}
+            {form_field field='shipping_zone_id'}
                 <input type="hidden" name="{$name}" value="{$delivery_module_id}" />
             {/form_field}
 
-            {form_field form=$form field='area_id'}
+            {form_field field='area_id'}
                 <input type="hidden" name="{$name}" value="" id="shipping-zone-id-delete" />
             {/form_field}
-            {module_include location='zone_delete_form'}
+            {hook name="zone.delete-form" location="zone_delete_form" module_id={$delivery_module_id} }
         {/form}
     {/capture}
 
@@ -154,9 +158,6 @@
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>        
-    {/javascripts}
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>        
     {/javascripts}
@@ -171,5 +172,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='shipping-zones-edit-js'}
+    {hook name="shipping-zones.edit-js" location="shipping-zones-edit-js" module_id={$delivery_module_id} }
 {/block}

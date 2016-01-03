@@ -31,7 +31,6 @@ class InvalidConditionValueException extends \RuntimeException
      */
     public function __construct($className, $parameter)
     {
-
         $message = 'Invalid Parameter for Condition ' . $className . ' on parameter ' . $parameter;
         Tlog::getInstance()->addError($message);
 

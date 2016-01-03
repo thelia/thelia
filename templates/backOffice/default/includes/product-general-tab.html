@@ -1,7 +1,7 @@
 <div class="form-container">
 
     {form name="thelia.admin.product.modification"}
-    <form method="POST" action="{url path='/admin/products/save'}" {form_enctype form=$form} class="clearfix">
+    <form method="POST" action="{url path='/admin/products/save'}" {form_enctype} class="clearfix">
 
         {include
             file = "includes/inner-form-toolbar.html"
@@ -11,22 +11,24 @@
             close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
         }
 
+        {hook name="product.modification.form_top" product_id=$ID}
+
         {* Be sure to get the product ID, even if the form could not be validated*}
         <input type="hidden" name="page" value="{$page}" />
         <input type="hidden" name="product_id" value="{$product_id}">
         <input type="hidden" name="current_tab" value="general">
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='id'}
+        {form_field field='id'}
             <input type="hidden" name="{$name}" value="{$value}">
         {/form_field}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
             <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}">
         {/form_field}
 
-        {form_field form=$form field='locale'}
+        {form_field field='locale'}
             <input type="hidden" name="{$name}" value="{$edit_language_locale}">
         {/form_field}
 
@@ -34,15 +36,13 @@
 
         <div class="row">
             <div class="col-md-8">
-                {form_field form=$form field='ref'}
+                {form_field field='ref'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="{$label_attr.for}" class="control-label">
                             {$label} :
                         </label>
                         <div class="control-input">
-                            {* If ref's 'value is not empty the field is disable and the value is sent with an hidden field *}
-                            <input type="text" id="{$label_attr.for}" {if $value}name="{$name}_disabled" disabled{else}name="{$name}"{/if} class="form-control" value="{$value}"{if $required} aria-required="true" required{/if}>
-                            {if $value}<input type="hidden" name="{$name}" value="{$value}">{/if}
+                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if}>
                         </div>
                     </div>
                 {/form_field}
@@ -51,8 +51,9 @@
             </div>
 
             <div class="col-md-4">
+                {hook name="product.modification.form-right.top" product_id=$ID}
 
-                {form_field form=$form field='default_category'}
+                {form_field field='default_category'}
                     <div class="form-group {if $error}has-error{/if}">
 
                         <label for="{$label_attr.for}" class="control-label">
@@ -60,9 +61,9 @@
                         </label>
 
                         <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                              <option value="0">{intl l="Top level"}</option>
+                              <option value="0" disabled>{intl l="Top level"}</option>
 
-                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
+                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0" return_url=false}
                                    <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{$TITLE}</option>
                               {/loop}
 
@@ -71,7 +72,57 @@
                      </div>
                 {/form_field}
 
-                {form_field form=$form field='visible'}
+                {form_field field='virtual'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l='Virtual product'}</label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VIRTUAL != 0}checked="checked"{/if}>
+                            {$label}
+                        </label>
+                    </div>
+                </div>
+                {/form_field}
+
+                <div id="virtual-product-file" class="{if $VIRTUAL == 0}hidden {/if}form-group {if $error}has-error{/if}">
+                    {if $PSE_COUNT == 1}
+                        {custom_render_form_field field='virtual_document_id'}
+                        <select {form_field_attributes field='virtual_document_id' extra_class='document-selector'} data-pse="{$PRODUCT_SALE_ELEMENT}" data-product="{$ID}">
+                            <option value="0">{intl l="No document"}</option>
+                            {loop name="virtual-documents" type="document" product=$ID visible="0" }
+                            <option value="{$ID}" {if $value == $ID}selected="selected"{/if}>{$TITLE} ({$DOCUMENT_FILE})</option>
+                            {/loop}
+                        </select>
+                        {/custom_render_form_field}
+                        <div id="virtual-product-message" class="{ifloop rel="virtual-documents"}hidden{/ifloop}">
+                            <div class="alert alert-warning">
+                                <p>
+                                    {intl l="There is no files to associate to your product. Only documents that are not visible can be selected !"}<br />
+                                    <a href='javascript:jQuery("#tab-documents").tab("show");'>{intl l="Add document to your product."}</a>
+                                </p>
+                            </div>
+                        </div>
+                    {else}
+                        {form_field field='virtual_document_id'}
+                            <input type="hidden" name="{$name}" value="-1" />
+                        {/form_field}
+                        <p>
+                            <a href="#prices" data-toggle="tab">{intl l="Associate files to your combinations"}</a>
+                        </p>
+                    {/if}
+                </div>
+
+                {custom_render_form_field field='brand_id'}
+                    <select {form_field_attributes field='brand_id'}>
+                        <option value="0">{intl l="No brand"}</option>
+
+                        {loop name="brand-list" type="brand" visible="*" return_url=false}
+                            <option value="{$ID}" {if $BRAND_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
+                        {/loop}
+                    </select>
+                {/custom_render_form_field}
+
+                {form_field field='visible'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
                         <div class="checkbox">
@@ -82,8 +133,12 @@
                         </div>
                     </div>
                 {/form_field}
+
+                {hook name="product.modification.form-right.bottom" product_id=$ID}
             </div>
         </div>
+
+        {hook name="product.modification.form_bottom" product_id=$ID}
 
         {include
             file = "includes/inner-form-toolbar.html"

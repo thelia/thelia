@@ -17,10 +17,10 @@
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping zones"}</a></li>
+            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping configuration"}</a></li>
         </ul>
 
-        {module_include location='shipping_zones_top'}
+        {hook name="shipping-zones.top" location="shipping_zones_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -32,7 +32,7 @@
                             <div class="alert alert-warning">
                                 {intl l='<strong>Warning</strong>, some of your shipping zones are not attached to any delivery module:'}
                                 {loop name="area-not-attached" type="area" unassigned=true}
-                                    <a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}" title="{intl l='Edit this delivery zone'}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{else}.{/if}
+                                    <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}" title="{intl l='Edit this delivery zone'}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{else}.{/if}
                                 {/loop}
                             </div>
                         </div>
@@ -43,7 +43,7 @@
                         <table class="table table-striped table-condensed table-left-aligned">
 
                             <caption>
-                               {intl l='Shipping zones'}
+                               {intl l='Shipping configuration'}
                             </caption>
 
                             <thead>
@@ -51,7 +51,7 @@
                                     <th>{intl l="Delivery module"}</th>
                                     <th>{intl l="Shipping zones for this module"}</th>
 
-                                   {module_include location='shipping_zones_table_header'}
+                                   {hook name="shipping-zones.table-header" location="shipping_zones_table_header" }
 
                                    <th class="text-center">{intl l="Actions"}</th>
     	                        </tr>
@@ -60,32 +60,42 @@
                             <tbody>
                                 {loop type="module" module_type="2" active="*" name="delivery.list" backend_context="1"}
                                 <tr>
-                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$TITLE}</a></td>
+                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$CODE} - {$TITLE}</a></td>
                                     <td>
                                         {loop name="area.module.associated" type="area" with_zone=$ID backend_context="1"}
                                             {$countries = ''}
-                                            {loop name="country-area" type="country" area=$ID backend_context="1"}
+                                            {loop name="country-area" type="country" area=$ID backend_context="1" visible="*"}
                                                 {$countries = "$countries, $TITLE"}
                                             {/loop}
                                             {$countries = ltrim($countries, ', ')}
 
-                                            <a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}" title="{$countries}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+                                            <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}" title="{$countries}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
                                         {/loop}
                                         {elseloop rel="area.module.associated"}
                                             {intl l="There are no shipping zones attached to this module."}
                                         {/elseloop}
                                     </td>
-                                    {module_include location='shipping_zones_table_row'}
+                                    {hook name="shipping-zones.table-row" location="shipping_zones_table_row" module_id={$ID} }
 
                                     <td class="text-center">
                                         <div class="btn-group">
                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-zone" access="UPDATE"}
-                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                            {/loop}
                                         </div>
                                     </td>
                                 </tr>
                                 {/loop}
+
+                                {elseloop rel="delivery.list"}
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="alert alert-info">
+                                                {intl l="No shipping zone defined yet. Click the + button to create one."}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
                             </tbody>
                         </table>
                     </div>
@@ -93,12 +103,12 @@
             </div>
         </div>
 
-        {module_include location='shipping_zones_bottom'}
+        {hook name="shipping-zones.bottom" location="shipping_zones_bottom" }
 
     </div>
 </div>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='shipping-zones-js'}
+    {hook name="shipping-zones.js" location="shipping-zones-js" }
 {/block}

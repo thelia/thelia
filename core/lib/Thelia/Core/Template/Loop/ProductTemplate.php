@@ -16,12 +16,11 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\TemplateQuery;
+use Thelia\Model\Template as TemplateModel;
 
 /**
  *
@@ -31,6 +30,10 @@ use Thelia\Model\TemplateQuery;
  * Class Template
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
  */
 class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -67,21 +70,21 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TemplateModel $template */
         foreach ($loopResult->getResultDataCollection() as $template) {
-
             $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow
                 ->set("ID", $template->getId())
-                ->set("IS_TRANSLATED" , $template->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE" , $this->locale)
-                ->set("NAME" , $template->getVirtualColumn('i18n_NAME'))
+                ->set("IS_TRANSLATED", $template->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("NAME", $template->getVirtualColumn('i18n_NAME'))
             ;
+            $this->addOutputFields($loopResultRow, $template);
 
             $loopResult->addRow($loopResultRow);
         }

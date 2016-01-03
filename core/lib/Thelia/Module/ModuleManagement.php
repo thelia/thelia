@@ -15,81 +15,151 @@ namespace Thelia\Module;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use SplFileInfo;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Thelia\Exception\InvalidModuleException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleI18n;
 use Thelia\Model\ModuleQuery;
 
 /**
  * Class ModuleManagement
  * @package Thelia\Module
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleManagement
 {
     protected $baseModuleDir;
     protected $reflected;
 
+    /** @var ModuleDescriptorValidator $descriptorValidator */
+    protected $descriptorValidator;
+
     public function __construct()
     {
         $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
-    public function updateModules()
+    public function updateModules(ContainerInterface $container)
     {
         $finder = new Finder();
 
         $finder
             ->name('module.xml')
-            ->in($this->baseModuleDir . '/*/Config');
+            ->in($this->baseModuleDir . '*'.DS.'Config');
 
-        $descriptorValidator = new ModuleDescriptorValidator();
+        $errors = [];
+
         foreach ($finder as $file) {
-            $content = $descriptorValidator->getDescriptor($file->getRealPath());
-            $reflected = new \ReflectionClass((string) $content->fullnamespace);
-            $code = basename(dirname($reflected->getFileName()));
-            if (null === ModuleQuery::create()->filterByCode($code)->findOne()) {
-                $module = new Module();
-                $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
-                $con->beginTransaction();
-                try {
-                    $module
-                        ->setCode($code)
-                        ->setFullNamespace((string) $content->fullnamespace)
-                        ->setType($this->getModuleType($reflected))
-                        ->setActivate(0)
-                        ->save($con);
+            try {
+                $this->updateModule($file, $container);
+            } catch (\Exception $ex) {
+                // Guess module code
+                $moduleCode = basename(dirname(dirname($file)));
 
-                    $this->saveDescription($module, $content, $con);
-
-                    $con->commit();
-                } catch (PropelException $e) {
-                    $con->rollBack();
-                    throw $e;
-                }
-
+                $errors[$moduleCode] = $ex;
             }
+        }
+
+        if (count($errors) > 0) {
+            throw new InvalidModuleException($errors);
         }
     }
 
-    private function saveDescription(Module $module,\SimpleXMLElement $content, ConnectionInterface $con)
+    /**
+     * Update module information, and invoke install() for new modules (e.g. modules
+     * just discovered), or update() modules for which version number ha changed.
+     *
+     * @param SplFileInfo $file the module.xml file descriptor
+     * @param ContainerInterface $container the container
+     *
+     * @return Module
+     *
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function updateModule($file, ContainerInterface $container)
     {
+        $descriptorValidator = $this->getDescriptorValidator();
 
-        foreach ($content->descriptive as $description) {
-            $locale = $description->attributes()->locale;
+        $content   = $descriptorValidator->getDescriptor($file->getRealPath());
+        $reflected = new \ReflectionClass((string)$content->fullnamespace);
+        $code      = basename(dirname($reflected->getFileName()));
+        $version   = (string)$content->version;
 
-            $moduleI18n = new ModuleI18n();
+        $module = ModuleQuery::create()->filterByCode($code)->findOne();
 
-            $moduleI18n
-                ->setLocale($locale)
-                ->setModule($module)
-                ->setTitle($description->title)
-                ->setDescription(isset($description->description)?$description->description:null)
-                ->setPostscriptum(isset($description->postscriptum)?$description->postscriptum:null)
-                ->setChapo(isset($description->subtitle)?$description->subtitle:null)
-                ->save($con);
+        if (null === $module) {
+            $module = new Module();
+            $module->setActivate(0);
+
+            $action = 'install';
+        } elseif ($version !== $module->getVersion()) {
+            $currentVersion = $module->getVersion();
+            $action = 'update';
+        } else {
+            $action = 'none';
         }
+
+        $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            $module
+                ->setCode($code)
+                ->setVersion($version)
+                ->setFullNamespace((string)$content->fullnamespace)
+                ->setType($this->getModuleType($reflected))
+                ->setCategory((string)$content->type)
+                ->save($con);
+
+            // Update the module images, title and description when the module is installed, but not after
+            // as these data may have been modified byt the administrator
+            if ('install' === $action) {
+                $this->saveDescription($module, $content, $con);
+
+                if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
+                    /** @var \Thelia\Module\BaseModule $moduleInstance */
+                    $moduleInstance = $reflected->newInstance();
+                    $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string) $content->{"images-folder"};
+                    $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
+                }
+            }
+
+            // Tell the module to install() or update()
+            $instance = $module->createInstance();
+
+            $instance->setContainer($container);
+
+            if ($action == 'install') {
+                $instance->install($con);
+            } elseif ($action == 'update') {
+                $instance->update($currentVersion, $version, $con);
+            }
+
+            $con->commit();
+        } catch (\Exception $ex) {
+            Tlog::getInstance()->addError("Failed to update module ".$module->getCode(), $ex);
+
+            $con->rollBack();
+            throw $ex;
+        }
+
+        return $module;
+    }
+
+    /**
+     * @return \Thelia\Module\ModuleDescriptorValidator
+     */
+    public function getDescriptorValidator()
+    {
+        if (null === $this->descriptorValidator) {
+            $this->descriptorValidator = new ModuleDescriptorValidator();
+        }
+
+        return $this->descriptorValidator;
     }
 
     private function getModuleType(\ReflectionClass $reflected)
@@ -101,7 +171,20 @@ class ModuleManagement
         } else {
             return BaseModule::CLASSIC_MODULE_TYPE;
         }
-
     }
 
+    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con)
+    {
+        foreach ($content->descriptive as $description) {
+            $locale = (string)$description->attributes()->locale;
+
+            $module
+                ->setLocale($locale)
+                ->setTitle($description->title)
+                ->setDescription(isset($description->description) ? $description->description : null)
+                ->setPostscriptum(isset($description->postscriptum) ? $description->postscriptum : null)
+                ->setChapo(isset($description->subtitle) ? $description->subtitle : null)
+                ->save($con);
+        }
+    }
 }

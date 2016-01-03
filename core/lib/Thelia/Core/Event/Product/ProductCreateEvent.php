@@ -19,11 +19,14 @@ class ProductCreateEvent extends ProductEvent
     protected $locale;
     protected $default_category;
     protected $visible;
+    protected $virtual;
 
     protected $basePrice;
     protected $baseWeight;
     protected $taxRuleId;
     protected $currencyId;
+    protected $baseQuantity;
+    protected $templateId;
 
     public function getRef()
     {
@@ -85,6 +88,18 @@ class ProductCreateEvent extends ProductEvent
         return $this;
     }
 
+    public function setVirtual($virtual)
+    {
+        $this->virtual = $virtual;
+
+        return $this;
+    }
+
+    public function getVirtual()
+    {
+        return $this->virtual;
+    }
+
     public function getBasePrice()
     {
         return $this->basePrice;
@@ -130,6 +145,102 @@ class ProductCreateEvent extends ProductEvent
     {
         $this->currencyId = $currencyId;
 
+        return $this;
+    }
+
+    /**
+     * This method is an alias of setBasePrice and used by the event when binding a form
+     *
+     * @param float $price price for this new product
+     * @return $this
+     * @see setBasePrice
+     */
+    public function setPrice($price)
+    {
+        return $this->setBasePrice($price);
+    }
+
+    /**
+     * This method is an alias of setBaseWeight and used by the event when binding a form
+     *
+     * @param float $weight
+     * @return $this
+     * @see setBaseWeight
+     */
+    public function setWeight($weight)
+    {
+        return $this->setBaseWeight($weight);
+    }
+
+    /**
+     * This method is an alias of setCurrencyId and used by the event when binding a form
+     *
+     * @param $currencyId
+     * @return $this
+     * @see setCurrencyId
+     */
+    public function setCurrency($currencyId)
+    {
+        return $this->setCurrencyId($currencyId);
+    }
+
+    /**
+     * This method is an alias of setTaxRuleId and used by the event when binding a form
+     *
+     * @param $taxRuleId
+     * @return $this
+     * @see setTaxRuleId
+     */
+    public function setTaxRule($taxRuleId)
+    {
+        return $this->setTaxRuleId($taxRuleId);
+    }
+
+    /**
+     * @return integer
+     */
+    public function getBaseQuantity()
+    {
+        return $this->baseQuantity;
+    }
+
+    /**
+     * @param integer $baseQuantity
+     * @return $this
+     */
+    public function setBaseQuantity($baseQuantity)
+    {
+        $this->baseQuantity = $baseQuantity;
+        return $this;
+    }
+
+    /**
+     * This method is an alias of setBaseQuantity and used by the event when binding a form
+     *
+     * @param integer $quantity quantity for this new product
+     * @return $this
+     * @see setBaseQuantity
+     */
+    public function setQuantity($quantity)
+    {
+        return $this->setBaseQuantity($quantity);
+    }
+
+    /**
+     * @return integer
+     */
+    public function getTemplateId()
+    {
+        return $this->templateId;
+    }
+
+    /**
+     * @param integer $templateId
+     * @return $this
+     */
+    public function setTemplateId($templateId)
+    {
+        $this->templateId = $templateId;
         return $this;
     }
 }

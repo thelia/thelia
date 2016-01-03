@@ -29,28 +29,20 @@ class TaxCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected $taxEngine = null;
-
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array(), TaxEngine $taxEngine = null)
-    {
-        $this->taxEngine = $taxEngine;
-
-        parent::__construct($request, $type, $data, $options);
-    }
-
     protected function buildForm($change_mode = false)
     {
-        if ($this->taxEngine == null) {
-            throw new \LogicException(Translator::getInstance()->trans("The TaxEngine should be passed to this form before using it."));
+        if (! $this->container) {
+            throw new \LogicException(Translator::getInstance()->trans("The container should not be null in this form. Please use the FormFactory to get an instance."));
         }
+        /** @var TaxEngine $taxEngine */
+        $taxEngine = $this->container->get('thelia.taxEngine');
 
-        $types = $this->taxEngine->getTaxTypeList();
+        $types = $taxEngine->getTaxTypeList();
 
         $typeList = array();
         $requirementList = array();
 
         foreach ($types as $classname) {
-
             $instance = new $classname();
 
             $typeList[Tax::escapeTypeName($classname)] = $instance->getTitle();
@@ -60,7 +52,7 @@ class TaxCreationForm extends BaseForm
 
         $this->formBuilder
             ->add("locale", "text", array(
-                "constraints" => array(new NotBlank())
+                "constraints" => array(new NotBlank()),
             ))
             ->add("type", "choice", array(
                 "choices" => $typeList,
@@ -78,7 +70,7 @@ class TaxCreationForm extends BaseForm
                 $this->formBuilder
                     // Replace the '\' in the class name by hyphens
                     // See TaxController::getRequirements if some changes are made about this.
-                    ->add(Tax::escapeTypeName($name) . ':' . $requirement->getName(), new TheliaType(), array(
+                    ->add(Tax::escapeTypeName($name).':'.$requirement->getName(), new TheliaType(), array(
                         //"instance" => $requirement->getType(),
                         "constraints" => array(
                             new Constraints\Callback(

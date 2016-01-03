@@ -9,6 +9,8 @@ use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Module\BaseModuleInterface;
+use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\PaymentModuleInterface;
 
 class Module extends BaseModule
 {
@@ -35,7 +37,8 @@ class Module extends BaseModule
 
     public function getAbsoluteBackOfficeTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
             $subdir
@@ -44,7 +47,8 @@ class Module extends BaseModule
 
     public function getAbsoluteBackOfficeI18nTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
             $subdir
@@ -58,7 +62,8 @@ class Module extends BaseModule
 
     public function getAbsoluteFrontOfficeTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
             $subdir
@@ -67,7 +72,8 @@ class Module extends BaseModule
 
     public function getAbsoluteFrontOfficeI18nTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
             $subdir
@@ -79,8 +85,59 @@ class Module extends BaseModule
         return $this->getTranslationDomain(). '.fo.' . $templateName;
     }
 
+    public function getAbsolutePdfTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteTemplateBasePath(),
+            TemplateDefinition::PDF_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getAbsolutePdfI18nTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteI18nPath(),
+            TemplateDefinition::PDF_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getPdfTemplateTranslationDomain($templateName)
+    {
+        return $this->getTranslationDomain(). '.pdf.' . $templateName;
+    }
+
+
+    public function getAbsoluteEmailTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteTemplateBasePath(),
+            TemplateDefinition::EMAIL_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getAbsoluteEmailI18nTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteI18nPath(),
+            TemplateDefinition::EMAIL_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getEmailTemplateTranslationDomain($templateName)
+    {
+        return $this->getTranslationDomain(). '.email.' . $templateName;
+    }
+
     /**
-     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */
     public function getBaseDir()
     {
@@ -88,7 +145,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */
     public function getAbsoluteBaseDir()
     {
@@ -96,7 +153,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's config directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's config directory path, relative to THELIA_MODULE_DIR
      */
     public function getConfigPath()
     {
@@ -104,7 +161,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's config absolute directory path
+     * @return string the module's config absolute directory path
      */
     public function getAbsoluteConfigPath()
     {
@@ -112,7 +169,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's i18N directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's i18N directory path, relative to THELIA_MODULE_DIR
      */
     public function getI18nPath()
     {
@@ -120,7 +177,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's i18N absolute directory path
+     * @return string the module's i18N absolute directory path
      */
     public function getAbsoluteI18nPath()
     {
@@ -128,7 +185,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's AdminIncludes absolute directory path
+     * @return string the module's AdminIncludes absolute directory path
      */
     public function getAbsoluteAdminIncludesPath()
     {
@@ -136,7 +193,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's AdminIncludes i18N absolute directory path
+     * @return string the module's AdminIncludes i18N absolute directory path
      */
     public function getAbsoluteAdminIncludesI18nPath()
     {
@@ -185,6 +242,14 @@ class Module extends BaseModule
     }
 
     /**
+     * @return bool true if the module image has been deployed, false otherwise.
+     */
+    public function isModuleImageDeployed()
+    {
+        return ModuleImageQuery::create()->filterByModuleId($this->getId())->count() > 0;
+    }
+
+    /**
      * @param  ContainerInterface        $container the Thelia container
      * @return BaseModuleInterface       a module instance
      * @throws \InvalidArgumentException if the module could not be found in the container/
@@ -199,8 +264,40 @@ class Module extends BaseModule
 
         return $instance;
     }
+
     /**
-     * @return BaseModule a new module instance.
+     * @param  ContainerInterface        $container the Thelia container
+     * @return DeliveryModuleInterface   a module instance
+     * @throws \InvalidArgumentException if the module could not be found in the container/
+     */
+    public function getDeliveryModuleInstance(ContainerInterface $container)
+    {
+        $instance = $this->getModuleInstance($container);
+
+        if (! $instance instanceof DeliveryModuleInterface) {
+            throw new \InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param  ContainerInterface        $container the Thelia container
+     * @return PaymentModuleInterface    a payment module instance
+     * @throws \InvalidArgumentException if the module is not found or not a payment module
+     */
+    public function getPaymentModuleInstance(ContainerInterface $container)
+    {
+        $instance = $this->getModuleInstance($container);
+
+        if (! $instance instanceof PaymentModuleInterface) {
+            throw new \InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
+        }
+
+        return $instance;
+    }
+    /**
+     * @return \Thelia\Module\BaseModule a new module instance.
      */
     public function createInstance()
     {
@@ -211,6 +308,8 @@ class Module extends BaseModule
 
     /**
      * Calculate next position relative to module type
+     *
+     * @param ModuleQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
     {

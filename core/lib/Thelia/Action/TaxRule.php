@@ -39,7 +39,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
 
         $taxRule->save();
 
-        $event->setTaxRule($taxRule);
+        $event->setTaxRule($taxRule)->setId($taxRule->getId());
     }
 
     /**
@@ -48,7 +48,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function update(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             $taxRule
                 ->setDispatcher($event->getDispatcher())
                 ->setLocale($event->getLocale())
@@ -68,24 +67,34 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
 
-            $taxList = json_decode($event->getTaxList(), true);
+            $taxList = $this->getArrayFromJson($event->getTaxList());
+            $countryList = $this->getArrayFromJson($event->getCountryList());
+            $countryDeletedList = $this->getArrayFromJson($event->getCountryDeletedList());
 
-            /* clean the current tax rule for the countries */
-            TaxRuleCountryQuery::create()
-                ->filterByTaxRule($taxRule)
-                ->filterByCountryId($event->getCountryList(), Criteria::IN)
-                ->delete();
+            /* clean the current tax rule for the countries/states */
+            $deletes = array_merge($countryList, $countryDeletedList);
+            foreach ($deletes as $item) {
+                TaxRuleCountryQuery::create()
+                    ->filterByTaxRule($taxRule)
+                    ->filterByCountryId(intval($item[0]), Criteria::EQUAL)
+                    ->filterByStateId(intval($item[1]) !== 0 ? $item[1] : null, Criteria::EQUAL)
+                    ->delete();
+            }
 
             /* for each country */
-            foreach ($event->getCountryList() as $country) {
+            foreach ($countryList as $item) {
                 $position = 1;
+                $countryId = intval($item[0]);
+                $stateId = intval($item[1]);
+
                 /* on applique les nouvelles regles */
                 foreach ($taxList as $tax) {
                     if (is_array($tax)) {
                         foreach ($tax as $samePositionTax) {
                             $taxModel = new TaxRuleCountry();
                             $taxModel->setTaxRule($taxRule)
-                                ->setCountryId($country)
+                                ->setCountryId($countryId)
+                                ->setStateId($stateId ?: null)
                                 ->setTaxId($samePositionTax)
                                 ->setPosition($position);
                             $taxModel->save();
@@ -93,7 +102,8 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                     } else {
                         $taxModel = new TaxRuleCountry();
                         $taxModel->setTaxRule($taxRule)
-                            ->setCountryId($country)
+                            ->setCountryId($countryId)
+                            ->setStateId($stateId ?: null)
                             ->setTaxId($tax)
                             ->setPosition($position);
                         $taxModel->save();
@@ -106,13 +116,19 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    protected function getArrayFromJson($obj)
+    {
+        return is_array($obj)
+            ? $obj
+            : json_decode($obj, true);
+    }
+
     /**
      * @param TaxRuleEvent $event
      */
     public function delete(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             $taxRule
                 ->delete()
             ;
@@ -127,7 +143,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function setDefault(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             TaxRuleQuery::create()->update(array(
                 "IsDefault" => 0
             ));

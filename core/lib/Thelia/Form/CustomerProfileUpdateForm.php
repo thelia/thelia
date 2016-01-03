@@ -14,6 +14,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -23,7 +24,6 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerProfileUpdateForm extends CustomerCreateForm
 {
-
     protected function buildForm()
     {
         parent::buildForm();
@@ -44,8 +44,22 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             // Remove Login Information
             ->remove("password")
             ->remove("password_confirm")
-            // Remove Terms & conditions
-            ->remove("agreed");
+        ;
+
+        $customerCanChangeEmail = ConfigQuery::read("customer_change_email");
+        $emailConfirmation = ConfigQuery::read("customer_confirm_email");
+
+        if (! $customerCanChangeEmail) {
+            $currentOptions = $this->formBuilder->get("email")->getOptions();
+            $currentOptions["constraints"] = [];
+            $currentOptions["required"] = false;
+
+            $this->formBuilder->remove("email")->add("email", "text", $currentOptions);
+        }
+
+        if ($this->formBuilder->has("email_confirm") && ! ($customerCanChangeEmail && $emailConfirmation)) {
+            $this->formBuilder->remove("email_confirm");
+        }
     }
 
     /**

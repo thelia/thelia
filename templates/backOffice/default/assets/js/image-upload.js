@@ -11,11 +11,11 @@ $(function($){
         $.imageUploadManager.onClickModal();
         $.imageUploadManager.onModalHidden();
         $.imageUploadManager.sortImage();
+        $.imageUploadManager.onClickToggleVisibilityImage();
 
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
-            maxFilesize: 8,
             acceptedFiles: 'image/png, image/gif, image/jpeg'
         });    
 
@@ -42,6 +42,7 @@ $(function($){
             imageDropzone.removeFile(file);
             $.imageUploadManager.updateImageListAjax();
             $.imageUploadManager.onClickDeleteImage();
+            $.imageUploadManager.onClickToggleVisibilityImage();
         });
         
               
@@ -68,6 +69,7 @@ $(function($){
                 );
                 $.imageUploadManager.onClickDeleteImage();
                 $.imageUploadManager.sortImage();
+                $.imageUploadManager.onClickToggleVisibilityImage();
             });
     };
 
@@ -113,8 +115,6 @@ $(function($){
                     }
                 }
             }).done(function(data) {
-                $('#image_delete_dialog').modal("hide");
-                $("#submit-delete-image").data("element-id", "");
                 $greatParent.remove();
                 $(".image-manager .message").html(
                     data
@@ -124,12 +124,38 @@ $(function($){
                 $( "#js-sort-image").children('li').each(function(position, element) {
                     $(element).find('.js-sorted-position').html(position + 1);
                 });
-            }).fail(function(){
+            }).always(function(){
                 $('#image_delete_dialog').modal("hide");
                 $("#submit-delete-image").data("element-id", "");
-            })
+            });
+        });
+    };
 
-            ;
+    // toggle document on click
+    $.imageUploadManager.onClickToggleVisibilityImage = function() {
+        $('.image-manager').on('click', '.image-toggle-btn', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var $url = $this.attr("href");
+            var errorMessage = $this.attr("data-error-message");
+            $.ajax({
+                type: "GET",
+                url: $url,
+                statusCode: {
+                    404: function() {
+                        $(".image-manager .message").html(
+                            errorMessage
+                        );
+                    }
+                }
+            }).done(function(data) {
+                $(".image-manager .message").html(
+                    data
+                );
+
+                $this.toggleClass("visibility-visible");
+            });
+            return false;
         });
     };
 

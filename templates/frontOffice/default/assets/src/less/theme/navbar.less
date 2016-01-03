@@ -1,0 +1,60 @@
+// Thelia: Navbars
+.navbar {
+    &.navbar-secondary {
+        z-index: 1001;
+    }
+
+    // Subnav Links
+    @media (min-width: @grid-float-breakpoint) {
+        .list-subnav {
+            background-color: @navbar-subnav-bg;
+            border: 1px solid @navbar-subnav-border;
+            border-radius: @navbar-subnav-border-radius;
+            .box-shadow(@navbar-subnav-shadow);
+
+            // Links within the sub navigation
+            > li > a {
+                color: @navbar-subnav-link-color;
+                padding: @navbar-subnav-link-padding;
+
+                // Hover/Focus state
+                &:hover,
+                &:focus {
+                    color: @navbar-subnav-link-hover-color;
+                    background-color: @navbar-subnav-link-hover-bg;
+                }
+            }
+
+            // Active state
+            > .active > a {
+                &,
+                &:hover,
+                &:focus {
+                    background-color: @navbar-subnav-link-hover-bg;
+                    color: @navbar-subnav-link-hover-color;
+                }
+            }
+        }
+    }
+
+    // Subnav Full width
+    .full-width {
+        .dropdown-menu {
+            .dropdown-content {
+                padding: 20px;
+                .dropdown-subheading {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
+// Icons (Accordion and Dropdown)
+//.accordion-toggle,
+.js .dropdown-toggle {
+    &:after {
+        .fa-icon();
+        content: @fa-var-chevron-down;
+    }
+}

@@ -22,7 +22,7 @@ use Thelia\Core\Translation\Translator;
  * Take care of integration tests (database connection)
  *
  * @package Thelia\Install
- * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
 class CheckDatabaseConnection extends BaseInstall
@@ -80,7 +80,6 @@ class CheckDatabaseConnection extends BaseInstall
      */
     public function exec()
     {
-
         $dsn = "mysql:host=%s;port=%s";
 
         try {
@@ -90,7 +89,6 @@ class CheckDatabaseConnection extends BaseInstall
                 $this->password
             );
         } catch (\PDOException $e) {
-
             $this->validationMessages = 'Wrong connection information';
 
             $this->isValid = false;
@@ -103,5 +101,4 @@ class CheckDatabaseConnection extends BaseInstall
     {
         return $this->connection;
     }
-
 }

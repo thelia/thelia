@@ -4,11 +4,16 @@ A generic document upload form
 Parameters:
     documentType    = Document type (category, product, folder, content, module)
     parentId        = Document parent id, ex: category id
+    resource        = Document parent resource name
 
 *}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
+{hook name="tab-image.top" id=$parentId type=$documentType}
 
 <div class="document-manager" >
-    <form action="{url path="/admin/document/type/$documentType/$parentId/save-ajax"}" method="post" class="dropzone" id="documents-dropzone" enctype="multipart/form-data">
+    <form action="{url path="/admin/document/type/%document/%id/save-ajax" document=$documentType id=$parentId}" method="post" class="dropzone" id="documents-dropzone" enctype="multipart/form-data">
         <div class="fallback">
             <input name="file" type="file" />
             <button type="submit" class="btn btn-info btn-upload"><span class="glyphicon glyphicon-send"></span> {intl l="Send files"}</button>
@@ -24,15 +29,40 @@ Parameters:
     </form>
 
     <div class="existing-document">
-        {include file='includes/document-upload-list-ajax.html'}
+        {include file='includes/document-upload-list-ajax.html'
+            documentType=$documentType
+            parentId=$parentId
+            resource=$resource
+        }
     </div>
 
 </div>
 
+{hook name="tab-image.bottom" id=$parentId type=$documentType}
+
 <script>
-    var documentDropZoneUrl = "{url path="/admin/document/type/$documentType/$parentId/save-ajax"}";
-    var documentListUrl = "{url path="/admin/document/type/$documentType/$parentId/list-ajax"}";
-    var documentReorder = "{url path="/admin/document/type/$documentType/$parentId/update-position"}";
+    var documentDropZoneUrl = "{url path="/admin/document/type/%document/%id/save-ajax" document=$documentType id=$parentId}";
+    var documentListUrl = "{url path="/admin/document/type/%document/%id/list-ajax" document=$documentType id=$parentId}";
+    var documentReorder = "{url path="/admin/document/type/%document/%id/update-position" document=$documentType id=$parentId}";
     var documentListErrorMessage = "{intl l='Can\'t load documents, please refresh this page.'}";
     var documentReorderErrorMessage = "{intl l='Can\'t reorder documents, please refresh this page.'}";
 </script>
+
+
+<div class="modal fade" id="document_delete_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="delete document"}</h3>
+            </div>
+            <div class="modal-body">
+                {intl l="Do you really want to delete this document ?"}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span>{intl l="No"}</button>
+                <button type="button" id="submit-delete-document" data-element-id="" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span>{intl l="Yes"}</button>
+            </div>
+        </div>
+    </div>
+</div>

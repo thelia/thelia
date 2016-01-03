@@ -17,8 +17,10 @@
 
             {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
 
+            {hook name="product-edit.top" product_id=$product_id}
+
             <div class="row">
-                {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
+                {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" with_prev_next_info=true lang=$edit_language_id}
 
                 {* Define close url *}
                 {assign var='close_url' value="{url path='/admin/catalog' category_id=$DEFAULT_CATEGORY}"}
@@ -26,12 +28,15 @@
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
                         <div class="col-md-7 title">
-                            {intl l='Edit product %title' title={$TITLE}}
+                            {intl l='Edit product %title' title={$TITLE}}{if $REF} ({intl l='ref.:'} {$REF}){/if}
                         </div>
 
                         <div class="col-md-5 actions">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cloneProductModal">
+                                {intl l="Clone"}
+                            </button>
                             <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                            <a href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                            <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
                             <a {if $HAS_NEXT != 0}href="{url path='/admin/products/update' product_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                         </div>
                     </div>
@@ -39,8 +44,36 @@
                     <div class="row">
                         <div class="col-md-12">
 
+                            {hookblock name="product.tab" id="{$product_id}" fields="id,title,href,content"}
+
+                                {capture "product_tab_tab"}
+                                    {forhook rel="product.tab"}
+                                    <li>
+                                        <a href="#{$id}"
+                                            {if $href}data-href="{$href}"{/if}
+                                            data-toggle="tab">{$title}
+                                        </a>
+                                    </li>
+                                    {/forhook}
+                                {/capture}
+
+                                {capture "product_tab_content"}
+                                    {forhook rel="product.tab"}
+                                    <div class="tab-pane fade" id="{$id}">
+                                        {if $href}
+                                            {* ajax *}
+                                            <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                        {else}
+                                            {$content nofilter}
+                                        {/if}
+                                    </div>
+                                    {/forhook}
+                                {/capture}
+
+                            {/hookblock}
+
                             <ul class="nav nav-tabs" id="tabbed-menu">
-                                <li><a href="#general" data-toggle="tab">{intl l="General"}</a></li>
+                                <li><a href="#general" data-toggle="tab" data-trigger="#virtual_field::change">{intl l="General"}</a></li>
                                 <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
                                 <li><a href="#prices" data-toggle="tab">{intl l="Price"}</a></li>
                                 <li>
@@ -58,19 +91,21 @@
                                 <li>
                                     <a href="#images"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/image/type/product/{$ID}/form-ajax"}"
+                                       data-href="{url path="/admin/image/type/product/%id/form-ajax" id=$ID}"
                                        data-callback="$.imageUploadManager.initImageDropZone">
                                         {intl l="Images"}
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#documents"
+                                       id="tab-documents"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/document/type/product/{$ID}/form-ajax"}"
+                                       data-href="{url path="/admin/document/type/product/%id/form-ajax" id=$ID}"
                                        data-callback="$.documentUploadManager.initDocumentDropZone">
                                         {intl l="Documents"}
                                     </a>
                                 </li>
+                                {$smarty.capture.product_tab_tab nofilter}
                                 <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
                             </ul>
 
@@ -81,15 +116,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="seo">
-                                    {form name="thelia.admin.seo"}
-                                        {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/products/seo/save'}"
-                                            pageUrl = "{url path='/admin/products/update' product_id=$ID}"
-                                            closeUrl = $close_url
-                                            current_id = $product_id
-                                        }
-                                    {/form}
+                                    {include file="includes/seo-tab.html"
+                                        formAction  = "{url path='/admin/products/seo/save'}"
+                                        pageUrl     = "{url path='/admin/products/update' product_id=$ID}"
+                                        closeUrl    = $close_url
+                                        current_id  = $product_id
+                                        success_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}"
+                                        seoType     = 'product'
+                                    }
                                 </div>
 
                                 <div class="tab-pane fade" id="prices">
@@ -112,6 +146,8 @@
                                     <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
                                 </div>
 
+                                {$smarty.capture.product_tab_content nofilter}
+
                                 <div class="tab-pane fade" id="modules">
                                     <div class="form-container">
                                         {include
@@ -122,8 +158,8 @@
                                         current_tab = "modules"
                                         }
                                     </div>
-
-                                    {include file="includes/module-tab-content.html" location="product-edit"}
+                                    {* ugly fix : {hook name="product.tab-content" id="{$product_id}" view="product"} *}
+                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit" id="{$product_id}" view="product"}
                                 </div>
 
                              </div>
@@ -132,9 +168,66 @@
                 </div>
                 {/loop}
             </div>
+
+            {hook name="product-edit.bottom" product_id=$product_id}
+
         </div>
     </div>
 
+    <div class="modal fade" id="template_notice" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>{intl l="warning"}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {intl l="If you change the template, all the prices will be reset and you have to configure them again."}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="ok"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {form name="thelia.admin.product.clone"}
+    <div class="modal fade{if $form_error} modal-force-show{/if}" id="cloneProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>{intl l="Clone product"}</h3>
+                </div>
+                <form method="post" action="{url path='/admin/products/clone' product_id=$product_id}" class="form-inline" role="form" {form_enctype form=$form}>
+                    <div class="modal-body">
+                        {if $form_error && $form_error_message}
+                            <div class="alert alert-danger">{$form_error_message}</div>
+                        {/if}
+
+                        {form_hidden_fields form=$form}
+
+                        {form_field form=$form field="productId"}
+                        <input type="hidden" name="{$name}" value="{product attr='id'}">
+                        {/form_field}
+
+                        <div class="form-group">
+                            {form_field form=$form field="newRef"}
+                            <label for="{$label_attr.for}">{$label}</label>
+                            <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" required >
+                            {/form_field}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">{intl l="OK"}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {/form}
 {/block}
 
 {block name="javascript-initialization"}
@@ -163,7 +256,11 @@
 
 <script>
 $(function() {
-
+    // show tab documents
+    $(".alert-warning a[href^='javascript']").on('click', function () {
+        eval(this.href);
+        return false;
+        });
     // Atomatic ajax tab load, if data-href is defined.
     $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
         var $this = $(this);
@@ -172,10 +269,71 @@ $(function() {
                 eval($this.data('callback') + '();');
             }
         });
+
     });
+    $('.nav-tabs a[data-trigger]').on('shown.bs.tab', function(ev) {
+        var $this = $(this);
+        var trigger = $this.data('trigger');
+        var triggers = trigger.split('::');
+        if (triggers.length == 2) {
+            $(triggers[0]).trigger(triggers[1]);
+        }
+    });
+
+    $("body").on("change", "#template_id", function(){
+        $("#template_notice").modal('show');
+    });
+
 
     // Load active tab
     $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
+
+    $('.nav-tabs a[href="#general"]').trigger("change");
+
+    // vitual product
+    $('#virtual_field').change(function(event) {
+        var $virtual = $(this);
+        if ($virtual.prop("checked")){
+            var $virtualDocumentsSelector;
+            $('#virtual-product-file').removeClass("hidden");
+            $virtualDocumentsSelector = $('#virtual-product-file select');
+            if ($virtualDocumentsSelector.length > 0){
+                // update options
+                $.ajax({
+                    url      : '{url path="/admin/product/virtual-documents/"}' +
+                               $virtualDocumentsSelector.data('product') + '/' +
+                               $virtualDocumentsSelector.data('pse'),
+                    type     : 'get',
+                    dataType : 'json',
+                    success  : function(data) {
+                        var i = 0,
+                            selectedOption = 0,
+                            virtualDocumentsSelector,
+                            option;
+                        virtualDocumentsSelector = $virtualDocumentsSelector.get(0);
+                        virtualDocumentsSelector.options.length = 1;
+                        if (data.length == 0){
+                            $('#virtual-product-message').removeClass('hidden');
+                        } else {
+                            $('#virtual-product-message').addClass('hidden');
+                            for (; i < data.length ; i++ ){
+                                if (data[i].selected){
+                                    selectedOption = i + 1;
+                                }
+                                virtualDocumentsSelector.options[virtualDocumentsSelector.options.length]
+                                    = new Option(data[i].title + ' (' + data[i].file + ')', data[i].id);
+                            }
+                            virtualDocumentsSelector.selectedIndex = selectedOption;
+
+                        }
+                    }
+                });
+            }
+
+        } else {
+            $('#virtual-product-file').addClass("hidden");
+        }
+    });
 
     // -- Product prices management tab ---------------------------------------
 
@@ -185,7 +343,7 @@ $(function() {
 
 	    if (val != "") {
 	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
+	             url      : '{url path="/admin/product/%id/attribute-values/" id=$product_id}' + $(this).val() + '.xml',
 	             type     : 'get',
 	             dataType : 'json',
 	             success  : function(json) {
@@ -227,7 +385,7 @@ $(function() {
     	$('#combination_attributes option').prop('selected', 'selected');
 
         $.ajax({
-            url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
+            url      : '{url path="/admin/product/%id/add-attribute-value-to-combination/" id=$product_id}'
                             + $('#attribute_value_id').val()
                             + '/'
                             + $('#combination_attributes').val()
@@ -291,8 +449,6 @@ $(function() {
                 type     : 'get',
                 dataType : 'json',
                 success  : function(json) {
-                	console.log(json);
-
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="price-with-tax"]').val(json.price_with_tax);
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="price-without-tax"]').val(json.price_without_tax);
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-with-tax"]').val(json.sale_price_with_tax);
@@ -363,9 +519,15 @@ $(function() {
     	captureLength: 1,
     	wait         : 300,
     	callback     : function () {
-    		update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
+            var price = $(this).val();
+            $(this).val(sanitizeFloat(price));
+            update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
     	}
     });
+
+    function sanitizeFloat(numVal) {
+        return numVal.replace(",", ".");
+    };
 
     // Count generated combinations in real time
     function countGeneratedCombinations() {
@@ -377,20 +539,15 @@ $(function() {
     	var list = $('.attribute_av_value:checked');
 
     	if (list.length > 0) {
-    		console.log("ok !");
 
 	    	list.each(function() {
 	    		var attr_id = $(this).data('attribute-id');
-
-	    		console.log("att="+attr_id);
 
 	    		if (undefined != counter[attr_id])
 	    			counter[attr_id]++;
 	    		else
 	    			counter[attr_id] = 1;
 	    	});
-
-	    	console.log(counter);
 
 	    	total = 1;
 
@@ -407,12 +564,97 @@ $(function() {
 
     	$('#number_of_generated_combinations').text(total);
     });
+
+    $(".pse-assoc-image-document").click(function() {
+        var $this = $(this);
+        var type = "none";
+        var toggle_event = "";
+
+
+        if ($this.hasClass("pse-assoc-image")) {
+            type = "image";
+            toggle_event = "click";
+        } else if ($this.hasClass("pse-assoc-document")) {
+            type = "document";
+            toggle_event = "switch-change";
+        } else {
+            if ($this.data("type")){
+                type = $this.data("type");
+                toggle_event = "switch-change";
+            }
+        }
+
+        var $modal_container = $("#pse-modal-container");
+        var pse_id = $(this).data("id");
+
+        $.ajax(
+            "{url path="/admin/product_sale_elements/ajax/"}"+ type + "/" + pse_id
+        ).done(function(data) {
+            $modal_container.html(data);
+
+            $("#pse-image-document-assoc-modal").modal();
+
+            $(".do-associate").on(toggle_event, function(e, data) {
+                var $file = $(this);
+                var type_id = $file.data("id");
+
+                $.ajax(
+                    "{url path='/admin/product_sale_elements'}/"+pse_id+"/"+type+"/"+type_id
+                ).done(function() {
+                    /**
+                     * If the modal is for images, add some graphics
+                     */
+                    if (type == "image") {
+                        if ($file.hasClass("is-associated")) {
+                            $file.removeClass("is-associated");
+                            $(".product-pse-image-join-glyphicon", $file.parent()).remove();
+                        } else {
+                            $file.addClass("is-associated");
+                            $file.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
+                        }
+                    } else if (type == "virtual") {
+                        if ( $file.bootstrapSwitch('status') ) {
+                            $(".do-associate").each(function(){
+                                if (type_id != $(this).data("id") && $(this).bootstrapSwitch('status')) {
+                                    $(this).bootstrapSwitch('setState', false);
+                                }
+                            });
+                        }
+                    }
+
+                }).fail(function(data) {
+                    var $body = $(".modal-body", $modal_container);
+                    $errorMessage = $("<div class='alert alert-danger'>"+data["error"]+"</div>");
+
+                    $body.html($errorMessage + $body.html());
+                });
+            });
+        }).fail(function(data) {
+            var $modal_title = $("#associate_images_documents_label");
+            var $body = $(".modal-body", $modal_container);
+
+            $modal_title.html("{intl l='Error'}");
+
+            var error_message = data["error"];
+            if (!error_message || error_message.length === 0) {
+                error_message = "{intl l='An unknown error occured, please try again.'}";
+            }
+
+            $body.html("<p>"+error_message+"</p>");
+
+            $("#pse-assoc-image-document-modal").modal();
+        });
+    });
+
 });
+
 </script>
 
 
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='product-edit-js'}
+    {hook name="product.edit-js" location="product-edit-js" product_id={$product_id} }
+
+    {hook name="wysiwyg.js" location="wysiwyg-product-edit-js" }
 {/block}

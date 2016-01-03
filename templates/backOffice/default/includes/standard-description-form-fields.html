@@ -1,43 +1,6 @@
-{*
-The standard description fields, used by many Thelia objects
-*}
+{* The standard description fields, used by many Thelia objects *}
 
-{form_field form=$form field='title'}
-<div class="form-group {if $error}has-error{/if}">
-    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-    <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value}">
-</div>
-{/form_field}
-
-{form_field form=$form field='chapo'}
-<div class="form-group {if $error}has-error{/if}">
-    <label for="{$label_attr.for}" class="control-label">
-        {$label} :
-        <span class="label-help-block">{intl l="A short description, used when a summary or an introduction is required"}</span>
-    </label>
-
-    <textarea name="{$name}" id="{$label_attr.for}" rows="3" title="{intl l='Short description'}" placeholder="{intl l='Short description'}" class="form-control">{$value}</textarea>
-</div>
-{/form_field}
-
-{form_field form=$form field='description'}
-<div class="form-group {if $error}has-error{/if}">
-    <label for="{$label_attr.for}" class="control-label">
-        {$label} :
-        <span class="label-help-block">{intl l="The detailed description."}</span>
-    </label>
-
-    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{$value}</textarea>
-</div>
-{/form_field}
-
-{form_field form=$form field='postscriptum'}
-<div class="form-group {if $error}has-error{/if}">
-    <label for="{$label_attr.for}" class="control-label">
-        {$label} :
-        <span class="label-help-block">{intl l="A short post-description information"}</span>
-    </label>
-
-    <textarea name="{$name}" id="{$label_attr.for}" rows="3" title="{intl l='Short conclusion'}" placeholder="{intl l='Short conclusion'}" class="form-control">{$value}</textarea>
-</div>
-{/form_field}
+{render_form_field field='title'}
+{render_form_field field="chapo"}
+{render_form_field field="description" extra_class="wysiwyg"}
+{render_form_field field="postscriptum"}

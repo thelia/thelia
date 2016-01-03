@@ -12,13 +12,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\TaxCreationForm;
-use Thelia\Form\TaxModificationForm;
-use Thelia\Model\TaxQuery;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Tax;
+use Thelia\Model\TaxQuery;
 
 class TaxController extends AbstractCrudController
 {
@@ -28,9 +27,7 @@ class TaxController extends AbstractCrudController
             'tax',
             'manual',
             'order',
-
             AdminResources::TAX,
-
             TheliaEvents::TAX_CREATE,
             TheliaEvents::TAX_UPDATE,
             TheliaEvents::TAX_DELETE
@@ -39,14 +36,14 @@ class TaxController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        $form = new TaxCreationForm($this->getRequest(), 'form', array(), array(), $this->container->get('thelia.taxEngine'));
+        $form = $this->createForm(AdminForm::TAX_CREATION);
 
         return $form;
     }
 
     protected function getUpdateForm()
     {
-        return new TaxModificationForm($this->getRequest(), 'form', array(), array(), $this->container->get('thelia.taxEngine'));
+        return $this->createForm(AdminForm::TAX_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -103,7 +100,11 @@ class TaxController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new TaxModificationForm($this->getRequest(), "form", $data, array(), $this->container->get('thelia.taxEngine'));
+        return $this->createForm(
+            AdminForm::TAX_MODIFICATION,
+            "form",
+            $data
+        );
     }
 
     protected function getObjectFromEvent($event)
@@ -161,8 +162,7 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // We always return to the feature edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
@@ -177,7 +177,7 @@ class TaxController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getTax()->getId())
@@ -186,16 +186,13 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.taxes-rules.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
     }
 
     protected function getRequirements($type, $formData)
     {
         $requirements = array();
         foreach ($formData as $data => $value) {
-
             if (!strstr($data, ':')) {
                 continue;
             }

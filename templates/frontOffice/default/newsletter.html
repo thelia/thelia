@@ -10,11 +10,14 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Newsletter Subscription"}</h1>
 
+            {hook name="newsletter.top"}
+
             {form name="thelia.front.newsletter"}
                 <form id="form-newsletter" action="{url path="/newsletter"}" method="post">
-                    {form_hidden_fields form=$form}
+                    {form_hidden_fields}
                     <p>{intl l="You want to subscribe to the newsletter? Please enter your email address below."}</p>
-                    {form_field form=$form field="email"}
+                    <div class="col-sm-6">
+                    {form_field field="email"}
                         <div class="form-group group-email {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
                             <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input">
@@ -22,19 +25,55 @@
                                 {if $error}
                                     <span class="help-block">{$message}</span>
                                 {elseif !$error && $value != ""}
-                                    <span class="help-block"><span class="icon-ok"></span> {intl l="Thanks for signing up! We'll keep you posted whenever we have any new updates."}</span>
+                                    <span class="help-block"><span class="fa fa-check"></span> {intl l="Thanks for signing up! We'll keep you posted whenever we have any new updates."}</span>
                                 {/if}
                             </div>
                         </div>
                     {/form_field}
 
+                    {loop type="auth" name="customer_newsletter_block" role="CUSTOMER"}{/loop}
+                    {elseloop rel="customer_newsletter_block"}
+                        {form_field field="firstname"}
+                        <div class="form-group {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
+                            <label for="{$label_attr.for}">{$label}</label>
+                            <div class="control-input">
+                                <input type="text" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255">
+                            </div>
+                        </div>
+                        {/form_field}
+
+                        {form_field field="lastname"}
+                            <div class="form-group {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
+                                <label for="{$label_attr.for}">{$label}</label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255">
+                                </div>
+                            </div>
+                        {/form_field}
+                    {/elseloop}
+
                     <div class="form-group group-btn">
                         <div class="control-btn">
-                            <button type="submit" class="btn btn-submit">{intl l="Subscribe"}</button>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Subscribe"}</button>
                         </div>
                     </div><!--/.form-group-->
+                    </div>
                 </form>
             {/form}
+            {hook name="newsletter.bottom"}
         </article>
     </div>
+{/block}
+
+
+{block name="stylesheet"}
+    {hook name="newsletter.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+    {hook name="newsletter.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+    {hook name="newsletter.javascript-initialization"}
 {/block}

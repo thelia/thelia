@@ -26,10 +26,10 @@ class FeatureModificationForm extends FeatureCreationForm
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
-                        )
-                    )
+                        ),
+                    ),
             ))
-     ;
+        ;
 
         // Add standard description fields
         $this->addStandardDescFields();

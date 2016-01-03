@@ -11,35 +11,32 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Security\Resource\AdminResources;
+
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Form\FolderCreationForm;
-use Thelia\Form\FolderModificationForm;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\FolderQuery;
 
 /**
  * Class FolderController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderController extends AbstractSeoCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'folder',
             'manual',
             'folder_order',
-
             AdminResources::FOLDER,
-
             TheliaEvents::FOLDER_CREATE,
             TheliaEvents::FOLDER_UPDATE,
             TheliaEvents::FOLDER_DELETE,
@@ -54,7 +51,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getCreationForm()
     {
-        return new FolderCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::FOLDER_CREATION);
     }
 
     /**
@@ -62,7 +59,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getUpdateForm()
     {
-        return new FolderModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::FOLDER_MODIFICATION);
     }
 
     /**
@@ -88,7 +85,7 @@ class FolderController extends AbstractSeoCrudController
         );
 
         // Setup the object form
-        return new FolderModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::FOLDER_MODIFICATION, "form", $data);
     }
 
     /**
@@ -228,12 +225,14 @@ class FolderController extends AbstractSeoCrudController
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
 
-        return $this->render('folders',
+        return $this->render(
+            'folders',
             array(
                 'folder_order' => $currentOrder,
                 'content_order' => $content_order,
                 'parent' => $this->getRequest()->get('parent', 0)
-            ));
+            )
+        );
     }
 
     /**
@@ -263,12 +262,12 @@ class FolderController extends AbstractSeoCrudController
     protected function performAdditionalUpdateAction($updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
-
-            // Redirect to parent category list
-            $this->redirectToRoute(
+            return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                array('parent' => $updateEvent->getFolder()->getParent())
+                ['parent' => $updateEvent->getFolder()->getParent()]
             );
+        } else {
+            return null;
         }
     }
 
@@ -280,10 +279,9 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Redirect to parent category list
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            array('parent' => $deleteEvent->getFolder()->getParent())
+            ['parent' => $deleteEvent->getFolder()->getParent()]
         );
     }
 
@@ -293,18 +291,16 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
-
         $folder = FolderQuery::create()->findPk($event->getObjectId());
 
         if ($folder != null) {
-            // Redirect to parent category list
-            $this->redirectToRoute(
+            return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                array('parent' => $folder->getParent())
+                ['parent' => $folder->getParent()]
             );
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**
@@ -312,7 +308,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function redirectToEditionTemplate(Request $request = null)
     {
-        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments($request)));
+        return $this->generateRedirectFromRoute('admin.folders.update', [], $this->getEditionArguments($request));
     }
 
     /**
@@ -320,9 +316,9 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            array('parent' => $this->getRequest()->get('parent', 0))
+            ['parent' => $this->getRequest()->get('parent', 0)]
         );
     }
 }

@@ -32,17 +32,17 @@ class TemplateDefinition
     );
 
     /**
-     * @var the template directory name (e.g. 'default')
+     * @var string the template directory name (e.g. 'default')
      */
     protected $name;
 
     /**
-     * @var the template directory full path
+     * @var string the template directory full path
      */
     protected $path;
 
     /**
-     * @var the template type (front, back, pdf)
+     * @var int the template type (front, back, pdf)
      */
     protected $type;
 
@@ -82,6 +82,9 @@ class TemplateDefinition
         return $this->translationDomainPrefix . strtolower($this->getName());
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
@@ -131,6 +134,9 @@ class TemplateDefinition
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getType()
     {
         return $this->type;

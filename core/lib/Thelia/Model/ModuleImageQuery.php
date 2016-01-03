@@ -16,5 +16,5 @@ use Thelia\Model\Base\ModuleImageQuery as BaseModuleImageQuery;
  */
 class ModuleImageQuery extends BaseModuleImageQuery
 {
-
-} // ModuleImageQuery
+}
+// ModuleImageQuery

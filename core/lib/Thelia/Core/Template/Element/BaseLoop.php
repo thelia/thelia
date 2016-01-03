@@ -17,9 +17,16 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Event\Loop\LoopExtendsArgDefinitionsEvent;
+use Thelia\Core\Event\Loop\LoopExtendsBuildArrayEvent;
+use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
+use Thelia\Core\Event\Loop\LoopExtendsInitializeArgsEvent;
+use Thelia\Core\Event\Loop\LoopExtendsParseResultsEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Translation\Translator;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
@@ -29,11 +36,25 @@ use Thelia\Type\TypeCollection;
  *
  * Class BaseLoop
  * @package TThelia\Core\Template\Element
+ *
+ * @method string getType()
+ * @method bool getForceReturn()
+ * @method bool getBackendContext()
+ * @method int getOffset() available if countable is true
+ * @method int getPage() available if countable is true
+ * @method int getLimit() available if countable is true
+ * @method bool getReturnUrl() false for disable the generation of urls
  */
 abstract class BaseLoop
 {
+    /** @var String|null The loop name  */
+    protected $loopName = null;
+
+    /** @var array|null array of loop definitions (class => id) */
+    protected static $loopDefinitions = null;
+
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var \Thelia\Core\HttpFoundation\Request
      */
     protected $request;
 
@@ -50,6 +71,7 @@ abstract class BaseLoop
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
+    /** @var ArgumentCollection */
     protected $args;
 
     protected $countable = true;
@@ -62,6 +84,9 @@ abstract class BaseLoop
     private static $cacheLoopResult = [];
     private static $cacheCount = [];
 
+    /** @var array cache of event to dispatch */
+    protected static $dispatchCache = [];
+
     /**
      * Create a new Loop
      *
@@ -69,16 +94,45 @@ abstract class BaseLoop
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->checkInterface();
-
         $this->container = $container;
+
+        $this->translator = $container->get("thelia.translator");
+
+        $this->checkInterface();
 
         $this->request = $container->get('request');
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
-        $this->translator = $container->get("thelia.translator");
+
+        $this->initialize();
+    }
+
+    /**
+     * Initialize the loop
+     *
+     * First it will get the loop name according to the loop class.
+     * Then argument definitions is initialized
+     *
+     */
+    protected function initialize()
+    {
+        if (null === self::$loopDefinitions) {
+            self::$loopDefinitions = array_flip($this->container->getParameter('thelia.parser.loops'));
+        }
+
+        if (isset(self::$loopDefinitions[get_class($this)])) {
+            $this->loopName = self::$loopDefinitions[get_class($this)];
+        }
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
+
+        $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS);
+        if (null !== $eventName) {
+            $this->dispatcher->dispatch(
+                $eventName,
+                new LoopExtendsArgDefinitionsEvent($this)
+            );
+        }
     }
 
     /**
@@ -92,19 +146,24 @@ abstract class BaseLoop
             Argument::createBooleanTypeArgument('backend_context', false),
             Argument::createBooleanTypeArgument('force_return', false),
             Argument::createAnyTypeArgument('type'),
+            Argument::createBooleanTypeArgument('no-cache', false)
         ];
 
         if (true === $this->countable) {
-            $defaultArgs = array_merge($defaultArgs, [
+            $defaultArgs = array_merge(
+                $defaultArgs,
+                [
                     Argument::createIntTypeArgument('offset', 0),
                     Argument::createIntTypeArgument('page'),
                     Argument::createIntTypeArgument('limit', PHP_INT_MAX),
-                ]);
+                ]
+            );
         }
 
         if ($this instanceof SearchLoopInterface) {
-
-            $defaultArgs = array_merge($defaultArgs, [
+            $defaultArgs = array_merge(
+                $defaultArgs,
+                [
                     Argument::createAnyTypeArgument('search_term'),
                     new Argument(
                         'search_in',
@@ -115,16 +174,21 @@ abstract class BaseLoop
                     new Argument(
                         'search_mode',
                         new TypeCollection(
-                            new EnumType([
-                                SearchLoopInterface::MODE_ANY_WORD,
-                                SearchLoopInterface::MODE_SENTENCE,
-                                SearchLoopInterface::MODE_STRICT_SENTENCE,
-                            ])
+                            new EnumType(
+                                [
+                                    SearchLoopInterface::MODE_ANY_WORD,
+                                    SearchLoopInterface::MODE_SENTENCE,
+                                    SearchLoopInterface::MODE_STRICT_SENTENCE,
+                                ]
+                            )
                         ),
                         SearchLoopInterface::MODE_STRICT_SENTENCE
                     )
-                ]);
+                ]
+            );
         }
+
+        $defaultArgs[] = Argument::createBooleanTypeArgument('return_url', true);
 
         return $defaultArgs;
     }
@@ -141,7 +205,6 @@ abstract class BaseLoop
     public function __call($name, $arguments)
     {
         if (substr($name, 0, 3) == 'get') {
-
             // camelCase to underscore: getNotEmpty -> not_empty
             $argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', "$1_$2", substr($name, 3)));
 
@@ -165,6 +228,12 @@ abstract class BaseLoop
         $faultActor = [];
         $faultDetails = [];
 
+        if (null !== $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_INITIALIZE_ARGS)) {
+            $event = new LoopExtendsInitializeArgsEvent($this, $nameValuePairs);
+            $this->dispatcher->dispatch($eventName, $event);
+            $nameValuePairs = $event->getLoopParameters();
+        }
+
         $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
         $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
 
@@ -178,7 +247,8 @@ abstract class BaseLoop
             if ($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
                 $faultDetails[] = $this->translator->trans(
-                    '"%param" parameter is missing in loop type: %type, name: %name', [
+                    '"%param" parameter is missing in loop type: %type, name: %name',
+                    [
                         '%param' => $argument->name,
                         '%type' => $loopType,
                         '%name' => $loopName
@@ -189,7 +259,8 @@ abstract class BaseLoop
                     /* check if empty */
                     $faultActor[] = $argument->name;
                     $faultDetails[] = $this->translator->trans(
-                        '"%param" parameter cannot be empty in loop type: %type, name: %name', [
+                        '"%param" parameter cannot be empty in loop type: %type, name: %name',
+                        [
                             '%param' => $argument->name,
                             '%type' => $loopType,
                             '%name' => $loopName
@@ -200,7 +271,8 @@ abstract class BaseLoop
                 /* check type */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = $this->translator->trans(
-                    'Invalid value "%value" for "%param" parameter in loop type: %type, name: %name', [
+                    'Invalid value "%value" for "%param" parameter in loop type: %type, name: %name',
+                    [
                         '%value' => $value,
                         '%param' => $argument->name,
                         '%type' => $loopType,
@@ -237,10 +309,11 @@ abstract class BaseLoop
     {
         $arg = $this->args->get($argumentName);
 
-        if ($arg === null)
+        if ($arg === null) {
             throw new \InvalidArgumentException(
                 $this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName])
             );
+        }
 
         return $arg;
     }
@@ -272,13 +345,11 @@ abstract class BaseLoop
         }
 
         if ($this instanceof SearchLoopInterface) {
-
             $searchTerm = $this->getArgValue('search_term');
             $searchIn   = $this->getArgValue('search_in');
             $searchMode = $this->getArgValue('search_mode');
 
             if (null !== $searchTerm && null !== $searchIn) {
-
                 switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
                         $searchCriteria = Criteria::IN;
@@ -318,7 +389,6 @@ abstract class BaseLoop
         $offset = intval($this->getArgValue('offset'));
 
         if ($this->getArgValue('page') !== null) {
-
             $pageNum = intval($this->getArgValue('page'));
 
             $totalPageCount = ceil(count($search) / $limit);
@@ -330,10 +400,8 @@ abstract class BaseLoop
             $firstItem = ($pageNum - 1) * $limit + 1;
 
             return array_slice($search, $firstItem, $firstItem + $limit, false);
-
         } else {
             return array_slice($search, $offset, $limit, false);
-
         }
     }
 
@@ -378,27 +446,34 @@ abstract class BaseLoop
     public function count()
     {
         $hash = $this->args->getHash();
-        if (false === isset(self::$cacheCount[$hash])) {
-            $count = 0;
-            if ($this instanceof PropelSearchLoopInterface) {
-                $searchModelCriteria = $this->buildModelCriteria();
-                if (null === $searchModelCriteria) {
-                    $count = 0;
-                } else {
-                    $count = $searchModelCriteria->count();
-                }
-            } elseif ($this instanceof ArraySearchLoopInterface) {
-                $searchArray = $this->buildArray();
-                if (null === $searchArray) {
-                    $count = 0;
-                } else {
-                    $count = count($searchArray);
-                }
+
+        if (($isCaching = $this->isCaching()) && isset(self::$cacheCount[$hash])) {
+            return self::$cacheCount[$hash];
+        }
+
+        $count = 0;
+        if ($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
+
+            if (null === $searchModelCriteria) {
+                $count = 0;
+            } else {
+                $count = $searchModelCriteria->count();
             }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->extendsBuildArray($this->buildArray());
+            if (null === $searchArray) {
+                $count = 0;
+            } else {
+                $count = count($searchArray);
+            }
+        }
+
+        if ($isCaching) {
             self::$cacheCount[$hash] = $count;
         }
 
-        return self::$cacheCount[$hash];
+        return $count;
     }
 
     /**
@@ -409,44 +484,49 @@ abstract class BaseLoop
     public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
-        if (false === isset(self::$cacheLoopResult[$hash])) {
 
-            $results = [];
-
-            if ($this instanceof PropelSearchLoopInterface) {
-                $searchModelCriteria = $this->buildModelCriteria();
-
-                if (null !== $searchModelCriteria) {
-                    $results = $this->search(
-                        $searchModelCriteria,
-                        $pagination
-                    );
-                }
-            } elseif ($this instanceof ArraySearchLoopInterface) {
-                $searchArray = $this->buildArray();
-
-                if (null !== $searchArray) {
-                    $results = $this->searchArray($searchArray);
-                }
-            }
-
-            $loopResult = new LoopResult($results);
-
-            if (true === $this->countable) {
-                $loopResult->setCountable();
-            }
-            if (true === $this->timestampable) {
-                $loopResult->setTimestamped();
-            }
-            if (true === $this->versionable) {
-                $loopResult->setVersioned();
-            }
-
-            self::$cacheLoopResult[$hash] = $this->parseResults($loopResult);
+        if (($isCaching = $this->isCaching()) && isset(self::$cacheLoopResult[$hash])) {
+            return self::$cacheLoopResult[$hash];
         }
 
-        return self::$cacheLoopResult[$hash];
+        $results = [];
 
+        if ($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
+
+            if (null !== $searchModelCriteria) {
+                $results = $this->search(
+                    $searchModelCriteria,
+                    $pagination
+                );
+            }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->extendsBuildArray($this->buildArray());
+
+            if (null !== $searchArray) {
+                $results = $this->searchArray($searchArray);
+            }
+        }
+
+        $loopResult = new LoopResult($results);
+
+        if (true === $this->countable) {
+            $loopResult->setCountable();
+        }
+        if (true === $this->timestampable) {
+            $loopResult->setTimestamped();
+        }
+        if (true === $this->versionable) {
+            $loopResult->setVersioned();
+        }
+
+        $parsedResults = $this->extendsParseResults($this->parseResults($loopResult));
+
+        if ($isCaching) {
+            self::$cacheLoopResult[$hash] = $parsedResults;
+        }
+
+        return $parsedResults;
     }
 
     protected function checkInterface()
@@ -463,7 +543,8 @@ abstract class BaseLoop
                     $this->translator->trans(
                         'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
                     ),
-                    LoopException::MULTIPLE_SEARCH_INTERFACE);
+                    LoopException::MULTIPLE_SEARCH_INTERFACE
+                );
             }
             $searchInterface = true;
         }
@@ -474,7 +555,8 @@ abstract class BaseLoop
                     $this->translator->trans(
                         'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
                     ),
-                    LoopException::MULTIPLE_SEARCH_INTERFACE);
+                    LoopException::MULTIPLE_SEARCH_INTERFACE
+                );
             }
             $searchInterface = true;
         }
@@ -484,7 +566,8 @@ abstract class BaseLoop
                 $this->translator->trans(
                     'Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
                 ),
-                LoopException::SEARCH_INTERFACE_NOT_FOUND);
+                LoopException::SEARCH_INTERFACE_NOT_FOUND
+            );
         }
 
         /* Only PropelSearch allows timestamp and version */
@@ -492,15 +575,22 @@ abstract class BaseLoop
             if (true === $this->timestampable) {
                 throw new LoopException(
                     $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be timestampable"),
-                    LoopException::NOT_TIMESTAMPED);
+                    LoopException::NOT_TIMESTAMPED
+                );
             }
 
             if (true === $this->versionable) {
                 throw new LoopException(
                     $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be versionable"),
-                    LoopException::NOT_VERSIONED);
+                    LoopException::NOT_VERSIONED
+                );
             }
         }
+    }
+
+    protected function isCaching()
+    {
+        return !$this->getArg("no-cache")->getValue();
     }
 
     /**
@@ -536,4 +626,121 @@ abstract class BaseLoop
      */
     abstract protected function getArgDefinitions();
 
+    /**
+     * Use this method in order to add fields in sub-classes
+     * @param LoopResultRow $loopResultRow
+     * @param object|array $item
+     *
+     */
+    protected function addOutputFields(LoopResultRow $loopResultRow, $item)
+    {
+    }
+
+    /**
+     * Get the event name for the loop depending of the event name and the loop name.
+     *
+     * This function also checks if there are services that listen to this event.
+     * If not the function returns null.
+     *
+     * @param string $eventName the event name (`TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS`,
+     *                          `TheliaEvents::LOOP_EXTENDS_INITIALIZE_ARGS`, ...)
+     * @return null|string The event name for the loop if listeners exist, otherwise null is returned
+     */
+    protected function getDispatchEventName($eventName)
+    {
+        $customEventName = TheliaEvents::getLoopExtendsEvent($eventName, $this->loopName);
+
+        if (!isset(self::$dispatchCache[$customEventName])) {
+            self::$dispatchCache[$customEventName] = $this->dispatcher->hasListeners($customEventName);
+        }
+
+        return self::$dispatchCache[$customEventName]
+            ? $customEventName
+            : null;
+    }
+
+    /**
+     * Dispatch an event to extend the BuildModelCriteria
+     *
+     * @param ModelCriteria $search
+     * @return ModelCriteria
+     */
+    protected function extendsBuildModelCriteria(ModelCriteria $search = null)
+    {
+        if (null === $search) {
+            return null;
+        }
+
+        $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA);
+        if (null !== $eventName) {
+            $this->dispatcher->dispatch(
+                $eventName,
+                new LoopExtendsBuildModelCriteriaEvent($this, $search)
+            );
+        }
+
+        return $search;
+    }
+
+    /**
+     * Dispatch an event to extend the BuildArray
+     *
+     * @param array $search
+     * @return array
+     */
+    protected function extendsBuildArray(array $search = null)
+    {
+        if (null === $search) {
+            return null;
+        }
+
+        $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_BUILD_ARRAY);
+        if (null !== $eventName) {
+            $this->dispatcher->dispatch(
+                $eventName,
+                new LoopExtendsBuildArrayEvent($this, $search)
+            );
+        }
+
+        return $search;
+    }
+
+    /**
+     * Dispatch an event to extend the ParseResults
+     *
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     */
+    protected function extendsParseResults(LoopResult $loopResult)
+    {
+        $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS);
+        if (null !== $eventName) {
+            $this->dispatcher->dispatch(
+                $eventName,
+                new LoopExtendsParseResultsEvent($this, $loopResult)
+            );
+        }
+
+        return $loopResult;
+    }
+
+    /**
+     * Get the argument collection
+     *
+     * @return ArgumentCollection
+     */
+    public function getArgumentCollection()
+    {
+        return $this->args;
+    }
+
+    /**
+     * Get the loop name
+     *
+     * @return null|String
+     */
+    public function getLoopName()
+    {
+        return $this->loopName;
+    }
 }

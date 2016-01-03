@@ -15,9 +15,8 @@ namespace Thelia\Install\Exception;
 /**
  * Class UpToDateException
  * @package Thelia\Install\Exception
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class UpToDateException extends InstallException
 {
-
 }

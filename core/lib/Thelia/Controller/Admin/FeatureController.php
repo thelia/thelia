@@ -12,19 +12,17 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Feature\FeatureDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Feature\FeatureUpdateEvent;
-use Thelia\Core\Event\Feature\FeatureCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\FeatureQuery;
-use Thelia\Form\FeatureModificationForm;
-use Thelia\Form\FeatureCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
-
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\Feature\FeatureCreateEvent;
+use Thelia\Core\Event\Feature\FeatureDeleteEvent;
 use Thelia\Core\Event\Feature\FeatureEvent;
+use Thelia\Core\Event\Feature\FeatureUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\FeatureQuery;
 
 /**
  * Manages features
@@ -39,9 +37,7 @@ class FeatureController extends AbstractCrudController
             'feature',
             'manual',
             'order',
-
             AdminResources::FEATURE,
-
             TheliaEvents::FEATURE_CREATE,
             TheliaEvents::FEATURE_UPDATE,
             TheliaEvents::FEATURE_DELETE,
@@ -52,12 +48,12 @@ class FeatureController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new FeatureCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::FEATURE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new FeatureModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::FEATURE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -99,9 +95,7 @@ class FeatureController extends AbstractCrudController
         $attr_values = $this->getRequest()->get('feature_values', null);
 
         if ($attr_values !== null) {
-
             foreach ($attr_values as $id => $value) {
-
                 $event = new FeatureAvUpdateEvent($id);
 
                 $event->setTitle($value);
@@ -117,9 +111,9 @@ class FeatureController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('feature_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('feature_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -135,7 +129,6 @@ class FeatureController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-
         $data = array(
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
@@ -146,7 +139,7 @@ class FeatureController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new FeatureModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::FEATURE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -184,28 +177,28 @@ class FeatureController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render(
-                'feature-edit',
-                array(
-                        'feature_id' => $this->getRequest()->get('feature_id'),
-                        'featureav_order' => $this->getFeatureAvListOrder()
-                )
+            'feature-edit',
+            array(
+                    'feature_id' => $this->getRequest()->get('feature_id'),
+                    'featureav_order' => $this->getFeatureAvListOrder()
+            )
         );
     }
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.features.update",
-                array(
-                        'feature_id' => $this->getRequest()->get('feature_id'),
-                        'featureav_order' => $this->getFeatureAvListOrder()
-                )
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.features.update",
+            [
+                'feature_id' => $this->getRequest()->get('feature_id'),
+                'featureav_order' => $this->getFeatureAvListOrder()
+            ]
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.features.default');
+        return $this->generateRedirectFromRoute('admin.configuration.features.default');
     }
 
     /**
@@ -216,9 +209,9 @@ class FeatureController extends AbstractCrudController
     protected function getFeatureAvListOrder()
     {
         return $this->getListOrderFromSession(
-                'featureav',
-                'featureav_order',
-                'manual'
+            'featureav',
+            'featureav_order',
+            'manual'
         );
     }
 
@@ -228,11 +221,12 @@ class FeatureController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         try {
             if (null !== $object = $this->getExistingObject()) {
-
                 $event = new FeatureEvent($object);
 
                 $this->dispatch($eventType, $event);
@@ -242,7 +236,7 @@ class FeatureController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**

@@ -21,6 +21,7 @@ use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
+use Thelia\Model\CustomerVersionQuery as ChildCustomerVersionQuery;
 use Thelia\Model\Lang as ChildLang;
 use Thelia\Model\LangQuery as ChildLangQuery;
 use Thelia\Model\Module as ChildModule;
@@ -35,7 +36,10 @@ use Thelia\Model\OrderProductQuery as ChildOrderProductQuery;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\OrderStatus as ChildOrderStatus;
 use Thelia\Model\OrderStatusQuery as ChildOrderStatusQuery;
+use Thelia\Model\OrderVersion as ChildOrderVersion;
+use Thelia\Model\OrderVersionQuery as ChildOrderVersionQuery;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Map\OrderVersionTableMap;
 
 abstract class Order implements ActiveRecordInterface
 {
@@ -139,15 +143,30 @@ abstract class Order implements ActiveRecordInterface
 
     /**
      * The value for the discount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $discount;
 
     /**
      * The value for the postage field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $postage;
+
+    /**
+     * The value for the postage_tax field.
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
+     */
+    protected $postage_tax;
+
+    /**
+     * The value for the postage_tax_rule_title field.
+     * @var        string
+     */
+    protected $postage_tax_rule_title;
 
     /**
      * The value for the payment_module_id field.
@@ -174,6 +193,12 @@ abstract class Order implements ActiveRecordInterface
     protected $lang_id;
 
     /**
+     * The value for the cart_id field.
+     * @var        int
+     */
+    protected $cart_id;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -184,6 +209,25 @@ abstract class Order implements ActiveRecordInterface
      * @var        string
      */
     protected $updated_at;
+
+    /**
+     * The value for the version field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $version;
+
+    /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
 
     /**
      * @var        Currency
@@ -238,12 +282,26 @@ abstract class Order implements ActiveRecordInterface
     protected $collOrderCouponsPartial;
 
     /**
+     * @var        ObjectCollection|ChildOrderVersion[] Collection to store aggregation of ChildOrderVersion objects.
+     */
+    protected $collOrderVersions;
+    protected $collOrderVersionsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    // versionable behavior
+
+
+    /**
+     * @var bool
+     */
+    protected $enforceVersion = false;
 
     /**
      * An array of objects scheduled for deletion.
@@ -258,10 +316,32 @@ abstract class Order implements ActiveRecordInterface
     protected $orderCouponsScheduledForDeletion = null;
 
     /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $orderVersionsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->discount = '0.000000';
+        $this->postage = '0.000000';
+        $this->postage_tax = '0.000000';
+        $this->version = 0;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Order object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -577,7 +657,7 @@ abstract class Order implements ActiveRecordInterface
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
      *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
@@ -648,7 +728,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getDiscount()
     {
@@ -659,12 +739,34 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [postage] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPostage()
     {
 
         return $this->postage;
+    }
+
+    /**
+     * Get the [postage_tax] column value.
+     *
+     * @return   string
+     */
+    public function getPostageTax()
+    {
+
+        return $this->postage_tax;
+    }
+
+    /**
+     * Get the [postage_tax_rule_title] column value.
+     *
+     * @return   string
+     */
+    public function getPostageTaxRuleTitle()
+    {
+
+        return $this->postage_tax_rule_title;
     }
 
     /**
@@ -712,6 +814,17 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
+     * Get the [cart_id] column value.
+     *
+     * @return   int
+     */
+    public function getCartId()
+    {
+
+        return $this->cart_id;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -749,6 +862,48 @@ abstract class Order implements ActiveRecordInterface
         } else {
             return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
+    }
+
+    /**
+     * Get the [version] column value.
+     *
+     * @return   int
+     */
+    public function getVersion()
+    {
+
+        return $this->version;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->version_created_at;
+        } else {
+            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return   string
+     */
+    public function getVersionCreatedBy()
+    {
+
+        return $this->version_created_by;
     }
 
     /**
@@ -1001,13 +1156,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->discount !== $v) {
@@ -1022,13 +1177,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [postage] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPostage($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->postage !== $v) {
@@ -1039,6 +1194,48 @@ abstract class Order implements ActiveRecordInterface
 
         return $this;
     } // setPostage()
+
+    /**
+     * Set the value of [postage_tax] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setPostageTax($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->postage_tax !== $v) {
+            $this->postage_tax = $v;
+            $this->modifiedColumns[OrderTableMap::POSTAGE_TAX] = true;
+        }
+
+
+        return $this;
+    } // setPostageTax()
+
+    /**
+     * Set the value of [postage_tax_rule_title] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setPostageTaxRuleTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->postage_tax_rule_title !== $v) {
+            $this->postage_tax_rule_title = $v;
+            $this->modifiedColumns[OrderTableMap::POSTAGE_TAX_RULE_TITLE] = true;
+        }
+
+
+        return $this;
+    } // setPostageTaxRuleTitle()
 
     /**
      * Set the value of [payment_module_id] column.
@@ -1141,6 +1338,27 @@ abstract class Order implements ActiveRecordInterface
     } // setLangId()
 
     /**
+     * Set the value of [cart_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setCartId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->cart_id !== $v) {
+            $this->cart_id = $v;
+            $this->modifiedColumns[OrderTableMap::CART_ID] = true;
+        }
+
+
+        return $this;
+    } // setCartId()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -1183,6 +1401,69 @@ abstract class Order implements ActiveRecordInterface
     } // setUpdatedAt()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[OrderTableMap::VERSION] = true;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            if ($dt !== $this->version_created_at) {
+                $this->version_created_at = $dt;
+                $this->modifiedColumns[OrderTableMap::VERSION_CREATED_AT] = true;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[OrderTableMap::VERSION_CREATED_BY] = true;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1192,6 +1473,22 @@ abstract class Order implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->discount !== '0.000000') {
+                return false;
+            }
+
+            if ($this->postage !== '0.000000') {
+                return false;
+            }
+
+            if ($this->postage_tax !== '0.000000') {
+                return false;
+            }
+
+            if ($this->version !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -1235,7 +1532,7 @@ abstract class Order implements ActiveRecordInterface
             $this->delivery_order_address_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderTableMap::translateFieldName('InvoiceDate', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00') {
+            if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->invoice_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
@@ -1256,34 +1553,55 @@ abstract class Order implements ActiveRecordInterface
             $this->invoice_ref = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->discount = (null !== $col) ? (double) $col : null;
+            $this->discount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postage = (null !== $col) ? (double) $col : null;
+            $this->postage = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PostageTax', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postage_tax = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('PostageTaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postage_tax_rule_title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->payment_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->delivery_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->status_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lang_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderTableMap::translateFieldName('CartId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->cart_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OrderTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 23 + $startcol : OrderTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 24 + $startcol : OrderTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1292,7 +1610,7 @@ abstract class Order implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 19; // 19 = OrderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 25; // 25 = OrderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Order object", 0, $e);
@@ -1389,6 +1707,8 @@ abstract class Order implements ActiveRecordInterface
 
             $this->collOrderCoupons = null;
 
+            $this->collOrderVersions = null;
+
         } // if (deep)
     }
 
@@ -1457,6 +1777,14 @@ abstract class Order implements ActiveRecordInterface
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // versionable behavior
+            if ($this->isVersioningNecessary()) {
+                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
+                if (!$this->isColumnModified(OrderTableMap::VERSION_CREATED_AT)) {
+                    $this->setVersionCreatedAt(time());
+                }
+                $createVersion = true; // for postSave hook
+            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -1481,6 +1809,10 @@ abstract class Order implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // versionable behavior
+                if (isset($createVersion)) {
+                    $this->addVersion($con);
+                }
                 OrderTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -1617,6 +1949,23 @@ abstract class Order implements ActiveRecordInterface
                 }
             }
 
+            if ($this->orderVersionsScheduledForDeletion !== null) {
+                if (!$this->orderVersionsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderVersionQuery::create()
+                        ->filterByPrimaryKeys($this->orderVersionsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->orderVersionsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collOrderVersions !== null) {
+            foreach ($this->collOrderVersions as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -1682,6 +2031,12 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) {
             $modifiedColumns[':p' . $index++]  = '`POSTAGE`';
         }
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX)) {
+            $modifiedColumns[':p' . $index++]  = '`POSTAGE_TAX`';
+        }
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX_RULE_TITLE)) {
+            $modifiedColumns[':p' . $index++]  = '`POSTAGE_TAX_RULE_TITLE`';
+        }
         if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`PAYMENT_MODULE_ID`';
         }
@@ -1694,11 +2049,23 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::LANG_ID)) {
             $modifiedColumns[':p' . $index++]  = '`LANG_ID`';
         }
+        if ($this->isColumnModified(OrderTableMap::CART_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`CART_ID`';
+        }
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
         if ($this->isColumnModified(OrderTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+        }
+        if ($this->isColumnModified(OrderTableMap::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(OrderTableMap::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(OrderTableMap::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
         }
 
         $sql = sprintf(
@@ -1750,6 +2117,12 @@ abstract class Order implements ActiveRecordInterface
                     case '`POSTAGE`':
                         $stmt->bindValue($identifier, $this->postage, PDO::PARAM_STR);
                         break;
+                    case '`POSTAGE_TAX`':
+                        $stmt->bindValue($identifier, $this->postage_tax, PDO::PARAM_STR);
+                        break;
+                    case '`POSTAGE_TAX_RULE_TITLE`':
+                        $stmt->bindValue($identifier, $this->postage_tax_rule_title, PDO::PARAM_STR);
+                        break;
                     case '`PAYMENT_MODULE_ID`':
                         $stmt->bindValue($identifier, $this->payment_module_id, PDO::PARAM_INT);
                         break;
@@ -1762,11 +2135,23 @@ abstract class Order implements ActiveRecordInterface
                     case '`LANG_ID`':
                         $stmt->bindValue($identifier, $this->lang_id, PDO::PARAM_INT);
                         break;
+                    case '`CART_ID`':
+                        $stmt->bindValue($identifier, $this->cart_id, PDO::PARAM_INT);
+                        break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1870,22 +2255,40 @@ abstract class Order implements ActiveRecordInterface
                 return $this->getPostage();
                 break;
             case 13:
-                return $this->getPaymentModuleId();
+                return $this->getPostageTax();
                 break;
             case 14:
-                return $this->getDeliveryModuleId();
+                return $this->getPostageTaxRuleTitle();
                 break;
             case 15:
-                return $this->getStatusId();
+                return $this->getPaymentModuleId();
                 break;
             case 16:
-                return $this->getLangId();
+                return $this->getDeliveryModuleId();
                 break;
             case 17:
-                return $this->getCreatedAt();
+                return $this->getStatusId();
                 break;
             case 18:
+                return $this->getLangId();
+                break;
+            case 19:
+                return $this->getCartId();
+                break;
+            case 20:
+                return $this->getCreatedAt();
+                break;
+            case 21:
                 return $this->getUpdatedAt();
+                break;
+            case 22:
+                return $this->getVersion();
+                break;
+            case 23:
+                return $this->getVersionCreatedAt();
+                break;
+            case 24:
+                return $this->getVersionCreatedBy();
                 break;
             default:
                 return null;
@@ -1929,12 +2332,18 @@ abstract class Order implements ActiveRecordInterface
             $keys[10] => $this->getInvoiceRef(),
             $keys[11] => $this->getDiscount(),
             $keys[12] => $this->getPostage(),
-            $keys[13] => $this->getPaymentModuleId(),
-            $keys[14] => $this->getDeliveryModuleId(),
-            $keys[15] => $this->getStatusId(),
-            $keys[16] => $this->getLangId(),
-            $keys[17] => $this->getCreatedAt(),
-            $keys[18] => $this->getUpdatedAt(),
+            $keys[13] => $this->getPostageTax(),
+            $keys[14] => $this->getPostageTaxRuleTitle(),
+            $keys[15] => $this->getPaymentModuleId(),
+            $keys[16] => $this->getDeliveryModuleId(),
+            $keys[17] => $this->getStatusId(),
+            $keys[18] => $this->getLangId(),
+            $keys[19] => $this->getCartId(),
+            $keys[20] => $this->getCreatedAt(),
+            $keys[21] => $this->getUpdatedAt(),
+            $keys[22] => $this->getVersion(),
+            $keys[23] => $this->getVersionCreatedAt(),
+            $keys[24] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1971,6 +2380,9 @@ abstract class Order implements ActiveRecordInterface
             }
             if (null !== $this->collOrderCoupons) {
                 $result['OrderCoupons'] = $this->collOrderCoupons->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collOrderVersions) {
+                $result['OrderVersions'] = $this->collOrderVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -2046,22 +2458,40 @@ abstract class Order implements ActiveRecordInterface
                 $this->setPostage($value);
                 break;
             case 13:
-                $this->setPaymentModuleId($value);
+                $this->setPostageTax($value);
                 break;
             case 14:
-                $this->setDeliveryModuleId($value);
+                $this->setPostageTaxRuleTitle($value);
                 break;
             case 15:
-                $this->setStatusId($value);
+                $this->setPaymentModuleId($value);
                 break;
             case 16:
-                $this->setLangId($value);
+                $this->setDeliveryModuleId($value);
                 break;
             case 17:
-                $this->setCreatedAt($value);
+                $this->setStatusId($value);
                 break;
             case 18:
+                $this->setLangId($value);
+                break;
+            case 19:
+                $this->setCartId($value);
+                break;
+            case 20:
+                $this->setCreatedAt($value);
+                break;
+            case 21:
                 $this->setUpdatedAt($value);
+                break;
+            case 22:
+                $this->setVersion($value);
+                break;
+            case 23:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 24:
+                $this->setVersionCreatedBy($value);
                 break;
         } // switch()
     }
@@ -2100,12 +2530,18 @@ abstract class Order implements ActiveRecordInterface
         if (array_key_exists($keys[10], $arr)) $this->setInvoiceRef($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setPostage($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setPaymentModuleId($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setDeliveryModuleId($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setStatusId($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setLangId($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPostageTax($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPostageTaxRuleTitle($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setPaymentModuleId($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setDeliveryModuleId($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setStatusId($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setLangId($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setCartId($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setCreatedAt($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setUpdatedAt($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setVersion($arr[$keys[22]]);
+        if (array_key_exists($keys[23], $arr)) $this->setVersionCreatedAt($arr[$keys[23]]);
+        if (array_key_exists($keys[24], $arr)) $this->setVersionCreatedBy($arr[$keys[24]]);
     }
 
     /**
@@ -2130,12 +2566,18 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::INVOICE_REF)) $criteria->add(OrderTableMap::INVOICE_REF, $this->invoice_ref);
         if ($this->isColumnModified(OrderTableMap::DISCOUNT)) $criteria->add(OrderTableMap::DISCOUNT, $this->discount);
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) $criteria->add(OrderTableMap::POSTAGE, $this->postage);
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX)) $criteria->add(OrderTableMap::POSTAGE_TAX, $this->postage_tax);
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX_RULE_TITLE)) $criteria->add(OrderTableMap::POSTAGE_TAX_RULE_TITLE, $this->postage_tax_rule_title);
         if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) $criteria->add(OrderTableMap::PAYMENT_MODULE_ID, $this->payment_module_id);
         if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) $criteria->add(OrderTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
         if ($this->isColumnModified(OrderTableMap::STATUS_ID)) $criteria->add(OrderTableMap::STATUS_ID, $this->status_id);
         if ($this->isColumnModified(OrderTableMap::LANG_ID)) $criteria->add(OrderTableMap::LANG_ID, $this->lang_id);
+        if ($this->isColumnModified(OrderTableMap::CART_ID)) $criteria->add(OrderTableMap::CART_ID, $this->cart_id);
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) $criteria->add(OrderTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderTableMap::UPDATED_AT)) $criteria->add(OrderTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(OrderTableMap::VERSION)) $criteria->add(OrderTableMap::VERSION, $this->version);
+        if ($this->isColumnModified(OrderTableMap::VERSION_CREATED_AT)) $criteria->add(OrderTableMap::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(OrderTableMap::VERSION_CREATED_BY)) $criteria->add(OrderTableMap::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -2211,12 +2653,18 @@ abstract class Order implements ActiveRecordInterface
         $copyObj->setInvoiceRef($this->getInvoiceRef());
         $copyObj->setDiscount($this->getDiscount());
         $copyObj->setPostage($this->getPostage());
+        $copyObj->setPostageTax($this->getPostageTax());
+        $copyObj->setPostageTaxRuleTitle($this->getPostageTaxRuleTitle());
         $copyObj->setPaymentModuleId($this->getPaymentModuleId());
         $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
         $copyObj->setStatusId($this->getStatusId());
         $copyObj->setLangId($this->getLangId());
+        $copyObj->setCartId($this->getCartId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2232,6 +2680,12 @@ abstract class Order implements ActiveRecordInterface
             foreach ($this->getOrderCoupons() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addOrderCoupon($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getOrderVersions() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -2690,6 +3144,9 @@ abstract class Order implements ActiveRecordInterface
         if ('OrderCoupon' == $relationName) {
             return $this->initOrderCoupons();
         }
+        if ('OrderVersion' == $relationName) {
+            return $this->initOrderVersions();
+        }
     }
 
     /**
@@ -3129,6 +3586,227 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collOrderVersions collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrderVersions()
+     */
+    public function clearOrderVersions()
+    {
+        $this->collOrderVersions = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOrderVersions collection loaded partially.
+     */
+    public function resetPartialOrderVersions($v = true)
+    {
+        $this->collOrderVersionsPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrderVersions collection.
+     *
+     * By default this just sets the collOrderVersions collection to an empty array (like clearcollOrderVersions());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrderVersions($overrideExisting = true)
+    {
+        if (null !== $this->collOrderVersions && !$overrideExisting) {
+            return;
+        }
+        $this->collOrderVersions = new ObjectCollection();
+        $this->collOrderVersions->setModel('\Thelia\Model\OrderVersion');
+    }
+
+    /**
+     * Gets an array of ChildOrderVersion objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildOrder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildOrderVersion[] List of ChildOrderVersion objects
+     * @throws PropelException
+     */
+    public function getOrderVersions($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrderVersionsPartial && !$this->isNew();
+        if (null === $this->collOrderVersions || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderVersions) {
+                // return empty collection
+                $this->initOrderVersions();
+            } else {
+                $collOrderVersions = ChildOrderVersionQuery::create(null, $criteria)
+                    ->filterByOrder($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOrderVersionsPartial && count($collOrderVersions)) {
+                        $this->initOrderVersions(false);
+
+                        foreach ($collOrderVersions as $obj) {
+                            if (false == $this->collOrderVersions->contains($obj)) {
+                                $this->collOrderVersions->append($obj);
+                            }
+                        }
+
+                        $this->collOrderVersionsPartial = true;
+                    }
+
+                    reset($collOrderVersions);
+
+                    return $collOrderVersions;
+                }
+
+                if ($partial && $this->collOrderVersions) {
+                    foreach ($this->collOrderVersions as $obj) {
+                        if ($obj->isNew()) {
+                            $collOrderVersions[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrderVersions = $collOrderVersions;
+                $this->collOrderVersionsPartial = false;
+            }
+        }
+
+        return $this->collOrderVersions;
+    }
+
+    /**
+     * Sets a collection of OrderVersion objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $orderVersions A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildOrder The current object (for fluent API support)
+     */
+    public function setOrderVersions(Collection $orderVersions, ConnectionInterface $con = null)
+    {
+        $orderVersionsToDelete = $this->getOrderVersions(new Criteria(), $con)->diff($orderVersions);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->orderVersionsScheduledForDeletion = clone $orderVersionsToDelete;
+
+        foreach ($orderVersionsToDelete as $orderVersionRemoved) {
+            $orderVersionRemoved->setOrder(null);
+        }
+
+        $this->collOrderVersions = null;
+        foreach ($orderVersions as $orderVersion) {
+            $this->addOrderVersion($orderVersion);
+        }
+
+        $this->collOrderVersions = $orderVersions;
+        $this->collOrderVersionsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related OrderVersion objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related OrderVersion objects.
+     * @throws PropelException
+     */
+    public function countOrderVersions(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrderVersionsPartial && !$this->isNew();
+        if (null === $this->collOrderVersions || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderVersions) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOrderVersions());
+            }
+
+            $query = ChildOrderVersionQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOrder($this)
+                ->count($con);
+        }
+
+        return count($this->collOrderVersions);
+    }
+
+    /**
+     * Method called to associate a ChildOrderVersion object to this object
+     * through the ChildOrderVersion foreign key attribute.
+     *
+     * @param    ChildOrderVersion $l ChildOrderVersion
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function addOrderVersion(ChildOrderVersion $l)
+    {
+        if ($this->collOrderVersions === null) {
+            $this->initOrderVersions();
+            $this->collOrderVersionsPartial = true;
+        }
+
+        if (!in_array($l, $this->collOrderVersions->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderVersion($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param OrderVersion $orderVersion The orderVersion object to add.
+     */
+    protected function doAddOrderVersion($orderVersion)
+    {
+        $this->collOrderVersions[]= $orderVersion;
+        $orderVersion->setOrder($this);
+    }
+
+    /**
+     * @param  OrderVersion $orderVersion The orderVersion object to remove.
+     * @return ChildOrder The current object (for fluent API support)
+     */
+    public function removeOrderVersion($orderVersion)
+    {
+        if ($this->getOrderVersions()->contains($orderVersion)) {
+            $this->collOrderVersions->remove($this->collOrderVersions->search($orderVersion));
+            if (null === $this->orderVersionsScheduledForDeletion) {
+                $this->orderVersionsScheduledForDeletion = clone $this->collOrderVersions;
+                $this->orderVersionsScheduledForDeletion->clear();
+            }
+            $this->orderVersionsScheduledForDeletion[]= clone $orderVersion;
+            $orderVersion->setOrder(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3146,14 +3824,21 @@ abstract class Order implements ActiveRecordInterface
         $this->invoice_ref = null;
         $this->discount = null;
         $this->postage = null;
+        $this->postage_tax = null;
+        $this->postage_tax_rule_title = null;
         $this->payment_module_id = null;
         $this->delivery_module_id = null;
         $this->status_id = null;
         $this->lang_id = null;
+        $this->cart_id = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -3181,10 +3866,16 @@ abstract class Order implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collOrderVersions) {
+                foreach ($this->collOrderVersions as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collOrderProducts = null;
         $this->collOrderCoupons = null;
+        $this->collOrderVersions = null;
         $this->aCurrency = null;
         $this->aCustomer = null;
         $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;
@@ -3219,6 +3910,343 @@ abstract class Order implements ActiveRecordInterface
         return $this;
     }
 
+    // versionable behavior
+
+    /**
+     * Enforce a new Version of this object upon next save.
+     *
+     * @return \Thelia\Model\Order
+     */
+    public function enforceVersioning()
+    {
+        $this->enforceVersion = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks whether the current state must be recorded as a version
+     *
+     * @return  boolean
+     */
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->alreadyInSave) {
+            return false;
+        }
+
+        if ($this->enforceVersion) {
+            return true;
+        }
+
+        if (ChildOrderQuery::isVersioningEnabled() && ($this->isNew() || $this->isModified()) || $this->isDeleted()) {
+            return true;
+        }
+        if (null !== ($object = $this->getCustomer($con)) && $object->isVersioningNecessary($con)) {
+            return true;
+        }
+
+
+        return false;
+    }
+
+    /**
+     * Creates a version of the current object and saves it.
+     *
+     * @param   ConnectionInterface $con the connection to use
+     *
+     * @return  ChildOrderVersion A version object
+     */
+    public function addVersion($con = null)
+    {
+        $this->enforceVersion = false;
+
+        $version = new ChildOrderVersion();
+        $version->setId($this->getId());
+        $version->setRef($this->getRef());
+        $version->setCustomerId($this->getCustomerId());
+        $version->setInvoiceOrderAddressId($this->getInvoiceOrderAddressId());
+        $version->setDeliveryOrderAddressId($this->getDeliveryOrderAddressId());
+        $version->setInvoiceDate($this->getInvoiceDate());
+        $version->setCurrencyId($this->getCurrencyId());
+        $version->setCurrencyRate($this->getCurrencyRate());
+        $version->setTransactionRef($this->getTransactionRef());
+        $version->setDeliveryRef($this->getDeliveryRef());
+        $version->setInvoiceRef($this->getInvoiceRef());
+        $version->setDiscount($this->getDiscount());
+        $version->setPostage($this->getPostage());
+        $version->setPostageTax($this->getPostageTax());
+        $version->setPostageTaxRuleTitle($this->getPostageTaxRuleTitle());
+        $version->setPaymentModuleId($this->getPaymentModuleId());
+        $version->setDeliveryModuleId($this->getDeliveryModuleId());
+        $version->setStatusId($this->getStatusId());
+        $version->setLangId($this->getLangId());
+        $version->setCartId($this->getCartId());
+        $version->setCreatedAt($this->getCreatedAt());
+        $version->setUpdatedAt($this->getUpdatedAt());
+        $version->setVersion($this->getVersion());
+        $version->setVersionCreatedAt($this->getVersionCreatedAt());
+        $version->setVersionCreatedBy($this->getVersionCreatedBy());
+        $version->setOrder($this);
+        if (($related = $this->getCustomer($con)) && $related->getVersion()) {
+            $version->setCustomerIdVersion($related->getVersion());
+        }
+        $version->save($con);
+
+        return $version;
+    }
+
+    /**
+     * Sets the properties of the current object to the value they had at a specific version
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   ConnectionInterface $con The connection to use
+     *
+     * @return  ChildOrder The current object (for fluent API support)
+     */
+    public function toVersion($versionNumber, $con = null)
+    {
+        $version = $this->getOneVersion($versionNumber, $con);
+        if (!$version) {
+            throw new PropelException(sprintf('No ChildOrder object found with version %d', $version));
+        }
+        $this->populateFromVersion($version, $con);
+
+        return $this;
+    }
+
+    /**
+     * Sets the properties of the current object to the value they had at a specific version
+     *
+     * @param ChildOrderVersion $version The version object to use
+     * @param ConnectionInterface   $con the connection to use
+     * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     *
+     * @return ChildOrder The current object (for fluent API support)
+     */
+    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
+    {
+        $loadedObjects['ChildOrder'][$version->getId()][$version->getVersion()] = $this;
+        $this->setId($version->getId());
+        $this->setRef($version->getRef());
+        $this->setCustomerId($version->getCustomerId());
+        $this->setInvoiceOrderAddressId($version->getInvoiceOrderAddressId());
+        $this->setDeliveryOrderAddressId($version->getDeliveryOrderAddressId());
+        $this->setInvoiceDate($version->getInvoiceDate());
+        $this->setCurrencyId($version->getCurrencyId());
+        $this->setCurrencyRate($version->getCurrencyRate());
+        $this->setTransactionRef($version->getTransactionRef());
+        $this->setDeliveryRef($version->getDeliveryRef());
+        $this->setInvoiceRef($version->getInvoiceRef());
+        $this->setDiscount($version->getDiscount());
+        $this->setPostage($version->getPostage());
+        $this->setPostageTax($version->getPostageTax());
+        $this->setPostageTaxRuleTitle($version->getPostageTaxRuleTitle());
+        $this->setPaymentModuleId($version->getPaymentModuleId());
+        $this->setDeliveryModuleId($version->getDeliveryModuleId());
+        $this->setStatusId($version->getStatusId());
+        $this->setLangId($version->getLangId());
+        $this->setCartId($version->getCartId());
+        $this->setCreatedAt($version->getCreatedAt());
+        $this->setUpdatedAt($version->getUpdatedAt());
+        $this->setVersion($version->getVersion());
+        $this->setVersionCreatedAt($version->getVersionCreatedAt());
+        $this->setVersionCreatedBy($version->getVersionCreatedBy());
+        if ($fkValue = $version->getCustomerId()) {
+            if (isset($loadedObjects['ChildCustomer']) && isset($loadedObjects['ChildCustomer'][$fkValue]) && isset($loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()])) {
+                $related = $loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()];
+            } else {
+                $related = new ChildCustomer();
+                $relatedVersion = ChildCustomerVersionQuery::create()
+                    ->filterById($fkValue)
+                    ->filterByVersion($version->getCustomerIdVersion())
+                    ->findOne($con);
+                $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
+                $related->setNew(false);
+            }
+            $this->setCustomer($related);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets the latest persisted version number for the current object
+     *
+     * @param   ConnectionInterface $con the connection to use
+     *
+     * @return  integer
+     */
+    public function getLastVersionNumber($con = null)
+    {
+        $v = ChildOrderVersionQuery::create()
+            ->filterByOrder($this)
+            ->orderByVersion('desc')
+            ->findOne($con);
+        if (!$v) {
+            return 0;
+        }
+
+        return $v->getVersion();
+    }
+
+    /**
+     * Checks whether the current object is the latest one
+     *
+     * @param   ConnectionInterface $con the connection to use
+     *
+     * @return  Boolean
+     */
+    public function isLastVersion($con = null)
+    {
+        return $this->getLastVersionNumber($con) == $this->getVersion();
+    }
+
+    /**
+     * Retrieves a version object for this entity and a version number
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   ConnectionInterface $con the connection to use
+     *
+     * @return  ChildOrderVersion A version object
+     */
+    public function getOneVersion($versionNumber, $con = null)
+    {
+        return ChildOrderVersionQuery::create()
+            ->filterByOrder($this)
+            ->filterByVersion($versionNumber)
+            ->findOne($con);
+    }
+
+    /**
+     * Gets all the versions of this object, in incremental order
+     *
+     * @param   ConnectionInterface $con the connection to use
+     *
+     * @return  ObjectCollection A list of ChildOrderVersion objects
+     */
+    public function getAllVersions($con = null)
+    {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(OrderVersionTableMap::VERSION);
+
+        return $this->getOrderVersions($criteria, $con);
+    }
+
+    /**
+     * Compares the current object with another of its version.
+     * <code>
+     * print_r($book->compareVersion(1));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer             $versionNumber
+     * @param   string              $keys Main key used for the result diff (versions|columns)
+     * @param   ConnectionInterface $con the connection to use
+     * @param   array               $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->toArray();
+        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Compares two versions of the current object.
+     * <code>
+     * print_r($book->compareVersions(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer             $fromVersionNumber
+     * @param   integer             $toVersionNumber
+     * @param   string              $keys Main key used for the result diff (versions|columns)
+     * @param   ConnectionInterface $con the connection to use
+     * @param   array               $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
+        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Computes the diff between two versions.
+     * <code>
+     * print_r($book->computeDiff(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
+    {
+        $fromVersionNumber = $fromVersion['Version'];
+        $toVersionNumber = $toVersion['Version'];
+        $ignoredColumns = array_merge(array(
+            'Version',
+            'VersionCreatedAt',
+            'VersionCreatedBy',
+        ), $ignoredColumns);
+        $diff = array();
+        foreach ($fromVersion as $key => $value) {
+            if (in_array($key, $ignoredColumns)) {
+                continue;
+            }
+            if ($toVersion[$key] != $value) {
+                switch ($keys) {
+                    case 'versions':
+                        $diff[$fromVersionNumber][$key] = $value;
+                        $diff[$toVersionNumber][$key] = $toVersion[$key];
+                        break;
+                    default:
+                        $diff[$key] = array(
+                            $fromVersionNumber => $value,
+                            $toVersionNumber => $toVersion[$key],
+                        );
+                        break;
+                }
+            }
+        }
+
+        return $diff;
+    }
+    /**
+     * retrieve the last $number versions.
+     *
+     * @param Integer $number the number of record to return.
+     * @return PropelCollection|array \Thelia\Model\OrderVersion[] List of \Thelia\Model\OrderVersion objects
+     */
+    public function getLastVersions($number = 10, $criteria = null, $con = null)
+    {
+        $criteria = ChildOrderVersionQuery::create(null, $criteria);
+        $criteria->addDescendingOrderByColumn(OrderVersionTableMap::VERSION);
+        $criteria->limit($number);
+
+        return $this->getOrderVersions($criteria, $con);
+    }
     /**
      * Code to be run before persisting the object
      * @param  ConnectionInterface $con

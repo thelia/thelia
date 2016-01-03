@@ -58,7 +58,7 @@ class OrderProductTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 20;
+    const NUM_COLUMNS = 23;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class OrderProductTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 20;
+    const NUM_HYDRATE_COLUMNS = 23;
 
     /**
      * the column name for the ID field
@@ -89,6 +89,11 @@ class OrderProductTableMap extends TableMap
      * the column name for the PRODUCT_SALE_ELEMENTS_REF field
      */
     const PRODUCT_SALE_ELEMENTS_REF = 'order_product.PRODUCT_SALE_ELEMENTS_REF';
+
+    /**
+     * the column name for the PRODUCT_SALE_ELEMENTS_ID field
+     */
+    const PRODUCT_SALE_ELEMENTS_ID = 'order_product.PRODUCT_SALE_ELEMENTS_ID';
 
     /**
      * the column name for the TITLE field
@@ -161,6 +166,16 @@ class OrderProductTableMap extends TableMap
     const PARENT = 'order_product.PARENT';
 
     /**
+     * the column name for the VIRTUAL field
+     */
+    const VIRTUAL = 'order_product.VIRTUAL';
+
+    /**
+     * the column name for the VIRTUAL_DOCUMENT field
+     */
+    const VIRTUAL_DOCUMENT = 'order_product.VIRTUAL_DOCUMENT';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'order_product.CREATED_AT';
@@ -182,12 +197,12 @@ class OrderProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'ProductRef', 'ProductSaleElementsRef', 'Title', 'Chapo', 'Description', 'Postscriptum', 'Quantity', 'Price', 'PromoPrice', 'WasNew', 'WasInPromo', 'Weight', 'EanCode', 'TaxRuleTitle', 'TaxRuleDescription', 'Parent', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'productRef', 'productSaleElementsRef', 'title', 'chapo', 'description', 'postscriptum', 'quantity', 'price', 'promoPrice', 'wasNew', 'wasInPromo', 'weight', 'eanCode', 'taxRuleTitle', 'taxRuleDescription', 'parent', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderProductTableMap::ID, OrderProductTableMap::ORDER_ID, OrderProductTableMap::PRODUCT_REF, OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF, OrderProductTableMap::TITLE, OrderProductTableMap::CHAPO, OrderProductTableMap::DESCRIPTION, OrderProductTableMap::POSTSCRIPTUM, OrderProductTableMap::QUANTITY, OrderProductTableMap::PRICE, OrderProductTableMap::PROMO_PRICE, OrderProductTableMap::WAS_NEW, OrderProductTableMap::WAS_IN_PROMO, OrderProductTableMap::WEIGHT, OrderProductTableMap::EAN_CODE, OrderProductTableMap::TAX_RULE_TITLE, OrderProductTableMap::TAX_RULE_DESCRIPTION, OrderProductTableMap::PARENT, OrderProductTableMap::CREATED_AT, OrderProductTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'PRODUCT_REF', 'PRODUCT_SALE_ELEMENTS_REF', 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'QUANTITY', 'PRICE', 'PROMO_PRICE', 'WAS_NEW', 'WAS_IN_PROMO', 'WEIGHT', 'EAN_CODE', 'TAX_RULE_TITLE', 'TAX_RULE_DESCRIPTION', 'PARENT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_id', 'product_ref', 'product_sale_elements_ref', 'title', 'chapo', 'description', 'postscriptum', 'quantity', 'price', 'promo_price', 'was_new', 'was_in_promo', 'weight', 'ean_code', 'tax_rule_title', 'tax_rule_description', 'parent', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, )
+        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'ProductRef', 'ProductSaleElementsRef', 'ProductSaleElementsId', 'Title', 'Chapo', 'Description', 'Postscriptum', 'Quantity', 'Price', 'PromoPrice', 'WasNew', 'WasInPromo', 'Weight', 'EanCode', 'TaxRuleTitle', 'TaxRuleDescription', 'Parent', 'Virtual', 'VirtualDocument', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'productRef', 'productSaleElementsRef', 'productSaleElementsId', 'title', 'chapo', 'description', 'postscriptum', 'quantity', 'price', 'promoPrice', 'wasNew', 'wasInPromo', 'weight', 'eanCode', 'taxRuleTitle', 'taxRuleDescription', 'parent', 'virtual', 'virtualDocument', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderProductTableMap::ID, OrderProductTableMap::ORDER_ID, OrderProductTableMap::PRODUCT_REF, OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF, OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID, OrderProductTableMap::TITLE, OrderProductTableMap::CHAPO, OrderProductTableMap::DESCRIPTION, OrderProductTableMap::POSTSCRIPTUM, OrderProductTableMap::QUANTITY, OrderProductTableMap::PRICE, OrderProductTableMap::PROMO_PRICE, OrderProductTableMap::WAS_NEW, OrderProductTableMap::WAS_IN_PROMO, OrderProductTableMap::WEIGHT, OrderProductTableMap::EAN_CODE, OrderProductTableMap::TAX_RULE_TITLE, OrderProductTableMap::TAX_RULE_DESCRIPTION, OrderProductTableMap::PARENT, OrderProductTableMap::VIRTUAL, OrderProductTableMap::VIRTUAL_DOCUMENT, OrderProductTableMap::CREATED_AT, OrderProductTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'PRODUCT_REF', 'PRODUCT_SALE_ELEMENTS_REF', 'PRODUCT_SALE_ELEMENTS_ID', 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'QUANTITY', 'PRICE', 'PROMO_PRICE', 'WAS_NEW', 'WAS_IN_PROMO', 'WEIGHT', 'EAN_CODE', 'TAX_RULE_TITLE', 'TAX_RULE_DESCRIPTION', 'PARENT', 'VIRTUAL', 'VIRTUAL_DOCUMENT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'order_id', 'product_ref', 'product_sale_elements_ref', 'product_sale_elements_id', 'title', 'chapo', 'description', 'postscriptum', 'quantity', 'price', 'promo_price', 'was_new', 'was_in_promo', 'weight', 'ean_code', 'tax_rule_title', 'tax_rule_description', 'parent', 'virtual', 'virtual_document', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
     );
 
     /**
@@ -197,12 +212,12 @@ class OrderProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'ProductRef' => 2, 'ProductSaleElementsRef' => 3, 'Title' => 4, 'Chapo' => 5, 'Description' => 6, 'Postscriptum' => 7, 'Quantity' => 8, 'Price' => 9, 'PromoPrice' => 10, 'WasNew' => 11, 'WasInPromo' => 12, 'Weight' => 13, 'EanCode' => 14, 'TaxRuleTitle' => 15, 'TaxRuleDescription' => 16, 'Parent' => 17, 'CreatedAt' => 18, 'UpdatedAt' => 19, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'productRef' => 2, 'productSaleElementsRef' => 3, 'title' => 4, 'chapo' => 5, 'description' => 6, 'postscriptum' => 7, 'quantity' => 8, 'price' => 9, 'promoPrice' => 10, 'wasNew' => 11, 'wasInPromo' => 12, 'weight' => 13, 'eanCode' => 14, 'taxRuleTitle' => 15, 'taxRuleDescription' => 16, 'parent' => 17, 'createdAt' => 18, 'updatedAt' => 19, ),
-        self::TYPE_COLNAME       => array(OrderProductTableMap::ID => 0, OrderProductTableMap::ORDER_ID => 1, OrderProductTableMap::PRODUCT_REF => 2, OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF => 3, OrderProductTableMap::TITLE => 4, OrderProductTableMap::CHAPO => 5, OrderProductTableMap::DESCRIPTION => 6, OrderProductTableMap::POSTSCRIPTUM => 7, OrderProductTableMap::QUANTITY => 8, OrderProductTableMap::PRICE => 9, OrderProductTableMap::PROMO_PRICE => 10, OrderProductTableMap::WAS_NEW => 11, OrderProductTableMap::WAS_IN_PROMO => 12, OrderProductTableMap::WEIGHT => 13, OrderProductTableMap::EAN_CODE => 14, OrderProductTableMap::TAX_RULE_TITLE => 15, OrderProductTableMap::TAX_RULE_DESCRIPTION => 16, OrderProductTableMap::PARENT => 17, OrderProductTableMap::CREATED_AT => 18, OrderProductTableMap::UPDATED_AT => 19, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'PRODUCT_REF' => 2, 'PRODUCT_SALE_ELEMENTS_REF' => 3, 'TITLE' => 4, 'CHAPO' => 5, 'DESCRIPTION' => 6, 'POSTSCRIPTUM' => 7, 'QUANTITY' => 8, 'PRICE' => 9, 'PROMO_PRICE' => 10, 'WAS_NEW' => 11, 'WAS_IN_PROMO' => 12, 'WEIGHT' => 13, 'EAN_CODE' => 14, 'TAX_RULE_TITLE' => 15, 'TAX_RULE_DESCRIPTION' => 16, 'PARENT' => 17, 'CREATED_AT' => 18, 'UPDATED_AT' => 19, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'product_ref' => 2, 'product_sale_elements_ref' => 3, 'title' => 4, 'chapo' => 5, 'description' => 6, 'postscriptum' => 7, 'quantity' => 8, 'price' => 9, 'promo_price' => 10, 'was_new' => 11, 'was_in_promo' => 12, 'weight' => 13, 'ean_code' => 14, 'tax_rule_title' => 15, 'tax_rule_description' => 16, 'parent' => 17, 'created_at' => 18, 'updated_at' => 19, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'ProductRef' => 2, 'ProductSaleElementsRef' => 3, 'ProductSaleElementsId' => 4, 'Title' => 5, 'Chapo' => 6, 'Description' => 7, 'Postscriptum' => 8, 'Quantity' => 9, 'Price' => 10, 'PromoPrice' => 11, 'WasNew' => 12, 'WasInPromo' => 13, 'Weight' => 14, 'EanCode' => 15, 'TaxRuleTitle' => 16, 'TaxRuleDescription' => 17, 'Parent' => 18, 'Virtual' => 19, 'VirtualDocument' => 20, 'CreatedAt' => 21, 'UpdatedAt' => 22, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'productRef' => 2, 'productSaleElementsRef' => 3, 'productSaleElementsId' => 4, 'title' => 5, 'chapo' => 6, 'description' => 7, 'postscriptum' => 8, 'quantity' => 9, 'price' => 10, 'promoPrice' => 11, 'wasNew' => 12, 'wasInPromo' => 13, 'weight' => 14, 'eanCode' => 15, 'taxRuleTitle' => 16, 'taxRuleDescription' => 17, 'parent' => 18, 'virtual' => 19, 'virtualDocument' => 20, 'createdAt' => 21, 'updatedAt' => 22, ),
+        self::TYPE_COLNAME       => array(OrderProductTableMap::ID => 0, OrderProductTableMap::ORDER_ID => 1, OrderProductTableMap::PRODUCT_REF => 2, OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF => 3, OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID => 4, OrderProductTableMap::TITLE => 5, OrderProductTableMap::CHAPO => 6, OrderProductTableMap::DESCRIPTION => 7, OrderProductTableMap::POSTSCRIPTUM => 8, OrderProductTableMap::QUANTITY => 9, OrderProductTableMap::PRICE => 10, OrderProductTableMap::PROMO_PRICE => 11, OrderProductTableMap::WAS_NEW => 12, OrderProductTableMap::WAS_IN_PROMO => 13, OrderProductTableMap::WEIGHT => 14, OrderProductTableMap::EAN_CODE => 15, OrderProductTableMap::TAX_RULE_TITLE => 16, OrderProductTableMap::TAX_RULE_DESCRIPTION => 17, OrderProductTableMap::PARENT => 18, OrderProductTableMap::VIRTUAL => 19, OrderProductTableMap::VIRTUAL_DOCUMENT => 20, OrderProductTableMap::CREATED_AT => 21, OrderProductTableMap::UPDATED_AT => 22, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'PRODUCT_REF' => 2, 'PRODUCT_SALE_ELEMENTS_REF' => 3, 'PRODUCT_SALE_ELEMENTS_ID' => 4, 'TITLE' => 5, 'CHAPO' => 6, 'DESCRIPTION' => 7, 'POSTSCRIPTUM' => 8, 'QUANTITY' => 9, 'PRICE' => 10, 'PROMO_PRICE' => 11, 'WAS_NEW' => 12, 'WAS_IN_PROMO' => 13, 'WEIGHT' => 14, 'EAN_CODE' => 15, 'TAX_RULE_TITLE' => 16, 'TAX_RULE_DESCRIPTION' => 17, 'PARENT' => 18, 'VIRTUAL' => 19, 'VIRTUAL_DOCUMENT' => 20, 'CREATED_AT' => 21, 'UPDATED_AT' => 22, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'product_ref' => 2, 'product_sale_elements_ref' => 3, 'product_sale_elements_id' => 4, 'title' => 5, 'chapo' => 6, 'description' => 7, 'postscriptum' => 8, 'quantity' => 9, 'price' => 10, 'promo_price' => 11, 'was_new' => 12, 'was_in_promo' => 13, 'weight' => 14, 'ean_code' => 15, 'tax_rule_title' => 16, 'tax_rule_description' => 17, 'parent' => 18, 'virtual' => 19, 'virtual_document' => 20, 'created_at' => 21, 'updated_at' => 22, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
     );
 
     /**
@@ -225,13 +240,14 @@ class OrderProductTableMap extends TableMap
         $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
         $this->addColumn('PRODUCT_REF', 'ProductRef', 'VARCHAR', true, 255, null);
         $this->addColumn('PRODUCT_SALE_ELEMENTS_REF', 'ProductSaleElementsRef', 'VARCHAR', true, 255, null);
+        $this->addColumn('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', false, null, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
         $this->addColumn('POSTSCRIPTUM', 'Postscriptum', 'LONGVARCHAR', false, null, null);
         $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'VARCHAR', false, 45, null);
+        $this->addColumn('PRICE', 'Price', 'DECIMAL', true, 16, 0);
+        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'DECIMAL', false, 16, 0);
         $this->addColumn('WAS_NEW', 'WasNew', 'TINYINT', true, null, null);
         $this->addColumn('WAS_IN_PROMO', 'WasInPromo', 'TINYINT', true, null, null);
         $this->addColumn('WEIGHT', 'Weight', 'VARCHAR', false, 45, null);
@@ -239,6 +255,8 @@ class OrderProductTableMap extends TableMap
         $this->addColumn('TAX_RULE_TITLE', 'TaxRuleTitle', 'VARCHAR', false, 255, null);
         $this->addColumn('TAX_RULE_DESCRIPTION', 'TaxRuleDescription', 'CLOB', false, null, null);
         $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
+        $this->addColumn('VIRTUAL', 'Virtual', 'TINYINT', true, null, 0);
+        $this->addColumn('VIRTUAL_DOCUMENT', 'VirtualDocument', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -418,6 +436,7 @@ class OrderProductTableMap extends TableMap
             $criteria->addSelectColumn(OrderProductTableMap::ORDER_ID);
             $criteria->addSelectColumn(OrderProductTableMap::PRODUCT_REF);
             $criteria->addSelectColumn(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF);
+            $criteria->addSelectColumn(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID);
             $criteria->addSelectColumn(OrderProductTableMap::TITLE);
             $criteria->addSelectColumn(OrderProductTableMap::CHAPO);
             $criteria->addSelectColumn(OrderProductTableMap::DESCRIPTION);
@@ -432,6 +451,8 @@ class OrderProductTableMap extends TableMap
             $criteria->addSelectColumn(OrderProductTableMap::TAX_RULE_TITLE);
             $criteria->addSelectColumn(OrderProductTableMap::TAX_RULE_DESCRIPTION);
             $criteria->addSelectColumn(OrderProductTableMap::PARENT);
+            $criteria->addSelectColumn(OrderProductTableMap::VIRTUAL);
+            $criteria->addSelectColumn(OrderProductTableMap::VIRTUAL_DOCUMENT);
             $criteria->addSelectColumn(OrderProductTableMap::CREATED_AT);
             $criteria->addSelectColumn(OrderProductTableMap::UPDATED_AT);
         } else {
@@ -439,6 +460,7 @@ class OrderProductTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ORDER_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_REF');
             $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_REF');
+            $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
             $criteria->addSelectColumn($alias . '.TITLE');
             $criteria->addSelectColumn($alias . '.CHAPO');
             $criteria->addSelectColumn($alias . '.DESCRIPTION');
@@ -453,6 +475,8 @@ class OrderProductTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.TAX_RULE_TITLE');
             $criteria->addSelectColumn($alias . '.TAX_RULE_DESCRIPTION');
             $criteria->addSelectColumn($alias . '.PARENT');
+            $criteria->addSelectColumn($alias . '.VIRTUAL');
+            $criteria->addSelectColumn($alias . '.VIRTUAL_DOCUMENT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

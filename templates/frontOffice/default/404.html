@@ -13,10 +13,27 @@
 {block name="main-content"}
 <div class="main">
     <article class="col-main" role="main" aria-labelledby="main-label">
+        {ifhook rel="404.content"}
+            {hook name="404.content"}
+        {/ifhook}
+        {elsehook rel="404.content"}
         <h1 id="main-label">
             404
-            <span>{intl l="The page cannot be found"}</span>
+                <span>{intl l="The page cannot be found"}</span>
         </h1>
+        {/elsehook}
     </article>
 </div>
+{/block}
+
+{block name="stylesheet"}
+{hook name="404.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="404.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="404.javascript-initialization"}
 {/block}

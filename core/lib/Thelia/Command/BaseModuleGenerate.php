@@ -12,25 +12,23 @@
 
 namespace Thelia\Command;
 
-use Thelia\Model\Module;
-
 /**
  * base class for module commands
  *
  * Class BaseModuleGenerate
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 abstract class BaseModuleGenerate extends ContainerAwareCommand
 {
-     protected $module;
-     protected $moduleDirectory;
+    protected $module;
+    protected $moduleDirectory;
 
-     protected $reservedKeyWords = array(
+    protected $reservedKeyWords = array(
          'thelia'
      );
 
-     protected $neededDirectories = array(
+    protected $neededDirectories = array(
          'Config',
          'Model',
          'Loop',
@@ -38,23 +36,28 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'Controller',
          'EventListeners',
          'I18n',
-         Module::ADMIN_INCLUDES_DIRECTORY_NAME,
          'templates',
+         'Hook',
      );
 
-     protected function verifyExistingModule()
-     {
-         if (file_exists($this->moduleDirectory)) {
-             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-         }
-     }
+    protected function verifyExistingModule()
+    {
+        if (file_exists($this->moduleDirectory)) {
+            throw new \RuntimeException(
+                sprintf(
+                    "%s module already exists. Use --force option to force generation.",
+                    $this->module
+                )
+            );
+        }
+    }
 
-     protected function formatModuleName($name)
-     {
-         if (in_array(strtolower($name), $this->reservedKeyWords)) {
-             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-         }
+    protected function formatModuleName($name)
+    {
+        if (in_array(strtolower($name), $this->reservedKeyWords)) {
+            throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
+        }
 
-         return ucfirst($name);
-     }
+        return ucfirst($name);
+    }
 }

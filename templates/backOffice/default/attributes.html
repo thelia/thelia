@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/attributes'}">{intl l="Product attributes"}</a></li>
         </ul>
 
-        {module_include location='attributes_top'}
+        {hook name="attributes.top" location="attributes_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -32,7 +32,7 @@
     	                           {intl l='Thelia product attributes'}
 
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.attribute" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product attribute'}" href="#creation_dialog" data-toggle="modal">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new product attribute'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                     {/loop}
@@ -69,7 +69,7 @@
                                             }
                                         </th>
 
-                                        {module_include location='attributes_table_header'}
+                                        {hook name="attributes.table-header" location="attributes_table_header" }
 
                                         <th class="actions">{intl l="Actions"}</th>
                                     </tr>
@@ -101,28 +101,29 @@
                                             }
                                         </td>
 
-                                        {module_include location='attributes_table_row'}
+                                        {hook name="attributes.table-row" location="attributes_table_row" attribute_id={$ID} }
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
-                                            <div class="btn-group">
-                                                <a class="btn btn-default btn-xs attribute-remove-from-all" title="{intl l='Remove this attribute from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-minus"></span>
-                                                </a>
-                                                <a class="btn btn-default btn-xs attribute-add-to-all" title="{intl l='Add this attribute to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-plus"></span>
-                                                </a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
                                             </div>
-                                            {/loop}
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
+                                                    <a class="attribute-remove-from-all" title="{intl l='Remove this attribute from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                    </a>
+                                                    <a class="attribute-add-to-all" title="{intl l='Add this attribute to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                    </a>
+                                                {/loop}
 
-                                            <div class="btn-group">
-    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs attribute-change" title="{intl l='Change this product attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-    	                                        {/loop}
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
+                                                    <a class="attribute-change" title="{intl l='Change this product attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
 
-    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs attribute-delete" title="{intl l='Delete this product attribute'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-    	                                        {/loop}
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="DELETE"}
+                                                    <a class="attribute-delete" title="{intl l='Delete this product attribute'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {/loop}
                                             </div>
                                         </td>
                                     </tr>
@@ -145,7 +146,7 @@
             </div>
         </div>
 
-        {module_include location='attributes_bottom'}
+        {hook name="attributes.bottom" location="attributes_bottom" }
 
     </div>
 </div>
@@ -156,14 +157,14 @@
 
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
               {* on success, redirect to the edition page, _ID_ is replaced with the created attribute ID, see controller  *}
               <input type="hidden" name="{$name}" value="{url path='/admin/configuration/attributes/update' attribute_id='_ID_'}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -178,14 +179,14 @@
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
             </div>
         {/form_field}
 
-        {form_field form=$form field='add_to_all'}
+        {form_field field='add_to_all'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">
@@ -197,7 +198,7 @@
             </div>
         {/form_field}
 
-        {module_include location='attribute_create_form'}
+        {hook name="attribute.create-form" location="attribute_create_form" }
 
     {/capture}
 
@@ -211,7 +212,7 @@
         dialog_ok_label     = {intl l="Create this attribute"}
 
         form_action        = {url path='/admin/configuration/attributes/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}
@@ -221,7 +222,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="attribute_id" id="attribute_delete_id" value="" />
 
-    {module_include location='attribute_delete_form'}
+    {hook name="attribute.delete-form" location="attribute_delete_form" }
 
 {/capture}
 
@@ -232,7 +233,7 @@
     dialog_title    = {intl l="Delete attribute"}
     dialog_message  = {intl l="Do you really want to delete this attribute ? It will be removed from all product templates."}
 
-    form_action     = {url path='/admin/configuration/attributes/delete'}
+    form_action     = {token_url path='/admin/configuration/attributes/delete'}
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 
@@ -242,7 +243,7 @@
 {capture "add_to_all_dialog"}
     <input type="hidden" name="attribute_id" id="attribute_add_to_all_id" value="" />
 
-    {module_include location='attribute_add_to_all_form'}
+    {hook name="attribute.add-to-all-form" location="attribute_add_to_all_form" }
 
 {/capture}
 
@@ -262,7 +263,7 @@
 {capture "remove_from_all_dialog"}
     <input type="hidden" name="attribute_id" id="attribute_remove_from_all_id" value="" />
 
-    {module_include location='attribute_add_to_all_form'}
+    {hook name="attribute.remove-to-all-form" location="attribute_remove_to_all_form" }
 
 {/capture}
 
@@ -334,5 +335,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='attributes-js'}
+    {hook name="attributes.js" location="attributes-js" }
 {/block}

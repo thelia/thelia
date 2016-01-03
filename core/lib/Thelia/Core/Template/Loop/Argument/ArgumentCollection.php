@@ -27,16 +27,27 @@ class ArgumentCollection implements \Iterator
         $this->addArguments(func_get_args(), true);
     }
 
+    /**
+     * @param $key
+     * @return bool
+     */
     public function hasKey($key)
     {
         return isset($this->arguments[$key]);
     }
 
+    /**
+     * @param $key
+     * @return Argument|null
+     */
     public function get($key)
     {
         return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
+    /**
+     * @return bool
+     */
     public function isEmpty()
     {
         return count($this->arguments) == 0;
@@ -70,6 +81,36 @@ class ArgumentCollection implements \Iterator
         }
 
         $this->arguments[$argument->name] = $argument;
+
+        return $this;
+    }
+
+    /**
+     * @param array $argumentNames Array with names of arguments to remove.
+     *
+     * @return ArgumentCollection
+     * @since 2.2.0-beta1
+     */
+    public function removeArguments(array $argumentNames)
+    {
+        foreach ($argumentNames as $argumentName) {
+            $this->removeArgument($argumentName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $argumentName Name of the argument to remove.
+     *
+     * @return ArgumentCollection
+     * @since 2.2.0-beta1
+     */
+    public function removeArgument($argumentName)
+    {
+        if (isset($this->arguments[$argumentName])) {
+            unset($this->arguments[$argumentName]);
+        }
 
         return $this;
     }

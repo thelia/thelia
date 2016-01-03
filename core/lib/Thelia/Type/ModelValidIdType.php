@@ -13,6 +13,7 @@
 namespace Thelia\Type;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TypeException;
 
 /**
@@ -67,8 +68,16 @@ class ModelValidIdType extends BaseType
     {
         $queryClass = $this->expectedModelActiveRecordQuery;
 
+        $query = $queryClass::create();
+
+        if (method_exists($query, "joinWithI18n")) {
+            if (null !== $locale = Translator::getInstance()->getLocale()) {
+                $query->joinWithI18n($locale);
+            }
+        }
+
         $choices = array();
-        foreach ($queryClass::create()->find() as $item) {
+        foreach ($query->find() as $item) {
             $choices[$item->getId()] = method_exists($item, "getTitle") ? $item->getTitle() : $item->getId();
         }
 

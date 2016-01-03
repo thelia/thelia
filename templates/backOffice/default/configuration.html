@@ -21,7 +21,7 @@
                 </ul>
             </nav>
 
-            {module_include location='configuration_top'}
+            {hook name="configuration.top" location="configuration_top" }
 
             <div class="row">
 
@@ -31,7 +31,7 @@
                             <table class="table table-striped table-condensed">
                                 <caption>{intl l='Product catalog configuration'}</caption>
 
-                                {module_include location='catalog_configuration_top'}
+                                {hook name="configuration.catalog-top" location="configuration_catalog_top" }
 
                                 {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.template" access="VIEW"}
                                     <tr>
@@ -75,7 +75,7 @@
                                     </tr>
                                 {/loop}
 
-                                {module_include location='catalog_configuration_bottom'}
+                                {hook name="configuration.catalog-bottom" location="configuration_catalog_bottom" }
                             </table>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                             <table class="table table-striped table-condensed">
                                 <caption>{intl l='Shipping configuration'}</caption>
 
-                                {module_include location='shipping_configuration_top'}
+                                {hook name="configuration.shipping-top" location="configuration_shipping_top" }
 
                                 {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.contry" access="VIEW"}
                                     <tr>
@@ -96,21 +96,28 @@
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
+                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.state" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/states'}">{intl l='States / Provinces'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/states'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+
+                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping configuration'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
+                                {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping zones management'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {module_include location='shipping_configuration_bottom'}
+                                {hook name="configuration.shipping-bottom" location="configuration_shipping_bottom" }
 
                             </table>
                         </div>
@@ -123,7 +130,7 @@
                             <table class="table table-striped table-condensed">
                                 <caption>{intl l='System parameters'}</caption>
 
-                                {module_include location='system_configuration_top'}
+                                {hook name="configuration.system-top" location="configuration_system_top" }
 
                                 {loop type="auth" name="pcc-store" role="ADMIN" resource="admin.configuration.store" access="VIEW"}
                                     <tr>
@@ -187,24 +194,42 @@
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system-logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
-                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
+                                {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.api" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/api'}">{intl l='API configuration'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/api'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+                                {loop type="auth" name="pcc10" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/advanced'}">{intl l='Advanced configuration'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/advanced'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
-                                {module_include location='system_configuration_bottom'}
+                                {loop type="auth" name="pcc10" role="ADMIN" resource="admin.hook" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/hooks'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
+                                {loop type="auth" name="pcc11" role="ADMIN" resource="admin.module-hook" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/module-hooks'}">{intl l='Modules attachments'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/module-hooks'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
+                                {hook name="configuration.system-bottom" location="configuration_system_bottom" }
                             </table>
                         </div>
                     </div>
                 </div>
 
-                {module_include location='configuration_bottom'}
+                {hook name="configuration.bottom" location="configuration_bottom" }
             </div>
         </div>
     </div>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='configuration-js'}
+    {hook name="configuration.js" location="configuration-js" }
 {/block}

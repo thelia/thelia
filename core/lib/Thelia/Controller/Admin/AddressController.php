@@ -11,20 +11,20 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\AddressCreateForm;
-use Thelia\Form\AddressUpdateForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
  * Class AddressController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressController extends AbstractCrudController
 {
@@ -34,9 +34,7 @@ class AddressController extends AbstractCrudController
             'registration_date',
             null,
             null,
-
             AdminResources::ADDRESS,
-
             TheliaEvents::ADDRESS_CREATE,
             TheliaEvents::ADDRESS_UPDATE,
             TheliaEvents::ADDRESS_DELETE
@@ -45,7 +43,9 @@ class AddressController extends AbstractCrudController
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $address_id = $this->getRequest()->request->get('address_id');
 
@@ -60,12 +60,21 @@ class AddressController extends AbstractCrudController
 
             $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $addressEvent);
 
-            $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("address %d for customer %d set as default address", $address_id, $address->getCustomerId()));
+            $this->adminLogAppend(
+                $this->resourceCode,
+                AccessManager::UPDATE,
+                sprintf(
+                    "address %d for customer %d set as default address",
+                    $address_id,
+                    $address->getCustomerId()
+                ),
+                $address_id
+            );
         } catch (\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address setting as default with message %s", $e->getMessage()));
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -73,7 +82,7 @@ class AddressController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new AddressCreateForm($this->getRequest());
+        return $this->createForm(AdminForm::ADDRESS_CREATE);
     }
 
     /**
@@ -81,14 +90,14 @@ class AddressController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new AddressUpdateForm($this->getRequest());
+        return $this->createForm(AdminForm::ADDRESS_UPDATE);
     }
 
     /**
      * Fills in the form data array
      *
      * @param  unknown        $object
-     * @return multitype:NULL
+     * @return array
      */
     protected function createFormDataArray($object)
     {
@@ -103,6 +112,7 @@ class AddressController extends AbstractCrudController
             "zipcode" => $object->getZipcode(),
             "city" => $object->getCity(),
             "country" => $object->getCountryId(),
+            "state" => $object->getStateId(),
             "cellphone" => $object->getCellphone(),
             "phone" => $object->getPhone(),
             "company" => $object->getCompany()
@@ -116,7 +126,7 @@ class AddressController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        return new AddressUpdateForm($this->getRequest(), "form", $this->createFormDataArray($object));
+        return $this->createForm(AdminForm::ADDRESS_UPDATE, "form", $this->createFormDataArray($object));
     }
 
     /**
@@ -165,11 +175,11 @@ class AddressController extends AbstractCrudController
             $formData["cellphone"],
             $formData["phone"],
             $formData["company"],
-            $formData["is_default"]
+            $formData["is_default"],
+            $formData["state"]
         );
 
         return $event;
-
     }
 
     /**
@@ -257,10 +267,13 @@ class AddressController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         // We display here the custromer edition template
-        $this->redirectToRoute('admin.customer.update.view', array(
-            "page"        => $this->getRequest()->get('page'),
-            "customer_id" => $this->getCustomerId()
-        ));
+        return $this->generateRedirectFromRoute(
+            'admin.customer.update.view',
+            [
+                "page"        => $this->getRequest()->get('page'),
+                "customer_id" => $this->getCustomerId()
+            ]
+        );
     }
 
     /**
@@ -279,7 +292,7 @@ class AddressController extends AbstractCrudController
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -290,19 +303,20 @@ class AddressController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     protected function performAdditionalUpdateAction($event)
     {
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     protected function getCustomerId()
     {
-        if (null !== $address = $this->getExistingObject())
+        if (null !== $address = $this->getExistingObject()) {
             return $address->getCustomerId();
-        else
+        } else {
             return $this->getRequest()->get('customer_id', 0);
+        }
     }
 }

@@ -19,11 +19,10 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class ContactForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ContactForm extends BaseForm
+class ContactForm extends FirewallForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -49,40 +48,40 @@ class ContactForm extends BaseForm
         $this->formBuilder
             ->add('name', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('Full Name'),
                 'label_attr' => array(
-                    'for' => 'name_contact'
-                )
+                    'for' => 'name_contact',
+                ),
             ))
             ->add('email', 'email', array(
                 'constraints' => array(
                     new NotBlank(),
-                    new Email()
+                    new Email(),
                 ),
                 'label' => Translator::getInstance()->trans('Your Email Address'),
                 'label_attr' => array(
-                    'for' => 'email_contact'
-                )
+                    'for' => 'email_contact',
+                ),
             ))
             ->add('subject', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('Subject'),
                 'label_attr' => array(
-                    'for' => 'subject_contact'
-                )
+                    'for' => 'subject_contact',
+                ),
             ))
             ->add('message', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('Your Message'),
                 'label_attr' => array(
-                    'for' => 'message_contact'
-                )
+                    'for' => 'message_contact',
+                ),
 
             ))
         ;

@@ -1,0 +1,31 @@
+{extends file="email-layout.tpl"}
+
+{* Open in browser  *}
+{block name="browser"}{/block}
+
+{* No big image header *}
+{block name="image-header"}{/block}
+
+{* No pre-header *}
+{block name="pre-header"}{/block}
+
+{* Subject  *}
+{block name="email-subject"}{intl l="Your %store account" store={config key="store_name"}}{/block}
+
+{* Title  *}
+{block name="email-title"}{/block}
+
+{* Content  *}
+{block name="email-content"}
+    {intl l="Hello,"}<br /><br />
+    {intl l="An account at %store_name has been created by one of our managers." store_name={config key="store_name"}}.<br /><br />
+    {loop name="cust_info" type="customer" id={$customer_id} current="false"}
+        {intl l="To login, please use the email address <span style=\"font-family: courier, fixed; font-size: 120%\">%email</span>" email={$EMAIL}}<br /><br />
+    {/loop}
+    {if ! empty($password)}
+        {intl l="Your password is <span style=\"font-family: courier, fixed; font-size: 120%\">%pass</span>" pass={$password}}<br /><br />
+    {/if}
+    {intl l='You can change your password and your account details at any time <a href="%url">in our store</a>.' url={url path="/account"}}<br /><br />
+    {intl l='Kind regards'},<br />
+    {intl l="The %store team." store={config key="store_name"}}
+{/block}

@@ -34,7 +34,7 @@
                         <div class="col-md-4">
                             {form name="thelia.cache.flush"}
                                 <form method="post" action="{url path="/admin/configuration/advanced/flush-cache"}">
-                                    {form_hidden_fields form=$form}
+                                    {form_hidden_fields}
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-warning btn-sm btn-block">{intl l="Flush the Thelia internal cache"}</button>
@@ -47,7 +47,7 @@
 
                             {form name="thelia.assets.flush"}
                                 <form method="post" action="{url path="/admin/configuration/advanced/flush-assets"}">
-                                    {form_hidden_fields form=$form}
+                                    {form_hidden_fields}
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-warning btn-sm btn-block">{intl l="Flush the assets cache directory"}</button>
@@ -60,7 +60,7 @@
 
                             {form name="thelia.images-and-documents-cache.flush"}
                                 <form method="post" action="{url path="/admin/configuration/advanced/flush-images-and-documents"}">
-                                    {form_hidden_fields form=$form}
+                                    {form_hidden_fields}
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-warning btn-sm btn-block">{intl l="Flush the images and documents cache"}</button>
@@ -69,8 +69,13 @@
                             {/form}
                         </div>
                     </div>
+                    {hook name="advanced-configuration" location="advanced-configuration"}
                 </div>
             </div>
         </div>
     </div>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="advanced-configuration.js" location="advanced-configuration-js" }
 {/block}

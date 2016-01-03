@@ -13,21 +13,22 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\TemplateHelper;
 
 /**
  *
  * Class HttpException
  * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Manuel Raynaud  <manu@raynaud.io>
  */
 class HttpException extends BaseAction implements EventSubscriberInterface
 {
@@ -38,7 +39,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function __construct(ParserInterface $parser)
     {
-         $this->parser = $parser;
+        $this->parser = $parser;
     }
 
     public function checkHttpException(GetResponseForExceptionEvent $event)
@@ -48,29 +49,33 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->display404($event);
         }
 
-        if ($exception instanceof AccessDeniedHttpException) {
-            $this->display403($event);
-        }
-
         if ($exception instanceof AdminAccessDenied) {
             $this->displayAdminGeneralError($event);
+        }
+
+        if ($exception instanceof BaseHttpException && null === $event->getResponse()) {
+            $this->displayException($event);
         }
     }
 
     protected function displayAdminGeneralError(GetResponseForExceptionEvent $event)
     {
         // Define the template thant shoud be used
-        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+        $this->parser->setTemplateDefinition(
+            $this->parser->getTemplateHelper()->getActiveAdminTemplate()
+        );
 
         $message = $event->getException()->getMessage();
 
         $response = Response::create(
-            $this->parser->render('general_error.html',
+            $this->parser->render(
+                'general_error.html',
                 array(
                     "error_message" => $message
-                )),
+                )
+            ),
             403
-        ) ;
+        );
 
         $event->setResponse($response);
     }
@@ -78,16 +83,26 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     protected function display404(GetResponseForExceptionEvent $event)
     {
         // Define the template thant shoud be used
-        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $this->parser->setTemplateDefinition(
+            $this->parser->getTemplateHelper()->getActiveFrontTemplate()
+        );
 
         $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), 404);
 
         $event->setResponse($response);
     }
 
-    protected function display403(GetResponseForExceptionEvent $event)
+    protected function displayException(GetResponseForExceptionEvent $event)
     {
-        $event->setResponse(new Response("You don't have access to this resources", 403));
+        /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
+        $exception = $event->getException();
+        $event->setResponse(
+            new Response(
+                $exception->getMessage(),
+                $exception->getStatusCode(),
+                $exception->getHeaders()
+            )
+        );
     }
 
     /**
@@ -113,7 +128,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::EXCEPTION => array("checkHttpException", 128),
+            KernelEvents::EXCEPTION => ["checkHttpException", 128],
         );
     }
 }

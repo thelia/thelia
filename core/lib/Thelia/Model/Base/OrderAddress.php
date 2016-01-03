@@ -17,10 +17,16 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Country as ChildCountry;
+use Thelia\Model\CountryQuery as ChildCountryQuery;
+use Thelia\Model\CustomerTitle as ChildCustomerTitle;
+use Thelia\Model\CustomerTitleQuery as ChildCustomerTitleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderAddress as ChildOrderAddress;
 use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
+use Thelia\Model\State as ChildState;
+use Thelia\Model\StateQuery as ChildStateQuery;
 use Thelia\Model\Map\OrderAddressTableMap;
 
 abstract class OrderAddress implements ActiveRecordInterface
@@ -124,10 +130,22 @@ abstract class OrderAddress implements ActiveRecordInterface
     protected $phone;
 
     /**
+     * The value for the cellphone field.
+     * @var        string
+     */
+    protected $cellphone;
+
+    /**
      * The value for the country_id field.
      * @var        int
      */
     protected $country_id;
+
+    /**
+     * The value for the state_id field.
+     * @var        int
+     */
+    protected $state_id;
 
     /**
      * The value for the created_at field.
@@ -140,6 +158,21 @@ abstract class OrderAddress implements ActiveRecordInterface
      * @var        string
      */
     protected $updated_at;
+
+    /**
+     * @var        CustomerTitle
+     */
+    protected $aCustomerTitle;
+
+    /**
+     * @var        Country
+     */
+    protected $aCountry;
+
+    /**
+     * @var        State
+     */
+    protected $aState;
 
     /**
      * @var        ObjectCollection|ChildOrder[] Collection to store aggregation of ChildOrder objects.
@@ -553,6 +586,17 @@ abstract class OrderAddress implements ActiveRecordInterface
     }
 
     /**
+     * Get the [cellphone] column value.
+     *
+     * @return   string
+     */
+    public function getCellphone()
+    {
+
+        return $this->cellphone;
+    }
+
+    /**
      * Get the [country_id] column value.
      *
      * @return   int
@@ -561,6 +605,17 @@ abstract class OrderAddress implements ActiveRecordInterface
     {
 
         return $this->country_id;
+    }
+
+    /**
+     * Get the [state_id] column value.
+     *
+     * @return   int
+     */
+    public function getStateId()
+    {
+
+        return $this->state_id;
     }
 
     /**
@@ -639,6 +694,10 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->customer_title_id !== $v) {
             $this->customer_title_id = $v;
             $this->modifiedColumns[OrderAddressTableMap::CUSTOMER_TITLE_ID] = true;
+        }
+
+        if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
+            $this->aCustomerTitle = null;
         }
 
 
@@ -835,6 +894,27 @@ abstract class OrderAddress implements ActiveRecordInterface
     } // setPhone()
 
     /**
+     * Set the value of [cellphone] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderAddress The current object (for fluent API support)
+     */
+    public function setCellphone($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->cellphone !== $v) {
+            $this->cellphone = $v;
+            $this->modifiedColumns[OrderAddressTableMap::CELLPHONE] = true;
+        }
+
+
+        return $this;
+    } // setCellphone()
+
+    /**
      * Set the value of [country_id] column.
      *
      * @param      int $v new value
@@ -851,9 +931,38 @@ abstract class OrderAddress implements ActiveRecordInterface
             $this->modifiedColumns[OrderAddressTableMap::COUNTRY_ID] = true;
         }
 
+        if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
+            $this->aCountry = null;
+        }
+
 
         return $this;
     } // setCountryId()
+
+    /**
+     * Set the value of [state_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderAddress The current object (for fluent API support)
+     */
+    public function setStateId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->state_id !== $v) {
+            $this->state_id = $v;
+            $this->modifiedColumns[OrderAddressTableMap::STATE_ID] = true;
+        }
+
+        if ($this->aState !== null && $this->aState->getId() !== $v) {
+            $this->aState = null;
+        }
+
+
+        return $this;
+    } // setStateId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -967,16 +1076,22 @@ abstract class OrderAddress implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderAddressTableMap::translateFieldName('Phone', TableMap::TYPE_PHPNAME, $indexType)];
             $this->phone = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderAddressTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderAddressTableMap::translateFieldName('Cellphone', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->cellphone = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderAddressTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->country_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderAddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderAddressTableMap::translateFieldName('StateId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->state_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderAddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderAddressTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderAddressTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -989,7 +1104,7 @@ abstract class OrderAddress implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 14; // 14 = OrderAddressTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 16; // 16 = OrderAddressTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderAddress object", 0, $e);
@@ -1011,6 +1126,15 @@ abstract class OrderAddress implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aCustomerTitle !== null && $this->customer_title_id !== $this->aCustomerTitle->getId()) {
+            $this->aCustomerTitle = null;
+        }
+        if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
+            $this->aCountry = null;
+        }
+        if ($this->aState !== null && $this->state_id !== $this->aState->getId()) {
+            $this->aState = null;
+        }
     } // ensureConsistency
 
     /**
@@ -1050,6 +1174,9 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aCustomerTitle = null;
+            $this->aCountry = null;
+            $this->aState = null;
             $this->collOrdersRelatedByInvoiceOrderAddressId = null;
 
             $this->collOrdersRelatedByDeliveryOrderAddressId = null;
@@ -1176,6 +1303,32 @@ abstract class OrderAddress implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomerTitle !== null) {
+                if ($this->aCustomerTitle->isModified() || $this->aCustomerTitle->isNew()) {
+                    $affectedRows += $this->aCustomerTitle->save($con);
+                }
+                $this->setCustomerTitle($this->aCustomerTitle);
+            }
+
+            if ($this->aCountry !== null) {
+                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
+                    $affectedRows += $this->aCountry->save($con);
+                }
+                $this->setCountry($this->aCountry);
+            }
+
+            if ($this->aState !== null) {
+                if ($this->aState->isModified() || $this->aState->isNew()) {
+                    $affectedRows += $this->aState->save($con);
+                }
+                $this->setState($this->aState);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1280,8 +1433,14 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->isColumnModified(OrderAddressTableMap::PHONE)) {
             $modifiedColumns[':p' . $index++]  = '`PHONE`';
         }
+        if ($this->isColumnModified(OrderAddressTableMap::CELLPHONE)) {
+            $modifiedColumns[':p' . $index++]  = '`CELLPHONE`';
+        }
         if ($this->isColumnModified(OrderAddressTableMap::COUNTRY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+        }
+        if ($this->isColumnModified(OrderAddressTableMap::STATE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`STATE_ID`';
         }
         if ($this->isColumnModified(OrderAddressTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
@@ -1333,8 +1492,14 @@ abstract class OrderAddress implements ActiveRecordInterface
                     case '`PHONE`':
                         $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
                         break;
+                    case '`CELLPHONE`':
+                        $stmt->bindValue($identifier, $this->cellphone, PDO::PARAM_STR);
+                        break;
                     case '`COUNTRY_ID`':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
+                        break;
+                    case '`STATE_ID`':
+                        $stmt->bindValue($identifier, $this->state_id, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1438,12 +1603,18 @@ abstract class OrderAddress implements ActiveRecordInterface
                 return $this->getPhone();
                 break;
             case 11:
-                return $this->getCountryId();
+                return $this->getCellphone();
                 break;
             case 12:
-                return $this->getCreatedAt();
+                return $this->getCountryId();
                 break;
             case 13:
+                return $this->getStateId();
+                break;
+            case 14:
+                return $this->getCreatedAt();
+                break;
+            case 15:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1486,9 +1657,11 @@ abstract class OrderAddress implements ActiveRecordInterface
             $keys[8] => $this->getZipcode(),
             $keys[9] => $this->getCity(),
             $keys[10] => $this->getPhone(),
-            $keys[11] => $this->getCountryId(),
-            $keys[12] => $this->getCreatedAt(),
-            $keys[13] => $this->getUpdatedAt(),
+            $keys[11] => $this->getCellphone(),
+            $keys[12] => $this->getCountryId(),
+            $keys[13] => $this->getStateId(),
+            $keys[14] => $this->getCreatedAt(),
+            $keys[15] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1496,6 +1669,15 @@ abstract class OrderAddress implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->aCustomerTitle) {
+                $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCountry) {
+                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aState) {
+                $result['State'] = $this->aState->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collOrdersRelatedByInvoiceOrderAddressId) {
                 $result['OrdersRelatedByInvoiceOrderAddressId'] = $this->collOrdersRelatedByInvoiceOrderAddressId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1570,12 +1752,18 @@ abstract class OrderAddress implements ActiveRecordInterface
                 $this->setPhone($value);
                 break;
             case 11:
-                $this->setCountryId($value);
+                $this->setCellphone($value);
                 break;
             case 12:
-                $this->setCreatedAt($value);
+                $this->setCountryId($value);
                 break;
             case 13:
+                $this->setStateId($value);
+                break;
+            case 14:
+                $this->setCreatedAt($value);
+                break;
+            case 15:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1613,9 +1801,11 @@ abstract class OrderAddress implements ActiveRecordInterface
         if (array_key_exists($keys[8], $arr)) $this->setZipcode($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setCity($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setPhone($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCountryId($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[11], $arr)) $this->setCellphone($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCountryId($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setStateId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
     }
 
     /**
@@ -1638,7 +1828,9 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->isColumnModified(OrderAddressTableMap::ZIPCODE)) $criteria->add(OrderAddressTableMap::ZIPCODE, $this->zipcode);
         if ($this->isColumnModified(OrderAddressTableMap::CITY)) $criteria->add(OrderAddressTableMap::CITY, $this->city);
         if ($this->isColumnModified(OrderAddressTableMap::PHONE)) $criteria->add(OrderAddressTableMap::PHONE, $this->phone);
+        if ($this->isColumnModified(OrderAddressTableMap::CELLPHONE)) $criteria->add(OrderAddressTableMap::CELLPHONE, $this->cellphone);
         if ($this->isColumnModified(OrderAddressTableMap::COUNTRY_ID)) $criteria->add(OrderAddressTableMap::COUNTRY_ID, $this->country_id);
+        if ($this->isColumnModified(OrderAddressTableMap::STATE_ID)) $criteria->add(OrderAddressTableMap::STATE_ID, $this->state_id);
         if ($this->isColumnModified(OrderAddressTableMap::CREATED_AT)) $criteria->add(OrderAddressTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderAddressTableMap::UPDATED_AT)) $criteria->add(OrderAddressTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1714,7 +1906,9 @@ abstract class OrderAddress implements ActiveRecordInterface
         $copyObj->setZipcode($this->getZipcode());
         $copyObj->setCity($this->getCity());
         $copyObj->setPhone($this->getPhone());
+        $copyObj->setCellphone($this->getCellphone());
         $copyObj->setCountryId($this->getCountryId());
+        $copyObj->setStateId($this->getStateId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1763,6 +1957,159 @@ abstract class OrderAddress implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCustomerTitle object.
+     *
+     * @param                  ChildCustomerTitle $v
+     * @return                 \Thelia\Model\OrderAddress The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomerTitle(ChildCustomerTitle $v = null)
+    {
+        if ($v === null) {
+            $this->setCustomerTitleId(NULL);
+        } else {
+            $this->setCustomerTitleId($v->getId());
+        }
+
+        $this->aCustomerTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomerTitle object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderAddress($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCustomerTitle object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCustomerTitle The associated ChildCustomerTitle object.
+     * @throws PropelException
+     */
+    public function getCustomerTitle(ConnectionInterface $con = null)
+    {
+        if ($this->aCustomerTitle === null && ($this->customer_title_id !== null)) {
+            $this->aCustomerTitle = ChildCustomerTitleQuery::create()->findPk($this->customer_title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerTitle->addOrderAddresses($this);
+             */
+        }
+
+        return $this->aCustomerTitle;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCountry object.
+     *
+     * @param                  ChildCountry $v
+     * @return                 \Thelia\Model\OrderAddress The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCountry(ChildCountry $v = null)
+    {
+        if ($v === null) {
+            $this->setCountryId(NULL);
+        } else {
+            $this->setCountryId($v->getId());
+        }
+
+        $this->aCountry = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCountry object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderAddress($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCountry object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCountry The associated ChildCountry object.
+     * @throws PropelException
+     */
+    public function getCountry(ConnectionInterface $con = null)
+    {
+        if ($this->aCountry === null && ($this->country_id !== null)) {
+            $this->aCountry = ChildCountryQuery::create()->findPk($this->country_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCountry->addOrderAddresses($this);
+             */
+        }
+
+        return $this->aCountry;
+    }
+
+    /**
+     * Declares an association between this object and a ChildState object.
+     *
+     * @param                  ChildState $v
+     * @return                 \Thelia\Model\OrderAddress The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setState(ChildState $v = null)
+    {
+        if ($v === null) {
+            $this->setStateId(NULL);
+        } else {
+            $this->setStateId($v->getId());
+        }
+
+        $this->aState = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildState object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderAddress($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildState object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildState The associated ChildState object.
+     * @throws PropelException
+     */
+    public function getState(ConnectionInterface $con = null)
+    {
+        if ($this->aState === null && ($this->state_id !== null)) {
+            $this->aState = ChildStateQuery::create()->findPk($this->state_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aState->addOrderAddresses($this);
+             */
+        }
+
+        return $this->aState;
     }
 
 
@@ -2536,7 +2883,9 @@ abstract class OrderAddress implements ActiveRecordInterface
         $this->zipcode = null;
         $this->city = null;
         $this->phone = null;
+        $this->cellphone = null;
         $this->country_id = null;
+        $this->state_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2572,6 +2921,9 @@ abstract class OrderAddress implements ActiveRecordInterface
 
         $this->collOrdersRelatedByInvoiceOrderAddressId = null;
         $this->collOrdersRelatedByDeliveryOrderAddressId = null;
+        $this->aCustomerTitle = null;
+        $this->aCountry = null;
+        $this->aState = null;
     }
 
     /**

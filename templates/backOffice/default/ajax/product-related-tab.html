@@ -31,7 +31,7 @@
 		                <div class="form-group">
 		                    <select name="folder_id" id="folder_id" class="form-control">
 		                        <option value="">{intl l='Select a folder...'}</option>
-		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
+		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
 		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 		                        {/loop}
 		                    </select>
@@ -45,7 +45,7 @@
 		                            <option value="">{intl l='Select a folder content...'}</option>
 		                        </select>
 		                        <span class="input-group-btn" id="content_add_button">
-		                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+		                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
 		                        </span>
 		                    </div>
 
@@ -76,19 +76,19 @@
 
 		                        <th class="text-center">{intl l='Position'}</th>
 
-		                        {module_include location='product_contents_table_header'}
+		                        {hook name="product.contents-table-header" location="product_contents_table_header" }
 
 		                        <th class="actions">{intl l="Actions"}</th>
 		                    </tr>
 		                </thead>
 
 		                <tbody>
-		                    {loop name="assigned_contents" type="associated_content" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    {loop name="assigned_contents" type="associated_content" visible="*" product="$product_id" backend_context="1" lang="$edit_language_id"}
 		                    <tr>
 		                        <td>{$CONTENT_ID}</td>
 
 		                        <td>
-		                            <a href="{url path="/admin/content/update/{$CONTENT_ID}"}">{$TITLE}</a>
+		                            <a href="{url path="/admin/content/update/%id" id=$CONTENT_ID}">{$TITLE}</a>
 		                        </td>
 
 		                         <td class="text-center">
@@ -103,16 +103,14 @@
 		                          }
 		                         </td>
 
-		                        {module_include location='product_contents_table_row'}
+                                {hook name="product.contents-table-row" location="product_contents_table_row-bottom" }
 
 		                        <td class="actions">
-		                            <div class="btn-group">
-		                                {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-		                                   <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
-		                                    <span class="glyphicon glyphicon-trash"></span>
-		                                   </a>
-		                                {/loop}
-		                            </div>
+                                    {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    {/loop}
 		                        </td>
 		                    </tr>
 		                     {/loop}
@@ -151,7 +149,7 @@
 		                <div class="form-group">
 		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
 		                        <option value="">{intl l='Select a category...'}</option>
-		                        {loop name="categories" type="category-tree" category="0" backend_context="1" lang="$edit_language_id"}
+		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
 		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 		                        {/loop}
 		                    </select>
@@ -165,7 +163,7 @@
 		                            <option value="">{intl l='Select a product...'}</option>
 		                        </select>
 		                        <span class="input-group-btn" id="accessory_add_button">
-		                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+		                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
 		                        </span>
 		                    </div>
 
@@ -197,14 +195,14 @@
 
 		                        <th class="text-center">{intl l='Position'}</th>
 
-		                        {module_include location='product_accessories_table_header'}
+                                {hook name="product.accessories-table-header" location="product_accessories_table_header-bottom" }
 
 		                        <th class="actions">{intl l="Actions"}</th>
 		                    </tr>
 		                </thead>
 
 		                <tbody>
-		                    {loop name="assigned_accessories" order="accessory" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    {loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id" return_url=false}
 		                    <tr>
 		                        <td>{$ID}</td>
 
@@ -224,16 +222,14 @@
 		                          }
 		                         </td>
 
-		                        {module_include location='product_accessories_table_row'}
+                                {hook name="product.accessories-table-row" location="product_accessories_table_row-bottom" }
 
 		                        <td class="actions">
-		                            <div class="btn-group">
-		                                {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-		                                   <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
-		                                    <span class="glyphicon glyphicon-trash"></span>
-		                                   </a>
-		                                {/loop}
-		                            </div>
+                                    {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
+                                    <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                    {/loop}
 		                        </td>
 		                    </tr>
 		                     {/loop}
@@ -268,12 +264,12 @@
 
 	                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
 	                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
-	                    {loop name="default_category" type="category" id=$DEFAULT_CATEGORY}
+	                    {loop name="default_category" visible="*" type="category" id=$DEFAULT_CATEGORY return_url=false}
 	                        {intl l='You can change the default category (%title) in the "General" tab.' title={$TITLE}}
 	                    {/loop}
 
 	                    {$exclude_from_tree = "-1"}
-	                    {loop name="additional_categories" type="category" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                    {loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
 	                        {$exclude_from_tree = "$exclude_from_tree,$ID"}
 	                    {/loop}
 
@@ -285,7 +281,7 @@
 
 	                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
 	                            <option value="">{intl l='Select a category...'}</option>
-	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id"}
+	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id" return_url=false}
 	                                <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
 	                                    {$TITLE} {if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
 	                                </option>
@@ -293,7 +289,7 @@
 	                        </select>
 
 	                        <span class="input-group-btn" id="content_add_button">
-	                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+	                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
 	                        </span>
 
 	                    </div>
@@ -315,14 +311,14 @@
 
 	                            <th>{intl l='Category title'}</th>
 
-	                            {module_include location='product_categories_table_header'}
+	                            {hook name="product.categories-table-header" location="product_categories_table_header" }
 
 	                            <th class="actions">{intl l="Actions"}</th>
 	                        </tr>
 	                    </thead>
 
 	                    <tbody>
-	                        {loop name="additional_categories" type="category" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                        {loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
 	                        <tr>
 	                            <td>{$ID}</td>
 
@@ -330,16 +326,14 @@
 	                                {$TITLE}
 	                            </td>
 
-	                            {module_include location='product_categories_table_row'}
+	                            {hook name="product.categories-table-row" location="product_categories_table_row" }
 
 	                            <td class="actions">
-	                                <div class="btn-group">
-	                                    {loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
-	                                       <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
-	                                        <span class="glyphicon glyphicon-trash"></span>
-	                                       </a>
-	                                    {/loop}
-	                                </div>
+                                    {loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    {/loop}
 	                            </td>
 	                        </tr>
 	                        {/loop}
@@ -380,7 +374,7 @@
     dialog_title    = {intl l="Remove related content"}
     dialog_message  = {intl l="Do you really want to remove this related content from the product ?"}
 
-    form_action     = {url path='/admin/products/content/delete'}
+    form_action     = {token_url path='/admin/products/content/delete'}
     form_content    = {$smarty.capture.delete_content_dialog nofilter}
 }
 
@@ -401,7 +395,7 @@
     dialog_title    = {intl l="Remove an accessory"}
     dialog_message  = {intl l="Do you really want to remove this accessory from the product ?"}
 
-    form_action     = {url path='/admin/products/accessory/delete'}
+    form_action     = {token_url path='/admin/products/accessory/delete'}
     form_content    = {$smarty.capture.delete_accessory_dialog nofilter}
 }
 
@@ -421,7 +415,7 @@
     dialog_title    = {intl l="Remove from category"}
     dialog_message  = {intl l="Do you really want to remove the product from this category ?"}
 
-    form_action     = {url path='/admin/products/category/delete'}
+    form_action     = {token_url path='/admin/products/category/delete'}
     form_content    = {$smarty.capture.delete_category_dialog nofilter}
 }
 

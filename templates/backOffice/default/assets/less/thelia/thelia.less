@@ -1,4 +1,5 @@
 @import "variables.less";
+@import "mixins.less";
 @import "navbar.less";
 @import "scaffolding.less";
 @import "type.less";
@@ -16,11 +17,86 @@
 @import "jqplot.less";
 @import "dropzone.less";
 @import "logger.less";
+@import "labels.less";
+@import "fonts.less";
+@import "toolbar.less";
+@import "buttons.less";
+@import "login-page.less";
+@import "home.less";
 
 // -- Base styling ------------------------------------------------------------
 
 #wrapper {
-	padding-top: 20px;
+	width: 100%;
+}
+
+.navbar-static-top {
+    margin: 0;
+    z-index: 1;
+}
+
+#page-wrapper {
+    padding: 0 15px 10px 15px;
+    min-height: 568px;
+    background-color: #f5f5f5;
+    
+    @media (min-width: @screen-sm){
+        position: inherit;
+        margin: 0 0 0 250px;
+        padding: 0 30px 20px 30px;
+        border-left: 1px solid @navbar-default-border;
+    }
+}
+
+.navbar-top-links {
+    margin-right: 0;
+
+    > li {
+        display: inline-block;
+        
+        > a,
+        > button {
+            font-weight: normal;
+            padding: 15px;
+            min-height: 50px;
+            color: @navbar-default-link-color;
+            .transition(all 0.3s ease-in-out);
+
+            &,
+            &:hover,
+            &:focus {
+                background: none;
+                border: none;
+            }
+
+            &:hover,
+            &:focus {
+                color: @brand-primary;
+            }
+        }
+    }
+    
+    .dropdown-menu {
+        padding-top: 0;
+        padding-bottom: 0;
+        border-radius: @border-radius-base;
+        background: @navbar-default-bg;
+
+        .menu-links();
+    }
+
+    .open {
+        .caret {
+            .rotate(-180deg);
+        }
+    }
+}
+
+.sidebar,
+.navbar-top-links {
+    .caret {
+        .transition(transform 0.3s ease-in-out);
+    }
 }
 
 // Bootstrap Adjustements ------------------------------------------------------
@@ -38,8 +114,8 @@
 // -- Top bar -----------------------------------------------------------------
 
 .topbar {
-
-	background: url("@{imgDir}/top.jpg") repeat-x;
+    position: relative;
+	background: #26272B;
 	font-weight: bold;
 
 	.version-info {
@@ -56,11 +132,19 @@
     }
 }
 
+// -- Top bar -----------------------------------------------------------------
+
+// display sub menu on hover
+ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
+  display: block;
+}
+
 // -- Brandbar ----------------------------------------------------------------
 
-.loginpage {
+.login-page {
+    background: #f5f5f5;
 
-	.hero-unit {
+    .hero-unit {
     	background-color: transparent;
 
     	h1 {
@@ -120,7 +204,7 @@
     }
 
     .breadcrumb {
-        border-radius: 0;
+        border-radius: @border-radius-base;
         padding: 25px 0px 25px 30px;
         background: url("@{imgDir}/logo-light.png") left center no-repeat;
         float: left;
@@ -169,19 +253,18 @@
 	margin: 0 auto 20px;
 	background-color: #fff;
 	border: 1px solid #e5e5e5;
-    border-radius: 5px;
+    border-radius: @border-radius-base;
 	.box-shadow(none);
 }
 
 // -- General decoration of back-office boxes ---------------------------------
 
 .general-block-decorator {
-    background: none repeat scroll 0 0 white;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 4px 4px 4px 4px;
-    box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.05) inset, 0 2px 3px rgba(0, 0, 0, 0.1);
-    padding: 1em;
-    margin-bottom: 20px;
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 30px;
+    .box-shadow(0 3px #eee);
+    border: 1px solid #eee;
 
     .select-fixed-width {
       width: 120px;
@@ -189,16 +272,17 @@
 
 
     // The block title
-    .title {
-        color: #5A6876;
+    .title,
+    caption {
+        text-align: left;
+        font-size: 15px;
+        font-weight: 600;
         text-transform: uppercase;
-        font-weight: bold;
-        padding-bottom: 0.5em;
-        line-height: 30px;
+        line-height: 1.2;
+        margin-bottom: 10px;
     }
 
     .title-without-tabs {
-        border-bottom: 2px solid #A5CED8;
         margin-bottom: 0.5em;
     }
 
@@ -258,6 +342,12 @@
                 background-color: #E7E7E7;
             }
         }
+    }
+
+    .inner-toolbar-bottom {
+        border-top: 1px dotted #A5CED8;
+        margin-top: 1em;
+        padding-top: 0.5em;
     }
 }
 
@@ -443,6 +533,20 @@ ul.document-list {
 
 }
 
+
+// document / image visibility
+.document-toggle-btn,
+.image-toggle-btn {
+  .glyphicon-eye-open{ display: none; }
+  .glyphicon-eye-close{ display: inline-block; }
+}
+.document-toggle-btn.visibility-visible,
+.image-toggle-btn.visibility-visible {
+  .glyphicon-eye-open{ display: inline-block; }
+  .glyphicon-eye-close{ display: none; }
+}
+
+
 // Loader (Overlay)
 .loader {
   position: fixed;
@@ -457,4 +561,72 @@ ul.document-list {
 // A vertical spacer between rows
 .vertical-row-space {
   margin-bottom: 1em;
+}
+
+// Product image / document association
+
+.product-pse-image-container  {
+  position: relative;
+  width: 100px;
+  height: 75px;
+
+  > .is-associated {
+    box-shadow: 0px 0px 5px 0px @associated-color;
+  }
+
+  > img {
+    cursor: pointer;
+  }
+}
+
+.product-pse-image-join-glyphicon {
+  position: absolute;
+  right: 0px;
+  color: @associated-color;
+}
+
+
+// help block
+.alert-help {
+  .alert-variant(@gray-lighter; darken(@gray-lighter, 20%); @gray);
+}
+
+.page-header {
+    color: #545454;
+    font-weight: 400;
+    margin-top: 25px;
+}
+
+.install-module-col {
+    .general-block-decorator {
+        min-height: 150px;
+    }
+}
+
+footer {
+    position: relative;
+}
+
+#follow-us {
+    text-align: center;
+
+    @media (min-width: @screen-sm-max) {
+        position: absolute;
+        right: 30px;
+        top: 30px;
+    }
+
+    [class^="icon-"], [class*=" icon-"] {
+        position: relative;
+        top: 0;
+    }
+
+    a {
+        font-size: 20px;
+
+        &:hover,
+        &:focus {
+            color: @text-color;
+        }
+    }
 }

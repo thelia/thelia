@@ -4,7 +4,7 @@
 {default_translation_domain domain='bo.default'}
 
 <div class="panel-group" id="accordion">
-	{loop type="feed" name="thelia_feeds" url="http://thelia.net/Flux-rss.html?id_rubrique=8" limit="3"}
+	{loop type="feed" name="thelia_feeds" url="http://thelia.net/feeds/?lang={$lang_code}" limit="3"}
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -20,7 +20,7 @@
          			<p>{$DESCRIPTION|strip_tags|unescape:"htmlall"|truncate:250:"...":true nofilter}</p>
 				</div>
 				<div class="panel-footer">
-					<a href="{$URL}" target="_blank" class="btn btn-defaut btn-primary"><span class="glyphicon glyphicon-book"></span> {intl l='Lire la suite'}</a>
+					<a href="{$URL nofilter}" target="_blank" class="btn btn-defaut btn-primary"><span class="glyphicon glyphicon-book"></span> {intl l='Lire la suite'}</a>
 				</div>
 			</div>
 		</div>

@@ -20,7 +20,6 @@ class TemplateDeleteAttributeEvent extends TemplateEvent
 
     public function __construct(Template $template, $attribute_id)
     {
-
         parent::__construct($template);
 
         $this->attribute_id = $attribute_id;

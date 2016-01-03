@@ -14,6 +14,7 @@ namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -22,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateCommand extends BaseModuleGenerate
 {
@@ -32,9 +33,15 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             ->setName("module:generate")
             ->setDescription("generate all needed files for creating a new Module")
             ->addArgument(
-                "name" ,
+                "name",
                 InputArgument::REQUIRED,
                 "name wanted for your Module"
+            )
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'If defined, it will update the module with missing directories and files (no overrides).'
             )
         ;
     }
@@ -42,13 +49,20 @@ class ModuleGenerateCommand extends BaseModuleGenerate
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . DIRECTORY_SEPARATOR . $this->module;
-        $this->verifyExistingModule();
+        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
+
+        try {
+            $this->verifyExistingModule();
+        } catch (\RuntimeException $ex) {
+            if (false === $input->getOption('force')) {
+                throw $ex;
+            }
+        }
 
         $this->createDirectories();
         $this->createFiles();
-        if (method_exists($this, "renderBlock")) {
-            //impossible to change output class in CommandTester...
+        if (method_exists($output, "renderBlock")) {
+            // impossible to change output class in CommandTester...
             $output->renderBlock(array(
                 '',
                 sprintf("module %s create with success", $this->module),
@@ -56,19 +70,38 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 ''
             ), "bg=green;fg=black");
         }
-
     }
 
     private function createDirectories()
     {
         $fs = new Filesystem();
 
-        $fs->mkdir($this->moduleDirectory);
-
-        foreach ($this->neededDirectories as $directory) {
-            $fs->mkdir($this->moduleDirectory . DIRECTORY_SEPARATOR . $directory);
+        if (!$fs->exists($this->moduleDirectory)) {
+            $fs->mkdir($this->moduleDirectory);
         }
 
+        foreach ($this->neededDirectories as $directory) {
+            if (!$fs->exists($this->moduleDirectory . DIRECTORY_SEPARATOR . $directory)) {
+                $fs->mkdir($this->moduleDirectory . DIRECTORY_SEPARATOR . $directory);
+            }
+        }
+    }
+
+    protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs)
+    {
+        $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . $filename;
+        if (!$fs->exists($filename)) {
+            $configContent = file_get_contents($skeletonDir . "config.xml");
+
+            $configContent = str_replace("%%CLASSNAME%%", $this->module, $configContent);
+            $configContent = str_replace("%%NAMESPACE%%", $this->module, $configContent);
+            $configContent = str_replace("%%NAMESPACE_LOWER%%", strtolower($this->module), $configContent);
+
+            file_put_contents(
+                $filename,
+                $configContent
+            );
+        }
     }
 
     private function createFiles()
@@ -76,56 +109,116 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $fs = new Filesystem();
 
         try {
-            $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
+            $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, __DIR__ . "/Skeleton/Module/");
 
             // config.xml file
-            $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
+            $this->copyConfigFile("config.xml", $skeletonDir, $fs);
+            $this->copyConfigFile("config_prod.xml", $skeletonDir, $fs);
+            $this->copyConfigFile("config_dev.xml", $skeletonDir, $fs);
+            $this->copyConfigFile("config_test.xml", $skeletonDir, $fs);
 
-            $moduleContent = file_get_contents($skeletonDir . "module.xml");
+            // Readme.md file
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Readme.md";
+            if (!$fs->exists($filename)) {
+                $readmeContent = file_get_contents($skeletonDir . "Readme.md");
 
-            $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);
-            $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
+                // generate title for readme
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $readmeTitle);
+                $composerFinalName = strtolower(implode("-", $readmeTitle[0]));
 
-            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml", $moduleContent);
+                $readmeContent = str_replace("%%MODULENAME%%", $this->module, $readmeContent);
+                $readmeContent = str_replace("%%MODULENAMETITLE%%", implode(" ", $readmeTitle[0]), $readmeContent);
+                $readmeContent = str_replace("%%COMPOSERNAME%%", $composerFinalName, $readmeContent);
+
+                file_put_contents($filename, $readmeContent);
+            }
+
+            // composer.json file
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "composer.json";
+            if (!$fs->exists($filename)) {
+                $composerContent = file_get_contents($skeletonDir . "composer.json");
+
+                // generate composer module name
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $composerName);
+
+                $composerContent = str_replace("%%MODULENAME%%", $this->module, $composerContent);
+                $composerContent = str_replace("%%COMPOSERNAME%%", strtolower(implode("-", $composerName[0])), $composerContent);
+
+                file_put_contents($filename, $composerContent);
+            }
+
+            // module.xml file
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml";
+            if (!$fs->exists($filename)) {
+                $moduleContent = file_get_contents($skeletonDir . "module.xml");
+
+                $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);
+                $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
+
+                file_put_contents($filename, $moduleContent);
+            }
 
             // PHP Class template
-            $classContent = file_get_contents($skeletonDir . "Class.php.template");
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . $this->module . ".php";
+            if (!$fs->exists($filename)) {
+                $classContent = file_get_contents($skeletonDir . "Class.php.template");
 
-            $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
-            $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);
+                $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
+                $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);
+                $classContent = str_replace("%%DOMAINNAME%%", strtolower($this->module), $classContent);
 
-            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . $this->module.".php", $classContent);
+                file_put_contents($filename, $classContent);
+            }
 
             // schema.xml file
-            $schemaContent = file_get_contents($skeletonDir . "schema.xml");
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "schema.xml";
+            if (!$fs->exists($filename)) {
+                $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
-            $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
+                $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
+                $schemaContent = str_replace(
+                    '%%XSD_LOCATION%%',
+                    $fs->makePathRelative(
+                        THELIA_VENDOR . 'propel/propel/resources/xsd/',
+                        $this->moduleDirectory
+                    ) . 'database.xsd',
+                    $schemaContent
+                );
 
-            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
+                file_put_contents($filename, $schemaContent);
+            }
 
             // routing.xml file
-            $routingContent = file_get_contents($skeletonDir . "routing.xml");
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "routing.xml";
+            if (!$fs->exists($filename)) {
+                $routingContent = file_get_contents($skeletonDir . "routing.xml");
 
-            $routingContent = str_replace("%%NAMESPACE%%", $this->module, $routingContent);
-            $routingContent = str_replace("%%CLASSNAME_LOWER%%", strtolower($this->module), $routingContent);
+                $routingContent = str_replace("%%NAMESPACE%%", $this->module, $routingContent);
+                $routingContent = str_replace("%%CLASSNAME_LOWER%%", strtolower($this->module), $routingContent);
 
-            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "routing.xml", $routingContent);
+                file_put_contents($filename, $routingContent);
+            }
 
             // I18n sample files
-            $fs->copy(
-                $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php",
-                $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php"
-            );
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php";
+            if (!$fs->exists($filename)) {
+                $fs->copy(
+                    $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "fr_FR.php",
+                    $filename
+                );
+            }
 
-            $fs->copy(
-                $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php",
-                $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php"
-            );
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php";
+            if (!$fs->exists($filename)) {
+                $fs->copy(
+                    $skeletonDir . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php",
+                    $this->moduleDirectory . DIRECTORY_SEPARATOR . "I18n" . DIRECTORY_SEPARATOR . "en_US.php"
+                );
+            }
         } catch (\Exception $ex) {
             $fs->remove($this->moduleDirectory);
 
             throw $ex;
         }
     }
-
 }

@@ -43,7 +43,7 @@ class Tax extends BaseTax
     public function getTaxRuleCountryPosition()
     {
         try {
-             $taxRuleCountryPosition = $this->getVirtualColumn(TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION);
+            $taxRuleCountryPosition = $this->getVirtualColumn(TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION);
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `" . TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION . "` does not exist in Tax::getTaxRuleCountryPosition");
         }
@@ -59,12 +59,14 @@ class Tax extends BaseTax
         if (!class_exists($class)) {
             throw new TaxEngineException('Recorded type `' . $class . '` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
-
+    /** @var \Thelia\TaxEngine\BaseTaxType $instance */
         $instance = new $class;
 
         if (!$instance instanceof BaseTaxType) {
             throw new TaxEngineException('Recorded type `' . $class . '` does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
         }
+
+        $instance->loadRequirements($this->getRequirements());
 
         return $instance;
     }

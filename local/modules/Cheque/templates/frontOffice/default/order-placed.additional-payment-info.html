@@ -1,0 +1,21 @@
+{loop type="module-config" name="cheque-instructions" module="cheque" variable="payable_to"}
+    <p>{intl d='cheque.fo.default' l="Please make your cheque payable to <b>%name</b>, and send it to the following address :" name={$VALUE}}</p>
+{/loop}
+
+<blockquote>
+    {config key="store_name"}<br>
+    {config key="store_address1"}<br />
+    {if ! empty({config key="store_address2"})}{config key="store_address2"}<br />{/if}
+    {if ! empty({config key="store_address3"})}{config key="store_address3"}<br />{/if}
+    {config key="store_zipcode"}, {config key="store_city"}<br />
+    {if {config key="store_country"}}
+        {loop type="country" name="store_country" id={config key="store_country"}}
+        {$TITLE}<br />
+        {/loop}
+    {/if}
+</blockquote>
+<p><span class="glyphicon glyphicon-warning-sign"></span> {intl d='cheque.fo.default' l="Be sure to sign your cheque !"}</p>
+
+{loop type="module-config" name="cheque-instructions" module="cheque" variable="instructions"}
+<p>{$VALUE nofilter}</p>
+{/loop}

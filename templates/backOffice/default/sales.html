@@ -1,0 +1,329 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'tools'}
+{/block}
+
+{block name="page-title"}{intl l='Sales management'}{/block}
+
+{block name="check-resource"}admin.sales{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="sales">
+
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/tools'}">{intl l="Tools"}</a></li>
+                <li><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
+            </ul>
+
+            {hook name="sales.top" location="sales_top" }
+
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                               <caption class="clearfix">
+                                   {intl l='Sales management'}
+                                   {loop type="auth" name="can_create" role="ADMIN" resource="admin.sales" access="CREATE"}
+                                        <a class="btn btn-primary action-btn" title="{intl l='Add a new sale'}" href="#creation_dialog" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-plus-sign"></span>
+                                       </a>
+                                       <a class="btn btn-primary action-btn" href="#confirm_sale_status_reset" data-toggle="modal">
+                                           {intl l='Reset sale status for all products'}
+                                       </a>
+                                       <a class="btn btn-default btn-default action-btn" href="{url path="/admin/sales/check-activation"}">
+                                           {intl l='Check sale activation'}
+                                       </a>
+                                   {/loop}
+                                </caption>
+
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='id'
+                                            reverse_order='id-reverse'
+                                            path='/admin/sales'
+                                            label="{intl l='ID'}"
+                                            }
+                                        </th>
+
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='alpha'
+                                            reverse_order='alpha-reverse'
+                                            path='/admin/sales'
+                                            label="{intl l='Name'}"
+                                            }
+                                        </th>
+
+                                        <th class="text-center">
+                                            {admin_sortable_header
+                                            current_order=$content_order
+                                            order='active'
+                                            reverse_order='active-reverse'
+                                            path={url path='/admin/sales'}
+                                            label="{intl l='Active'}"
+                                            }
+                                        </th>
+
+                                        <th class="text-center">
+                                            {admin_sortable_header
+                                            current_order=$content_order
+                                            order='start-date'
+                                            reverse_order='start-date-reverse'
+                                            path={url path='/admin/sales'}
+                                            label="{intl l='Start Date'}"
+                                            }
+                                        </th>
+
+                                        <th class="text-center">
+                                            {admin_sortable_header
+                                            current_order=$content_order
+                                            order='end-date'
+                                            reverse_order='end-date-reverse'
+                                            path={url path='/admin/sales'}
+                                            label="{intl l='End Date'}"
+                                            }
+                                        </th>
+
+                                        {hook name="sales.table-header" location="sales_table_header" }
+
+                                        <th class="actions">{intl l='Actions'}</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {loop name="sales" type="sale" active="*" backend_context="1" lang=$lang_id order=$order}
+                                        <tr>
+                                            <td>{$ID}</td>
+
+                                            <td>
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
+                                                    <a title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/%id" id=$ID}">{$TITLE}</a>
+                                                {/loop}
+                                                {elseloop rel="can_change"}
+                                                    {$TITLE}
+                                                {/elseloop}
+                                            </td>
+
+                                            <td class="text-center">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
+                                                    <div class="make-switch switch-small visibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                        <input type="checkbox" class="visibleToggle" {if $ACTIVE == 1}checked="checked"{/if}>
+                                                    </div>
+                                                {/loop}
+
+                                                {elseloop rel="can_change"}
+                                                    <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                        <input type="checkbox" class="disabled" disabled="disabled" {if $ACTIVE == 1}checked="checked"{/if}>
+                                                    </div>
+                                                {/elseloop}
+                                            </td>
+
+                                            <td class="text-center">
+                                                {if $HAS_START_DATE}
+                                                    {format_date date=$START_DATE}
+                                                {else}
+                                                    {intl l='None defined'}
+                                                {/if}
+                                            </td>
+
+                                            <td class="text-center">
+                                                {if $HAS_END_DATE}
+                                                    {format_date date=$END_DATE}
+                                                {else}
+                                                    {intl l='None defined'}
+                                                {/if}
+                                            </td>
+
+                                            {hook name="sales.table-row" location="sales_table_row" sale_id={$ID} }
+
+                                            <td class="actions">
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
+                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
+                                                        <a class="sale-change" title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/%id" id=$ID}">
+                                                            <span class="glyphicon glyphicon-edit"></span>
+                                                        </a>
+                                                    {/loop}
+
+                                                    {loop type="auth" name="can_delete" role="ADMIN" resource="admin.sales" access="DELETE"}
+                                                        <a class="sale-delete" title="{intl l='Delete this sale'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                            <span class="glyphicon glyphicon-trash"></span>
+                                                        </a>
+                                                    {/loop}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/loop}
+                                    {elseloop rel="sales"}
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="alert alert-info">
+                                                    {intl l="No sale has been created yet. Click the + button to create one."}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/elseloop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {hook name="sales.bottom" location="sales_bottom" }
+
+        </div>
+    </div>
+
+
+    {* Adding a new sale *}
+
+    {form name="thelia.admin.sale.creation"}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+        {capture "creation_dialog"}
+			{form_hidden_fields}
+
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+                {render_form_field field="locale" value=$LOCALE}
+            {/loop}
+
+            {render_form_field field="success_url" value={url path='/admin/sale/update/_ID_'}}
+
+            {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+                {render_form_field field="locale" value=$LOCALE}
+
+                <div class="input-group">
+                    <input type="text" {form_field_attributes field="title"}>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                </div>
+            {/loop}
+            {/custom_render_form_field}
+
+            {custom_render_form_field field="label"}
+                {loop type="lang" name="default-lang" default_only="1"}
+                    <div class="input-group">
+                        <input type="text" {form_field_attributes field="label"}>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    </div>
+                {/loop}
+            {/custom_render_form_field}
+
+            {hook name="sale.create-form" location="sale_create_form" }
+
+        {/capture}
+
+        {include
+            file = "includes/generic-create-dialog.html"
+
+            dialog_id    = "creation_dialog"
+            dialog_title = {intl l="Create a new sale"}
+            dialog_body  = {$smarty.capture.creation_dialog nofilter}
+
+            dialog_ok_label     = {intl l="Create this sale"}
+
+            form_action        = {url path='/admin/sale/create'}
+            form_enctype       = {form_enctype}
+            form_error_message = $form_error_message
+        }
+    {/form}
+
+
+    {* Delete confirmation dialog *}
+
+    {capture "delete_dialog"}
+        <input type="hidden" name="sale_id" id="sale_delete_id" value="" />
+
+        {hook name="sale.delete-form" location="sale_delete_form" }
+
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "delete_dialog"
+        dialog_title    = {intl l="Delete sale"}
+        dialog_message  = {intl l="Do you really want to delete this sale ? All related products will no longer be on sale"}
+
+        form_action         = {token_url path='/admin/sale/delete'}
+        form_content        = {$smarty.capture.delete_dialog nofilter}
+    }
+
+    {* Delete confirmation dialog *}
+
+    {include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "confirm_sale_status_reset"
+    dialog_title    = {intl l="Reset sale status for all products"}
+    dialog_message  = {intl l="This will reset the sale status of all products, and disable all active sales. Dou you really want to continue ?"}
+
+    form_action         = {url path='/admin/sales/reset'}
+    form_content        = ''
+}
+
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script>
+        $(function() {
+
+            // Set proper sale ID in delete from
+            $('a.sale-delete').click(function(ev) {
+                $('#sale_delete_id').val($(this).data('id'));
+            });
+
+            // JS stuff for creation form
+            {include
+                file      = "includes/generic-js-dialog.html"
+                dialog_id = "creation_dialog"
+                form_name = "thelia.admin.sale.creation"
+            }
+
+            {* Activity toggle *}
+
+            $(".visibleToggle").on('switch-change', function(event, data) {
+                var url =
+                $.ajax({
+                    url : "{url path='/admin/sale/toggle-activity/'}" + $(this).data('id')
+                });
+            });
+
+        });
+    </script>
+{/block}
+
+
+{block name="javascript-last-call"}
+    {hook name="sales.js" location="sales-js" }
+{/block}

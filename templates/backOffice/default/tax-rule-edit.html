@@ -13,6 +13,7 @@
 
     {assign oder_tab {$smarty.get.tab|default:$smarty.post.tab|default:'data'}}
     {assign asked_country {$smarty.get.country|default:{country ask="default" attr="id"}}}
+    {assign asked_state {$smarty.get.state|default:0}}
 
 <div class="taxes-rules edit-taxes-rules">
 
@@ -26,6 +27,8 @@
         </ul>
 
         {loop type="tax-rule" name="tax-rule" id=$tax_rule_id backend_context="1" lang=$edit_language_id}
+
+        {hook name="tax-rule-edit.top" tax_rule_id=$tax_rule_id}
 
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
@@ -42,39 +45,39 @@
 
                             {form name="thelia.admin.taxrule.modification"}
 
-                                <form method="POST" action="{url path="/admin/configuration/taxes_rules/save"}" {form_enctype form=$form} >
+                                <form method="POST" action="{url path="/admin/configuration/taxes_rules/save"}" {form_enctype} >
 
                                     {include
                                     file = "includes/inner-form-toolbar.html"
                                     hide_submit_buttons = false
 
-                                    page_url  = {url path="/admin/configuration/taxes_rules/update/$tax_rule_id" tab=data}
+                                    page_url  = {url path="/admin/configuration/taxes_rules/update/%id" id=$tax_rule_id tab=data}
                                     close_url = {url path="/admin/configuration/taxes_rules"}
                                     }
 
                                     {* Be sure to get the product ID, even if the form could not be validated *}
                                     <input type="hidden" name="tax_rule_id" value="{$ID}" />
 
-                                    {form_hidden_fields form=$form}
+                                    {form_hidden_fields}
 
-                                    {form_field form=$form field='success_url'}
+                                    {form_field field='success_url'}
                                         <input type="hidden" name="{$name}" value="{url path="/admin/configuration/taxes_rules"}" />
                                     {/form_field}
 
-                                    {form_field form=$form field='locale'}
+                                    {form_field field='locale'}
                                         <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
                                     {/form_field}
 
                                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                    {form_field form=$form field='title'}
+                                    {form_field field='title'}
                                         <div class="form-group {if $error}has-error{/if}">
                                             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                                             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
                                         </div>
                                     {/form_field}
 
-                                    {form_field form=$form field='description'}
+                                    {form_field field='description'}
                                         <div class="form-group {if $error}has-error{/if}">
                                             <label for="{$label_attr.for}" class="control-label">
                                                 {$label} :
@@ -108,124 +111,194 @@
                             {intl l="Manage taxes"}
                         </div>
 
-                        <div class="form-group">
-                            <label for="" class="label-control">{intl l="Choose a country"} :</label>
-                            <form id="country-selector-form" action="{url path="/admin/configuration/taxes_rules/update/$tax_rule_id"}" method="GET">
-                                <input type="hidden" name="tab" value="taxes">
-                                <select id="country-selector" name="country" data-toggle="selectpicker">
-                                    {loop type="country" name="country-list"}
-                                        <option value="{$ID}" {if $ID == $asked_country}selected="selected"{/if}>{$TITLE}</option>
-                                    {/loop}
-                                </select>
-                            </form>
+                        <hr class="space">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">{intl l="Select a configuration"}</div>
+                            <div class="panel-body">
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="" class="label-control">{intl l="Choose a configuration"} :</label>
+                                            <input type="hidden" name="tab" value="taxes">
+                                            <select id="configuration-selector" name="configuration" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="country-selector" class="label-control">{intl l="Choose a country"} :</label>
+                                            <select id="country-selector" name="country" data-toggle="selectpicker" data-live-search="true">
+                                                {loop type="country" name="country-list" visible="*"}
+                                                    {if $HAS_STATES}
+                                                        {$country_id=$ID}
+                                                        {$country_title=$TITLE}
+                                                        <optgroup label="{$country_title}">
+                                                            <option value="{$country_id}-0">{intl l="all states"}</option>
+                                                            {loop type="state" name="state-list" visible="*" country={$country_id}}
+                                                                <option value="{$country_id}-{$ID}">{$TITLE}</option>
+                                                            {/loop}
+                                                        </optgroup>
+                                                    {else}
+                                                        <option value="{$ID}-0">{$TITLE}</option>
+                                                    {/if}
+                                                {/loop}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                {intl l="For a tax rule, you can have multiple configurations, as only one tax rule is affected to a product."}
+                                {intl l="(according to a country the taxes applied could be different)"}<br>
+                                {intl l="So, each configuration is a list of taxes applied to a list of countries/states."}
+                            </div>
                         </div>
 
-                        <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
-                        <p class="lead js-collapse" id="same_countries" data-collapse-height="86">
-
-                            {$matchedCountries.first=$asked_country}
-
-                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID ask="countries" country=$asked_country}
-                            {$matchedCountries[]=$COUNTRY}
-                                <span class="label label-info">{$COUNTRY_TITLE}</span>
-                            {/loop}
-
-                            {elseloop rel="same-country-list"}
-                                <span class="label label-danger">{intl l="NONE"}</span>
-                            {/elseloop}
-                        </p>
-                        <button data-collapse-block="same_countries" type="button" class="btn btn-info btn-sm btn-block js-collapse-btn" style="margin-bottom: 15px">See all countries</button>
-
-                        <div class="row">
-                            <div class="col-md-6">
-
-                                <div id="panel" class="panel panel-default place">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">{intl l="Manage the tax rule taxes appliance order"}</h3>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">{intl l="Countries/states configuration"}</div>
+                            <div class="panel-body">
+                                <div id="country-list-filter">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div id="country-list-filter-buttons" class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-primary active">
+                                                    <input type="radio" name="country-list-filter-status" id="country-list-filter-all" value="all" autocomplete="off" checked > {intl l="No filters"}
+                                                </label>
+                                                <label class="btn btn-primary">
+                                                    <input type="radio" name="country-list-filter-status" id="country-list-filter-selected" value="selected" autocomplete="off" > {intl l="Use this config."}
+                                                </label>
+                                                <label class="btn btn-primary">
+                                                    <input type="radio" name="country-list-filter-status" id="country-list-filter-none" value="none" autocomplete="off" > {intl l="No config."}
+                                                </label>
+                                                <label class="btn btn-primary">
+                                                    <input type="radio" name="country-list-filter-status" id="country-list-filter-other" value="other" autocomplete="off" > {intl l="Use an other config."}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" id="country-list-filter-text" class="form-control" placeholder="{intl l="Filter"}">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="panel-body">
-                                        {assign lastPosition 0}
-                                        {loop type="tax-rule-country" name="existing-tax-list" tax_rule=$ID country=$asked_country}
-                                        {if $POSITION != $lastPosition}
-                                        {assign lastPosition $POSITION}
-                                        {if $LOOP_COUNT > 1}
+                                </div>
+                                <div id="country-list" class="">
+                                    <div class="u-margin-bottom">
+                                        {loop type="country" name="country-list" visible="1" has_states="0"}
+                                            <span class="label" data-id="{$ID}-0">{$TITLE}</span>
+                                        {/loop}
                                     </div>
-                                    {/if}
-                                    <div class="drop-group droppable add-to-group">
-                                        <p class="drop-message">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                            <span class="message">{intl l="Add tax to this group"}</span>
-                                        </p>
-                                        {/if}
-
-                                        <div class="drag" data-id="{$TAX}">{$TAX_TITLE}</div>
-
-                                        {if $LOOP_COUNT == $LOOP_TOTAL}
-                                    </div>
-                                    {/if}
+                                    {loop type="country" name="country-list" visible="1" has_states="1"}
+                                        {$country_id=$ID}
+                                        {$country_title=$TITLE}
+                                        <div class="panel panel-default country-states">
+                                            <div class="panel-heading">{$country_title}</div>
+                                            <div class="panel-body">
+                                                <span class="label" data-id="{$ID}-0">{intl l="all states/provinces"}</span>
+                                                {loop type="state" name="state-list" visible="*" country={$country_id}}
+                                                    <span class="label" data-id="{$country_id}-{$ID}">{$TITLE}</span>
+                                                {/loop}
+                                            </div>
+                                        </div>
                                     {/loop}
 
-                                    {elseloop rel="existing-tax-list"}
-                                        <div class="drop-group droppable add-to-group">
-                                            <p class="drop-message">
-                                                <span class="glyphicon glyphicon-plus"></span>
-                                                <span class="message">{intl l="Add tax to this group"}</span>
-                                            </p>
+                                    <div>
+                                        <button type="button" id="reset-country-list" class="btn btn-default btn-danger">
+                                            <span class="glyphicon glyphicon-refresh">
+                                            {intl l="Reset"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <span class="glyphicon glyphicon-info-sign"></span> {intl l="caption"} :
+                                <span class="label label-default">{intl l="country has no configuration"}</span>
+                                <span class="label label-success">{intl l="country has the current configuration"}</span>
+                                <span class="label label-danger">{intl l="country has an other configuration"}</span>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">{intl l="Taxes configuration"}</div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+
+                                        <div id="panel" class="panel panel-default place">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">{intl l="Manage the tax rule taxes appliance order"}</h3>
+                                            </div>
+                                            <div class="panel-body">
+
+                                            </div>
+
+                                            <div class="panel-footer droppable create-group">
+                                                <p class="drop-message">
+                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                    <span class="message">{intl l="Drop tax here to create a tax group"}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <div id="panel-list" class="panel panel-default take">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">{intl l="Available taxes"}</h3>
+                                            </div>
+                                            <div class="panel-body">
+
+                                            </div>
+                                            <div class="panel-footer droppable remove-from-group">
+                                                <p class="drop-message">
+                                                    <span class="glyphicon glyphicon-minus"></span>
+                                                    <span class="message">{intl l="Drop tax here to delete from group"}</span>
+                                                </p>
+                                            </div>
                                         </div>
 
-                                    {/elseloop}
+                                    </div>
 
-                                </div>
-                                <div class="panel-footer droppable create-group">
-                                    <p class="drop-message">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                        <span class="message">{intl l="Drop tax here to create a tax group"}</span>
-                                    </p>
-                                </div>
+                                </div><!--//row-->
+
                             </div>
-
-                            <a href="#tax_list_update_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
-
-                        </div>
-                        <div class="col-md-6">
-
-                            <div id="panel-list" class="panel panel-default take">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Available taxes</h3>
-                                </div>
-                                <div class="panel-body">
-                                    {loop type="tax" name="tax-list" exclude_tax_rule=$ID country=$asked_country}
-                                        <div class="draggable" data-id="{$ID}">{$TITLE}</div>
-                                    {/loop}
-                                </div>
-                                <div class="panel-footer droppable remove-from-group">
-                                    <p class="drop-message">
-                                        <span class="glyphicon glyphicon-minus"></span>
-                                        <span class="message">{intl l="Drop tax here to delete from group"}</span>
-                                    </p>
-                                </div>
+                            <div class="panel-footer">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                                {intl l="Here, just drag and drog the available taxes in groups."}<br>
+                                {intl l="Each group of taxes are applied from top to bottom."}
+                                {intl l="In a group, each taxes are applied independently on the incomming price (the price without tax for the first group)."}
+                                {intl l="The outcomming price is the sum of the incomming one and the sum of taxes."}
+                                {intl l="This outcomming price is then passed to the next group as its incomming price, etc..."}
                             </div>
+                        </div><!--//panel-->
 
+                        <div class="row">
+                            <a href="#tax_list_update_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
                         </div>
+
                     </div>
 
                 </div>
             </div>
 
         </div>
+
+        {hook name="tax-rule-edit.bottom" tax_rule_id=$tax_rule_id}
+
         {/loop}
     </div>
 
 </div>
 
+
 {* Confirmation dialog *}
     {form name="thelia.admin.taxrule.taxlistupdate"}
-
-    {if $form_error_message}
-        {$taxUpdateError = true}
-    {else}
-        {$taxUpdateError = false}
-    {/if}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "tax_list_update_dialog"}
@@ -233,43 +306,40 @@
         <input type="hidden" name="tax_rule_id" value="{$tax_rule_id}">
         <input type="hidden" name="tab" value="taxes">
 
-        {form_hidden_fields form=$form}
+        <div id="save-error-message" class="alert alert-danger hidden"></div>
 
-        {form_field form=$form field='country_list'}
+        {form_hidden_fields}
 
-            <p>{intl l="Tax rule taxes will be update for the following countries :"}</p>
-            <div class="form-group">
-                <div class="input-group">
-                    <select id="countries-select" class="" name="{$name}" data-toggle="selectpicker" multiple>
-                        {loop type="country" name="country-list"}
-                            <option value='{$ID}' {if (!$value AND in_array($ID, $matchedCountries)) OR ($value AND in_array($ID, $value))}selected="selected"{/if}>{$TITLE}</option>
-                        {/loop}
-                    </select>
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary js-uncheck-all" data-uncheck-select="countries-select">{intl l="uncheck all"}</button>
-                    </span>
-                </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">{intl l="Countries/states that will use this configuration"}</div>
+            <div id="countries-added" class="panel-body">
+                <div></div>
             </div>
+        </div>
 
-        {/form_field}
+        <div class="panel panel-default">
+            <div class="panel-heading">{intl l="Countries/states deleted of this configuration"}</div>
+            <div id="countries-deleted" class="panel-body">
+                <div></div>
+            </div>
+        </div>
 
-        {module_include location='tax_list_update_form'}
+        {hook name="taxes.update-form" location="tax_list_update_form" tax_rule_id={$tax_rule_id} }
 
     {/capture}
 
-        {include
+    {include
         file = "includes/generic-create-dialog.html"
 
         dialog_id    = "tax_list_update_dialog"
         dialog_title = {intl l="Update tax rule taxes"}
         dialog_body  = {$smarty.capture.tax_list_update_dialog nofilter}
 
-    dialog_ok_label     = {intl l="Edit tax rule taxes"}
-    dialog_cancel_label = {intl l="Cancel"}
+        dialog_ok_label     = {intl l="Save tax rule taxes"}
+        dialog_cancel_label = {intl l="Cancel"}
 
-    form_action        = {url path="/admin/configuration/taxes_rules/saveTaxes"}
-    form_enctype       = {form_enctype form=$form}
-    form_error_message = $form_error_message
+        form_action        = {url path="/admin/configuration/taxes_rules/saveTaxes"}
+        form_enctype       = {form_enctype}
     }
 
     {/form}
@@ -282,69 +352,68 @@
         <script src='{$asset_url}'></script>
     {/javascripts}
 
-    {javascripts file='assets/js/main.js'}
-        <script src='{$asset_url}'></script>
+    {javascripts file='assets/js/libs/underscore-min.js'}
+        <script src="{$asset_url}"></script>
     {/javascripts}
 
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+<script id="tax-group" type="text/html">
+    <div class="drop-group droppable add-to-group">
+        <p class="drop-message">
+            <span class="glyphicon glyphicon-plus"></span>
+            <span class="message">{intl l="Add tax to this group"}</span>
+        </p>
+
+        <% _.each(taxes, function(tax) { %>
+        <div class="drag bg-info" data-id="<%= tax.id %>"><%- tax.title %></div>
+        <% }) %>
+    </div>
+</script>
+
+<script id="tax-list" type="text/html">
+    <% _.each(taxes, function(tax) { %>
+    <div class="draggable bg-warning" data-id="<%= tax.id %>"><%- tax.title %></div>
+    <% }) %>
+</script>
+
+    {* get taxes configuration *}
+    {$taxes=[]}
+    {loop type="tax" name="tax-list"}
+        {$taxes[$ID]= {$TITLE}}
+    {/loop}
 
     <script>
         $(function() {
 
-            {if $taxUpdateError == true}
-            $('#tax_list_update_dialog').modal();
-            {/if}
-
-
-            $('.js-collapse').each(function(k, v) {
-                var h = $(v).data('collapse-height');
-                if( $(v).height() > h ) {
-                    $(v).css('overflow', 'hidden').css('height', h + 'px');
-                } else {
-                    $('[data-collapse-block=' + $(v).attr('id') + ']').hide();
-                }
-            });
-
-            $('.js-collapse-btn').click(function(e) {
-                e.preventDefault();
-                var block = $(this).data('collapseBlock');
-                $('#' + block).css('overflow', 'initial').css('height', 'initial');
-                $(this).unbind().remove();
-            });
-
-            $('.js-uncheck-all').click(function(e) {
-                e.preventDefault();
-                var selectId = $(this).data('uncheckSelect');
-                $('#' + selectId).selectpicker('deselectAll');
-            });
-
-            {literal}
-            $('#country-selector').change(function(e) {
-                $('#country-selector-form').submit();
-            });
+            var configuration = {render action='Thelia\Controller\Admin\TaxRuleController::specsAction' taxRuleId=$tax_rule_id};
+            var taxes = {$taxes|json_encode nofilter};
+            var eventsRegistered = false;
+            var taxesConfigurationInitialized = false;
+            var lastSelectedSpec = '';
 
             // Cache jQuery Objects
             var $group = $('#panel');
             var $list = $('#panel-list');
+            var $configurationSelector = $('#configuration-selector');
+            var $countrySelector = $('#country-selector');
+            var $countryList = $('#country-list');
 
-            // Build array of taxes rules
-            $('#apply-taxes-rules').click(function(){
-                var taxesRules = [],
-                        index;
+            var i18n = {
+                'configuration': '{intl l="Configuration"}'
+                , 'configuration_new': '{intl l='New Configuration'}'
+                , 'countries': '{intl l="Countries"}'
+            };
 
-                $('.drop-group', $group).each(function(i){
-                    var $this = $(this);
-                    index = i;
-                    taxesRules[index] = [];
+            var tpl = {
+                'select-configuration-new': _.template('<option value=""><%- i18n.configuration_new %></option>')
+                , 'select-configuration': _.template('<option value="<%= spec %>"><%- i18n.configuration %> #<%= i + 1 %> (<%= specCount %> <%- i18n.countries %>)</option>')
+                , 'country-item': _.template('<span class="label label-"<%= status %>" data-id="<%= id %>"><%- title %></span>')
+                , 'tax-group': _.template($("#tax-group").html())
+                , 'tax-list': _.template($("#tax-list").html())
+            };
 
-                    $('.drag', $this).each(function(j){
-                        taxesRules[index][j] = [];
-                        taxesRules[index][j] = $(this).data('id'); // retrieve with data
-                    });
-                });
-
-                $('#tax_list').val(JSON.stringify(taxesRules));
-            });
+            {literal}
 
             // Default options for draggable
             var dragOptions = {
@@ -388,39 +457,420 @@
 
                             // Make the new group droppable
                             $drop
-                                    .droppable(dropOptions)
-                                    .sortable(sortOptions);
+                                .droppable(dropOptions)
+                                .sortable(sortOptions);
                         }
                     }
 
-                    $("<div></div>").addClass('drag').attr('data-id', ui.draggable.data('id')).text( ui.draggable.text()).appendTo( $drop );
+                    $("<div></div>").addClass('drag bg-info').attr('data-id', ui.draggable.data('id')).text( ui.draggable.text()).appendTo( $drop );
                     ui.draggable.remove();
                 }
             };
 
+            /**
+             * Try to find a configuration used for this country/state
+             */
+            $countrySelector.change(function(e) {
+                var country = $('#country-selector').val()
+                    , data = country.match(/(\d+)\-(\d+)/)
+                    , countryId = 0
+                    , stateId = 0
+                    , specification
+                ;
 
-            // Make the list of taxes draggable
-            $('.draggable', $list).draggable(dragOptions);
+                if (null !== data) {
+                    // find the
+                    countryId = data[1];
+                    stateId = data[2];
+
+                    specification = _.find(configuration.specifications, function(item) {
+                        return (item.country == countryId && item.state == stateId);
+                    });
+
+                    if (undefined !== specification) {
+                        $configurationSelector.val(specification.specification);
+                        $configurationSelector.trigger('change');
+                    }
+                }
+
+                e.preventDefault();
+            });
+
+            // Build array of taxes rules
+            // and country list
+            $('#apply-taxes-rules').click(function(){
+                var taxesRules = [],
+                    countries = [],
+                    countriesDeleted = [],
+                    $added = $('#countries-added > div'),
+                    $deleted = $('#countries-deleted > div'),
+                    spec = '',
+                    index;
+
+                // get countries configuration
+                $added.empty();
+                $deleted.empty();
+
+                $countryList.find('.label').each(function(){
+                    var $country = $(this);
+                    if ($country.hasClass('label-success')) {
+                        countries.push($country.data('id').split('-'));
+                        $added.append($country.clone());
+                        $added.append(" ");
+                    } else {
+                        if ($country.data('memorize') !== undefined) {
+                            if ($country.data('memorize').indexOf('label-success') !== -1) {
+                                countriesDeleted.push($country.data('id').split('-'));
+                                $deleted.append($country.clone());
+                                $deleted.append(" ");
+                            }
+                        }
+                    }
+                });
+
+                // get taxes configuration
+                $('.drop-group', $group).each(function(i){
+                    var $this = $(this);
+                    index = i;
+                    taxesRules[index] = [];
+
+                    $('.drag', $this).each(function(j){
+                        taxesRules[index][j] = [];
+                        taxesRules[index][j] = $(this).data('id'); // retrieve with data
+                    });
+                });
 
 
-            // let the drop-group be droppable & sortable, accepting the tax items
-            $('.droppable', $group)
+                // save the configuration spec to find the right configuration
+                // after an successful save
+                _.each(taxesRules, function(element, index) {
+                    var sortedTaxes = _.sortBy(element, function(num){ return num; });
+                    _.each(sortedTaxes, function(taxe) {
+                        if (spec != '') spec += ',';
+                        spec += taxe + '-' + (index+1);
+                    });
+                });
+                lastSelectedSpec = spec;
+
+                // update the modal form
+                $added.closest('.panel').css('display', (countries.length === 0) ? 'none' : 'block');
+                $added.find("span.label.hidden").removeClass('hidden');
+                $deleted.closest('.panel').css('display', (countriesDeleted.length === 0) ? 'none' : 'block');
+                $deleted.find("span.label.hidden").removeClass('hidden');
+
+                $('#country_list').val(JSON.stringify(countries));
+                $('#country_deleted_list').val(JSON.stringify(countriesDeleted));
+                $('#tax_list').val(JSON.stringify(taxesRules));
+            });
+
+            /**
+             * Save configuration in ajax
+             */
+            var saveConfiguration = function saveConfiguration(ev) {
+
+                var $form = $('#tax_list_update_dialog form')
+                    , $message = $('#save-error-message')
+                ;
+
+                ev.preventDefault();
+
+                $.ajax({
+                    type: $form.attr('method'),
+                    dataType: 'json',
+                    data: $form.serialize(),
+                    url: $form.attr('action')
+                }).done(function (data, textStatus, jqXHR) {
+                    if (data.success) {
+                        $message.addClass('hidden');
+                        configuration = data.data;
+                        $('#tax_list_update_dialog').modal('hide');
+                        initialize();
+                    } else {
+                        $message.html(data.message).removeClass('hidden');
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    $message.html(data.message).removeClass('hidden');
+                });
+
+            };
+
+
+            var getTaxesForSpec = function getTaxesForSpec(spec) {
+                var taxesTemp = []
+                    , taxes = []
+                    , taxTemp
+                ;
+
+                if (spec == '') {
+                    return taxes;
+                } else {
+                    taxesTemp = spec.split(',')
+                }
+
+                for (var i = 0 ; i < taxesTemp.length ; i++) {
+                    taxTemp = taxesTemp[i].split('-');
+                    taxes.push([parseInt(taxTemp[0]), parseInt(taxTemp[1])]);
+                }
+
+                return taxes;
+            };
+
+            /**
+             * Build the taxes configuration panel
+             */
+            var initTaxesConfiguration = function initTaxesConfiguration() {
+
+                var spec = $configurationSelector.val()
+                    , taxesUsed = []
+                    , taxesUnused = []
+                    , nbGroup;
+
+                // remove old
+                if (taxesConfigurationInitialized) {
+                    $('.draggable', $list).draggable("destroy");
+                    $('.droppable', $group).droppable("destroy");
+                    $('.droppable', $group).sortable("destroy");
+                }
+
+                // get current configuration
+                spec = getTaxesForSpec(spec);
+
+                nbGroup = _.isEmpty(spec) ? 0 : _.max(spec, function(tax){ return tax[1]; })[1];
+
+                taxesUsed.length = nbGroup;
+
+                _.each(taxes, function(taxTitle, taxId) {
+                    var tax = _.find(spec, function (item) {
+                        return item[0] == taxId;
+                    });
+
+                    if (tax !== undefined) {
+                        if (!taxesUsed[tax[1] - 1]) taxesUsed[tax[1] - 1] = [];
+                        taxesUsed[tax[1] - 1].push({id: taxId, title: taxTitle});
+                    } else {
+                        taxesUnused.push({id: taxId, title: taxTitle});
+                    }
+                });
+
+                $groupContainer = $group.find('.panel-body');
+                $groupContainer.empty();
+                if (taxesUsed.length != 0) {
+                    for (var i = 0; i < taxesUsed.length; i++) {
+                        $groupContainer.append(render('tax-group', {taxes: taxesUsed[i]}));
+                    }
+                } else {
+                    $groupContainer.append(render('tax-group', {taxes: []}));
+                }
+
+                $groupContainer = $list.find('.panel-body');
+                $groupContainer.empty();
+                $groupContainer.append(render('tax-list', {taxes: taxesUnused}));
+
+                // Make the list of taxes draggable
+                $('.draggable', $list).draggable(dragOptions);
+                // let the drop-group be droppable & sortable, accepting the tax items
+                $('.droppable', $group)
                     .droppable(dropOptions)
                     .sortable(sortOptions);
+                $('.place .panel-body').sortable(sortOptions);
 
-            $('.place .panel-body').sortable(sortOptions);
+                taxesConfigurationInitialized = true;
+            };
 
             // let the gallery be droppable as well, accepting items from the trash
             $('.remove-from-group', $list)
-                    .droppable({
-                        accept: "#panel .drag",
-                        hoverClass: 'over',
-                        drop: function( event, ui ) {
-                            $("<div></div>").addClass('draggable').text( ui.draggable.text() ).attr('data-id', ui.draggable.data('id')).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
-                            ui.draggable.remove();
+                .droppable({
+                    accept: "#panel .drag",
+                    hoverClass: 'over',
+                    drop: function( event, ui ) {
+                        $("<div></div>").addClass('draggable bg-warning').text( ui.draggable.text() ).attr('data-id', ui.draggable.data('id')).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
+                        ui.draggable.remove();
 
+                    }
+                });
+
+
+            // Utils
+            var render = function render(tplName, obj) {
+                var data = $.extend({}, obj, {'i18n': i18n});
+                return tpl[tplName](data);
+            };
+
+            var getSpecsForConfiguration = function getSpecsForConfiguration(specification) {
+                return _.filter(
+                    configuration.specifications,
+                    function(item){ return item.specification == specification; }
+                );
+            };
+
+            /**
+             * Update country/sate list and taxes configuration
+             * called on a configuration change
+             *
+             * @param ev
+             */
+            var configurationChange = function configurationChange(ev) {
+                var spec = $configurationSelector.val(),
+                    countries,
+                    country,
+                    selector,
+                    i;
+
+                // TODO discard if changes done
+
+                countries = configuration.specifications;
+
+                // reset country/state status
+                $countryList
+                    .find('.label')
+                    .removeClass('label-success label-danger')
+                    .addClass('label-default')
+                ;
+
+                for (i = 0; i < countries.length; i++) {
+                    country = countries[i];
+                    selector = "[data-id='" + country.country + '-' + country.state + "']";
+                    if (spec == country.specification) {
+                        // same configuration
+                        $countryList.find(selector).removeClass('label-default').addClass('label-success');
+                    } else {
+                        // an other configuration
+                        $countryList.find(selector).removeClass('label-default').addClass('label-danger');
+                    }
+                }
+
+                // apply filter depending of the spec
+                if (spec == "") {
+                    $('#country-list-filter-none').parent().trigger('click');
+                } else {
+                    $('#country-list-filter-selected').parent().trigger('click');
+                }
+
+                initTaxesConfiguration();
+            };
+
+            /**
+             * Filter the list of country/state according to the form
+             */
+            var filterCountryList = function filterCountryList() {
+                var status = $("input:radio[name=country-list-filter-status]:checked").val()
+                    ,text = $("#country-list-filter-text").val().toLowerCase().trim()
+                ;
+
+                $countryList.attr('class', '');
+                $countryList.addClass('filter-' + status);
+
+                $countryList.find('.label').removeClass('hidden');
+                if (text != '') {
+                    $countryList.find('.label').each(function () {
+                        var $item = $(this);
+                        if (-1 == $item.text().toLowerCase().indexOf(text)) {
+                            $item.addClass("hidden");
                         }
                     });
+                }
+
+                // hide/show country with states
+                $('.country-states').each(function(){
+                    var $countryBlock = $(this)
+                        , hide
+                    ;
+
+                    $countryBlock.css('display', 'block');
+                    if ($('#taxes').hasClass('in')) {
+                        hide = $countryBlock.find('span.label').filter(":visible").length == 0;
+                        $countryBlock.css('display', hide ? 'none' : 'block');
+                    }
+                });
+
+            };
+
+            /**
+             * Toggle the status of a country/state in the country list
+             */
+            var toggleCountryStatus = function toggleCountryStatus() {
+                var $current = $(this),
+                    store;
+
+                store = ($current.data('memorize') === undefined);
+                if (store) {
+                    $current.data('memorize', $current.attr('class'));
+                } else {
+                    $current.attr('class', $current.data('memorize'));
+                    $current.removeData('memorize');
+                    return;
+                }
+
+                if ($current.hasClass("label-success")) {
+                    $current.removeClass("label-success").addClass('label-default');
+                } else if ($current.hasClass("label-danger")) {
+                    $current.removeClass("label-danger").addClass("label-success");
+                } else {
+                    $current.removeClass('label-default').addClass("label-success");
+                }
+            };
+
+            /**
+             * Discard status changes done in country list
+             */
+            var resetCountryList = function resetCountryList() {
+                $countryList.find('.label').each(function () {
+                    var $item = $(this);
+                    if ($item.data('memorize') !== undefined) {
+                        $item.attr('class', $item.data('memorize'));
+                        $item.removeData('memorize');
+                    }
+                });
+            };
+
+
+            /**
+             * Initialize everything when document loaded and after a successful save.
+             */
+            var initialize = function initialize() {
+                var i = 1,
+                    conf,
+                    spec;
+
+                $configurationSelector.empty();
+                $configurationSelector.append(
+                    render('select-configuration-new', {})
+                );
+                for (i = 0; i < configuration['taxRules'].length; i++) {
+                    spec = configuration['taxRules'][i];
+                    specCount = getSpecsForConfiguration(spec).length;
+                    $configurationSelector.append(
+                        render('select-configuration', {'spec': spec, 'specCount': specCount, 'i': i})
+                    );
+                }
+
+                // event
+                if (!eventsRegistered) {
+                    $configurationSelector.on('change', configurationChange);
+
+                    $("#country-list-filter-buttons").on('change', filterCountryList);
+                    $("#country-list-filter-text").on('keyup', filterCountryList);
+
+                    $countryList
+                            .find('.label')
+                            .on('click', toggleCountryStatus);
+
+                    $('#reset-country-list').on('click', resetCountryList);
+
+                    $('#tax_list_update_dialog form').on('submit', saveConfiguration);
+
+                    eventsRegistered = true;
+                }
+
+                // trigger action
+                if (lastSelectedSpec !== '') {
+                    $configurationSelector.val(lastSelectedSpec);
+                    lastSelectedSpec = '';
+                }
+                $configurationSelector.trigger('change');
+            };
+
+            initialize();
 
             {/literal}
 
@@ -431,5 +881,35 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='tax-rule-edit-js'}
+    {hook name="tax-rule.edit-js" location="tax-rule-edit-js" tax_rule_id={$tax_rule_id} }
+    {hook name="wysiwyg.js" location="wysiwyg-tax-rule-edit-js" }
+{/block}
+
+{block name="after-bootstrap-css"}
+<style type="text/css">
+#country-list .label,
+#tax_list_update_dialog .label {
+    line-height: 2;
+    cursor: pointer;
+}
+
+.filter-selected .label-danger,
+.filter-selected .label-default {
+    display: none;
+    width: 0;
+    height: 0;
+}
+.filter-none .label-danger,
+.filter-none .label-success {
+    display: none;
+    width: 0;
+    height: 0;
+}
+.filter-other .label-success,
+.filter-other .label-default {
+    display: none;
+    width: 0;
+    height: 0;
+}
+</style>
 {/block}

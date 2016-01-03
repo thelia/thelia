@@ -1,0 +1,17 @@
+{ifloop rel="blog.articles"}
+<ul>
+    {loop type="content" name="blog.articles" folder=$bodyFolderId limit=3}
+    <li>
+        <a href="{$URL}">
+            <h4 class="block-subtitle">{$TITLE}</h4>
+            <p>{$CHAPO}</p>
+        </a>
+    </li>
+    {/loop}
+</ul>
+{/ifloop}
+{elseloop rel="blog.articles"}
+<ul>
+    <li>{intl l="No articles currently" d="hooknavigation.fo.default"}</li>
+</ul>
+{/elseloop}

@@ -1,0 +1,59 @@
+{ifloop rel="product_new"}
+<section id="products-new">
+    <div class="products-heading">
+        <h2>{intl l="Latest" d="hookproductsnew.fo.default"} <a href="{url path="/view_all"  type="new"}" class="btn-all">{intl l="+ View All" d="hookproductsnew.fo.default"}</a></h2>
+    </div>
+    <div class="products-content">
+        <ul class="list-unstyled products-grid row">
+            {loop name="product_new" type="product" limit="4" new="yes"}
+            <li class="item col-md-3 col-sm-4">
+                <article itemscope itemtype="http://schema.org/Product">
+                    <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                    {$product_id=$ID}
+                    {loop name="brand.feature" type="feature" product="{$ID}" title="brand"}
+                    {loop name="brand.value" type="feature_value" feature="{$ID}" product="$product_id"}
+                    <meta itemprop="brand" content="{$TITLE}">
+                    {/loop}
+                    {/loop}
+                    {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+                    {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                    <meta itemprop="productID" content="isbn:{$TITLE}">
+                    {/loop}
+                    {/loop}
+
+                    <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image overlay">
+                        {ifloop rel="image_product_new" }
+                        <img itemprop="image" class="img-responsive center-block"
+                        {loop name="image_product_new" type="image" limit="1" product="{$ID}" force_return="true" width="280" height="196" resize_mode="borders"}
+                        src="{$IMAGE_URL}"
+                        {/loop}
+                        alt="Product #{$LOOP_COUNT}" >
+                        {/ifloop}
+                        {elseloop rel="image_product_new"}
+                        <img itemprop="image" class="img-responsive center-block" src="{image file='assets/dist/img/280x196.png'}" alt="Product #{$LOOP_COUNT}">
+                        {/elseloop}
+                    </a>
+
+                    <a href="{$URL}" class="product-info">
+                        <h3 class="name"><span itemprop="name">{$TITLE}</span></h3>
+                        <div class="short-description" itemprop="description">{$CHAPO}</div>
+
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                {loop type="category" name="category_tag" id=$DEFAULT_CATEGORY}
+                                <meta itemprop="category" content="{$TITLE}">
+                                {/loop}
+                                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
+                                <meta itemprop="priceCurrency" content="{currency attr="code"}">
+                                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+                                <span class="regular-price"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE}</span></span>
+                            </div>
+                        </div>
+                    </a>
+                </article><!-- /product -->
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</section><!-- #products-new -->
+{/ifloop}

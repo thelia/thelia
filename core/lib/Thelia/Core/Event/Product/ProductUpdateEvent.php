@@ -19,6 +19,8 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $chapo;
     protected $description;
     protected $postscriptum;
+    protected $brand_id;
+    protected $virtual_document_id;
 
     public function __construct($product_id)
     {
@@ -71,5 +73,44 @@ class ProductUpdateEvent extends ProductCreateEvent
         $this->postscriptum = $postscriptum;
 
         return $this;
+    }
+
+    /**
+     * @param  int   $brand_id
+     * @return $this
+     */
+    public function setBrandId($brand_id)
+    {
+        $this->brand_id = $brand_id;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBrandId()
+    {
+        return $this->brand_id;
+    }
+
+    /**
+     * @param mixed $virtual_document_id
+     *
+     * @return $this
+     */
+    public function setVirtualDocumentId($virtual_document_id)
+    {
+        $this->virtual_document_id = $virtual_document_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVirtualDocumentId()
+    {
+        return $this->virtual_document_id;
     }
 }

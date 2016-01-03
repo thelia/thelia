@@ -1,0 +1,128 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+{$locale = {lang attr='locale'}}
+{loop type="module" name="module-information" id=$moduleId lang=$locale}
+    <h4>{intl l="Module detailed information"}</h4>
+
+    <table class="table table-striped table-condensed">
+        {if $TITLE}
+            <tr>
+                <th>{intl l="Title"}</th>
+                <td>{$TITLE}</td>
+            </tr>
+        {/if}
+
+        <tr>
+            <th>{intl l="Module code"}</th>
+            <td>{$CODE}</td>
+        </tr>
+
+        <tr>
+            <th>{intl l="Module type"}</th>
+            <td>{$moduleData.type}</td>
+        </tr>
+
+        {if $CHAPO}
+            <tr>
+                <th>{intl l="Subtitle"}</th>
+                <td>{$CHAPO}</td>
+            </tr>
+        {/if}
+
+        {if $DESCRIPTION}
+            <tr>
+                <th>{intl l="Description"}</th>
+                <td>{$DESCRIPTION nofilter}</td>
+            </tr>
+        {/if}
+
+        {if $POSTSCRIPTUM}
+            <tr>
+                <th>{intl l="Postscriptum"}</th>
+                <td>{$POSTSCRIPTUM}</td>
+            </tr>
+        {/if}
+
+        {if $moduleData.tags.tag}
+            <tr>
+                <th>{intl l="Tags"}</th>
+                <td>
+                    {foreach $moduleData.tags.tag as $label}{if $label@index > 0}, {/if}{$label}{/foreach}
+                </td>
+            </tr>
+        {/if}
+
+        {if $moduleData.languages.language}
+            <tr>
+                <th>{intl l="Supported locales"}</th>
+                <td>
+                    {foreach $moduleData.languages.language as $label}{if $label@index > 0}, {/if}{$label}{/foreach}
+                </td>
+            </tr>
+        {/if}
+
+        <tr>
+            <th>{intl l="Namespace of main class"}</th>
+            <td><code>{$moduleData.fullnamespace}</code></td>
+        </tr>
+
+        <tr>
+            <th>{intl l="Minimum required Thelia version"}</th>
+            <td>{$moduleData.thelia}</td>
+        </tr>
+
+        {if $moduleData.required.module}
+            <tr>
+                <th>{intl l="Required modules"}</th>
+                <td>
+                    <ul class="list-unstyled">
+                        {foreach $moduleData.required.module as $module}
+                            <li>{$module}</li>
+                        {/foreach}
+                    </ul>
+                </td>
+            </tr>
+        {/if}
+
+        <tr>
+            <th>{intl l="Stability"}</th>
+            <td>{$moduleData.stability}</td>
+        </tr>
+
+        {if $moduleData.urlmiseajour}
+            <tr>
+                <th>{intl l="Update URL"}</th>
+                <td><a href="{$moduleData.urlmiseajour}" target="_blank">{$moduleData.urlmiseajour}</a></td>
+            </tr>
+        {/if}
+
+        {if $moduleData.updateurl}
+            <tr>
+                <th>{intl l="Update URL"}</th>
+                <td><a href="{$moduleData.updateurl}" target="_blank">{$moduleData.updateurl}</a></td>
+            </tr>
+        {/if}
+
+        <tr>
+            <th>{intl l="Author"}</th>
+            <td>
+                {if $moduleData.author.name}{$moduleData.author.name}{else}{intl l='Unspecified'}{/if}{if $moduleData.author.company}, {$moduleData.author.company}{/if}
+            </td>
+        </tr>
+
+        {if $moduleData.author.email}
+            <tr>
+                <th>{intl l="E-mail"}</th>
+                <td>{mailto address=$moduleData.author.email encode='hex'}</td>
+            </tr>
+        {/if}
+
+        {if $moduleData.author.website}
+            <tr>
+                <th>{intl l="Web site"}</th>
+                <td><a href="{$moduleData.author.website}">{$moduleData.author.website}</a></td>
+            </tr>
+        {/if}
+    </table>
+{/loop}
+{* fro debugging only <pre>{$moduleData|print_r}</pre> *}

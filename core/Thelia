@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php
+
+if (php_sapi_name() != 'cli') {
+    throw new \Exception('this script can only be launched with cli sapi');
+}
+set_time_limit(0);
+
+// allow cache to be cleared by php client or web
+umask(0002);
+
+$bootstrapToggle = false;
+$bootstraped = false;
+
+// Autoload bootstrap
+
+foreach ($argv as $arg) {
+    if ($arg === '-b') {
+        $bootstrapToggle = true;
+
+        continue;
+    }
+
+    if ($bootstrapToggle) {
+        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
+
+        $bootstraped = true;
+    }
+}
+
+if (!$bootstraped) {
+    if (isset($bootstrapFile)) {
+        require $bootstrapFile;
+    } elseif (is_file($file = __DIR__ . '/vendor/autoload.php')) {
+        require $file;
+    } else {
+        echo "No autoload file found. Please use the -b argument to include yours";
+        exit(1);
+    }
+}
+
+use Thelia\Core\Thelia;
+use Thelia\Core\Application;
+use Thelia\Command\Output\TheliaConsoleOutput;
+use Symfony\Component\Console\Input\ArgvInput;
+
+$input = new ArgvInput();
+$env = $input->getParameterOption(array('--env', '-e'), getenv('THELIA_ENV') ?: 'dev');
+$debug = getenv('THELIA_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', '')) && $env !== 'prod';
+
+$thelia = new Thelia($env, $debug);
+$application = new Application($thelia);
+$application->getContainer()->get('thelia.translator');
+$application->run($input, new TheliaConsoleOutput());

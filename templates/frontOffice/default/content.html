@@ -1,44 +1,53 @@
 {extends file="layout.tpl"}
 
+{block name='init'}
+    {assign var="content_id" value={content attr="id"}}
+{/block}
+
 {* Body Class *}
 {block name="body-class"}page-content{/block}
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="content.seo.title" type="content" id="{content attr="id"}"}
-    {$page_title = {$META_TITLE}}
-    {/loop}
+    {if {$content_id}}
+        {loop name="content.seo.title" type="content" id={$content_id} limit="1"}
+            {$page_title = {$META_TITLE}}
+        {/loop}
+    {/if}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="content.seo.meta" type="content" id="{content attr="id"}"}
-    {if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-    {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
-    {/loop}
-{/block}
-
-{* Feeds *}
-{block name="feeds"}
-<link rel="alternate" type="application/rss+xml" title="{intl l='All contents in'} {content attr='title'}" href="{url path="/feed/content/{lang attr="locale"}/{content attr="id"}"}" />
+    {if $content_id}
+        {loop name="content.seo.meta" type="content" id=$content_id limit="1"}
+            {include file="includes/meta-seo.html"}
+        {/loop}
+    {/if}
 {/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$breadcrumbs = []}
-    {loop type="content" name="content-breadcrumb" id="{content attr="id"}"}
-        {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+    {if $content_id}
+        {$breadcrumbs = []}
+        {loop type="content" name="content-breadcrumb" id=$content_id limit="1"}
+            {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
+                {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+            {/loop}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
         {/loop}
-        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
-    {/loop}
+    {/if}
 {/block}
 
 {block name="main-content"}
-    <div class="main layout-col-2-left">
+{if $content_id}
+    {hook name="content.top" content="$content_id"}
+    <div class="main row">
+        {hook name="content.main-top" content="$content_id"}
+        <article id="content-main" class="col-main col-md-9 col-md-push-3" role="main" aria-labelledby="main-label">
 
-        <article class="col-main" role="main" aria-labelledby="main-label">
-            {loop name="blog.content"  type="content" current="yes"}
+            {hook name="content.content-top" content="$content_id"}
+
+            {loop name="blog.content" type="content" id=$content_id limit="1"}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
                 {if $CHAPO}
                     <div class="chapo">
@@ -50,17 +59,52 @@
                         {$DESCRIPTION nofilter}
                     </div>
                 {/if}
+                
+                {ifloop rel="blog.document"}
+                <div class="documents">
+                    <ul>
+                    {loop name="blog.document"  type="document" content="{$ID}"}
+                    <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
+                    {/loop}  
+                    </ul>
+                </div>    
+                {/ifloop}                    
+                
                 {if $POSTSCRIPTUM}
                     <small class="postscriptum">
                         {$POSTSCRIPTUM}
-                    </small>
-                {/if}
+                   </small>
+                {/if}                
             {/loop}
+
+            {hook name="content.content-bottom" content="$content_id"}
+
         </article>
 
-        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+        <aside class="col-left col-md-3 col-md-pull-9" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/asides/articles.html"}
         </aside>
 
+        {hook name="content.main-bottom" content="$content_id"}
     </div><!-- /.layout -->
+    {hook name="content.bottom" content="$content_id"}
+{else}
+    <div class="main">
+        <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
+            {include file="includes/empty.html"}
+        </article>
+    </div><!-- /.layout -->
+{/if}
+{/block}
+
+{block name="stylesheet"}
+{hook name="content.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="content.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="content.javascript-initialization"}
 {/block}

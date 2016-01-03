@@ -1,6 +1,6 @@
 <div class="jumbotron">
     <h1>{intl l="Product Empty Title"}</h1>
-    <p>{intl l="Product Empty Message"}</p>
+    {intl l="Product Empty Message"}
     <p><a href="{url path="/admin"}" class="btn btn-jumbotron btn-lg" role="button">{intl l="Product Empty Button"}</a></p>
 </div>
 
@@ -10,20 +10,19 @@
     </div>
 
     <div class="products-content">
-        <ul class="products-grid product-col-4">
+        <ul class="list-unstyled row">
             {for $count=1 to 4}
-            <li class="item">
+            <li class="item col-md-3">
                 <article>
-                    <a href="{url path="/admin"}" tabindex="-1" class="product-image">
-                        {images file='../assets/img/280x196.png'}<img src="{$asset_url}" alt="{intl l="Demo product title"}">{/images}
-                        <span class="mask"></span>
+                    <a href="{url path="/admin"}" tabindex="-1" class="product-image overlay">
+                        <img src="{image file='assets/dist/img/280x196.png'}" class="img-responsive" alt="{intl l="Demo product title"}">
                     </a>
                     <a href="{url path="/admin"}" class="product-info">
                         <h3 class="name">{intl l="Demo product title"}</h3>
                         <div class="short-description">{intl l="Demo product description"}</div>
                         <div class="product-price">
                             <div class="price-container">
-                               <span class="regular-price"><span class="price">99.99 {currency attr="symbol"}</span></span>
+                               <span class="regular-price"><span class="price">{format_money number=99.99}</span></span>
                             </div>
                         </div>
                     </a>

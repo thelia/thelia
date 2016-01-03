@@ -18,28 +18,25 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-
+use Thelia\Model\CartItem as CartItemModel;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Cart as CartModel;
 use Thelia\Type;
 
+/**
+ *
+ * Cart Loop
+ *
+ *
+ * Class Cart
+ * @package Thelia\Core\Template\Loop
+ *
+ * {@inheritdoc}
+ * @method string[] getOrder()
+ */
 class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
-    use \Thelia\Cart\CartTrait;
     /**
-     *
-     * define all args used in your loop
-     *
-     * array key is your arg name.
-     *
-     * example :
-     *
-     * return array (
-     *  "ref",
-     *  "id" => "optional",
-     *  "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     * );
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
@@ -49,16 +46,17 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array('reverse'))
+                    new Type\EnumListType(array('normal', 'reverse'))
                 ),
-                'reverse'
+                'normal'
             )
         );
     }
 
     public function buildArray()
     {
-        $cart = $this->getCart($this->getDispatcher(), $this->request);
+        /** @var CartModel $cart */
+        $cart = $this->request->getSession()->getSessionCart($this->getDispatcher());
 
         if (null === $cart) {
             return array();
@@ -83,6 +81,10 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         $locale = $this->request->getSession()->getLang()->getLocale();
+        $checkAvailability = ConfigQuery::checkAvailableStock();
+        $defaultAvailability = intval(ConfigQuery::read('default-available-stock', 100));
+
+        /** @var CartItemModel $cartItem */
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
             $product = $cartItem->getProduct(null, $locale);
             $productSaleElement = $cartItem->getProductSaleElements();
@@ -94,15 +96,24 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set("REF", $product->getRef());
             $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
-            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()))
-                ->set("STOCK", $productSaleElement->getQuantity())
-                ->set("PRICE", $cartItem->getPrice())
+            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()));
+            if (!$checkAvailability || $product->getVirtual() === 1) {
+                $loopResultRow->set("STOCK", $defaultAvailability);
+            } else {
+                $loopResultRow->set("STOCK", $productSaleElement->getQuantity());
+            }
+            $loopResultRow->set("PRICE", $cartItem->getPrice())
                 ->set("PROMO_PRICE", $cartItem->getPromoPrice())
                 ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
                 ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
                 ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
+            $loopResultRow->set("TOTAL_PRICE", $cartItem->getPrice()*$cartItem->getQuantity())
+                ->set("TOTAL_PROMO_PRICE", $cartItem->getPromoPrice()*$cartItem->getQuantity())
+                ->set("TOTAL_TAXED_PRICE", $cartItem->getTotalTaxedPrice($taxCountry))
+                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry));
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
+            $this->addOutputFields($loopResultRow, $cartItem);
             $loopResult->addRow($loopResultRow);
         }
 

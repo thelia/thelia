@@ -16,4 +16,5 @@ use Thelia\Model\Base\AddressQuery as BaseAddressQuery;
  */
 class AddressQuery extends BaseAddressQuery
 {
-} // AddressQuery
+}
+// AddressQuery

@@ -1,0 +1,483 @@
+{extends file="admin-layout.tpl"}
+
+{block name="after-bootstrap-css"}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}">
+{/block}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'sales'}
+{/block}
+
+{block name="page-title"}{intl l='Change sale configuration'}{/block}
+
+{block name="check-resource"}admin.sales{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+
+<div class="edit-sale">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
+            <li>{intl l='Sale configuration'}</li>
+        </ul>
+
+        {loop type="sale" name="sale" active='*' id=$sale_id backend_context="1" lang=$edit_language_id}
+
+        {hook name="sale-edit.top" sale_id=$sale_id}
+
+        <div class="row">
+            <div class="col-md-12 general-block-decorator clearfix">
+
+                <div class="form-container">
+
+                {form name="thelia.admin.sale.modification"}
+
+                <form method="POST" id="sale-update-form" action="{url path="/admin/sale/save/%id" id=$ID}" {form_enctype} >
+
+                    {include
+                        file = "includes/inner-form-toolbar.html"
+                        hide_submit_buttons = false
+
+                        page_url  = {url path="/admin/sale/update/%id" id=$ID}
+                        close_url = {url path="/admin/sales"}
+                    }
+
+                    {* Be sure to get the sale ID, even if the form could not be validated *}
+                    <input type="hidden" name="sale_id" value="{$ID}" />
+
+                    {form_hidden_fields}
+
+                    {render_form_field field="success_url" value={url path="/admin/sales"}}
+                    {render_form_field field="locale" value={$edit_language_locale}}
+
+                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                    <div class="row">
+                        <div class="col-md-7">
+                            <p class="title title-without-tabs">{intl l='Sale operation features'}</p>
+
+                            {render_form_field field='label'}
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {render_form_field field='active'}
+                                    {render_form_field field='display_initial_price'}
+
+                                    {custom_render_form_field field='start_date'}
+                                        {* data-date-format is a moment.js date format *}
+                                        <div class="input-group">
+                                            <input type="text" {form_field_attributes field="start_date" extra_class="datetime-picker"}>
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                                        </div>
+                                    {/custom_render_form_field}
+
+                                    {custom_render_form_field field='end_date'}
+
+                                        <div class="input-group">
+                                            <input type="text" {form_field_attributes field="end_date" extra_class="datetime-picker"}>
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                                        </div>
+                                    {/custom_render_form_field}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {render_form_field field='price_offset_type'}
+
+                                    <div class="well well-sm">
+                                        {loop type="currency" name="sale.currencies" backend_context="1" lang=$edit_language_id}
+                                            {$aff=($LOOP_COUNT == 1)}
+                                            {custom_render_form_field field='price_offset' value_key=$ID show_label=$aff}
+                                                <div class="input-group">
+                                                    <input type="text" {form_field_attributes field="price_offset" value_key=$ID}>
+                                                    <span class="input-group-addon">{intl l='For prices in %currency' currency={$SYMBOL}}</span>
+                                                </div>
+                                            {/custom_render_form_field}
+                                        {/loop}
+                                        <p>{intl l='You can define here a specific price offset for each of the shop currencies, as a percentage or a constant amount, depending on the selected offset type.'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <p class="title title-without-tabs">{intl l='Sale operation description'}</p>
+
+                            {include file="includes/standard-description-form-fields.html"}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <p class="title title-without-tabs">{intl l='Products selection'}</p>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {form_field field="categories"}
+                                    <div class="form-group ">
+                                        <label for="cat_source" class="control-label">{intl l='Available product categories'}</label>
+
+                                        <select class="form-control" id="cat_source" name="cat_source" size="10" multiple>
+                                        {loop type="category-tree" category=0 name="available-categories"  backend_context=1}
+                                            {$selected = in_array($ID, $value)}
+                                            <option {if $selected}disabled class="disabled-select-option"{/if}style="padding-left: {$LEVEL * 20}px" value="{$ID}">{$TITLE}</option>
+                                        {/loop}
+                                        </select>
+                                    </div>
+                                    {/form_field}
+
+                                    <div class="form-group ">
+                                        <button id="add-to-selection" class="category-manipulation btn-block btn btn-primary">
+                                            {intl l='Add to selected categories'}
+                                            <span class="glyphicon glyphicon-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    {form_field field="categories"}
+                                    <div class="form-group ">
+                                        <label for="cat_source" class="control-label">{intl l='Selected categories'}</label>
+                                        <select {form_field_attributes field='categories'}'>
+                                        {* protect ourselves against empty $value, which causes all categories to be displayed *}
+                                        {if empty($value)}{$value = [ 0 ]}{/if}
+                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1}
+                                            <option value="{$ID}">{$TITLE}</option>
+                                        {/loop}
+                                        </select>
+                                    </div>
+                                    {/form_field}
+
+                                    <div class="form-group ">
+                                        <button id="remove-from-selection" class="category-manipulation btn-block btn btn-primary">
+                                            <span class="glyphicon glyphicon-backward"></span>
+                                            {intl l='Remove from selected categories'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                <p class="title title-without-tabs">{intl l='Products'}</p>
+
+                                    <div class="text-center" id="loading-products">
+                                        <span class="loading">{intl l="Please wait, loading products list"}</span>
+                                    </div>
+
+                                    <div id="sale-products-list">
+                                        {* Loaded through Ajax *}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {include
+                        file = "includes/inner-form-toolbar.html"
+                        hide_submit_buttons = false
+                        hide_flags = true
+                        page_bottom = true
+
+                        page_url  = {url path="/admin/sale/update/%id" id=$ID}
+                        close_url = {url path="/admin/sales"}
+                    }
+
+                    </form>
+                    {/form}
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="control-group">
+                                <label>&nbsp;</label>
+                                <div class="controls">
+                                    <p>{intl l='Sale created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {hook name="sale-edit.bottom" sale_id=$sale_id}
+
+        {/loop}
+    </div>
+</div>
+
+<div class="modal fade" id="product-attribute-selector" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="Product attribute selection"}</h3>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-center" id="loading-product-attributes">
+                    <span class="loading">{intl l="Please wait, loading"}</span>
+                </div>
+
+                <div class="product-attributes-list">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l='Cancel'}</button>
+                <button type="button" data-dismiss="modal" class="btn btn-primary" aria-hidden="true" id="submit-attribute-selector"><span class="glyphicon glyphicon-check"></span> {intl l='Save'}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/moment-with-locales.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+<script>
+    (function($) {
+
+        {* data-date-format is a moment.js date format *}
+
+        {$langcode = {lang attr="code"}|substr:0:2}
+
+        $('.datetime-picker').datetimepicker({
+            locale: "{$langcode}"
+        });
+
+        $(document.body).on('change', '.invert-selection', function(ev) {
+            var checked = $(this).prop('checked');
+
+            $('.product-selector-checkbox').each(function() {
+                var $zis = $(this);
+
+                $(this).prop("checked", checked).change();
+            });
+        });
+
+        $(document.body).on('change', '.product-selector-checkbox', function() {
+            var $is_on = $(this).is(':checked');
+            var $row = $('tr[data-product-id=' + $(this).data('product-id') + ']');
+            var $attrButton = $('button[data-product-id=' + $(this).data('product-id') + ']');
+
+            if ($is_on) {
+                $row.addClass('success');
+            }
+            else {
+                $row.removeClass('success');
+            }
+
+            $attrButton.prop('disabled', ! $is_on);
+        });
+
+        $(document.body).on('click', '.product-attribute-selector', function(ev) {
+            update_product_attribute_list(
+                    $(this).data('product-id')
+            );
+
+            ev.preventDefault();
+        });
+
+        $('.form-submit-button').on('click', function(ev) {
+            $('option', '#categories').prop('selected', true);
+        });
+
+        $('#add-to-selection').on('click', function(ev) {
+            var $selection = $('option:selected', '#cat_source');
+
+            if ($selection.length > 0) {
+                $selection.each(function() {
+                    var $zis = $(this);
+                    var val = $zis.attr('value');
+
+                    $('option[value=' + val + ']', '#categories').prop("selected", true);
+                    $("#categories").append('<option value="' + val + '">' + $zis.text() + '</option>');
+
+                    $zis.prop("selected", false).prop('disabled', true).addClass('disabled-select-option');
+                });
+
+                update_product_list();
+            }
+            else {
+                alert("{intl l='Please select at least one category.'}");
+            }
+
+            ev.preventDefault();
+        });
+
+        $('#remove-from-selection').on('click', function(ev) {
+            var $selection = $('option:selected', '#categories');
+
+            if ($selection.length > 0) {
+                $selection.each(function() {
+                    var $zis = $(this);
+                    $('option[value=' + $zis.attr('value') + ']', '#cat_source').prop("disabled", false).removeClass('disabled-select-option');
+                    $zis.remove();
+                });
+
+                update_product_list();
+            }
+            else {
+                alert("{intl l='Please select at least one category.'}");
+            }
+
+            ev.preventDefault();
+        });
+
+        $('#submit-attribute-selector').click(function(ev) {
+            // Build the products attribute list
+            var attrAvIds = [];
+
+            $('input.attribute-selector-box:checked').each(function(idx, val) {
+                attrAvIds.push($(this).val());
+            });
+
+            var productId = $('input[name=attribute-selector-product-id]').val();
+
+            var attrAvIdsStr = attrAvIds.join(',');
+
+            setProductAttributeIds(productId, attrAvIdsStr);
+        });
+
+        function setProductAttributeIds(productId, attrAvIdsStr) {
+
+            $('input.product-selected-attributes-ids[data-product-id='+productId+']').val(attrAvIdsStr);
+
+            var $attrSelectButton = $('button[data-product-id=' + productId + ']');
+
+            if (attrAvIdsStr == '') {
+                $attrSelectButton
+                        .removeClass('btn-success')
+                        .addClass('btn-primary')
+                        .html("{intl l='All' js=1}");
+            }
+            else {
+                $attrSelectButton
+                        .removeClass('btn-primary')
+                        .addClass('btn-success')
+                        .html("{intl l='Click to view' js=1}");
+            }
+
+        }
+
+        {form name="thelia.admin.sale.modification"}
+
+            {form_field field="products"}
+                // This is the products IDs as hydrated in the controller.
+                var selected_product_ids_at_page_load = [ {$value|implode:','} ];
+            {/form_field}
+
+            {form_field field="product_attributes"}
+                // This is the products IDs as hydrated in the controller.
+                var selected_attributes_avs_ids_at_page_load = {$value|@json_encode nofilter};
+            {/form_field}
+
+        {/form}
+
+        function update_product_list() {
+
+            $('#loading-products').show();
+            $('button.category-manipulation').prop('disabled', true);
+
+            // Get the selected categories
+            var categories = $.map($('option', '#categories') ,function(option) {
+                return option.value;
+            });
+
+            // Get the selected products ID list
+            //
+            // If the page have just been loaded, use the product IDs from selected_product_ids_at_page_load variable
+            // otherwise, use the checkboxes in the products table.
+            // We should do that, as the form is not hydrated by the controller when the sale-edit-products template is processed.
+
+            var selected_products;
+            var selected_attributes;
+
+            if (selected_product_ids_at_page_load) {
+                selected_products = selected_product_ids_at_page_load;
+                selected_attributes = selected_attributes_avs_ids_at_page_load;
+
+                selected_product_ids_at_page_load = false;
+            }
+            else {
+                selected_attributes = new Object();
+
+                $('input.product-selected-attributes-ids').each(function(idx, checkbox) {
+                    selected_attributes[$(this).data('product-id')] = $(this).val();
+                });
+
+                selected_products = $.map($('.product-selector-checkbox:checked') ,function(box) {
+                    return box.value;
+                });
+            }
+
+            $('#sale-products-list').empty();
+
+            $.ajax('{url path="/admin/sale/update-product-list/%id" id=$sale_id}', {
+                type: 'POST',
+                data: {
+                    categories: categories,
+                    products  : selected_products
+                }
+            }).always(function() {
+                $('#loading-products').hide();
+            }).done(function(data, textStatus, jqXHR) {
+                $('#sale-products-list').html(data)
+                $('button.category-manipulation').prop('disabled', false);
+
+                $.each(selected_attributes, function(productId, attrAvIdsStr) {
+                    setProductAttributeIds(productId, attrAvIdsStr);
+                });
+            });
+        }
+
+        function update_product_attribute_list(product_id) {
+            var $dialog = $('#product-attribute-selector');
+
+            $('.product-attributes-list', $dialog).empty();
+            $('#loading-product-attributes').show();
+
+            $dialog.modal('show');
+
+            var url = '{url path="/admin/sale/update-product-attribute-list/%id/__product_id__" id=$sale_id}';
+
+            url = url.replace("__product_id__", product_id);
+
+            $.ajax(url, {
+                type: 'POST',
+                data: {
+                    selected_attributes_av_id: $('input.product-selected-attributes-ids[data-product-id=' + product_id + ']').val()
+                }
+            }).always(function() {
+                $('#loading-product-attributes').hide();
+            }).done(function(data, textStatus, jqXHR) {
+                $('.product-attributes-list', $dialog).html(data)
+                $('button.category-manipulation').prop('disabled', false);
+            });
+        }
+
+        update_product_list();
+    })(jQuery);
+</script>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="sale.edit-js" location='sale-edit-js' sale_id={$sale_id}}
+
+    {hook name="wysiwyg.js" location="wysiwyg-sale-edit-js" }
+{/block}
