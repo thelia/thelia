@@ -85,12 +85,11 @@ abstract class BaseHook
     /**
      * This function is called when hook uses the automatic insert template.
      *
-     *@param HookRenderEvent $event
+     * @param HookRenderEvent $event
+     * @param string $code
      */
-    public function insertTemplate(HookRenderEvent $event)
+    public function insertTemplate(HookRenderEvent $event, $code)
     {
-        $code = $event->getName();
-
         if (array_key_exists($code, $this->templates)) {
             $templates = explode(';', $this->templates[$code]);
 
@@ -439,6 +438,4 @@ abstract class BaseHook
 
         return [$type, $filepath];
     }
-
-
 }

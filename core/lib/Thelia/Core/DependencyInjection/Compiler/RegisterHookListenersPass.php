@@ -369,11 +369,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
             $method = new ReflectionMethod($className, $methodName);
 
             $parameters = $method->getParameters();
-            if (count($parameters) !== 1) {
-                $this->logAlertMessage(sprintf("Method %s in %s does not have the right signature.", $methodName, $className));
-
-                return false;
-            }
 
             $eventType = ($block) ?
                 HookDefinition::RENDER_BLOCK_EVENT :
