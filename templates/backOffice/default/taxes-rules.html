@@ -77,7 +77,14 @@
                                 {loop type="tax" name="taxes" backend_context="1"}
 
                                     <tr>
-                                        <td>{$TITLE}</td>
+                                        <td>
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
+                                                <a title="{intl l='Change this tax'}" href="{url path="/admin/configuration/taxes/update/%id" id=$ID}">{$TITLE}</span></a>
+                                            {/loop}
+                                            {elseloop rel="can_change"}
+                                                {$TITLE}
+                                            {/elseloop}
+                                        </td>
                                         <td>{$DESCRIPTION}</td>
                                         <td class="actions">
                                             <div class="btn-toolbar btn toolbar-primary">
@@ -117,7 +124,7 @@
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-4">{intl l="Description"}</th>
-                                    <th class="col-md-1">{intl l="Default"}</th>
+                                    <th class="col-md-1 text-center">{intl l="Default"}</th>
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
                                 </thead>
@@ -126,11 +133,18 @@
                                 {loop type="tax-rule" name="taxes-rules" backend_context="1"}
 
                                     <tr>
-                                        <td>{$TITLE}</td>
-                                        <td>{$DESCRIPTION}</td>
                                         <td>
+                                            {loop type="auth" name="can_change-tr" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
+                                                <a title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/%id" id=$ID}">{$TITLE}</a>
+                                            {/loop}
+                                            {elseloop rel="can_change-tr"}
+                                                {$TITLE}
+                                            {/elseloop}
+                                        </td>
+                                        <td>{$DESCRIPTION}</td>
+                                        <td class="text-center">
                                             {if $IS_DEFAULT == 1}
-                                                <span class="glyphicon glyphicon-ok"></span>
+                                                <span class="glyphicon glyphicon-star"></span>
                                             {/if}
                                         </td>
                                         <td class="actions">
@@ -176,29 +190,23 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "tax_create_dialog"}
 
-        {form_hidden_fields}
+        {form_hidden_fields exclude="locale"}
 
-        {form_field field='locale'}
-            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-        {/form_field}
+        {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-        {form_field field='title'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
-            </div>
-        {/form_field}
+                {form_field field='locale'}
+                    <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                {/form_field}
 
-        {form_field field='description'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
-                    {$label} :
-                    <span class="label-help-block">{intl l="The detailed description."}</span>
-                </label>
-
-                <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
-            </div>
-        {/form_field}
+                <div class="input-group">
+                    <input type="text" {form_field_attributes field="title"}>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/`$CODE`.png"}" alt="{$TITLE}" /></span>
+                </div>
+            {/loop}
+        {/custom_render_form_field}
 
         {form_field field='type'}
             <div class="form-group {if $error}has-error{/if}">
@@ -291,31 +299,26 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "tax_rule_create_dialog"}
 
-        {form_hidden_fields}
-
-        {form_field field='locale'}
-            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-        {/form_field}
+        {form_hidden_fields exclude="locale"}
 
         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-        {form_field field='title'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{/if}">
-            </div>
-        {/form_field}
+        {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-        {form_field field='description'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
-                    {$label} :
-                    <span class="label-help-block">{intl l="The detailed description."}</span>
-                </label>
+                {form_field field='locale'}
+                    <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                {/form_field}
 
-                <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{/if}</textarea>
+                <div class="input-group">
+                <input type="text" {form_field_attributes field="title"}>
+                <span class="input-group-addon"><img src="{image file="assets/img/flags/`$CODE`.png"}" alt="{$TITLE}" /></span>
             </div>
-        {/form_field}
+            {/loop}
+        {/custom_render_form_field}
+
         {hook name="tax-rule.create-form" location="tax_rule_create_form" }
     {/capture}
 
