@@ -40,7 +40,7 @@
 
                 <td><a target="_blank" title="{intl l='View this product in a new page'}" href="{url path="/admin/products/update" product_id=$ID current_tab=prices}">{$REF}</a></td>
 
-                <td class="text-right">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</td>
+                <td class="text-right">{format_money number=$BEST_TAXED_PRICE}</td>
 
                 <td class="text-center">
                     {$has_combinations = false}

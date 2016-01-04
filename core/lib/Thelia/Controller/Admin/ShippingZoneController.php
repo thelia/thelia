@@ -43,9 +43,11 @@ class ShippingZoneController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) {
             return $response;
         }
-        return $this->render("shipping-zones-edit", array(
-            "delivery_module_id" => $delivery_module_id
-        ));
+
+        return $this->render(
+            "shipping-zones-edit",
+            ["delivery_module_id" => $delivery_module_id]
+        );
     }
 
     /**
@@ -134,9 +136,10 @@ class ShippingZoneController extends BaseAdminController
      */
     protected function renderEditionTemplate()
     {
-        return $this->render("shipping-zones-edit", array(
-            "delivery_module_id" => $this->getDeliveryModuleId()
-        ));
+        return $this->render(
+            "shipping-zones-edit",
+            ["delivery_module_id" => $this->getDeliveryModuleId()]
+        );
     }
 
     protected function getDeliveryModuleId()

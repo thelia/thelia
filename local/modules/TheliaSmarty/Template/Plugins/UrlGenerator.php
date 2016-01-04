@@ -12,24 +12,33 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Router;
 use TheliaSmarty\Template\SmartyParser;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Translation\Translator;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
     protected $request;
 
     protected $tokenProvider;
+    /** @var ContainerInterface */
+    private $container;
 
-    public function __construct(Request $request, TokenProvider $tokenProvider)
+    /**
+     * @param Request            $request
+     * @param TokenProvider      $tokenProvider
+     * @param ContainerInterface $container         Needed to get all router.
+     */
+    public function __construct(Request $request, TokenProvider $tokenProvider, ContainerInterface $container)
     {
         $this->request = $request;
         $this->tokenProvider = $tokenProvider;
+        $this->container = $container;
     }
 
     /**
@@ -44,7 +53,18 @@ class UrlGenerator extends AbstractSmartyPlugin
         // the path to process
         $current = $this->getParam($params, 'current', false);
         $path  = $this->getParam($params, 'path', null);
-        $file  = $this->getParam($params, 'file', null); // Do not invoke index.php in URL (get a static file in web space
+        // Do not invoke index.php in URL (get a static file in web space
+        $file = $this->getParam($params, 'file', null);
+        $routeId = $this->getParam($params, 'route_id', null);
+        // select default router
+        if ($this->request->fromAdmin()) {
+            $defaultRouter = 'admin';
+        } elseif ($this->request->fromFront()) {
+            $defaultRouter = 'front';
+        } else {
+            $defaultRouter = null;
+        }
+        $routerId = $this->getParam($params, 'router', $defaultRouter);
 
         if ($current) {
             $path = $this->request->getPathInfo();
@@ -57,25 +77,44 @@ class UrlGenerator extends AbstractSmartyPlugin
             );
         }
 
+        if ($routeId !== null && $routerId !== null) {
+            $routerId = 'router.' . $routerId;
 
+            // test if the router exists
+            if (!$this->container->has($routerId)) {
+                throw new \InvalidArgumentException(
+                    'The router "' . $routerId . '" not found.'
+                );
+            }
+            // get url by router and id
+            /** @var Router $router */
+            $router = $this->container->get($routerId);
 
-        if ($file !== null) {
-            $path = $file;
-            $mode = URL::PATH_TO_FILE;
-        } elseif ($path !== null) {
-            $mode = URL::WITH_INDEX_PAGE;
+            $url = $router->generate(
+                $routeId,
+                $this->getArgsFromParam($params, ['route_id', 'router']),
+                Router::ABSOLUTE_URL
+            );
         } else {
-            throw new \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
+            if ($file !== null) {
+                $path = $file;
+                $mode = URL::PATH_TO_FILE;
+            } elseif ($path !== null) {
+                $mode = URL::WITH_INDEX_PAGE;
+            } else {
+                throw new \InvalidArgumentException(
+                    "Please specify either 'path', 'file' or router and route_id on parameters in {url} function."
+                );
+            }
+
+            $excludeParams = $this->resolvePath($params, $path, $smarty);
+
+            $url = URL::getInstance()->absoluteUrl(
+                $path,
+                $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
+                $mode
+            );
         }
-
-        $excludeParams = $this->resolvePath($params, $path, $smarty);
-
-        $url = URL::getInstance()->absoluteUrl(
-            $path,
-            $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
-            $mode
-        );
-
         return $this->applyNoAmpAndTarget($params, $url);
     }
 
@@ -164,6 +203,7 @@ class UrlGenerator extends AbstractSmartyPlugin
       * Get URL parameters array from parameters.
       *
       * @param array $params Smarty function params
+      * @param array $exclude Smarty function exclude params
       * @return array the parameters array (either emply, of valued)
       */
     private function getArgsFromParam($params, $exclude = array())

@@ -26,12 +26,6 @@ use Thelia\Core\Hook\BaseHook;
  */
 class FrontHook extends BaseHook
 {
-    public function onMainNavbarPrimary(HookRenderEvent $event)
-    {
-        $content = $this->render('main-navbar-primary.html');
-        $event->add($content);
-    }
-
     public function onMainFooterBody(HookRenderBlockEvent $event)
     {
         $bodyConfig = HookNavigation::getConfigValue(HookNavigationConfigValue::FOOTER_BODY_FOLDER_ID);

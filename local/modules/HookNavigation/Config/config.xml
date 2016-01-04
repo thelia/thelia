@@ -3,15 +3,15 @@
   <loops>
     </loops>
   <forms>
-    <form name="hooknavigation.configuration" class="HookNavigation\Form\HookNavigationConfigForm"/>
+    <form name="hooknavigation.configuration" class="HookNavigation\Form\HookNavigationConfigForm" />
   </forms>
   <commands>
     </commands>
   <hooks>
     <hook id="hooknavigation.hook.front" class="HookNavigation\Hook\FrontHook" scope="request">
-      <tag name="hook.event_listener" event="main.navbar-primary"/>
-      <tag name="hook.event_listener" event="main.footer-bottom" type="front" active="1"/>
-      <tag name="hook.event_listener" event="main.footer-body" type="front" active="1"/>
+      <tag name="hook.event_listener" event="main.navbar-primary" templates="render:main-navbar-primary.html" />
+      <tag name="hook.event_listener" event="main.footer-bottom" type="front" active="1" method="onMainFooterBottom" />
+      <tag name="hook.event_listener" event="main.footer-body" type="front" active="1" method="onMainFooterBody" />
     </hook>
   </hooks>
 </config>

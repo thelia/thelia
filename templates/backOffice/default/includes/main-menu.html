@@ -29,6 +29,11 @@
                     </a>
 
                     <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
+                        <li role="menuitem" id="customers_menu">
+                            <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
+                                {intl l="Customers"}
+                            </a>
+                        </li>
                         {forhook rel="main.top-menu-customer"}
                             <li role="menuitem">
                                 <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -107,6 +112,11 @@
                 </a>
 
                 <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
+                    <li role="menuitem" id="catalog_menu">
+                        <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
+                            {intl l="Catalog"}
+                        </a>
+                    </li>
                     {forhook rel="main.top-menu-catalog"}
                         <li role="menuitem">
                             <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -139,6 +149,11 @@
                     </a>
 
                     <ul id="collapse-content" class="collapse {if $admin_current_location == 'content'}in{/if}" role="menu">
+                        <li role="menuitem" id="contents_menu">
+                            <a title="{intl l="Folders"}" href="{url path='/admin/folders'}">
+                                {intl l="Folders"}
+                            </a>
+                        </li>
                         {forhook rel="main.top-menu-content"}
                         <li role="menuitem">
                             <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -211,6 +226,11 @@
                 </a>
 
                 <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
+                    <li role="menuitem" id="modules_menu">
+                        <a title="{intl l="Modules"}" href="{url path='/admin/modules'}">
+                            {intl l="Modules"}
+                        </a>
+                    </li>
                     {forhook rel="main.top-menu-modules"}
                         <li role="menuitem">
                             <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">

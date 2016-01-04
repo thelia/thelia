@@ -10,7 +10,7 @@
 {block name="page-title"}{intl l='Edit content'}{/block}
 
 {block name="main-content"}
-    <div class="folder edit-folder">
+    <div class="content edit-content">
         <div id="wrapper" class="container">
 
             {include file="includes/folder-breadcrumb.html" editing_content="true"}
@@ -18,7 +18,7 @@
             {hook name="content-edit.top" content_id=$content_id}
 
             <div class="row">
-                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
+                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id" with_prev_next_info="true"}
                     <div class="col-md-12 general-block-decorator">
                         <div class="row">
                             <div class="col-md-7 title">
@@ -121,6 +121,8 @@
 
                                                         <div class="col-md-4">
 
+                                                            {hook name="content.modification.form-right.top" content_id=$content_id}
+
                                                             {form_field field='default_folder'}
                                                                 <div class="form-group {if $error}has-error{/if}">
 
@@ -152,6 +154,8 @@
                                                                     </div>
                                                                 </div>
                                                             {/form_field}
+
+                                                            {hook name="content.modification.form-right.bottom" content_id=$content_id}
                                                         </div>
                                                     </div>
 

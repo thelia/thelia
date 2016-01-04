@@ -117,6 +117,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             ->setModuleActive($this->isModuleActive($event->getModuleId()))
             ->setHookActive($this->isHookActive($event->getHookId()))
             ->setPosition($this->getLastPositionInHook($event->getHookId()))
+            ->setTemplates($event->getTemplates())
             ->save();
 
         // Be sure to delete this module hook from the ignored module hook table
@@ -139,6 +140,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 ->setMethod($event->getMethod())
                 ->setActive($event->getActive())
                 ->setHookActive($this->isHookActive($event->getHookId()))
+                ->setTemplates($event->getTemplates())
                 ->save();
 
             $event->setModuleHook($moduleHook);

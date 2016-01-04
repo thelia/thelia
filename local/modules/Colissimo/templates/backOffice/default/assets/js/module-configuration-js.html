@@ -1,0 +1,36 @@
+{javascripts file="assets/js/bootstrap-switch/bootstrap-switch.js"}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+    $(document).ready(function() {
+    $(".freeshipping-activation-Colissimo").bootstrapSwitch();
+
+    $(".freeshipping-activation-Colissimo").on("switch-change", function(e, data){
+        var is_checked = data.value;
+        var form = $("#freeshippingform");
+        $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+        $.ajax({
+            url: form.attr('action'),
+            type: form.attr('method'),
+            data: form.serialize()
+        }).done(function(){
+            $("#loading-event").remove();
+        })
+            .success(function() {
+                if (is_checked) {
+                    $('#config-btn-0').removeClass('disabled');
+                    $('#table-prices-colissimo').hide('slow');
+                } else {
+                    $('#config-btn-0').addClass('disabled');
+                    $('#table-prices-colissimo').show('slow');
+                }
+            })
+            .fail(function(jqXHR, textStatus, errorThrown){
+                $("#loading-event").remove();
+                $('#freeshipping-failed-body').html(jqXHR.responseJSON.error);
+                $("#freeshipping-failed").modal("show");
+            });
+        });
+    });
+</script>

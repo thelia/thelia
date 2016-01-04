@@ -95,6 +95,11 @@
             <tag name="thelia.form.type" />
         </service>
 
+        <service id="thelia.form.type.field.state_id" class="Thelia\Core\Form\Type\Field\StateIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
         <service id="thelia.form.type.field.tax_id" class="Thelia\Core\Form\Type\Field\TaxIdType">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.form.type" />

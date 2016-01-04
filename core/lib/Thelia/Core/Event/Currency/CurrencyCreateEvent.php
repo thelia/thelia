@@ -17,6 +17,7 @@ class CurrencyCreateEvent extends CurrencyEvent
     protected $currency_name;
     protected $locale;
     protected $symbol;
+    protected $format;
     protected $code;
     protected $rate;
 
@@ -53,6 +54,18 @@ class CurrencyCreateEvent extends CurrencyEvent
     public function setSymbol($symbol)
     {
         $this->symbol = $symbol;
+
+        return $this;
+    }
+
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    public function setFormat($format)
+    {
+        $this->format = $format;
 
         return $this;
     }

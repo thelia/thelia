@@ -23,6 +23,7 @@
         <command class="Thelia\Command\ConfigCommand"/>
         <command class="Thelia\Command\SaleCheckActivationCommand"/>
         <command class="Thelia\Command\GenerateSQLCommand"/>
+        <command class="Thelia\Command\HookCleanCommand"/>
     </commands>
 
 </config>

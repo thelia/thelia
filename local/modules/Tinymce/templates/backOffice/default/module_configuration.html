@@ -1,0 +1,106 @@
+<div class="row">
+    <div class="col-md-12 general-block-decorator">
+
+        <div class="row">
+            <div class="col-md-12 title title-without-tabs">
+                {intl d='tinymce.bo.default' l="TinyMCE configuration"}
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="row">
+                <div class="col-md-12">
+
+                    {form name="tinymce.configure"}
+
+                        <form action="{url path="/admin/tinymce/configure"}" method="post">
+
+                            {include
+                            file = "includes/inner-form-toolbar.html"
+                            hide_submit_buttons = false
+
+                            page_url  = {url path="/admin/module/Tinymce"}
+                            close_url = {url path="/admin/modules"}
+                            }
+
+                            {form_hidden_fields form=$form}
+
+                            <div class="row">
+                                <div class="col-md-12 general-block-decorator">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>{intl l='Product' d='tinymce.bo.default'}</th>
+                                            <th>{intl l='Content' d='tinymce.bo.default'}</th>
+                                            <th>{intl l='Folder' d='tinymce.bo.default'}</th>
+                                            <th>{intl l='Brand' d='tinymce.bo.default'}</th>
+                                            <th>{intl l='Category' d='tinymce.bo.default'}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <th>{intl l='Summary' d='tinymce.bo.default'}</th>
+                                            <td>{render_form_field form=$form field="product_summary"}</td>
+                                            <td>{render_form_field form=$form field="content_summary"}</td>
+                                            <td>{render_form_field form=$form field="folder_summary"}</td>
+                                            <td>{render_form_field form=$form field="brand_summary"}</td>
+                                            <td>{render_form_field form=$form field="category_summary"}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>{intl l='Conclusion' d='tinymce.bo.default'}</th>
+                                            <td>{render_form_field form=$form field="product_conclusion"}</td>
+                                            <td>{render_form_field form=$form field="content_conclusion"}</td>
+                                            <td>{render_form_field form=$form field="folder_conclusion"}</td>
+                                            <td>{render_form_field form=$form field="brand_conclusion"}</td>
+                                            <td>{render_form_field form=$form field="category_conclusion"}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 general-block-decorator">
+                                    <div class="title">
+                                        {intl l='List of the text area where the wysiwyg editor will be used' d='tinymce.bo.default'}
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <p>
+                                            {intl l='This is a <strong>critical</strong> data, to update it you have to inform the ids (#timymce_configuration-id-test_zone for example) or the classes (.wysiwyg for example) , <strong>separated with comas</strong>, of the text areas you want to have the wysiwyg editor <strong>directly in the data base</strong>.' d='tinymce.bo.default'}
+                                        </p>
+                                    </div>
+
+                                   <div id="available_text_areas">
+                                       {render_form_field form=$form field="available_text_areas"}
+                                   </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 general-block-decorator">
+                                    {if $form_error}
+                                        <div class="alert alert-danger">{$form_error_message}</div>
+                                    {/if}
+
+                                    <div class="col-md-5">
+                                        {render_form_field form=$form field="editor_height"}
+
+                                        {render_form_field form=$form field="force_pasting_as_text"}
+                                        {render_form_field form=$form field="set_images_as_responsive"}
+                                        {render_form_field form=$form field="show_menu_bar"}
+                                        {render_form_field form=$form field="custom_css"}
+                                    </div>
+                                    
+                                    <div class="col-md-7">
+                                        {render_form_field form=$form field="test_zone" extra_class="wysiwyg"}
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -27,6 +27,8 @@ use Thelia\Model\OrderAddressQuery;
  */
 class OrderUpdateAddress extends BaseForm
 {
+    use AddressCountryValidationTrait;
+
     protected function buildForm()
     {
         $this->formBuilder
@@ -97,6 +99,11 @@ class OrderUpdateAddress extends BaseForm
             ->add("zipcode", "text", array(
                 "constraints" => array(
                     new NotBlank(),
+                    new Callback(array(
+                        "methods" => array(
+                            array($this, "verifyZipCode")
+                        ),
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Zip code"),
                 "label_attr" => array(
@@ -124,6 +131,19 @@ class OrderUpdateAddress extends BaseForm
                 "label" => Translator::getInstance()->trans("Country"),
                 "label_attr" => array(
                     "for" => "country_update",
+                ),
+            ))
+            ->add("state", "text", array(
+                "constraints" => array(
+                    new Callback(array(
+                        "methods" => array(
+                            array($this, "verifyState")
+                        ),
+                    )),
+                ),
+                "label" => Translator::getInstance()->trans("State"),
+                "label_attr" => array(
+                    "for" => "state",
                 ),
             ))
             ->add("phone", "text", array(

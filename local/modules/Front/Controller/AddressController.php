@@ -117,7 +117,8 @@ class AddressController extends BaseFrontController
             $form->get("cellphone")->getData(),
             $form->get("phone")->getData(),
             $form->get("company")->getData(),
-            $form->get("is_default")->getData()
+            $form->get("is_default")->getData(),
+            $form->get("state")->getData()
         );
     }
 

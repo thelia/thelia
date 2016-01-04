@@ -97,6 +97,7 @@
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="request"/>
             <argument type="service" id="thelia.token_provider"/>
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="smarty.plugin.security" class="TheliaSmarty\Template\Plugins\Security" scope="request">

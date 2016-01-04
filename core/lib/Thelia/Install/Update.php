@@ -12,6 +12,7 @@
 
 namespace Thelia\Install;
 
+use Michelf\Markdown;
 use PDO;
 use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -33,6 +34,8 @@ class Update
     const SQL_DIR = 'update/sql/';
 
     const PHP_DIR = 'update/php/';
+
+    const INSTRUCTION_DIR = 'update/instruction/';
 
     protected static $version = array(
         '0' => '2.0.0-beta1',
@@ -80,6 +83,9 @@ class Update
 
     /** @var array log messages */
     protected $logs = [];
+
+    /** @var array post instructions */
+    protected $postInstructions = [];
 
     /** @var array */
     protected $updatedVersions = [];
@@ -138,7 +144,7 @@ class Update
 
         $definePropel = new DefinePropel(
             new DatabaseConfiguration(),
-            Yaml::parse($configPath),
+            Yaml::parse(file_get_contents($configPath)),
             $this->getEnvParameters()
         );
 
@@ -362,6 +368,18 @@ class Update
             $this->log('debug', sprintf('end executing file %s', $version . '.php'));
         }
 
+        // instructions
+        $filename = sprintf(
+            "%s%s%s",
+            THELIA_SETUP_DIRECTORY,
+            str_replace('/', DS, self::INSTRUCTION_DIR),
+            $version . '.md'
+        );
+
+        if (file_exists($filename)) {
+            $this->addPostInstructions($version, file_get_contents($filename));
+        }
+
         $this->setCurrentVersion($version);
     }
 
@@ -461,4 +479,57 @@ class Update
     {
         $this->updatedVersions = $updatedVersions;
     }
+
+    /**
+     * Add a new post update instruction
+     *
+     * @param string $instructions content of the instruction un markdown format
+     */
+    protected function addPostInstructions($version, $instructions)
+    {
+        if (!isset($this->postInstructions[$version])) {
+            $this->postInstructions[$version] = [];
+        }
+
+        $this->postInstructions[$version][] = $instructions;
+    }
+
+    /**
+     * Return the content of all instructions
+     *
+     * @param string $format the format of the export : plain (default) or html
+     * @return string the instructions in plain text or html
+     */
+    public function getPostInstructions($format = 'plain')
+    {
+        $content = [];
+
+        if (count($this->postInstructions) == 0) {
+            return null;
+        }
+
+        ksort($this->postInstructions);
+
+        foreach ($this->postInstructions as $version => $instructions) {
+            $content[] = sprintf("## %s", $version);
+            foreach ($instructions as $instruction) {
+                $content[] = sprintf("%s", $instruction);
+            }
+        }
+
+        $content = implode("\n\n", $content);
+
+        if ($format === 'html') {
+            $content = Markdown::defaultTransform($content);
+        }
+
+        return $content;
+    }
+
+    public function hasPostInstructions()
+    {
+        return (count($this->postInstructions) !== 0);
+    }
+
+
 }

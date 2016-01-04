@@ -80,8 +80,12 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         $this->smarty->registerPlugins();
     }
 
-    protected function render($template)
+    protected function render($template, $data = [])
     {
+        foreach ($data as $key => $value) {
+            $this->smarty->assign($key, $value);
+        }
+
         return $this->smarty->fetch(__DIR__.DS."fixtures".DS.$template);
     }
 

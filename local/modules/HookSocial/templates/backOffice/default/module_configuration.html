@@ -1,0 +1,94 @@
+<div class="modal fade" id="hooksocial-failed" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl d='hooksocial.bo.default' l="An error occured"}</h3>
+            </div>
+            <div class="modal-body" id="hooksocial-failed-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="general-block-decorator">
+    <div class="row">
+
+        <div class="col-md-12 title title-without-tabs">
+            {intl d='hooksocial.bo.default' l='Edit your social accounts.'}
+        </div>
+
+        <div class="form-container">
+            <div class="col-md-12">
+
+            {form name="hooksocial.configuration.form"}
+                <form method="POST" id="hooksocial-form" action="{url path="/admin/module/hooksocial/save"}" {form_enctype} class="clearfix">
+
+                    {form_hidden_fields}
+
+                    {form_field field='twitter'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+
+                    {form_field field='facebook'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+
+                    {form_field field='google'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+
+                    {form_field field='instagram'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+                    
+                    {form_field field='pinterest'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+
+                    {form_field field='youtube'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+
+                    {form_field field='rss'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
+
+                    <button type="submit" id="hooksocial-save" name="hooksocial_save" value="save" class="form-submit-button btn btn-sm btn-default" title="{intl d='hooksocial.bo.default' l='Save'}">{intl d='hooksocial.bo.default' l='Save'}</button>
+                </form>
+            {/form}
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+

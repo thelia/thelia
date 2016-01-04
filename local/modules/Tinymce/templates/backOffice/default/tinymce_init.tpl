@@ -1,8 +1,34 @@
 <script src="{url file='/tinymce/tinymce.min.js'}"></script>
 
 <script>
+    function build_fields_list() {
+        var fields_list = [];
+
+        {function name=get_config}
+            {foreach $datas as $config}
+                {foreach $datas_types as $type}
+                    {loop type="module-config" name="dummy" module="tinymce" variable="$config"|cat:"_"|cat:"{$type}" default_value="0"}
+                        {if $VALUE > 0}
+                            fields_list.push(".edit-{$config} #{$type}_field");
+                        {/if}
+                    {/loop}
+                {/foreach}
+            {/foreach}
+            {loop type="module-config" name="dummy" module="tinymce" variable="available_text_areas" default_value="0"}
+                {if $VALUE !== ""}
+                    fields_list.push("{$VALUE}");
+                {/if}
+            {/loop}
+        {/function}
+
+        {$configs=["product", "category", "folder", "content", "brand"]}
+        {$config_types = ["summary", "conclusion"]}
+        {get_config datas=$configs datas_types=$config_types}
+
+        return fields_list.join(",");
+    }
     tinymce.init({
-        selector: ".wysiwyg",
+        selector: build_fields_list(),
 
         theme: "modern",
 
@@ -27,7 +53,7 @@
                 paste_remove_styles_if_webkit: true,
                 paste_strip_class_attributes: true,
                 paste_as_text: true,
-        {/if}
+            {/if}
         {/loop}
 
         // Use our smarty plugin to guess the best available language

@@ -58,7 +58,7 @@ class CountryAreaTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,12 +68,22 @@ class CountryAreaTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
+
+    /**
+     * the column name for the ID field
+     */
+    const ID = 'country_area.ID';
 
     /**
      * the column name for the COUNTRY_ID field
      */
     const COUNTRY_ID = 'country_area.COUNTRY_ID';
+
+    /**
+     * the column name for the STATE_ID field
+     */
+    const STATE_ID = 'country_area.STATE_ID';
 
     /**
      * the column name for the AREA_ID field
@@ -102,12 +112,12 @@ class CountryAreaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('CountryId', 'AreaId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('countryId', 'areaId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CountryAreaTableMap::COUNTRY_ID, CountryAreaTableMap::AREA_ID, CountryAreaTableMap::CREATED_AT, CountryAreaTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('COUNTRY_ID', 'AREA_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('country_id', 'area_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'CountryId', 'StateId', 'AreaId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'countryId', 'stateId', 'areaId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CountryAreaTableMap::ID, CountryAreaTableMap::COUNTRY_ID, CountryAreaTableMap::STATE_ID, CountryAreaTableMap::AREA_ID, CountryAreaTableMap::CREATED_AT, CountryAreaTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'COUNTRY_ID', 'STATE_ID', 'AREA_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'country_id', 'state_id', 'area_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -117,12 +127,12 @@ class CountryAreaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('CountryId' => 0, 'AreaId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('countryId' => 0, 'areaId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(CountryAreaTableMap::COUNTRY_ID => 0, CountryAreaTableMap::AREA_ID => 1, CountryAreaTableMap::CREATED_AT => 2, CountryAreaTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('COUNTRY_ID' => 0, 'AREA_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('country_id' => 0, 'area_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CountryId' => 1, 'StateId' => 2, 'AreaId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'countryId' => 1, 'stateId' => 2, 'areaId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(CountryAreaTableMap::ID => 0, CountryAreaTableMap::COUNTRY_ID => 1, CountryAreaTableMap::STATE_ID => 2, CountryAreaTableMap::AREA_ID => 3, CountryAreaTableMap::CREATED_AT => 4, CountryAreaTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'COUNTRY_ID' => 1, 'STATE_ID' => 2, 'AREA_ID' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'country_id' => 1, 'state_id' => 2, 'area_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -139,10 +149,12 @@ class CountryAreaTableMap extends TableMap
         $this->setPhpName('CountryArea');
         $this->setClassName('\\Thelia\\Model\\CountryArea');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         $this->setIsCrossRef(true);
         // columns
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
+        $this->addColumn('STATE_ID', 'StateId', 'INTEGER', false, null, null);
         $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -183,7 +195,12 @@ class CountryAreaTableMap extends TableMap
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return null;
+        // If the PK cannot be derived from the row, return NULL.
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+            return null;
+        }
+
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -201,7 +218,11 @@ class CountryAreaTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return '';
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -299,12 +320,16 @@ class CountryAreaTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(CountryAreaTableMap::ID);
             $criteria->addSelectColumn(CountryAreaTableMap::COUNTRY_ID);
+            $criteria->addSelectColumn(CountryAreaTableMap::STATE_ID);
             $criteria->addSelectColumn(CountryAreaTableMap::AREA_ID);
             $criteria->addSelectColumn(CountryAreaTableMap::CREATED_AT);
             $criteria->addSelectColumn(CountryAreaTableMap::UPDATED_AT);
         } else {
+            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.COUNTRY_ID');
+            $criteria->addSelectColumn($alias . '.STATE_ID');
             $criteria->addSelectColumn($alias . '.AREA_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
@@ -355,19 +380,11 @@ class CountryAreaTableMap extends TableMap
             // rename for clarity
             $criteria = $values;
         } elseif ($values instanceof \Thelia\Model\CountryArea) { // it's a model object
-            // create criteria based on pk value
-            $criteria = $values->buildCriteria();
+            // create criteria based on pk values
+            $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CountryAreaTableMap::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criteria->addOr($criterion);
-            }
+            $criteria->add(CountryAreaTableMap::ID, (array) $values, Criteria::IN);
         }
 
         $query = CountryAreaQuery::create()->mergeWith($criteria);
@@ -411,6 +428,10 @@ class CountryAreaTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from CountryArea object
+        }
+
+        if ($criteria->containsKey(CountryAreaTableMap::ID) && $criteria->keyContainsValue(CountryAreaTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CountryAreaTableMap::ID.')');
         }
 
 

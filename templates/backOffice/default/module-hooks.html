@@ -46,7 +46,7 @@
                             <select id="hooks-filter-module" class="form-control">
                                 <option value="">{intl l="All"}</option>
                                 {loop type="module" name="module" order='title' backend_context=1}
-                                <option value="{$ID}">{$TITLE}</option>
+                                <option value="{$ID}">{$CODE} - {$TITLE}</option>
                                 {/loop}
                             </select>
                         </div>
@@ -184,6 +184,8 @@
         <select {form_field_attributes field='method'} >
         </select>
     {/custom_render_form_field}
+
+    {render_form_field field="templates"}
 
     {hook name="module-hook.create-form" location="module_hook_create_form" }
 

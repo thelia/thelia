@@ -256,7 +256,7 @@ class OrderVersionTableMap extends TableMap
         $this->addColumn('CUSTOMER_ID', 'CustomerId', 'INTEGER', true, null, null);
         $this->addColumn('INVOICE_ORDER_ADDRESS_ID', 'InvoiceOrderAddressId', 'INTEGER', true, null, null);
         $this->addColumn('DELIVERY_ORDER_ADDRESS_ID', 'DeliveryOrderAddressId', 'INTEGER', true, null, null);
-        $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'DATE', false, null, null);
+        $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'TIMESTAMP', false, null, null);
         $this->addColumn('CURRENCY_ID', 'CurrencyId', 'INTEGER', true, null, null);
         $this->addColumn('CURRENCY_RATE', 'CurrencyRate', 'FLOAT', true, null, null);
         $this->addColumn('TRANSACTION_REF', 'TransactionRef', 'VARCHAR', false, 100, null);

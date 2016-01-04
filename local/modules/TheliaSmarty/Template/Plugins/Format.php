@@ -204,6 +204,16 @@ class Format extends AbstractSmartyPlugin
             return "";
         }
 
+        if ($this->getParam($params, "symbol", null) === null) {
+            return MoneyFormat::getInstance($this->request)->formatByCurrency(
+                $number,
+                $this->getParam($params, "decimals", null),
+                $this->getParam($params, "dec_point", null),
+                $this->getParam($params, "thousands_sep", null),
+                $this->getParam($params, "currency_id", null)
+            );
+        }
+
         return MoneyFormat::getInstance($this->request)->format(
             $number,
             $this->getParam($params, "decimals", null),
@@ -211,6 +221,46 @@ class Format extends AbstractSmartyPlugin
             $this->getParam($params, "thousands_sep", null),
             $this->getParam($params, "symbol", null)
         );
+    }
+
+
+    /**
+     * return two-dimensional arrays in string
+     *
+     * available parameters :
+     *  values => array 2D ['key A' => ['value 1', 'value 2'], 'key B' => ['value 3', 'value 4']]
+     *  separators => ['key value separator', 'value value separator', 'key key separator']
+     *
+     * ex :
+     *  {format_array_2d values=['Colors' => ['Green', 'Yellow', 'Red'], 'Material' => ['Wood']] separators=[' : ', ' / ', ' | ']}
+     *  will output the format with specific format : "Colors : Green / Yellow / Red | Material : Wood"
+     */
+    public function formatTwoDimensionalArray($params)
+    {
+        $output = '';
+        $values = $this->getParam($params, "values", null);
+        $separators = $this->getParam($params, "separators", [' : ', ' / ', ' | ']);
+
+        if (!is_array($values)) {
+            return $output;
+        }
+
+        foreach ($values as $key => $value) {
+
+            if ($output !== '') {
+                $output .= $separators[2];
+            }
+
+            $output .= $key . $separators[0];
+
+            if (!is_array($value)) {
+                $output .= $value;
+                continue;
+            }
+
+            $output .= implode($separators[1], $value);
+        }
+        return $output;
     }
 
     protected function arrayContains(array $expected, array $hayStack)
@@ -305,6 +355,7 @@ class Format extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
             new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
             new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney"),
+            new SmartyPluginDescriptor("function", "format_array_2d", $this, "formatTwoDimensionalArray"),
         );
     }
 }

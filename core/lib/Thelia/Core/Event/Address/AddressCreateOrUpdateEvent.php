@@ -79,6 +79,11 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     protected $country;
 
     /**
+     * @var int state id
+     */
+    protected $state;
+
+    /**
      * @var string cell phone
      */
     protected $cellphone;
@@ -103,8 +108,23 @@ class AddressCreateOrUpdateEvent extends ActionEvent
      */
     protected $isDefault;
 
-    public function __construct($label, $title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $cellphone, $phone, $company, $isDefault = 0)
-    {
+    public function __construct(
+        $label,
+        $title,
+        $firstname,
+        $lastname,
+        $address1,
+        $address2,
+        $address3,
+        $zipcode,
+        $city,
+        $country,
+        $cellphone,
+        $phone,
+        $company,
+        $isDefault = 0,
+        $state = null
+    ) {
         $this->address1 = $address1;
         $this->address2 = $address2;
         $this->address3 = $address3;
@@ -112,6 +132,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         $this->city = $city;
         $this->company = $company;
         $this->country = $country;
+        $this->state = $state;
         $this->firstname = $firstname;
         $this->label = $label;
         $this->lastname = $lastname;
@@ -175,6 +196,14 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getState()
+    {
+        return $this->state;
     }
 
     /**

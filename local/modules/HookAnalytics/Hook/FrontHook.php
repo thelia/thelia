@@ -11,11 +11,10 @@
 /*************************************************************************************/
 
 namespace HookAnalytics\Hook;
-use Thelia\Core\Event\Hook\HookRenderBlockEvent;
+
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Model\ConfigQuery;
-
 
 /**
  * Class FrontHook
@@ -31,5 +30,4 @@ class FrontHook extends BaseHook {
             $event->add($value);
         }
     }
-
 } 

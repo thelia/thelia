@@ -660,6 +660,10 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.currencies.set-visible" path="/admin/configuration/currencies/set-visible">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::setVisibleAction</default>
+    </route>
+
     <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
@@ -881,7 +885,45 @@
         <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.countries.toggle-online" path="/admin/configuration/country/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.data" path="/admin/configuration/countries/data">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::getDataAction</default>
+    </route>
+
     <!-- end countries routes management -->
+
+    <!-- States routes management -->
+
+    <route id="admin.configuration.states.default" path="/admin/configuration/states">
+        <default key="_controller">Thelia\Controller\Admin\StateController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.states.create" path="/admin/configuration/states/create">
+        <default key="_controller">Thelia\Controller\Admin\StateController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.states.update" path="/admin/configuration/state/update/{state_id}">
+        <default key="_controller">Thelia\Controller\Admin\StateController::updateAction</default>
+        <requirement key="state_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.states.save" path="/admin/configuration/state/save/{state_id}">
+        <default key="_controller">Thelia\Controller\Admin\StateController::processUpdateAction</default>
+        <requirement key="state_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.states.delete" path="/admin/configuration/states/delete">
+        <default key="_controller">Thelia\Controller\Admin\StateController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.states.toggle-online" path="/admin/configuration/state/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\StateController::setToggleVisibilityAction</default>
+    </route>
+
+    <!-- end states routes management -->
 
     <!-- profiles management -->
 
@@ -1253,6 +1295,11 @@
         <requirement key="tax_rule_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.taxes-rules.get" path="/admin/configuration/taxes_rules/specs/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::specsAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
     <!-- end tax rules management -->
 
     <!-- language management -->
@@ -1273,6 +1320,16 @@
 
     <route id="admin.configuration.languages.toggleDefault" path="/admin/configuration/languages/toggleDefault/{lang_id}">
         <default key="_controller">Thelia\Controller\Admin\LangController::toggleDefaultAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleActive" path="/admin/configuration/languages/toggleActive/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleActiveAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleVisible" path="/admin/configuration/languages/toggleVisible/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleVisibleAction</default>
         <requirement key="lang_id">\d+</requirement>
     </route>
 

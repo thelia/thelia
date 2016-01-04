@@ -16,7 +16,7 @@
 {block name="main-content"}
     <div class="brand edit-brand">
         <div id="wrapper" class="container">
-            {loop name="brand_edit" type="brand" visible="*" id="{$brand_id}" backend_context="1" lang="$edit_language_id"}
+            {loop name="brand_edit" type="brand" visible="*" id="{$brand_id}" backend_context="1" lang="$edit_language_id" with_prev_next_info="true"}
 
             <nav>
                 <ul class="breadcrumb">
@@ -128,6 +128,8 @@
                                                     </div>
 
                                                     <div class="col-md-4">
+                                                        {hook name="brand.modification.form-right.top" brand_id=$brand_id}
+
                                                         {render_form_field field="visible"}
 
                                                         {custom_render_form_field field='logo_image_id'}
@@ -139,6 +141,8 @@
                                                                 {/loop}
                                                             </select>
                                                         {/custom_render_form_field}
+
+                                                        {hook name="brand.modification.form-right.bottom" brand_id=$brand_id}
                                                     </div>
                                                 </div>
 

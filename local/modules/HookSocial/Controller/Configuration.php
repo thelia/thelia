@@ -11,13 +11,13 @@
 /*************************************************************************************/
 
 namespace HookSocial\Controller;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-
 
 /**
  * Class Configuration

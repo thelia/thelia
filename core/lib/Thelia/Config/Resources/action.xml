@@ -156,6 +156,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.state" class="Thelia\Action\State">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.area" class="Thelia\Action\Area">
             <tag name="kernel.event_subscriber"/>
         </service>

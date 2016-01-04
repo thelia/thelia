@@ -13,7 +13,7 @@
     <div class="customers edit-customer">
 
         <div id="wrapper" class="container">
-            {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" with_prev_next_info="true" lang="$edit_language_id"}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -27,13 +27,28 @@
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
 
-        					<div class="col-md-12 title title-without-tabs">
+        					<div class="col-md-6 title title-without-tabs">
                                 {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname={$FIRSTNAME} lastname={$LASTNAME} ref={$REF}}
         					</div>
 
+                            <div class="col-md-6 actions">
+
+                                {if $HAS_PREVIOUS != 0}
+                                <a href="{url path="/admin/customer/update?customer_id=%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous customer'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                {/if}
+                                {if $HAS_NEXT != 0}
+                                <a href="{url path="/admin/customer/update?customer_id=%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next customer'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                {/if}
+                            </div>
+
+
                             <div class="form-container">
                                 <div class="col-md-12">
-
+                                    <br>
         						    {form name="thelia.admin.customer.update"}
         						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype} class="clearfix">
 
@@ -160,11 +175,24 @@
                                                     {/form_field}
 
                                                     {form_field field='country'}
+                                                        {$countryFieldId=$label_attr.for}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                                                                {loop type="country" name="country1"}
+                                                                {loop type="country" name="country1" visible="*"}
                                                                     <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
+                                                                {/loop}
+                                                            </select>
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field field='state'}
+                                                        <div class="form-group group-state{if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                                                            <select name="{$name}" id="{$label_attr.for}" class="form-control"
+                                                                    data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state">
+                                                                {loop type="state" name="state1" visible="*"}
+                                                                    <option value="{$ID}" {if {$value} == $ID}selected{/if} data-country="{$COUNTRY}">{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
                                                         </div>
@@ -218,9 +246,11 @@
                                                                         {if $ADDRESS2}<br />{$ADDRESS2}{/if}
                                                                         {if $ADDRESS3}<br />{$ADDRESS3}{/if}
                                                                         <br>{$ZIPCODE} {$CITY}
-                                                                        {loop name="address.country" type="country" id=$COUNTRY}
+                                                                        {loop name="address.country" type="country" id=$COUNTRY visible="*"}
                                                                             <br>{$TITLE}
                                                                         {/loop}
+                                                                        {if $STATE}{loop type="state" name="address.state" id=$STATE}, {$TITLE}{/loop}{/if}
+
                                                                         {if $PHONE}
                                                                             <br>{intl l="Phone"}: {$PHONE}
                                                                         {/if}
@@ -363,7 +393,7 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "address_creation_dialog"}
 
-        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
+        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page dialog_type="new"}
 
         {hook name="customer.address-create-form" location="customer_address_create_form" customer_id=$customer_id page=$page}
 
@@ -396,7 +426,7 @@
 	    {capture "address_update_dialog"}
 	        <input type="hidden" name="address_id" id="address_update_id" value="{$address_id}" />
 
-	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
+	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page dialog_type="update"}
             {hook name="customer.address-update-form" location="customer_address_update_form" customer_id=$customer_id page=$page}
 	    {/capture}
 
@@ -463,7 +493,9 @@
 
 
 {block name="javascript-initialization"}
-
+    {javascripts file='assets/js/thelia-states.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
     <script>
         $(function() {
 

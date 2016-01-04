@@ -14,11 +14,14 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleQuery;
 
 class TaxRuleController extends AbstractCrudController
@@ -92,6 +95,7 @@ class TaxRuleController extends AbstractCrudController
         $event->setId($formData['id']);
         $event->setTaxList($formData['tax_list']);
         $event->setCountryList($formData['country_list']);
+        $event->setCountryDeletedList($formData['country_deleted_list']);
 
         return $event;
     }
@@ -162,11 +166,12 @@ class TaxRuleController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments($country = null, $tab = null)
+    protected function getViewArguments($country = null, $tab = null, $state = null)
     {
         return array(
             'tab' => $tab === null ? $this->getRequest()->get('tab', 'data') : $tab,
             'country' => $country === null ? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()) : $country,
+            'state' => $state,
         );
     }
 
@@ -192,11 +197,11 @@ class TaxRuleController extends AbstractCrudController
         return $this->render('tax-rule-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate($request = null, $country = null, $state = null)
     {
         return $this->generateRedirectFromRoute(
             "admin.configuration.taxes-rules.update",
-            $this->getViewArguments($country),
+            $this->getViewArguments($country, null, $state),
             $this->getRouteArguments()
         );
     }
@@ -266,6 +271,11 @@ class TaxRuleController extends AbstractCrudController
             return $response;
         }
 
+        $responseData = [
+            "success" => false,
+            "message" => ''
+        ];
+
         $error_msg = false;
 
         // Create the form from the request
@@ -303,11 +313,13 @@ class TaxRuleController extends AbstractCrudController
                 );
             }
 
-            if ($response == null) {
-                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
-            } else {
-                return $response;
-            }
+            $responseData['success'] = true;
+            $responseData['data'] = $this->getSpecification(
+                $changeEvent->getTaxRule()->getId()
+            );
+
+            return $this->jsonResponse(json_encode($responseData));
+
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -319,6 +331,82 @@ class TaxRuleController extends AbstractCrudController
         $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
-        return $this->renderEditionTemplate();
+        $responseData["message"] = $error_msg;
+
+        return $this->jsonResponse(json_encode($responseData));
+    }
+
+
+    /**
+     * @return Response
+     */
+    public function specsAction($taxRuleId)
+    {
+        $data = $this->getSpecification($taxRuleId);
+
+        return $this->jsonResponse(json_encode($data));
+    }
+
+    protected function getSpecification($taxRuleId)
+    {
+        $taxRuleCountries = TaxRuleCountryQuery::create()
+            ->filterByTaxRuleId($taxRuleId)
+            ->orderByCountryId()
+            ->orderByStateId()
+            ->orderByPosition()
+            ->orderByTaxId()
+            ->find();
+
+        $specKey = [];
+        $specifications = [];
+        $taxRules = [];
+
+        if (!$taxRuleCountries->isEmpty()) {
+
+            $taxRuleCountry = $taxRuleCountries->getFirst();
+            $currentCountryId = $taxRuleCountry->getCountryId();
+            $currentStateId = intval($taxRuleCountry->getStateId());
+
+            while (true) {
+                $hasChanged = $taxRuleCountry === null
+                    || $taxRuleCountry->getCountryId() != $currentCountryId
+                    || intval($taxRuleCountry->getStateId()) != $currentStateId
+                ;
+
+                if ($hasChanged) {
+                    $specification = implode(',', $specKey);
+
+                    $specifications[] = [
+                        'country' => $currentCountryId,
+                        'state' => $currentStateId,
+                        'specification' => $specification
+                    ];
+
+                    if (!in_array($specification, $taxRules)) {
+                        $taxRules[] = $specification;
+                    }
+
+                    if (null === $taxRuleCountry) {
+                        break;
+                    }
+
+                    $currentCountryId = $taxRuleCountry->getCountryId();
+                    $currentStateId = intval($taxRuleCountry->getStateId());
+                    $specKey = [];
+                }
+
+                $specKey[] = $taxRuleCountry->getTaxId() . '-' . $taxRuleCountry->getPosition();
+
+                $taxRuleCountry = $taxRuleCountries->getNext();
+            }
+
+        }
+
+        $data = [
+            'taxRules' => $taxRules,
+            'specifications' => $specifications,
+        ];
+
+        return $data;
     }
 }

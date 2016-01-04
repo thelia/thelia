@@ -15,6 +15,8 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\StateQuery;
 
 /**
  * Class CustomerUpdateForm
@@ -23,6 +25,8 @@ use Thelia\Core\Translation\Translator;
  */
 class CustomerUpdateForm extends BaseForm
 {
+    use AddressCountryValidationTrait;
+
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -46,7 +50,8 @@ class CustomerUpdateForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('update_logged_in_user', 'integer') // In a front office context, update the in-memory logged-in user data
+            ->add('update_logged_in_user',
+                'integer')// In a front office context, update the in-memory logged-in user data
             ->add("company", "text", array(
                 "label" => Translator::getInstance()->trans("Company"),
                 "label_attr" => array(
@@ -85,9 +90,11 @@ class CustomerUpdateForm extends BaseForm
             ->add("email_confirm", "email", array(
                 "constraints" => array(
                     new Constraints\Email(),
-                    new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyEmailField"),
-                    ))),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this, "verifyEmailField"),
+                        )
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Confirm Email address"),
                 "label_attr" => array(
@@ -138,6 +145,11 @@ class CustomerUpdateForm extends BaseForm
             ->add("zipcode", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this, "verifyZipCode")
+                        ),
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Zip code"),
                 "label_attr" => array(
@@ -160,6 +172,19 @@ class CustomerUpdateForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Country"),
                 "label_attr" => array(
                     "for" => "country",
+                ),
+            ))
+            ->add("state", "text", array(
+                "constraints" => array(
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this, "verifyState")
+                        ),
+                    )),
+                ),
+                "label" => Translator::getInstance()->trans("State"),
+                "label_attr" => array(
+                    "for" => "state",
                 ),
             ))
             ->add("title", "text", array(
@@ -186,6 +211,17 @@ class CustomerUpdateForm extends BaseForm
         ;
     }
 
+    public function verifyEmailField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if (isset($data["email_confirm"]) && $data["email"] != $data["email_confirm"]) {
+            $context->addViolation(
+                Translator::getInstance()->trans("email confirmation is not the same as email field")
+            );
+        }
+    }
+
     /**
      * @return string the name of you form. This name must be unique
      */
@@ -194,12 +230,5 @@ class CustomerUpdateForm extends BaseForm
         return "thelia_customer_update";
     }
 
-    public function verifyEmailField($value, ExecutionContextInterface $context)
-    {
-        $data = $context->getRoot()->getData();
 
-        if (isset($data["email_confirm"]) && $data["email"] != $data["email_confirm"]) {
-            $context->addViolation(Translator::getInstance()->trans("email confirmation is not the same as email field"));
-        }
-    }
 }

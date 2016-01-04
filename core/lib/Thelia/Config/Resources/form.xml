@@ -112,6 +112,9 @@
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
 
+        <form name="thelia.admin.state.creation" class="Thelia\Form\State\StateCreationForm"/>
+        <form name="thelia.admin.state.modification" class="Thelia\Form\State\StateModificationForm"/>
+
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
         <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>

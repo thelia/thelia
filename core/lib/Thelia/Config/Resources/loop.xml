@@ -18,6 +18,8 @@
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Content" name="content"/>
         <loop class="Thelia\Core\Template\Loop\Country" name="country"/>
+        <loop class="Thelia\Core\Template\Loop\CountryArea" name="country-area"/>
+        <loop class="Thelia\Core\Template\Loop\State" name="state"/>
         <loop class="Thelia\Core\Template\Loop\Currency" name="currency"/>
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>

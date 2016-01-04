@@ -109,10 +109,6 @@
 
                                 {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
 
-                                    {loop type="currency" name="order-currency" id=$CURRENCY}
-                                        {$orderCurrency=$SYMBOL}
-                                    {/loop}
-
                                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
                                         {assign "orderInvoiceLastName" $LASTNAME}
@@ -137,7 +133,7 @@
                                        	<td>{format_date date=$CREATE_DATE}</td>
                                        	<td>{$orderInvoiceCompany}</td>
                                        	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-                                       	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
+                                       	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</td>
                                         <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
                                         {* *}
                                         {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }

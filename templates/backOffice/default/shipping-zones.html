@@ -60,11 +60,11 @@
                             <tbody>
                                 {loop type="module" module_type="2" active="*" name="delivery.list" backend_context="1"}
                                 <tr>
-                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$TITLE}</a></td>
+                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$CODE} - {$TITLE}</a></td>
                                     <td>
                                         {loop name="area.module.associated" type="area" with_zone=$ID backend_context="1"}
                                             {$countries = ''}
-                                            {loop name="country-area" type="country" area=$ID backend_context="1"}
+                                            {loop name="country-area" type="country" area=$ID backend_context="1" visible="*"}
                                                 {$countries = "$countries, $TITLE"}
                                             {/loop}
                                             {$countries = ltrim($countries, ', ')}

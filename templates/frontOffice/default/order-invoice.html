@@ -110,27 +110,29 @@
                         <td class="unitprice">
                             <div class="secondary-price">
                             {if $IS_PROMO == 1}
-                                <small><span class="price">{format_money number=$PROMO_PRICE symbol={currency attr="symbol"}}</span></small>
+                                <small><span class="price">{format_money number=$PROMO_PRICE}</span></small>
                             {else}
-                                <small><span class="price">{format_money number=$PRICE symbol={currency attr="symbol"}}</span></small>
+                                <small><span class="price">{format_money number=$PRICE}</span></small>
                             {/if}
                             </div>
                         </td>
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
+                                {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
+                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                {assign "real_total_price" $TOTAL_TAXED_PRICE}
+                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
                             {/if}
                         </td>
                         <td class="qty">
                             <span class="price">{$QUANTITY}</span>
                         </td>
                         <td class="subprice">
-                            <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
+                            <span class="price">{format_money number=$real_total_price}</span>
                         </td>
                     </tr>
 
@@ -149,7 +151,7 @@
                                 <th class="discount">{intl l="Discount"}</th>
                                 <td class="shipping">
                                     <div class="shipping-price">
-                                        <span class="price">{format_money number=$discount symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number=$discount}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -180,7 +182,7 @@
                                 <th class="shipping">{intl l="Shipping Tax"}</th>
                                 <td class="shipping">
                                     <div class="shipping-price">
-                                        <span class="price">{format_money number={order attr="postage"} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={order attr="postage"}}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -189,7 +191,7 @@
                                 <th>{intl l="Total excl. taxes"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}}}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -197,7 +199,7 @@
                                 <th class="total">{intl l="Total incl. taxes"}</th>
                                 <td class="total">
                                     <div class="total-price">
-                                        <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}}}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -237,7 +239,9 @@
                                     <span class="street-address">{$ADDRESS3}</span><br>
                                 {/if}
                                 <span class="postal-code">{$ZIPCODE}</span>
-                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                <span class="locality">{$CITY},
+                                <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
                             </address>
                         </div>
                         {/loop}
@@ -280,7 +284,9 @@
                                             <span class="street-address">{$ADDRESS3}</span><br>
                                         {/if}
                                         <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                        <span class="locality">{$CITY},
+                                        <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                        {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
                                     </address>
                                 </label>
                             </div>

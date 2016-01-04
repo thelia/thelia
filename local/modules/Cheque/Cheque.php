@@ -13,16 +13,11 @@
 namespace Cheque;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\Event\Order\OrderEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Install\Database;
 use Thelia\Model\MessageQuery;
-use Thelia\Model\ModuleImageQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
-use Thelia\Tools\URL;
 
 class Cheque extends BaseModule implements PaymentModuleInterface
 {
@@ -49,7 +44,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
 
     public function postActivation(ConnectionInterface $con = null)
     {
-        $database = new Database($con->getWrappedConnection());
+        $database = new Database($con);
 
         // Insert email message
         $database->insertSql(null, array(__DIR__ . "/Config/setup.sql"));

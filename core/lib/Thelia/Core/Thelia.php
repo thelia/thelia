@@ -119,7 +119,7 @@ class Thelia extends Kernel
 
             $definePropel = new DefinePropel(
                 new DatabaseConfiguration(),
-                Yaml::parse($file),
+                Yaml::parse(file_get_contents($file)),
                 $this->getEnvParameters()
             );
 

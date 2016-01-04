@@ -25,9 +25,11 @@ class CountryCreateEvent extends CountryEvent
     protected $isoAlpha2;
     protected $isoAlpha3;
 
-    /**
-     * @var int area zone
-     */
+    /** @var bool is visible */
+    protected $visible;
+    /** @var bool has states */
+    protected $hasStates;
+
     protected $area;
 
     /**
@@ -136,5 +138,39 @@ class CountryCreateEvent extends CountryEvent
     public function getArea()
     {
         return $this->area;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param boolean $visible
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isHasStates()
+    {
+        return $this->hasStates;
+    }
+
+    /**
+     * @param boolean $hasStates
+     */
+    public function setHasStates($hasStates)
+    {
+        $this->hasStates = $hasStates;
+        return $this;
     }
 }

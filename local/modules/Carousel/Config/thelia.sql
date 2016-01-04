@@ -1,4 +1,3 @@
-
 # This is a fix for InnoDB in MySQL >= 4.1.x
 # It "suspends judgement" for fkey relationships until are tables are set.
 SET FOREIGN_KEY_CHECKS = 0;
@@ -7,9 +6,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- carousel
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `carousel`;
-
-CREATE TABLE `carousel`
+CREATE TABLE IF NOT EXISTS `carousel`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `file` VARCHAR(255),
@@ -24,9 +21,9 @@ CREATE TABLE `carousel`
 -- carousel_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `carousel_i18n`;
 
-CREATE TABLE `carousel_i18n`
+
+CREATE TABLE IF NOT EXISTS `carousel_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,

@@ -50,7 +50,9 @@
                                             <span class="extended-address">{$ADDRESS3}</span><br>
                                         {/if}
                                         <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY}<br><span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                        <span class="locality">{$CITY}<br>
+                                        <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                        {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
                                     </address>
                                 </li>
                                 <li class="col-sm-4">
@@ -113,7 +115,9 @@
                                                         <span class="street-address">{$ADDRESS3}</span><br>
                                                     {/if}
                                                     <span class="postal-code">{$ZIPCODE}</span>
-                                                    <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                    <span class="locality">{$CITY},
+                                                    <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                    {if $STATE}<span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
                                                 </address>
                                             </li>
                                             <li class="col-sm-4">
@@ -167,7 +171,7 @@
                                 <tr>
                                     <td>{$REF}</td>
                                     <td>{format_date date=$CREATE_DATE}</td>
-                                    <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
+                                    <td>{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</td>
                                     <td>
                                         {loop type="order-status" name="order.status" id={$STATUS}}
                                             {assign "orderStatusCode" "order_$CODE"}

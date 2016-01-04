@@ -16,6 +16,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\ModuleHookQuery;
 use Thelia\Model\Hook;
@@ -45,10 +46,10 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans("Module"),
+                    "label" => $this->trans("Module"),
                     "label_attr" => array(
                         "for" => "module_id",
-                        "help" => Translator::getInstance()->trans(
+                        "help" => $this->trans(
                             "Only hookable modules are displayed in this menu."
                         ),
                     ),
@@ -62,7 +63,7 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans("Hook"),
+                    "label" => $this->trans("Hook"),
                     "label_attr" => array("for" => "hook_id"),
                 )
             )
@@ -73,10 +74,10 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans("Service ID"),
+                    "label" => $this->trans("Service ID"),
                     "label_attr" => array(
                         "for" => "classname",
-                        "help" => Translator::getInstance()->trans(
+                        "help" => $this->trans(
                             "The service id that will handle the hook (defined in the config.xml file of the module)."
                         ),
                     ),
@@ -86,7 +87,7 @@ class ModuleHookCreationForm extends BaseForm
                 "method",
                 "text",
                 array(
-                    "label" => Translator::getInstance()->trans("Method Name"),
+                    "label" => $this->trans("Method Name"),
                     "constraints" => array(
                         new NotBlank(),
                         new Callback(
@@ -99,12 +100,37 @@ class ModuleHookCreationForm extends BaseForm
                     ),
                     "label_attr" => array(
                         "for" => "method",
-                        "help" => Translator::getInstance()->trans(
+                        "help" => $this->trans(
                             "The method name that will handle the hook event."
                         ),
                     ),
                 )
-            );
+            )
+            ->add(
+                "templates",
+                "text",
+                array(
+                    "label" => $this->trans("Automatic rendered templates"),
+                    "constraints" => array(
+                        new Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyTemplates"),
+                                ),
+                            )
+                        ),
+                    ),
+                    "label_attr" => array(
+                        "for" => "templates",
+                        "help" => $this->trans(
+                            "When using the %method% method you can automatically render or dump templates or add CSS and JS files (e.g.: render:mytemplate.html;js:assets/js/myjs.js)",
+                            ["%method%" => BaseHook::INJECT_TEMPLATE_METHOD_NAME]
+                        ),
+                    ),
+                    "required" => false
+                )
+            )
+        ;
     }
 
     protected function trans($id, $parameters = [])
@@ -165,7 +191,51 @@ class ModuleHookCreationForm extends BaseForm
      */
     public function verifyMethod($value, ExecutionContextInterface $context)
     {
-        return true;
+        if (! $this->hasContainer()) {
+            return true;
+        }
+
+        $data = $context->getRoot()->getData();
+
+        if (null === $service = $this->container->get($data["classname"])) {
+            return true;
+        }
+
+        if (!method_exists($service, $data['method'])) {
+            $context->addViolation(
+                $this->trans(
+                    "The method %method% doesn't exist in classname %classname%",
+                    [
+                        '%method%' => $data['method'],
+                        '%classname%' => $data['classname']
+                    ]
+                )
+            );
+        }
+    }
+
+    /**
+     * Check if method is the right one if we want to use automatic inserted templates .
+     *
+     * @param $value
+     * @param  ExecutionContextInterface $context
+     *
+     * @return bool
+     */
+    public function verifyTemplates($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if (!empty($data['templates']) && $data['method'] !== BaseHook::INJECT_TEMPLATE_METHOD_NAME) {
+            $context->addViolation(
+                $this->trans(
+                    "If you use automatic insert templates, you should use the method %method%",
+                    [
+                        '%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME
+                    ]
+                )
+            );
+        }
     }
 
     public function getName()

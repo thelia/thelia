@@ -1,5 +1,70 @@
 # 2.3.0-alpha1
 
+- #1823 Add states/provinces concept. The objective of this PR is to separate states/provinces of countries. For now, the concept of states/provinces was managed in country model which was not the best way.
+- #1878 Add module code in the lists of the BackOffice for a better understanding.
+- #1832 Language improvement. Add the possibility to disable a language. It's possible to disable the language only for the front.
+- #1851 Add in the module Tinymce, the possibility to choose in which text areas the editor will be used.
+- #1840 Add the possibility to generate an url with the arguments ```router``` and ```route_id``` in the smarty function ```url```. Documentation ```http://doc.thelia.net/en/documentation/templates/urls-and-paths.html```
+- #1872 Add next/prev buttons for orders and customers. Modify the loops of brands, categories, folders and contents so that the queries to get the next and previous objects are sent only when it is needed.
+- #1850 #1859 Add hooks for email template
+- #1845 Add price including taxes in the combination creation pop-up in the BackOffice
+- #1868 Allow to open order-edit.html template with a specific module tab
+- #1861 Add links to the appropriate pages
+- #1860 Change version of Symfony Yaml components
+- #1843 Fix smarty form_collection_field, a performance problem was introduced after this PR: #1613 because ​the Form::createView() method create all form view on each call.
+- #1856 Convert order.invoice_date to datetime column
+- #1852 Add the possibility to disable the generation of url for the loops, adds argument ```return_url``` in loops, the default value for argument ```return_url``` is ```true```
+- #1857 Fix of hookblack : order.tab
+- #1792 Update module Carousel, change the location of saving of the images
+- #1844 #1848 Added hooks in the right column part of the edtion form of brand, content, category folder and product templates :
+    - ```brand.modification.form-right.top```, ```brand.modification.form-right.bottom```
+    - ```category.modification.form-right.top```, ```category.modification.form-right.bottom```
+    - ```content.modification.form-right.top```, ```content.modification.form-right.bottom```
+    - ```folder.modification.form-right.top```, ```folder.modification.form-right.bottom```
+    - ```product.modification.form-right.top```, ```product.modification.form-right.bottom```
+- #1835 Add the product combination in PDF delivery
+- #1788 Remove all the AdminIncludes from the core modules.
+- #1841 Add the possibility to create a product combination with several same attribute inside (2 colors in one product sales elements).
+- #1830 Fix attribute title in the modal "create a new combination"
+- #1780 Currency improvements. Add the possibility to disable a currency. Add the possibility to change the position of the currency symbol. Resolve #1446
+- #1825 Add message if thelia project is not installed
+- #1714 #1839 #1833 Hook improvements
+    - Add new syntax to hook on a hook. Documentation ```http://doc.thelia.net/en/documentation/modules/hooks/index.html```
+    - Add command ```php Thelia hook```
+- #1824 #1829 Fix the admin home stats, On page load, the month sent to Thelia was bad
+- #1821 Fix the value for constant ```AdminForm::LANG_DEFAULT_BEHAVIOR```, Resolve ##1820
+- #1818 Fix BackOffice menu, hook block to integrate main link if it's used
+- #1816 Fix the total price of cart if the items have a quantity greater than one, Resolve #1772, add new methods ```getTotalRealTaxedPrice```, ```getTotalTaxedPrice```, ```getTotalTaxedPromoPrice``` in the model ```Thelia\Model\CartItem```
+- #1783 Fix product price exports. Resolve #1078 #1610
+- #1808 Add customer's company in order mails and PDF
+- #1780 Adds the ability to disable a currency and change the position of the currency symbol
+- #1806 Fix the event dispatched before decoding of the import, ```TheliaEvents::IMPORT_AFTER_DECODE``` to ```TheliaEvents::IMPORT_BEFORE_DECODE```
+- #1799 Fixed the redirection to rewritten URL
+- #1725 Added new attributes and some aliases to the {cart} substitution
+    - A new `weight` attribute is added, to get the cart total weight.
+    - A new `total_price_without_discount` attribute is added, to get the cart total amount without taxes, excluding discount.
+    - The following aliases of existing attributes are added, to provide a better english syntax, or a more accurate name :
+        - `product_count`, alias of `count_product`
+        - `item_count`, alias of `count_item`
+        - `total_price_with_discount` alias of `total_price`
+        - `total_taxed_price_with_discount` alias of `total_taxed_price`
+        - `contains_virtual_product` alias of `is_virtual`
+        - `total_tax_amount` alias of `total_vat`
+- #1802 After upload, The image file name is no longer the default image title
+- #1805 Add a new parameter ```locale``` for the module_config smarty plugin
+- #1796 Fix regression in OrderAddressEvent cell phone can not be required in the constructor
+- #1787 Add loop Overriding, Documentation ```http://doc.thelia.net/en/documentation/loop/extend.html```
+- #1785 Fix undesirable carts, persist only non empty carts
+- #1790 Update the default PSE ref when the product ref is updated
+- #1778 #1797 Add ```manual``` and ```manuel_reverse``` order in attributeCombination loop
+- #1766 Add order by ```id``` and ```id_reverse``` in product_sale_element loop
+- #1760 Set order status as paid when the FreeOrder module is used to "pay" an order
+- #1751 Fix for undefined currency exchange rate, add error message in the currency configuration page when an exchange rate could not be found
+- #1769 Increase API key size to 48
+- #1771 Add argument ```customer_id``` for hook customer.edit-js
+- #1753 Fix the rounding of prices in the order product loop
+- #1768 Update composer.lock file, update of the dependency thelia/currency-converter to version 1.0.1
+- #1752 Add addValues method in EnumListType
 - #1746 Removes deprecated classes and methods for the version 2.3
 - #1745 Fix output value IS_DEFAULT in the product_sale_elements loop
 - #1754 Add homepage redirection on /admin/login if the admin is already authenticate. Before this change, there was a render

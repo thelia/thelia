@@ -16,4 +16,27 @@ use Thelia\Model\Base\CountryAreaQuery as BaseCountryAreaQuery;
  */
 class CountryAreaQuery extends BaseCountryAreaQuery
 {
+    public static function findByCountryAndState(Country $country, State $state = null)
+    {
+        $response = null;
+
+        if (null !== $state) {
+            $countryAreaList = self::create()
+                ->filterByCountryId($country->getId())
+                ->filterByStateId($country->getId())
+                ->find();
+
+            if (count($countryAreaList) > 0) {
+                return $countryAreaList;
+            }
+        }
+
+        $countryAreaList = self::create()
+            ->filterByCountryId($country->getId())
+            ->filterByStateId(null)
+            ->find()
+        ;
+
+        return $countryAreaList;
+    }
 }

@@ -28,6 +28,7 @@ phpunit.phar
 phpmyadmin
 composer.phar
 web/.htaccess
+local/I18n/*.php
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
@@ -40,6 +41,7 @@ local/modules/*
 !local/modules/VirtualProductDelivery/
 !local/modules/VirtualProductControl/
 !local/modules/TheliaSmarty/
+!local/modules/TheliaMigrateCountry/
 local/modules/HookTest/
 
 # Ignore everything in the "templates" directory, except the "default template"

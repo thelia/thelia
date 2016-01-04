@@ -23,9 +23,6 @@
     {$payment_id=$PAYMENT_MODULE}
     {$delivery_id=$DELIVERY_MODULE}
     {$status=$STATUS}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-        {assign "orderCurrency" $SYMBOL}
-    {/loop}
 
     <article class="col-main" role="main" aria-labelledby="main-label">
 
@@ -98,7 +95,7 @@
                                 {loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                                 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                                 {$ZIPCODE} {$CITY}<br/>
-                                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                                {loop type="country" visible="*" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
                             {/loop}
                         {/elsehook}
 
@@ -132,7 +129,7 @@
                                 {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                                 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                                 {$ZIPCODE} {$CITY}<br/>
-                                {loop type="country" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                                {loop type="country" visible="*" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
                             {/loop}
                         {/elsehook}
 
@@ -185,10 +182,12 @@
                     {assign "realPrice" $PROMO_PRICE}
                     {assign "realTax" $PROMO_PRICE_TAX}
                     {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                    {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
                 {else}
                     {assign "realPrice" $PRICE}
                     {assign "realTax" $PRICE_TAX}
                     {assign "realTaxedPrice" $TAXED_PRICE}
+                    {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
                 {/if}
 
                 {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
@@ -204,10 +203,10 @@
                         </p>
                         {/ifloop}
                     </td>
-                    <td class="unitprice"><p>{format_money number=$realPrice symbol=$orderCurrency}</p></td>
-                    <td class="unitprice"><p>{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
+                    <td class="unitprice"><p>{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
+                    <td class="unitprice"><p>{format_money number=$realTaxedPrice currency_id=$CURRENCY}</p></td>
                     <td class="qty"><p>{$QUANTITY}</p></td>
-                    <td class="subprice"><p>{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
+                    <td class="subprice"><p>{format_money number=$realTotalPrice currency_id=$CURRENCY}</p></td>
                 </tr>
                 {ifhook rel="account-order.product-extra"}
                 <tr>
@@ -238,12 +237,12 @@
                         {if $DISCOUNT}
                         <tr>
                             <td><p>{intl l="Discount"}</p></td>
-                            <td><p>{format_money number=$DISCOUNT symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
                         </tr>
                         {/if}
                         <tr>
                             <td><p>{intl l="Total without tax"}</p></td>
-                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} currency_id=$CURRENCY}</p></td>
                         </tr>
                         {strip}
                             {capture name="tax"}
@@ -255,7 +254,7 @@
                                     {if $_price_taxe_ != 0}
                                     <tr>
                                         <td><p>{$name}</p></td>
-                                        <td><P>{format_money number=$_price_taxe_ symbol=$orderCurrency}</P></td>
+                                        <td><P>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</P></td>
                                     </tr>
                                     {/if}
                                 {/foreach}
@@ -266,15 +265,15 @@
                         {/if}
                         <tr>
                             <td><p>{intl l="Total with tax"}</p></td>
-                            <td><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrency}</P></td>
+                            <td><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}</P></td>
                         </tr>
                         <tr>
                             <td><p>{intl l="Postage"}</p></td>
-                            <td><p>{format_money number=$POSTAGE symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number=$POSTAGE curency_id=$CURRENCY}</p></td>
                         </tr>
                         <tr>
                             <td><h3>{intl l="Total"}</h3></td>
-                            <td><h3>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</h3></td>
+                            <td><h3>{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</h3></td>
                         </tr>
                     </tfoot>
                 </table>

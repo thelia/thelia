@@ -29,11 +29,13 @@
                         <td class="unitprice text-center">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
+                                {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
+                                {assign "real_total_price" $TOTAL_TAXED_PRICE}
                             {/if}
-                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{$real_price} {currency attr="symbol"}</span></div>
-        {assign "total_price" $total_price + ($QUANTITY * $real_price)}
+                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{format_money number=$real_price}</span></div>
+        {assign "total_price" $total_price + $real_total_price}
         </td>
         </tr>
         {/loop}
@@ -47,7 +49,7 @@
             </td>
             <td class="total">
                 <div class="total-price">
-                    <span class="price">{$total_price} {currency attr="symbol"}</span>
+                    <span class="price">{format_money number=$total_price}</span>
                 </div>
             </td>
         </tr>

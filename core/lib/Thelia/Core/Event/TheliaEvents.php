@@ -138,20 +138,40 @@ final class TheliaEvents
 
 
     // -- COUNTRY EVENTS -----------------------------------------------
-    const BEFORE_CREATECOUNTRY = "action.before_createCountry";
-    const COUNTRY_CREATE            = "action.createCountry";
-    const AFTER_CREATECOUNTRY    = "action.after_createCountry";
+    const BEFORE_CREATECOUNTRY = "action.state.before_create";
+    const COUNTRY_CREATE            = "action.state.create";
+    const AFTER_CREATECOUNTRY    = "action.state.after_create";
 
-    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
-    const COUNTRY_UPDATE            = "action.updateCountry";
-    const AFTER_UPDATECOUNTRY    = "action.after_updateCountry";
+    const BEFORE_UPDATECOUNTRY = "action.state.before_update";
+    const COUNTRY_UPDATE            = "action.state.update";
+    const AFTER_UPDATECOUNTRY    = "action.state.after_update";
 
-    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
-    const COUNTRY_DELETE            = "action.deleteCountry";
-    const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
+    const BEFORE_DELETECOUNTRY = "action.state.before_delete";
+    const COUNTRY_DELETE            = "action.state.delete";
+    const AFTER_DELETECOUNTRY    = "action.state.after_delete";
 
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
+    const COUNTRY_TOGGLE_VISIBILITY = "action.state.toggleVisibility";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
+
+
+    // -- STATE EVENTS -----------------------------------------------
+    const BEFORE_CREATESTATE = "action.before_createCountry";
+    const STATE_CREATE            = "action.createCountry";
+    const AFTER_CREATESTATE    = "action.after_createCountry";
+
+    const BEFORE_UPDATESTATE = "action.before_updateCountry";
+    const STATE_UPDATE            = "action.updateCountry";
+    const AFTER_UPDATESTATE    = "action.after_updateCountry";
+
+    const BEFORE_DELETESTATE = "action.before_deleteCountry";
+    const STATE_DELETE            = "action.deleteCountry";
+    const AFTER_DELETESTATE    = "action.after_deleteCountry";
+
+    const STATE_TOGGLE_VISIBILITY = "action.toggleCountryVisibility";
+    // -- END STATE EVENTS ---------------------------------------------------------
+
+
 
 
     // -- CUSTOMER EVENTS ---------------------------------------------------------
@@ -605,6 +625,7 @@ final class TheliaEvents
     const CURRENCY_UPDATE          = "action.updateCurrency";
     const CURRENCY_DELETE          = "action.deleteCurrency";
     const CURRENCY_SET_DEFAULT     = "action.setDefaultCurrency";
+    const CURRENCY_SET_VISIBLE     = "action.setVisibleCurrency";
     const CURRENCY_UPDATE_RATES    = "action.updateCurrencyRates";
     const CURRENCY_UPDATE_POSITION = "action.updateCurrencyPosition";
 
@@ -831,6 +852,8 @@ final class TheliaEvents
     const LANG_FIX_MISSING_FLAG                 = 'action.lang.fix_missing_flag';
 
     const LANG_TOGGLEDEFAULT                    = 'action.lang.toggleDefault';
+    const LANG_TOGGLEACTIVE                    = 'action.lang.toggleActive';
+    const LANG_TOGGLEVISIBLE                    = 'action.lang.toggleVisible';
 
     const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
     const AFTER_UPDATELANG                      = 'action.lang.afterUpdate';

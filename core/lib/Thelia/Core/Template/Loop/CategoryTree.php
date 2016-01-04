@@ -120,7 +120,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                 "PARENT" => $result->getParent(),
-                "URL" => $result->getUrl($this->locale),
+                "URL" => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
                 "VISIBLE" => $result->getVisible() ? "1" : "0",
                 "LEVEL" => $level,
                 'PREV_LEVEL' => $previousLevel,

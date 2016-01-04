@@ -44,6 +44,7 @@ use Thelia\Type;
  * @method int getSponsor()
  * @method bool|string getNewsletter()
  * @method string[] getOrder()
+ * @method bool getWithPrevNextInfo()
  */
 class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
@@ -57,6 +58,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         return new ArgumentCollection(
             Argument::createBooleanTypeArgument('current', 1),
             Argument::createIntListTypeArgument('id'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             new Argument(
                 'ref',
                 new TypeCollection(
@@ -68,22 +70,24 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array(
-                        'id',
-                        'id_reverse',
-                        'reference',
-                        'reference_reverse',
-                        'firstname',
-                        'firstname_reverse',
-                        'lastname',
-                        'lastname_reverse',
-                        'last_order',
-                        'last_order_reverse',
-                        'order_amount',
-                        'order_amount_reverse',
-                        'registration_date',
-                        'registration_date_reverse'
-                    ))
+                    new Type\EnumListType(
+                        array(
+                            'id',
+                            'id_reverse',
+                            'reference',
+                            'reference_reverse',
+                            'firstname',
+                            'firstname_reverse',
+                            'lastname',
+                            'lastname_reverse',
+                            'last_order',
+                            'last_order_reverse',
+                            'order_amount',
+                            'order_amount_reverse',
+                            'registration_date',
+                            'registration_date_reverse'
+                        )
+                    )
                 ),
                 'lastname'
             ),
@@ -147,8 +151,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         $search
             ->addJoinObject($join)
-            ->withColumn("IF(ISNULL(".NewsletterTableMap::EMAIL."), 0, 1)", "is_registered_to_newsletter")
-        ;
+            ->withColumn("IF(ISNULL(".NewsletterTableMap::EMAIL."), 0, 1)", "is_registered_to_newsletter");
 
         // If "*" === $newsletter, no filter will be applied, so it won't change anything
         if (false === $newsletter) {
@@ -202,35 +205,30 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'reference':
                     $search->orderByRef(Criteria::ASC);
                     break;
                 case 'reference_reverse':
                     $search->orderByRef(Criteria::DESC);
                     break;
-
                 case 'lastname':
                     $search->orderByLastname(Criteria::ASC);
                     break;
                 case 'lastname_reverse':
                     $search->orderByLastname(Criteria::DESC);
                     break;
-
                 case 'firstname':
                     $search->orderByFirstname(Criteria::ASC);
                     break;
                 case 'firstname_reverse':
                     $search->orderByFirstname(Criteria::DESC);
                     break;
-
                 case 'registration_date':
                     $search->orderByCreatedAt(Criteria::ASC);
                     break;
                 case 'registration_date_reverse':
                     $search->orderByCreatedAt(Criteria::DESC);
                     break;
-
             }
         }
 
@@ -253,8 +251,27 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set("RESELLER", $customer->getReseller())
                 ->set("SPONSOR", $customer->getSponsor())
                 ->set("DISCOUNT", $customer->getDiscount())
-                ->set("NEWSLETTER", $customer->getVirtualColumn("is_registered_to_newsletter"))
-            ;
+                ->set("NEWSLETTER", $customer->getVirtualColumn("is_registered_to_newsletter"));
+
+            if ($this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previousQuery = CustomerQuery::create()
+                    ->filterById($customer->getId(), Criteria::LESS_THAN);
+                $previous = $previousQuery
+                    ->orderById(Criteria::DESC)
+                    ->findOne();
+                $nextQuery = CustomerQuery::create()
+                    ->filterById($customer->getId(), Criteria::GREATER_THAN);
+                $next = $nextQuery
+                    ->orderById(Criteria::ASC)
+                    ->findOne();
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
+            }
+
             $this->addOutputFields($loopResultRow, $customer);
 
             $loopResult->addRow($loopResultRow);

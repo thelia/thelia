@@ -53,16 +53,16 @@
                     {assign var="combination_count" value={count type="product_sale_elements" promo="1" product=$ID}}
                     <span class="special-price col-xs-6"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">
                         {if $combination_count > 1}
-                            {intl l="From %price" price={format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}}
+                            {intl l="From %price" price={format_money number=$BEST_TAXED_PRICE}}
                         {else}
-                            {format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}
+                            {format_money number=$BEST_TAXED_PRICE}
                         {/if}
                     </span></span>
                     {if $SHOW_ORIGINAL_PRICE}
-                    <span class="old-price col-xs-6"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                    <span class="old-price col-xs-6"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE}</span></span>
                     {/if}
                 {else}
-                    <span class="regular-price col-xs-12"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                    <span class="regular-price col-xs-12"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE}</span></span>
                 {/if}
             </div>
 

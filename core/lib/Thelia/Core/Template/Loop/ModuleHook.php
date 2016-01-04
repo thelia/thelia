@@ -162,6 +162,7 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("HOOK_ACTIVE", $moduleHook->getHookActive())
                     ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())
                     ->set("POSITION", $moduleHook->getPosition())
+                    ->set("TEMPLATES", $moduleHook->getTemplates())
                 ;
 
                 $loopResult->addRow($loopResultRow);

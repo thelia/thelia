@@ -43,6 +43,7 @@ use Thelia\Type\TypeCollection;
  * @method int getOffset() available if countable is true
  * @method int getPage() available if countable is true
  * @method int getLimit() available if countable is true
+ * @method bool getReturnUrl() false for disable the generation of urls
  */
 abstract class BaseLoop
 {
@@ -186,6 +187,8 @@ abstract class BaseLoop
                 ]
             );
         }
+
+        $defaultArgs[] = Argument::createBooleanTypeArgument('return_url', true);
 
         return $defaultArgs;
     }

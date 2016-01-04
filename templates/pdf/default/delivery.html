@@ -146,7 +146,7 @@
 		                {if $addresses != "  "}- {$addresses}{/if}
 		                {if $city != " " }- {$city}{/if}
 		                {if {config key="store_country"} }
-		                {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+		                {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
 		                {/if}
 		                {if {config key="store_business_id"} }
 		                - {config key="store_business_id"}
@@ -168,9 +168,6 @@
     </page_footer>
 
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-    {assign "orderCurrency" $SYMBOL}
-    {/loop}
 
     <table class="table-info">
         <col style="width: 100%; padding: 0mm;" />
@@ -216,7 +213,8 @@
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {loop type="country" visible="*" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}
                     {/loop}
                 </p>
                 {/elsehook}
@@ -229,7 +227,8 @@
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {loop type="country" visible="*" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                    -{if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}
                     {/loop}
                 </p>
             </td>
@@ -239,9 +238,9 @@
     {hook name="delivery.after-addresses" order=$order_id}
 
     <table style="padding-top: 5mm;">
-        <col style="width: 40%; padding: 3mm;" />
-        <col style="width: 40%; padding: 3mm;" />
-        <col style="width: 20%; padding: 3mm;" />
+        <col style="width: 23%; padding: 3mm;" />
+        <col style="width: 65%; padding: 3mm;" />
+        <col style="width: 12%; padding: 3mm;" />
         <tr>
             <td style="border:solid 1px #dddddd;background:#f1f3f4;" >
                 <h3 style="color:#58585a;">{intl l="Ref"}</h3>
@@ -250,7 +249,7 @@
                 <h3 style="color:#58585a;">{intl l="product"}</h3>
             </td>
             <td style="border:solid 1px #dddddd;background-color:#f6993c;">
-                <h3 style="color:white;">{intl l="Quantity"}</h3>
+                <h3 style="color:white; text-align:center;">{intl l="Quantity"}</h3>
             </td>
         </tr>
         {loop type="order_product" name="order-products" order=$ID}
@@ -260,8 +259,13 @@
             </td>
             <td style="border:solid 1px #dddddd;">
                 <p>{$TITLE}</p>
+                    {ifloop rel="combinations"}
+                    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                        {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
+                    {/loop}
+                    {/ifloop}
             </td>
-            <td style="border:solid 1px #dddddd;">
+            <td style="border:solid 1px #dddddd; text-align:center;">
                 <p>{$QUANTITY}</p>
             </td>
         </tr>

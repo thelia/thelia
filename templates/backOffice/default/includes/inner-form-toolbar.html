@@ -17,7 +17,7 @@ Parameters:
     <div class="col-md-3 inner-actions">
     {if $hide_flags != true}
 		<ul class="nav nav-pills">
-		    {loop name="lang_list" type="lang"}
+		    {loop name="lang_list" type="lang" backend_context="1"}
 		    <li {if $ID == $edit_language_id}class="active"{/if}>
                 {if $current_tab}
                     {$lang_url = {url path={$page_url|default:$current_url nofilter} edit_language_id=$ID current_tab=$current_tab}}
@@ -38,7 +38,7 @@ Parameters:
         <div class="row">
             <div class="col-md-12">
                 <div class="button-group">
-                    {loop name="currency_list" type="currency"}
+                    {loop name="currency_list" type="currency" backend_context="1"}
                         <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path={$page_url|default:$current_url nofilter} edit_currency_id=$ID product_id=$product_id current_tab='prices'}" title="{intl l='Edit prices in %curr' curr={$NAME}}">
                             {$SYMBOL}
                         </a>

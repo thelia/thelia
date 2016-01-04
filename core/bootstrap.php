@@ -75,8 +75,14 @@ if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_M
     $sapi = php_sapi_name();
     if (substr($sapi, 0, 3) == 'cli') {
         define('THELIA_INSTALL_MODE', true);
-    } else {
+    } elseif (file_exists(THELIA_ROOT . DS . 'web' . DS . 'install')) {
         $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
         header('Location: '.$request->getUriForPath('/install'));
+    } else {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Thelia is not installed', true, 500);
+        die(sprintf(
+            "Thelia is not installed. <a href=\"%s\" target=\"_blank\">More information</a>\n",
+            "http://doc.thelia.net/en/documentation/installation/index.html#using-cli-tools"
+        ));
     }
 }

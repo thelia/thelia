@@ -12,8 +12,6 @@
 
 namespace Carousel\Controller;
 
-use Carousel\Form\CarouselImageForm;
-use Carousel\Form\CarouselUpdateForm;
 use Carousel\Model\Carousel;
 use Carousel\Model\CarouselQuery;
 use Symfony\Component\Form\Form;
@@ -112,8 +110,6 @@ class ConfigurationController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::UPDATE)) {
             return $response;
         }
-
-        $request = $this->getRequest();
 
         $form = $this->createForm('carousel.update');
 

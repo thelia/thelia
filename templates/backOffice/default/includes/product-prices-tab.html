@@ -86,7 +86,6 @@
 			                        {/loop}
 			                    </select>
 			                </div>
-
 			            </div>
 			        {/form_field}
 			    </div>
@@ -375,12 +374,6 @@
                                     {form_field field='product_sale_element_id' value_key=$idx}
                                         <input type="hidden" name="{$name}" value="{$value}" />
                                         {$current_pse_id = $value}
-
-                                        {capture assign="combination_label"}
-                                            {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
-                                            {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
-                                            {/loop}
-                                        {/capture}
                                     {/form_field}
 
                                     <div class="btn-group">
@@ -399,8 +392,13 @@
 
                                     <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$current_pse_id}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
 
-                                    {$combination_label}
-                                </td>
+									{assign var='combination_list' value=array()}
+									{loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
+										{$combination_list[$ATTRIBUTE_TITLE][] = $ATTRIBUTE_AVAILABILITY_TITLE}
+									{/loop}
+
+									{format_array_2d values=$combination_list}
+								</td>
 
                                 <td class="text-right">ID: {$current_pse_id}</td>
                             </tr>
@@ -703,14 +701,22 @@
 		<div class="col-md-6">
          {form_field field='price'}
              <div class="form-group {if $error}has-error{/if}">
-                 <label for="price_without_tax" class="control-label">{$label} : </label>
+                 <label for="price-without-tax-modal" class="control-label">{$label} : </label>
 
-                    <div class="input-group">
-                        <input type="text" id="price_without_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{if $value}{$value}{else}{$PRICE}{/if}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
-                        <span class="input-group-addon">{$currency_symbol}</span>
-                    </div>
+                 <div class="input-group">
+                     <input type="text" id="price-without-tax-modal" data-price-type="price-without-tax-modal" data-rel-price="price-with-tax-modal" name="{$name}" class="price_field automatic_price_field form-control" value="{if $value}{$value}{else}{$PRICE}{/if}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
+                     <span class="input-group-addon">{$currency_symbol}</span>
+                 </div>
              </div>
          {/form_field}
+
+         <div class="form-group">
+              <label for="price-with-tax-modal" class="control-label">{intl l="Product price including taxes"} : </label>
+              <div class="input-group">
+                  <input type="text" id="price-with-tax-modal" data-price-type="price-with-tax-modal" data-rel-price="price-without-tax-modal" class="price_field automatic_price_field form-control" value="{if $value}{$value}{else}{$PRICE}{/if}" title="{intl l='Product price including taxes'}" placeholder="{intl l='Price incl. taxes'}">
+                  <span class="input-group-addon">{$currency_symbol}</span>
+              </div>
+         </div>
 
          {form_field field='reference'}
             <div class="form-group {if $error}has-error{/if}">
@@ -725,7 +731,6 @@
          {form_field field='ean_code'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
                 <div class="form-group">
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{if $value}{$value}{else}{$EAN_CODE}{/if}" title="{$label}" placeholder="{intl l='Combination EAN Code'}">
                 </div>
