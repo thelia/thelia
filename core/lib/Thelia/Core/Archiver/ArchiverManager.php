@@ -122,14 +122,13 @@ class ArchiverManager
      *
      * @return $this Return $this, allow chaining
      */
-    public function setArchivers(array $archivers = [])
+    public function setArchivers(array $archivers)
     {
         $this->archivers = [];
 
         foreach ($archivers as $archiver) {
             if (!($archiver instanceof ArchiverInterface)) {
-                // Todo
-                throw new \Exception('TODO: ' . __FILE__ . ' ' . __LINE__);
+                throw new \Exception('ArchiverManager manage only ' . __NAMESPACE__ . '\\ArchiverInterface');
             }
 
             $this->archivers[$archiver->getId()] = $archiver;

@@ -98,14 +98,13 @@ class SerializerManager
      *
      * @return $this Return $this, allow chaining
      */
-    public function setSerializers(array $serializers = [])
+    public function setSerializers(array $serializers)
     {
         $this->serializers = [];
 
         foreach ($serializers as $serializer) {
             if (!($serializer instanceof SerializerInterface)) {
-                // Todo
-                throw new \Exception('TODO: ' . __FILE__ . ' ' . __LINE__);
+                throw new \Exception('SerializerManager manage only ' . __NAMESPACE__ . '\\SerializerInterface');
             }
 
             $this->serializers[$serializer->getId()] = $serializer;
