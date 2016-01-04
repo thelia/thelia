@@ -290,6 +290,7 @@ class OrderExport extends AbstractExport
         ;
         $order->setNew(false);
 
+        $tax = 0;
         $data['order_TOTAL_TTC'] = $order->getTotalAmount($tax, false, false);
         $data['order_TOTAL_WITH_DISCOUNT'] = $order->getTotalAmount($tax, false, true);
         $data['order_TOTAL_WITH_DISCOUNT_AND_POSTAGE'] = $order->getTotalAmount($tax, true, true);

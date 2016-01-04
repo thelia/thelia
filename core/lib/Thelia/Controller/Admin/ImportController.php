@@ -176,7 +176,7 @@ class ImportController extends BaseAdminController
      *
      * @param integer $id An import identifier
      *
-     * @return Response
+     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function importAction($id)
     {
