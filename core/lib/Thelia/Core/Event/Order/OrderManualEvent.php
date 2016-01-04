@@ -12,11 +12,11 @@
 
 namespace Thelia\Core\Event\Order;
 
-use Thelia\Model\Order;
-use Thelia\Model\Currency;
-use Thelia\Model\Lang;
 use Thelia\Model\Cart;
+use Thelia\Model\Currency;
 use Thelia\Model\Customer;
+use Thelia\Model\Lang;
+use Thelia\Model\Order;
 
 class OrderManualEvent extends OrderEvent
 {
@@ -24,6 +24,7 @@ class OrderManualEvent extends OrderEvent
     protected $lang = null;
     protected $cart = null;
     protected $customer = null;
+    protected $useOrderDefinedAddresses = false;
 
     /**
      * @param \Thelia\Model\Order    $order
@@ -34,8 +35,9 @@ class OrderManualEvent extends OrderEvent
      */
     public function __construct(Order $order, Currency $currency, Lang $lang, Cart $cart, Customer $customer)
     {
+        parent::__construct($order);
+
         $this
-            ->setOrder($order)
             ->setCurrency($currency)
             ->setLang($lang)
             ->setCart($cart)
@@ -43,189 +45,15 @@ class OrderManualEvent extends OrderEvent
         ;
     }
 
-    /**
-     * @param Order $order
-     */
-    public function setOrder(Order $order)
-    {
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * @param Order $order
-     */
-    public function setPlacedOrder(Order $order)
-    {
-        $this->placedOrder = $order;
-
-        return $this;
-    }
-
-    /**
-     * @param $address
-     */
-    public function setInvoiceAddress($address)
-    {
-        $this->invoiceAddress = $address;
-
-        return $this;
-    }
-
-    /**
-     * @param $address
-     */
-    public function setDeliveryAddress($address)
-    {
-        $this->deliveryAddress = $address;
-
-        return $this;
-    }
-
-    /**
-     * @param $module
-     */
-    public function setDeliveryModule($module)
-    {
-        $this->deliveryModule = $module;
-
-        return $this;
-    }
-
-    /**
-     * @param $module
-     */
-    public function setPaymentModule($module)
-    {
-        $this->paymentModule = $module;
-
-        return $this;
-    }
-
-    /**
-     * @param $postage
-     */
-    public function setPostage($postage)
-    {
-        $this->postage = $postage;
-
-        return $this;
-    }
-
-    /**
-     * @param $ref
-     */
-    public function setRef($ref)
-    {
-        $this->ref = $ref;
-
-        return $this;
-    }
-
-    /**
-     * @param $status
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    /**
-     * @param $deliveryRef
-     */
-    public function setDeliveryRef($deliveryRef)
-    {
-        $this->deliveryRef = $deliveryRef;
-    }
-
-    /**
-     * @return null|Order
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
-     * @return null|Order
-     */
-    public function getPlacedOrder()
-    {
-        return $this->placedOrder;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getInvoiceAddress()
-    {
-        return $this->invoiceAddress;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getDeliveryAddress()
-    {
-        return $this->deliveryAddress;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getDeliveryModule()
-    {
-        return $this->deliveryModule;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getPaymentModule()
-    {
-        return $this->paymentModule;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getPostage()
-    {
-        return $this->postage;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getRef()
-    {
-        return $this->ref;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getDeliveryRef()
-    {
-        return $this->deliveryRef;
-    }
-
     public function getCurrency()
     {
         return $this->currency;
     }
 
+    /**
+     * @param Currency $currency
+     * @return $this
+     */
     public function setCurrency($currency)
     {
         $this->currency = $currency;
@@ -233,11 +61,18 @@ class OrderManualEvent extends OrderEvent
         return $this;
     }
 
+    /**
+     * @return Lang
+     */
     public function getLang()
     {
         return $this->lang;
     }
 
+    /**
+     * @param Lang $lang
+     * @return $this
+     */
     public function setLang($lang)
     {
         $this->lang = $lang;
@@ -245,11 +80,18 @@ class OrderManualEvent extends OrderEvent
         return $this;
     }
 
+    /**
+     * @return Cart
+     */
     public function getCart()
     {
         return $this->cart;
     }
 
+    /**
+     * @param Cart $cart
+     * @return $this
+     */
     public function setCart($cart)
     {
         $this->cart = $cart;
@@ -257,15 +99,43 @@ class OrderManualEvent extends OrderEvent
         return $this;
     }
 
+    /**
+     * @return Customer
+     */
     public function getCustomer()
     {
         return $this->customer;
     }
 
+    /**
+     * @param Customer $customer
+     * @return $this
+     */
     public function setCustomer($customer)
     {
         $this->customer = $customer;
 
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getUseOrderDefinedAddresses()
+    {
+        return $this->useOrderDefinedAddresses;
+    }
+
+    /**
+     * If true, the order will be created using the delivery and invoice addresses defined in $this->order instead of
+     * creating new OrderAdresses using the Order::getChoosenXXXAddress().
+     *
+     * @param boolean $useOrderDefinedAddresses
+     * @return $this
+     */
+    public function setUseOrderDefinedAddresses($useOrderDefinedAddresses)
+    {
+        $this->useOrderDefinedAddresses = $useOrderDefinedAddresses;
         return $this;
     }
 }

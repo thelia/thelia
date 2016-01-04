@@ -15,13 +15,15 @@ class Order extends BaseOrder
 {
     use ModelEventDispatcherTrait;
 
+    /** @var int|null  */
     protected $choosenDeliveryAddress = null;
+    /** @var int|null  */
     protected $choosenInvoiceAddress = null;
 
     protected $disableVersioning = false;
 
     /**
-     * @param Address $choosenDeliveryAddress
+     * @param int $choosenDeliveryAddress the choosen delivery address ID
      * @return $this
      */
     public function setChoosenDeliveryAddress($choosenDeliveryAddress)
@@ -57,7 +59,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return Address
+     * @return int|null the choosen delivery address ID
      */
     public function getChoosenDeliveryAddress()
     {
@@ -65,7 +67,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param Address $choosenInvoiceAddress
+     * @param int  $choosenInvoiceAddress the choosen invoice address
      * @return $this
      */
     public function setChoosenInvoiceAddress($choosenInvoiceAddress)
@@ -76,7 +78,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return Address
+     * @return int|null the choosen invoice address ID
      */
     public function getChoosenInvoiceAddress()
     {

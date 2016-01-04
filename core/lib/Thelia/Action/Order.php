@@ -33,9 +33,10 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\ModuleQuery;
-use Thelia\Model\Order as OrderModel;
 use Thelia\Model\Order as ModelOrder;
+use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderProductTax;
@@ -153,6 +154,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param CartModel $cart
      * @param UserInterface $customer
      * @param bool $manageStock decrement stock when order is created if true
+     * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
      * @return ModelOrder
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -164,7 +166,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         LangModel $lang,
         CartModel $cart,
         UserInterface $customer,
-        $manageStock
+        $manageStock,
+        $useOrderDefinedAddresses = false
     ) {
         $con = Propel::getConnection(
             OrderTableMap::DATABASE_NAME
@@ -173,11 +176,18 @@ class Order extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         $placedOrder = $sessionOrder->copy();
+
+        // Be sure to create a brand new order, as copy raises the modified flag for all fields
+        // and will also copy order reference and id.
+        $placedOrder->setId(null)->setRef(null)->setNew(true);
+
+        // Dates should be marked as not updated so that Propel will update them.
+        $placedOrder->resetModified(OrderTableMap::CREATED_AT);
+        $placedOrder->resetModified(OrderTableMap::UPDATED_AT);
+        $placedOrder->resetModified(OrderTableMap::VERSION_CREATED_AT);
+
         $placedOrder->setDispatcher($dispatcher);
 
-        $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenDeliveryAddress());
-        $taxCountry = $deliveryAddress->getCountry();
-        $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenInvoiceAddress());
         $cartItems = $cart->getCartItems();
 
         /* fulfill order */
@@ -185,46 +195,57 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder->setCurrencyId($currency->getId());
         $placedOrder->setCurrencyRate($currency->getRate());
         $placedOrder->setLangId($lang->getId());
+        
+        if ($useOrderDefinedAddresses) {
+            $taxCountry =
+                OrderAddressQuery::create()
+                    ->findPk($placedOrder->getDeliveryOrderAddressId())
+                    ->getCountry()
+            ;
+        } else {
+            $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenDeliveryAddress());
+            $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->getChoosenInvoiceAddress());
 
-        /* hard save the delivery and invoice addresses */
-        $deliveryOrderAddress = new OrderAddress();
-        $deliveryOrderAddress
-            ->setCustomerTitleId($deliveryAddress->getTitleId())
-            ->setCompany($deliveryAddress->getCompany())
-            ->setFirstname($deliveryAddress->getFirstname())
-            ->setLastname($deliveryAddress->getLastname())
-            ->setAddress1($deliveryAddress->getAddress1())
-            ->setAddress2($deliveryAddress->getAddress2())
-            ->setAddress3($deliveryAddress->getAddress3())
-            ->setZipcode($deliveryAddress->getZipcode())
-            ->setCity($deliveryAddress->getCity())
-            ->setPhone($deliveryAddress->getPhone())
-            ->setCellphone($deliveryAddress->getCellphone())
-            ->setCountryId($deliveryAddress->getCountryId())
-            ->setStateId($deliveryAddress->getStateId())
-            ->save($con)
-        ;
+            /* hard save the delivery and invoice addresses */
+            $deliveryOrderAddress = new OrderAddress();
+            $deliveryOrderAddress
+                ->setCustomerTitleId($deliveryAddress->getTitleId())
+                ->setCompany($deliveryAddress->getCompany())
+                ->setFirstname($deliveryAddress->getFirstname())
+                ->setLastname($deliveryAddress->getLastname())
+                ->setAddress1($deliveryAddress->getAddress1())
+                ->setAddress2($deliveryAddress->getAddress2())
+                ->setAddress3($deliveryAddress->getAddress3())
+                ->setZipcode($deliveryAddress->getZipcode())
+                ->setCity($deliveryAddress->getCity())
+                ->setPhone($deliveryAddress->getPhone())
+                ->setCellphone($deliveryAddress->getCellphone())
+                ->setCountryId($deliveryAddress->getCountryId())
+                ->setStateId($deliveryAddress->getStateId())
+                ->save($con);
 
-        $invoiceOrderAddress = new OrderAddress();
-        $invoiceOrderAddress
-            ->setCustomerTitleId($invoiceAddress->getTitleId())
-            ->setCompany($invoiceAddress->getCompany())
-            ->setFirstname($invoiceAddress->getFirstname())
-            ->setLastname($invoiceAddress->getLastname())
-            ->setAddress1($invoiceAddress->getAddress1())
-            ->setAddress2($invoiceAddress->getAddress2())
-            ->setAddress3($invoiceAddress->getAddress3())
-            ->setZipcode($invoiceAddress->getZipcode())
-            ->setCity($invoiceAddress->getCity())
-            ->setPhone($invoiceAddress->getPhone())
-            ->setCellphone($invoiceAddress->getCellphone())
-            ->setCountryId($invoiceAddress->getCountryId())
-            ->setStateId($deliveryAddress->getStateId())
-            ->save($con)
-        ;
+            $invoiceOrderAddress = new OrderAddress();
+            $invoiceOrderAddress
+                ->setCustomerTitleId($invoiceAddress->getTitleId())
+                ->setCompany($invoiceAddress->getCompany())
+                ->setFirstname($invoiceAddress->getFirstname())
+                ->setLastname($invoiceAddress->getLastname())
+                ->setAddress1($invoiceAddress->getAddress1())
+                ->setAddress2($invoiceAddress->getAddress2())
+                ->setAddress3($invoiceAddress->getAddress3())
+                ->setZipcode($invoiceAddress->getZipcode())
+                ->setCity($invoiceAddress->getCity())
+                ->setPhone($invoiceAddress->getPhone())
+                ->setCellphone($invoiceAddress->getCellphone())
+                ->setCountryId($invoiceAddress->getCountryId())
+                ->setStateId($deliveryAddress->getStateId())
+                ->save($con);
 
-        $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
-        $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
+            $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
+            $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
+
+            $taxCountry = $deliveryAddress->getCountry();
+        }
 
         $placedOrder->setStatusId(
             OrderStatusQuery::getNotPaidStatus()->getId()
@@ -361,6 +382,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
+     * @param OrderManualEvent $event
      */
     public function createManual(OrderManualEvent $event)
     {
@@ -377,7 +399,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getLang(),
                 $event->getCart(),
                 $event->getCustomer(),
-                $paymentModuleInstance->manageStockOnCreation()
+                $paymentModuleInstance->manageStockOnCreation(),
+                $event->getUseOrderDefinedAddresses()
             )
         );
 
@@ -502,9 +525,8 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param  ModelOrder                               $order
-     * @param $newStatus
-     * @param $canceledStatus
+     * @param ModelOrder $order
+     * @param $newStatus $newStatus the new status ID
      * @throws \Thelia\Exception\TheliaProcessException
      */
     public function updateQuantity(ModelOrder $order, $newStatus)
