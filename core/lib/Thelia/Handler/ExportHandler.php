@@ -75,6 +75,34 @@ class ExportHandler
     }
 
     /**
+     * Get export model based on given reference
+     *
+     * @param string  $exportRef          An export reference
+     * @param boolean $dispatchException  Dispatch exception if model doesn't exist
+     *
+     * @throws \ErrorException
+     *
+     * @return null|\Thelia\Model\Export
+     */
+    public function getExportByRef($exportRef, $dispatchException = false)
+    {
+        $export = (new ExportQuery)->findOneByRef($exportRef);
+
+        if ($export === null && $dispatchException) {
+            throw new \ErrorException(
+                Translator::getInstance()->trans(
+                    'There is no ref "%ref" in the exports',
+                    [
+                        '%ref' => $exportRef
+                    ]
+                )
+            );
+        }
+
+        return $export;
+    }
+
+    /**
      * Get export category model based on given identifier
      *
      * @param integer $exportCategoryId  An export category identifier

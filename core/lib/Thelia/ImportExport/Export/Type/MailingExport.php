@@ -24,10 +24,10 @@ class MailingExport extends AbstractExport
     const FILE_NAME = 'mailing';
 
     protected $orderAndAliases = [
-        'Id' => 'Identifier',
-        'Email' => 'Email',
-        'Fistname' => 'FirstName',
-        'Lastname' => 'LastName'
+        'newsletter.ID' => 'Identifier',
+        'newsletter.EMAIL' => 'Email',
+        'newsletter.FISTNAME' => 'FirstName',
+        'newsletter.LASTNAME' => 'LastName'
     ];
 
     protected function getData()

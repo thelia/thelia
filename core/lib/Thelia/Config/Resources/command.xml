@@ -24,6 +24,7 @@
         <command class="Thelia\Command\SaleCheckActivationCommand"/>
         <command class="Thelia\Command\GenerateSQLCommand"/>
         <command class="Thelia\Command\HookCleanCommand"/>
+        <command class="Thelia\Command\ExportCommand"/>
     </commands>
 
 </config>
