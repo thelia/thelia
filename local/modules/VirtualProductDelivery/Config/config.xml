@@ -5,17 +5,17 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <services>
-        <service id="virtualproductdelivery.events" class="VirtualProductDelivery\EventListeners\VirtualProductEvents" scope="request">
+        <service id="virtualproductdelivery.events" class="VirtualProductDelivery\EventListeners\VirtualProductEvents">
             <tag name="kernel.event_subscriber"/>
         </service>
-        <service id="virtualproductdelivery.mail" class="VirtualProductDelivery\EventListeners\SendMail" scope="request">
+        <service id="virtualproductdelivery.mail" class="VirtualProductDelivery\EventListeners\SendMail">
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>
 
     <hooks>
-        <hook id="virtualproductdelivery.hook" class="VirtualProductDelivery\Hook\HookManager" scope="request">
+        <hook id="virtualproductdelivery.hook" class="VirtualProductDelivery\Hook\HookManager">
             <tag name="hook.event_listener" event="order-invoice.delivery-address" type="front" templates="render:delivery-address.html" />
             <tag name="hook.event_listener" event="account-order.after-products" type="front"/>
             <tag name="hook.event_listener" event="delivery.delivery-address" type="pdf" templates="render:delivery-address.html" />

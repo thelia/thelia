@@ -66,6 +66,8 @@ class XmlFileLoader extends FileLoader
         $xml = $this->parseFile($path);
         $xml->registerXPathNamespace('config', 'http://thelia.net/schema/dic/config');
 
+        $this->removeScope($xml);
+
         $this->container->addResource(new FileResource($path));
 
         $this->parseLoops($xml);
@@ -276,10 +278,6 @@ class XmlFileLoader extends FileLoader
 
     protected function parseHook($id, $hook, $file, $type)
     {
-        if (!array_key_exists('scope', $hook)) {
-            $hook['scope'] = 'request';
-        }
-
         if (! isset($hook['class'])) {
             $hook['class'] = self::DEFAULT_HOOK_CLASS;
         }
@@ -783,5 +781,15 @@ EOF
     public function getAttributeAsPhp(SimpleXMLElement $xml, $name)
     {
         return XmlUtils::phpize($xml[$name]);
+    }
+
+    private function removeScope(SimpleXMLElement $xml)
+    {
+        $nodes = $xml->xpath('//*[@scope]');
+
+        /** @var \DOMElement $node */
+        foreach ($nodes as $node) {
+            unset($node['scope']);
+        }
     }
 }

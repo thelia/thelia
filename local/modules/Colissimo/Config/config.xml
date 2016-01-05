@@ -17,7 +17,7 @@
     </forms>
 
     <services>
-        <service id="send.colissimo.mail" class="Colissimo\Listener\SendMail" scope="request">
+        <service id="send.colissimo.mail" class="Colissimo\Listener\SendMail">
             <argument type="service" id="thelia.parser" />
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>

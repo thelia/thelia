@@ -30,7 +30,7 @@
 
     <!--
     <hooks>
-        <hook id="%%NAMESPACE_LOWER%%.hook" class="%%NAMESPACE%%\Hook\MySuperHook" scope="request">
+        <hook id="%%NAMESPACE_LOWER%%.hook" class="%%NAMESPACE%%\Hook\MySuperHook">
             <tag name="hook.event_listener" event="main.body.bottom" type="front|back|pdf|email" method="onMainBodyBottom" />
         </hook>
     </hooks>

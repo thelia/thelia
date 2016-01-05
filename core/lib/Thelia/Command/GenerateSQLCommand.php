@@ -100,7 +100,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         $container->set("request", new Request());
         $container->get("request")->setSession(new Session(new MockArraySessionStorage()));
-        $container->enterScope("request");
 
         $this->translator = $container->get('thelia.translator');
         $this->parser = $container->get('thelia.parser');
