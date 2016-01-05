@@ -137,8 +137,8 @@ class CouponCustomerCountTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
-        $this->addForeignKey('COUPON_ID', 'CouponId', 'INTEGER', 'coupon', 'ID', true, null, null);
-        $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('COUPON_ID', 'CouponId', 'INTEGER' , 'coupon', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('CUSTOMER_ID', 'CustomerId', 'INTEGER' , 'customer', 'ID', true, null, null);
         $this->addColumn('COUNT', 'Count', 'INTEGER', true, null, 0);
     } // initialize()
 
@@ -150,6 +150,59 @@ class CouponCustomerCountTableMap extends TableMap
         $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('coupon_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
+
+    /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\CouponCustomerCount $obj A \Thelia\Model\CouponCustomerCount object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getCouponId(), (string) $obj->getCustomerId()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\CouponCustomerCount object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\CouponCustomerCount) {
+                $key = serialize(array((string) $value->getCouponId(), (string) $value->getCustomerId()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\CouponCustomerCount object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -164,7 +217,12 @@ class CouponCustomerCountTableMap extends TableMap
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return null;
+        // If the PK cannot be derived from the row, return NULL.
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('CouponId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+            return null;
+        }
+
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('CouponId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -182,7 +240,7 @@ class CouponCustomerCountTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return '';
+            return $pks;
     }
 
     /**
@@ -334,8 +392,8 @@ class CouponCustomerCountTableMap extends TableMap
             // rename for clarity
             $criteria = $values;
         } elseif ($values instanceof \Thelia\Model\CouponCustomerCount) { // it's a model object
-            // create criteria based on pk value
-            $criteria = $values->buildCriteria();
+            // create criteria based on pk values
+            $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CouponCustomerCountTableMap::DATABASE_NAME);
             // primary key is composite; we therefore, expect
@@ -345,6 +403,8 @@ class CouponCustomerCountTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(CouponCustomerCountTableMap::COUPON_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CouponCustomerCountTableMap::CUSTOMER_ID, $value[1]));
                 $criteria->addOr($criterion);
             }
         }

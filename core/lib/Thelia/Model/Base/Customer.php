@@ -3484,7 +3484,10 @@ abstract class Customer implements ActiveRecordInterface
         $couponCustomerCountsToDelete = $this->getCouponCustomerCounts(new Criteria(), $con)->diff($couponCustomerCounts);
 
 
-        $this->couponCustomerCountsScheduledForDeletion = $couponCustomerCountsToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->couponCustomerCountsScheduledForDeletion = clone $couponCustomerCountsToDelete;
 
         foreach ($couponCustomerCountsToDelete as $couponCustomerCountRemoved) {
             $couponCustomerCountRemoved->setCustomer(null);

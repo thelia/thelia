@@ -1847,6 +1847,7 @@ CREATE TABLE `coupon_customer_count`
     `coupon_id` INTEGER NOT NULL,
     `customer_id` INTEGER NOT NULL,
     `count` INTEGER DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`coupon_id`,`customer_id`),
     INDEX `fk_coupon_customer_customer_id_idx` (`customer_id`),
     INDEX `fk_coupon_customer_coupon_id_idx` (`coupon_id`),
     CONSTRAINT `fk_coupon_customer_customer_id`
@@ -2329,6 +2330,7 @@ CREATE TABLE `ignored_module_hook`
     `classname` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    PRIMARY KEY (`module_id`,`hook_id`),
     INDEX `fk_deleted_module_hook_module_id_idx` (`module_id`),
     INDEX `fk_deleted_module_hook_hook_id_idx` (`hook_id`),
     CONSTRAINT `fk_deleted_module_hook_module_id`

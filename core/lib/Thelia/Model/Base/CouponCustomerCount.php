@@ -872,10 +872,10 @@ abstract class CouponCustomerCount implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['CouponCustomerCount'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CouponCustomerCount'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CouponCustomerCount'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['CouponCustomerCount'][serialize($this->getPrimaryKey())] = true;
         $keys = CouponCustomerCountTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getCouponId(),
@@ -993,32 +993,36 @@ abstract class CouponCustomerCount implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(CouponCustomerCountTableMap::DATABASE_NAME);
+        $criteria->add(CouponCustomerCountTableMap::COUPON_ID, $this->coupon_id);
+        $criteria->add(CouponCustomerCountTableMap::CUSTOMER_ID, $this->customer_id);
 
         return $criteria;
     }
 
     /**
-     * Returns NULL since this table doesn't have a primary key.
-     * This method exists only for BC and is deprecated!
-     * @return null
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return null;
+        $pks = array();
+        $pks[0] = $this->getCouponId();
+        $pks[1] = $this->getCustomerId();
+
+        return $pks;
     }
 
     /**
-     * Dummy primary key setter.
+     * Set the [composite] primary key.
      *
-     * This function only exists to preserve backwards compatibility.  It is no longer
-     * needed or required by the Persistent interface.  It will be removed in next BC-breaking
-     * release of Propel.
-     *
-     * @deprecated
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @return void
      */
-    public function setPrimaryKey($pk)
+    public function setPrimaryKey($keys)
     {
-        // do nothing, because this object doesn't have any primary keys
+        $this->setCouponId($keys[0]);
+        $this->setCustomerId($keys[1]);
     }
 
     /**
@@ -1028,7 +1032,7 @@ abstract class CouponCustomerCount implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return ;
+        return (null === $this->getCouponId()) && (null === $this->getCustomerId());
     }
 
     /**

@@ -1494,8 +1494,8 @@
     </index>
   </table>
   <table isCrossRef="true" name="coupon_customer_count" namespace="Thelia\Model">
-    <column name="coupon_id" required="true" type="INTEGER" />
-    <column name="customer_id" required="true" type="INTEGER" />
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="customer_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="count" required="true" type="INTEGER" />
     <foreign-key foreignTable="customer" name="fk_coupon_customer_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
@@ -1879,8 +1879,8 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="ignored_module_hook" namespace="Thelia\Model">
-    <column name="module_id" required="true" type="INTEGER" />
-    <column name="hook_id" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="hook_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="method" size="255" type="VARCHAR" />
     <column name="classname" size="255" type="VARCHAR" />
     <foreign-key foreignTable="module" name="fk_deleted_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">

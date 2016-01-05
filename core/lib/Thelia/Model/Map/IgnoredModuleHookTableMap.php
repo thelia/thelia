@@ -152,8 +152,8 @@ class IgnoredModuleHookTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
-        $this->addForeignKey('MODULE_ID', 'ModuleId', 'INTEGER', 'module', 'ID', true, null, null);
-        $this->addForeignKey('HOOK_ID', 'HookId', 'INTEGER', 'hook', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('MODULE_ID', 'ModuleId', 'INTEGER' , 'module', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('HOOK_ID', 'HookId', 'INTEGER' , 'hook', 'ID', true, null, null);
         $this->addColumn('METHOD', 'Method', 'VARCHAR', false, 255, null);
         $this->addColumn('CLASSNAME', 'Classname', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
@@ -183,6 +183,59 @@ class IgnoredModuleHookTableMap extends TableMap
     } // getBehaviors()
 
     /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\IgnoredModuleHook $obj A \Thelia\Model\IgnoredModuleHook object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getModuleId(), (string) $obj->getHookId()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\IgnoredModuleHook object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\IgnoredModuleHook) {
+                $key = serialize(array((string) $value->getModuleId(), (string) $value->getHookId()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\IgnoredModuleHook object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
+
+    /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
      *
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
@@ -195,7 +248,12 @@ class IgnoredModuleHookTableMap extends TableMap
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return null;
+        // If the PK cannot be derived from the row, return NULL.
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('HookId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+            return null;
+        }
+
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('HookId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -213,7 +271,7 @@ class IgnoredModuleHookTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return '';
+            return $pks;
     }
 
     /**
@@ -371,8 +429,8 @@ class IgnoredModuleHookTableMap extends TableMap
             // rename for clarity
             $criteria = $values;
         } elseif ($values instanceof \Thelia\Model\IgnoredModuleHook) { // it's a model object
-            // create criteria based on pk value
-            $criteria = $values->buildCriteria();
+            // create criteria based on pk values
+            $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(IgnoredModuleHookTableMap::DATABASE_NAME);
             // primary key is composite; we therefore, expect
@@ -382,6 +440,8 @@ class IgnoredModuleHookTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(IgnoredModuleHookTableMap::MODULE_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(IgnoredModuleHookTableMap::HOOK_ID, $value[1]));
                 $criteria->addOr($criterion);
             }
         }
