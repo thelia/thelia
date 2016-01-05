@@ -1042,10 +1042,10 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['IgnoredModuleHook'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['IgnoredModuleHook'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['IgnoredModuleHook'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['IgnoredModuleHook'][serialize($this->getPrimaryKey())] = true;
         $keys = IgnoredModuleHookTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getModuleId(),
@@ -1181,32 +1181,36 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(IgnoredModuleHookTableMap::DATABASE_NAME);
+        $criteria->add(IgnoredModuleHookTableMap::MODULE_ID, $this->module_id);
+        $criteria->add(IgnoredModuleHookTableMap::HOOK_ID, $this->hook_id);
 
         return $criteria;
     }
 
     /**
-     * Returns NULL since this table doesn't have a primary key.
-     * This method exists only for BC and is deprecated!
-     * @return null
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return null;
+        $pks = array();
+        $pks[0] = $this->getModuleId();
+        $pks[1] = $this->getHookId();
+
+        return $pks;
     }
 
     /**
-     * Dummy primary key setter.
+     * Set the [composite] primary key.
      *
-     * This function only exists to preserve backwards compatibility.  It is no longer
-     * needed or required by the Persistent interface.  It will be removed in next BC-breaking
-     * release of Propel.
-     *
-     * @deprecated
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @return void
      */
-    public function setPrimaryKey($pk)
+    public function setPrimaryKey($keys)
     {
-        // do nothing, because this object doesn't have any primary keys
+        $this->setModuleId($keys[0]);
+        $this->setHookId($keys[1]);
     }
 
     /**
@@ -1216,7 +1220,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return ;
+        return (null === $this->getModuleId()) && (null === $this->getHookId());
     }
 
     /**

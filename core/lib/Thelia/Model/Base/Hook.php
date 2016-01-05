@@ -2051,7 +2051,10 @@ abstract class Hook implements ActiveRecordInterface
         $ignoredModuleHooksToDelete = $this->getIgnoredModuleHooks(new Criteria(), $con)->diff($ignoredModuleHooks);
 
 
-        $this->ignoredModuleHooksScheduledForDeletion = $ignoredModuleHooksToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->ignoredModuleHooksScheduledForDeletion = clone $ignoredModuleHooksToDelete;
 
         foreach ($ignoredModuleHooksToDelete as $ignoredModuleHookRemoved) {
             $ignoredModuleHookRemoved->setHook(null);

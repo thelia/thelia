@@ -3,6 +3,7 @@
 namespace Thelia\Model\Base;
 
 use \Exception;
+use \PDO;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -97,17 +98,85 @@ abstract class CouponCustomerCountQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array[$coupon_id, $customer_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildCouponCustomerCount|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
-        throw new \LogicException('The ChildCouponCustomerCount class has no primary key');
+        if ($key === null) {
+            return null;
+        }
+        if ((null !== ($obj = CouponCustomerCountTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
+            // the object is already in the instance pool
+            return $obj;
+        }
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(CouponCustomerCountTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
+    }
+
+    /**
+     * Find object by primary key using raw SQL to go fast.
+     * Bypass doSelect() and the object formatter by using generated code.
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
+     *
+     * @return   ChildCouponCustomerCount A model object, or null if the key is not found
+     */
+    protected function findPkSimple($key, $con)
+    {
+        $sql = 'SELECT `COUPON_ID`, `CUSTOMER_ID`, `COUNT` FROM `coupon_customer_count` WHERE `COUPON_ID` = :p0 AND `CUSTOMER_ID` = :p1';
+        try {
+            $stmt = $con->prepare($sql);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (Exception $e) {
+            Propel::log($e->getMessage(), Propel::LOG_ERR);
+            throw new PropelException(sprintf('Unable to execute SELECT statement [%s]', $sql), 0, $e);
+        }
+        $obj = null;
+        if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
+            $obj = new ChildCouponCustomerCount();
+            $obj->hydrate($row);
+            CouponCustomerCountTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
+        }
+        $stmt->closeCursor();
+
+        return $obj;
+    }
+
+    /**
+     * Find object by primary key.
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     ConnectionInterface $con A connection object
+     *
+     * @return ChildCouponCustomerCount|array|mixed the result, formatted by the current formatter
+     */
+    protected function findPkComplex($key, $con)
+    {
+        // As the query uses a PK condition, no limit(1) is necessary.
+        $criteria = $this->isKeepQuery() ? clone $this : $this;
+        $dataFetcher = $criteria
+            ->filterByPrimaryKey($key)
+            ->doSelect($con);
+
+        return $criteria->getFormatter()->init($criteria)->formatOne($dataFetcher);
     }
 
     /**
@@ -122,7 +191,16 @@ abstract class CouponCustomerCountQuery extends ModelCriteria
      */
     public function findPks($keys, $con = null)
     {
-        throw new \LogicException('The ChildCouponCustomerCount class has no primary key');
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getReadConnection($this->getDbName());
+        }
+        $this->basePreSelect($con);
+        $criteria = $this->isKeepQuery() ? clone $this : $this;
+        $dataFetcher = $criteria
+            ->filterByPrimaryKeys($keys)
+            ->doSelect($con);
+
+        return $criteria->getFormatter()->init($criteria)->format($dataFetcher);
     }
 
     /**
@@ -134,7 +212,10 @@ abstract class CouponCustomerCountQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        throw new \LogicException('The ChildCouponCustomerCount class has no primary key');
+        $this->addUsingAlias(CouponCustomerCountTableMap::COUPON_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(CouponCustomerCountTableMap::CUSTOMER_ID, $key[1], Criteria::EQUAL);
+
+        return $this;
     }
 
     /**
@@ -146,7 +227,17 @@ abstract class CouponCustomerCountQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-        throw new \LogicException('The ChildCouponCustomerCount class has no primary key');
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(CouponCustomerCountTableMap::COUPON_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(CouponCustomerCountTableMap::CUSTOMER_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
+        }
+
+        return $this;
     }
 
     /**
@@ -436,8 +527,9 @@ abstract class CouponCustomerCountQuery extends ModelCriteria
     public function prune($couponCustomerCount = null)
     {
         if ($couponCustomerCount) {
-            throw new \LogicException('ChildCouponCustomerCount class has no primary key');
-
+            $this->addCond('pruneCond0', $this->getAliasedColName(CouponCustomerCountTableMap::COUPON_ID), $couponCustomerCount->getCouponId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(CouponCustomerCountTableMap::CUSTOMER_ID), $couponCustomerCount->getCustomerId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

@@ -2003,4 +2003,8 @@ ALTER TABLE  `lang` ADD  `visible` TINYINT NOT NULL DEFAULT  '0' AFTER  `active`
 -- Update lang
 UPDATE `lang` SET `active` = '1', `visible` = '1' WHERE 1;
 
+-- add missing primary key
+ALTER TABLE `coupon_customer_count` ADD PRIMARY KEY(`coupon_id`, `customer_id`);
+ALTER TABLE `ignored_module_hook` ADD PRIMARY KEY(`module_id`, `hook_id`);
+
 SET FOREIGN_KEY_CHECKS = 1;
