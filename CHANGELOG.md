@@ -1,7 +1,8 @@
 # 2.1.8
 
-- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
+- Fix the rounding of prices in the order product loop (related to #1753)
 - Add EQUAL to product loop filter by min or max (related to #1750)
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
 
 # 2.1.7
 
