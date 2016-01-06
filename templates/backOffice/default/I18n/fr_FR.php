@@ -785,7 +785,7 @@ return array(
     'Overall sales' => 'Total des ventes',
     'PDF template you want to translate' => 'Template PDF à traduire',
     'PDF templates' => 'Templates PDF',
-    'PDF | Invoice' => 'Facure PDF',
+    'PDF | Invoice' => 'Facture PDF',
     'PDF | Purchase order' => 'Bon de commande PDF',
     'Page not found' => 'Page non trouvée',
     'Parameters' => 'Paramètres',
