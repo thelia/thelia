@@ -46,7 +46,7 @@ class Api extends BaseApi implements UserInterface
 
         $file = $dir . DS . $this->getApiKey().".key";
         $fs->touch($file);
-        file_put_contents($file, Password::generateHexaRandom(45));
+        file_put_contents($file, Password::generateHexaRandom(48));
         $fs->chmod($file, 0600);
     }
 
