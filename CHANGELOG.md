@@ -1,18 +1,18 @@
 # 2.2.1
 
-- Fix missing use for BirthdayType (related to #1699)
-- Fix form retrieving (related to #1700)
-- Fix coupon form (related to #1706)
-- Add more options for content, folder and order in search results (related to #1713)
-- Replaced parameter "locale" with "lang" in URL generated (related to #1722)
-- Fix customer update input ID and indentation (related to #1724)
-- Fix method setRangeDate variable in ExportHandler (related to #1726)
-- Fix all useless DIRECTORY_SEPARATOR (related to #1729)
-- Change layout to only cache assets/dist (related to #1730)
-- Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document (related to #1732)
-- Fix order attribute in BaseHook (related to #1733)
-- Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
-- Add template & stock inputs on product creation (related to #1727) 
+- (related to #1699) Fix missing use for BirthdayType
+- (related to #1700) Fix form retrieving
+- (related to #1706) Fix coupon form
+- (related to #1713) Add more options for content, folder and order in search results
+- (related to #1722) Replaced parameter "locale" with "lang" in URL generated
+- (related to #1724) Fix customer update input ID and indentation
+- (related to #1726) Fix method setRangeDate variable in ExportHandler
+- (related to #1729) Fix all useless DIRECTORY_SEPARATOR
+- (related to #1730) Change layout to only cache assets/dist
+- (related to #1732) Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document
+- (related to #1733) Fix order attribute in BaseHook
+- (related to #1734) Fix critical performance issue on ProductController HydrateObjectForm
+- (related to #1727) Add template & stock inputs on product creation
 
 # 2.2.0
 
@@ -176,6 +176,20 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+# 2.1.8
+
+- Fix Colissimo module external-schema (related to #1838)
+- Fix attribute title in the modal "create a new combination" (related to #1830)
+- Add message if thelia project is not installed (related to #1825)
+- Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE (related to #1806)
+- Update the default PSE ref when the product ref is updated (related to #1790)
+- Sanitize the get arguments for admin stats (related to #1782)
+- Add argument customer_id for hook customer.edit-js (related #1771)
+- Increase API key size to 48 (related #1769)
+- Fix for undefined currency exchange rate, add error message in the currency configuration page when an exchange rate could not be found (related #1751)
+- Fix the rounding of prices in the order product loop (related to #1753)
+- Add EQUAL to product loop filter by min or max (related to #1750)
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
 
 # 2.1.7
 
@@ -397,6 +411,11 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
 
+# 2.0.12
+
+- Sanitize the get arguments for admin stats (related to #1782)
+- Add EQUAL to product loop filter by min or max (related to #1750)
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
 
 # 2.0.11
 
