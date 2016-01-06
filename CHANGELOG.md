@@ -1,5 +1,6 @@
 # 2.1.8
 
+- Sanitize the get arguments for admin stats (related to #1782)
 - Add argument customer_id for hook customer.edit-js (related #1771)
 - Increase API key size to 48 (related #1769)
 - Fix for undefined currency exchange rate, add error message in the currency configuration page when an exchange rate could not be found (related #1751)
