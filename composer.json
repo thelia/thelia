@@ -44,7 +44,7 @@
         "symfony/http-foundation": "2.3.*",
         "symfony/form": "2.3.*",
         "stack/builder": "1.0.*",
-        "thelia/currency-converter": "~1.0",
+        "thelia/currency-converter": "1.0.1",
         "symfony/class-loader": "2.3.*",
         "maximebf/debugbar": "dev-master",
         "oyejorge/less.php": "~1.7",
