@@ -1,3 +1,7 @@
+# 2.2.2
+
+- (related to #1745) Fix output value IS_DEFAULT in the product_sale_elements loop
+
 # 2.2.1
 
 - (related to #1699) Fix missing use for BirthdayType
