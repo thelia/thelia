@@ -1,3 +1,7 @@
+# 2.1.8
+
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
+
 # 2.1.7
 
 - Fix all useless DIRECTORY_SEPARATOR (related to #1729)
