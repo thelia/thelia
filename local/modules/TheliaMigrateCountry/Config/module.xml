@@ -21,6 +21,6 @@
         </author>
     </authors>
     <type>classic</type>
-    <thelia>2.2.0</thelia>
+    <thelia>2.3.0</thelia>
     <stability>alpha</stability>
 </module>

@@ -1,5 +1,10 @@
 # 2.3.0-alpha1
 
+- #1902 Update Colissimo export, add link to order and to customer, add package weight
+- #1801 Fixed cart duplication conditions at user login/logout
+- #1892 Add a name verification when creating a module with a command
+- #1891 Add primary key in ```coupon_customer_count``` and ```ignored_module_hook``` tables.
+- #1701 This PR improves the Order::createOrder() so that the method could be used to duplicate an order by re-using the delivery and invoice addresses defined in the original order.
 - #1823 Add states/provinces concept. The objective of this PR is to separate states/provinces of countries. For now, the concept of states/provinces was managed in country model which was not the best way.
 - #1878 Add module code in the lists of the BackOffice for a better understanding.
 - #1832 Language improvement. Add the possibility to disable a language. It's possible to disable the language only for the front.
@@ -92,6 +97,7 @@
 
 # 2.2.2
 
+- #1901 Update Colissimo export, add link to order and to customer, add package weight
 - (related to #1857) Fix of hookblack : order.tab
 - (related to #1843) Fix smarty form_collection_field, a performance problem was introduced after this PR: #1613 because ​the Form::createView() method create all form view on each call.
 - (related to #1830) Fix attribute title in the modal "create a new combination"
