@@ -281,19 +281,19 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $min_stock = $this->getMin_stock();
 
         if (null != $min_stock) {
-            $search->where('`pse`.QUANTITY' . Criteria::GREATER_THAN . '?', $min_stock, \PDO::PARAM_INT);
+            $search->where('`pse`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
         }
 
         $min_weight = $this->getMin_weight();
 
         if (null != $min_weight) {
-            $search->where('`pse`.WEIGHT' . Criteria::GREATER_THAN . '?', $min_weight, \PDO::PARAM_STR);
+            $search->where('`pse`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
         }
 
         $max_weight = $this->getMax_weight();
 
         if (null != $max_weight) {
-            $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_THAN . '?', $max_weight, \PDO::PARAM_STR);
+            $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
         }
 
         $min_price = $this->getMin_price();
@@ -639,7 +639,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null != $min_stock) {
             $isPSELeftJoinList[] = 'is_min_stock';
             $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
-                ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_THAN . '?', $min_stock, \PDO::PARAM_INT)
+                ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
                 ->where('NOT ISNULL(`is_min_stock`.ID)');
         }
 
@@ -648,7 +648,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null != $min_weight) {
             $isPSELeftJoinList[] = 'is_min_weight';
             $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
-                ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_THAN . '?', $min_weight, \PDO::PARAM_STR)
+                ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
                 ->where('NOT ISNULL(`is_min_weight`.ID)');
         }
 
@@ -657,7 +657,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null != $max_weight) {
             $isPSELeftJoinList[] = 'is_max_weight';
             $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
-                ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_THAN . '?', $max_weight, \PDO::PARAM_STR)
+                ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
                 ->where('NOT ISNULL(`is_max_weight`.ID)');
         }
 

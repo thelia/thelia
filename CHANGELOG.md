@@ -1,6 +1,7 @@
 # 2.0.12
 
 - Sanitize the get arguments for admin stats (related to #1782)
+- Add EQUAL to product loop filter by min or max (related to #1750)
 
 # 2.0.11
 
