@@ -91,7 +91,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         )
                     )
                 ),
-                'alpha'
+                'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_folder')
