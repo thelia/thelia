@@ -60,4 +60,13 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
 
         return ucfirst($name);
     }
+
+    protected function validModuleName($name)
+    {
+        if (!preg_match('#^[A-Z]([A-Za-z\d])+$#', $name)) {
+            throw new \RuntimeException(
+                sprintf("%s module name is not a valid name, it must be in CamelCase. (ex: MyModuleName)", $name)
+            );
+        }
+    }
 }

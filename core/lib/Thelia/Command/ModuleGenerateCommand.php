@@ -51,6 +51,8 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $this->module = $this->formatModuleName($input->getArgument("name"));
         $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
 
+        $this->validModuleName($this->module);
+
         try {
             $this->verifyExistingModule();
         } catch (\RuntimeException $ex) {
