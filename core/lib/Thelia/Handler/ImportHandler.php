@@ -98,6 +98,34 @@ class ImportHandler
     }
 
     /**
+     * Get import model based on given reference
+     *
+     * @param string  $importRef         An import reference
+     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     *
+     * @throws \ErrorException
+     *
+     * @return null|\Thelia\Model\Import
+     */
+    public function getImportByRef($importRef, $dispatchException = false)
+    {
+        $import = (new ImportQuery)->findOneByRef($importRef);
+
+        if ($import === null && $dispatchException) {
+            throw new \ErrorException(
+                Translator::getInstance()->trans(
+                    'There is no id "%ref" in the imports',
+                    [
+                        '%ref' => $importRef
+                    ]
+                )
+            );
+        }
+
+        return $import;
+    }
+
+    /**
      * Get import category model based on given identifier
      *
      * @param integer $importCategoryId  An import category identifier

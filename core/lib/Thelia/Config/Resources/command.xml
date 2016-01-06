@@ -25,6 +25,7 @@
         <command class="Thelia\Command\GenerateSQLCommand"/>
         <command class="Thelia\Command\HookCleanCommand"/>
         <command class="Thelia\Command\ExportCommand"/>
+        <command class="Thelia\Command\ImportCommand"/>
     </commands>
 
 </config>

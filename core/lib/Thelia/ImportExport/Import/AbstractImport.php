@@ -45,7 +45,7 @@ abstract class AbstractImport implements \Iterator
     /**
      * @var integer Imported row count
      */
-    protected $importedRows;
+    protected $importedRows = 0;
 
     public function current()
     {

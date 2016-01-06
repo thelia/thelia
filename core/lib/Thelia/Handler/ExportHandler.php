@@ -77,8 +77,8 @@ class ExportHandler
     /**
      * Get export model based on given reference
      *
-     * @param string  $exportRef          An export reference
-     * @param boolean $dispatchException  Dispatch exception if model doesn't exist
+     * @param string  $exportRef         An export reference
+     * @param boolean $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
