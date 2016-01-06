@@ -1,3 +1,7 @@
+# 2.0.12
+
+- Sanitize the get arguments for admin stats (related to #1782)
+
 # 2.0.11
 
 - Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
