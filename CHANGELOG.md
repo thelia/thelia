@@ -1,6 +1,7 @@
 # 2.1.8
 
 - Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
+- Add EQUAL to product loop filter by min or max (related to #1750)
 
 # 2.1.7
 
