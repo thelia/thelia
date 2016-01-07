@@ -13,7 +13,7 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>2.3.0-alpha1</version>
+    <version>2.3.0</version>
     <authors>
         <author>
             <name>Julien Chanséaume</name>
@@ -22,6 +22,5 @@
     </authors>
     <type>classic</type>
     <thelia>2.2.0</thelia>
-    <!--<thelia>2.3.0-alpha1</thelia>-->
     <stability>alpha</stability>
 </module>
