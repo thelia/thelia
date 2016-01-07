@@ -150,7 +150,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(1, count($PSE));
 
         /** @var ProductSaleElements $defaultPSE */
-        $defaultPSE = $PSE->getFirst();
+        $defaultPSE = $updatedProduct->getDefaultSaleElements();
         $this->assertEquals($newRef, $defaultPSE->getRef(), "Default PSE Ref was not change when product ref is changed.");
 
         return $updatedProduct;
