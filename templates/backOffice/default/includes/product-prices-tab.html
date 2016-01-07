@@ -288,7 +288,7 @@
 
 	                {hook name="product.before-combinations" location="product_before_combinations" }
 
-                    <div class="title title-without-tabs">
+                    <div class="title title-without-tabs clearfix">
                         {intl l='Attribute Combinations'}
 
                         {hook name="product.combinations-list-caption" location="product_combinations_list_caption" }
@@ -328,7 +328,7 @@
                                 {/capture}
                             {/form_field}
 
-                            <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="col-sm-12 col-md-6 col-lg-4">
                                 {form_field field='default_pse'}
                                 <div class="panel pse-panel {if $value == $current_pse_id}panel-primary{else}panel-default{/if}">
                                 {/form_field}
@@ -468,8 +468,8 @@
                             </div>
 
                             {* Be sure to have clean columns *}
-                            {if (1+$idx) % 2 == 0}<div class="clearfix visible-sm"></div>{/if}
-                            {if (1+$idx) % 3 == 0}<div class="clearfix visible-md visible-lg"></div>{/if}
+                            {if (1+$idx) % 2 == 0}<div class="clearfix visible-md"></div>{/if}
+                            {if (1+$idx) % 3 == 0}<div class="clearfix visible-lg"></div>{/if}
                         {/for}
                     </div>
 
