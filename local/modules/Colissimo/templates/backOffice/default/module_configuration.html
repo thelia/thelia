@@ -32,31 +32,35 @@
 <div class="general-block-decorator">
     <div class="row">
         <div class="col-md-12">
+            <!-- Tab menu -->
             <ul id="tabbed-menu" class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#export">{intl d='colissimo.bo.default' l="Export expeditor inet file"}</a> </li>
                 <li class="{if $tab eq "1"}active{/if}"><a data-toggle="tab" href="#prices_slices_tab">{intl d='colissimo.bo.default' l="Price slices"}</a></li>
             </ul>
+
             <div class="tab-content">
+
+                <!-- Export tab -->
                 <div id="export" class="tab-pane active form-container">
                     {form name="colissimo.export.form"}
                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                         <form action="{url path='/admin/module/colissimo/export'}" method="post">
                             {form_hidden_fields}
                             <div class="panel panel-default">
-                                {form_field field="status_id"}
+
                                 <div class="panel-heading clearfix">
                                     {intl d='colissimo.bo.default' l="Change orders status after export"}
                                 </div>
+
                                 <div class="panel-body">
-
-                                        <table>
-
+                                    <table>
+                                        {form_field field="status_id"}
                                             <tr>
                                                 <td>
                                                     <label for="nochange">{intl d='colissimo.bo.default' l="Do not change"}</label>&nbsp;
                                                 </td>
                                                 <td>
-                                                    <input type="radio"  id="nochange" name="{$name}" value="nochange" checked/>
+                                                    <input type="radio" id="nochange" name="{$name}" value="nochange" checked/>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -64,7 +68,7 @@
                                                     <label for="processing">{intl d='colissimo.bo.default' l="Processing"}</label>&nbsp;
                                                 </td>
                                                 <td>
-                                                    <input type="radio"  id="processing" name="{$name}" value="processing"/>
+                                                    <input type="radio" id="processing" name="{$name}" value="processing"/>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -72,67 +76,84 @@
                                                     <label for="sent">{intl d='colissimo.bo.default' l="Sent"}*</label>&nbsp;
                                                 </td>
                                                 <td>
-                                                    <input type="radio"  id="sent" name="{$name}" value="sent"/>
+                                                    <input type="radio" id="sent" name="{$name}" value="sent"/>
                                                 </td>
                                             </tr>
-                                        </table>
-                                    {/form_field}
-                                    <span class="p">{intl d='colissimo.bo.default' l="*If you choose this option, the exported orders would not be available on this page anymore"}</span>
+                                        {/form_field}
+                                    </table>
+
+                                    <span class="p">{intl d='colissimo.ai' l="*If you choose this option, the exported orders would not be available on this page anymore"}</span>
                                 </div>
                             </div>
+
+                            <!-- Order list -->
                             <table class="table table-striped table-condensed">
                                 <thead>
-                                <th class="object-title">
-                                    {intl d='colissimo.bo.default' l="REF"}
-                                </th>
-                                <th class="object-title">
-                                    {intl d='colissimo.bo.default' l='Customer'}
-                                </th>
-                                <th class="object-title">
-                                    {intl d='colissimo.bo.default' l="Date"}
-                                </th>
-                                <th class="object-title">
-                                    {intl d='colissimo.bo.default' l="Total taxed amount"}
-                                </th>
-                                <th class="object-title">
-                                    {intl d='colissimo.bo.default' l="Export"}
-                                </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="REF"}
+                                    </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="Customer"}
+                                    </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="Date"}
+                                    </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="Total taxed amount"}
+                                    </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="Number of packages"}
+                                    </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="Packages weight"}
+                                    </th>
+                                    <th class="object-title">
+                                        {intl d='colissimo.ai' l="Export"}
+                                    </th>
                                 </thead>
 
                                 <tbody>
-                                {loop name="colissimo.notsend.loop" type="colissimo.notsend.loop"}
-                                {form_field field="order_"|cat:$ID}
-                                    <tr>
-                                        <td>
-                                            <label for="{$label_attr.for}">
-                                                {$label}
-                                            </label>
-                                        </td>
-                                        <td>
-                                            {loop type="customer" name="colissimo.customer" id=$CUSTOMER current=false}
-                                                {$LASTNAME} {$FIRSTNAME}
-                                            {/loop}
-                                        </td>
-                                        <td>
-                                            {$CREATE_DATE|date_format}
-                                        </td>
-                                        <td>
-                                            {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}
-                                        </td>
-                                        <td>
-                                            <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="true" class="form-control"/>
-                                        </td>
-                                    </tr>
-                                {/form_field}
-                                {/loop}
-                                {elseloop rel="colissimo.notsend.loop"}
-                                    <tr>
-                                        <td colspan="4">
-                                            <br />
-                                            <div class="alert alert-info">{intl d='colissimo.bo.default' l="There is currently not orders to export"}</div>
-                                        </td>
-                                    </tr>
-                                {/elseloop}
+                                    {loop name="colissimo.notsend.loop" type="colissimo.notsend.loop"}
+                                        <tr>
+                                            <td>
+                                                <a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a>
+                                            </td>
+                                            <td>
+                                                {loop type='customer' name='colissimo.customer' id=$CUSTOMER current='false'}
+                                                    <a href="{url path="/admin/customer/update" customer_id=$ID}">{$LASTNAME} {$FIRSTNAME}</a>
+                                                {/loop}
+                                            </td>
+                                            <td>
+                                                {$CREATE_DATE|date_format}
+                                            </td>
+                                            <td>
+                                                {$TOTAL_TAXED_AMOUNT} {loop name="list.socolissimo.getcurrency" type="currency" id=$CURRENCY}{$SYMBOL}{/loop}
+                                            </td>
+                                            <td>
+                                                {form_field form=$form field="order_nb_pkg_"|cat:$ID}
+                                                    <input class="form-control text-center" type="text" name="{$name}" value="1" />
+                                                {/form_field}
+                                            </td>
+                                            <td>
+                                                {form_field form=$form field="order_weight_"|cat:$ID}
+                                                    <input class="form-control text-center" type="text" name="{$name}" value="0" />
+                                                {/form_field}
+                                            </td>
+                                            <td>
+                                                {form_field field="order_"|cat:$ID}
+                                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="true" class="form-control"/>
+                                                {/form_field}
+                                            </td>
+                                        </tr>
+                                    {/loop}
+                                    {elseloop rel="colissimo.notsend.loop"}
+                                        <tr>
+                                            <td colspan="4">
+                                                <br />
+                                                <div class="alert alert-info">{intl d='colissimo.ai' l="There is currently not orders to export"}</div>
+                                            </td>
+                                        </tr>
+                                    {/elseloop}
                                 </tbody>
                             </table>
 

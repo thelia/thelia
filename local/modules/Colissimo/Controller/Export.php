@@ -49,17 +49,18 @@ class Export extends BaseAdminController
         try {
             $exportForm = $this->validateForm($form);
 
+            // Get new status
             $status_id = $exportForm->get('status_id')->getData();
-
             $status = OrderStatusQuery::create()
                 ->filterByCode($status_id)
                 ->findOne();
 
-            $orders = ColissimoQuery::getOrders()
-                ->find();
+            // Get Colissimo orders
+            $orders = ColissimoQuery::getOrders()->find();
 
             $export = "";
             $store_name = ConfigQuery::getStoreName();
+
             /** @var $order \Thelia\Model\Order */
             foreach ($orders as $order) {
 
@@ -67,6 +68,7 @@ class Export extends BaseAdminController
 
                 if ($value) {
 
+                    // Get order information
                     $customer = $order->getCustomer();
                     $locale = $order->getLang()->getLocale();
                     $address = $order->getOrderAddressRelatedByDeliveryOrderAddressId();
@@ -74,6 +76,14 @@ class Export extends BaseAdminController
                     $country->setLocale($locale);
                     $customerTitle = CustomerTitleQuery::create()->findPk($address->getCustomerTitleId());
                     $customerTitle->setLocale($locale);
+                    $weight = $exportForm->get('order_weight_'.$order->getId())->getData();
+
+                    if ($weight == 0) {
+                        /** @var \Thelia\Model\OrderProduct $product */
+                        foreach ($order->getOrderProducts() as $product) {
+                            $weight += (double)$product->getWeight();
+                        }
+                    }
 
                     /**
                      * Get user's phone & cellphone
@@ -90,9 +100,7 @@ class Export extends BaseAdminController
                         }
                     }
 
-                    /**
-                     * Cellp
-                     */
+                    // Cellphone
                     $cellphone = $customer->getDefaultAddress()->getCellphone();
 
                     if (empty($cellphone)) {
@@ -103,14 +111,6 @@ class Export extends BaseAdminController
                         }
                     }
 
-                    /**
-                     * Compute package weight
-                     */
-                    $weight = 0;
-                    /** @var \Thelia\Model\OrderProduct $product */
-                    foreach ($order->getOrderProducts() as $product) {
-                        $weight+=(double) $product->getWeight();
-                    }
 
                     $export .=
                         "\"".$order->getRef()
