@@ -446,7 +446,7 @@ body,#bodyTable{
                                 <tr>
                                     <td align="center" valign="top" style="padding-bottom: 40px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;border-collapse: collapse !important;">
                                         {hook name="email-html.layout.footer"}
-                                        {elsehook rel="email.layout.footer"}
+                                        {elsehook rel="email-html.layout.footer"}
                                         <table border="0" cellpadding="0" cellspacing="0" class="templateContainer" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 600px;border-collapse: collapse !important;">
                                             <tr>
                                                 <td valign="top" class="footerContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #808080;font-family: Helvetica;font-size: 10px;line-height: 150%;padding-top: 20px;text-align: left;border-collapse: collapse !important;">
