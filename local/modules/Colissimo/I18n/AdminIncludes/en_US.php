@@ -11,6 +11,7 @@ return array(
     'Create' => 'Create',
     'Create a new price slice' => 'Create a new price slice',
     'Create a price slice' => 'Create a price slice',
+    'Customer' => 'Customer',
     'Date' => 'Date',
     'Delete' => 'Delete',
     'Delete a price slice' => 'Delete a price slice',
@@ -22,6 +23,8 @@ return array(
     'Edit this price slice' => 'Edit this price slice',
     'Export' => 'Export',
     'Export expeditor inet file' => 'Export expeditor inet file',
+    'Number of packages' => 'Number of packages',
+    'Packages weight' => 'Packages weight',
     'Please change the access rights' => 'Please change the access rights',
     'Price (€)' => 'Price (€)',
     'Price slices' => 'Price slices',
@@ -31,5 +34,4 @@ return array(
     'There is currently not orders to export' => 'There is currently no orders to export',
     'Total taxed amount' => 'Total taxed amount',
     'Weight up to ... (kg)' => 'Weight up to ... (kg)',
-    'Customer' => 'Customer',
 );
