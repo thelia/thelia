@@ -18,4 +18,13 @@ UPDATE `currency` SET `visible` = 1 WHERE 1;
 UPDATE `currency` SET `format` = '%n %s' WHERE `code` NOT IN ('USD', 'GBP');
 UPDATE `currency` SET `format` = '%s%n' WHERE `code` IN ('USD', 'GBP');
 
+-- new config
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max_id + 1,'default_language_on_change', '0', 0, 0, NOW(), NOW());
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+    (@max_id + 1, 'en_US', 'Stay on the default language at use arrows \"Next\" and \"Previous\" on the product, category, content, folder and brand page. 1 for yes, 0 for no.', NULL, NULL, NULL),    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;
