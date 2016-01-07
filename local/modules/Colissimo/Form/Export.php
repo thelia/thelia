@@ -77,10 +77,25 @@ class Export extends BaseForm
 
         /** @var \Thelia\Model\Order $order */
         foreach ($orders as $order) {
-            $this->formBuilder->add("order_".$order->getId(), "checkbox", array(
-                    'label'=>$order->getRef(),
-                    'label_attr'=>array('for'=>'export_'.$order->getId())
-                ));
+            $this->formBuilder
+                ->add(
+                    "order_".$order->getId(),
+                    "checkbox",
+                    array(
+                        'label'=>$order->getRef(),
+                        'label_attr'=>array(
+                            'for'=>'export_'.$order->getId()
+                        )
+                    )
+                )
+                ->add(
+                    "order_nb_pkg_".$order->getId(),
+                    'number'
+                )
+                ->add(
+                    "order_weight_".$order->getId(),
+                    'number'
+                );
         }
     }
 
