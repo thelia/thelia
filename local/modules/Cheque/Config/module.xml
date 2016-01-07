@@ -7,12 +7,12 @@
     <descriptive locale="fr_FR">
         <title>Cheque</title>
     </descriptive>
-    <version>2.1.7</version>
+    <version>2.1.8</version>
     <author>
         <name>Manuel Raynaud</name>
         <email>manu@thelia.net</email>
     </author>
     <type>payment</type>
     <thelia>2.1.0</thelia>
-    <stability>beta</stability>
+    <stability>prod</stability>
 </module>
