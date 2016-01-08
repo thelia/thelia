@@ -32,6 +32,7 @@ use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 
 /**
@@ -85,7 +86,7 @@ class AddressController extends BaseFrontController
         }
 
         if ($message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
+            Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
             $addressCreate->setErrorMessage($message);
 
@@ -171,7 +172,7 @@ class AddressController extends BaseFrontController
         }
         $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
+            Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
             $addressUpdate->setErrorMessage($message);
 
@@ -179,6 +180,8 @@ class AddressController extends BaseFrontController
                 ->addForm($addressUpdate)
                 ->setGeneralError($message)
             ;
+
+            return $this->generateErrorRedirect($addressUpdate);
         }
     }
 
