@@ -143,7 +143,7 @@ class AddressController extends BaseFrontController
         $request = $this->getRequest();
 
         $addressUpdate = $this->createForm(FrontForm::ADDRESS_UPDATE);
-        $message = false;
+
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
 
@@ -170,7 +170,9 @@ class AddressController extends BaseFrontController
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
+
         $this->getParserContext()->set("address_id", $address_id);
+
         if ($message !== false) {
             Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
@@ -183,6 +185,8 @@ class AddressController extends BaseFrontController
 
             return $this->generateErrorRedirect($addressUpdate);
         }
+
+        return $this->generateErrorRedirect($addressUpdate);
     }
 
     public function deleteAction($address_id)
