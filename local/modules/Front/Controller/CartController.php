@@ -82,8 +82,6 @@ class CartController extends BaseFrontController
             $cartAdd->setErrorMessage($message);
             $this->getParserContext()->addForm($cartAdd);
         }
-
-        return $this->generateErrorRedirect($cartAdd);
     }
 
     public function changeItem()
