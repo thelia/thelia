@@ -906,4 +906,7 @@ UPDATE `lang` SET `active` = '1', `visible` = '1' WHERE 1;
 ALTER TABLE `coupon_customer_count` ADD PRIMARY KEY(`coupon_id`, `customer_id`);
 ALTER TABLE `ignored_module_hook` ADD PRIMARY KEY(`module_id`, `hook_id`);
 
+-- add admin email
+ALTER TABLE  `admin` ADD  `email` VARCHAR(255) NOT NULL AFTER `remember_me_serial` ;
+
 SET FOREIGN_KEY_CHECKS = 1;

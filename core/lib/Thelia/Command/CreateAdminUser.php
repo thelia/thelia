@@ -50,6 +50,13 @@ class CreateAdminUser extends ContainerAwareCommand
                 null
             )
             ->addOption(
+                "email",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Admin email address',
+                null
+            )
+            ->addOption(
                 "locale",
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -116,6 +123,7 @@ class CreateAdminUser extends ContainerAwareCommand
         $admin->setFirstname($input->getOption("first_name") ?: $this->enterData($dialog, $output, "User first name : ", "Please enter user first name."));
         $admin->setLastname($input->getOption("last_name") ?: $this->enterData($dialog, $output, "User last name : ", "Please enter user last name."));
         $admin->setLocale($input->getOption("locale") ?: 'en_US');
+        $admin->setEmail($input->getOption("email") ?: $this->enterData($dialog, $output, "Admin email address : ", "Please enter administrator email address."));
 
         do {
             $password = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password : ", "Please enter a password.", true);

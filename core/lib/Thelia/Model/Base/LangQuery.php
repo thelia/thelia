@@ -31,9 +31,9 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery orderByDatetimeFormat($order = Criteria::ASC) Order by the datetime_format column
  * @method     ChildLangQuery orderByDecimalSeparator($order = Criteria::ASC) Order by the decimal_separator column
  * @method     ChildLangQuery orderByThousandsSeparator($order = Criteria::ASC) Order by the thousands_separator column
- * @method     ChildLangQuery orderByDecimals($order = Criteria::ASC) Order by the decimals column
  * @method     ChildLangQuery orderByActive($order = Criteria::ASC) Order by the active column
  * @method     ChildLangQuery orderByVisible($order = Criteria::ASC) Order by the visible column
+ * @method     ChildLangQuery orderByDecimals($order = Criteria::ASC) Order by the decimals column
  * @method     ChildLangQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method     ChildLangQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildLangQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -49,9 +49,9 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery groupByDatetimeFormat() Group by the datetime_format column
  * @method     ChildLangQuery groupByDecimalSeparator() Group by the decimal_separator column
  * @method     ChildLangQuery groupByThousandsSeparator() Group by the thousands_separator column
- * @method     ChildLangQuery groupByDecimals() Group by the decimals column
  * @method     ChildLangQuery groupByActive() Group by the active column
  * @method     ChildLangQuery groupByVisible() Group by the visible column
+ * @method     ChildLangQuery groupByDecimals() Group by the decimals column
  * @method     ChildLangQuery groupByByDefault() Group by the by_default column
  * @method     ChildLangQuery groupByPosition() Group by the position column
  * @method     ChildLangQuery groupByCreatedAt() Group by the created_at column
@@ -78,9 +78,9 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLang findOneByDatetimeFormat(string $datetime_format) Return the first ChildLang filtered by the datetime_format column
  * @method     ChildLang findOneByDecimalSeparator(string $decimal_separator) Return the first ChildLang filtered by the decimal_separator column
  * @method     ChildLang findOneByThousandsSeparator(string $thousands_separator) Return the first ChildLang filtered by the thousands_separator column
- * @method     ChildLang findOneByDecimals(string $decimals) Return the first ChildLang filtered by the decimals column
  * @method     ChildLang findOneByActive(boolean $active) Return the first ChildLang filtered by the active column
  * @method     ChildLang findOneByVisible(int $visible) Return the first ChildLang filtered by the visible column
+ * @method     ChildLang findOneByDecimals(string $decimals) Return the first ChildLang filtered by the decimals column
  * @method     ChildLang findOneByByDefault(int $by_default) Return the first ChildLang filtered by the by_default column
  * @method     ChildLang findOneByPosition(int $position) Return the first ChildLang filtered by the position column
  * @method     ChildLang findOneByCreatedAt(string $created_at) Return the first ChildLang filtered by the created_at column
@@ -96,9 +96,9 @@ use Thelia\Model\Map\LangTableMap;
  * @method     array findByDatetimeFormat(string $datetime_format) Return ChildLang objects filtered by the datetime_format column
  * @method     array findByDecimalSeparator(string $decimal_separator) Return ChildLang objects filtered by the decimal_separator column
  * @method     array findByThousandsSeparator(string $thousands_separator) Return ChildLang objects filtered by the thousands_separator column
- * @method     array findByDecimals(string $decimals) Return ChildLang objects filtered by the decimals column
  * @method     array findByActive(boolean $active) Return ChildLang objects filtered by the active column
  * @method     array findByVisible(int $visible) Return ChildLang objects filtered by the visible column
+ * @method     array findByDecimals(string $decimals) Return ChildLang objects filtered by the decimals column
  * @method     array findByByDefault(int $by_default) Return ChildLang objects filtered by the by_default column
  * @method     array findByPosition(int $position) Return ChildLang objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildLang objects filtered by the created_at column
@@ -191,7 +191,7 @@ abstract class LangQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `LOCALE`, `URL`, `DATE_FORMAT`, `TIME_FORMAT`, `DATETIME_FORMAT`, `DECIMAL_SEPARATOR`, `THOUSANDS_SEPARATOR`, `DECIMALS`, `ACTIVE`, `VISIBLE`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `LOCALE`, `URL`, `DATE_FORMAT`, `TIME_FORMAT`, `DATETIME_FORMAT`, `DECIMAL_SEPARATOR`, `THOUSANDS_SEPARATOR`, `ACTIVE`, `VISIBLE`, `DECIMALS`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -583,35 +583,6 @@ abstract class LangQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the decimals column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByDecimals('fooValue');   // WHERE decimals = 'fooValue'
-     * $query->filterByDecimals('%fooValue%'); // WHERE decimals LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $decimals The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildLangQuery The current query, for fluid interface
-     */
-    public function filterByDecimals($decimals = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($decimals)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $decimals)) {
-                $decimals = str_replace('*', '%', $decimals);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(LangTableMap::DECIMALS, $decimals, $comparison);
-    }
-
-    /**
      * Filter the query on the active column
      *
      * Example usage:
@@ -677,6 +648,35 @@ abstract class LangQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(LangTableMap::VISIBLE, $visible, $comparison);
+    }
+
+    /**
+     * Filter the query on the decimals column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDecimals('fooValue');   // WHERE decimals = 'fooValue'
+     * $query->filterByDecimals('%fooValue%'); // WHERE decimals LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $decimals The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByDecimals($decimals = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($decimals)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $decimals)) {
+                $decimals = str_replace('*', '%', $decimals);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::DECIMALS, $decimals, $comparison);
     }
 
     /**

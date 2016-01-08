@@ -52,10 +52,6 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCountryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildCountryQuery leftJoinState($relationAlias = null) Adds a LEFT JOIN clause to the query using the State relation
- * @method     ChildCountryQuery rightJoinState($relationAlias = null) Adds a RIGHT JOIN clause to the query using the State relation
- * @method     ChildCountryQuery innerJoinState($relationAlias = null) Adds a INNER JOIN clause to the query using the State relation
- *
  * @method     ChildCountryQuery leftJoinTaxRuleCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleCountry relation
  * @method     ChildCountryQuery rightJoinTaxRuleCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleCountry relation
  * @method     ChildCountryQuery innerJoinTaxRuleCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRuleCountry relation
@@ -79,6 +75,10 @@ use Thelia\Model\Map\CountryTableMap;
  * @method     ChildCountryQuery leftJoinCountryArea($relationAlias = null) Adds a LEFT JOIN clause to the query using the CountryArea relation
  * @method     ChildCountryQuery rightJoinCountryArea($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CountryArea relation
  * @method     ChildCountryQuery innerJoinCountryArea($relationAlias = null) Adds a INNER JOIN clause to the query using the CountryArea relation
+ *
+ * @method     ChildCountryQuery leftJoinState($relationAlias = null) Adds a LEFT JOIN clause to the query using the State relation
+ * @method     ChildCountryQuery rightJoinState($relationAlias = null) Adds a RIGHT JOIN clause to the query using the State relation
+ * @method     ChildCountryQuery innerJoinState($relationAlias = null) Adds a INNER JOIN clause to the query using the State relation
  *
  * @method     ChildCountryQuery leftJoinCountryI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CountryI18n relation
  * @method     ChildCountryQuery rightJoinCountryI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CountryI18n relation
@@ -724,79 +724,6 @@ abstract class CountryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\State object
-     *
-     * @param \Thelia\Model\State|ObjectCollection $state  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCountryQuery The current query, for fluid interface
-     */
-    public function filterByState($state, $comparison = null)
-    {
-        if ($state instanceof \Thelia\Model\State) {
-            return $this
-                ->addUsingAlias(CountryTableMap::ID, $state->getCountryId(), $comparison);
-        } elseif ($state instanceof ObjectCollection) {
-            return $this
-                ->useStateQuery()
-                ->filterByPrimaryKeys($state->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByState() only accepts arguments of type \Thelia\Model\State or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the State relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildCountryQuery The current query, for fluid interface
-     */
-    public function joinState($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('State');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'State');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the State relation State object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\StateQuery A secondary query class using the current class as primary query
-     */
-    public function useStateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinState($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'State', '\Thelia\Model\StateQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\TaxRuleCountry object
      *
      * @param \Thelia\Model\TaxRuleCountry|ObjectCollection $taxRuleCountry  the related object to use as filter
@@ -1232,6 +1159,79 @@ abstract class CountryQuery extends ModelCriteria
         return $this
             ->joinCountryArea($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CountryArea', '\Thelia\Model\CountryAreaQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\State object
+     *
+     * @param \Thelia\Model\State|ObjectCollection $state  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function filterByState($state, $comparison = null)
+    {
+        if ($state instanceof \Thelia\Model\State) {
+            return $this
+                ->addUsingAlias(CountryTableMap::ID, $state->getCountryId(), $comparison);
+        } elseif ($state instanceof ObjectCollection) {
+            return $this
+                ->useStateQuery()
+                ->filterByPrimaryKeys($state->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByState() only accepts arguments of type \Thelia\Model\State or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the State relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCountryQuery The current query, for fluid interface
+     */
+    public function joinState($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('State');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'State');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the State relation State object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\StateQuery A secondary query class using the current class as primary query
+     */
+    public function useStateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinState($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'State', '\Thelia\Model\StateQuery');
     }
 
     /**

@@ -6,6 +6,7 @@ In addition to the standard form_field block output, this fragment uses the foll
 - field_template : the template style ('standard', or somethingelse)
 - field_value : the value of the input field, which is used if the form_field value is empty.
 - field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
+- field_no_standard_classes : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
 *}
 
 {*
@@ -25,6 +26,13 @@ Use the optionnal $field_value parameter if no value is defined
 {if ! empty($value_key)}
     {$label_attr.for = "{$label_attr.for}_{$value_key}"}
 {/if}
+
+{if $field_no_standard_classes}
+    {$standardClass = ''}
+{else}
+    {$standardClass = 'form-control'}
+{/if}
+
 {if $disabled}
     {$sDisabled = 'disabled'}
 {/if}
@@ -46,12 +54,12 @@ Use the optionnal $field_value parameter if no value is defined
 {elseif $type == 'checkbox' || $type == 'radio'}true
     id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'choice'}
-    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'collection'}
-    id="{$label_attr.for}" name="{$name}[]" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}[]" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
-    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {else}
-    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}" value="{$value}" class="{$standardClass} {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {/if}
 {/strip}

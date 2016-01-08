@@ -162,7 +162,7 @@ class RewritingUrlTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('URL', 'Url', 'VARCHAR', true, 255, null);
+        $this->addColumn('URL', 'Url', 'VARBINARY', true, 255, null);
         $this->addColumn('VIEW', 'View', 'VARCHAR', false, 255, null);
         $this->addColumn('VIEW_ID', 'ViewId', 'VARCHAR', false, 255, null);
         $this->addColumn('VIEW_LOCALE', 'ViewLocale', 'VARCHAR', false, 255, null);

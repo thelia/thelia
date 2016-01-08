@@ -123,6 +123,12 @@ abstract class Admin implements ActiveRecordInterface
     protected $remember_me_serial;
 
     /**
+     * The value for the email field.
+     * @var        string
+     */
+    protected $email;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -527,6 +533,17 @@ abstract class Admin implements ActiveRecordInterface
     }
 
     /**
+     * Get the [email] column value.
+     *
+     * @return   string
+     */
+    public function getEmail()
+    {
+
+        return $this->email;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -802,6 +819,27 @@ abstract class Admin implements ActiveRecordInterface
     } // setRememberMeSerial()
 
     /**
+     * Set the value of [email] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Admin The current object (for fluent API support)
+     */
+    public function setEmail($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->email !== $v) {
+            $this->email = $v;
+            $this->modifiedColumns[AdminTableMap::EMAIL] = true;
+        }
+
+
+        return $this;
+    } // setEmail()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -913,13 +951,16 @@ abstract class Admin implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AdminTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_serial = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : AdminTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : AdminTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->email = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : AdminTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : AdminTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : AdminTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -932,7 +973,7 @@ abstract class Admin implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 13; // 13 = AdminTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 14; // 14 = AdminTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Admin object", 0, $e);
@@ -1201,6 +1242,9 @@ abstract class Admin implements ActiveRecordInterface
         if ($this->isColumnModified(AdminTableMap::REMEMBER_ME_SERIAL)) {
             $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_SERIAL`';
         }
+        if ($this->isColumnModified(AdminTableMap::EMAIL)) {
+            $modifiedColumns[':p' . $index++]  = '`EMAIL`';
+        }
         if ($this->isColumnModified(AdminTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1250,6 +1294,9 @@ abstract class Admin implements ActiveRecordInterface
                         break;
                     case '`REMEMBER_ME_SERIAL`':
                         $stmt->bindValue($identifier, $this->remember_me_serial, PDO::PARAM_STR);
+                        break;
+                    case '`EMAIL`':
+                        $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1353,9 +1400,12 @@ abstract class Admin implements ActiveRecordInterface
                 return $this->getRememberMeSerial();
                 break;
             case 11:
-                return $this->getCreatedAt();
+                return $this->getEmail();
                 break;
             case 12:
+                return $this->getCreatedAt();
+                break;
+            case 13:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1398,8 +1448,9 @@ abstract class Admin implements ActiveRecordInterface
             $keys[8] => $this->getSalt(),
             $keys[9] => $this->getRememberMeToken(),
             $keys[10] => $this->getRememberMeSerial(),
-            $keys[11] => $this->getCreatedAt(),
-            $keys[12] => $this->getUpdatedAt(),
+            $keys[11] => $this->getEmail(),
+            $keys[12] => $this->getCreatedAt(),
+            $keys[13] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1478,9 +1529,12 @@ abstract class Admin implements ActiveRecordInterface
                 $this->setRememberMeSerial($value);
                 break;
             case 11:
-                $this->setCreatedAt($value);
+                $this->setEmail($value);
                 break;
             case 12:
+                $this->setCreatedAt($value);
+                break;
+            case 13:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1518,8 +1572,9 @@ abstract class Admin implements ActiveRecordInterface
         if (array_key_exists($keys[8], $arr)) $this->setSalt($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setRememberMeToken($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setRememberMeSerial($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[11], $arr)) $this->setEmail($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
     }
 
     /**
@@ -1542,6 +1597,7 @@ abstract class Admin implements ActiveRecordInterface
         if ($this->isColumnModified(AdminTableMap::SALT)) $criteria->add(AdminTableMap::SALT, $this->salt);
         if ($this->isColumnModified(AdminTableMap::REMEMBER_ME_TOKEN)) $criteria->add(AdminTableMap::REMEMBER_ME_TOKEN, $this->remember_me_token);
         if ($this->isColumnModified(AdminTableMap::REMEMBER_ME_SERIAL)) $criteria->add(AdminTableMap::REMEMBER_ME_SERIAL, $this->remember_me_serial);
+        if ($this->isColumnModified(AdminTableMap::EMAIL)) $criteria->add(AdminTableMap::EMAIL, $this->email);
         if ($this->isColumnModified(AdminTableMap::CREATED_AT)) $criteria->add(AdminTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AdminTableMap::UPDATED_AT)) $criteria->add(AdminTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1617,6 +1673,7 @@ abstract class Admin implements ActiveRecordInterface
         $copyObj->setSalt($this->getSalt());
         $copyObj->setRememberMeToken($this->getRememberMeToken());
         $copyObj->setRememberMeSerial($this->getRememberMeSerial());
+        $copyObj->setEmail($this->getEmail());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1714,6 +1771,7 @@ abstract class Admin implements ActiveRecordInterface
         $this->salt = null;
         $this->remember_me_token = null;
         $this->remember_me_serial = null;
+        $this->email = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
