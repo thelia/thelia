@@ -82,7 +82,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
                 }
             }
 
-            $rowAttributes = explode(",", $row["attributes"]);
+            $rowAttributes = (!empty($row["attributes"])) ? explode(",", $row["attributes"]) : [] ;
 
             sort($rowAttributes);
             sort($attributes);

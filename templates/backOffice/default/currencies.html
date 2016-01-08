@@ -25,6 +25,18 @@
             <div class="row">
                 <div class="col-md-12">
 
+                    {if ! empty($undefined_rates)}
+                        <div class="alert alert-warning">
+                            {$currencyList = ''}
+                            {loop type="currency" name="err-currencies" id={","|implode:$undefined_rates}}
+                                {$currencyList = "$currencyList, $NAME ($ISOCODE)"}
+                            {/loop}
+
+                            {intl l="<strong>Warning</strong>, an exchange rate was not found for at least one currency: %list" list=$currencyList|ltrim:', '}
+
+                        </div>
+                    {/if}
+
                     <form action="{url path='/admin/configuration/currencies/update-rates'}" method="post">
 
                         <div class="general-block-decorator">

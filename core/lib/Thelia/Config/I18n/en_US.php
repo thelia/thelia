@@ -445,6 +445,7 @@ return array(
     'Start date' => 'Start date',
     'Start date of sales' => 'Start date of sales',
     'Stats on %month/%year' => 'Stats on %month/%year',
+    'Stock' => 'Stock',
     'Store Business Identification Number (SIRET, etc).' => 'Store Business Identification Number (SIRET, etc).',
     'Store Information' => 'Store Information',
     'Store configuration failed.' => 'Store configuration failed.',

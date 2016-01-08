@@ -87,7 +87,7 @@ class OrderAddressEvent extends ActionEvent
      */
     protected $order;
 
-    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $phone, $company, $cellphone)
+    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $phone, $company, $cellphone = null)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;

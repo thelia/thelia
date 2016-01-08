@@ -10,31 +10,32 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace FreeOrder;
+namespace Thelia\Core\Event\Currency;
 
-use Thelia\Core\Event\Order\OrderEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Order;
-use Thelia\Model\OrderStatusQuery;
-use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
+use Thelia\Core\Event\ActionEvent;
 
-class FreeOrder extends BaseModule implements PaymentModuleInterface
+class CurrencyUpdateRateEvent extends ActionEvent
 {
-    public function isValidPayment()
+    protected $undefinedRates = [];
+
+    /**
+     * @param int $currencyId
+     */
+    public function addUndefinedRate($currencyId)
     {
-        return $this->getCurrentOrderTotalAmount() == 0;
+        $this->undefinedRates[] = $currencyId;
     }
 
-    public function pay(Order $order)
+    public function hasUndefinedRates()
     {
-        $event = new OrderEvent($order);
-        $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+        return ! empty($this->undefinedRates);
     }
 
-    public function manageStockOnCreation()
+    /**
+     * @return array of currency objects
+     */
+    public function getUndefinedRates()
     {
-        return false;
+        return $this->undefinedRates;
     }
 }

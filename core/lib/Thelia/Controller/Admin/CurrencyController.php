@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateRateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
@@ -183,7 +184,16 @@ class CurrencyController extends AbstractCrudController
         }
 
         try {
-            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
+            $event = new CurrencyUpdateRateEvent();
+
+            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $event);
+
+            if ($event->hasUndefinedRates()) {
+                return $this->render('currencies', [
+                    'undefined_rates' => $event->getUndefinedRates()
+                ]);
+            }
+
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
