@@ -5,5 +5,5 @@
     	<column name="active" required="true" type="BOOLEAN" />
         <behavior name="timestampable" />
     </table>
-	<external-schema filename="/home/benjamin/dev/thelia2/local/config/schema.xml" referenceOnly="true" />
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

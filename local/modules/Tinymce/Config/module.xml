@@ -7,12 +7,12 @@
     <descriptive locale="fr_FR">
         <title>Editeur visuel TinyMCE</title>
     </descriptive>
-    <version>2.1.7</version>
+    <version>2.1.8</version>
     <author>
         <name>Manuel Raynaud</name>
         <email>manu@thelia.net</email>
     </author>
     <type>classic</type>
     <thelia>2.0.0</thelia>
-    <stability>beta</stability>
+    <stability>prod</stability>
 </module>

@@ -32,6 +32,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
@@ -115,6 +116,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $event = new ProductUpdateEvent($product->getId());
         $defaultCategory = CategoryQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
         $brandId = BrandQuery::create()->findOne()->getId();
+        $newRef = $product->getRef() . '-new';
         $event
             ->setLocale('fr_FR')
             ->setTitle('test MAJ titre en français')
@@ -124,7 +126,8 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setVisible(1)
             ->setDefaultCategory($defaultCategory)
             ->setBrandId($brandId)
-            ->setDispatcher($this->getDispatcher());
+            ->setRef($newRef)
+            ->setDispatcher($this->getDispatcher())
         ;
 
         $action = new Product();
@@ -144,8 +147,11 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($defaultCategory, $updatedProduct->getDefaultCategoryId());
 
         $PSE = $updatedProduct->getProductSaleElementss();
-
         $this->assertEquals(1, count($PSE));
+
+        /** @var ProductSaleElements $defaultPSE */
+        $defaultPSE = $updatedProduct->getDefaultSaleElements();
+        $this->assertEquals($newRef, $defaultPSE->getRef(), "Default PSE Ref was not change when product ref is changed.");
 
         return $updatedProduct;
     }

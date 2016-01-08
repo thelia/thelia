@@ -296,7 +296,7 @@ class ImportController extends BaseAdminController
         $event = new ImportExportEvent($formatter, $handler, null, $archiveBuilder);
         $event->setContent($content);
 
-        $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
+        $this->dispatch(TheliaEvents::IMPORT_BEFORE_DECODE, $event);
 
         $data = $formatter
             ->decode($event->getContent())
