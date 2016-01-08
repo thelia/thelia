@@ -41,6 +41,9 @@ class AdministratorModificationForm extends AdministratorCreationForm
                 ),
             ))
         ;
+
+        $this->formBuilder->get('password')->setRequired(false);
+        $this->formBuilder->get('password_confirm')->setRequired(false);
     }
 
     /**

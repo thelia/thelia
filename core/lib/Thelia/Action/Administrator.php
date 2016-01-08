@@ -32,6 +32,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->setDispatcher($event->getDispatcher())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
+            ->setEmail($event->getEmail())
             ->setLogin($event->getLogin())
             ->setPassword($event->getPassword())
             ->setProfileId($event->getProfile())

@@ -22,6 +22,7 @@ class AdministratorEvent extends ActionEvent
     protected $firstname = null;
     protected $lastname = null;
     protected $login = null;
+    protected $email = null;
     protected $password = null;
     protected $profile = null;
     protected $locale = null;
@@ -134,5 +135,25 @@ class AdministratorEvent extends ActionEvent
     public function getLocale()
     {
         return $this->locale;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return $this
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
     }
 }
