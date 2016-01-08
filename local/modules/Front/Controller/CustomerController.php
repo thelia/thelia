@@ -490,6 +490,8 @@ class CustomerController extends BaseFrontController
             $customerLoginForm->setErrorMessage($message);
 
             $this->getParserContext()->addForm($customerLoginForm);
+
+            return $this->generateErrorRedirect($customerLoginForm);
         }
     }
 
