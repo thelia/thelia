@@ -1,3 +1,9 @@
+# 2.0.12
+
+- Sanitize the get arguments for admin stats (related to #1782)
+- Add EQUAL to product loop filter by min or max (related to #1750)
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
+
 # 2.0.11
 
 - Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
