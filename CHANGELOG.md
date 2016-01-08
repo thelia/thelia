@@ -1,5 +1,10 @@
 # 2.3.0-alpha1
 
+- #1902 Update Colissimo export, add link to order and to customer, add package weight
+- #1801 Fixed cart duplication conditions at user login/logout
+- #1892 Add a name verification when creating a module with a command
+- #1891 Add primary key in ```coupon_customer_count``` and ```ignored_module_hook``` tables.
+- #1701 This PR improves the Order::createOrder() so that the method could be used to duplicate an order by re-using the delivery and invoice addresses defined in the original order.
 - #1823 Add states/provinces concept. The objective of this PR is to separate states/provinces of countries. For now, the concept of states/provinces was managed in country model which was not the best way.
 - #1878 Add module code in the lists of the BackOffice for a better understanding.
 - #1832 Language improvement. Add the possibility to disable a language. It's possible to disable the language only for the front.
@@ -89,6 +94,46 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
+
+# 2.2.2
+
+- #1901 Update Colissimo export, add link to order and to customer, add package weight
+- (related to #1857) Fix of hookblack : order.tab
+- (related to #1843) Fix smarty form_collection_field, a performance problem was introduced after this PR: #1613 because ​the Form::createView() method create all form view on each call.
+- (related to #1830) Fix attribute title in the modal "create a new combination"
+- (related to #1825) Add message if thelia project is not installed
+- (related to #1824 #1829) Fix the admin home stats, On page load, the month sent to Thelia was bad
+- (related to #1821) Fix the value for constant AdminForm::LANG_DEFAULT_BEHAVIOR, Resolve ##1820
+- (related to #1818) Fix menu hook block to integrate main link if it's used #1818
+- (related to #1806) Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE
+- (related to #1796) Fix regression in OrderAddressEvent cell phone can not be required in the constructor
+- (related to #1790) Update the default PSE ref when the product ref is updated
+- (related to #1783) Fix product price exports. Resolve #1078 #1610
+- (related to #1771) Add argument customer_id for hook customer.edit-js
+- (related to #1769) Increase API key size to 48
+- (related to #1768) Update composer.lock file, update of the dependency thelia/currency-converter to version 1.0.1
+- (related to #1760) Set order status as paid when the FreeOrder module is used to "pay" an order
+- (related to #1753) Fix the rounding of prices in the order product loop
+- (related to #1751) Fix for undefined currency exchange rate, add error message in the currency configuration page when an
+- (related to #1750) Add EQUAL to product loop filter by min or max
+- (related to #1747) Fixed success_url check for contact form
+- (related to #1745) Fix output value IS_DEFAULT in the product_sale_elements loop
+
+# 2.2.1
+
+- (related to #1699) Fix missing use for BirthdayType
+- (related to #1700) Fix form retrieving
+- (related to #1706) Fix coupon form
+- (related to #1713) Add more options for content, folder and order in search results
+- (related to #1722) Replaced parameter "locale" with "lang" in URL generated
+- (related to #1724) Fix customer update input ID and indentation
+- (related to #1726) Fix method setRangeDate variable in ExportHandler
+- (related to #1729) Fix all useless DIRECTORY_SEPARATOR
+- (related to #1730) Change layout to only cache assets/dist
+- (related to #1732) Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document
+- (related to #1733) Fix order attribute in BaseHook
+- (related to #1734) Fix critical performance issue on ProductController HydrateObjectForm
+- (related to #1727) Add template & stock inputs on product creation
 
 # 2.2.0
 
@@ -252,6 +297,28 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+# 2.1.8
+
+- Fix Colissimo module external-schema (related to #1838)
+- Fix attribute title in the modal "create a new combination" (related to #1830)
+- Add message if thelia project is not installed (related to #1825)
+- Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE (related to #1806)
+- Update the default PSE ref when the product ref is updated (related to #1790)
+- Sanitize the get arguments for admin stats (related to #1782)
+- Add argument customer_id for hook customer.edit-js (related #1771)
+- Increase API key size to 48 (related #1769)
+- Fix for undefined currency exchange rate, add error message in the currency configuration page when an exchange rate could not be found (related #1751)
+- Fix the rounding of prices in the order product loop (related to #1753)
+- Add EQUAL to product loop filter by min or max (related to #1750)
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
+
+# 2.1.7
+
+- Fix all useless DIRECTORY_SEPARATOR (related to #1729)
+- Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document (related to #1732)
+- Fix order attribute in BaseHook (related to #1733)
+- Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
+- Replaced parameter "locale" with "lang" in URL generated (related to #1722)
 
 # 2.1.6
 
@@ -465,6 +532,15 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
 
+# 2.0.12
+
+- Sanitize the get arguments for admin stats (related to #1782)
+- Add EQUAL to product loop filter by min or max (related to #1750)
+- Fix output value IS_DEFAULT in the product_sale_elements loop (related to #1745)
+
+# 2.0.11
+
+- Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
 
 # 2.0.10
 

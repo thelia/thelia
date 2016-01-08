@@ -14,12 +14,12 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>1.1</version>
+    <version>2.3.0</version>
     <author>
         <name>Manuel Raynaud</name>
         <email>manu@raynaud.io</email>
     </author>
     <type>payment</type>
-    <thelia>2.1.0</thelia>
-    <stability>beta</stability>
+    <thelia>2.2.0</thelia>
+    <stability>alpha</stability>
 </module>
