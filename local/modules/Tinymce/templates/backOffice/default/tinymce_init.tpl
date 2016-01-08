@@ -72,6 +72,7 @@
         toolbar2: "link unlink anchor | image responsivefilemanager media youtube | forecolor backcolor | charmap | print preview ",
 
         image_advtab: true,
+        image_caption: true,
 
         {loop type="module-config" name="dummy" module="tinymce" variable="set_images_as_responsive" default_value="1"}
             {if $VALUE != 0}
