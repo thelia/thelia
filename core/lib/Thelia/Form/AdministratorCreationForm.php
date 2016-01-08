@@ -35,16 +35,30 @@ class AdministratorCreationForm extends BaseForm
                         ),
                     )),
                 ),
-                "label" => Translator::getInstance()->trans("Login"),
+                "label" => $this->translator->trans("Login name"),
                 "label_attr" => array(
                     "for" => "login",
+                    'help' => $this->translator->trans("This is the name used on the login screen")
                 ),
+            ))
+            ->add("email", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email()
+                ),
+                "label" => $this->translator->trans("Email address"),
+                "label_attr" => array(
+                    "for" => "email",
+                ),
+                'attr'        => [
+                    'placeholder' => $this->translator->trans('Administrator email address'),
+                ]
             ))
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("First Name"),
+                "label" => $this->translator->trans("First Name"),
                 "label_attr" => array(
                     "for" => "firstname",
                 ),
@@ -53,14 +67,14 @@ class AdministratorCreationForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("Last Name"),
+                "label" => $this->translator->trans("Last Name"),
                 "label_attr" => array(
                     "for" => "lastname",
                 ),
             ))
             ->add("password", "password", array(
                 "constraints" => array(),
-                "label" => Translator::getInstance()->trans("Password"),
+                "label" => $this->translator->trans("Password"),
                 "label_attr" => array(
                     "for" => "password",
                 ),
@@ -71,7 +85,7 @@ class AdministratorCreationForm extends BaseForm
                         array($this, "verifyPasswordField"),
                     ))),
                 ),
-                "label" => Translator::getInstance()->trans('Password confirmation'),
+                "label" => $this->translator->trans('Password confirmation'),
                 "label_attr" => array(
                     "for" => "password_confirmation",
                 ),
@@ -84,7 +98,7 @@ class AdministratorCreationForm extends BaseForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans('Profile'),
+                    "label" => $this->translator->trans('Profile'),
                     "label_attr" => array(
                         "for" => "profile",
                     ),
@@ -98,7 +112,7 @@ class AdministratorCreationForm extends BaseForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans('Preferred locale'),
+                    "label" => $this->translator->trans('Preferred locale'),
                     "label_attr" => array(
                         "for" => "locale",
                     ),

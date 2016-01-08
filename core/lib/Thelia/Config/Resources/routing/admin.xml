@@ -965,6 +965,10 @@
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::defaultAction</default>
     </route>
 
+    <route id="admin.configuration.administrators.view" path="/admin/configuration/administrators/view">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::viewAction</default>
+    </route>
+
     <route id="admin.configuration.administrators.add" path="/admin/configuration/administrators/add">
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::createAction</default>
     </route>

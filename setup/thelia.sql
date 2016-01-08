@@ -122,29 +122,6 @@ CREATE TABLE `country`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
--- state
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `state`;
-
-CREATE TABLE `state`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `visible` TINYINT DEFAULT 0 NOT NULL,
-    `isocode` VARCHAR(4) NOT NULL,
-    `country_id` INTEGER NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `FI_state_country_id` (`country_id`),
-    CONSTRAINT `fk_state_country_id`
-        FOREIGN KEY (`country_id`)
-        REFERENCES `country` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
 -- tax
 -- ---------------------------------------------------------------------
 
@@ -195,8 +172,8 @@ CREATE TABLE `tax_rule_country`
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
-    INDEX `idx_tax_rule_country_state_id` (`state_id`),
     INDEX `idx_tax_rule_country_tax_rule_id_country_id_position` (`tax_rule_id`, `country_id`, `position`),
+    INDEX `idx_tax_rule_country_state_id` (`state_id`),
     CONSTRAINT `fk_tax_rule_country_tax_id`
         FOREIGN KEY (`tax_id`)
         REFERENCES `tax` (`id`)
@@ -542,7 +519,7 @@ CREATE TABLE `address`
     INDEX `idx_address_customer_id` (`customer_id`),
     INDEX `idx_address_customer_title_id` (`title_id`),
     INDEX `idx_address_country_id` (`country_id`),
-    INDEX `FI_address_state_id` (`state_id`),
+    INDEX `fk_address_state_id_idx` (`state_id`),
     CONSTRAINT `fk_address_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -599,9 +576,9 @@ CREATE TABLE `lang`
     `datetime_format` VARCHAR(45),
     `decimal_separator` VARCHAR(45),
     `thousands_separator` VARCHAR(45),
-    `decimals` VARCHAR(45),
     `active` TINYINT(1) DEFAULT 0,
     `visible` TINYINT DEFAULT 0,
+    `decimals` VARCHAR(45),
     `by_default` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -834,7 +811,7 @@ CREATE TABLE `order_address`
     PRIMARY KEY (`id`),
     INDEX `fk_order_address_customer_title_id_idx` (`customer_title_id`),
     INDEX `fk_order_address_country_id_idx` (`country_id`),
-    INDEX `FI_order_address_state_id` (`state_id`),
+    INDEX `fk_order_address_state_id_idx` (`state_id`),
     CONSTRAINT `fk_order_address_customer_title_id`
         FOREIGN KEY (`customer_title_id`)
         REFERENCES `customer_title` (`id`)
@@ -1085,6 +1062,7 @@ CREATE TABLE `admin`
     `salt` VARCHAR(128),
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
+    `email` VARCHAR(255) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1361,8 +1339,8 @@ CREATE TABLE `product_price`
 (
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
-    `price` DECIMAL(16,6) DEFAULT 0.000000,
-    `promo_price` DECIMAL(16,6) DEFAULT 0.000000,
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `promo_price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
     `from_default_currency` TINYINT(1) DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -2347,6 +2325,29 @@ CREATE TABLE `ignored_module_hook`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- state
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `state`;
+
+CREATE TABLE `state`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
+    `isocode` VARCHAR(4),
+    `country_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_state_country_id_idx` (`country_id`),
+    CONSTRAINT `fk_state_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -2412,24 +2413,6 @@ CREATE TABLE `country_i18n`
     CONSTRAINT `country_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `country` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
--- state_i18n
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `state_i18n`;
-
-CREATE TABLE `state_i18n`
-(
-    `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
-    `title` VARCHAR(255),
-    PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `state_i18n_FK_1`
-        FOREIGN KEY (`id`)
-        REFERENCES `state` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
@@ -3190,6 +3173,24 @@ CREATE TABLE `module_config_i18n`
     CONSTRAINT `module_config_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `module_config` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- state_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `state_i18n`;
+
+CREATE TABLE `state_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `state_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `state` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
