@@ -69,9 +69,9 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (HttpKernelInterface::MASTER_REQUEST === $type) {
-            $this->container->set('request', $request);
-        }
+        // for backward compatibility
+        $this->container->set('request', $request);
+        $this->container->get('request.context')->fromRequest($request);
 
         $response = parent::handle($request, $type, $catch);
 
