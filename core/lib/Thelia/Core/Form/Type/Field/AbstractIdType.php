@@ -13,7 +13,7 @@
 namespace Thelia\Core\Form\Type\Field;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -36,9 +36,9 @@ abstract class AbstractIdType extends AbstractType
         $this->translator = $translator;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->replaceDefaults([
+        $resolver->setDefaults([
             "required" => true,
             "constraints" => array(
                 new NotBlank(),

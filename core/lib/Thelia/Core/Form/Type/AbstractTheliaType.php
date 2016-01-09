@@ -58,7 +58,7 @@ abstract class AbstractTheliaType extends AbstractType
          * Create a resolver to get the options
          */
         $nullResolver = new OptionsResolver();
-        $type->setDefaultOptions($nullResolver);
+        $type->configureOptions($nullResolver);
 
         $options = $nullResolver->resolve();
 

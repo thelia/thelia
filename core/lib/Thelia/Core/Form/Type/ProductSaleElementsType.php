@@ -13,7 +13,7 @@
 namespace Thelia\Core\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Thelia\Core\Form\Type\Field\ProductIdType;
 use Thelia\Core\Form\Type\Field\ProductSaleElementsIdType;
@@ -42,13 +42,13 @@ class ProductSaleElementsType extends AbstractTheliaType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      *
      * Always allow cascade validation for types
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->replaceDefaults([
+        $resolver->setDefaults([
             "cascade_validation" => true,
         ]);
     }
