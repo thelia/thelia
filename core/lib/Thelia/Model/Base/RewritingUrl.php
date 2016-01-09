@@ -65,7 +65,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
 
     /**
      * The value for the url field.
-     * @var        VARBINARY(255)
+     * @var        string
      */
     protected $url;
 
@@ -414,7 +414,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Get the [url] column value.
      *
-     * @return   VARBINARY(255)
+     * @return   string
      */
     public function getUrl()
     {
@@ -530,22 +530,19 @@ abstract class RewritingUrl implements ActiveRecordInterface
     /**
      * Set the value of [url] column.
      *
-     * @param      VARBINARY(255) $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setUrl($v)
     {
-        // Because BLOB columns are streams in PDO we have to assume that they are
-        // always modified when a new value is passed in.  For example, the contents
-        // of the stream itself may have changed externally.
-        if (!is_resource($v) && $v !== null) {
-            $this->url = fopen('php://memory', 'r+');
-            fwrite($this->url, $v);
-            rewind($this->url);
-        } else { // it's already a stream
-            $this->url = $v;
+        if ($v !== null) {
+            $v = (string) $v;
         }
-        $this->modifiedColumns[RewritingUrlTableMap::URL] = true;
+
+        if ($this->url !== $v) {
+            $this->url = $v;
+            $this->modifiedColumns[RewritingUrlTableMap::URL] = true;
+        }
 
 
         return $this;
@@ -722,13 +719,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
             $this->id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RewritingUrlTableMap::translateFieldName('Url', TableMap::TYPE_PHPNAME, $indexType)];
-            if (null !== $col) {
-                $this->url = fopen('php://memory', 'r+');
-                fwrite($this->url, $col);
-                rewind($this->url);
-            } else {
-                $this->url = null;
-            }
+            $this->url = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RewritingUrlTableMap::translateFieldName('View', TableMap::TYPE_PHPNAME, $indexType)];
             $this->view = (null !== $col) ? (string) $col : null;
@@ -972,11 +963,6 @@ abstract class RewritingUrl implements ActiveRecordInterface
                     $this->doUpdate($con);
                 }
                 $affectedRows += 1;
-                // Rewind the url LOB column, since PDO does not rewind after inserting value.
-                if ($this->url !== null && is_resource($this->url)) {
-                    rewind($this->url);
-                }
-
                 $this->resetModified();
             }
 
@@ -1080,10 +1066,7 @@ abstract class RewritingUrl implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                     case '`URL`':
-                        if (is_resource($this->url)) {
-                            rewind($this->url);
-                        }
-                        $stmt->bindValue($identifier, $this->url, PDO::PARAM_LOB);
+                        $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
                         break;
                     case '`VIEW`':
                         $stmt->bindValue($identifier, $this->view, PDO::PARAM_STR);

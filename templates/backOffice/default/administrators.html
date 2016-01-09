@@ -212,11 +212,11 @@
     {/form_field}
 
     {custom_render_form_field field='password'}
-        <input type="password" {form_field_attributes field="password"} placeholder="{intl l='Leave empty to keep current password'}">
+        <input type="password" {form_field_attributes field="password"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
     {/custom_render_form_field}
 
     {custom_render_form_field field='password_confirm'}
-        <input type="password" {form_field_attributes field="password_confirm"} placeholder="{intl l='Leave empty to keep current password'}">
+        <input type="password" {form_field_attributes field="password_confirm"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
     {/custom_render_form_field}
 
     {custom_render_form_field field="locale"}
@@ -326,6 +326,8 @@ jQuery(function($) {
             } else {
                 var fieldValue = $v.text();
             }
+
+            $('.' + $v.data('field-class')).val($.trim(fieldValue));
 
             if($('.' + $v.data('field-class')).is('select')) {
                 $('.' + $v.data('field-class')).selectpicker('refresh');

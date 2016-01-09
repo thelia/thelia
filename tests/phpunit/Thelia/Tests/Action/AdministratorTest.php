@@ -67,6 +67,7 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
             ->setLogin($login)
             ->setPassword('azerty')
             ->setLocale($locale)
+            ->setEmail(uniqid().'@example.com')
             ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
         ;
 
@@ -100,6 +101,7 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
             ->setLogin($login)
             ->setPassword('azertyuiop')
             ->setLocale($locale)
+            ->setEmail(uniqid().'@example.com')
             ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
         ;
 

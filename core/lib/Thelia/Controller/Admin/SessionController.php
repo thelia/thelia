@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Action\Administrator;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
+use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -32,6 +33,7 @@ class SessionController extends BaseAdminController
 {
     use \Thelia\Tools\RememberMeTrait;
 
+    const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
 
     protected function checkAdminLoggedIn()
     {
@@ -62,25 +64,12 @@ class SessionController extends BaseAdminController
         return $this->render("lost-password");
     }
 
-    public function passwordRenewedAction()
+
+    public function passwordCreateRequestAction()
     {
         if (null !== $response = $this->checkAdminLoggedIn()) {
             return $response;
         }
-
-        return $this->render(
-            "lost-password",
-            [ 'renew_success' => true ]
-        );
-    }
-
-    public function passwordRenewAction()
-    {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
-            return $response;
-        }
-
-        $request = $this->getRequest();
 
         $adminLostPasswordForm = $this->createForm(AdminForm::ADMIN_LOST_PASSWORD);
 
@@ -104,26 +93,31 @@ class SessionController extends BaseAdminController
                 throw new \Exception($this->getTranslator()->trans("Sorry, no email defined for this administrator."));
             }
 
-            $this->dispatch(TheliaEvents::ADMINISTRATOR_RENEWPASSWORD, new AdministratorEvent($admin));
+            $this->dispatch(TheliaEvents::ADMINISTRATOR_CREATEPASSWORD, new AdministratorEvent($admin));
 
-            // Redirect to the success URL, passing the cookie if one exists.
+            // Redirect to the success URL
             return $this->generateSuccessRedirect($adminLostPasswordForm);
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
-            // Log authentication failure
-            AdminLog::append("admin", "LOST_PASSWORD", $ex->getMessage(), $request);
+            // Log failure
+            AdminLog::append("admin", "ADMIN_LOST_PASSWORD", $ex->getMessage(), $this->getRequest());
 
             $message = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext("Login process", $message, $adminLostPasswordForm, $ex);
+        $this->setupFormErrorContext("Admin password create request", $message, $adminLostPasswordForm, $ex);
 
         return $this->render("lost-password");
     }
 
-    public function displayRenewFormAction($token)
+    public function passwordCreateRequestSuccessAction()
+    {
+        return $this->render("lost-password", [ 'create_request_success' => true ]);
+    }
+
+    public function displayCreateFormAction($token)
     {
         if (null !== $response = $this->checkAdminLoggedIn()) {
             return $response;
@@ -135,13 +129,63 @@ class SessionController extends BaseAdminController
                 "lost-password",
                 [ 'token_error' => true ]
             );
-
         }
 
-        return $this->render(
-            "renew-password",
-            [ 'token' => $token ]
-        );
+        $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, $token);
+
+        return $this->render("create-password");
+    }
+
+    public function passwordCreatedAction()
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
+        $adminCreatePasswordForm = $this->createForm(AdminForm::ADMIN_CREATE_PASSWORD);
+
+        try {
+            $form = $this->validateForm($adminCreatePasswordForm, "post");
+
+            $data = $form->getData();
+
+            $token = $this->getSession()->get(self::ADMIN_TOKEN_SESSION_VAR_NAME);
+
+            if (empty($token) || null === $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
+                throw new \Exception($this->getTranslator()->trans("An invalid token was provided, your password cannot be changed"));
+            }
+
+            $event = new AdministratorUpdatePasswordEvent($admin);
+            $event->setPassword($data['password']);
+
+            $this->dispatch(TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD, $event);
+
+            $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, null);
+
+            return $this->generateSuccessRedirect($adminCreatePasswordForm);
+
+        } catch (FormValidationException $ex) {
+            // Validation problem
+            $message = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Log authentication failure
+            AdminLog::append("admin", "ADMIN_CREATE_PASSWORD", $ex->getMessage(), $this->getRequest());
+
+            $message = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext("Login process", $message, $adminCreatePasswordForm, $ex);
+
+        return $this->render("create-password");
+    }
+
+    public function passwordCreatedSuccessAction()
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
+        return $this->render("create-password-success");
     }
 
     public function checkLogoutAction()

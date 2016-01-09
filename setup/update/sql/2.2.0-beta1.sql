@@ -21,7 +21,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-    (@max_id + 1, 'de_DE', 'Bestellung - Tabellenkopf', '', ''),
+    (@max_id + 1, 'ar_SA', NULL, '', ''),
+    (@max_id + 2, 'ar_SA', NULL, '', ''),
+    (@max_id + 3, 'ar_SA', NULL, '', ''),    (@max_id + 1, 'de_DE', 'Bestellung - Tabellenkopf', '', ''),
     (@max_id + 2, 'de_DE', 'Bestellung - Tabellenzeile', '', ''),
     (@max_id + 3, 'de_DE', NULL, '', ''),    (@max_id + 1, 'en_US', 'Order - table header', '', ''),
     (@max_id + 2, 'en_US', 'Order - table row', '', ''),
@@ -29,7 +31,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 2, 'es_ES', NULL, '', ''),
     (@max_id + 3, 'es_ES', NULL, '', ''),    (@max_id + 1, 'fr_FR', 'Commande - colonne tableau', '', ''),
     (@max_id + 2, 'fr_FR', 'Commande - ligne tableau', '', ''),
-    (@max_id + 3, 'fr_FR', 'Mini panier', '', '');
+    (@max_id + 3, 'fr_FR', 'Mini panier', '', ''),    (@max_id + 1, 'it_IT', NULL, '', ''),
+    (@max_id + 2, 'it_IT', NULL, '', ''),
+    (@max_id + 3, 'it_IT', NULL, '', ''),    (@max_id + 1, 'pt_BR', NULL, '', ''),
+    (@max_id + 2, 'pt_BR', NULL, '', ''),
+    (@max_id + 3, 'pt_BR', NULL, '', ''),    (@max_id + 1, 'tr_TR', 'Siparişler - Tablo üstbilgisi', '', ''),
+    (@max_id + 2, 'tr_TR', 'Siparişler - tablo satırı', '', ''),
+    (@max_id + 3, 'tr_TR', 'Mini arabası', '', '');
 
 ALTER TABLE `rewriting_url` CHANGE `url` `url` VARBINARY( 255 ) NOT NULL;
 

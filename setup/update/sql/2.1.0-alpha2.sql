@@ -18,6 +18,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id + 1, 'ar_SA', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'ar_SA', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'ar_SA', NULL, NULL, NULL, NULL),
+(@max_id + 4, 'ar_SA', NULL, NULL, NULL, NULL),
 (@max_id + 1, 'de_DE', 'Ein dauerhaftes Cookie verwenden, um den Kundes-Warenkorb zu merken', NULL, NULL, NULL),
 (@max_id + 2, 'de_DE', 'Name der Warenkorb-Cookie', NULL, NULL, NULL),
 (@max_id + 3, 'de_DE', 'Dauer der Warenkorb-Cookie in dem Kunden-Browser, in Sekunden', NULL, NULL, NULL),
@@ -33,7 +37,19 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 1, 'fr_FR', 'Utiliser un cookie persistant pour mémoriser le panier du client', NULL, NULL, NULL),
 (@max_id + 2, 'fr_FR', 'Nom du cookie pour le panier', NULL, NULL, NULL),
 (@max_id + 3, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
-(@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL)
+(@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL),
+(@max_id + 1, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 4, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 1, 'pt_BR', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'pt_BR', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'pt_BR', NULL, NULL, NULL, NULL),
+(@max_id + 4, 'pt_BR', NULL, NULL, NULL, NULL),
+(@max_id + 1, 'tr_TR', 'Müşteri sepeti izlemek için kalıcı bir tanımlama bilgisi kullanın', NULL, NULL, NULL),
+(@max_id + 2, 'tr_TR', 'Adı sepeti tanımlama bilgisi', NULL, NULL, NULL),
+(@max_id + 3, 'tr_TR', 'Müşteri tarayıcı sepeti çerezde yaşam süresi saniye içinde', NULL, NULL, NULL),
+(@max_id + 4, 'tr_TR', 'Eğik çizgi sona erdi URI izin', NULL, NULL, NULL)
 ;
 
 DELETE FROM `config` WHERE `name`='currency_rate_update_url';
@@ -62,6 +78,24 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+  (@max_id+1, 'ar_SA', NULL, '', ''),
+  (@max_id+2, 'ar_SA', NULL, '', ''),
+  (@max_id+3, 'ar_SA', NULL, '', ''),
+  (@max_id+4, 'ar_SA', NULL, '', ''),
+  (@max_id+5, 'ar_SA', NULL, '', ''),
+  (@max_id+6, 'ar_SA', NULL, '', ''),
+  (@max_id+7, 'ar_SA', NULL, '', ''),
+  (@max_id+8, 'ar_SA', NULL, '', ''),
+  (@max_id+9, 'ar_SA', NULL, '', ''),
+  (@max_id+10, 'ar_SA', NULL, '', ''),
+  (@max_id+11, 'ar_SA', NULL, '', ''),
+  (@max_id+12, 'ar_SA', NULL, '', ''),
+  (@max_id+13, 'ar_SA', NULL, '', ''),
+  (@max_id+14, 'ar_SA', NULL, '', ''),
+  (@max_id+15, 'ar_SA', NULL, '', ''),
+  (@max_id+16, 'ar_SA', NULL, '', ''),
+  (@max_id+17, 'ar_SA', NULL, '', ''),
+  (@max_id+18, 'ar_SA', NULL, '', ''),
   (@max_id+1, 'de_DE', 'Bestellung - Warenkorb oben', '', ''),
   (@max_id+2, 'de_DE', 'Bestellung - Warenkorb unten', '', ''),
   (@max_id+3, 'de_DE', 'Bestellung - Rechnung oben', '', ''),
@@ -133,7 +167,61 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+15, 'fr_FR', 'Promotions - JavaScript', '', ''),
   (@max_id+16, 'fr_FR', 'Produit - en bas d\'une combinaison de déclinaisons', '', ''),
   (@max_id+17, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
-  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', '')
+  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', ''),
+  (@max_id+1, 'it_IT', NULL, '', ''),
+  (@max_id+2, 'it_IT', NULL, '', ''),
+  (@max_id+3, 'it_IT', NULL, '', ''),
+  (@max_id+4, 'it_IT', NULL, '', ''),
+  (@max_id+5, 'it_IT', NULL, '', ''),
+  (@max_id+6, 'it_IT', NULL, '', ''),
+  (@max_id+7, 'it_IT', NULL, '', ''),
+  (@max_id+8, 'it_IT', NULL, '', ''),
+  (@max_id+9, 'it_IT', NULL, '', ''),
+  (@max_id+10, 'it_IT', NULL, '', ''),
+  (@max_id+11, 'it_IT', NULL, '', ''),
+  (@max_id+12, 'it_IT', NULL, '', ''),
+  (@max_id+13, 'it_IT', NULL, '', ''),
+  (@max_id+14, 'it_IT', NULL, '', ''),
+  (@max_id+15, 'it_IT', NULL, '', ''),
+  (@max_id+16, 'it_IT', NULL, '', ''),
+  (@max_id+17, 'it_IT', NULL, '', ''),
+  (@max_id+18, 'it_IT', NULL, '', ''),
+  (@max_id+1, 'pt_BR', NULL, '', ''),
+  (@max_id+2, 'pt_BR', NULL, '', ''),
+  (@max_id+3, 'pt_BR', NULL, '', ''),
+  (@max_id+4, 'pt_BR', NULL, '', ''),
+  (@max_id+5, 'pt_BR', NULL, '', ''),
+  (@max_id+6, 'pt_BR', NULL, '', ''),
+  (@max_id+7, 'pt_BR', NULL, '', ''),
+  (@max_id+8, 'pt_BR', NULL, '', ''),
+  (@max_id+9, 'pt_BR', NULL, '', ''),
+  (@max_id+10, 'pt_BR', NULL, '', ''),
+  (@max_id+11, 'pt_BR', NULL, '', ''),
+  (@max_id+12, 'pt_BR', NULL, '', ''),
+  (@max_id+13, 'pt_BR', NULL, '', ''),
+  (@max_id+14, 'pt_BR', NULL, '', ''),
+  (@max_id+15, 'pt_BR', NULL, '', ''),
+  (@max_id+16, 'pt_BR', NULL, '', ''),
+  (@max_id+17, 'pt_BR', NULL, '', ''),
+  (@max_id+18, 'pt_BR', NULL, '', ''),
+  (@max_id+1, 'tr_TR', 'Sipariş - sepeti üst', '', ''),
+  (@max_id+2, 'tr_TR', 'Sipariş - sepeti alt', '', ''),
+  (@max_id+3, 'tr_TR', 'Sipariş - bill üst', '', ''),
+  (@max_id+4, 'tr_TR', 'Sipariş - bill alt', '', ''),
+  (@max_id+5, 'tr_TR', 'Sipariş - önce ürün listesi', '', ''),
+  (@max_id+6, 'tr_TR', 'Sipariş ürün satır başlamadan önce-', '', ''),
+  (@max_id+7, 'tr_TR', 'Sipariş ürün satır kapattıktan sonra-', '', ''),
+  (@max_id+8, 'tr_TR', 'Sipariş - sonra ürün listesi', '', ''),
+  (@max_id+9, 'tr_TR', 'Satış - üst', '', ''),
+  (@max_id+10, 'tr_TR', 'Satış - Tablo üstbilgisi', '', ''),
+  (@max_id+11, 'tr_TR', 'Satış - tablo satırı', '', ''),
+  (@max_id+12, 'tr_TR', 'Satış - alt', '', ''),
+  (@max_id+13, 'tr_TR', 'Satılık - oluşturma formu', '', ''),
+  (@max_id+14, 'tr_TR', 'Satılık - silme formu', '', ''),
+  (@max_id+15, 'tr_TR', 'Satış - JavaScript', '', ''),
+  (@max_id+16, 'tr_TR', 'Ürünler - ürün birleşimi dibinde', '', ''),
+  (@max_id+17, 'tr_TR', 'Düzen - daha önce ana içerik', '', ''),
+  (@max_id+18, 'tr_TR', 'Admin düzeni - sonra ana içerik', '', '')
 ;
 
 # ======================================================================================================================
@@ -168,6 +256,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id+1, 'ar_SA', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'ar_SA', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'de_DE', NULL, NULL,  NULL,  NULL),
 (@max_id+2, 'de_DE', NULL, 'Prüfen ob ein Liefermodul für virtuellen Produkte aktiviert ist,  wenn es mindestens ein virtuelles Produkt gibt',  NULL,  NULL),
 (@max_id+1, 'en_US', 'Smarty template engine integration', NULL,  NULL,  NULL),
@@ -175,7 +265,13 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+2, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'fr_FR', 'Intégration du moteur de template Smarty', NULL,  NULL,  NULL),
-(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
+(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL),
+(@max_id+1, 'it_IT', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'it_IT', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'pt_BR', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'pt_BR', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'tr_TR', 'Smarty şablon motoru entegrasyonu', NULL,  NULL,  NULL),
+(@max_id+2, 'tr_TR', 'Sanal ürün denetleyicisi', 'En az bir ürün sanal ise bir sanal ürün teslim modülü etkin olup olmadığını denetleyin',  NULL,  NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

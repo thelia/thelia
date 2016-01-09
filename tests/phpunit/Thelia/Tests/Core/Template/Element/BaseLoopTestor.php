@@ -50,6 +50,13 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
     {
         $this->container = new ContainerBuilder();
 
+        $this->container->setParameter(
+            "thelia.parser.loops",
+            [
+                "tested-loop" => $this->getTestedClassName()
+            ]
+        );
+
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();
 

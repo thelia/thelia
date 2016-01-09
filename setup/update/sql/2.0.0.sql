@@ -39,10 +39,14 @@ INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max, 'admin.cache', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'ar_SA', NULL),
 (@max, 'de_DE', 'Konfiguration / Cache'),
 (@max, 'en_US', 'Configuration / Cache'),
 (@max, 'es_ES', NULL),
-(@max, 'fr_FR', 'Configuration / Cache')
+(@max, 'fr_FR', 'Configuration / Cache'),
+(@max, 'it_IT', NULL),
+(@max, 'pt_BR', NULL),
+(@max, 'tr_TR', 'Yapılandırma / Cache')
 ;
 
 SET @max := @max+1;
@@ -51,10 +55,14 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max, 'admin.home', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'ar_SA', NULL),
 (@max, 'de_DE', 'Back-Office Startseite'),
 (@max, 'en_US', 'Back-office home page'),
 (@max, 'es_ES', NULL),
-(@max, 'fr_FR', 'Page d\'acceuil de l\'administration')
+(@max, 'fr_FR', 'Page d\'acceuil de l\'administration'),
+(@max, 'it_IT', NULL),
+(@max, 'pt_BR', NULL),
+(@max, 'tr_TR', 'Arka ofis ana sayfa')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

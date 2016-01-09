@@ -297,7 +297,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getMinimuAdminPasswordLength()
     {
-        return (bool) self::read("minimum_admin_password_length", 4);
+        return self::read("minimum_admin_password_length", 4);
     }
 }
 // ConfigQuery
