@@ -112,21 +112,25 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
         $admin = $event->getAdministrator();
 
-        // Generate renew token
-        $admin
-            ->setPasswordRenewToken($renewToken)
-            ->save();
+        $email = $admin->getEmail();
 
-        $this->mailer->sendEmailMessage(
-            'new_admin_password',
-            [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
-            [ $admin->getEmail() => $admin->getFirstname() . ' ' . $admin->getLastname() ],
-            [
-                'renew_url' => URL::getInstance()->absoluteUrl('/admin/password-renew/' . $renewToken),
-                'token'     => $renewToken,
-                'admin'     => $admin
-            ]
-        );
+        if (! empty($email)) {
+            // Generate renew token
+            $admin
+                ->setPasswordRenewToken($renewToken)
+                ->save();
+
+            $this->mailer->sendEmailMessage(
+                'new_admin_password',
+                [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+                [ $admin->getEmail() => $admin->getFirstname() . ' ' . $admin->getLastname() ],
+                [
+                    'renew_url' => URL::getInstance()->absoluteUrl('/admin/password-renew/' . $renewToken),
+                    'token'     => $renewToken,
+                    'admin'     => $admin
+                ]
+            );
+        }
     }
 
     /**

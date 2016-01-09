@@ -23,6 +23,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Tests\TestCaseWithURLToolSetup;
 use Thelia\Tools\TokenProvider;
 
 /**
