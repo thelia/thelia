@@ -70,7 +70,7 @@
             </div>
         {/images}
 
-        <p class="text-center">{intl l="Welcome to Thelia administration !"}</p>
+        <p class="text-center">{block name="main-title"}{intl l="Welcome to Thelia administration !"}{/block}</p>
 
         <div class="row">
             {block name="main-content"}Put here the content of the template{/block}

@@ -895,6 +895,7 @@
     <column name="remember_me_token" size="255" type="VARCHAR" />
     <column name="remember_me_serial" size="255" type="VARCHAR" />
     <column name="email" required="true" size="255" type="VARCHAR" />
+    <column name="password_renew_token" size="255" type="VARCHAR" />
     <foreign-key foreignTable="profile" name="fk_admin_profile_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="profile_id" />
     </foreign-key>
