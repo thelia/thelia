@@ -70,6 +70,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (60, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW())
+(63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1959,7 +1960,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (59, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL),
     (60, '{$locale}', {intl l='Allow customers to change their email. 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
     (61, '{$locale}', {intl l='Ask the customers to confirm their email, 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
-    (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL),
+    (63, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

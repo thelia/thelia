@@ -294,5 +294,10 @@ class ConfigQuery extends BaseConfigQuery
     {
         return (bool) self::read("one_domain_foreach_lang", false);
     }
+
+    public static function getMinimuAdminPasswordLength()
+    {
+        return (bool) self::read("minimum_admin_password_length", 4);
+    }
 }
 // ConfigQuery
