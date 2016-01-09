@@ -36,7 +36,7 @@ if exist local\config\database.yml (
     php Thelia cache:clear
 
     echo [INFO] Adding admin
-    php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email admin@example.com
+    php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
 
     echo [INFO] Admin user thelia2 with password thelia2 and email admin@example.com successfully created.
 
