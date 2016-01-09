@@ -19,9 +19,17 @@ class AdminUserProvider implements UserProviderInterface
 {
     public function getUser($key)
     {
+        // Try with login name
         $admin = AdminQuery::create()
             ->filterByLogin($key, Criteria::EQUAL)
             ->findOne();
+
+        // Try with email address
+        if (null == $admin && ! empty($key)) {
+            $admin = AdminQuery::create()
+                ->filterByEmail($key, Criteria::EQUAL)
+                ->findOne();
+        }
 
         return $admin;
     }

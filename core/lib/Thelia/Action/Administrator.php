@@ -16,11 +16,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\TokenProvider;
+use Thelia\Tools\URL;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
+    /** @var MailerFactory  */
+    protected $mailer;
+
+    /** @var  TokenProvider */
+    protected $tokenProvider;
+
+    public function __construct(MailerFactory $mailer, TokenProvider $tokenProvider)
+    {
+        $this->mailer = $mailer;
+        $this->tokenProvider = $tokenProvider;
+    }
+
     /**
      * @param AdministratorEvent $event
      */
@@ -87,7 +103,30 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     {
         $admin = $event->getAdmin();
         $admin->setPassword($event->getPassword())
+              ->save();
+    }
+
+    public function renewPassword(AdministratorEvent $event)
+    {
+        $renewToken = $this->tokenProvider->getToken();
+
+        $admin = $event->getAdministrator();
+
+        // Generate renew token
+        $admin
+            ->setPasswordRenewToken($renewToken)
             ->save();
+
+        $this->mailer->sendEmailMessage(
+            'new_admin_password',
+            [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+            [ $admin->getEmail() => $admin->getFirstname() . ' ' . $admin->getLastname() ],
+            [
+                'renew_url' => URL::getInstance()->absoluteUrl('/admin/password-renew/' . $renewToken),
+                'token'     => $renewToken,
+                'admin'     => $admin
+            ]
+        );
     }
 
     /**
@@ -99,7 +138,8 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ADMINISTRATOR_CREATE                        => array('create', 128),
             TheliaEvents::ADMINISTRATOR_UPDATE                        => array('update', 128),
             TheliaEvents::ADMINISTRATOR_DELETE                        => array('delete', 128),
-            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD              => array('updatePassword', 128)
+            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD                => array('updatePassword', 128),
+            TheliaEvents::ADMINISTRATOR_RENEWPASSWORD                 => array('renewPassword', 128)
         );
     }
 }

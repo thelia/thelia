@@ -13,13 +13,17 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Action\Administrator;
+use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Form\AdminLogin;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AdminLog;
+use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -29,7 +33,7 @@ class SessionController extends BaseAdminController
     use \Thelia\Tools\RememberMeTrait;
 
 
-    public function showLoginAction()
+    protected function checkAdminLoggedIn()
     {
         // Check if user is already authenticate
         if ($this->getSecurityContext()->hasAdminUser()) {
@@ -37,7 +41,107 @@ class SessionController extends BaseAdminController
             return new RedirectResponse($this->retrieveUrlFromRouteId('admin.home.view'));
         }
 
+        return null;
+    }
+
+    public function showLoginAction()
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
         return $this->render("login");
+    }
+
+    public function showLostPasswordAction()
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
+        return $this->render("lost-password");
+    }
+
+    public function passwordRenewedAction()
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
+        return $this->render(
+            "lost-password",
+            [ 'renew_success' => true ]
+        );
+    }
+
+    public function passwordRenewAction()
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
+        $request = $this->getRequest();
+
+        $adminLostPasswordForm = $this->createForm(AdminForm::ADMIN_LOST_PASSWORD);
+
+        try {
+            $form = $this->validateForm($adminLostPasswordForm, "post");
+
+            $data = $form->getData();
+
+            // Check if user exists
+            if (null === $admin = AdminQuery::create()->findOneByEmail($data['username_or_email'])) {
+                $admin = AdminQuery::create()->findOneByLogin($data['username_or_email']);
+            }
+
+            if (null === $admin) {
+                throw new \Exception($this->getTranslator()->trans("Invalid username or email."));
+            }
+
+            $email = $admin->getEmail();
+
+            if (empty($email)) {
+                throw new \Exception($this->getTranslator()->trans("Sorry, no email defined for this administrator."));
+            }
+
+            $this->dispatch(TheliaEvents::ADMINISTRATOR_RENEWPASSWORD, new AdministratorEvent($admin));
+
+            // Redirect to the success URL, passing the cookie if one exists.
+            return $this->generateSuccessRedirect($adminLostPasswordForm);
+        } catch (FormValidationException $ex) {
+            // Validation problem
+            $message = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Log authentication failure
+            AdminLog::append("admin", "LOST_PASSWORD", $ex->getMessage(), $request);
+
+            $message = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext("Login process", $message, $adminLostPasswordForm, $ex);
+
+        return $this->render("lost-password");
+    }
+
+    public function displayRenewFormAction($token)
+    {
+        if (null !== $response = $this->checkAdminLoggedIn()) {
+            return $response;
+        }
+
+        // Check the token
+        if (null == $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
+            return $this->render(
+                "lost-password",
+                [ 'token_error' => true ]
+            );
+
+        }
+
+        return $this->render(
+            "renew-password",
+            [ 'token' => $token ]
+        );
     }
 
     public function checkLogoutAction()
