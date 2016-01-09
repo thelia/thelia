@@ -14,7 +14,7 @@ namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
@@ -42,8 +42,10 @@ use Thelia\Model\Order;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\Image;
 
-class BaseModule extends ContainerAware implements BaseModuleInterface
+class BaseModule implements BaseModuleInterface
 {
+    use ContainerAwareTrait;
+
     const CLASSIC_MODULE_TYPE  = 1;
     const DELIVERY_MODULE_TYPE = 2;
     const PAYMENT_MODULE_TYPE  = 3;
