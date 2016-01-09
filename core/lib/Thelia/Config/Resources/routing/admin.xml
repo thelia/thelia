@@ -39,19 +39,30 @@
         <default key="not-logged">1</default>
     </route>
 
-    <route id="admin.password-renew" path="/admin/password-renew">
-        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordRenewAction</default>
+    <route id="admin.password-create" path="/admin/password-create-request">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestAction</default>
         <default key="not-logged">1</default>
     </route>
 
-    <route id="admin.password-renew-form" path="/admin/password-renew/{token}">
-        <default key="_controller">Thelia\Controller\Admin\SessionController::displayRenewFormAction</default>
+    <route id="admin.password-create-success" path="/admin/password-create-request-success">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestSuccessAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+
+    <route id="admin.password-create-form" path="/admin/password-create/{token}">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::displayCreateFormAction</default>
         <requirement key="token">.*</requirement>
         <default key="not-logged">1</default>
     </route>
 
-    <route id="admin.password-renewed" path="/admin/password-renewed">
-        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordRenewedAction</default>
+    <route id="admin.password-renewed" path="/admin/password-created">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreatedAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-renewed-success" path="/admin/password-create-success">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreatedSuccessAction</default>
         <default key="not-logged">1</default>
     </route>
 
@@ -986,7 +997,7 @@
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.administrators.view" path="/admin/configuration/administrators/view">
+    <route id="admin.configuration.administrators.view-profile" path="/admin/configuration/administrators/view">
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::viewAction</default>
     </route>
 

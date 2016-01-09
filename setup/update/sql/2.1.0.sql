@@ -29,6 +29,11 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'ar_SA', NULL, '', ''),
+(@max_id + 2, 'ar_SA', NULL, '', ''),
+(@max_id + 3, 'ar_SA', NULL, '', ''),
+(@max_id + 4, 'ar_SA', NULL, '', ''),
+(@max_id + 5, 'ar_SA', NULL, '', ''),
 (@max_id + 1, 'de_DE', 'Brand edit Seite - im Formular', '', ''),
 (@max_id + 2, 'de_DE', 'Sonderangebot Änderungsseite - javascript last call block', '', ''),
 (@max_id + 3, 'de_DE', 'API Seite - oben', '', ''),
@@ -48,7 +53,22 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 2, 'fr_FR', 'Page sale edit - appel javascript', '', ''),
 (@max_id + 3, 'fr_FR', 'Page api - en haut', '', ''),
 (@max_id + 4, 'fr_FR', 'Page api - en bas', '', ''),
-(@max_id + 5, 'fr_FR', 'Page api - formulaire de suppression', '', '')
+(@max_id + 5, 'fr_FR', 'Page api - formulaire de suppression', '', ''),
+(@max_id + 1, 'it_IT', NULL, '', ''),
+(@max_id + 2, 'it_IT', NULL, '', ''),
+(@max_id + 3, 'it_IT', NULL, '', ''),
+(@max_id + 4, 'it_IT', NULL, '', ''),
+(@max_id + 5, 'it_IT', NULL, '', ''),
+(@max_id + 1, 'pt_BR', NULL, '', ''),
+(@max_id + 2, 'pt_BR', NULL, '', ''),
+(@max_id + 3, 'pt_BR', NULL, '', ''),
+(@max_id + 4, 'pt_BR', NULL, '', ''),
+(@max_id + 5, 'pt_BR', NULL, '', ''),
+(@max_id + 1, 'tr_TR', 'Marka Düzenle sayfa - formu', '', ''),
+(@max_id + 2, 'tr_TR', 'Satış sayfa - javascript son çağrı blok Düzenle', '', ''),
+(@max_id + 3, 'tr_TR', 'API sayfa - üst', '', ''),
+(@max_id + 4, 'tr_TR', 'API sayfa - alt', '', ''),
+(@max_id + 5, 'tr_TR', 'API sayfa - silme formu', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

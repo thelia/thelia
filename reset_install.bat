@@ -24,7 +24,6 @@ if exist local\config\database.yml (
     echo [INFO] Building SQL CREATE file
     ..\..\bin\propel sql:build -v --output-dir=..\..\setup
 
-
     echo [INFO] Reloading Thelia2 database
     cd ..\..
     del setup\sqldb.map
@@ -37,9 +36,9 @@ if exist local\config\database.yml (
     php Thelia cache:clear
 
     echo [INFO] Adding admin
-    php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
+    php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email admin@example.com
 
-    echo [INFO] Admin user thelia2 with password thelia2 successfully created.
+    echo [INFO] Admin user thelia2 with password thelia2 and email admin@example.com successfully created.
 
     echo [INFO] Activating Delivery Module
     php Thelia module:activate Colissimo

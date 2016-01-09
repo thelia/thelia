@@ -33,6 +33,15 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 ;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'ar_SA', NULL),
+(@max+1, 'ar_SA', NULL),
+(@max+2, 'ar_SA', NULL),
+(@max+3, 'ar_SA', NULL),
+(@max+4, 'ar_SA', 'التكوين المتقدم'),
+(@max+5, 'ar_SA', NULL),
+(@max+6, 'ar_SA', NULL),
+(@max+7, 'ar_SA', NULL),
+(@max+8, 'ar_SA', NULL),
 (@max, 'de_DE', 'Shop Informationen'),
 (@max+1, 'de_DE', 'Konfigurations Variablen'),
 (@max+2, 'de_DE', 'Administration Logs ansehen'),
@@ -68,7 +77,34 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max+5, 'fr_FR', 'Traductions'),
 (@max+6, 'fr_FR', 'Outils'),
 (@max+7, 'fr_FR', 'gestion des exports'),
-(@max+8, 'fr_FR', 'Export des inscrits à la newsletter')
+(@max+8, 'fr_FR', 'Export des inscrits à la newsletter'),
+(@max, 'it_IT', NULL),
+(@max+1, 'it_IT', NULL),
+(@max+2, 'it_IT', NULL),
+(@max+3, 'it_IT', NULL),
+(@max+4, 'it_IT', 'Configurazione avanzata'),
+(@max+5, 'it_IT', NULL),
+(@max+6, 'it_IT', NULL),
+(@max+7, 'it_IT', NULL),
+(@max+8, 'it_IT', NULL),
+(@max, 'pt_BR', NULL),
+(@max+1, 'pt_BR', NULL),
+(@max+2, 'pt_BR', NULL),
+(@max+3, 'pt_BR', NULL),
+(@max+4, 'pt_BR', NULL),
+(@max+5, 'pt_BR', NULL),
+(@max+6, 'pt_BR', NULL),
+(@max+7, 'pt_BR', NULL),
+(@max+8, 'pt_BR', NULL),
+(@max, 'tr_TR', 'Mağaza bilgileri yapılandırma'),
+(@max+1, 'tr_TR', 'Yapılandırma değişkenleri'),
+(@max+2, 'tr_TR', 'Yönetim günlüklerini görüntüleme'),
+(@max+3, 'tr_TR', 'Günlük sistem yapılandırmasını'),
+(@max+4, 'tr_TR', 'Gelişmiş yapılandırma'),
+(@max+5, 'tr_TR', 'Çeviri'),
+(@max+6, 'tr_TR', 'Araçlar paneli'),
+(@max+7, 'tr_TR', 'Arka ofis ihracat yönetimi'),
+(@max+8, 'tr_TR', 'bülten abonesi ihracat')
 ;
 
 SELECT @max := MAX(`id`) FROM `lang`;

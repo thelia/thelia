@@ -663,7 +663,7 @@ final class TheliaEvents
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
     const ADMINISTRATOR_UPDATEPASSWORD            = 'action.generatePassword';
-    const ADMINISTRATOR_RENEWPASSWORD             = 'action.renewPassword';
+    const ADMINISTRATOR_CREATEPASSWORD            = 'action.createPassword';
 
     // -- Api management ---------------------------------------------
 
