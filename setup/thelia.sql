@@ -1063,6 +1063,7 @@ CREATE TABLE `admin`
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
     `email` VARCHAR(255) NOT NULL,
+    `password_renew_token` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

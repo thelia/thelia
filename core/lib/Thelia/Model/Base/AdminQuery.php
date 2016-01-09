@@ -33,6 +33,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
  * @method     ChildAdminQuery orderByRememberMeSerial($order = Criteria::ASC) Order by the remember_me_serial column
  * @method     ChildAdminQuery orderByEmail($order = Criteria::ASC) Order by the email column
+ * @method     ChildAdminQuery orderByPasswordRenewToken($order = Criteria::ASC) Order by the password_renew_token column
  * @method     ChildAdminQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAdminQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -48,6 +49,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery groupByRememberMeToken() Group by the remember_me_token column
  * @method     ChildAdminQuery groupByRememberMeSerial() Group by the remember_me_serial column
  * @method     ChildAdminQuery groupByEmail() Group by the email column
+ * @method     ChildAdminQuery groupByPasswordRenewToken() Group by the password_renew_token column
  * @method     ChildAdminQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAdminQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -74,6 +76,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdmin findOneByRememberMeToken(string $remember_me_token) Return the first ChildAdmin filtered by the remember_me_token column
  * @method     ChildAdmin findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildAdmin filtered by the remember_me_serial column
  * @method     ChildAdmin findOneByEmail(string $email) Return the first ChildAdmin filtered by the email column
+ * @method     ChildAdmin findOneByPasswordRenewToken(string $password_renew_token) Return the first ChildAdmin filtered by the password_renew_token column
  * @method     ChildAdmin findOneByCreatedAt(string $created_at) Return the first ChildAdmin filtered by the created_at column
  * @method     ChildAdmin findOneByUpdatedAt(string $updated_at) Return the first ChildAdmin filtered by the updated_at column
  *
@@ -89,6 +92,7 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildAdmin objects filtered by the remember_me_token column
  * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildAdmin objects filtered by the remember_me_serial column
  * @method     array findByEmail(string $email) Return ChildAdmin objects filtered by the email column
+ * @method     array findByPasswordRenewToken(string $password_renew_token) Return ChildAdmin objects filtered by the password_renew_token column
  * @method     array findByCreatedAt(string $created_at) Return ChildAdmin objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAdmin objects filtered by the updated_at column
  *
@@ -179,7 +183,7 @@ abstract class AdminQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PROFILE_ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `LOCALE`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `EMAIL`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PROFILE_ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `LOCALE`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `EMAIL`, `PASSWORD_RENEW_TOKEN`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -640,6 +644,35 @@ abstract class AdminQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AdminTableMap::EMAIL, $email, $comparison);
+    }
+
+    /**
+     * Filter the query on the password_renew_token column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPasswordRenewToken('fooValue');   // WHERE password_renew_token = 'fooValue'
+     * $query->filterByPasswordRenewToken('%fooValue%'); // WHERE password_renew_token LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $passwordRenewToken The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminQuery The current query, for fluid interface
+     */
+    public function filterByPasswordRenewToken($passwordRenewToken = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($passwordRenewToken)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $passwordRenewToken)) {
+                $passwordRenewToken = str_replace('*', '%', $passwordRenewToken);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AdminTableMap::PASSWORD_RENEW_TOKEN, $passwordRenewToken, $comparison);
     }
 
     /**

@@ -16,12 +16,12 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
-class AdminLogin extends BruteforceForm
+class AdminLostPassword extends BruteforceForm
 {
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", "text", array(
+            ->add("username_or_email", "text", array(
                 "constraints" => array(
                     new NotBlank(),
                     new Length(array("min" => 3)),
@@ -31,27 +31,6 @@ class AdminLogin extends BruteforceForm
                     "for" => "username",
                 ),
             ))
-            ->add("password", "password", array(
-                "constraints" => array(
-                    new NotBlank(),
-                ),
-                "label" => Translator::getInstance()->trans("Password *"),
-                "label_attr" => array(
-                    "for" => "password",
-                ),
-            ))
-            ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
-                        "for" => "remember_me",
-                    ),
-            ))
-            ;
-    }
-
-    public function getName()
-    {
-        return "thelia_admin_login";
+        ;
     }
 }
