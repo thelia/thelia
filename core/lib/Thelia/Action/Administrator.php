@@ -71,6 +71,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setLogin($event->getLogin())
+                ->setEmail($event->getEmail())
                 ->setProfileId($event->getProfile())
                 ->setLocale($event->getLocale())
             ;
@@ -106,7 +107,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
               ->save();
     }
 
-    public function renewPassword(AdministratorEvent $event)
+    public function createPassword(AdministratorEvent $event)
     {
         $renewToken = $this->tokenProvider->getToken();
 
@@ -123,9 +124,8 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             $this->mailer->sendEmailMessage(
                 'new_admin_password',
                 [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
-                [ $admin->getEmail() => $admin->getFirstname() . ' ' . $admin->getLastname() ],
+                [ $email => $admin->getFirstname() . ' ' . $admin->getLastname() ],
                 [
-                    'renew_url' => URL::getInstance()->absoluteUrl('/admin/password-renew/' . $renewToken),
                     'token'     => $renewToken,
                     'admin'     => $admin
                 ]
@@ -143,7 +143,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ADMINISTRATOR_UPDATE                        => array('update', 128),
             TheliaEvents::ADMINISTRATOR_DELETE                        => array('delete', 128),
             TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD                => array('updatePassword', 128),
-            TheliaEvents::ADMINISTRATOR_RENEWPASSWORD                 => array('renewPassword', 128)
+            TheliaEvents::ADMINISTRATOR_CREATEPASSWORD                => array('createPassword', 128)
         );
     }
 }

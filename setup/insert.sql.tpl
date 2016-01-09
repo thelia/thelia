@@ -69,7 +69,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (59, 'error_message.page_name', 'error.html', 0, 0, NOW(), NOW()),
 (60, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
-(62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW())
+(62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
 (63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW())
 ;
 
@@ -1903,9 +1903,9 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (2, 'lost_password', NULL, NULL, 'password.txt', NULL, 'password.html', NOW(), NOW()),
 (3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW()),
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
-(5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW());
-(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
-
+(5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
+(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW())
+;
 
 /**
 I18n

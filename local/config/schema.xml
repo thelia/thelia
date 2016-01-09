@@ -905,6 +905,9 @@
     <unique name="login_UNIQUE">
       <unique-column name="login" />
     </unique>
+    <unique name="email_UNIQUE">
+      <unique-column name="email" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="profile_resource" namespace="Thelia\Model">
@@ -1318,7 +1321,7 @@
   </table>
   <table name="rewriting_url" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" phpType="VARBINARY(255)" required="true" size="255" sqlType="VARBINARY(255)" type="VARBINARY" />
+    <column name="url" required="true" size="255" sqlType="VARBINARY(255)" type="VARCHAR" />
     <column name="view" size="255" type="VARCHAR" />
     <column name="view_id" size="255" type="VARCHAR" />
     <column name="view_locale" size="255" type="VARCHAR" />

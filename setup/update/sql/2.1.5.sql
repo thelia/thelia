@@ -17,6 +17,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+    (@max_id+1, 'ar_SA', NULL, '', ''),
+    (@max_id+2, 'ar_SA', NULL, '', ''),
     (@max_id+1, 'de_DE', 'Rechnung - Weitere Produktinformationen', '', ''),
     (@max_id+2, 'de_DE', 'Lieferung - Weitere Produktinformationen', '', ''),
     (@max_id+1, 'en_US', 'Invoice - additional product information', '', ''),
@@ -24,7 +26,13 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (@max_id+1, 'es_ES', NULL, '', ''),
     (@max_id+2, 'es_ES', NULL, '', ''),
     (@max_id+1, 'fr_FR', 'Facture - informations additionnelles pour un produit', '', ''),
-    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', '')
+    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', ''),
+    (@max_id+1, 'it_IT', NULL, '', ''),
+    (@max_id+2, 'it_IT', NULL, '', ''),
+    (@max_id+1, 'pt_BR', NULL, '', ''),
+    (@max_id+2, 'pt_BR', NULL, '', ''),
+    (@max_id+1, 'tr_TR', 'Fatura - daha fazla ürün bilgisi', '', ''),
+    (@max_id+2, 'tr_TR', 'Dağıtım - daha fazla ürün bilgisi', '', '')
 ;
 
 UPDATE `hook` SET `by_module` = 1 WHERE `code` = 'module.config-js';

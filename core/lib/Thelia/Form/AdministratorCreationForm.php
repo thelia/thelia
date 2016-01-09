@@ -45,7 +45,12 @@ class AdministratorCreationForm extends BaseForm
             ->add("email", "email", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Email()
+                    new Constraints\Email(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this, "verifyExistingEmail"),
+                        ),
+                    )),
                 ),
                 "label" => $this->translator->trans("Email address"),
                 "label_attr" => array(
@@ -156,9 +161,15 @@ class AdministratorCreationForm extends BaseForm
 
     public function verifyExistingLogin($value, ExecutionContextInterface $context)
     {
-        $administrator = AdminQuery::create()->findOneByLogin($value);
-        if ($administrator !== null) {
-            $context->addViolation("This login already exists");
+        if (null !== $administrator = AdminQuery::create()->findOneByLogin($value)) {
+            $context->addViolation($this->translator->trans("This administrator login already exists"));
+        }
+    }
+
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        if (null !== $administrator = AdminQuery::create()->findOneByEmail($value)) {
+            $context->addViolation($this->translator->trans("An administrator with thie email address already exists"));
         }
     }
 

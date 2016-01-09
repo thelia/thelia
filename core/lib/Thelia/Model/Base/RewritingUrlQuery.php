@@ -59,7 +59,7 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  * @method     ChildRewritingUrl findOneOrCreate(ConnectionInterface $con = null) Return the first ChildRewritingUrl matching the query, or a new ChildRewritingUrl object populated from the query conditions when no match is found
  *
  * @method     ChildRewritingUrl findOneById(int $id) Return the first ChildRewritingUrl filtered by the id column
- * @method     ChildRewritingUrl findOneByUrl(VARBINARY(255) $url) Return the first ChildRewritingUrl filtered by the url column
+ * @method     ChildRewritingUrl findOneByUrl(string $url) Return the first ChildRewritingUrl filtered by the url column
  * @method     ChildRewritingUrl findOneByView(string $view) Return the first ChildRewritingUrl filtered by the view column
  * @method     ChildRewritingUrl findOneByViewId(string $view_id) Return the first ChildRewritingUrl filtered by the view_id column
  * @method     ChildRewritingUrl findOneByViewLocale(string $view_locale) Return the first ChildRewritingUrl filtered by the view_locale column
@@ -68,7 +68,7 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  * @method     ChildRewritingUrl findOneByUpdatedAt(string $updated_at) Return the first ChildRewritingUrl filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildRewritingUrl objects filtered by the id column
- * @method     array findByUrl(VARBINARY(255) $url) Return ChildRewritingUrl objects filtered by the url column
+ * @method     array findByUrl(string $url) Return ChildRewritingUrl objects filtered by the url column
  * @method     array findByView(string $view) Return ChildRewritingUrl objects filtered by the view column
  * @method     array findByViewId(string $view_id) Return ChildRewritingUrl objects filtered by the view_id column
  * @method     array findByViewLocale(string $view_locale) Return ChildRewritingUrl objects filtered by the view_locale column
@@ -296,13 +296,28 @@ abstract class RewritingUrlQuery extends ModelCriteria
     /**
      * Filter the query on the url column
      *
-     * @param     mixed $url The value to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByUrl('fooValue');   // WHERE url = 'fooValue'
+     * $query->filterByUrl('%fooValue%'); // WHERE url LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $url The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildRewritingUrlQuery The current query, for fluid interface
      */
     public function filterByUrl($url = null, $comparison = null)
     {
+        if (null === $comparison) {
+            if (is_array($url)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $url)) {
+                $url = str_replace('*', '%', $url);
+                $comparison = Criteria::LIKE;
+            }
+        }
 
         return $this->addUsingAlias(RewritingUrlTableMap::URL, $url, $comparison);
     }

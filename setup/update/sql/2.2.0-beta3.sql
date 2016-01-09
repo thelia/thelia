@@ -20,6 +20,13 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+    (@max_id + 1, 'ar_SA', NULL, '', ''),
+    (@max_id + 2, 'ar_SA', NULL, '', ''),
+    (@max_id + 3, 'ar_SA', NULL, '', ''),
+    (@max_id + 4, 'ar_SA', NULL, '', ''),
+    (@max_id + 5, 'ar_SA', NULL, '', ''),
+    (@max_id + 6, 'ar_SA', NULL, '', ''),
+    (@max_id + 7, 'ar_SA', NULL, '', ''),
     (@max_id + 1, 'de_DE', NULL, '', ''),
     (@max_id + 2, 'de_DE', NULL, '', ''),
     (@max_id + 3, 'de_DE', NULL, '', ''),
@@ -47,7 +54,28 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 4, 'fr_FR', 'Administrateurs - en-tête', '', ''),
     (@max_id + 5, 'fr_FR', 'Administrateurs - ligne', '', ''),
     (@max_id + 6, 'fr_FR', 'Configuration avancée', '', ''),
-    (@max_id + 7, 'fr_FR', 'Configuration avancée - JavaScript', '', '')
+    (@max_id + 7, 'fr_FR', 'Configuration avancée - JavaScript', '', ''),
+    (@max_id + 1, 'it_IT', NULL, '', ''),
+    (@max_id + 2, 'it_IT', NULL, '', ''),
+    (@max_id + 3, 'it_IT', NULL, '', ''),
+    (@max_id + 4, 'it_IT', NULL, '', ''),
+    (@max_id + 5, 'it_IT', NULL, '', ''),
+    (@max_id + 6, 'it_IT', NULL, '', ''),
+    (@max_id + 7, 'it_IT', NULL, '', ''),
+    (@max_id + 1, 'pt_BR', NULL, '', ''),
+    (@max_id + 2, 'pt_BR', NULL, '', ''),
+    (@max_id + 3, 'pt_BR', NULL, '', ''),
+    (@max_id + 4, 'pt_BR', NULL, '', ''),
+    (@max_id + 5, 'pt_BR', NULL, '', ''),
+    (@max_id + 6, 'pt_BR', NULL, '', ''),
+    (@max_id + 7, 'pt_BR', NULL, '', ''),
+    (@max_id + 1, 'tr_TR', 'Sekme SEO - güncelleştirme formu', '', ''),
+    (@max_id + 2, 'tr_TR', 'Siparişi gir - sipariş ürün tablo başlığı', '', ''),
+    (@max_id + 3, 'tr_TR', 'Siparişi gir - sipariş ürün tablo satırı', '', ''),
+    (@max_id + 4, 'tr_TR', 'Yöneticiler - başlık', '', ''),
+    (@max_id + 5, 'tr_TR', 'Yöneticiler - kürek', '', ''),
+    (@max_id + 6, 'tr_TR', 'Gelişmiş yapılandırma', '', ''),
+    (@max_id + 7, 'tr_TR', 'Gelişmiş yapılandırma - JavaScript', '', '')
 ;
 
 UPDATE `hook` SET  `block` =  '0', `updated_at` =  NOW() WHERE `code` = 'main.topbar-top' AND `type` = 2;

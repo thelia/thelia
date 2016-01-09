@@ -69,8 +69,20 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $data = $context->getRoot()->getData();
 
         $administrator = AdminQuery::create()->findOneByLogin($value);
-        if ($administrator !== null && $administrator->getId() != $data['id']) {
-            $context->addViolation(Translator::getInstance()->trans("This login already exists"));
+
+        if (null !== $administrator && $administrator->getId() != $data['id']) {
+            $context->addViolation($this->translator->trans("This administrator login already exists"));
+        }
+    }
+
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        $administrator = AdminQuery::create()->findOneByEmail($value);
+
+        if (null !== $administrator && $administrator->getId() != $data['id']) {
+            $context->addViolation($this->translator->trans("An administrator with thie email address already exists"));
         }
     }
 
