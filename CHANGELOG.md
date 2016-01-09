@@ -4,6 +4,7 @@
 
 # 2.3.0-alpha1
 
+- #XXXX Administrators new minimum_admin_password_length configuration variable
 - #1902 Update Colissimo export, add link to order and to customer, add package weight
 - #1801 Fixed cart duplication conditions at user login/logout
 - #1892 Add a name verification when creating a module with a command

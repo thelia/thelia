@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\ProfileQuery;
 
@@ -146,8 +147,10 @@ class AdministratorCreationForm extends BaseForm
             $context->addViolation("password confirmation is not the same as password field");
         }
 
-        if (strlen($data["password"]) < 4) {
-            $context->addViolation("password must be composed of at least 4 characters");
+        $minLength = ConfigQuery::getMinimuAdminPasswordLength();
+
+        if (strlen($data["password"]) < $minLength) {
+            $context->addViolation("password must be composed of at least $minLength characters");
         }
     }
 

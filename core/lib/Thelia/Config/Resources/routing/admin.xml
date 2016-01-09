@@ -44,7 +44,7 @@
         <default key="not-logged">1</default>
     </route>
 
-    <route id="admin.password-renew" path="/admin/password-renew/{token}">
+    <route id="admin.password-renew-form" path="/admin/password-renew/{token}">
         <default key="_controller">Thelia\Controller\Admin\SessionController::displayRenewFormAction</default>
         <requirement key="token">.*</requirement>
         <default key="not-logged">1</default>
