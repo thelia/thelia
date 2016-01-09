@@ -13,7 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Form\Exception\StockNotFoundException;
 use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Model\ProductSaleElementsQuery;

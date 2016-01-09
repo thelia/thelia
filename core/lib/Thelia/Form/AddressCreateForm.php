@@ -14,11 +14,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CountryQuery;
-use Thelia\Model\State;
-use Thelia\Model\StateQuery;
 
 /**
  * Class AddressCreateForm

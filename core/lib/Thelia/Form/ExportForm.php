@@ -13,7 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\LangQuery;
 
 /**

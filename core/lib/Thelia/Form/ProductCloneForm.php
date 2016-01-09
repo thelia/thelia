@@ -15,7 +15,7 @@ namespace Thelia\Form;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\ProductQuery;
 
 class ProductCloneForm extends BaseForm

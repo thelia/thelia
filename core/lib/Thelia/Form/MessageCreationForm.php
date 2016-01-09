@@ -15,7 +15,7 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Model\Lang;
 use Thelia\Model\MessageQuery;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
 class MessageCreationForm extends BaseForm
