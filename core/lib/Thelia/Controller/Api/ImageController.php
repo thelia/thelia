@@ -13,23 +13,18 @@
 namespace Thelia\Controller\Api;
 
 use Propel\Runtime\Propel;
-use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Controller\Admin\FileController;
-use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
-use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Files\FileConfiguration;
-use Thelia\Model\ProductQuery;
 
 /**
  * Class ImageController
