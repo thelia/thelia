@@ -389,7 +389,7 @@ jQuery(function($) {
             bootbox.hideAll();
             // Show dialog
             bootbox.dialog({
-                message : $("#content-main",data),
+                message : '<div class="clearfix">'+$("#content-main",data).html()+'</div>',
                 onEscape: function() {
                     bootbox.hideAll();
                 }
