@@ -213,7 +213,7 @@ class ConfigStoreForm extends BaseForm
         foreach ($list as $email) {
             $email = trim($email);
 
-            $context->validateValue($email, $emailValidator);
+            $context->getValidator()->validate($email, $emailValidator);
         }
     }
 
