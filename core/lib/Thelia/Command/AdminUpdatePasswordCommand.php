@@ -35,23 +35,13 @@ use Thelia\Tools\Password;
  */
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
 {
-    protected function init(InputInterface $input)
+    protected function init()
     {
         $container = $this->getContainer();
 
         $container->set("request", new Request());
         $container->get("request")->setSession(new Session(new MockArraySessionStorage()));
         $container->enterScope("request");
-/*
-        $this->translator = $container->get('thelia.translator');
-        $this->parser = $container->get('thelia.parser');
-
-        $this->con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
-
-        $this->initLocales($input);
-
-        $this->initParser();
-*/
     }
 
     /**
@@ -79,7 +69,7 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->init($input);
+        $this->init();
 
         $login = $input->getArgument('login');
 
