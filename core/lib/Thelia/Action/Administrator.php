@@ -103,20 +103,22 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     public function updatePassword(AdministratorUpdatePasswordEvent $event)
     {
         $admin = $event->getAdmin();
-        $admin->setPassword($event->getPassword())
-              ->save();
+
+        $admin
+            ->setPassword($event->getPassword())
+            ->setPasswordRenewToken(null)
+            ->save();
     }
 
     public function createPassword(AdministratorEvent $event)
     {
-        $renewToken = $this->tokenProvider->getToken();
-
         $admin = $event->getAdministrator();
 
         $email = $admin->getEmail();
 
         if (! empty($email)) {
-            // Generate renew token
+            $renewToken = $this->tokenProvider->getToken();
+
             $admin
                 ->setPasswordRenewToken($renewToken)
                 ->save();
