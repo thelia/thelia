@@ -158,4 +158,22 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf("Thelia\Model\Admin", $updatedAdmin);
         $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
+
+    public function testRenewPassword()
+    {
+        $admin = AdminQuery::create()->findOne();
+        $admin->setPasswordRenewToken(null)->setEmail('no_reply@thelia.net')->save();
+
+        $adminEvent = new AdministratorEvent($admin);
+        $adminEvent
+            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+
+        $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
+        $actionAdmin->createPassword($adminEvent);
+
+        $updatedAdmin = $adminEvent->getAdministrator();
+
+        $this->assertInstanceOf("Thelia\Model\Admin", $updatedAdmin);
+        $this->assertNotEmpty($admin->getPasswordRenewToken());
+    }
 }
