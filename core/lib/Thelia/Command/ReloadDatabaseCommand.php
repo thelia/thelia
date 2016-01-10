@@ -12,6 +12,8 @@
 
 namespace Thelia\Command;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
+use \Thelia\Model\Map\ProductTableMap;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,7 +42,8 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+        /** @var \PDO|ConnectionWrapper $connection */
+        $connection = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         $connection = $connection->getWrappedConnection();
 
         $tables = $connection->query("SHOW TABLES");

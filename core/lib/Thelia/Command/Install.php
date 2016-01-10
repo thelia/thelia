@@ -12,10 +12,13 @@
 
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Translation\Translator;
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
 use Thelia\Tools\TokenProvider;
@@ -145,7 +148,10 @@ class Install extends ContainerAwareCommand
             "Checking some permissions"
         ));
 
-        $permissions = new CheckPermission(false, $this->getContainer()->get('thelia.translator'));
+        /** @var Translator $translator */
+        $translator = $this->getContainer()->get('thelia.translator');
+
+        $permissions = new CheckPermission(false, $translator);
         $isValid = $permissions->exec();
 
         foreach ($permissions->getValidationMessages() as $item => $data) {
@@ -247,74 +253,89 @@ class Install extends ContainerAwareCommand
      */
     protected function getConnectionInfo(InputInterface $input, OutputInterface $output)
     {
-        $dialog = $this->getHelperSet()->get('dialog');
+        /** @var QuestionHelper $helper */
+        $helper = $this->getHelper('question');
 
         $connectionInfo = array();
 
-        $connectionInfo["host"] = $dialog->askAndValidate(
+        $connectionInfo['host'] = $this->enterData(
+            $helper,
+            $input,
             $output,
-            $this->decorateInfo("Database host [default: localhost] : "),
-            function ($answer) {
-                $answer = trim($answer);
-                if (is_null($answer)) {
-                    throw new \RuntimeException("You must specify a database host");
-                }
-
-                return $answer;
-            },
+            "Database host [default: localhost] : ",
+            "You must specify a database host",
             false,
             "localhost"
         );
 
-        $connectionInfo["port"] = $dialog->askAndValidate(
+        $connectionInfo['port'] = $this->enterData(
+            $helper,
+            $input,
             $output,
-            $this->decorateInfo("Database port [default: 3306]: "),
-            function ($answer) {
-                $answer = trim($answer);
-                if (is_null($answer)) {
-                    throw new \RuntimeException("You must specify a database port");
-                }
-
-                return $answer;
-            },
+            "Database port [default: 3306] : ",
+            "You must specify a database port",
             false,
             "3306"
         );
 
-        $connectionInfo["dbName"] = $dialog->askAndValidate(
+        $connectionInfo['dbName'] = $this->enterData(
+            $helper,
+            $input,
             $output,
-            $this->decorateInfo("Database name (if database does not exist, Thelia will try to create it) : "),
-            function ($answer) {
-                $answer = trim($answer);
-
-                if (is_null($answer)) {
-                    throw new \RuntimeException("You must specify a database name");
-                }
-
-                return $answer;
-            }
+            "Database name (if database does not exist, Thelia will try to create it) : ",
+            "You must specify a database name"
         );
 
-        $connectionInfo["username"] = $dialog->askAndValidate(
+        $connectionInfo['username'] = $this->enterData(
+            $helper,
+            $input,
             $output,
-            $this->decorateInfo("Database username : "),
-            function ($answer) {
-                $answer = trim($answer);
-
-                if (is_null($answer)) {
-                    throw new \RuntimeException("You must specify a database username");
-                }
-
-                return $answer;
-            }
+            "Database username : ",
+            "You must specify a database username"
         );
 
-        $connectionInfo["password"] = $dialog->askHiddenResponse(
+        $connectionInfo['password'] = $this->enterData(
+            $helper,
+            $input,
             $output,
-            $this->decorateInfo("Database password : ")
+            "Database password : ",
+            "You must specify a database username",
+            true,
+            null,
+            true
         );
 
         return $connectionInfo;
+    }
+
+    protected function enterData(
+        QuestionHelper $helper,
+        InputInterface $input,
+        OutputInterface $output,
+        $label,
+        $errorMessage,
+        $hidden = false,
+        $defaultValue = null,
+        $beEmpty = false
+    ) {
+        $question = new Question($label, $defaultValue);
+
+        if ($hidden) {
+            $question->setHidden(true);
+            $question->setHiddenFallback(false);
+        }
+
+        $question->setValidator(function ($value) use (&$errorMessage, &$beEmpty) {
+            if (trim($value) == '') {
+                if (is_null($value) && !$beEmpty) {
+                    throw new \Exception($errorMessage);
+                }
+            }
+
+            return $value;
+        });
+
+        return $password = $helper->ask($input, $output, $question);
     }
 
     protected function decorateInfo($text)

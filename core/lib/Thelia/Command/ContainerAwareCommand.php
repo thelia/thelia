@@ -15,6 +15,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Thelia\Core\Application;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -35,7 +36,9 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
     protected function getContainer()
     {
         if (null === $this->container) {
-            $this->container = $this->getApplication()->getKernel()->getContainer();
+            /** @var Application $application */
+            $application = $this->getApplication();
+            $this->container = $application->getKernel()->getContainer();
         }
 
         return $this->container;
