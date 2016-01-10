@@ -43,7 +43,7 @@ class ViewListener implements EventSubscriberInterface
 
     /**
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerInterfac $container
+     * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
@@ -117,10 +117,8 @@ class ViewListener implements EventSubscriberInterface
 
 
     /**
-     *
-     * Register the method to execute in this class for a specific event (here the kernel.view event)
-     *
-     * @return array The event names to listen to
+     * {@inheritdoc}
+     * api
      */
     public static function getSubscribedEvents()
     {

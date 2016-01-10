@@ -12,7 +12,7 @@
 
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\Map\ModuleTableMap;
@@ -41,7 +41,7 @@ class ModuleListCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $helper = new TableHelper();
+        $helper = new Table($output);
         $helper->addRows($this->getModulesData());
 
         $helper

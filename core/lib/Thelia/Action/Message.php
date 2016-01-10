@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Message as MessageModel;
@@ -26,19 +27,19 @@ class Message extends BaseAction implements EventSubscriberInterface
      * Create a new messageuration entry
      *
      * @param \Thelia\Core\Event\Message\MessageCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(MessageCreateEvent $event)
+    public function create(MessageCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $message = new MessageModel();
 
         $message
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
 
             ->setName($event->getMessageName())
-
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-
             ->setSecured($event->getSecured())
 
             ->save()
@@ -51,12 +52,14 @@ class Message extends BaseAction implements EventSubscriberInterface
      * Change a message
      *
      * @param \Thelia\Core\Event\Message\MessageUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function modify(MessageUpdateEvent $event)
+    public function modify(MessageUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
             $message
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
 
                 ->setName($event->getMessageName())
                 ->setSecured($event->getSecured())
@@ -84,12 +87,14 @@ class Message extends BaseAction implements EventSubscriberInterface
      * Delete a messageuration entry
      *
      * @param \Thelia\Core\Event\Message\MessageDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function delete(MessageDeleteEvent $event)
+    public function delete(MessageDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
             $message
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 

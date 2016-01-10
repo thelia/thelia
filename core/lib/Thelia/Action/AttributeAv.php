@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeAv as AttributeAvModel;
@@ -27,13 +28,15 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      * Create a new attribute entry
      *
      * @param AttributeAvCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(AttributeAvCreateEvent $event)
+    public function create(AttributeAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $attribute = new AttributeAvModel();
 
         $attribute
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
 
             ->setAttributeId($event->getAttributeId())
             ->setLocale($event->getLocale())
@@ -48,13 +51,15 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product attribute
      *
-     * @param \Thelia\Core\Event\Attribute\AttributeAvUpdateEvent $event
+     * @param AttributeAvUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(AttributeAvUpdateEvent $event)
+    public function update(AttributeAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
             $attribute
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -72,12 +77,14 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      * Delete a product attribute entry
      *
      * @param AttributeAvDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function delete(AttributeAvDeleteEvent $event)
+    public function delete(AttributeAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
             $attribute
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 
@@ -88,15 +95,17 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

@@ -211,6 +211,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      * Next, if the module, hook and module hook is active, a new listener is
      * added to the service definition.
      *
+     * @param ContainerBuilder $container
      * @param Definition $definition The service definition
      */
     protected function addHooksMethodCall(ContainerBuilder $container, Definition $definition)

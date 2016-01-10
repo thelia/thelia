@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
@@ -29,31 +30,29 @@ use Thelia\Model\CurrencyQuery;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var CurrencyConverter
-     */
+    /** @var CurrencyConverter  */
     protected $currencyConverter;
 
-    /**
-     * @param CurrencyConverter $currencyConverter
-     */
     public function __construct(CurrencyConverter $currencyConverter)
     {
         $this->currencyConverter = $currencyConverter;
     }
+
     /**
      * Create a new currencyuration entry
      *
      * @param \Thelia\Core\Event\Currency\CurrencyCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(CurrencyCreateEvent $event)
+    public function create(CurrencyCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $currency = new CurrencyModel();
 
         $isDefault = CurrencyQuery::create()->count() === 0;
 
         $currency
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setLocale($event->getLocale())
             ->setName($event->getCurrencyName())
             ->setSymbol($event->getSymbol())
@@ -71,12 +70,14 @@ class Currency extends BaseAction implements EventSubscriberInterface
      * Change a currency
      *
      * @param \Thelia\Core\Event\Currency\CurrencyUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(CurrencyUpdateEvent $event)
+    public function update(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             $currency
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
 
                 ->setLocale($event->getLocale())
                 ->setName($event->getCurrencyName())
@@ -95,15 +96,17 @@ class Currency extends BaseAction implements EventSubscriberInterface
      * Set the default currency
      *
      * @param CurrencyUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function setDefault(CurrencyUpdateEvent $event)
+    public function setDefault(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             // Reset default status
             CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
             $currency
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setVisible($event->getVisible())
                 ->setByDefault($event->getIsDefault())
                 ->save()
@@ -113,7 +116,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             if ($event->getIsDefault()) {
                 $updateRateEvent = new CurrencyUpdateRateEvent();
 
-                $event->getDispatcher()->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $updateRateEvent);
+                $dispatcher->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $updateRateEvent);
             }
 
             $event->setCurrency($currency);
@@ -122,6 +125,8 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param CurrencyUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
     public function setVisible(CurrencyUpdateEvent $event)
     {
@@ -136,8 +141,10 @@ class Currency extends BaseAction implements EventSubscriberInterface
      * Delete a currencyuration entry
      *
      * @param \Thelia\Core\Event\Currency\CurrencyDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function delete(CurrencyDeleteEvent $event)
+    public function delete(CurrencyDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
             if ($currency->getByDefault()) {
@@ -147,7 +154,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             }
 
             $currency
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 
@@ -188,10 +195,12 @@ class Currency extends BaseAction implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param UpdatePositionEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(CurrencyQuery::create(), $event);
+        $this->genericUpdatePosition(CurrencyQuery::create(), $event, $dispatcher);
     }
 
     /**

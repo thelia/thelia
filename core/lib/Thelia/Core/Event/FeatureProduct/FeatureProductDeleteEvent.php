@@ -14,7 +14,10 @@ namespace Thelia\Core\Event\FeatureProduct;
 
 class FeatureProductDeleteEvent extends FeatureProductEvent
 {
+    /** @var int */
     protected $product_id;
+
+    /** @var int */
     protected $feature_id;
 
     public function __construct($product_id, $feature_id)

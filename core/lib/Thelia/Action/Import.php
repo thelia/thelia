@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -53,22 +54,26 @@ class Import extends BaseAction implements EventSubscriberInterface
     /**
      * Handle import change position event
      *
-     * @param \Thelia\Core\Event\UpdatePositionEvent $updatePositionEvent
+     * @param UpdatePositionEvent $updatePositionEvent
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function importChangePosition(UpdatePositionEvent $updatePositionEvent)
+    public function importChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getImport($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ImportQuery, $updatePositionEvent);
+        $this->genericUpdatePosition(new ImportQuery, $updatePositionEvent, $dispatcher);
     }
 
     /**
      * Handle import category change position event
      *
-     * @param \Thelia\Core\Event\UpdatePositionEvent $updatePositionEvent
+     * @param UpdatePositionEvent $updatePositionEvent
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent)
+    public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ImportCategoryQuery, $updatePositionEvent);
+        $this->genericUpdatePosition(new ImportCategoryQuery, $updatePositionEvent, $dispatcher);
     }
 }

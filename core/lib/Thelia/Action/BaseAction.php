@@ -12,6 +12,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
@@ -25,13 +26,15 @@ class BaseAction
      *
      * @param ModelCriteria       $query
      * @param UpdatePositionEvent $event
+     * @param EventDispatcherInterface $dispatcher
      *
      * @return null
      */
-    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
+    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
-            $object->setDispatcher($event->getDispatcher());
+            //for backward compatibility
+            $object->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher());
 
             $mode = $event->getMode();
 
@@ -50,15 +53,17 @@ class BaseAction
      *
      * @param ModelCriteria  $query
      * @param UpdateSeoEvent $event
+     * @param EventDispatcherInterface $dispatcher
      *
      * @return mixed                   an SEOxxx object
      * @throws FormValidationException if a rewritten URL cannot be created
      */
-    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event)
+    protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $object
-                ->setDispatcher($event->getDispatcher())
+                //for backward compatibility
+                ->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher())
 
                 ->setLocale($event->getLocale())
                 ->setMetaTitle($event->getMetaTitle())
@@ -86,15 +91,17 @@ class BaseAction
      *
      * @param ModelCriteria               $query
      * @param ToggleVisibilityEvent $event
+     * @param EventDispatcherInterface $dispatcher
      *
      * @return mixed
      */
-    public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event)
+    public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event, EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $newVisibility = !$object->getVisible();
             $object
-                ->setDispatcher($event->getDispatcher())
+                //for backward compatibility
+                ->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher())
                 ->setVisible($newVisibility)
                 ->save()
             ;

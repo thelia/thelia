@@ -16,6 +16,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Sale\ProductSaleStatusUpdateEvent;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
@@ -208,12 +209,14 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * Process update sale
      *
      * @param  SaleUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      * @throws PropelException
      */
-    public function update(SaleUpdateEvent $event)
+    public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
-            $sale->setDispatcher($event->getDispatcher());
+            $sale->setDispatcher($dispatcher);
 
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
 
@@ -231,7 +234,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 $update = ($startDate <= $now && $now <= $endDate);
 
                 if ($update) {
-                    $event->getDispatcher()->dispatch(
+                    $dispatcher->dispatch(
                         TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                         new ProductSaleStatusUpdateEvent($sale)
                     );
@@ -300,7 +303,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                 if ($update) {
                     // Update related products sale status
-                    $event->getDispatcher()->dispatch(
+                    $dispatcher->dispatch(
                         TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                         new ProductSaleStatusUpdateEvent($sale)
                     );
@@ -317,10 +320,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Sale activity
      *
-     * @param  SaleToggleActivityEvent                   $event
+     * @param SaleToggleActivityEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleActivity(SaleToggleActivityEvent $event)
+    public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $sale = $event->getSale();
 
@@ -330,12 +335,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
         try {
             $sale
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setActive(!$sale->getActive())
             ->save($con);
 
             // Update related products sale status
-            $event->getDispatcher()->dispatch(
+            $dispatcher->dispatch(
                 TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                 new ProductSaleStatusUpdateEvent($sale)
             );
@@ -352,10 +357,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a sale
      *
-     * @param  SaleDeleteEvent                           $event
+     * @param  SaleDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function delete(SaleDeleteEvent $event)
+    public function delete(SaleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
@@ -368,13 +375,13 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     $sale->setActive(false);
 
                     // Update related products sale status
-                    $event->getDispatcher()->dispatch(
+                    $dispatcher->dispatch(
                         TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                         new ProductSaleStatusUpdateEvent($sale)
                     );
                 }
 
-                $sale->setDispatcher($event->getDispatcher())->delete($con);
+                $sale->setDispatcher($dispatcher)->delete($con);
 
                 $event->setSale($sale);
 
@@ -421,10 +428,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * This method check the activation and deactivation dates of sales, and perform
      * the required action depending on the current date.
      *
-     * @param  SaleActiveStatusCheckEvent                $event
+     * @param  SaleActiveStatusCheckEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function checkSaleActivation(SaleActiveStatusCheckEvent $event)
+    public function checkSaleActivation(SaleActiveStatusCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -442,7 +451,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     $sale->setActive(false)->save();
 
                     // Update related products sale status
-                    $event->getDispatcher()->dispatch(
+                    $dispatcher->dispatch(
                         TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                         new ProductSaleStatusUpdateEvent($sale)
                     );
@@ -460,7 +469,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     $sale->setActive(true)->save();
 
                     // Update related products sale status
-                    $event->getDispatcher()->dispatch(
+                    $dispatcher->dispatch(
                         TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                         new ProductSaleStatusUpdateEvent($sale)
                     );

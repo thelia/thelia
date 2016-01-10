@@ -105,6 +105,9 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(

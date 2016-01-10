@@ -17,12 +17,17 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\ImageException;
+use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
+use Imagine\Imagick\Imagine as ImagickImagine;
+use Imagine\Gmagick\Imagine as GmagickImagine;
+use Imagine\Gd\Imagine;
 
 /**
  *
@@ -83,11 +88,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      * This method updates the cache_file_path and file_url attributes of the event
      *
      * @param ImageEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
      *
      * @throws \Thelia\Exception\ImageException
      * @throws \InvalidArgumentException
      */
-    public function processImage(ImageEvent $event)
+    public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $subdir      = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();
@@ -133,7 +140,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 if ($image) {
                     // Allow image pre-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
-                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
+                    $dispatcher->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
                     $image = $event->getImageObject();
 
                     $background_color = $event->getBackgroundColor();
@@ -221,7 +228,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     // Allow image post-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
-                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
+                    $dispatcher->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
                     $image = $event->getImageObject();
 
                     $image->save(
@@ -374,21 +381,24 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         switch ($driver) {
             case 'imagick':
-                $image = new \Imagine\Imagick\Imagine();
+                $image = new ImagickImagine();
                 break;
 
             case 'gmagick':
-                $image = new \Imagine\Gmagick\Imagine();
+                $image = new GmagickImagine();
                 break;
 
             case 'gd':
             default:
-                $image = new \Imagine\Gd\Imagine();
+                $image = new Imagine();
         }
 
         return $image;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(

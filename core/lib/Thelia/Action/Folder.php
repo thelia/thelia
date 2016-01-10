@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
@@ -35,10 +36,10 @@ use Thelia\Model\Map\FolderTableMap;
  */
 class Folder extends BaseAction implements EventSubscriberInterface
 {
-    public function update(FolderUpdateEvent $event)
+    public function update(FolderUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
-            $folder->setDispatcher($event->getDispatcher());
+            $folder->setDispatcher($dispatcher);
 
             $folder
                 ->setParent($event->getParent())
@@ -58,16 +59,17 @@ class Folder extends BaseAction implements EventSubscriberInterface
     /**
      * Change Folder SEO
      *
-     * @param \Thelia\Core\Event\UpdateSeoEvent $event
-     *
-     * @return mixed
+     * @param UpdateSeoEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return Object
      */
-    public function updateSeo(UpdateSeoEvent $event)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdateSeo(FolderQuery::create(), $event);
+        return $this->genericUpdateSeo(FolderQuery::create(), $event, $dispatcher);
     }
 
-    public function delete(FolderDeleteEvent $event)
+    public function delete(FolderDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
             $con = Propel::getWriteConnection(FolderTableMap::DATABASE_NAME);
@@ -84,7 +86,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
 
                 // Delete folder
-                $folder->setDispatcher($event->getDispatcher())
+                $folder->setDispatcher($dispatcher)
                     ->delete($con);
 
                 $event->setFolder($folder);
@@ -93,7 +95,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $dispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
                     }
                 }
 
@@ -105,13 +107,10 @@ class Folder extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FolderCreateEvent $event
-     */
-    public function create(FolderCreateEvent $event)
+    public function create(FolderCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $folder = new FolderModel();
-        $folder->setDispatcher($event->getDispatcher());
+        $folder->setDispatcher($dispatcher);
 
         $folder
             ->setParent($event->getParent())
@@ -123,22 +122,22 @@ class Folder extends BaseAction implements EventSubscriberInterface
         $event->setFolder($folder);
     }
 
-    public function toggleVisibility(FolderToggleVisibilityEvent $event)
+    public function toggleVisibility(FolderToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $folder = $event->getFolder();
 
         $folder
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setVisible(!$folder->getVisible())
             ->save();
 
         $event->setFolder($folder);
     }
 
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
-            $folder->setDispatcher($event->getDispatcher());
+            $folder->setDispatcher($dispatcher);
 
             switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:
@@ -155,24 +154,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

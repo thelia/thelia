@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Lang\LangCreateEvent;
@@ -24,6 +25,7 @@ use Thelia\Core\Event\Lang\LangToggleVisibleEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
@@ -50,10 +52,10 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $this->request = $request;
     }
 
-    public function update(LangUpdateEvent $event)
+    public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
-            $lang->setDispatcher($event->getDispatcher());
+            $lang->setDispatcher($dispatcher);
 
             $lang->setTitle($event->getTitle())
                 ->setLocale($event->getLocale())
@@ -69,10 +71,10 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleDefault(LangToggleDefaultEvent $event)
+    public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            $lang->setDispatcher($event->getDispatcher());
+            $lang->setDispatcher($dispatcher);
 
             $lang->toggleDefault();
 
@@ -122,12 +124,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function create(LangCreateEvent $event)
+    public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $lang = new LangModel();
 
         $lang
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setTitle($event->getTitle())
             ->setCode($event->getCode())
             ->setLocale($event->getLocale())
@@ -141,7 +143,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $event->setLang($lang);
     }
 
-    public function delete(LangDeleteEvent $event)
+    public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
@@ -150,9 +152,10 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 );
             }
 
-            $lang->setDispatcher($event->getDispatcher())
+            $lang->setDispatcher($dispatcher)
                 ->delete();
 
+            /** @var Session $session */
             $session = $this->request->getSession();
 
             // If we've just deleted the current admin edition language, set it to the default one.
@@ -214,24 +217,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -22,13 +23,15 @@ class Tax extends BaseAction implements EventSubscriberInterface
 {
     /**
      * @param TaxEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(TaxEvent $event)
+    public function create(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $tax = new TaxModel();
 
         $tax
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setRequirements($event->getRequirements())
             ->setType($event->getType())
             ->setLocale($event->getLocale())
@@ -43,12 +46,14 @@ class Tax extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param TaxEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(TaxEvent $event)
+    public function update(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
             $tax
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setRequirements($event->getRequirements())
                 ->setType($event->getType())
                 ->setLocale($event->getLocale())

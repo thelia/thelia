@@ -14,6 +14,7 @@ namespace Thelia\Core\Event\Product;
 
 class ProductUpdateEvent extends ProductCreateEvent
 {
+    /** @var int */
     protected $product_id;
 
     protected $chapo;

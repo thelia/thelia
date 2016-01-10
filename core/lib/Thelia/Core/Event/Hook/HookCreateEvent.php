@@ -19,15 +19,27 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookCreateEvent extends HookEvent
 {
+    /** @var string */
     protected $locale;
+
+    /** @var string */
     protected $code;
+
+    /** @var int */
     protected $type;
+
+    /** @var string */
     protected $title;
+
+    /** @var int */
     protected $native;
+
+    /** @var int */
     protected $active;
 
     /**
-     * @param mixed $locale
+     * @param string $locale
+     * @return $this;
      */
     public function setLocale($locale)
     {
@@ -37,7 +49,7 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLocale()
     {
@@ -45,7 +57,8 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param mixed $native
+     * @param $native
+     * @return $this
      */
     public function setNative($native)
     {
@@ -63,7 +76,8 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param mixed $title
+     * @param $title
+     * @return $this
      */
     public function setTitle($title)
     {
@@ -81,7 +95,8 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param mixed $type
+     * @param $type
+     * @return $this
      */
     public function setType($type)
     {
@@ -99,7 +114,8 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param mixed $active
+     * @param $active
+     * @return $this
      */
     public function setActive($active)
     {
@@ -117,7 +133,8 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param mixed $code
+     * @param $code
+     * @return $this
      */
     public function setCode($code)
     {

@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -53,22 +54,26 @@ class Export extends BaseAction implements EventSubscriberInterface
     /**
      * Handle export change position event
      *
-     * @param \Thelia\Core\Event\UpdatePositionEvent $updatePositionEvent
+     * @param UpdatePositionEvent $updatePositionEvent
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function exportChangePosition(UpdatePositionEvent $updatePositionEvent)
+    public function exportChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getExport($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ExportQuery, $updatePositionEvent);
+        $this->genericUpdatePosition(new ExportQuery, $updatePositionEvent, $dispatcher);
     }
 
     /**
      * Handle export category change position event
      *
-     * @param \Thelia\Core\Event\UpdatePositionEvent $updatePositionEvent
+     * @param UpdatePositionEvent $updatePositionEvent
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent)
+    public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ExportCategoryQuery, $updatePositionEvent);
+        $this->genericUpdatePosition(new ExportCategoryQuery, $updatePositionEvent, $dispatcher);
     }
 }

@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
@@ -38,13 +39,15 @@ class Category extends BaseAction implements EventSubscriberInterface
      * Create a new category entry
      *
      * @param \Thelia\Core\Event\Category\CategoryCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(CategoryCreateEvent $event)
+    public function create(CategoryCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $category = new CategoryModel();
 
         $category
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
 
             ->setLocale($event->getLocale())
             ->setParent($event->getParent())
@@ -61,12 +64,14 @@ class Category extends BaseAction implements EventSubscriberInterface
      * Change a category
      *
      * @param \Thelia\Core\Event\Category\CategoryUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(CategoryUpdateEvent $event)
+    public function update(CategoryUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $category
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setDefaultTemplateId($event->getDefaultTemplateId() == 0 ? null : $event->getDefaultTemplateId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -86,21 +91,25 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Change a Category SEO
      *
-     * @param \Thelia\Core\Event\UpdateSeoEvent $event
-     *
-     * @return mixed
+     * @param UpdateSeoEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return Object
      */
-    public function updateSeo(UpdateSeoEvent $event)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdateSeo(CategoryQuery::create(), $event);
+        return $this->genericUpdateSeo(CategoryQuery::create(), $event, $dispatcher);
     }
 
     /**
      * Delete a category entry
      *
      * @param \Thelia\Core\Event\Category\CategoryDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Exception
      */
-    public function delete(CategoryDeleteEvent $event)
+    public function delete(CategoryDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $con = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
@@ -118,7 +127,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
                 // Delete category
                 $category
-                    ->setDispatcher($event->getDispatcher())
+                    ->setDispatcher($dispatcher)
                     ->delete($con);
 
                 $event->setCategory($category);
@@ -127,7 +136,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $dispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
                     }
                 }
 
@@ -142,14 +151,16 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle category visibility. No form used here
      *
-     * @param ActionEvent $event
+     * @param CategoryToggleVisibilityEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function toggleVisibility(CategoryToggleVisibilityEvent $event)
+    public function toggleVisibility(CategoryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $category = $event->getCategory();
 
         $category
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setVisible($category->getVisible() ? false : true)
             ->save()
             ;
@@ -160,14 +171,16 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(CategoryQuery::create(), $event);
+        $this->genericUpdatePosition(CategoryQuery::create(), $event, $dispatcher);
     }
 
-    public function addContent(CategoryAddContentEvent $event)
+    public function addContent(CategoryAddContentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
@@ -175,7 +188,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             $content = new CategoryAssociatedContent();
 
             $content
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setCategory($event->getCategory())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -183,7 +196,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeContent(CategoryDeleteContentEvent $event)
+    public function removeContent(CategoryDeleteContentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $content = CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
@@ -192,7 +205,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
         if ($content !== null) {
             $content
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->delete();
         }
     }

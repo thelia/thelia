@@ -45,7 +45,7 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::MAILING_SYSTEM_UPDATE                        => array("update", 128),
+            TheliaEvents::MAILING_SYSTEM_UPDATE => array("update", 128),
         );
     }
 }
