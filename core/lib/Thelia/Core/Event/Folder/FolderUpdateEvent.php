@@ -19,12 +19,16 @@ namespace Thelia\Core\Event\Folder;
  */
 class FolderUpdateEvent extends FolderCreateEvent
 {
+    /** @var int */
     protected $folder_id;
 
     protected $chapo;
     protected $description;
     protected $postscriptum;
 
+    /**
+     * @param int $folder_id
+     */
     public function __construct($folder_id)
     {
         $this->folder_id = $folder_id;
@@ -32,6 +36,7 @@ class FolderUpdateEvent extends FolderCreateEvent
 
     /**
      * @param mixed $chapo
+     * @return $this
      */
     public function setChapo($chapo)
     {
@@ -50,6 +55,7 @@ class FolderUpdateEvent extends FolderCreateEvent
 
     /**
      * @param mixed $description
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -68,6 +74,7 @@ class FolderUpdateEvent extends FolderCreateEvent
 
     /**
      * @param mixed $folder_id
+     * @return $this
      */
     public function setFolderId($folder_id)
     {
@@ -86,6 +93,7 @@ class FolderUpdateEvent extends FolderCreateEvent
 
     /**
      * @param mixed $postscriptum
+     * @return $this
      */
     public function setPostscriptum($postscriptum)
     {

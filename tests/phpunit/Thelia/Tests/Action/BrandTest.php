@@ -31,13 +31,11 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
 class BrandTest extends TestCaseWithURLToolSetup
 {
     /**
-     * @var EventDispatcherInterface
+     * @return EventDispatcherInterface
      */
-    protected $dispatcher;
-
-    public function setUp()
+    protected function getMockEventDispatcher()
     {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     public function getUpdateEvent(&$brand)
@@ -47,7 +45,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         }
 
         $event = new BrandUpdateEvent($brand->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setVisible(1)
             ->setLocale($brand->getLocale())
@@ -60,9 +58,13 @@ class BrandTest extends TestCaseWithURLToolSetup
         return $event;
     }
 
+    /**
+     * @param BrandUpdateEvent $event
+     * @return Brand
+     */
     public function processUpdateAction($event)
     {
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->update($event);
 
         return $event->getBrand();
@@ -71,14 +73,14 @@ class BrandTest extends TestCaseWithURLToolSetup
     public function testCreateBrand()
     {
         $event = new BrandCreateEvent();
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setVisible(1)
             ->setLocale('en_US')
             ->setTitle('test create brand')
         ;
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->create($event);
 
         $createdBrand = $event->getBrand();
@@ -93,7 +95,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $brand = $this->getRandomBrand();
 
         $event = new BrandUpdateEvent($brand->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setVisible(1)
             ->setLocale('en_US')
@@ -103,7 +105,7 @@ class BrandTest extends TestCaseWithURLToolSetup
             ->setPostscriptum('test update brand postscriptum')
         ;
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->update($event);
 
         $updatedBrand = $event->getBrand();
@@ -121,9 +123,9 @@ class BrandTest extends TestCaseWithURLToolSetup
         $brand = $this->getRandomBrand();
 
         $event = new BrandDeleteEvent($brand->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->delete($event);
 
         $deletedBrand = $event->getBrand();
@@ -139,9 +141,9 @@ class BrandTest extends TestCaseWithURLToolSetup
         $visibility = $brand->getVisible();
 
         $event = new BrandToggleVisibilityEvent($brand);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->toggleVisibility($event);
 
         $updatedBrand = $event->getBrand();
@@ -165,9 +167,9 @@ class BrandTest extends TestCaseWithURLToolSetup
         $newPosition = $brand->getPosition()-1;
 
         $event = new UpdatePositionEvent($brand->getId(), UpdatePositionEvent::POSITION_UP);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->updatePosition($event);
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());
@@ -190,9 +192,9 @@ class BrandTest extends TestCaseWithURLToolSetup
         $newPosition = $brand->getPosition()+1;
 
         $event = new UpdatePositionEvent($brand->getId(), UpdatePositionEvent::POSITION_DOWN);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->updatePosition($event);
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());
@@ -213,9 +215,9 @@ class BrandTest extends TestCaseWithURLToolSetup
         }
 
         $event = new UpdatePositionEvent($brand->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $brandAction = new Brand($this->getContainer());
+        $brandAction = new Brand($this->getMockEventDispatcher());
         $brandAction->updatePosition($event);
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());

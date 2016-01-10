@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Thelia\Tools\URL;
 
@@ -69,5 +70,13 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getMockEventDispatcher()
+    {
+        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 }

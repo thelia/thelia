@@ -28,11 +28,8 @@ use Thelia\Model\ModuleQuery;
  * @package Thelia\Tests\Action
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHookTest extends \PHPUnit_Framework_TestCase
+class ModuleHookTest extends BaseAction
 {
-    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-    protected $dispatcher;
-
     /** @var ModuleHook $action */
     protected $action;
 
@@ -44,12 +41,10 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->dispatcher = $this->getMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->action = new ModuleHook($stubContainer);
+        $this->action = new ModuleHook($stubContainer, $this->getMockEventDispatcher());
 
         $this->module = ModuleQuery::create()->findOneByActivate(1);
 
@@ -62,7 +57,7 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
         $event
             ->setHookId($this->hook->getId())
             ->setModuleId($this->module->getId())
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
         $this->action->createModuleHook($event);
 
@@ -79,15 +74,16 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params ModuleHookModel $hook
+     * @param ModuleHookModel $moduleHook
      * @depends testCreate
+     * @return ModuleHookModel
      */
     public function testToggleActivation(ModuleHookModel $moduleHook)
     {
         $activated = $moduleHook->getActive();
 
         $event = new ModuleHookToggleActivationEvent($moduleHook);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
         $this->action->toggleModuleHookActivation($event);
         $updatedModuleHook = $event->getModuleHook();
@@ -98,8 +94,9 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params ModuleHookModel $hook
+     * @param ModuleHookModel $moduleHook
      * @depends testToggleActivation
+     * @return ModuleHookModel
      */
     public function testUpdate(ModuleHookModel $moduleHook)
     {
@@ -110,7 +107,7 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
             ->setClassname($moduleHook->getClassname())
             ->setMethod($moduleHook->getMethod())
             ->setActive(true)
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
         $this->action->updateModuleHook($event);
 
@@ -125,14 +122,15 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params ModuleHookModel $hook
+     * @param ModuleHookModel $moduleHook
      * @depends testUpdate
+     * @return ModuleHookModel
      */
     public function testDelete(ModuleHookModel $moduleHook)
     {
         $event = new ModuleHookDeleteEvent($moduleHook->getId());
 
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
         $this->action->deleteModuleHook($event);
 

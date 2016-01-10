@@ -24,6 +24,9 @@ class CountryDeleteEvent extends CountryEvent
      */
     protected $country_id;
 
+    /**
+     * @param int $country_id
+     */
     public function __construct($country_id)
     {
         $this->country_id = $country_id;

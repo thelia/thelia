@@ -26,7 +26,7 @@ use Thelia\Model\CustomerQuery;
  * @package Thelia\Tests\Action\ImageTest
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class CustomerTest extends \PHPUnit_Framework_TestCase
+class CustomerTest extends BaseAction
 {
     /**
      * @var SecurityContext
@@ -48,18 +48,15 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
     {
         $session = new Session(new MockArraySessionStorage());
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
         $this->request = new Request();
         $this->request->setSession($session);
 
         $this->securityContext = new SecurityContext($this->request);
 
-        $parser = $this->getMock("Thelia\\Core\\Template\\ParserInterface");
-
         $this->customerAction = new Customer(
             $this->securityContext,
-            new MailerFactory($dispatcher, $parser)
+            new MailerFactory($this->getMockEventDispatcher(), $this->getMockParserInterface()),
+            $this->getMockEventDispatcher()
         );
     }
 
@@ -87,8 +84,9 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $customerCreateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+        $customerCreateEvent->setDispatcher($this->getMockEventDispatcher());
 
+        /** @var Customer $customerAction */
         $customerAction = $this->customerAction;
 
         $customerAction->create($customerCreateEvent);
@@ -148,8 +146,9 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
             'testRef'
         );
 
-        $customerCreateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+        $customerCreateEvent->setDispatcher($this->getMockEventDispatcher());
 
+        /** @var Customer $customerAction */
         $customerAction = $this->customerAction;
 
         $customerAction->create($customerCreateEvent);

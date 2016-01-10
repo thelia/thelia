@@ -24,15 +24,8 @@ use Thelia\Model\FeatureQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class FeatureAvTest extends \PHPUnit_Framework_TestCase
+class FeatureAvTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     /**
      * @return \Thelia\Model\Feature
      */
@@ -58,9 +51,9 @@ class FeatureAvTest extends \PHPUnit_Framework_TestCase
             ->setFeatureId($feature->getId())
             ->setLocale('en_US')
             ->setTitle('test')
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new FeatureAv();
+        $action = new FeatureAv($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdFeatureAv = $event->getFeatureAv();
@@ -79,6 +72,7 @@ class FeatureAvTest extends \PHPUnit_Framework_TestCase
     /**
      * @param FeatureAvModel $featureAv
      * @depends testCreate
+     * @return FeatureAvModel
      */
     public function testUpdate(FeatureAvModel $featureAv)
     {
@@ -89,9 +83,9 @@ class FeatureAvTest extends \PHPUnit_Framework_TestCase
             ->setDescription('test description')
             ->setChapo('test chapo')
             ->setPostscriptum('test postscriptum')
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new FeatureAv();
+        $action = new FeatureAv($this->getMockEventDispatcher());
         $action->update($event);
 
         $updatedFeatureAv = $event->getFeatureAv();
@@ -114,9 +108,9 @@ class FeatureAvTest extends \PHPUnit_Framework_TestCase
     public function testDelete(FeatureAvModel $featureAv)
     {
         $event = new FeatureAvDeleteEvent($featureAv->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new FeatureAv();
+        $action = new FeatureAv($this->getMockEventDispatcher());
         $action->delete($event);
 
         $deletedFeatureAv = $event->getFeatureAv();

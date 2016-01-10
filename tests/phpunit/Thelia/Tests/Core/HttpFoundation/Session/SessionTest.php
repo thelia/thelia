@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\HttpFoundation\Session;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -37,6 +38,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     /** @var  Request */
     protected $request;
 
+    /** @var EventDispatcher */
     protected $dispatcher;
 
     protected $dispatcherNull;
@@ -51,15 +53,24 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->session = new Session(new MockArraySessionStorage());
 
+        $this->request->setSession($this->session);
+
+        $this->dispatcher = new EventDispatcher();
+
+        $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
+
+        $token = new TokenProvider($this->request, $translator, 'test');
+
+        $this->dispatcher->addSubscriber(new \Thelia\Action\Cart($this->request, $token, $this->dispatcher));
+
         $this->session->setSessionCart(null);
 
         $this->request->setSession($this->session);
 
-        $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
-
         $this->cartAction = new \Thelia\Action\Cart(
             $this->request,
-            new TokenProvider($this->request, $translator, 'baba au rhum')
+            new TokenProvider($this->request, $translator, 'baba au rhum'),
+            $this->dispatcher
         );
 
         $this->dispatcherNull = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -81,8 +92,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($type, $event) {
-                    $event->setDispatcher($this->dispatcher);
-
+                        $event->setDispatcher($this->dispatcher);
                         if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
                             $this->cartAction->restoreCurrentCart($event);
                         } elseif ($type == TheliaEvents::CART_CREATE_NEW) {
@@ -110,7 +120,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $session = $this->session;
 
-        @$session->getCart();
+        @$session->getSessionCart();
     }
 
     /**

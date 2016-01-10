@@ -26,7 +26,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
  */
 class ConditionCollection implements Iterator, Countable, ArrayAccess
 {
-    /** @var array Array of ConditionInterface */
+    /** @var ConditionInterface[] */
     protected $conditions = [];
 
     /**

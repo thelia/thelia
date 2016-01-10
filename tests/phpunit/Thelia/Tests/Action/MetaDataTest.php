@@ -24,15 +24,8 @@ use Thelia\Model\ProductQuery;
  * @package Thelia\Tests\Action
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class MetaDataTest extends \PHPUnit_Framework_TestCase
+class MetaDataTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\\Component\\EventDispatcher\\EventDispatcherInterface");
-    }
-
     public static function setUpBeforeClass()
     {
         $boom = MetaDataQuery::create()
@@ -51,7 +44,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
             ->setElementKey(get_class($product))
             ->setElementId($product->getId())
             ->setValue('test')
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
         $action = new MetaData();
         $action->createOrUpdate($event);
@@ -75,7 +68,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
             ->setElementKey(get_class($product))
             ->setElementId($product->getId())
             ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"))
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
         $action = new MetaData();
         $action->createOrUpdate($event);
 
@@ -95,9 +88,9 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params Product $product
-     *
+     * @param Product $product
      * @depends testCreate
+     * @return Product
      */
     public function testRead(Product $product)
     {
@@ -131,9 +124,9 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params Product $product
-     *
+     * @param Product $product
      * @depends testRead
+     * @return Product
      */
     public function testUpdate(Product $product)
     {
@@ -151,7 +144,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
             ->setElementKey($metaData->getElementKey())
             ->setElementId($metaData->getElementId())
             ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"))
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
         $action = new MetaData();
         $action->createOrUpdate($event);
@@ -172,9 +165,9 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params Product $product
-     *
+     * @param Product $product
      * @depends testUpdate
+     * @return Product
      */
     public function testDelete(Product $product)
     {
@@ -188,7 +181,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
 
         $event = new MetaDataDeleteEvent('test', get_class($product), $product->getId());
         $event
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
         $action = new MetaData();
         $action->delete($event);

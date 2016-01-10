@@ -50,7 +50,7 @@ class TokenProvider
     protected $tokenName;
 
     /**
-     * @param SessionInterface    $session
+     * @param Request $request
      * @param TranslatorInterface $translator
      * @param $tokenName
      */
@@ -134,6 +134,7 @@ class TokenProvider
     }
 
     /**
+     * @param int $length
      * @return string
      */
     protected static function getOpenSSLRandom($length = 40)

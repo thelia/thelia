@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\RewritingUrlQuery;
@@ -24,6 +25,8 @@ use Thelia\Rewriting\RewritingResolver;
  * @package Thelia\Tests\Action
 
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * @method EventDispatcherInterface getMockEventDispatcher()
  */
 trait RewrittenUrlTestTrait
 {
@@ -40,7 +43,7 @@ trait RewrittenUrlTestTrait
     {
         $object = null;
         $event = $this->getUpdateSeoEvent($object);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
         /* get an existing url */
         $existingUrl = RewritingUrlQuery::create()
@@ -62,7 +65,7 @@ trait RewrittenUrlTestTrait
     {
         $object = null;
         $event = $this->getUpdateSeoEvent($object);
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
         $currentUrl = $object->getRewrittenUrl($object->getLocale());
 

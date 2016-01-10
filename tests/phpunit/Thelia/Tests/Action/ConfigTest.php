@@ -24,20 +24,13 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends BaseAction
 {
-    protected $dispatcher;
-
     public static function setUpBeforeClass()
     {
         ConfigQuery::create()
             ->filterByName('foo')
             ->delete();
-    }
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     public function testCreate()
@@ -51,10 +44,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->setTitle('test config foo bar')
             ->setHidden(true)
             ->setSecured(true)
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Config();
+        $action = new Config($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdConfig = $event->getConfig();
@@ -74,16 +67,18 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param ConfigModel $config
      * @depends testCreate
+     * @return ConfigModel
      */
     public function testSetValue(ConfigModel $config)
     {
         $event = new ConfigUpdateEvent($config->getId());
         $event
             ->setValue('baz')
-            ->setDispatcher($this->dispatcher);
+            ->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Config();
+        $action = new Config($this->getMockEventDispatcher());
         $action->setValue($event);
 
         $updatedConfig = $event->getConfig();
@@ -103,6 +98,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ConfigModel $config
      * @depends testSetValue
+     * @return ConfigModel
      */
     public function testModify(ConfigModel $config)
     {
@@ -117,10 +113,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->setPostscriptum('config postscriptum')
             ->setHidden(0)
             ->setSecured(0)
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Config();
+        $action = new Config($this->getMockEventDispatcher());
         $action->modify($event);
 
         $updatedConfig = $event->getConfig();
@@ -147,9 +143,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testDelete(ConfigModel $config)
     {
         $event = new ConfigDeleteEvent($config->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Config();
+        $action = new Config($this->getMockEventDispatcher());
         $action->delete($event);
 
         $deletedConfig = $event->getConfig();

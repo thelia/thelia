@@ -45,7 +45,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Tests\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderTest extends \PHPUnit_Framework_TestCase
+class OrderTest extends BaseAction
 {
     /**
      * @var ContainerBuilder $container
@@ -82,13 +82,12 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     protected $securityContext;
 
+    /** @var Request */
     protected $request;
 
     public function setUp()
     {
         $session = new Session(new MockArraySessionStorage());
-
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $this->request = new Request();
         $this->request->setSession($session);
@@ -97,23 +96,23 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $this->container = new ContainerBuilder();
 
-        $this->container->set("event_dispatcher", $dispatcher);
+        $this->container->set("event_dispatcher", $this->getMockEventDispatcher());
         $this->container->set('request', $this->request);
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 
-        $this->orderEvent->setDispatcher($dispatcher);
+        $this->orderEvent->setDispatcher($this->getMockEventDispatcher());
 
-        $parser = $this->getMock("Thelia\\Core\\Template\\ParserInterface");
         $mailerFactory = new MailerFactory(
-            $dispatcher,
-            $parser
+            $this->getMockEventDispatcher(),
+            $this->getMockParserInterface()
         );
 
         $this->orderAction = new Order(
             $this->request,
             $mailerFactory,
-            $this->securityContext
+            $this->securityContext,
+            $this->getMockEventDispatcher()
         );
 
         /* load customer */
@@ -395,8 +394,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testCreate
-     *
      * @param OrderModel $order
+     * @return OrderModel
      */
     public function testCreateManual(OrderModel $order)
     {
@@ -651,7 +650,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateAddress(OrderModel $order)
     {
-        $deliveryRef = uniqid('DELREF');
         $orderAddress = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId());
         $title = $orderAddress->getCustomerTitleId() == 3 ? 1 : 3;
         $country = $orderAddress->getCountryId() == 64 ? 1 : 64;

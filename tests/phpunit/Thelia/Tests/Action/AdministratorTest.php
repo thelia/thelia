@@ -31,7 +31,7 @@ use Thelia\Tools\TokenProvider;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class AdministratorTest extends \PHPUnit_Framework_TestCase
+class AdministratorTest extends BaseAction
 {
     protected $mailerFactory;
     protected $tokenProvider;
@@ -64,10 +64,11 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
             ->setPassword('azerty')
             ->setLocale($locale)
             ->setEmail(uniqid().'@example.com')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
         $admin = new Administrator($this->mailerFactory, $this->tokenProvider);
+
         $admin->create($adminEvent);
 
         $createdAdmin = $adminEvent->getAdministrator();
@@ -98,10 +99,11 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
             ->setPassword('azertyuiop')
             ->setLocale($locale)
             ->setEmail(uniqid().'@example.com')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
+
         $actionAdmin->update($adminEvent);
 
         $updatedAdmin = $adminEvent->getAdministrator();
@@ -125,10 +127,11 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
 
         $adminEvent
             ->setId($admin->getId())
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
+
         $actionAdmin->delete($adminEvent);
 
         $deletedAdmin = $adminEvent->getAdministrator();
@@ -144,9 +147,10 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
         $adminEvent = new AdministratorUpdatePasswordEvent($admin);
         $adminEvent
             ->setPassword('toto')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+            ->setDispatcher($this->getMockEventDispatcher());
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
+
         $actionAdmin->updatePassword($adminEvent);
 
         $updatedAdmin = $adminEvent->getAdmin();

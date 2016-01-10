@@ -21,7 +21,7 @@ use Thelia\Model\NewsletterQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class NewsletterTest extends \PHPUnit_Framework_TestCase
+class NewsletterTest extends BaseAction
 {
     public static function setUpBeforeClass()
     {
@@ -55,8 +55,8 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testSubscribe
      * @param NewsletterModel $newsletter
+     * @depends testSubscribe
      * @return NewsletterModel
      */
     public function testUpdate(NewsletterModel $newsletter)
@@ -84,6 +84,7 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param NewsletterModel $newsletter
      * @depends testUpdate
      * @param NewsletterModel $newsletter
      */

@@ -14,12 +14,22 @@ namespace Thelia\Core\Event\FeatureProduct;
 
 class FeatureProductUpdateEvent extends FeatureProductEvent
 {
+    /** @var int */
     protected $product_id;
+
+    /** @var int */
     protected $feature_id;
+
     protected $feature_value;
     protected $is_text_value;
     protected $locale;
 
+    /**
+     * @param int $product_id
+     * @param int $feature_id
+     * @param $feature_value
+     * @param bool $is_text_value
+     */
     public function __construct($product_id, $feature_id, $feature_value, $is_text_value = false)
     {
         $this->product_id = $product_id;
@@ -36,6 +46,10 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
         return $this->product_id;
     }
 
+    /**
+     * @param $product_id
+     * @return $this
+     */
     public function setProductId($product_id)
     {
         $this->product_id = $product_id;
@@ -43,11 +57,18 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getFeatureId()
     {
         return $this->feature_id;
     }
 
+    /**
+     * @param $feature_id
+     * @return $this
+     */
     public function setFeatureId($feature_id)
     {
         $this->feature_id = $feature_id;

@@ -24,15 +24,8 @@ use Thelia\Model\MessageQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class MessageTest extends \PHPUnit_Framework_TestCase
+class MessageTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public static function setUpBeforeClass()
     {
         $lang = MessageQuery::create()
@@ -48,10 +41,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             ->setLocale('en_US')
             ->setTitle('test title')
             ->setSecured(0)
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Message();
+        $action = new Message($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdMessage = $event->getMessage();
@@ -68,7 +61,9 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param MessageModel $message
      * @depends testCreate
+     * @return MessageModel
      */
     public function testModify(MessageModel $message)
     {
@@ -85,10 +80,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
             ->setHtmlTemplateFileName(null)
             ->setTextLayoutFileName(null)
             ->setTextTemplateFileName(null)
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Message();
+        $action = new Message($this->getMockEventDispatcher());
         $action->modify($event);
 
         $updatedMessage = $event->getMessage();
@@ -110,14 +105,15 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param MessageModel $message
      * @depends testModify
      */
     public function testDelete(MessageModel $message)
     {
         $event = new MessageDeleteEvent($message->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Message();
+        $action = new Message($this->getMockEventDispatcher());
         $action->delete($event);
 
         $deletedMessage = $event->getMessage();

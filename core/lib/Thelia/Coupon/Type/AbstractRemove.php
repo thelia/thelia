@@ -14,6 +14,7 @@ namespace Thelia\Coupon\Type;
 
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
+use Thelia\Model\Category;
 
 /**
  * Allow to remove an amount from the checkout total

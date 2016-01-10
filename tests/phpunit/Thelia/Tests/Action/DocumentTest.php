@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -19,21 +20,24 @@ use Thelia\Action\Document;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
  * Class DocumentTest
  *
  * @package Thelia\Tests\Action\DocumentTest
  */
-class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
+class DocumentTest extends TestCaseWithURLToolSetup
 {
+    protected $cache_dir_from_web_root;
+
     protected $request;
 
     protected $session;
 
     public function getContainer()
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        $container = new ContainerBuilder();
 
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 

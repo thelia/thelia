@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Category;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
@@ -30,6 +31,14 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class CategoryTest extends TestCaseWithURLToolSetup
 {
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getMockEventDispatcher()
+    {
+        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+    }
+
     /**
      * @return \Thelia\Model\Category
      */
@@ -55,9 +64,9 @@ class CategoryTest extends TestCaseWithURLToolSetup
             ->setParent(0)
             ->setTitle('foo')
             ->setVisible(1)
-            ->setDispatcher($this->getDispatcher());
+            ->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Category();
+        $action = new Category($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdCategory = $event->getCategory();
@@ -80,6 +89,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
     /**
      * @param CategoryModel $category
      * @depends testCreate
+     * @return CategoryModel
      */
     public function testUpdate(CategoryModel $category)
     {
@@ -97,10 +107,10 @@ class CategoryTest extends TestCaseWithURLToolSetup
             ->setVisible(0)
             ->setParent(0)
             ->setDefaultTemplateId($template->getId())
-            ->setDispatcher($this->getDispatcher())
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Category();
+        $action = new Category($this->getMockEventDispatcher());
         $action->update($event);
 
         $updatedCategory = $event->getCategory();
@@ -122,17 +132,21 @@ class CategoryTest extends TestCaseWithURLToolSetup
     /**
      * @param array $argArray
      * @depends testUpdate
+     * @return CategoryModel
      */
     public function testRemoveTemplate($argArray)
     {
+        /** @var CategoryModel $category */
         $category = $argArray[0];
+
+        /** @var Template $template */
         $template = $argArray[1];
 
         $event = new TemplateDeleteEvent($template->getId());
 
-        $event->setDispatcher($this->getDispatcher());
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new \Thelia\Action\Template();
+        $action = new \Thelia\Action\Template($this->getMockEventDispatcher());
         $action->delete($event);
 
         $this->assertInstanceOf('Thelia\Model\Template', $event->getTemplate());
@@ -145,14 +159,15 @@ class CategoryTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param CategoryModel $category
      * @depends testRemoveTemplate
      */
     public function testDelete(CategoryModel $category)
     {
         $event = new CategoryDeleteEvent($category->getId());
-        $event->setDispatcher($this->getDispatcher());
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Category();
+        $action = new Category($this->getMockEventDispatcher());
         $action->delete($event);
 
         $deletedCategory = $event->getCategory();
@@ -167,9 +182,9 @@ class CategoryTest extends TestCaseWithURLToolSetup
         $expectedVisibility = !$category->getVisible();
 
         $event = new CategoryToggleVisibilityEvent($category);
-        $event->setDispatcher($this->getDispatcher());
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Category();
+        $action = new Category($this->getMockEventDispatcher());
         $action->toggleVisibility($event);
 
         $updatedCategory = $event->getCategory();

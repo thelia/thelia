@@ -26,7 +26,7 @@ use Thelia\Model\CustomerQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class AddressTest extends \PHPUnit_Framework_TestCase
+class AddressTest extends BaseAction
 {
     public function testCreatedAddress()
     {
@@ -48,9 +48,9 @@ class AddressTest extends \PHPUnit_Framework_TestCase
             ""
         );
         $AddressCreateOrUpdateEvent->setCustomer($customer);
-        $AddressCreateOrUpdateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+        $AddressCreateOrUpdateEvent->setDispatcher($this->getMockEventDispatcher());
 
-        $actionAddress = new Address();
+        $actionAddress = new Address($this->getMockEventDispatcher());
         $actionAddress->create($AddressCreateOrUpdateEvent);
 
         $createdAddress = $AddressCreateOrUpdateEvent->getAddress();
@@ -95,9 +95,9 @@ class AddressTest extends \PHPUnit_Framework_TestCase
             ""
         );
         $addressEvent->setAddress($address);
-        $addressEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+        $addressEvent->setDispatcher($this->getMockEventDispatcher());
 
-        $actionAddress = new Address();
+        $actionAddress = new Address($this->getMockEventDispatcher());
         $actionAddress->update($addressEvent);
 
         $updatedAddress = $addressEvent->getAddress();
@@ -160,14 +160,12 @@ class AddressTest extends \PHPUnit_Framework_TestCase
         );
 
         $addressEvent->setAddress($defaultAddress);
-        $addressEvent->setDispatcher(
-            $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface")
-        );
+        $addressEvent->setDispatcher($this->getMockEventDispatcher());
 
         /**
          * Do the update
          */
-        $actionAddress = new Address();
+        $actionAddress = new Address($this->getMockEventDispatcher());
         $actionAddress->update($addressEvent);
 
         $updatedAddress = AddressQuery::create()

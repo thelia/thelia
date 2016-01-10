@@ -23,6 +23,9 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $brand_id;
     protected $virtual_document_id;
 
+    /**
+     * @param int $product_id
+     */
     public function __construct($product_id)
     {
         $this->product_id = $product_id;

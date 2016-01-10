@@ -24,15 +24,8 @@ use Thelia\Model\State as StateModel;
  * @package Thelia\Tests\Action
  * @author Julien Chanséaume <julien@thelia.net>
  */
-class StateTest extends \PHPUnit_Framework_TestCase
+class StateTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public function testCreate()
     {
         $country = CountryQuery::create()
@@ -48,10 +41,10 @@ class StateTest extends \PHPUnit_Framework_TestCase
             ->setIsocode('AA')
             ->setLocale('en_US')
             ->setTitle('State1')
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new State();
+        $action = new State($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdState = $event->getState();
@@ -70,6 +63,7 @@ class StateTest extends \PHPUnit_Framework_TestCase
     /**
      * @param StateModel $state
      * @depends testCreate
+     * @return StateModel
      */
     public function testUpdate(StateModel $state)
     {
@@ -81,10 +75,10 @@ class StateTest extends \PHPUnit_Framework_TestCase
             ->setCountry($state->getCountryId())
             ->setLocale('en_US')
             ->setTitle('State2')
-            ->setDispatcher($this->dispatcher)
+            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new State();
+        $action = new State($this->getMockEventDispatcher());
         $action->update($event);
 
         $updatedState = $event->getState();
@@ -106,9 +100,9 @@ class StateTest extends \PHPUnit_Framework_TestCase
     public function testDelete(StateModel $state)
     {
         $event = new StateDeleteEvent($state->getId());
-        $event->setDispatcher($this->dispatcher);
+        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new State();
+        $action = new State($this->getMockEventDispatcher());
         $action->delete($event);
 
         $deletedState = $event->getState();
