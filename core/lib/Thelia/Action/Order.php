@@ -353,7 +353,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             }
 
             /* fulfill order_attribute_combination and decrease stock */
-            foreach ($pse->getAttributeCombinations() as $attributeCombination) {
+            foreach ($pse->getAttributeCombinationsByAttributeTemplate() as $attributeCombination) {
                 /** @var \Thelia\Model\Attribute $attribute */
                 $attribute = I18n::forceI18nRetrieving($lang->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
 

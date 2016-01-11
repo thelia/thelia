@@ -51,7 +51,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'alpha'
             )
@@ -75,6 +75,12 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
                     break;
                 case "alpha_reverse":
                     $search->orderByAttributeTitle(Criteria::DESC);
+                    break;
+                case "manual":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $search->orderById(Criteria::DESC);
                     break;
             }
         }

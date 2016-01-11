@@ -46,7 +46,7 @@
 {/strip}
     {intl l="Item : %item" item=$TITLE}
 {ifloop rel="combinations"}
-    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID order="manual"}
     - {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
     {/loop}
 {/ifloop}

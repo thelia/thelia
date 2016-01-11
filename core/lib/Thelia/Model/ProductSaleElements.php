@@ -3,7 +3,9 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
+use Thelia\Model\Map\AttributeTemplateTableMap;
 use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\TaxEngine\Calculator;
 
@@ -102,5 +104,16 @@ class ProductSaleElements extends BaseProductSaleElements
         $productPriceTools = new ProductPriceTools($price, $promoPrice);
 
         return $productPriceTools;
+    }
+
+    public function getAttributeCombinationsByAttributeTemplate()
+    {
+        $query = AttributeCombinationQuery::create()
+            ->useAttributeQuery()
+                ->joinAttributeTemplate()
+            ->endUse()
+            ->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+
+        return $this->getAttributeCombinations($query);
     }
 }

@@ -260,7 +260,7 @@
             <td style="border:solid 1px #dddddd;">
                 <p>{$TITLE}</p>
                     {ifloop rel="combinations"}
-                    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID order="manual"}
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                     {/loop}
                     {/ifloop}

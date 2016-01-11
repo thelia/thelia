@@ -180,7 +180,7 @@
                                                             {/elseloop}
                                                             {ifloop rel="combinations"}
                                                             <dl class="dl-horizontal">
-                                                                {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                                                                {loop type="order_product_attribute_combination" name="combinations" order_product=$ID order="manual"}
                                                                 <dt>{$ATTRIBUTE_TITLE}</dt>
                                                                 <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                                                 {/loop}
