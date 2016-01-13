@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<database defaultIdMethod="native" name="thelia" namespace="Colissimo\Model">
-    <table name="colissimo_freeshipping">
-    	<column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
-    	<column name="active" required="true" type="BOOLEAN" />
-        <behavior name="timestampable" />
-    </table>
-    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
-</database>

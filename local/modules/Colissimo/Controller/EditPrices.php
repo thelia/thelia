@@ -13,8 +13,11 @@
 namespace Colissimo\Controller;
 
 use Colissimo\Colissimo;
+use Colissimo\Model\Config\ColissimoConfigValue;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Model\AreaQuery;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Tools\URL;
 
 /**
  * Class EditPrices
@@ -23,7 +26,6 @@ use Thelia\Controller\Admin\BaseAdminController;
  */
 class EditPrices extends BaseAdminController
 {
-
     public function editprices()
     {
         // Get data & treat
@@ -32,23 +34,20 @@ class EditPrices extends BaseAdminController
         $area = $post->get('area');
         $weight = $post->get('weight');
         $price = $post->get('price');
-        if (preg_match("#^add|delete$#", $operation)
-            && preg_match("#^\d+$#", $area)
-            && preg_match("#^\d+\.?\d*$#", $weight)
+
+        if (preg_match("#^add|delete$#", $operation) &&
+            preg_match("#^\d+$#", $area) &&
+            preg_match("#^\d+\.?\d*$#", $weight)
         ) {
             // check if area exists in db
             $exists = AreaQuery::create()
                 ->findPK($area);
             if ($exists !== null) {
-                $json_path= __DIR__."/../".Colissimo::JSON_PRICE_RESOURCE;
 
-                if (is_readable($json_path)) {
-                    $json_data = json_decode(file_get_contents($json_path), true);
-                } elseif (!file_exists($json_path)) {
-                    $json_data = array();
-                } else {
-                    throw new \Exception(
-                        "Can't read Colissimo".Colissimo::JSON_PRICE_RESOURCE.". Please change the rights on the file."
+                if (null !== $data = Colissimo::getConfigValue(ColissimoConfigValue::PRICES, null)) {
+                    $json_data = json_decode(
+                        $data,
+                        true
                     );
                 }
                 if ((float) $weight > 0 && $operation == "add"
@@ -62,15 +61,9 @@ class EditPrices extends BaseAdminController
                     throw new \Exception("Weight must be superior to 0");
                 }
                 ksort($json_data[$area]['slices']);
-                if ((file_exists($json_path) ?is_writable($json_path):is_writable(__DIR__."/../"))) {
-                    $file = fopen($json_path, 'w');
-                    fwrite($file, json_encode($json_data));
-                    fclose($file);
-                } else {
-                    throw new \Exception(
-                        "Can't write Colissimo".Colissimo::JSON_PRICE_RESOURCE.". Please change the rights on the file."
-                    );
-                }
+
+                Colissimo::setConfigValue(ColissimoConfigValue::PRICES, json_encode($json_data));
+
             } else {
                 throw new \Exception("Area not found");
             }
@@ -78,13 +71,14 @@ class EditPrices extends BaseAdminController
             throw new \ErrorException("Arguments are missing or invalid");
         }
 
-        return $this->generateRedirectFromRoute(
-            "admin.module.configure",
-            array(),
-            array (
-                'module_code'=>"Colissimo",
-                '_controller' => 'Thelia\\Controller\\Admin\\ModuleController::configureAction'
-            )
-        );
+        return $this->redirectToConfigurationPage();
+    }
+
+    /**
+     * Redirect to the configuration page
+     */
+    protected function redirectToConfigurationPage()
+    {
+        return RedirectResponse::create(URL::getInstance()->absoluteUrl('/admin/module/Colissimo'));
     }
 }

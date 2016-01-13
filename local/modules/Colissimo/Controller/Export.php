@@ -149,7 +149,7 @@ class Export extends BaseAdminController
 
         } catch (FormValidationException $e) {
             $this->setupFormErrorContext(
-                Translator::getInstance()->trans("colissimo expeditor export", [], Colissimo::MESSAGE_DOMAIN),
+                Translator::getInstance()->trans("colissimo expeditor export", [], Colissimo::DOMAIN_NAME),
                 $e->getMessage(),
                 $form,
                 $e

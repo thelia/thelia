@@ -36,11 +36,12 @@ class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
         $ret = array();
         $dir = __DIR__."/../Config/";
         if (!is_readable($dir)) {
+
             $ret[] = array(
                 "ERRMES"=>Translator::getInstance()->trans(
                     "Can't read Config directory",
                     [],
-                    Colissimo::MESSAGE_DOMAIN
+                    Colissimo::DOMAIN_NAME
                 ),
                 "ERRFILE"=>""
             );
@@ -50,20 +51,22 @@ class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
                 "ERRMES"=>Translator::getInstance()->trans(
                     "Can't write Config directory",
                     [],
-                    Colissimo::MESSAGE_DOMAIN
+                    Colissimo::DOMAIN_NAME
                 ),
                 "ERRFILE"=>""
             );
+
         }
         if ($handle = opendir($dir)) {
             while (false !== ($file = readdir($handle))) {
                 if (strlen($file) > 5 && substr($file, -5) === ".json") {
                     if (!is_readable($dir.$file)) {
+
                         $ret[] = array(
                             "ERRMES"=>Translator::getInstance()->trans(
                                 "Can't read file",
                                 [],
-                                Colissimo::MESSAGE_DOMAIN
+                                Colissimo::DOMAIN_NAME
                             ),
                             "ERRFILE"=>"Colissimo/Config/".$file
                         );
@@ -73,10 +76,11 @@ class CheckRightsLoop extends BaseLoop implements ArraySearchLoopInterface
                             "ERRMES"=>Translator::getInstance()->trans(
                                 "Can't write file",
                                 [],
-                                Colissimo::MESSAGE_DOMAIN
+                                Colissimo::DOMAIN_NAME
                             ),
                                 "ERRFILE"=>"Colissimo/Config/".$file
                         );
+
                     }
                 }
             }
