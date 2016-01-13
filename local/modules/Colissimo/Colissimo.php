@@ -13,7 +13,7 @@
 
 namespace Colissimo;
 
-use Colissimo\Model\ColissimoFreeshippingQuery;
+use Colissimo\Model\Config\ColissimoConfigValue;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Install\Database;
@@ -30,15 +30,21 @@ class Colissimo extends AbstractDeliveryModule
 
     const JSON_PRICE_RESOURCE = "/Config/prices.json";
 
-    const MESSAGE_DOMAIN = 'colissimo';
+    const DOMAIN_NAME = 'colissimo';
 
     public static function getPrices()
     {
         if (null === self::$prices) {
-            self::$prices = json_decode(file_get_contents(sprintf('%s%s', __DIR__, self::JSON_PRICE_RESOURCE)), true);
+            self::$prices = json_decode(Colissimo::getConfigValue(ColissimoConfigValue::PRICES, null), true);
         }
 
         return self::$prices;
+    }
+
+    public function postActivation(ConnectionInterface $con = null)
+    {
+        $database = new Database($con);
+        $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 
     public function isValidDelivery(Country $country)
@@ -78,7 +84,7 @@ class Colissimo extends AbstractDeliveryModule
      */
     public static function getPostageAmount($areaId, $weight)
     {
-        $freeshipping = ColissimoFreeshippingQuery::create()->getLast();
+        $freeshipping = Colissimo::getConfigValue(ColissimoConfigValue::FREE_SHIPPING);
         $postage = 0;
         if (!$freeshipping) {
             $prices = self::getPrices();
@@ -89,7 +95,7 @@ class Colissimo extends AbstractDeliveryModule
                     Translator::getInstance()->trans(
                         "Colissimo delivery unavailable for the delivery country",
                         [],
-                        self::MESSAGE_DOMAIN
+                        self::DOMAIN_NAME
                     )
                 );
             }
@@ -105,7 +111,7 @@ class Colissimo extends AbstractDeliveryModule
                     Translator::getInstance()->trans(
                         "Colissimo delivery unavailable for this cart weight (%weight kg)",
                         array("%weight" => $weight),
-                        self::MESSAGE_DOMAIN
+                        self::DOMAIN_NAME
                     )
                 );
             }
@@ -122,13 +128,6 @@ class Colissimo extends AbstractDeliveryModule
         }
         return $postage;
 
-    }
-
-    public function postActivation(ConnectionInterface $con = null)
-    {
-        $database = new Database($con);
-
-        $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 
     /**
@@ -149,5 +148,27 @@ class Colissimo extends AbstractDeliveryModule
         );
 
         return $postage;
+    }
+
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        $uploadDir = __DIR__ . '/Config/prices.json';
+        $database = new Database($con);
+
+        $table_exists = $database->execute(
+            "SELECT COUNT(*)
+             FROM information_schema.tables
+             WHERE table_schema = 'thelia'
+             AND table_name = 'colissimo_freeshipping'"
+        )->fetch()["COUNT(*)"] ? true : false;
+
+        if (Colissimo::getConfigValue(ColissimoConfigValue::FREE_SHIPPING, null) == null && $table_exists) {
+            $result = $database->execute('SELECT active FROM colissimo_freeshipping WHERE id=1')->fetch()["active"];
+            Colissimo::setConfigValue(ColissimoConfigValue::FREE_SHIPPING, $result);
+        }
+
+        if (is_readable($uploadDir) && Colissimo::getConfigValue(ColissimoConfigValue::PRICES, null) == null) {
+            Colissimo::setConfigValue(ColissimoConfigValue::PRICES, file_get_contents($uploadDir));
+        }
     }
 }
