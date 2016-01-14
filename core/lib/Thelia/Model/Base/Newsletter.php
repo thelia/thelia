@@ -85,6 +85,13 @@ abstract class Newsletter implements ActiveRecordInterface
     protected $locale;
 
     /**
+     * The value for the unsubscribed field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $unsubscribed;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -105,10 +112,23 @@ abstract class Newsletter implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->unsubscribed = false;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Newsletter object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -418,6 +438,17 @@ abstract class Newsletter implements ActiveRecordInterface
     }
 
     /**
+     * Get the [unsubscribed] column value.
+     *
+     * @return   boolean
+     */
+    public function getUnsubscribed()
+    {
+
+        return $this->unsubscribed;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -563,6 +594,35 @@ abstract class Newsletter implements ActiveRecordInterface
     } // setLocale()
 
     /**
+     * Sets the value of the [unsubscribed] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
+     */
+    public function setUnsubscribed($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->unsubscribed !== $v) {
+            $this->unsubscribed = $v;
+            $this->modifiedColumns[NewsletterTableMap::UNSUBSCRIBED] = true;
+        }
+
+
+        return $this;
+    } // setUnsubscribed()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -614,6 +674,10 @@ abstract class Newsletter implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->unsubscribed !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -656,13 +720,16 @@ abstract class Newsletter implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : NewsletterTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
             $this->locale = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : NewsletterTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : NewsletterTableMap::translateFieldName('Unsubscribed', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->unsubscribed = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : NewsletterTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : NewsletterTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : NewsletterTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -675,7 +742,7 @@ abstract class Newsletter implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = NewsletterTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = NewsletterTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Newsletter object", 0, $e);
@@ -910,6 +977,9 @@ abstract class Newsletter implements ActiveRecordInterface
         if ($this->isColumnModified(NewsletterTableMap::LOCALE)) {
             $modifiedColumns[':p' . $index++]  = '`LOCALE`';
         }
+        if ($this->isColumnModified(NewsletterTableMap::UNSUBSCRIBED)) {
+            $modifiedColumns[':p' . $index++]  = '`UNSUBSCRIBED`';
+        }
         if ($this->isColumnModified(NewsletterTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -941,6 +1011,9 @@ abstract class Newsletter implements ActiveRecordInterface
                         break;
                     case '`LOCALE`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
+                        break;
+                    case '`UNSUBSCRIBED`':
+                        $stmt->bindValue($identifier, (int) $this->unsubscribed, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1026,9 +1099,12 @@ abstract class Newsletter implements ActiveRecordInterface
                 return $this->getLocale();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getUnsubscribed();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1064,8 +1140,9 @@ abstract class Newsletter implements ActiveRecordInterface
             $keys[2] => $this->getFirstname(),
             $keys[3] => $this->getLastname(),
             $keys[4] => $this->getLocale(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[5] => $this->getUnsubscribed(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1121,9 +1198,12 @@ abstract class Newsletter implements ActiveRecordInterface
                 $this->setLocale($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setUnsubscribed($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1155,8 +1235,9 @@ abstract class Newsletter implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setFirstname($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setLastname($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setLocale($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUnsubscribed($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1173,6 +1254,7 @@ abstract class Newsletter implements ActiveRecordInterface
         if ($this->isColumnModified(NewsletterTableMap::FIRSTNAME)) $criteria->add(NewsletterTableMap::FIRSTNAME, $this->firstname);
         if ($this->isColumnModified(NewsletterTableMap::LASTNAME)) $criteria->add(NewsletterTableMap::LASTNAME, $this->lastname);
         if ($this->isColumnModified(NewsletterTableMap::LOCALE)) $criteria->add(NewsletterTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(NewsletterTableMap::UNSUBSCRIBED)) $criteria->add(NewsletterTableMap::UNSUBSCRIBED, $this->unsubscribed);
         if ($this->isColumnModified(NewsletterTableMap::CREATED_AT)) $criteria->add(NewsletterTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(NewsletterTableMap::UPDATED_AT)) $criteria->add(NewsletterTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1242,6 +1324,7 @@ abstract class Newsletter implements ActiveRecordInterface
         $copyObj->setFirstname($this->getFirstname());
         $copyObj->setLastname($this->getLastname());
         $copyObj->setLocale($this->getLocale());
+        $copyObj->setUnsubscribed($this->getUnsubscribed());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1282,10 +1365,12 @@ abstract class Newsletter implements ActiveRecordInterface
         $this->firstname = null;
         $this->lastname = null;
         $this->locale = null;
+        $this->unsubscribed = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

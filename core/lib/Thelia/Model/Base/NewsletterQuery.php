@@ -23,6 +23,7 @@ use Thelia\Model\Map\NewsletterTableMap;
  * @method     ChildNewsletterQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildNewsletterQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildNewsletterQuery orderByLocale($order = Criteria::ASC) Order by the locale column
+ * @method     ChildNewsletterQuery orderByUnsubscribed($order = Criteria::ASC) Order by the unsubscribed column
  * @method     ChildNewsletterQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildNewsletterQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -31,6 +32,7 @@ use Thelia\Model\Map\NewsletterTableMap;
  * @method     ChildNewsletterQuery groupByFirstname() Group by the firstname column
  * @method     ChildNewsletterQuery groupByLastname() Group by the lastname column
  * @method     ChildNewsletterQuery groupByLocale() Group by the locale column
+ * @method     ChildNewsletterQuery groupByUnsubscribed() Group by the unsubscribed column
  * @method     ChildNewsletterQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildNewsletterQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -46,6 +48,7 @@ use Thelia\Model\Map\NewsletterTableMap;
  * @method     ChildNewsletter findOneByFirstname(string $firstname) Return the first ChildNewsletter filtered by the firstname column
  * @method     ChildNewsletter findOneByLastname(string $lastname) Return the first ChildNewsletter filtered by the lastname column
  * @method     ChildNewsletter findOneByLocale(string $locale) Return the first ChildNewsletter filtered by the locale column
+ * @method     ChildNewsletter findOneByUnsubscribed(boolean $unsubscribed) Return the first ChildNewsletter filtered by the unsubscribed column
  * @method     ChildNewsletter findOneByCreatedAt(string $created_at) Return the first ChildNewsletter filtered by the created_at column
  * @method     ChildNewsletter findOneByUpdatedAt(string $updated_at) Return the first ChildNewsletter filtered by the updated_at column
  *
@@ -54,6 +57,7 @@ use Thelia\Model\Map\NewsletterTableMap;
  * @method     array findByFirstname(string $firstname) Return ChildNewsletter objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildNewsletter objects filtered by the lastname column
  * @method     array findByLocale(string $locale) Return ChildNewsletter objects filtered by the locale column
+ * @method     array findByUnsubscribed(boolean $unsubscribed) Return ChildNewsletter objects filtered by the unsubscribed column
  * @method     array findByCreatedAt(string $created_at) Return ChildNewsletter objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildNewsletter objects filtered by the updated_at column
  *
@@ -144,7 +148,7 @@ abstract class NewsletterQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `EMAIL`, `FIRSTNAME`, `LASTNAME`, `LOCALE`, `CREATED_AT`, `UPDATED_AT` FROM `newsletter` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `EMAIL`, `FIRSTNAME`, `LASTNAME`, `LOCALE`, `UNSUBSCRIBED`, `CREATED_AT`, `UPDATED_AT` FROM `newsletter` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -388,6 +392,33 @@ abstract class NewsletterQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(NewsletterTableMap::LOCALE, $locale, $comparison);
+    }
+
+    /**
+     * Filter the query on the unsubscribed column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUnsubscribed(true); // WHERE unsubscribed = true
+     * $query->filterByUnsubscribed('yes'); // WHERE unsubscribed = true
+     * </code>
+     *
+     * @param     boolean|string $unsubscribed The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildNewsletterQuery The current query, for fluid interface
+     */
+    public function filterByUnsubscribed($unsubscribed = null, $comparison = null)
+    {
+        if (is_string($unsubscribed)) {
+            $unsubscribed = in_array(strtolower($unsubscribed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(NewsletterTableMap::UNSUBSCRIBED, $unsubscribed, $comparison);
     }
 
     /**
