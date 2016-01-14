@@ -20,6 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -46,6 +47,22 @@ class SessionController extends BaseAdminController
         return null;
     }
 
+    protected function checkPasswordRecoveryEnabled()
+    {
+        // Check if user is already authenticate
+        if (! boolval(ConfigQuery::read('enable_lost_admin_password_recovery', false))) {
+            AdminLog::append(
+                "admin",
+                "ADMIN_CREATE_PASSWORD",
+                "Lost password recovery function invoked",
+                $this->getRequest()
+            );
+
+            // Redirect to the error page
+            return $this->errorPage($this->getTranslator()->trans("The lost admin password recovery feature is disabled."), 403);
+        }
+    }
+
     public function showLoginAction()
     {
         if (null !== $response = $this->checkAdminLoggedIn()) {
@@ -57,7 +74,7 @@ class SessionController extends BaseAdminController
 
     public function showLostPasswordAction()
     {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
+        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
         }
 
@@ -67,7 +84,7 @@ class SessionController extends BaseAdminController
 
     public function passwordCreateRequestAction()
     {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
+        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
         }
 
@@ -114,12 +131,16 @@ class SessionController extends BaseAdminController
 
     public function passwordCreateRequestSuccessAction()
     {
+        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
+            return $response;
+        }
+
         return $this->render("lost-password", [ 'create_request_success' => true ]);
     }
 
     public function displayCreateFormAction($token)
     {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
+        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
         }
 
@@ -138,7 +159,7 @@ class SessionController extends BaseAdminController
 
     public function passwordCreatedAction()
     {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
+        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
         }
 
@@ -181,7 +202,7 @@ class SessionController extends BaseAdminController
 
     public function passwordCreatedSuccessAction()
     {
-        if (null !== $response = $this->checkAdminLoggedIn()) {
+        if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
         }
 

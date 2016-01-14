@@ -4,7 +4,7 @@
 
 # 2.3.0-alpha1
 
-- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New ```minimum_admin_password_length``` configuration variable.
+- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New ```minimum_admin_password_length``` and ```enable_lost_admin_password_recovery``` configuration variable.
 - #1902 Update Colissimo export, add link to order and to customer, add package weight
 - #1801 Fixed cart duplication conditions at user login/logout
 - #1892 Add a name verification when creating a module with a command
