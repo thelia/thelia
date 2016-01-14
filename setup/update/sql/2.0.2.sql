@@ -120,14 +120,8 @@ INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (@max, 5, '344', 'HK', 'HKG', 0, 0, NOW(), NOW());
  
 INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max, 'ar_SA', NULL, '', '', ''),
-(@max, 'de_DE', NULL, '', '', ''),
 (@max, 'en_US', 'Hong Kong', '', '', ''),
-(@max, 'es_ES', NULL, '', '', ''),
-(@max, 'fr_FR', 'Hong Kong', '', '', ''),
-(@max, 'it_IT', NULL, '', '', ''),
-(@max, 'pt_BR', NULL, '', '', ''),
-(@max, 'tr_TR', 'Hong Kong', '', '', '')
+(@max, 'es_ES', NULL, '', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

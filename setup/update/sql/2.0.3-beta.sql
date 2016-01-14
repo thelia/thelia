@@ -19,30 +19,12 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`,  `created_at`, `upda
 ('terms_conditions_content_id', '', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max + 1, 'ar_SA', NULL, NULL, NULL, NULL),
-(@max + 2, 'ar_SA', NULL, NULL, NULL, NULL),
-(@max + 3, 'ar_SA', NULL, NULL, NULL, NULL),
-(@max + 1, 'de_DE', 'Standart verfügbaren Bestand wenn check-available-stock gleich 0.', NULL, NULL, NULL),
-(@max + 2, 'de_DE', 'Die ID des Ordners mit Ihren Informations-Seiten: AGB, Impressum, ...', NULL, NULL, NULL),
-(@max + 3, 'de_DE', 'Ihr \'Allgemeine Geschäftsbedingungen \' ID.', NULL, NULL, NULL),
 (@max + 1, 'en_US', 'Default available stock when check-available-stock is set to 0.', NULL, NULL, NULL),
 (@max + 2, 'en_US', 'The ID of the folder containing your information pages : terms, imprint, ...', NULL, NULL, NULL),
 (@max + 3, 'en_US', 'The ID of the \'Terms & Conditions\' content.', NULL, NULL, NULL),
 (@max + 1, 'es_ES', NULL, NULL, NULL, NULL),
 (@max + 2, 'es_ES', NULL, NULL, NULL, NULL),
-(@max + 3, 'es_ES', NULL, NULL, NULL, NULL),
-(@max + 1, 'fr_FR', 'Stock disponible par défaut quand check-available-stock est à 0.', NULL, NULL, NULL),
-(@max + 2, 'fr_FR', 'L\'ID du dossier contenant vos pages d\'informations : CGV, mentions légales, ...', NULL, NULL, NULL),
-(@max + 3, 'fr_FR', 'L\'ID du contenu de vos \'CGV\'.', NULL, NULL, NULL),
-(@max + 1, 'it_IT', NULL, NULL, NULL, NULL),
-(@max + 2, 'it_IT', NULL, NULL, NULL, NULL),
-(@max + 3, 'it_IT', NULL, NULL, NULL, NULL),
-(@max + 1, 'pt_BR', NULL, NULL, NULL, NULL),
-(@max + 2, 'pt_BR', NULL, NULL, NULL, NULL),
-(@max + 3, 'pt_BR', NULL, NULL, NULL, NULL),
-(@max + 1, 'tr_TR', 'Kullanılabilir stok onay mevcut stok 0 olarak ayarlandığında varsayılan.', NULL, NULL, NULL),
-(@max + 2, 'tr_TR', 'Bilgi sayfaları içeren klasörü Kımlığı: şartları, Künye,...', NULL, NULL, NULL),
-(@max + 3, 'tr_TR', '\'Şartlar ve koşullar\' içerik Kımlığı.', NULL, NULL, NULL)
+(@max + 3, 'es_ES', NULL, NULL, NULL, NULL)
 ;
 
 # Add new column to order (version, version_created_at, version_created_by)

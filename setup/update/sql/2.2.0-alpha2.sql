@@ -22,18 +22,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@max_id + 1, 'ar_SA', NULL, '', ''),
-(@max_id + 2, 'ar_SA', NULL, '', ''),
-(@max_id + 3, 'ar_SA', NULL, '', ''),
-(@max_id + 4, 'ar_SA', NULL, NULL, NULL),
-(@max_id + 5, 'ar_SA', NULL, NULL, NULL),
-(@max_id + 6, 'ar_SA', NULL, NULL, NULL),
-(@max_id + 1, 'de_DE', 'Bestellung - Kunde Informationen unten', '', ''),
-(@max_id + 2, 'de_DE', 'Bestellung - Zahlungsmodul unten', '', ''),
-(@max_id + 3, 'de_DE', 'Bestellung - Liefermodul unten', '', ''),
-(@max_id + 4, 'de_DE', 'Rechnung - Nach dem Zahlungsmodul', NULL, NULL),
-(@max_id + 5, 'de_DE', 'Rechnung - Nach dem Liefermodul', NULL, NULL),
-(@max_id + 6, 'de_DE', 'Lieferung - Nach dem Liefermodul', NULL, NULL),
 (@max_id + 1, 'en_US', 'Order - customer information bottom', '', ''),
 (@max_id + 2, 'en_US', 'Order - payment module bottom', '', ''),
 (@max_id + 3, 'en_US', 'Order - delivery module bottom', '', ''),
@@ -45,31 +33,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'es_ES', NULL, '', ''),
 (@max_id + 4, 'es_ES', NULL, NULL, NULL),
 (@max_id + 5, 'es_ES', NULL, NULL, NULL),
-(@max_id + 6, 'es_ES', NULL, NULL, NULL),
-(@max_id + 1, 'fr_FR', 'Commande - en bas des  informations client', '', ''),
-(@max_id + 2, 'fr_FR', 'Commande - en bas du module de paiement', '', ''),
-(@max_id + 3, 'fr_FR', 'Commande - en bas du module de livraison', '', ''),
-(@max_id + 4, 'fr_FR', 'Commande - après le module de paiement', NULL, NULL),
-(@max_id + 5, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
-(@max_id + 6, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
-(@max_id + 1, 'it_IT', NULL, '', ''),
-(@max_id + 2, 'it_IT', NULL, '', ''),
-(@max_id + 3, 'it_IT', NULL, '', ''),
-(@max_id + 4, 'it_IT', NULL, NULL, NULL),
-(@max_id + 5, 'it_IT', NULL, NULL, NULL),
-(@max_id + 6, 'it_IT', NULL, NULL, NULL),
-(@max_id + 1, 'pt_BR', NULL, '', ''),
-(@max_id + 2, 'pt_BR', NULL, '', ''),
-(@max_id + 3, 'pt_BR', NULL, '', ''),
-(@max_id + 4, 'pt_BR', NULL, NULL, NULL),
-(@max_id + 5, 'pt_BR', NULL, NULL, NULL),
-(@max_id + 6, 'pt_BR', NULL, NULL, NULL),
-(@max_id + 1, 'tr_TR', 'Sipariş - müşteri bilgi alt', '', ''),
-(@max_id + 2, 'tr_TR', 'Sipariş - ödeme modülü alt', '', ''),
-(@max_id + 3, 'tr_TR', 'Sipariş - teslimat modülü alt', '', ''),
-(@max_id + 4, 'tr_TR', '-Fatura ödeme modülü sonra', NULL, NULL),
-(@max_id + 5, 'tr_TR', 'Fatura - sonra teslim modülü', NULL, NULL),
-(@max_id + 6, 'tr_TR', 'Dağıtım - sonra teslim modülü', NULL, NULL)
+(@max_id + 6, 'es_ES', NULL, NULL, NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;
