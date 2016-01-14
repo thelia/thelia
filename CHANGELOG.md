@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1914) The module list in the translation page is now ordered by module code instead of module title
 - (related to #1908) A fix for "terms & conditions" bootbox height
 - (related to #1906) Fix coupon create form data
 - (related to #1799) Fixed the redirection to rewritten URL
