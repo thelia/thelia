@@ -1710,6 +1710,7 @@ CREATE TABLE `newsletter`
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
     `locale` VARCHAR(5),
+    `unsubscribed` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
