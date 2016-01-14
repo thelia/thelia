@@ -1276,6 +1276,20 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (@max, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-(@max, 'en_US', NULL, NULL, NULL, NULL),(@max, 'es_ES', NULL, NULL, NULL, NULL);
+(@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),(@max, 'es_ES', NULL, NULL, NULL, NULL);
+
+-- additional config variables
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
+(@max_id + 2, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW())
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+    (@max_id + 1, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
+    (@max_id + 2, 'en_US', 'Allow an administrator to recreate a lost password', NULL, NULL, NULL),    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

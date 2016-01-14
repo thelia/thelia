@@ -55,6 +55,7 @@ return array(
     'All Products - after javascript initialisation' => 'Tous les produits - après l\'initialisation du JavaScript',
     'All Products - at the bottom' => 'Tous les produits - en bas',
     'All Products - at the top' => 'Tous les produits - en haut',
+    'Allow an administrator to recreate a lost password' => 'Autoriser les administrateurs à recréer leur mot de passe',
     'Allow customers to change their email. 1 for yes, 0 for no' => 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non',
     'Allow negative product stock (1) or not (0)' => 'Autoriser un stock négatif sur les produits (1) ou pas (0, défaut)',
     'Allow negative product stock (1) or not (0, default)' => 'Autoriser le stock négatif (1) ou pas (0) (0 par défaut)',
