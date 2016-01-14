@@ -70,7 +70,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (60, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
-(63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW())
+(63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
 (64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW())
 ;
 
@@ -1961,9 +1961,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (60, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
     (61, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
     (62, 'en_US', 'Secret key for form CSRF token', NULL, NULL, NULL),
-    (63, 'en_US', NULL, NULL, NULL, NULL),
-    (64, 'en_US', NULL, NULL, NULL, NULL),
-    (1, 'es_ES', NULL, NULL, NULL, NULL),
+    (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
+    (64, 'en_US', 'Allow an administrator to recreate a lost password', NULL, NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL, NULL),
     (4, 'es_ES', NULL, NULL, NULL, NULL),
@@ -2012,8 +2011,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (61, 'es_ES', NULL, NULL, NULL, NULL),
     (62, 'es_ES', NULL, NULL, NULL, NULL),
     (63, 'es_ES', NULL, NULL, NULL, NULL),
-    (64, 'es_ES', NULL, NULL, NULL, NULL)
-;
+    (64, 'es_ES', NULL, NULL, NULL, NULL);
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
@@ -4766,7 +4764,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key=\"store_name\"}', NULL, NULL),
     (4, 'en_US', 'Mail sent to the customer when its password or email is changed in the back-office', 'Your account information on {config key=\"store_name\"} has been changed.', NULL, NULL),
     (5, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key=\"store_name\"} account has been created for you', NULL, NULL),
-    (6, 'en_US', NULL, NULL, NULL, NULL),
+    (6, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
     (1, 'es_ES', NULL, NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL, NULL),
