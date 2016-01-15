@@ -237,7 +237,6 @@
                                                     <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations.'}
                                                     (<a class="copy-all" href="#" title="{intl l='Copy all missing translations.'}">{intl l='Copy all translations.'}</a>)
                                                 </label>
-
                                             </div>
                                         </div>
                                     </div>
@@ -349,10 +348,14 @@
 	                                    </tr>
 
 	                                {else}
-
-	                                   {* Text is not displayed, put it in a hidden field *}
-	                                   <input type="hidden" id="translation_{$idx}" name="translation[]" value="{$info.translation}" />
-
+                                        <tr class="hidden">
+                                            <td colspan="2">
+                                                {* Text is not displayed, put it in a hidden field *}
+                                                <input type="hidden" id="translation_{$idx}" name="translation[]" value="{$info.translation}" />
+                                                <input type="hidden" id="translation_custom{$idx}" name="translation_custom[]" value="{$info.custom_fallback}" />
+                                                <input type="hidden" id="translation_global_{$idx}" name="translation_global[]" value="{$info.global_fallback}" />
+                                            </td>
+                                        </tr>
                                     {/if}
 
                                     {$idx = $idx + 1}
