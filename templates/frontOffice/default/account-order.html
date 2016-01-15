@@ -91,14 +91,8 @@
                             {hook name="account-order.delivery-address" module="{$delivery_id}" order="{$order_id}"}
                         {/ifhook}
                         {elsehook rel="account-order.delivery-address"}
-                            {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                                {loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                                {$ZIPCODE} {$CITY}<br/>
-                                {loop type="country" visible="*" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-                            {/loop}
+                            {format_address order_address=$DELIVERY_ADDRESS}
                         {/elsehook}
-
 
                     </div>
                 </div>
@@ -125,12 +119,7 @@
                             {hook name="account-order.invoice-address" module="{$payment_id}" order="{$order_id}"}
                         {/ifhook}
                         {elsehook rel="account-order.invoice-address"}
-                            {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
-                                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                                {$ZIPCODE} {$CITY}<br/>
-                                {loop type="country" visible="*" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
-                            {/loop}
+                            {format_address order_address=$DELIVERY_ADDRESS}
                         {/elsehook}
 
                         {hook name="account-order.invoice-address-bottom" module="{$delivery_id}" order="{$order_id}"}
