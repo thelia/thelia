@@ -38,22 +38,7 @@
                             {loop type="address" name="address.default" default="true"}
                             <ul class="list-info list-unstyled row">
                                 <li class="col-sm-4">
-                                    <address class="adr">
-                                        {if $COMPANY}
-                                          <span class="org">{$COMPANY}</span><br>
-                                        {/if}
-                                        <span class="street-address">{$ADDRESS1}</span><br>
-                                        {if $ADDRESS2 != ""}
-                                            <span class="extended-address">{$ADDRESS2}</span><br>
-                                        {/if}
-                                        {if $ADDRESS3 != ""}
-                                            <span class="extended-address">{$ADDRESS3}</span><br>
-                                        {/if}
-                                        <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY}<br>
-                                        <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
-                                        {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
-                                    </address>
+                                    {format_address address=$ID html_tag='address' html_class='adr'}
                                 </li>
                                 <li class="col-sm-4">
                                     {if $PHONE != ""}
