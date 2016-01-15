@@ -84,7 +84,7 @@ class FileController extends BaseAdminController
             /** @var UploadedFile $fileBeingUploaded */
             $fileBeingUploaded = $this->getRequest()->files->get('file');
             try {
-                $this->processImage(
+                $this->processFile(
                     $fileBeingUploaded,
                     $parentId,
                     $parentType,
@@ -103,7 +103,6 @@ class FileController extends BaseAdminController
     }
 
     /**
-     *
      * Process file uploaded
      *
      * @param UploadedFile $fileBeingUploaded
@@ -113,8 +112,36 @@ class FileController extends BaseAdminController
      * @param array $validMimeTypes
      * @param array $extBlackList
      * @return ResponseRest
+     *
+     * @deprecated since version 2.3, to be removed in 2.6. Please use the process method File present in the same class.
      */
     public function processImage(
+        $fileBeingUploaded,
+        $parentId,
+        $parentType,
+        $objectType,
+        $validMimeTypes = array(),
+        $extBlackList = array()
+    ) {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 2.6. Please use the process method File present in the same class.', E_USER_DEPRECATED);
+
+        return $this->processFile($fileBeingUploaded, $parentId, $parentType, $objectType, $validMimeTypes, $extBlackList);
+    }
+
+    /**
+     * Process file uploaded
+     *
+     * @param UploadedFile $fileBeingUploaded
+     * @param  int      $parentId       Parent id owning files being saved
+     * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
+     * @param  string   $objectType     Object type, e.g. image or document
+     * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
+     * @param  array    $extBlackList   an array of blacklisted extensions.
+     * @return ResponseRest
+     *
+     * @since 2.3
+     */
+    public function processFile(
         $fileBeingUploaded,
         $parentId,
         $parentType,
@@ -190,10 +217,16 @@ class FileController extends BaseAdminController
             throw new ProcessFileException('', 404);
         }
 
+        $defaultTitle = $parentModel->getTitle();
+
+        if (empty($defaultTitle) && $objectType !== 'image') {
+            $defaultTitle = $fileBeingUploaded->getClientOriginalName();
+        }
+
         $fileModel
             ->setParentId($parentId)
             ->setLocale(Lang::getDefaultLanguage()->getLocale())
-            ->setTitle($parentModel->getTitle())
+            ->setTitle($defaultTitle)
         ;
 
         $fileCreateOrUpdateEvent = new FileCreateOrUpdateEvent($parentId);
