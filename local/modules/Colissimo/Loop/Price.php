@@ -17,7 +17,6 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -48,10 +47,9 @@ class Price extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray()
     {
         $area = $this->getArea();
-
         $prices = Colissimo::getPrices();
 
-        if(!isset($prices[$area]) || !isset($prices[$area]["slices"])) {
+        if (!isset($prices[$area]) || !isset($prices[$area]["slices"])) {
             return array();
         }
 
@@ -70,8 +68,6 @@ class Price extends BaseLoop implements ArraySearchLoopInterface
 
             $loopResult->addRow($loopResultRow);
         }
-
         return $loopResult;
-
     }
 }

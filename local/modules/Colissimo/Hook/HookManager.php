@@ -10,30 +10,22 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Colissimo\Controller;
+namespace Colissimo\Hook;
 
-use Colissimo\Model\ColissimoFreeshipping;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Core\Hook\BaseHook;
 
-class FreeShipping extends BaseAdminController
+/**
+ * Class HookManager
+ * @package Colissimo\Hook
+ * @author Thomas Arnaud <tarnaud@openstudio.fr>
+ */
+class HookManager extends BaseHook
 {
-    public function set()
+    public function onModuleConfiguration(HookRenderEvent $event)
     {
-        $form = new \Colissimo\Form\FreeShipping($this->getRequest());
-        $response=null;
+        $module_id = self::getModule()->getModuleId();
 
-        try {
-            $vform = $this->validateForm($form);
-            $data = $vform->get('freeshipping')->getData();
-
-            $save = new ColissimoFreeshipping();
-            $save->setActive(!empty($data))->save();
-            $response = Response::create('');
-        } catch (\Exception $e) {
-            $response = JsonResponse::create(array("error"=>$e->getMessage()), 500);
-        }
-        return $response;
+        $event->add($this->render("module_configuration.html", ['module_id' => $module_id]));
     }
 }

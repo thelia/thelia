@@ -24,8 +24,8 @@
     </services>
 
     <hooks>
-        <hook id="colissimo.hook">
-            <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+        <hook id="colissimo.hook" class="Colissimo\Hook\HookManager">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
             <tag name="hook.event_listener" event="module.config-js" type="back" templates="render:assets/js/module-configuration-js.html" />
         </hook>
     </hooks>
