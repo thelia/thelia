@@ -23,49 +23,37 @@
                     {append var="parent_cat_ids" value=$ID}
                 {/loop}
             {/while}
-
-            {* define the function *}
-            {function menu level=0}
-            {if $level == 0}
-                <ul id="category" class="accordion">
-            {else}
-                {if in_array($parent, $parent_cat_ids)}
-                    <ul id="collapse{$parent}" class="in">
-                {else}
-                    <ul id="collapse{$parent}" class="collapse">
-                {/if}
-            {/if}
-
-            {loop name="cat-parent-$level" type="category" parent=$parent need_count_child=1 not_empty="1"}
-                {if $CHILD_COUNT > 0}
-                    {if in_array($ID, $parent_cat_ids)}
-                        {assign var="collapsed" value=""}
-                    {else}
-                        {assign var="collapsed" value="collapsed"}
-                    {/if}
-
-                    <li>
-                        <a href="{$URL nofilter}">
-                            {$TITLE} ({count type="product" category=$ID})
-                        </a>
-
-                        <a href="#collapse{$ID}" class="accordion-toggle {$collapsed}" data-toggle="collapse" data-parent="#collapse{$ID}"></a>
-
-                        {menu parent=$ID level=$level+1}
-                    </li>
-                {else}
-                    <li>
-                        <a href="{$URL nofilter}">
-                            {$TITLE} ({count type="product" category=$ID})
-                        </a>
-                    </li>
-                {/if}
+            
+            {* filling category tree array *}
+            {loop name="sidebar-menu" type="category-tree" category="0"}
+                {$category_tree[$PARENT][$ID] = ['TITLE'=>$TITLE, 'URL'=>$URL, 'CHILD_COUNT'=>$CHILD_COUNT, 'PRODUCT_COUNT'=>$PRODUCT_COUNT]}
             {/loop}
+            
+            {* define the function *}
+            {function menu parent=0 submenu=true}
+                {if $submenu}
+                    <ul id="collapse{$parent}" class="{if in_array($parent, $parent_cat_ids)}in{else}collapse{/if}">
+                {/if}
+                {foreach from=$category_tree[$parent] key=id item=category }
 
-            </ul>
+                    <li>
+                        <a href="{$category['URL'] nofilter}">
+                            {$category['TITLE']} {if $category['PRODUCT_COUNT']>0}({$category['PRODUCT_COUNT']}){/if}
+                        </a>
+                        {if $category['CHILD_COUNT'] > 0}
+                            <a href="#collapse{$id}" class="accordion-toggle {if in_array($id, $parent_cat_ids)}collapsed{/if}" data-toggle="collapse" data-parent="#collapse{$ID}"></a>
+                            {menu parent=$id}
+                        {/if}
+                    </li>
+                {/foreach}
+                {if $submenu}
+                    </ul>
+                {/if}
             {/function}
-
-            {menu parent='0'}
+            
+            <ul id="category" class="accordion">
+            {menu submenu=false}
+            </ul>
 
         </nav>
     </div>
