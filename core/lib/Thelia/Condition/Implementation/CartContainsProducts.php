@@ -148,7 +148,7 @@ class CartContainsProducts extends ConditionAbstract
         if (null !== $prodList = ProductQuery::create()->findPks($prodIds)) {
             /** @var Product $prod */
             foreach ($prodList as $prod) {
-                $prodStrList .= $prod->getTitle() . ', ';
+                $prodStrList .= $prod->setLocale($this->getCurrentLocale())->getTitle() . ', ';
             }
 
             $prodStrList = rtrim($prodStrList, ', ');
