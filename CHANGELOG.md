@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1920) Fixed coupons conditions label translation
 - (related to #1917) Fixed translations bug in user mode with view only missing translations activated
 - (related to #1914) The module list in the translation page is now ordered by module code instead of module title
 - (related to #1908) A fix for "terms & conditions" bootbox height
