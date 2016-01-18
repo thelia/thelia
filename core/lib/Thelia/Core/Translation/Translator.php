@@ -65,10 +65,6 @@ class Translator extends BaseTranslator
             if (null !== $request = $requestStack->getCurrentRequest()) {
                 return $request->getSession()->getLang()->getLocale();
             }
-        } else {
-            /** @var Request $request */
-            $request = $this->container->get('request');
-            return $request->getSession()->getLang()->getLocale();
         }
 
         return $this->locale;
