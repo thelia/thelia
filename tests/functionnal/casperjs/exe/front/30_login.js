@@ -5,8 +5,9 @@ casper.test.begin('Login', 5, function suite(test) {
     casper.start(thelia2_base_url + "login", function() {
         test.assertTitle("Login - " + thelia2_store_name, "title is the one expected");
         test.assertExists('form#form-login', "login form is found");
-        this.capture(screenshot_dir + 'front/30_login.png');
-
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/30_login.png');
+        }
         casper.test.comment('== Login with a bad account');
 
         this.fill('form#form-login', {
@@ -23,7 +24,9 @@ casper.test.begin('Login', 5, function suite(test) {
             document.querySelector('#password').value = password;
         }, 'chuck-norris@thelia.net', 'thelia');
 
-        this.capture(screenshot_dir + 'front/30_login-ko-0.png');
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/30_login-ko-0.png');
+        }
 
         this.click('form#form-login button[type="submit"]');
 
@@ -32,7 +35,9 @@ casper.test.begin('Login', 5, function suite(test) {
     casper.waitForSelector(
         'form#form-login .alert-danger',
         function(){
-            this.capture(screenshot_dir + 'front/30_login-ko.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/30_login-ko.png');
+            }
 
             test.assertSelectorHasText('form#form-login .alert-danger', 'Wrong email or password. Please try again');
 
@@ -57,7 +62,9 @@ casper.test.begin('Login', 5, function suite(test) {
     casper.waitForSelector(
         'a.logout',
         function(){
-            this.capture(screenshot_dir + 'front/30_login-ok.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/30_login-ok.png');
+            }
             test.assertExists('a.logout', 'Logout button exists');
 
             casper.test.comment('== Logout');
