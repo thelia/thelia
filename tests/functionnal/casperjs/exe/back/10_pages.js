@@ -2,6 +2,7 @@
  * Created by julien on 16/10/14.
  */
 var x = require('casper').selectXPath;
+var errors = [], resourceErrors = [];
 
 casper.test.begin('Back Office - Pages', 100, function suite(test) {
 
@@ -33,7 +34,7 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
         {"url": "admin/configuration/advanced", "title": "Advanced configuration"},
         {"url": "admin/modules", "title": "Modules"},
         {"url": "admin/hooks", "title": "Hooks"},
-        {"url": "admin/module-hooks", "title": "Hooks position"},
+        {"url": "admin/module-hooks", "title": "Modules attachments"},
         {"url": "admin/configuration/taxes_rules", "title": "Taxes rules"},
         {"url": "admin/configuration/languages", "title": "Thelia Languages"},
         {"url": "admin/configuration/translations", "title": "Translation"},
@@ -44,6 +45,24 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
         {"url": "admin/logout", "title": "Welcome"}
     ];
 
+    casper.on('page.error', function(msg, trace) {
+        this.echo("Error: " + msg, "ERROR");
+
+        errors.push(msg);
+    });
+
+    casper.on('resource.error', function(resourceError) {
+
+        var message = [
+            "Failed to load resource :", resourceError.url,
+            "-", resourceError.errorCode,
+            ":", resourceError.errorString
+        ].join(' ');
+
+        this.echo(message, "ERROR");
+
+        resourceErrors.push(message);
+    });
 
     casper.start(thelia2_base_url + 'admin/login', function() {
 
@@ -52,17 +71,20 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
         // trick too update the number of planned tests : 100 - 2 - (2x number of urls) !!
         test.skip(98 - (pages.length * 2));
 
+
         test.assertTitle("Welcome - Thelia Back Office");
-        test.assertExists('div.loginpage', "This is the login page");
+        test.assertExists('body.login-page', "This is the login page");
+
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + "login.png");
+        }
 
         casper.evaluate(function(username, password) {
             document.querySelector('#username').value = username;
             document.querySelector('#password').value = password;
         }, administrator.login, administrator.password);
 
-        this.click('div.loginpage button[type="submit"]');
-
-
+        this.click('body.login-page button[type="submit"]');
 
         this.echo('Waiting...');
     });
@@ -94,11 +116,22 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
                         "The page title is correct : " + pageTitle
                     );
 
-                    // page.title = pageTitle;
-
-                    this.capture(screenshot_dir + imageName);
+                    if (screenshot_enabled) {
+                        this.capture(screenshot_dir + imageName);
+                    }
                 },
                 function fail() {
+                    // try to catch exception
+                    if (this.exists('span.exception_title')) {
+                        var exceptionTitle = this.fetchText('span.exception_title');
+                        var exceptionMessage = this.fetchText('span.exception_message');
+
+                        this.echo(
+                            "Exception title : " + exceptionTitle + " " + exceptionMessage,
+                            "ERROR"
+                        );
+                    }
+
                     test.assertExists(
                         "footer.footer",
                         "Page " + page.url + " can't be loaded !"
@@ -110,6 +143,22 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
 
     });
 
-    casper.run(function() {test.done();});
+    casper.run(function() {
+        test.done();
+
+        if (errors.length > 0) {
+            this.echo(errors.length + ' JavaScript errors found', "WARNING");
+        } else {
+            this.echo('No Javascript errors found', "INFO");
+        }
+
+        if (resourceErrors.length > 0) {
+            this.echo(resourceErrors.length + ' Resources errors found', "WARNING");
+        } else {
+            this.echo('No resources errors found', "INFO");
+        }
+
+        casper.exit();
+    });
 
 });
