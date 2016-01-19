@@ -152,11 +152,6 @@ class ExportHandler
         $includeDocuments = false,
         $rangeDate = null
     ) {
-        // Todo
-//        if ($rangeDate !== null) {
-//            $handler->setRangeDate($rangeDate);
-//        }
-
         $exportHandleClass = $export->getHandleClass();
 
         /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
@@ -172,6 +167,11 @@ class ExportHandler
                 $instance->setExportDocuments(true);
             }
         }
+
+        // Todo
+//        if ($rangeDate !== null) {
+//            $instance->setRangeDate($rangeDate);
+//        }
 
         // Process export
         $event = new ExportEvent($instance, $serializer, $archiver);

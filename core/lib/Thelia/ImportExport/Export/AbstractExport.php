@@ -147,12 +147,12 @@ abstract class AbstractExport implements \Iterator
                 return;
             }
 
-            // Todo
-            throw new \Exception('TODO ' . __FILE__ . ':' . __LINE__);
+            throw new \DomainException(
+                'Data must an array or an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria'
+            );
         }
 
-        // Todo
-        throw new \Exception('TODO ' . __FILE__ . ':' . __LINE__);
+        throw new \LogicException('Export data can\'t be rewinded');
     }
 
     public function valid()

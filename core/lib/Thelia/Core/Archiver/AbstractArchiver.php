@@ -44,8 +44,7 @@ abstract class AbstractArchiver implements ArchiverInterface
     {
         $path = realpath($path);
         if (!file_exists($path)) {
-            //Todo
-            throw new \Exception('TODO: ' . __FILE__ . ' ' . __LINE__);
+            throw new \RuntimeException('File ' . $path . ' doesn\'t exists');
         }
 
         if ($pathInArchive === null) {
