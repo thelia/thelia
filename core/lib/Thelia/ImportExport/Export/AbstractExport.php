@@ -39,6 +39,11 @@ abstract class AbstractExport implements \Iterator
     const EXPORT_DOCUMENT = false;
 
     /**
+     * @var boolean Use range date
+     */
+    const USE_RANGE_DATE = false;
+
+    /**
      * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
      */
     private $data;
@@ -82,6 +87,11 @@ abstract class AbstractExport implements \Iterator
      * @var array Documents paths list
      */
     protected $documentsPaths = [];
+
+    /**
+     * @var null|array Export date range
+     */
+    protected $rangeDate;
 
     public function current()
     {
@@ -208,7 +218,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Whether images has to be exported as data
      *
-     * @return bool
+     * @return boolean
      */
     public function hasImages()
     {
@@ -267,7 +277,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Whether documents has to be exported as data
      *
-     * @return bool
+     * @return boolean
      */
     public function hasDocuments()
     {
@@ -320,6 +330,41 @@ abstract class AbstractExport implements \Iterator
         $this->documentsPaths = $documentsPaths;
 
         return $this;
+    }
+
+
+    /**
+     * Get range date
+     *
+     * @return null|array Array with date range
+     */
+    public function getRangeDate()
+    {
+        return $this->rangeDate;
+    }
+
+    /**
+     * Set range date
+     *
+     * @param null|array $rangeDate Array with date range
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setRangeDate(array $rangeDate = null)
+    {
+        $this->rangeDate = $rangeDate;
+
+        return $this;
+    }
+
+    /**
+     * Whether export bounded with date
+     *
+     * @return boolean
+     */
+    public function useRangeDate()
+    {
+        return static::USE_RANGE_DATE;
     }
 
 

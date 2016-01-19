@@ -152,7 +152,8 @@ class ExportController extends BaseAdminController
             [
                 'exportId' => $id,
                 'hasImages' => $export->hasImages(),
-                'hasDocuments' => $export->hasDocuments()
+                'hasDocuments' => $export->hasDocuments(),
+                'useRange' => $export->useRangeDate()
             ]
         );
     }

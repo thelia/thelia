@@ -36,6 +36,7 @@ use Thelia\Tools\I18n;
 class OrderExport extends AbstractExport
 {
     const FILE_NAME = 'order';
+    const USE_RANGE_DATE = true;
 
     protected $orderAndAliases = [
         OrderTableMap::REF => 'ref',

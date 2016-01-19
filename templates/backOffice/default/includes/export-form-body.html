@@ -8,14 +8,7 @@
     </div>
 {/if}
 
-{$showRange  = false}
-{loop name="export-category" type="export-category" id=$CATEGORY_ID limit=1}
-{if $TITLE == {intl l="Orders"} }
-    {$showRange  = true}
-{/if}
-{/loop}
-
-{if $showRange}
+{if $useRange}
     <div class="row vertical-row-space">
         <div class="col-md-4">
             {form_field field="range_date_start"}

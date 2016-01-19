@@ -82,6 +82,15 @@ class Export extends BaseExport
         return static::$cache->hasDocuments();
     }
 
+    public function useRangeDate()
+    {
+        if (static::$cache === null) {
+            static::$cache = $this->getHandleClassInstance();
+        }
+
+        return static::$cache->useRangeDate();
+    }
+
     /**
      * {@inheritDoc}
      */
