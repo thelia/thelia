@@ -43,12 +43,18 @@ class Colissimo extends AbstractDeliveryModule
 
     public function postActivation(ConnectionInterface $con = null)
     {
+        self::setConfigValue(ColissimoConfigValue::ENABLED, 1);
+
         $database = new Database($con);
         $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 
     public function isValidDelivery(Country $country)
     {
+        if (0 == self::getConfigValue(ColissimoConfigValue::ENABLED, 1)) {
+            return false;
+        }
+
         if (null !== $area = $this->getAreaForCountry($country)) {
             $areaId = $area->getId();
 
