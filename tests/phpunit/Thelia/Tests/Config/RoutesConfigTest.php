@@ -81,9 +81,6 @@ class RoutesConfigTest extends ContainerAwareTestCase
             = THELIA_VENDOR
             . DS . 'symfony'
             . DS . 'routing'
-            . DS . 'Symfony'
-            . DS . 'Component'
-            . DS . 'Routing'
             . DS . 'Loader'
             . DS . XmlFileLoader::SCHEME_PATH;
 

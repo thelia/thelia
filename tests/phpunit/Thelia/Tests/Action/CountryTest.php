@@ -39,11 +39,10 @@ class CountryTest extends BaseAction
             ->setHasStates(0)
             ->setLocale('en_US')
             ->setTitle('Test')
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Country($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new Country();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdCountry = $event->getCountry();
 
@@ -79,11 +78,10 @@ class CountryTest extends BaseAction
             ->setHasStates(0)
             ->setLocale('en_US')
             ->setTitle('Test')
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Country($this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new Country();
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedCountry = $event->getCountry();
 
@@ -107,10 +105,9 @@ class CountryTest extends BaseAction
     public function testDelete(CountryModel $country)
     {
         $event = new CountryDeleteEvent($country->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Country($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Country();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedCountry = $event->getCountry();
 
@@ -127,10 +124,9 @@ class CountryTest extends BaseAction
             ->findOne();
 
         $event = new CountryToggleDefaultEvent($country->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Country($this->getMockEventDispatcher());
-        $action->toggleDefault($event);
+        $action->toggleDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedCountry = $event->getCountry();
 

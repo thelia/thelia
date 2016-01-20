@@ -35,11 +35,10 @@ class AttributeAvTest extends BaseAction
         $event
             ->setAttributeId($attribute->getId())
             ->setLocale('en_US')
-            ->setTitle('foo')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTitle('foo');
 
-        $action = new AttributeAv($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new AttributeAv();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $attributeAvCreated = $event->getAttributeAv();
 
@@ -70,11 +69,10 @@ class AttributeAvTest extends BaseAction
             ->setDescription('bar description')
             ->setChapo('bar chapo')
             ->setPostscriptum('bar postscriptum')
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new AttributeAv($this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new AttributeAv();
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedAttributeAv = $event->getAttributeAv();
 
@@ -95,10 +93,9 @@ class AttributeAvTest extends BaseAction
     public function testDelete(AttributeAvModel $attributeAv)
     {
         $event = new AttributeAvDeleteEvent($attributeAv->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new AttributeAv($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new AttributeAv();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedAttributeAv = $event->getAttributeAv();
 

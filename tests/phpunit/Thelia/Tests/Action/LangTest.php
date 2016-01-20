@@ -69,11 +69,10 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimalSeparator(".")
             ->setThousandsSeparator(" ")
             ->setDecimals("2")
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request, $this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdLang = $event->getLang();
 
@@ -112,11 +111,10 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimalSeparator(",")
             ->setThousandsSeparator(".")
             ->setDecimals("1")
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request, $this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
 
@@ -143,10 +141,9 @@ class LangTest extends ContainerAwareTestCase
     public function testToggleDefault(LangModel $lang)
     {
         $event = new LangToggleDefaultEvent($lang->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request, $this->getMockEventDispatcher());
-        $action->toggleDefault($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action->toggleDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
 
@@ -171,10 +168,9 @@ class LangTest extends ContainerAwareTestCase
         self::tearDownAfterClass();
 
         $event = new LangDeleteEvent($lang->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request, $this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedLang = $event->getLang();
 
@@ -192,10 +188,9 @@ class LangTest extends ContainerAwareTestCase
         $lang = LangQuery::create()->findOneByByDefault(1);
 
         $event = new LangDeleteEvent($lang->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request, $this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
     public static function tearDownAfterClass()

@@ -63,11 +63,10 @@ class CategoryTest extends TestCaseWithURLToolSetup
             ->setLocale('en_US')
             ->setParent(0)
             ->setTitle('foo')
-            ->setVisible(1)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setVisible(1);
 
-        $action = new Category($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new Category();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdCategory = $event->getCategory();
 
@@ -107,11 +106,10 @@ class CategoryTest extends TestCaseWithURLToolSetup
             ->setVisible(0)
             ->setParent(0)
             ->setDefaultTemplateId($template->getId())
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Category($this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new Category();
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedCategory = $event->getCategory();
 
@@ -144,10 +142,8 @@ class CategoryTest extends TestCaseWithURLToolSetup
 
         $event = new TemplateDeleteEvent($template->getId());
 
-        $event->setDispatcher($this->getMockEventDispatcher());
-
-        $action = new \Thelia\Action\Template($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new \Thelia\Action\Template();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $this->assertInstanceOf('Thelia\Model\Template', $event->getTemplate());
 
@@ -165,10 +161,9 @@ class CategoryTest extends TestCaseWithURLToolSetup
     public function testDelete(CategoryModel $category)
     {
         $event = new CategoryDeleteEvent($category->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Category($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Category();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedCategory = $event->getCategory();
 
@@ -182,10 +177,9 @@ class CategoryTest extends TestCaseWithURLToolSetup
         $expectedVisibility = !$category->getVisible();
 
         $event = new CategoryToggleVisibilityEvent($category);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Category($this->getMockEventDispatcher());
-        $action->toggleVisibility($event);
+        $action = new Category();
+        $action->toggleVisibility($event, null, $this->getMockEventDispatcher());
 
         $updatedCategory = $event->getCategory();
 

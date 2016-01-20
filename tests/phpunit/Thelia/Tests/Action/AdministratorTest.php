@@ -13,17 +13,18 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Administrator;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\LangQuery;
-use Thelia\Tests\TestCaseWithURLToolSetup;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -47,9 +48,12 @@ class AdministratorTest extends BaseAction
             ->disableOriginalConstructor()
             ->getMock();
 
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $translator = new Translator(new Container());
 
-        $this->tokenProvider = new TokenProvider($request, $translator, 'test');
+        $this->tokenProvider = new TokenProvider($requestStack, $translator, 'test');
     }
 
     public function testCreate()
@@ -64,12 +68,11 @@ class AdministratorTest extends BaseAction
             ->setPassword('azerty')
             ->setLocale($locale)
             ->setEmail(uniqid().'@example.com')
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
         $admin = new Administrator($this->mailerFactory, $this->tokenProvider);
 
-        $admin->create($adminEvent);
+        $admin->create($adminEvent, null, $this->getMockEventDispatcher());
 
         $createdAdmin = $adminEvent->getAdministrator();
 
@@ -104,7 +107,7 @@ class AdministratorTest extends BaseAction
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
 
-        $actionAdmin->update($adminEvent);
+        $actionAdmin->update($adminEvent, null, $this->getMockEventDispatcher());
 
         $updatedAdmin = $adminEvent->getAdministrator();
 
@@ -127,7 +130,6 @@ class AdministratorTest extends BaseAction
 
         $adminEvent
             ->setId($admin->getId())
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
@@ -146,8 +148,7 @@ class AdministratorTest extends BaseAction
 
         $adminEvent = new AdministratorUpdatePasswordEvent($admin);
         $adminEvent
-            ->setPassword('toto')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setPassword('toto');
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
 
@@ -165,8 +166,6 @@ class AdministratorTest extends BaseAction
         $admin->setPasswordRenewToken(null)->setEmail('no_reply@thelia.net')->save();
 
         $adminEvent = new AdministratorEvent($admin);
-        $adminEvent
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
         $actionAdmin->createPassword($adminEvent);

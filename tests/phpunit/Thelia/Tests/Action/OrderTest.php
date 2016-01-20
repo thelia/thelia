@@ -101,8 +101,6 @@ class OrderTest extends BaseAction
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 
-        $this->orderEvent->setDispatcher($this->getMockEventDispatcher());
-
         $mailerFactory = new MailerFactory(
             $this->getMockEventDispatcher(),
             $this->getMockParserInterface()
@@ -111,8 +109,7 @@ class OrderTest extends BaseAction
         $this->orderAction = new Order(
             $this->request,
             $mailerFactory,
-            $this->securityContext,
-            $this->getMockEventDispatcher()
+            $this->securityContext
         );
 
         /* load customer */
@@ -280,7 +277,7 @@ class OrderTest extends BaseAction
             $itemsStock[$index] = $cartItem->getProductSaleElements()->getQuantity();
         }
 
-        $this->orderAction->create($this->orderEvent);
+        $this->orderAction->create($this->orderEvent, null, $this->getMockEventDispatcher());
 
         $placedOrder = $this->orderEvent->getPlacedOrder();
 
@@ -411,14 +408,14 @@ class OrderTest extends BaseAction
             $this->cart,
             $this->customer
         );
-        $orderManuelEvent->setDispatcher($this->orderEvent->getDispatcher());
+
         $orderManuelEvent->getOrder()->setChoosenDeliveryAddress($validDeliveryAddress->getId());
         $orderManuelEvent->getOrder()->setChoosenInvoiceAddress($validInvoiceAddress->getId());
 
         $deliveryModuleId = $orderCopy->getDeliveryModuleId();
         $paymentModuleId = $orderCopy->getPaymentModuleId();
 
-        $this->orderAction->createManual($orderManuelEvent);
+        $this->orderAction->createManual($orderManuelEvent, null, $this->getMockEventDispatcher());
 
         $placedOrder = $orderManuelEvent->getPlacedOrder();
 
@@ -484,7 +481,7 @@ class OrderTest extends BaseAction
         $validDeliveryAddressId = $orderCopy->getDeliveryOrderAddressId();
         $validInvoiceAddressId = $orderCopy->getInvoiceOrderAddressId();
 
-        $this->orderAction->createManual($orderManuelEvent);
+        $this->orderAction->createManual($orderManuelEvent, null, $this->getMockEventDispatcher());
 
         $placedOrder = $orderManuelEvent->getPlacedOrder();
 

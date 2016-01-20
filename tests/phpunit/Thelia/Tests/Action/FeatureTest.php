@@ -30,11 +30,10 @@ class FeatureTest extends BaseAction
         $event = new FeatureCreateEvent();
         $event
             ->setLocale('en_US')
-            ->setTitle('test feature')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTitle('test feature');
 
-        $action = new Feature($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new Feature();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdFeature = $event->getFeature();
 
@@ -62,11 +61,10 @@ class FeatureTest extends BaseAction
             ->setTitle('test update')
             ->setChapo('test chapo')
             ->setDescription('test description')
-            ->setPostscriptum('test postscriptum')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setPostscriptum('test postscriptum');
 
-        $action = new Feature($this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new Feature();
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedFeature = $event->getFeature();
 
@@ -88,10 +86,9 @@ class FeatureTest extends BaseAction
     public function testDelete(FeatureModel $feature)
     {
         $event = new FeatureDeleteEvent($feature->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Feature($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Feature();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedFeature = $event->getFeature();
 

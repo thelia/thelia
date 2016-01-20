@@ -41,11 +41,10 @@ class MessageTest extends BaseAction
             ->setLocale('en_US')
             ->setTitle('test title')
             ->setSecured(0)
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Message($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new Message();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdMessage = $event->getMessage();
 
@@ -80,11 +79,10 @@ class MessageTest extends BaseAction
             ->setHtmlTemplateFileName(null)
             ->setTextLayoutFileName(null)
             ->setTextTemplateFileName(null)
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Message($this->getMockEventDispatcher());
-        $action->modify($event);
+        $action = new Message();
+        $action->modify($event, null, $this->getMockEventDispatcher());
 
         $updatedMessage = $event->getMessage();
 
@@ -111,10 +109,9 @@ class MessageTest extends BaseAction
     public function testDelete(MessageModel $message)
     {
         $event = new MessageDeleteEvent($message->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Message($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Message();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedMessage = $event->getMessage();
 

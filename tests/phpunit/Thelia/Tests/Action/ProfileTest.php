@@ -42,12 +42,11 @@ class ProfileTest extends BaseAction
             ->setTitle('test profile')
             ->setChapo('test chapo')
             ->setDescription('test description')
-            ->setPostscriptum('test postscriptum')
-            ->setDispatcher($this->getMockEventDispatcher())
+            ->setPostscriptum('test postscriptum');
         ;
 
         $action = new Profile($this->getMockEventDispatcher());
-        $action->create($event);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdProfile = $event->getProfile();
 
@@ -79,12 +78,11 @@ class ProfileTest extends BaseAction
             ->setTitle('test update title')
             ->setChapo('test update chapo')
             ->setDescription('test update description')
-            ->setPostscriptum('test update postscriptum')
-            ->setDispatcher($this->getMockEventDispatcher())
+            ->setPostscriptum('test update postscriptum');
         ;
 
         $action = new Profile($this->getMockEventDispatcher());
-        $action->update($event);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedProfile = $event->getProfile();
 
@@ -112,7 +110,6 @@ class ProfileTest extends BaseAction
             ->setResourceAccess(array(
                     'admin.address' => array(AccessManager::CREATE)
                 ))
-            ->setDispatcher($this->getMockEventDispatcher());
         ;
 
         $action = new Profile($this->getMockEventDispatcher());

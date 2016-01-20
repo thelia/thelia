@@ -61,16 +61,16 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $token = new TokenProvider($this->request, $translator, 'test');
 
-        $this->dispatcher->addSubscriber(new \Thelia\Action\Cart($this->request, $token, $this->dispatcher));
+        $this->dispatcher->addSubscriber(new \Thelia\Action\Cart($this->request, $token));
 
         $this->session->setSessionCart(null);
 
         $this->request->setSession($this->session);
 
+        /** @var \Thelia\Action\Cart  cartAction */
         $this->cartAction = new \Thelia\Action\Cart(
             $this->request,
-            new TokenProvider($this->request, $translator, 'baba au rhum'),
-            $this->dispatcher
+            new TokenProvider($this->request, $translator, 'baba au rhum')
         );
 
         $this->dispatcherNull = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -92,11 +92,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($type, $event) {
-                        $event->setDispatcher($this->dispatcher);
                         if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
-                            $this->cartAction->restoreCurrentCart($event);
+                            $this->cartAction->restoreCurrentCart($event, null, $this->dispatcher);
                         } elseif ($type == TheliaEvents::CART_CREATE_NEW) {
-                            $this->cartAction->createEmptyCart($event);
+                            $this->cartAction->createEmptyCart($event, null, $this->dispatcher);
                         }
                     }
                 )

@@ -14,11 +14,9 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Thelia\Action\Document;
 use Thelia\Action\Feature;
 use Thelia\Action\FeatureAv;
 use Thelia\Action\File;
-use Thelia\Action\Image;
 use Thelia\Action\Product;
 use Thelia\Action\ProductSaleElement;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
@@ -34,7 +32,6 @@ use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Thelia;
-use Thelia\Files\FileManager;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeCombinationQuery;
@@ -99,8 +96,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setBasePrice(10)
             ->setTaxRuleId($taxRuleId)
             ->setBaseWeight(10)
-            ->setCurrencyId($currencyId)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setCurrencyId($currencyId);
 
         $action = new Product($this->getMockEventDispatcher());
         $action->create($event);
@@ -165,8 +161,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setBaseWeight(10)
             ->setCurrencyId($currencyId)
             ->setBaseQuantity(10)
-            ->setTemplateId($templateId)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTemplateId($templateId);
 
         $action = new Product($this->getMockEventDispatcher());
         $action->create($event);
@@ -227,7 +222,6 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setDefaultCategory($defaultCategory)
             ->setBrandId($brandId)
             ->setRef($newRef)
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
         $action = new Product($this->getMockEventDispatcher());
@@ -267,8 +261,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $event = new ProductToggleVisibilityEvent();
 
         $event
-            ->setProduct($product)
-            ->setDispatcher($this->getMockEventDispatcher())
+            ->setProduct($product);
         ;
 
         $action = new Product($this->getMockEventDispatcher());
@@ -296,7 +289,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $content = ContentQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
 
         $event = new ProductAddContentEvent($product, $content->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->addContent($event);
@@ -323,7 +315,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $content = $contents->getFirst();
 
         $event = new ProductDeleteContentEvent($product, $content->getContentId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->removeContent($event);
@@ -355,7 +346,6 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->findOne();
 
         $event = new ProductAddCategoryEvent($product, $category->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->addCategory($event);
@@ -390,7 +380,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(2, count($product->getProductCategories()));
 
         $event = new ProductDeleteCategoryEvent($product, $category->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->removeCategory($event);
@@ -419,7 +408,6 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->findOne();
 
         $event = new ProductAddAccessoryEvent($product, $accessoryId);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->addAccessory($event);
@@ -443,7 +431,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $currentAccessory = $accessories->getFirst();
         $event = new ProductDeleteAccessoryEvent($product, $currentAccessory->getAccessory());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->removeAccessory($event);
@@ -471,7 +458,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals("Thelia\Model\ProductSaleElements", get_class($oldProductSaleElements), "There is no default pse for this product");
 
         $event = new ProductSetTemplateEvent($product, $templateId, $currencyId);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->setProductTemplate($event);
@@ -510,7 +496,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     public function testDelete(ProductModel $product)
     {
         $event = new ProductDeleteEvent($product->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $action = new Product($this->getMockEventDispatcher());
         $action->delete($event);
@@ -536,7 +521,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $newRef = uniqid('testClone-');
 
         $event = new ProductCloneEvent($newRef, 'fr_FR', $originalProduct);
-        $event->setDispatcher($eventDispatcher);
 
         $originalProductDefaultI18n = ProductI18nQuery::create()->findPk([$originalProduct->getId(), $event->getLang()]);
         $originalProductDefaultPrice = ProductPriceQuery::create()->findOneByProductSaleElementsId($originalProduct->getDefaultSaleElements()->getId());
@@ -836,8 +820,8 @@ class ProductTest extends TestCaseWithURLToolSetup
         $kernel = new Thelia('test', true);
         $kernel->boot();
 
-        $action = new File($kernel->getContainer()->get('event_dispatcher'));
-        $action->cloneFile($event);
+        $action = new File();
+        $action->cloneFile($event, null, $kernel->getContainer()->get('event_dispatcher'));
 
         $originalProductId = $event->getOriginalProduct()->getId();
         $cloneProduct = $event->getClonedProduct();

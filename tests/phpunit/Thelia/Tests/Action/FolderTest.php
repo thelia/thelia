@@ -44,7 +44,6 @@ class FolderTest extends TestCaseWithURLToolSetup
         }
 
         $event = new FolderUpdateEvent($folder->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setVisible(1)
             ->setLocale($folder->getLocale())
@@ -65,7 +64,6 @@ class FolderTest extends TestCaseWithURLToolSetup
         }
 
         $event = new UpdateSeoEvent($folder->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setLocale($folder->getLocale())
             ->setMetaTitle($folder->getMetaTitle())
@@ -77,9 +75,9 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     public function processUpdateSeoAction($event)
     {
-        $contentAction = new Folder($this->getMockEventDispatcher());
+        $contentAction = new Folder();
 
-        return $contentAction->updateSeo($event);
+        return $contentAction->updateSeo($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -88,8 +86,8 @@ class FolderTest extends TestCaseWithURLToolSetup
      */
     public function processUpdateAction($event)
     {
-        $contentAction = new Folder($this->getMockEventDispatcher());
-        $contentAction->update($event);
+        $contentAction = new Folder();
+        $contentAction->update($event, null, $this->getMockEventDispatcher());
 
         return $event->getFolder();
     }
@@ -101,16 +99,15 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testCreateFolder()
     {
         $event = new FolderCreateEvent();
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setParent(0)
             ->setVisible(1)
             ->setLocale('en_US')
             ->setTitle('folder creation test');
 
-        $folderAction = new Folder($this->getMockEventDispatcher());
+        $folderAction = new Folder();
 
-        $folderAction->create($event);
+        $folderAction->create($event, null, $this->getMockEventDispatcher());
 
         $folder = $event->getFolder();
 
@@ -130,7 +127,6 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $visible = !$folder->getVisible();
         $event = new FolderUpdateEvent($folder->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setLocale('en_US')
             ->setTitle('test update folder')
@@ -141,8 +137,8 @@ class FolderTest extends TestCaseWithURLToolSetup
             ->setParent(0)
         ;
 
-        $folderAction = new Folder($this->getMockEventDispatcher());
-        $folderAction->update($event);
+        $folderAction = new Folder();
+        $folderAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = $event->getFolder();
 
@@ -164,9 +160,8 @@ class FolderTest extends TestCaseWithURLToolSetup
         $folder = $this->getRandomFolder();
 
         $event = new FolderDeleteEvent($folder->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
-        $folderAction = new Folder($this->getMockEventDispatcher());
-        $folderAction->delete($event);
+        $folderAction = new Folder();
+        $folderAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedFolder = $event->getFolder();
 
@@ -184,10 +179,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         $visible = $folder->getVisible();
 
         $event = new FolderToggleVisibilityEvent($folder);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $folderAction = new Folder($this->getMockEventDispatcher());
-        $folderAction->toggleVisibility($event);
+        $folderAction = new Folder();
+        $folderAction->toggleVisibility($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = $event->getFolder();
 
@@ -209,10 +203,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         $newPosition = $folder->getPosition()-1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_UP);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $folderAction = new Folder($this->getMockEventDispatcher());
-        $folderAction->updatePosition($event);
+        $folderAction = new Folder();
+        $folderAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
@@ -242,10 +235,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         $newPosition = $folder->getPosition()+1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_DOWN);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $folderAction = new Folder($this->getMockEventDispatcher());
-        $folderAction->updatePosition($event);
+        $folderAction = new Folder();
+        $folderAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
@@ -264,10 +256,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         }
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $folderAction = new Folder($this->getMockEventDispatcher());
-        $folderAction->updatePosition($event);
+        $folderAction = new Folder();
+        $folderAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 

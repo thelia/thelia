@@ -121,7 +121,7 @@ class HookTest extends WebTestCase
     {
         $this->assertStringContains($content, ":: main.content-top ::");
         $this->assertStringContains($content, ":: request : GET / HTTP/1.1");
-        $this->assertRegExp('/:: session : [a-f0-9]{40} ::/', $content);
+        $this->assertRegExp('/:: session : [a-f0-9]{40,} ::/', $content);
         $this->assertStringContains($content, ":: cart : not null ::");
         $this->assertStringContains($content, ":: order : not null ::");
         $this->assertStringContains($content, ":: currency : 1 ::");

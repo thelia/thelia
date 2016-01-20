@@ -122,9 +122,9 @@ class ImageTest extends TestCaseWithURLToolSetup
     {
         $event = new ImageEvent($this->request);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -136,14 +136,13 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessNonExistentImage()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         $event->setCacheFilepath("blablabla.png");
         $event->setCacheSubdirectory("tests");
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -155,14 +154,13 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageOutsideValidPath()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         $event->setCacheFilepath("blablabla.png");
         $event->setCacheSubdirectory("../../../");
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -171,12 +169,11 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageWithoutAnyTransformationsCopy()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-1.png");
         $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         // mock cache configuration.
         $config = ConfigQuery::create()->filterByName('original_image_delivery_mode')->findOne();
@@ -186,7 +183,7 @@ class ImageTest extends TestCaseWithURLToolSetup
             $config->setValue('copy')->save();
         }
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
 
         if ($config != null) {
             $config->setValue($oldval)->save();
@@ -203,12 +200,11 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageWithoutAnyTransformationsSymlink()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-9.png");
         $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         // mock cache configuration.
         $config = ConfigQuery::create()->filterByName('original_image_delivery_mode')->findOne();
@@ -218,7 +214,7 @@ class ImageTest extends TestCaseWithURLToolSetup
             $config->setValue('symlink')->save();
         }
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
 
         if ($config != null) {
             $config->setValue($oldval)->save();
@@ -235,7 +231,6 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageResizeHorizWithBands()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-2.png");
         $event->setCacheSubdirectory("tests");
@@ -245,9 +240,9 @@ class ImageTest extends TestCaseWithURLToolSetup
         $event->setHeight(100);
         $event->setResizeMode(Image::EXACT_RATIO_WITH_BORDERS);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -256,7 +251,6 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageResizeVertWithBands()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-3.png");
         $event->setCacheSubdirectory("tests");
@@ -266,9 +260,9 @@ class ImageTest extends TestCaseWithURLToolSetup
         $event->setHeight(100);
         $event->setResizeMode(Image::EXACT_RATIO_WITH_BORDERS);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -277,16 +271,15 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageWithTransformations()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getDispatcher(), $this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-4.png");
         $event->setCacheSubdirectory("tests");
 
         $event->setEffects(array("grayscale", "vertical_flip", "horizontal_flip", 'colorize:#00ff00', 'gamma: 0.2'));
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -295,7 +288,6 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageResizeHorizWithCrop()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-5.png");
         $event->setCacheSubdirectory("tests");
@@ -305,9 +297,9 @@ class ImageTest extends TestCaseWithURLToolSetup
         $event->setHeight(100);
         $event->setResizeMode(Image::EXACT_RATIO_WITH_CROP);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -316,7 +308,6 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageResizeVertWithCrop()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-6.png");
         $event->setCacheSubdirectory("tests");
@@ -326,9 +317,9 @@ class ImageTest extends TestCaseWithURLToolSetup
         $event->setHeight(150);
         $event->setResizeMode(Image::EXACT_RATIO_WITH_CROP);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -337,7 +328,6 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageResizeHorizKeepRatio()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-7.png");
         $event->setCacheSubdirectory("tests");
@@ -345,9 +335,9 @@ class ImageTest extends TestCaseWithURLToolSetup
         $event->setWidth(100);
         $event->setHeight(100);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
@@ -356,7 +346,6 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testProcessImageResizeVertKeepRatio()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-8.png");
         $event->setCacheSubdirectory("tests");
@@ -364,19 +353,18 @@ class ImageTest extends TestCaseWithURLToolSetup
         $event->setWidth(100);
         $event->setHeight(100);
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
-        $image->processImage($event);
+        $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     public function testClearTestsCache()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setCacheSubdirectory('tests');
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         $image->clearCache($event);
     }
@@ -384,9 +372,8 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testClearWholeCache()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         $image->clearCache($event);
     }
@@ -399,11 +386,10 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function testClearUnallowedPathCache()
     {
         $event = new ImageEvent($this->request);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $event->setCacheSubdirectory('../../../..');
 
-        $image = new Image($this->getFileManager(), $this->getMockEventDispatcher());
+        $image = new Image($this->getFileManager());
 
         $image->clearCache($event);
     }

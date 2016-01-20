@@ -44,11 +44,10 @@ class ConfigTest extends BaseAction
             ->setTitle('test config foo bar')
             ->setHidden(true)
             ->setSecured(true)
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Config($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new Config();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdConfig = $event->getConfig();
 
@@ -75,11 +74,10 @@ class ConfigTest extends BaseAction
     {
         $event = new ConfigUpdateEvent($config->getId());
         $event
-            ->setValue('baz')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setValue('baz');
 
-        $action = new Config($this->getMockEventDispatcher());
-        $action->setValue($event);
+        $action = new Config();
+        $action->setValue($event, null, $this->getMockEventDispatcher());
 
         $updatedConfig = $event->getConfig();
 
@@ -113,11 +111,10 @@ class ConfigTest extends BaseAction
             ->setPostscriptum('config postscriptum')
             ->setHidden(0)
             ->setSecured(0)
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new Config($this->getMockEventDispatcher());
-        $action->modify($event);
+        $action = new Config();
+        $action->modify($event, null, $this->getMockEventDispatcher());
 
         $updatedConfig = $event->getConfig();
 
@@ -143,10 +140,9 @@ class ConfigTest extends BaseAction
     public function testDelete(ConfigModel $config)
     {
         $event = new ConfigDeleteEvent($config->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Config($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Config();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedConfig = $event->getConfig();
 

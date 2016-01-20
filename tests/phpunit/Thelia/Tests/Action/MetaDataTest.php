@@ -43,8 +43,7 @@ class MetaDataTest extends BaseAction
             ->setMetaKey('test')
             ->setElementKey(get_class($product))
             ->setElementId($product->getId())
-            ->setValue('test')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setValue('test');
 
         $action = new MetaData();
         $action->createOrUpdate($event);
@@ -67,8 +66,7 @@ class MetaDataTest extends BaseAction
             ->setMetaKey('test2')
             ->setElementKey(get_class($product))
             ->setElementId($product->getId())
-            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"))
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"));
         $action = new MetaData();
         $action->createOrUpdate($event);
 
@@ -143,8 +141,7 @@ class MetaDataTest extends BaseAction
             ->setMetaKey($metaData->getMetaKey())
             ->setElementKey($metaData->getElementKey())
             ->setElementId($metaData->getElementId())
-            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"))
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"));
 
         $action = new MetaData();
         $action->createOrUpdate($event);
@@ -180,8 +177,6 @@ class MetaDataTest extends BaseAction
         $this->assertNotNull($metaData);
 
         $event = new MetaDataDeleteEvent('test', get_class($product), $product->getId());
-        $event
-            ->setDispatcher($this->getMockEventDispatcher());
 
         $action = new MetaData();
         $action->delete($event);

@@ -31,11 +31,10 @@ class AttributeTest extends BaseAction
 
         $event
             ->setLocale('en_US')
-            ->setTitle('foo')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTitle('foo');
 
         $action = new Attribute($this->getMockEventDispatcher());
-        $action->create($event);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdAttribute = $event->getAttribute();
 
@@ -60,11 +59,10 @@ class AttributeTest extends BaseAction
             ->setTitle('bar')
             ->setDescription('bar description')
             ->setChapo('bar chapo')
-            ->setPostscriptum('bar postscriptum')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setPostscriptum('bar postscriptum');
 
-        $action = new Attribute($this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new Attribute();
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedAttribute = $event->getAttribute();
 
@@ -85,10 +83,9 @@ class AttributeTest extends BaseAction
     public function testDelete(AttributeModel $attribute)
     {
         $event = new AttributeDeleteEvent($attribute->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new Attribute($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new Attribute();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedAttribute = $event->getAttribute();
 

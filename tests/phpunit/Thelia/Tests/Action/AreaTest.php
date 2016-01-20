@@ -33,11 +33,10 @@ class AreaTest extends BaseAction
     {
         $event = new AreaCreateEvent();
         $event
-            ->setAreaName('foo')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setAreaName('foo');
 
-        $areaAction = new Area($this->getMockEventDispatcher());
-        $areaAction->create($event);
+        $areaAction = new Area();
+        $areaAction->create($event, null, $this->getMockEventDispatcher());
 
         $createdArea = $event->getArea();
 
@@ -59,11 +58,10 @@ class AreaTest extends BaseAction
     {
         $event = new AreaUpdatePostageEvent($area->getId());
         $event
-            ->setPostage(20)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setPostage(20);
 
-        $areaAction = new Area($this->getMockEventDispatcher());
-        $areaAction->updatePostage($event);
+        $areaAction = new Area();
+        $areaAction->updatePostage($event, null, $this->getMockEventDispatcher());
 
         $updatedArea = $event->getArea();
 
@@ -83,9 +81,8 @@ class AreaTest extends BaseAction
         $country = CountryQuery::create()->findOne();
 
         $event = new AreaAddCountryEvent($area->getId(), [ $country->getId() ]);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $areaAction = new Area($this->getMockEventDispatcher());
+        $areaAction = new Area();
         $areaAction->addCountry($event);
 
         $updatedArea = $event->getArea();
@@ -108,9 +105,8 @@ class AreaTest extends BaseAction
         $country = CountryQuery::create()->filterByArea($area)->find()->getFirst();
 
         $event = new AreaRemoveCountryEvent($area->getId(), $country->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $areaAction = new Area($this->getMockEventDispatcher());
+        $areaAction = new Area();
         $areaAction->removeCountry($event);
 
         $updatedCountry = CountryAreaQuery::create()
@@ -134,10 +130,9 @@ class AreaTest extends BaseAction
     public function testDelete(AreaModel $area)
     {
         $event = new AreaDeleteEvent($area->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $areaAction = new Area($this->getMockEventDispatcher());
-        $areaAction->delete($event);
+        $areaAction = new Area();
+        $areaAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedArea = $event->getArea();
 

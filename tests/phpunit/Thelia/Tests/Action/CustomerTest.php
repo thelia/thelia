@@ -84,12 +84,10 @@ class CustomerTest extends BaseAction
             null
         );
 
-        $customerCreateEvent->setDispatcher($this->getMockEventDispatcher());
-
         /** @var Customer $customerAction */
         $customerAction = $this->customerAction;
 
-        $customerAction->create($customerCreateEvent);
+        $customerAction->create($customerCreateEvent, null, $this->getMockEventDispatcher());
 
         $customerCreated = $customerCreateEvent->getCustomer();
 
@@ -146,12 +144,10 @@ class CustomerTest extends BaseAction
             'testRef'
         );
 
-        $customerCreateEvent->setDispatcher($this->getMockEventDispatcher());
-
         /** @var Customer $customerAction */
         $customerAction = $this->customerAction;
 
-        $customerAction->create($customerCreateEvent);
+        $customerAction->create($customerCreateEvent, null, $this->getMockEventDispatcher());
 
         $customerCreated = $customerCreateEvent->getCustomer();
 

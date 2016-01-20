@@ -48,10 +48,9 @@ class AddressTest extends BaseAction
             ""
         );
         $AddressCreateOrUpdateEvent->setCustomer($customer);
-        $AddressCreateOrUpdateEvent->setDispatcher($this->getMockEventDispatcher());
 
-        $actionAddress = new Address($this->getMockEventDispatcher());
-        $actionAddress->create($AddressCreateOrUpdateEvent);
+        $actionAddress = new Address();
+        $actionAddress->create($AddressCreateOrUpdateEvent, null, $this->getMockEventDispatcher());
 
         $createdAddress = $AddressCreateOrUpdateEvent->getAddress();
 
@@ -95,10 +94,9 @@ class AddressTest extends BaseAction
             ""
         );
         $addressEvent->setAddress($address);
-        $addressEvent->setDispatcher($this->getMockEventDispatcher());
 
-        $actionAddress = new Address($this->getMockEventDispatcher());
-        $actionAddress->update($addressEvent);
+        $actionAddress = new Address();
+        $actionAddress->update($addressEvent, null, $this->getMockEventDispatcher());
 
         $updatedAddress = $addressEvent->getAddress();
         $this->assertInstanceOf("Thelia\Model\Address", $updatedAddress);
@@ -160,13 +158,12 @@ class AddressTest extends BaseAction
         );
 
         $addressEvent->setAddress($defaultAddress);
-        $addressEvent->setDispatcher($this->getMockEventDispatcher());
 
         /**
          * Do the update
          */
-        $actionAddress = new Address($this->getMockEventDispatcher());
-        $actionAddress->update($addressEvent);
+        $actionAddress = new Address();
+        $actionAddress->update($addressEvent, null, $this->getMockEventDispatcher());
 
         $updatedAddress = AddressQuery::create()
             ->findPk($addressId);

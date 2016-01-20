@@ -56,8 +56,7 @@ class ModuleHookTest extends BaseAction
         $event = new ModuleHookCreateEvent();
         $event
             ->setHookId($this->hook->getId())
-            ->setModuleId($this->module->getId())
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setModuleId($this->module->getId());
 
         $this->action->createModuleHook($event);
 
@@ -83,9 +82,8 @@ class ModuleHookTest extends BaseAction
         $activated = $moduleHook->getActive();
 
         $event = new ModuleHookToggleActivationEvent($moduleHook);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $this->action->toggleModuleHookActivation($event);
+        $this->action->toggleModuleHookActivation($event, null, $this->getMockEventDispatcher());
         $updatedModuleHook = $event->getModuleHook();
 
         $this->assertEquals(!$activated, $updatedModuleHook->getActive());
@@ -106,10 +104,9 @@ class ModuleHookTest extends BaseAction
             ->setHookId($moduleHook->getHookId())
             ->setClassname($moduleHook->getClassname())
             ->setMethod($moduleHook->getMethod())
-            ->setActive(true)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setActive(true);
 
-        $this->action->updateModuleHook($event);
+        $this->action->updateModuleHook($event, null, $this->getMockEventDispatcher());
 
         $updatedModuleHook = $event->getModuleHook();
 
@@ -130,9 +127,7 @@ class ModuleHookTest extends BaseAction
     {
         $event = new ModuleHookDeleteEvent($moduleHook->getId());
 
-        $event->setDispatcher($this->getMockEventDispatcher());
-
-        $this->action->deleteModuleHook($event);
+        $this->action->deleteModuleHook($event, null, $this->getMockEventDispatcher());
 
         $deletedModuleHook = $event->getModuleHook();
 

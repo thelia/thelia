@@ -54,10 +54,9 @@ class HookTest extends BaseAction
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test")
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTitle("Hook Test");
 
-        $this->action->create($event);
+        $this->action->create($event, null, $this->getMockEventDispatcher());
 
         $createdHook = $event->getHook();
 
@@ -88,8 +87,7 @@ class HookTest extends BaseAction
             ->setDescription("Hook Description")
             ->setChapo("Hook Chapo")
             ->setBlock(false)
-            ->setByModule(false)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setByModule(false);
 
         $this->action->createAll($event);
 
@@ -125,10 +123,9 @@ class HookTest extends BaseAction
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test")
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTitle("Hook Test");
 
-        $this->action->create($event);
+        $this->action->create($event, null, $this->getMockEventDispatcher());
 
         $createdHook = $event->getHook();
 
@@ -144,7 +141,6 @@ class HookTest extends BaseAction
     public function testDeactivation(HookModel $hook)
     {
         $event = new HookDeactivationEvent($hook->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $this->action->deactivation($event);
         $updatedHook = $event->getHook();
@@ -162,9 +158,8 @@ class HookTest extends BaseAction
     public function testToggleActivation(HookModel $hook)
     {
         $event = new HookToggleActivationEvent($hook->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $this->action->toggleActivation($event);
+        $this->action->toggleActivation($event, null, $this->getMockEventDispatcher());
         $updatedHook = $event->getHook();
 
         $this->assertTrue($updatedHook->getActivate());
@@ -191,10 +186,9 @@ class HookTest extends BaseAction
             ->setDescription("Updated Hook Description")
             ->setChapo("Updated Hook Chapo")
             ->setBlock(false)
-            ->setByModule(false)
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setByModule(false);
 
-        $this->action->update($event);
+        $this->action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedHook = $event->getHook();
 
@@ -220,9 +214,7 @@ class HookTest extends BaseAction
     {
         $event = new HookDeleteEvent($hook->getId());
 
-        $event->setDispatcher($this->getMockEventDispatcher());
-
-        $this->action->delete($event);
+        $this->action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedHook = $event->getHook();
 

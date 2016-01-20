@@ -40,7 +40,6 @@ class SaleTest extends TestCaseWithURLToolSetup
         }
 
         $event = new SaleUpdateEvent($sale->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setActive(1)
             ->setLocale($sale->getLocale())
@@ -61,8 +60,8 @@ class SaleTest extends TestCaseWithURLToolSetup
      */
     public function processUpdateAction($event)
     {
-        $saleAction = new Sale($this->getMockEventDispatcher());
-        $saleAction->update($event);
+        $saleAction = new Sale();
+        $saleAction->update($event, null, $this->getMockEventDispatcher());
 
         return $event->getSale();
     }
@@ -70,7 +69,6 @@ class SaleTest extends TestCaseWithURLToolSetup
     public function testCreateSale()
     {
         $event = new SaleCreateEvent();
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setLocale('en_US')
             ->setTitle('test create sale')
@@ -96,7 +94,6 @@ class SaleTest extends TestCaseWithURLToolSetup
         $product = ProductQuery::create()->findOne();
 
         $event = new SaleUpdateEvent($sale->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
             ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
@@ -114,8 +111,8 @@ class SaleTest extends TestCaseWithURLToolSetup
             ->setSaleLabel('test create sale label')
         ;
 
-        $saleAction = new Sale($this->getMockEventDispatcher());
-        $saleAction->update($event);
+        $saleAction = new Sale();
+        $saleAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedSale = $event->getSale();
 
@@ -138,7 +135,6 @@ class SaleTest extends TestCaseWithURLToolSetup
         $attrAv = AttributeAvQuery::create()->findOne();
 
         $event = new SaleUpdateEvent($sale->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
         $event
             ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
             ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
@@ -157,7 +153,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         ;
 
         $saleAction = new Sale($this->getMockEventDispatcher());
-        $saleAction->update($event);
+        $saleAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedSale = $event->getSale();
 
@@ -175,10 +171,9 @@ class SaleTest extends TestCaseWithURLToolSetup
         $sale = $this->getRandomSale();
 
         $event = new SaleDeleteEvent($sale->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $saleAction = new Sale($this->getMockEventDispatcher());
-        $saleAction->delete($event);
+        $saleAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedSale = $event->getSale();
 
@@ -193,10 +188,9 @@ class SaleTest extends TestCaseWithURLToolSetup
         $visibility = $sale->getActive();
 
         $event = new SaleToggleActivityEvent($sale);
-        $event->setDispatcher($this->getMockEventDispatcher());
 
         $saleAction = new Sale($this->getMockEventDispatcher());
-        $saleAction->toggleActivity($event);
+        $saleAction->toggleActivity($event, null, $this->getMockEventDispatcher());
 
         $updatedSale = $event->getSale();
 
@@ -210,9 +204,8 @@ class SaleTest extends TestCaseWithURLToolSetup
         $promoList = ProductSaleElementsQuery::create()->filterByPromo(true)->select('Id')->find()->toArray();
 
         $event = new SaleClearStatusEvent();
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $saleAction = new Sale($this->getMockEventDispatcher());
+        $saleAction = new Sale();
         $saleAction->clearStatus($event);
 
         // Restore promo status

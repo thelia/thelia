@@ -50,11 +50,10 @@ class FeatureAvTest extends BaseAction
         $event
             ->setFeatureId($feature->getId())
             ->setLocale('en_US')
-            ->setTitle('test')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setTitle('test');
 
-        $action = new FeatureAv($this->getMockEventDispatcher());
-        $action->create($event);
+        $action = new FeatureAv();
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdFeatureAv = $event->getFeatureAv();
 
@@ -82,11 +81,10 @@ class FeatureAvTest extends BaseAction
             ->setTitle('test update')
             ->setDescription('test description')
             ->setChapo('test chapo')
-            ->setPostscriptum('test postscriptum')
-            ->setDispatcher($this->getMockEventDispatcher());
+            ->setPostscriptum('test postscriptum');
 
-        $action = new FeatureAv($this->getMockEventDispatcher());
-        $action->update($event);
+        $action = new FeatureAv();
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedFeatureAv = $event->getFeatureAv();
 
@@ -108,10 +106,9 @@ class FeatureAvTest extends BaseAction
     public function testDelete(FeatureAvModel $featureAv)
     {
         $event = new FeatureAvDeleteEvent($featureAv->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new FeatureAv($this->getMockEventDispatcher());
-        $action->delete($event);
+        $action = new FeatureAv();
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedFeatureAv = $event->getFeatureAv();
 

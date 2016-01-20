@@ -41,10 +41,9 @@ class StateTest extends BaseAction
             ->setIsocode('AA')
             ->setLocale('en_US')
             ->setTitle('State1')
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new State($this->getMockEventDispatcher());
+        $action = new State();
         $action->create($event);
 
         $createdState = $event->getState();
@@ -75,10 +74,9 @@ class StateTest extends BaseAction
             ->setCountry($state->getCountryId())
             ->setLocale('en_US')
             ->setTitle('State2')
-            ->setDispatcher($this->getMockEventDispatcher())
         ;
 
-        $action = new State($this->getMockEventDispatcher());
+        $action = new State();
         $action->update($event);
 
         $updatedState = $event->getState();
@@ -100,9 +98,8 @@ class StateTest extends BaseAction
     public function testDelete(StateModel $state)
     {
         $event = new StateDeleteEvent($state->getId());
-        $event->setDispatcher($this->getMockEventDispatcher());
 
-        $action = new State($this->getMockEventDispatcher());
+        $action = new State();
         $action->delete($event);
 
         $deletedState = $event->getState();

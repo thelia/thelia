@@ -70,10 +70,14 @@ class Render extends AbstractSmartyPlugin
 
         $request = $this->prepareRequest($params);
 
+        $this->requestStack->push($request);
+
         $controller = $this->controllerResolver->getController($request);
         $controllerParameters = $this->controllerResolver->getArguments($request, $controller);
 
         $response = call_user_func_array($controller, $controllerParameters);
+
+        $this->requestStack->pop();
 
         if ($response instanceof Response) {
             return $response->getContent();
@@ -111,8 +115,6 @@ class Render extends AbstractSmartyPlugin
         foreach ($params as $key => $attribute) {
             $requestObject->attributes->set($key, $attribute);
         }
-
-        $this->container->set("request", $requestObject);
 
         return $requestObject;
     }
