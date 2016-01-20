@@ -38,6 +38,8 @@ use Thelia\Model\ModuleQuery;
  */
 class RegisterHookListenersPass implements CompilerPassInterface
 {
+    protected $debugEnabled;
+
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('event_dispatcher')) {
@@ -52,8 +54,19 @@ class RegisterHookListenersPass implements CompilerPassInterface
             return;
         }
 
+        $this->debugEnabled = $container->getParameter("kernel.debug");
+
         if (true === version_compare(ConfigQuery::getTheliaSimpleVersion(), '2.1.0', ">=")) {
             $this->processHook($container, $definition);
+        }
+    }
+
+    protected function logAlertMessage($message)
+    {
+        Tlog::getInstance()->addAlert($message);
+
+        if ($this->debugEnabled) {
+            throw new \InvalidArgumentException($message);
         }
     }
 
@@ -127,7 +140,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         if (null === $moduleHook) {
             if (!$validMethod) {
-                Tlog::getInstance()->addAlert(
+                $this->logAlertMessage(
                     sprintf(
                         "Module [%s] could not be registered hook [%s], method [%s] is not reachable.",
                         $module->getCode(),
@@ -165,7 +178,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
             }
         } else {
             if (!$validMethod) {
-                Tlog::getInstance()->addAlert(
+                $this->logAlertMessage(
                     sprintf(
                         "Module [%s] could not use hook [%s], method [%s] is not reachable anymore.",
                         $module->getCode(),
@@ -326,13 +339,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
             ->findOne();
 
         if (null === $hook) {
-            Tlog::getInstance()->addAlert(sprintf("Hook %s is unknown.", $hookName));
+            $this->logAlertMessage(sprintf("Hook %s is unknown.", $hookName));
 
             return null;
         }
 
         if (! $hook->getActivate()) {
-            Tlog::getInstance()->addAlert(sprintf("Hook %s is not activated.", $hookName));
+            $this->logAlertMessage(sprintf("Hook %s is not activated.", $hookName));
 
             return null;
         }
@@ -356,7 +369,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             $parameters = $method->getParameters();
             if (count($parameters) !== 1) {
-                Tlog::getInstance()->addAlert(sprintf("Method %s in %s does not have the right signature.", $methodName, $className));
+                $this->logAlertMessage(sprintf("Method %s in %s does not have the right signature.", $methodName, $className));
 
                 return false;
             }
@@ -366,12 +379,12 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 HookDefinition::RENDER_FUNCTION_EVENT;
 
             if (!($parameters[0]->getClass()->getName() == $eventType || is_subclass_of($parameters[0]->getClass()->getName(), $eventType))) {
-                Tlog::getInstance()->addAlert(sprintf("Method %s should use an event of type %s. found: %s", $methodName, $eventType, $parameters[0]->getClass()->getName()));
+                $this->logAlertMessage(sprintf("Method %s should use an event of type %s. found: %s", $methodName, $eventType, $parameters[0]->getClass()->getName()));
 
                 return false;
             }
         } catch (ReflectionException $ex) {
-            Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
+            $this->logAlertMessage(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
 
             return false;
         }
