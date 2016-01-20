@@ -122,22 +122,22 @@
 }
 
 .toolbar-primary {
-    .toolbar-variant(@brand-primary; @brand-primary; #fff);
+    .toolbar-variant(@brand-primary; @brand-primary; #fff; #ddd);
 }
 .toolbar-success {
-    .toolbar-variant(@brand-success; @brand-success; #fff);
+    .toolbar-variant(@brand-success; @brand-success; #fff; #ddd);
 }
 .toolbar-danger {
-    .toolbar-variant(@brand-danger; @brand-danger; #fff);
+    .toolbar-variant(@brand-danger; @brand-danger; #fff; #ddd);
 }
 .toolbar-warning {
-    .toolbar-variant(@brand-warning; @brand-warning; #fff);
+    .toolbar-variant(@brand-warning; @brand-warning; #fff; #ddd);
 }
 .toolbar-info {
-    .toolbar-variant(@brand-info; @brand-info; #fff);
+    .toolbar-variant(@brand-info; @brand-info; #fff; #ddd);
 }
 
-.toolbar-variant(@background; @border; @color) {
+.toolbar-variant(@background; @border; @color; @disabled_color) {
     background-color: @background;
 
     > span {
@@ -170,6 +170,15 @@
 
         > span {
             color: @color;
+        }
+
+        &.disabled {
+            pointer-events: none;
+            cursor: default;
+            
+            > span {
+                color: darken(@color, 10%);
+            }
         }
     }
 }
