@@ -28,6 +28,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -56,7 +57,6 @@ class CouponController extends BaseFrontController
      */
     public function consumeAction()
     {
-        $this->checkAuth();
         $this->checkCartNotEmpty();
 
         $message = false;
@@ -123,6 +123,15 @@ class CouponController extends BaseFrontController
                 ["%message" => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
+        } catch (UnmatchableConditionException $e) {
+            $message = $this->getTranslator()->trans(
+                'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon',
+                [
+                    '%sign' => $this->retrieveUrlFromRouteId('customer.login.view'),
+                    '%register' => $this->retrieveUrlFromRouteId('customer.create.view'),
+                ],
+                Front::MESSAGE_DOMAIN
+            );
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
@@ -144,5 +153,7 @@ class CouponController extends BaseFrontController
                 ->addForm($couponCodeForm)
                 ->setGeneralError($message);
         }
+
+        return $this->generateErrorRedirect($couponCodeForm);
     }
 }

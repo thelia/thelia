@@ -287,6 +287,8 @@ class OrderController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+
+        return $this->generateErrorRedirect($orderPayment);
     }
 
     public function pay()
