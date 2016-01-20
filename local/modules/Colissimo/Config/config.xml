@@ -24,6 +24,13 @@
         </service>
     </services>
 
+    <services>
+        <service id="area.deleted.listener" class="Colissimo\EventListener\AreaDeletedListener" scope="request">
+            <tag name="kernel.event_subscriber"/>
+            <argument type="service" id="request" />
+        </service>
+    </services>
+
     <hooks>
         <hook id="colissimo.hook" class="Colissimo\Hook\HookManager">
             <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
