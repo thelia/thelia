@@ -14,12 +14,18 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'de_DE', 'Kundenkonto - Erweitere Informationen', '', ''),
+(@max_id + 2, 'de_DE', 'Produktseite - oben im Formular', '', ''),
+(@max_id + 3, 'de_DE', 'Produktseite - unten an dem Formular', '', ''),
 (@max_id + 1, 'en_US', 'Customer account - additional information', '', ''),
 (@max_id + 2, 'en_US', 'Product page - On the top of the form', '', ''),
 (@max_id + 3, 'en_US', 'Product page - On the bottom of the form', '', ''),
 (@max_id + 1, 'es_ES', NULL, '', ''),
 (@max_id + 2, 'es_ES', NULL, '', ''),
-(@max_id + 3, 'es_ES', NULL, '', '')
+(@max_id + 3, 'es_ES', NULL, '', ''),
+(@max_id + 1, 'fr_FR', 'Compte client - informations additionnelles', '', ''),
+(@max_id + 2, 'fr_FR', 'Page produit - En haut du formulaire', '', ''),
+(@max_id + 3, 'fr_FR', 'Page produit - En bas du formulaire', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -33,6 +33,15 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 ;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'de_DE', 'Shop Informationen'),
+(@max+1, 'de_DE', 'Konfigurations Variablen'),
+(@max+2, 'de_DE', 'Administration Logs ansehen'),
+(@max+3, 'de_DE', 'Logs System Konfiguration'),
+(@max+4, 'de_DE', 'Erweiterte Konfiguration'),
+(@max+5, 'de_DE', 'Übersetzungen'),
+(@max+6, 'de_DE', 'Tools'),
+(@max+7, 'de_DE', 'Exporten-Verwaltung'),
+(@max+8, 'de_DE', 'Export für die Newsletter Angemeldeten'),
 (@max, 'en_US', 'Store information configuration'),
 (@max+1, 'en_US', 'Configuration variables'),
 (@max+2, 'en_US', 'View administration logs'),
@@ -50,7 +59,16 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max+5, 'es_ES', NULL),
 (@max+6, 'es_ES', NULL),
 (@max+7, 'es_ES', NULL),
-(@max+8, 'es_ES', NULL)
+(@max+8, 'es_ES', NULL),
+(@max, 'fr_FR', 'Configuration des informations sur la boutique'),
+(@max+1, 'fr_FR', 'Variables de configuration'),
+(@max+2, 'fr_FR', 'Consulter les logs d\'administration'),
+(@max+3, 'fr_FR', 'Configuration du système de log'),
+(@max+4, 'fr_FR', 'Configuration avancée'),
+(@max+5, 'fr_FR', 'Traductions'),
+(@max+6, 'fr_FR', 'Outils'),
+(@max+7, 'fr_FR', 'gestion des exports'),
+(@max+8, 'fr_FR', 'Export des inscrits à la newsletter')
 ;
 
 SELECT @max := MAX(`id`) FROM `lang`;
