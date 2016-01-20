@@ -123,7 +123,7 @@ class CartAdd extends BaseForm
         $data = $context->getRoot()->getData();
 
         if (null === $data["product_sale_elements_id"]) {
-            $context->addViolationAt("quantity", Translator::getInstance()->trans("Invalid product_sale_elements"));
+            $context->buildViolation(Translator::getInstance()->trans("Invalid product_sale_elements"));
         } else {
             $productSaleElements = ProductSaleElementsQuery::create()
                 ->filterById($data["product_sale_elements_id"])
