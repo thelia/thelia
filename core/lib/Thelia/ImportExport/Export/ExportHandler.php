@@ -41,6 +41,8 @@ abstract class ExportHandler extends AbstractHandler
 
     protected $isDocumentExport = false;
 
+    protected $rangeExport = false;
+
     protected $rangeDate = null;
 
     /**
@@ -225,6 +227,25 @@ abstract class ExportHandler extends AbstractHandler
     public function isImageExport()
     {
         return $this->isImageExport;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRangeExport()
+    {
+        return $this->rangeExport;
+    }
+
+    /**
+     * @param bool $rangeExport
+     * @return $this
+     */
+    public function setRangeExport($rangeExport)
+    {
+        $this->rangeExport = (bool) $rangeExport;
+
+        return $this;
     }
 
     /**

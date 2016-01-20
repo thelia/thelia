@@ -38,6 +38,8 @@ use Thelia\Tools\I18n;
  */
 class OrderExport extends ExportHandler
 {
+    protected $rangeExport = true;
+
     /**
      * @return string|array
      *
