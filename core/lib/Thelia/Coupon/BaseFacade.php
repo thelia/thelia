@@ -316,4 +316,25 @@ class BaseFacade implements FacadeInterface
     {
         return $this->container->get('event_dispatcher');
     }
+
+    /**
+     * Add a coupon in session
+     * @param $couponCode
+     * @return mixed|void
+     */
+    public function pushCouponInSession($couponCode)
+    {
+        $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
+
+        if (!isset($consumedCoupons) || !$consumedCoupons) {
+            $consumedCoupons = array();
+        }
+
+        if (!isset($consumedCoupons[$couponCode])) {
+            // Prevent accumulation of the same Coupon on a Checkout
+            $consumedCoupons[$couponCode] = $couponCode;
+
+            $this->getRequest()->getSession()->setConsumedCoupons($consumedCoupons);
+        }
+    }
 }

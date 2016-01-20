@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
-use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
@@ -165,19 +164,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $isValid = $coupon->isMatching();
 
             if ($isValid) {
-                $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
-                if (!isset($consumedCoupons) || !$consumedCoupons) {
-                    $consumedCoupons = array();
-                }
-
-                if (!isset($consumedCoupons[$event->getCode()])) {
-                    // Prevent accumulation of the same Coupon on a Checkout
-                    $consumedCoupons[$event->getCode()] = $event->getCode();
-
-                    $this->request->getSession()->setConsumedCoupons($consumedCoupons);
-                }
-
+                $this->couponManager->pushCouponInSession($event->getCode());
                 $totalDiscount = $this->couponManager->getDiscount();
 
                 $this->request
@@ -304,16 +292,18 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function afterOrder(OrderEvent $event)
     {
-        $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
+        /** @var CouponInterface[] $consumedCoupons */
+        $consumedCoupons = $this->couponManager->getCouponsKept();
 
-        if (is_array($consumedCoupons)) {
+        if (is_array($consumedCoupons) && count($consumedCoupons) > 0) {
             $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
             $con->beginTransaction();
 
             try {
                 foreach ($consumedCoupons as $couponCode) {
+
                     $couponQuery = CouponQuery::create();
-                    $couponModel = $couponQuery->findOneByCode($couponCode);
+                    $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
                     $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
 
                     /* decrease coupon quantity */
