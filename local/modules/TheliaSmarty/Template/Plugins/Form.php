@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
@@ -345,6 +345,7 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param  array $params
      * @param  string $content
+     * @param  string $templateFile
      * @param  \Smarty_Internal_Template $template
      * @return string
      */
