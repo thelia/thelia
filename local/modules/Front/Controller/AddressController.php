@@ -24,15 +24,16 @@
 namespace Front\Controller;
 
 use Front\Front;
+use Symfony\Component\Form\Form;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\AddressCreateForm;
-use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Customer;
 
 /**
  * Class AddressController
@@ -45,6 +46,7 @@ class AddressController extends BaseFrontController
     /**
      * Controller for generate modal containing update form
      * Check if request is a XmlHttpRequest and address owner is the current customer
+     *
      * @param $address_id
      */
     public function generateModalAction($address_id)
@@ -63,12 +65,12 @@ class AddressController extends BaseFrontController
      */
     public function createAction()
     {
-
         $this->checkAuth();
 
         $addressCreate = $this->createForm(FrontForm::ADDRESS_CREATE);
-        $message = false;
+
         try {
+            /** @var Customer $customer */
             $customer = $this->getSecurityContext()->getCustomerUser();
 
             $form = $this->validateForm($addressCreate, "post");
@@ -84,24 +86,20 @@ class AddressController extends BaseFrontController
             $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
-        if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
+        Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
-            $addressCreate->setErrorMessage($message);
+        $addressCreate->setErrorMessage($message);
 
-            $this->getParserContext()
-                ->addForm($addressCreate)
-                ->setGeneralError($message)
-            ;
+        $this->getParserContext()
+            ->addForm($addressCreate)
+            ->setGeneralError($message)
+        ;
 
-            // Redirect to error URL if defined
-            if ($addressCreate->hasErrorUrl()) {
-                return $this->generateErrorRedirect($addressCreate);
-            }
-        }
+        // Redirect to error URL if defined
+        return $this->generateErrorRedirect($addressCreate);
     }
 
-    protected function createAddressEvent($form)
+    protected function createAddressEvent(Form $form)
     {
         return new AddressCreateOrUpdateEvent(
             $form->get("label")->getData(),
@@ -139,10 +137,9 @@ class AddressController extends BaseFrontController
     public function processUpdateAction($address_id)
     {
         $this->checkAuth();
-        $request = $this->getRequest();
 
         $addressUpdate = $this->createForm(FrontForm::ADDRESS_UPDATE);
-        $message = false;
+
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
 
@@ -169,19 +166,19 @@ class AddressController extends BaseFrontController
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
+
         $this->getParserContext()->set("address_id", $address_id);
-        if ($message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
-            $addressUpdate->setErrorMessage($message);
+        Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
-            $this->getParserContext()
-                ->addForm($addressUpdate)
-                ->setGeneralError($message)
-            ;
+        $addressUpdate->setErrorMessage($message);
 
-            return $this->generateErrorRedirect($addressUpdate);
-        }
+        $this->getParserContext()
+            ->addForm($addressUpdate)
+            ->setGeneralError($message)
+        ;
+
+        return $this->generateErrorRedirect($addressUpdate);
     }
 
     public function deleteAction($address_id)
@@ -218,20 +215,22 @@ class AddressController extends BaseFrontController
             $error_message = $e->getMessage();
         }
 
-        \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during address deletion : %s', $error_message));
+        Tlog::getInstance()->error(sprintf('Error during address deletion : %s', $error_message));
 
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             if ($error_message) {
                 $response = $this->jsonResponse(json_encode(array(
-                            "success" => false,
-                            "message" => $error_message
-                        )));
+                    "success" => false,
+                    "message" => $error_message
+                )));
             } else {
-                $response = $this->jsonResponse(json_encode(array(
-                            "success" => true,
-                            "message" => ""
-                        )));;
+                $response = $this->jsonResponse(
+                    json_encode([
+                        "success" => true,
+                        "message" => ""
+                    ])
+                );
             }
 
             return $response;
@@ -246,7 +245,7 @@ class AddressController extends BaseFrontController
         $this->checkAuth();
 
         $address = AddressQuery::create()
-            ->filterByCustomer($this->getSecurityContext()->getCustomerUser())
+            ->filterByCustomerId($this->getSecurityContext()->getCustomerUser()->getId())
             ->findPk($addressId)
         ;
 
