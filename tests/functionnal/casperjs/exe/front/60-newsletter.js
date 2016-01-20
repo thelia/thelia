@@ -27,7 +27,9 @@ casper.test.begin('Newsletter', 12, function suite(test) {
             test.assertExists('form#form-newsletter #firstname_newsletter', 'firstname field is displayed');
             test.assertExists('form#form-newsletter #lastname_newsletter', 'lastname field is displayed');
 
-            this.capture(screenshot_dir + 'front/60_newsletter.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/60_newsletter.png');
+            }
 
             casper.test.comment('== Newsletter blank submission');
 
@@ -62,7 +64,9 @@ casper.test.begin('Newsletter', 12, function suite(test) {
     casper.waitForSelector(
         'form#form-newsletter .group-email.has-error',
         function(){
-            this.capture(screenshot_dir + 'front/60_newsletter-ko-0.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/60_newsletter-ko-0.png');
+            }
             test.assertExists('form#form-newsletter .group-email.has-error', 'email can not be empty');
         },function(){
             this.die("Can't find newsletter form error");
@@ -119,7 +123,9 @@ casper.test.begin('Newsletter', 12, function suite(test) {
     casper.waitForSelector(
         'form#form-newsletter .group-email.has-error',
         function(){
-            this.capture(screenshot_dir + 'front/60_newsletter-ko-0.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/60_newsletter-ko-0.png');
+            }
             test.assertExists('form#form-newsletter .group-email.has-error', 'email already exist');
         },
         function(){
@@ -156,7 +162,9 @@ casper.test.begin('Newsletter', 12, function suite(test) {
     casper.waitForSelector(
         'form#form-newsletter .group-email.has-success',
         function(){
-            this.capture(screenshot_dir + 'front/60_newsletter-ok-0.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/60_newsletter-ok-0.png');
+            }
             test.assertExists('form#form-newsletter .group-email.has-success', 'subscription with success');
         },
         function(){
@@ -186,7 +194,9 @@ casper.test.begin('Newsletter', 12, function suite(test) {
     casper.waitForSelector(
         'a.logout',
         function(){
-            this.capture(screenshot_dir + 'front/60_newsletter-ok-1.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/60_newsletter-ok-1.png');
+            }
             test.assertExists('a.logout', 'Logout button exists');
             test.assertDoesntExist('form#form-newsletter #firstname_newsletter', "firstname field doesn't exist");
             test.assertDoesntExist('form#form-newsletter #lastname_newsletter', "lastname field doesn't exist");
@@ -221,7 +231,9 @@ casper.test.begin('Newsletter', 12, function suite(test) {
     casper.waitForSelector(
         'form#form-newsletter .group-email.has-error',
         function(){
-            this.capture(screenshot_dir + 'front/60_newsletter-ko-1.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/60_newsletter-ko-1.png');
+            }
             test.assertExists('form#form-newsletter .group-email.has-error', 'this user is already registered');
         },
         function(){

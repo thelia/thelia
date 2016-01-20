@@ -26,4 +26,9 @@ rm -rf local/session/sess_*
 echo "CasperJS"
 cd ../casperjs
 export DISPLAY=:99.0
-./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/front/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url="http://localhost:8000/index.php/" --thelia2_screenshot_path="../thelia/tests/functionnal/casperjs/screenshot/"
+
+echo "Front tests"
+./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/front/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url="http://localhost:8000/index.php/" --thelia2_screenshot_path="../thelia/tests/functionnal/casperjs/screenshot/" --thelia2_screenshot_disabled
+
+echo "Back tests"
+./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/back/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --thelia2_base_url="http://localhost:8000/index_dev.php/" --thelia2_screenshot_path="../thelia/tests/functionnal/casperjs/screenshot/" --thelia2_screenshot_disabled

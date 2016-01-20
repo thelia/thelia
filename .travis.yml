@@ -13,6 +13,7 @@ before_script:
 - sudo apt-get update -qq
 - sudo apt-get install -y language-pack-fr language-pack-fr-base
 - phpenv config-add travis.php.ini
+- phpenv config-rm xdebug.ini
 - composer self-update
 - composer install --prefer-dist --dev
 - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS

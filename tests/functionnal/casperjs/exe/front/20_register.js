@@ -7,7 +7,9 @@ casper.test.begin('Register', 15, function suite(test) {
     casper.start(thelia2_base_url + "register", function() {
         test.assertTitle("Register - " + thelia2_store_name, "title is the one expected");
         test.assertExists('form#form-register', "register form is found");
-        this.capture(screenshot_dir + 'front/20_register.png');
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/20_register.png');
+        }
 
         casper.test.comment('== Register blank account');
 
@@ -36,7 +38,9 @@ casper.test.begin('Register', 15, function suite(test) {
 
         casper.test.comment('== Register thelia account');
 
-        this.capture(screenshot_dir + 'front/20_register-ko.png');
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/20_register-ko.png');
+        }
 
         test.assertExists('.group-title.has-error', 'title can not be empty');
         test.assertExists('.group-firstname.has-error', 'firstname can not be empty');
@@ -100,7 +104,9 @@ casper.test.begin('Register', 15, function suite(test) {
     casper.waitForSelector(
         '.navbar-customer a.account',
         function() {
-            this.capture(screenshot_dir + 'front/20_register-ok.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/20_register-ok.png');
+            }
             test.assertSelectorHasText('.navbar-customer a.account', 'My Account');
             test.assertExists('a.logout', 'Logout button exists');
 
