@@ -178,8 +178,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId())
             ->setBasePrice($originalProductDefaultPrice->getPrice())
             ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
-            ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
-            ->setDispatcher($this->eventDispatcher);
+            ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight());
 
         $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_CREATE, $createCloneEvent);
 

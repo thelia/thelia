@@ -333,7 +333,6 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $toggleEvent = new ModuleToggleActivationEvent($oldModule);
                 // disable the check of the module because it's already done
                 $toggleEvent->setNoCheck(true);
-                $toggleEvent->setDispatcher($dispatcher);
 
                 $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
             }
@@ -342,7 +341,6 @@ class Module extends BaseAction implements EventSubscriberInterface
             $modulePath = $oldModule->getAbsoluteBaseDir();
 
             $deleteEvent = new ModuleDeleteEvent($oldModule);
-            $deleteEvent->setDispatcher($dispatcher);
 
             try {
                 $dispatcher->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
@@ -375,7 +373,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         if ($activated) {
             $toggleEvent = new ModuleToggleActivationEvent($module->getId());
             $toggleEvent->setNoCheck(true);
-            $toggleEvent->setDispatcher($dispatcher);
 
             $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
         }
