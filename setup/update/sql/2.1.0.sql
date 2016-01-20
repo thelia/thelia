@@ -29,6 +29,11 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'de_DE', 'Brand edit Seite - im Formular', '', ''),
+(@max_id + 2, 'de_DE', 'Sonderangebot Änderungsseite - javascript last call block', '', ''),
+(@max_id + 3, 'de_DE', 'API Seite - oben', '', ''),
+(@max_id + 4, 'de_DE', 'API Seite - unten', '', ''),
+(@max_id + 5, 'de_DE', 'API Seite - Löschungsformular', '', ''),
 (@max_id + 1, 'en_US', 'Brand edit page - in the form', '', ''),
 (@max_id + 2, 'en_US', 'Sale edit page - javascript last call block', '', ''),
 (@max_id + 3, 'en_US', 'Api page - at top', '', ''),
@@ -38,7 +43,12 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 2, 'es_ES', NULL, '', ''),
 (@max_id + 3, 'es_ES', NULL, '', ''),
 (@max_id + 4, 'es_ES', NULL, '', ''),
-(@max_id + 5, 'es_ES', NULL, '', '')
+(@max_id + 5, 'es_ES', NULL, '', ''),
+(@max_id + 1, 'fr_FR', 'Page brand edit - dans formulaire', '', ''),
+(@max_id + 2, 'fr_FR', 'Page sale edit - appel javascript', '', ''),
+(@max_id + 3, 'fr_FR', 'Page api - en haut', '', ''),
+(@max_id + 4, 'fr_FR', 'Page api - en bas', '', ''),
+(@max_id + 5, 'fr_FR', 'Page api - formulaire de suppression', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

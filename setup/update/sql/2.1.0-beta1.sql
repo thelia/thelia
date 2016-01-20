@@ -34,12 +34,18 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 ;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id + 1, 'de_DE', 'Dauer der Session-Cookie in dem Kunden-Browser, in Sekunden', NULL, NULL, NULL),
+(@max_id + 2, 'de_DE', 'Fehlermeldung zeigen anstatt einer weißen Seite im Falle eines eines Serverfehlers', NULL, NULL, NULL),
+(@max_id + 3, 'de_DE', 'Dateiname der Fehlerseite', NULL, NULL, NULL),
 (@max_id + 1, 'en_US', 'Life time of the session cookie in the customer browser, in seconds', NULL, NULL, NULL),
 (@max_id + 2, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
 (@max_id + 3, 'en_US', 'Filename of the error page', NULL, NULL, NULL),
 (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
 (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
-(@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL)
+(@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
+(@max_id + 1, 'fr_FR', 'Durée de vie du cookie de la session dans le navigateur du client, en secondes', NULL, NULL, NULL),
+(@max_id + 2, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
+(@max_id + 3, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL)
 ;
 
 -- Hide the session_config.handlers configuration variable
@@ -90,6 +96,40 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'de_DE', 'Kategorieseite - vor dem Hauptinhaltsbereich', '', ''),
+(@max_id + 2, 'de_DE', 'Kategorieseite - nach dem Hauptinhaltsbereich', '', ''),
+(@max_id + 3, 'de_DE', 'Inhaltseite- vor dem Hauptinhaltsbereich', '', ''),
+(@max_id + 4, 'de_DE', 'Inhaltseite - nach dem Hauptinhaltsbereich', '', ''),
+(@max_id + 5, 'de_DE', 'Ordnerseite - vor dem Hauptinhaltsbereich', '', ''),
+(@max_id + 6, 'de_DE', 'Ordnerseite - nach dem Hauptinhaltsbereich', '', ''),
+(@max_id + 7, 'de_DE', 'Marken Seite - oben', '', ''),
+(@max_id + 8, 'de_DE', 'Marken Seite - unten', '', ''),
+(@max_id + 9, 'de_DE', 'Marken Seite - oben des Hauptbereichs', '', ''),
+(@max_id + 10, 'de_DE', 'Marken Seite - unten des Hauptbereichs', '', ''),
+(@max_id + 11, 'de_DE', 'Marken Seite - vor dem Hauptinhaltsbereich', '', ''),
+(@max_id + 12, 'de_DE', 'Marken Seite - Nach dem Hauptinhalt Bereich', '', ''),
+(@max_id + 13, 'de_DE', 'Marken Seite - CSS-Stylesheet', '', ''),
+(@max_id + 14, 'de_DE', 'Marken Seite - Nach der Integration von Javascript', '', ''),
+(@max_id + 15, 'de_DE', 'Marken Seite - Javascript Initialisation', '', ''),
+(@max_id + 16, 'de_DE', 'Marken Seite - oben der Sidebar', '', ''),
+(@max_id + 17, 'de_DE', 'Marken Seite - Sidebars Body', '', ''),
+(@max_id + 18, 'de_DE', 'Marken Seite - unten der Sidebar', '', ''),
+(@max_id + 19, 'de_DE', 'Bestellungsdetails - oben', '', ''),
+(@max_id + 20, 'de_DE', 'Bestellungsdetails - weitere Informationen', '', ''),
+(@max_id + 21, 'de_DE', 'Bestellungsdetails - nach den allgemeinen Informationen', '', ''),
+(@max_id + 22, 'de_DE', 'Bestellungsdetails - weitere Informationen für den Versand', '', ''),
+(@max_id + 23, 'de_DE', 'Bestellungsdetails - Lieferadresse', '', ''),
+(@max_id + 24, 'de_DE', 'Bestellungsdetails - weitere Informationen für die Rechnung', '', ''),
+(@max_id + 25, 'de_DE', 'Bestellungsdetails - Rechnungsadresse', '', ''),
+(@max_id + 26, 'de_DE', 'Bestellungsdetails - Nach den Adressen', '', ''),
+(@max_id + 27, 'de_DE', 'Bestellungsdetails - vor der Produktliste', '', ''),
+(@max_id + 28, 'de_DE', 'Bestellungsdetails - weitere Informationen für ein Produkt', '', ''),
+(@max_id + 29, 'de_DE', 'Bestellungsdetails - nach der Produktliste', '', ''),
+(@max_id + 30, 'de_DE', 'Bestellungsdetails - nach den Produkten', '', ''),
+(@max_id + 31, 'de_DE', 'Bestellungsdetails - unten', '', ''),
+(@max_id + 32, 'de_DE', 'Bestellungsdetails - CSS-Stylesheet', '', ''),
+(@max_id + 33, 'de_DE', 'Bestellungsdetails - nach Integration von JavaScript', '', ''),
+(@max_id + 34, 'de_DE', 'Bestellungsdetails - Initialisierung von Javascript', '', ''),
 (@max_id + 1, 'en_US', 'Category page - before the main content area', '', ''),
 (@max_id + 2, 'en_US', 'Category page - after the main content area', '', ''),
 (@max_id + 3, 'en_US', 'Content page - before the main content area', '', ''),
@@ -157,7 +197,41 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 31, 'es_ES', NULL, '', ''),
 (@max_id + 32, 'es_ES', NULL, '', ''),
 (@max_id + 33, 'es_ES', NULL, '', ''),
-(@max_id + 34, 'es_ES', NULL, '', '')
+(@max_id + 34, 'es_ES', NULL, '', ''),
+(@max_id + 1, 'fr_FR', 'Page catégorie - au dessus de la zone de contenu principale', '', ''),
+(@max_id + 2, 'fr_FR', 'Page catégorie - en dessous de la zone de contenu principale', '', ''),
+(@max_id + 3, 'fr_FR', 'Page de contenu - au dessus de la zone de contenu principale', '', ''),
+(@max_id + 4, 'fr_FR', 'Page de contenu - en dessous de la zone de contenu principale', '', ''),
+(@max_id + 5, 'fr_FR', 'Page dossier - au dessus de la zone de contenu principale', '', ''),
+(@max_id + 6, 'fr_FR', 'Page dossier - en dessous de la zone de contenu principale', '', ''),
+(@max_id + 7, 'fr_FR', 'Page des marques - en haut', '', ''),
+(@max_id + 8, 'fr_FR', 'Page des marques - en bas', '', ''),
+(@max_id + 9, 'fr_FR', 'Page des marques - en haut de la zone principal', '', ''),
+(@max_id + 10, 'fr_FR', 'Page des marques - en bas de la zone principal', '', ''),
+(@max_id + 11, 'fr_FR', 'Page des marques - au dessus de la zone de contenu principale', '', ''),
+(@max_id + 12, 'fr_FR', 'Page des marques - en dessous de la zone de contenu principale', '', ''),
+(@max_id + 13, 'fr_FR', 'Page des marques - feuille de style CSS', '', ''),
+(@max_id + 14, 'fr_FR', 'Page des marques - après l\'inclusion du JavaScript', '', ''),
+(@max_id + 15, 'fr_FR', 'Page des marques - initialisation du JavaScript', '', ''),
+(@max_id + 16, 'fr_FR', 'Page des marques - en haut de la sidebar', '', ''),
+(@max_id + 17, 'fr_FR', 'Page des marques - le corps de la sidebar', '', ''),
+(@max_id + 18, 'fr_FR', 'Page des marques - en bas de la sidebar', '', ''),
+(@max_id + 19, 'fr_FR', 'Détail d\'une commande - en haut', '', ''),
+(@max_id + 20, 'fr_FR', 'Détail d\'une commande - informations additionnelles', '', ''),
+(@max_id + 21, 'fr_FR', 'Détail d\'une commande - après les informations générales', '', ''),
+(@max_id + 22, 'fr_FR', 'Détail d\'une commande - informations additionnelles pour l\'expédition', '', ''),
+(@max_id + 23, 'fr_FR', 'Détail d\'une commande - adresse de livraison', '', ''),
+(@max_id + 24, 'fr_FR', 'Détail d\'une commande - informations additionnelles pour la facturation', '', ''),
+(@max_id + 25, 'fr_FR', 'Détail d\'une commande - adresse de facturation', '', ''),
+(@max_id + 26, 'fr_FR', 'Détail d\'une commande - Après les adresses', '', ''),
+(@max_id + 27, 'fr_FR', 'Détail d\'une commande - avant la liste des produits', '', ''),
+(@max_id + 28, 'fr_FR', 'Détail d\'une commande - informations additionnelles pour un produit', '', ''),
+(@max_id + 29, 'fr_FR', 'Détail d\'une commande - après la liste des produits', '', ''),
+(@max_id + 30, 'fr_FR', 'Détail d\'une commande - Après les produits', '', ''),
+(@max_id + 31, 'fr_FR', 'Détail d\'une commande - en bas', '', ''),
+(@max_id + 32, 'fr_FR', 'Détail d\'une commande - feuille de style CSS', '', ''),
+(@max_id + 33, 'fr_FR', 'Détail d\'une commande - après l\'inclusion du JavaScript', '', ''),
+(@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du JavaScript', '', '')
 ;
 
 
@@ -175,6 +249,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'de_DE', 'Kategorie - Tab', '', ''),
+(@max_id + 2, 'de_DE', 'Produkt - Tab', '', ''),
+(@max_id + 3, 'de_DE', 'Ordner - Tab', '', ''),
+(@max_id + 4, 'de_DE', 'Inhalt - Tab', '', ''),
+(@max_id + 5, 'de_DE', 'Marke - Tab', '', ''),
+(@max_id + 6, 'de_DE', 'Bestellungs-Änderung - Lieferadresse', '', ''),
 (@max_id + 1, 'en_US', 'Category - Tab', '', ''),
 (@max_id + 2, 'en_US', 'Product - Tab', '', ''),
 (@max_id + 3, 'en_US', 'Folder - Tab', '', ''),
@@ -186,7 +266,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'es_ES', NULL, '', ''),
 (@max_id + 4, 'es_ES', NULL, '', ''),
 (@max_id + 5, 'es_ES', NULL, '', ''),
-(@max_id + 6, 'es_ES', NULL, '', '')
+(@max_id + 6, 'es_ES', NULL, '', ''),
+(@max_id + 1, 'fr_FR', 'Catégorie - Onglet', '', ''),
+(@max_id + 2, 'fr_FR', 'Produit - Onglet', '', ''),
+(@max_id + 3, 'fr_FR', 'Dossier - Onglet', '', ''),
+(@max_id + 4, 'fr_FR', 'Contenu - Onglet', '', ''),
+(@max_id + 5, 'fr_FR', 'Marque - Onglet', '', ''),
+(@max_id + 6, 'fr_FR', 'Modification commande - adresse de livraison', '', '')
 ;
 
 

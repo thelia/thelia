@@ -6,8 +6,10 @@ INSERT INTO `module` (`code`, `type`, `activate`, `position`, `full_namespace`, 
 ( 'Tinymce', 1, 0, 1, 'Tinymce\\Tinymce', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(LAST_INSERT_ID(), 'de_DE', 'Tinymce Wysiwyg Editor', NULL,  NULL,  NULL),
 (LAST_INSERT_ID(), 'en_US', 'tinymce wysiwyg editor', NULL,  NULL,  NULL),
-(LAST_INSERT_ID(), 'es_ES', NULL, NULL,  NULL,  NULL)
+(LAST_INSERT_ID(), 'es_ES', NULL, NULL,  NULL,  NULL),
+(LAST_INSERT_ID(), 'fr_FR', 'Editeur TinyMCE', NULL,  NULL,  NULL)
 ;
 
 UPDATE `config` SET `value`='2.0.0-beta4' WHERE `name`='thelia_version';
