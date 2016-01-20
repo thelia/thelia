@@ -96,7 +96,9 @@ class AddressController extends BaseFrontController
         ;
 
         // Redirect to error URL if defined
-        return $this->generateErrorRedirect($addressCreate);
+        if ($addressCreate->hasErrorUrl()) {
+            return $this->generateErrorRedirect($addressCreate);
+        }
     }
 
     protected function createAddressEvent(Form $form)
@@ -178,7 +180,9 @@ class AddressController extends BaseFrontController
             ->setGeneralError($message)
         ;
 
-        return $this->generateErrorRedirect($addressUpdate);
+        if ($addressUpdate->hasErrorUrl()) {
+            return $this->generateErrorRedirect($addressUpdate);
+        }
     }
 
     public function deleteAction($address_id)
