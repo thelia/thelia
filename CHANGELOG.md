@@ -1,6 +1,6 @@
 # 2.3.0-alpha2
 
-
+- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New minimum_admin_password_length and enable_lost_admin_password_recovery configuration variable.
 
 # 2.3.0-alpha1
 
