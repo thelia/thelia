@@ -135,7 +135,9 @@ class CustomerController extends BaseFrontController
         ;
 
         // Redirect to error URL if defined
-        return $this->generateErrorRedirect($passwordLost);
+        if ($passwordLost->hasErrorUrl()) {
+            return $this->generateErrorRedirect($passwordLost);
+        }
     }
 
     public function newPasswordSentAction()
@@ -225,7 +227,9 @@ class CustomerController extends BaseFrontController
             ;
 
             // Redirect to error URL if defined
-            return $this->generateErrorRedirect($customerCreation);
+            if ($customerCreation->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerCreation);
+            }
         }
     }
 
@@ -304,7 +308,9 @@ class CustomerController extends BaseFrontController
             ;
 
             // Redirect to error URL if defined
-            return $this->generateErrorRedirect($customerPasswordUpdateForm);
+            if ($customerPasswordUpdateForm->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerPasswordUpdateForm);
+            }
         }
     }
 
@@ -389,7 +395,9 @@ class CustomerController extends BaseFrontController
             ;
 
             // Redirect to error URL if defined
-            return $this->generateErrorRedirect($customerProfileUpdateForm);
+            if ($customerProfileUpdateForm->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerProfileUpdateForm);
+            }
         }
     }
 
@@ -485,7 +493,9 @@ class CustomerController extends BaseFrontController
 
             $this->getParserContext()->addForm($customerLoginForm);
 
-            return $this->generateErrorRedirect($customerLoginForm);
+            if ($customerLoginForm->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerLoginForm);
+            }
         }
     }
 
