@@ -21,4 +21,5 @@ class ColissimoConfigValue
 {
     const FREE_SHIPPING = "free_shipping";
     const PRICES = "prices";
+    const ENABLED = "enabled";
 }

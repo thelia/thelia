@@ -13,6 +13,7 @@
     <forms>
         <form name="colissimo.freeshipping.form" class="Colissimo\Form\FreeShipping" />
         <form name="colissimo.export.form" class="Colissimo\Form\Export" />
+        <form name="colissimo.configuration" class="Colissimo\Form\Configuration" />
     </forms>
 
     <services>
