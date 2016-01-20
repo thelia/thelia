@@ -35,6 +35,14 @@
 
                 {form_hidden_fields}
 
+                {form_field field='success_url'}
+                    <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
+                {/form_field}
+
+                {form_field field='error_url'}
+                    <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
+                {/form_field}
+
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                 <table class="table table-cart table-bordered">
