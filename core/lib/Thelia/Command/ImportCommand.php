@@ -12,7 +12,7 @@
 
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -119,7 +119,7 @@ class ImportCommand extends ContainerAwareCommand
      */
     protected function listImport(OutputInterface $output)
     {
-        $table = new TableHelper;
+        $table = new Table($output);
 
         foreach ((new ImportQuery)->find() as $import) {
             $table->addRow([

@@ -12,13 +12,17 @@
 
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Thelia\Core\Archiver\ArchiverInterface;
+use Thelia\Core\Archiver\ArchiverManager;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
+use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\LangQuery;
 
@@ -149,7 +153,7 @@ class ExportCommand extends ContainerAwareCommand
      */
     protected function listExport(OutputInterface $output)
     {
-        $table = new TableHelper;
+        $table = new Table($output);
 
         foreach ((new ExportQuery)->find() as $export) {
             $table->addRow([
@@ -176,9 +180,12 @@ class ExportCommand extends ContainerAwareCommand
      */
     protected function listSerializer(OutputInterface $output)
     {
-        $table = new TableHelper;
+        $table = new Table($output);
 
+        /** @var SerializerManager $serializerManager */
         $serializerManager = $this->getContainer()->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
+
+        /** @var SerializerInterface $serializer */
         foreach ($serializerManager->getSerializers() as $serializer) {
             $table->addRow([
                 $serializer->getId(),
@@ -206,9 +213,12 @@ class ExportCommand extends ContainerAwareCommand
      */
     protected function listArchiver(OutputInterface $output)
     {
-        $table = new TableHelper;
+        $table = new Table($output);
 
+        /** @var ArchiverManager $archiverManager */
         $archiverManager = $this->getContainer()->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
+
+        /** @var ArchiverInterface $archiver */
         foreach ($archiverManager->getArchivers(true) as $archiver) {
             $table->addRow([
                 $archiver->getId(),
