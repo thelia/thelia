@@ -36,6 +36,52 @@
             <parameter key="image.module">Thelia\Model\ModuleImage</parameter>
         </parameter>
 
+        <parameter key="admin.resources" type="collection">
+            <parameter key="thelia" type="collection">
+                <parameter key="SUPERADMINISTRATOR">SUPERADMINISTRATOR</parameter>
+                <parameter key="ADDRESS">admin.address</parameter>
+                <parameter key="ADMINISTRATOR">admin.configuration.administrator</parameter>
+                <parameter key="ADVANCED_CONFIGURATION">admin.configuration.advanced</parameter>
+                <parameter key="AREA">admin.configuration.area</parameter>
+                <parameter key="ATTRIBUTE">admin.configuration.attribute</parameter>
+                <parameter key="BRAND">admin.brand</parameter>
+                <parameter key="CATEGORY">admin.category</parameter>
+                <parameter key="CONFIG">admin.configuration"</parameter>
+                <parameter key="CONTENT">admin.content</parameter>
+                <parameter key="COUNTRY">admin.configuration.country</parameter>
+                <parameter key="STATE">admin.configuration.state</parameter>
+                <parameter key="COUPON">admin.coupon</parameter>
+                <parameter key="CURRENCY">admin.configuration.currency</parameter>
+                <parameter key="CUSTOMER">admin.customer</parameter>
+                <parameter key="FEATURE">admin.configuration.feature</parameter>
+                <parameter key="FOLDER">admin.folder</parameter>
+                <parameter key="HOME">admin.home</parameter>
+                <parameter key="LANGUAGE">admin.configuration.language</parameter>
+                <parameter key="MAILING_SYSTEM">admin.configuration.mailing-system</parameter>
+                <parameter key="MESSAGE">admin.configuration.message</parameter>
+                <parameter key="MODULE">admin.module</parameter>
+                <parameter key="HOOK">admin.hook</parameter>
+                <parameter key="MODULE_HOOK">admin.module-hook</parameter>
+                <parameter key="ORDER">admin.order</parameter>
+                <parameter key="PRODUCT">admin.product</parameter>
+                <parameter key="PROFILE">admin.configuration.profile</parameter>
+                <parameter key="SHIPPING_ZONE">admin.configuration.shipping-zone</parameter>
+                <parameter key="TAX">admin.configuration.tax</parameter>
+                <parameter key="TEMPLATE">admin.configuration.template</parameter>
+                <parameter key="SYSTEM_LOG">admin.configuration.system-logs</parameter>
+                <parameter key="ADMIN_LOG">admin.configuration.admin-logs</parameter>
+                <parameter key="STORE">admin.configuration.store</parameter>
+                <parameter key="TRANSLATIONS">admin.configuration.translations</parameter>
+                <parameter key="UPDATE">admin.configuration.update</parameter>
+                <parameter key="EXPORT">admin.export</parameter>
+                <parameter key="IMPORT">admin.import</parameter>
+                <parameter key="TOOLS">admin.tools</parameter>
+                <parameter key="SALES">admin.sales</parameter>
+                <parameter key="API">admin.configuration.api</parameter>
+                <parameter key="TITLE">admin.customer.title</parameter>
+            </parameter>
+        </parameter>
+
         <parameter key="import.base_url">/admin/import</parameter>
         <parameter key="export.base_url">/admin/export</parameter>
 
@@ -305,6 +351,12 @@
 
         <!-- Thelia logger -->
         <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
+
+        <!-- The AdminRessources manager -->
+        <service id="thelia.admin.resources" class="Thelia\Core\Security\Resource\AdminResources">
+            <argument>%admin.resources%</argument>
+        </service>
+
 
         <!-- Handlers -->
         <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
