@@ -20,29 +20,8 @@ use Thelia\Core\Security\Exception\ResourceException;
  *
  * @author Etienne roudeix <eroudeix@openstudio.fr>
  */
-final class AdminResources
+class AdminResources
 {
-    private static $selfReflection = null;
-
-    /**
-     * @param $name
-     * @return string the constant value
-     */
-    public static function retrieve($name)
-    {
-        $constantName = strtoupper($name);
-
-        if (null === self::$selfReflection) {
-            self::$selfReflection = new \ReflectionClass(__CLASS__);
-        }
-
-        if (self::$selfReflection->hasConstant($constantName)) {
-            return self::$selfReflection->getConstant($constantName);
-        } else {
-            throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
-        }
-    }
-
     const SUPERADMINISTRATOR = "SUPERADMINISTRATOR";
 
     const ADDRESS = "admin.address";
@@ -124,4 +103,52 @@ final class AdminResources
     const API = "admin.configuration.api";
 
     const TITLE = "admin.customer.title";
+
+    /**
+     * Stock all resources by modules
+     * Exemple :
+     * [
+     *      "thelia" => [
+     *          "ADDRESS" => "admin.address",
+     *          ...
+     *      ],
+     *      "Front" => [
+     *          ...
+     *      ]
+     * ]
+     * @var Array $resources
+     */
+    protected $resources;
+
+    /**
+     * Create a new AdminRessources instance.
+     *
+     * @param array $resources with format module => [ KEY => value ].
+     */
+    public function __construct($resources)
+    {
+        $this->resources = $resources;
+    }
+
+    /**
+     * @param string $name
+     * @param string $module
+     * @return string
+     */
+    public function getResource($name, $module = "thelia")
+    {
+        $constantName = strtoupper($name);
+
+        if (isset($this->resources[$module])) {
+            if (isset($this->resources[$module][$constantName])) {
+                return $this->resources[$module][$constantName];
+            } else {
+                throw new ResourceException(sprintf('Resource `%s` not found', $module),
+                    ResourceException::RESOURCE_NOT_FOUND);
+            }
+        } else {
+            throw new ResourceException(sprintf('Module `%s` not found', $module),
+                ResourceException::RESOURCE_NOT_FOUND);
+        }
+    }
 }
