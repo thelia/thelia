@@ -21,7 +21,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Files\Exception\ProcessFileException;
 use Thelia\Files\FileConfiguration;
 use Thelia\Files\FileManager;
@@ -75,7 +74,7 @@ class FileController extends BaseAdminController
         $validMimeTypes = array(),
         $extBlackList = array()
     ) {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -243,7 +242,7 @@ class FileController extends BaseAdminController
         );
 
         $this->adminLogAppend(
-            $this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT),
+            $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
             AccessManager::UPDATE,
             $this->getTranslator()->trans(
                 'Saving %obj% for %parentName% parent id %parentId%',
@@ -309,7 +308,7 @@ class FileController extends BaseAdminController
      */
     public function getImageListAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
         $args = array('imageType' => $parentType, 'parentId' => $parentId);
 
@@ -326,7 +325,7 @@ class FileController extends BaseAdminController
      */
     public function getDocumentListAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
         $args = array('documentType' => $parentType, 'parentId' => $parentId);
 
@@ -343,7 +342,7 @@ class FileController extends BaseAdminController
      */
     public function getImageFormAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
         $args = array('imageType' => $parentType, 'parentId' => $parentId);
 
@@ -360,7 +359,7 @@ class FileController extends BaseAdminController
      */
     public function getDocumentFormAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
         $args = array('documentType' => $parentType, 'parentId' => $parentId);
 
@@ -377,7 +376,7 @@ class FileController extends BaseAdminController
      */
     public function viewImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
             return $response;
         }
         $fileManager = $this->getFileManager();
@@ -411,7 +410,7 @@ class FileController extends BaseAdminController
      */
     public function viewDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -509,7 +508,7 @@ class FileController extends BaseAdminController
             $fileUpdated = $event->getModel();
 
             $this->adminLogAppend(
-                $this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT),
+                $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
                 sprintf(
                     '%s with Ref %s (ID %d) modified',
@@ -564,7 +563,7 @@ class FileController extends BaseAdminController
      */
     public function updateImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -592,7 +591,7 @@ class FileController extends BaseAdminController
      */
     public function updateDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -624,7 +623,7 @@ class FileController extends BaseAdminController
     {
         $message = null;
 
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $fileManager = $this->getFileManager();
@@ -644,7 +643,7 @@ class FileController extends BaseAdminController
             $this->dispatch($eventName, $fileDeleteEvent);
 
             $this->adminLogAppend(
-                $this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT),
+                $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
                 $this->getTranslator()->trans(
                     'Deleting %obj% for %id% with parent id %parentId%',
@@ -668,7 +667,7 @@ class FileController extends BaseAdminController
             );
 
             $this->adminLogAppend(
-                $this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT),
+                $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
                 AccessManager::UPDATE,
                 $message,
                 $fileDeleteEvent->getFileToDelete()->getId()
@@ -718,7 +717,7 @@ class FileController extends BaseAdminController
 
         $position = $this->getRequest()->request->get('position');
 
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $fileManager = $this->getFileManager();
@@ -777,7 +776,7 @@ class FileController extends BaseAdminController
 
         //$position = $this->getRequest()->request->get('position');
 
-        $this->checkAuth($this->getAdminResources()->getResource($parentType,self::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $fileManager = $this->getFileManager();
