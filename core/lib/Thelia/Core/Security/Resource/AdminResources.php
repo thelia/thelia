@@ -151,4 +151,38 @@ class AdminResources
                 ResourceException::RESOURCE_NOT_FOUND);
         }
     }
+
+    /**
+     * @param $data with format
+     * [
+     *     "ADDRESS" => "admin.address",
+     *     ...
+     * ]
+     * @param $module string ModuleCode
+     * @throws \Exception
+     */
+    public function addModuleResources($data, $module = 'thelia')
+    {
+        if (null !== $data && is_array($data)) {
+            $this->resources[$module] = $data;
+        } else {
+            throw new \Exception("Format pass to addModuleResources method is not valid");
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     * @param string $module
+     */
+    public function addResource($name, $value, $module = 'thelia')
+    {
+        if (null !== $name && null !== $value) {
+            $nameFormated = strtoupper($name);
+            if (!$this->resources[$module]) {
+                $this->resources[$module] = [];
+            }
+            $this->resources[$module][$nameFormated] = $value;
+        }
+    }
 }

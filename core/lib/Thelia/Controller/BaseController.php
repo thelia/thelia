@@ -205,6 +205,7 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
+     * @since 2.3
      * @return \Thelia\Core\Security\Resource\AdminResources
      */
     protected function getAdminResources()
