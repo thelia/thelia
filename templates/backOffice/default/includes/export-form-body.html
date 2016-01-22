@@ -1,0 +1,196 @@
+{if $DESCRIPTION}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                {$DESCRIPTION nofilter}
+            </div>
+        </div>
+    </div>
+{/if}
+
+{if $useRange}
+    <div class="row vertical-row-space">
+        <div class="col-md-4">
+            {form_field field="range_date_start"}
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="{$label_attr.for}">
+                            {$label}
+                        </label>
+                    </div>
+                    <div class="col-md-12">
+                        <select id="{$label_attr.for}_year" name="{$name}[year]">
+                            {foreach from=$years item=m}
+                                <option value="{$m}"{if {$smarty.now|date_format:'%Y'} == $m} selected{/if}>{$m}</option>
+                            {/foreach}
+                        </select>
+                        <select id="{$label_attr.for}_month" name="{$name}[month]">
+                            {foreach from=$months item=m}
+                                <option value="{$m}"{if {$smarty.now|date_format:'%m'} == $m} selected{/if}>{$m}</option>
+                            {/foreach}
+                        </select>
+                        <select id="{$label_attr.for}_day" class="hidden" name="{$name}[day]">
+                            {foreach from=$days item=m}
+                                <option value="{$m}">{$m}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+            {/form_field}
+        </div>
+        <div class="col-md-4">
+            {form_field field="range_date_end"}
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="{$label_attr.for}">
+                            {$label}
+                        </label>
+                    </div>
+                    <div class="col-md-12">
+                        <select id="{$label_attr.for}_year" name="{$name}[year]">
+                            {foreach from=$years item=m}
+                                <option value="{$m}"{if {$smarty.now|date_format:'%Y'} == $m} selected{/if}>{$m}</option>
+                            {/foreach}
+                        </select>
+                        <select id="{$label_attr.for}_month" name="{$name}[month]">
+                            {foreach from=$months item=m}
+                                <option value="{$m}"{if {$smarty.now|date_format:'%m'} + 1 == $m} selected{/if}>{$m}</option>
+                            {/foreach}
+                        </select>
+                        <select id="{$label_attr.for}_day" class="hidden" name="{$name}[day]">
+                            {foreach from=$days item=m}
+                                <option value="{$m}">{$m}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+            {/form_field}
+        </div>
+    </div>
+{/if}
+
+<div class="row">
+    <div class="col-md-12">
+        {ifloop rel="serializer"}
+            <div class="row vertical-row-space">
+                <div class="col-xs-4">
+                    {form_field field="serializer"}
+                        <div>
+                            <label for="{$label_attr.for}">
+                                {$label}
+                            </label>
+                        </div>
+
+                        <div>
+                            <select id="{$label_attr.for}" name="{$name}" required>
+                                {loop type="serializer" name="serializer"}
+                                    <option value="{$ID}"{if $value == $ID} selected{/if}>{$NAME} (.{$EXTENSION})</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    {/form_field}
+                </div>
+
+                <div class="col-xs-4">
+                    {form_field field="language"}
+                        <div>
+                            <label for="{$label_attr.for}">
+                                {$label}
+                            </label>
+                        </div>
+
+                        <div>
+                            <select id="{$label_attr.for}" name="{$name}" required>
+                                {loop type="lang" name="export-lang"}
+                                    <option value="{$ID}"{if $ID == {lang attr="id"}} selected{/if}>{$TITLE}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    {/form_field}
+                </div>
+
+                {ifloop rel="archiver"}
+                    <div class="col-xs-4">
+                        {form_field field="do_compress"}
+                            <div>
+                                <label for="{$label_attr.for}">
+                                    {$label}
+                                </label>
+                            </div>
+                            <div>
+                                <div id="export-compression-switch" class="make-switch switch-small" data-on-label="<i class=&quot;glyphicon glyphicon-ok-circle&quot;></i>" data-on="success" data-off-label="<i class=&quot;glyphicon glyphicon-remove-circle&quot;></i>" data-off="danger">
+                                    <input id="{$label_attr.for}" type="checkbox" name="{$name}" />
+                                </div>
+                            </div>
+                        {/form_field}
+                    </div>
+
+                    {* Exact same loop as below *}
+                    {* Only needed for ifloop statement *}
+                    {* Prevent coding style break *}
+                    {loop type="archiver" name="archiver" available=true}{/loop}
+                {/ifloop}
+            </div>
+
+            {ifloop rel="archiver"}
+                <div class="row vertical-row-space export-compression-selection-row">
+                    <div class="col-xs-4">
+                        {form_field field="archiver"}
+                            <div>
+                                <label for="{$label_attr.for}">
+                                    {$label}
+                                </label>
+                            </div>
+                            <div>
+                                <select id="{$label_attr.for}" name="{$name}" required>
+                                    {loop type="archiver" name="archiver" available=true}
+                                        <option value="{$ID}"{if $value == $NAME} selected{/if}>{$NAME} (.{$EXTENSION})</option>
+                                    {/loop}
+                                </select>
+                            </div>
+                        {/form_field}
+                    </div>
+
+                    {if $hasImages}
+                        <div class="col-xs-4">
+                            {form_field field="images"}
+                                <div>
+                                    <label for="{$label_attr.for}">
+                                        {$label}
+                                    </label>
+                                </div>
+                                <div>
+                                    <div class="make-switch switch-small" data-on-label="<i class=&quot;glyphicon glyphicon-ok-circle&quot;></i>" data-on="success" data-off-label="<i class=&quot;glyphicon glyphicon-remove-circle&quot;></i>" data-off="danger">
+                                        <input id="{$label_attr.for}" type="checkbox" name="{$name}" />
+                                    </div>
+                                </div>
+                            {/form_field}
+                        </div>
+                    {/if}
+
+                    {if $hasDocuments}
+                        <div class="col-xs-4">
+                            {form_field field="documents"}
+                                <div>
+                                    <label for="{$label_attr.for}">
+                                        {$label}
+                                    </label>
+                                </div>
+                                <div>
+                                    <div class="make-switch switch-small" data-on-label="<i class=&quot;glyphicon glyphicon-ok-circle&quot;></i>" data-on="success" data-off-label="<i class=&quot;glyphicon glyphicon-remove-circle&quot;></i>" data-off="danger">
+                                        <input id="{$label_attr.for}" type="checkbox" name="{$name}" />
+                                    </div>
+                                </div>
+                            {/form_field}
+                        </div>
+                    {/if}
+                </div>
+            {/ifloop}
+        {/ifloop}
+        {elseloop rel="serializer"}
+            <div class="alert alert-warning">
+                {intl l="You can't do exports, you don't have any serializer that handles this."}
+            </div>
+        {/elseloop}
+    </div>
+</div>

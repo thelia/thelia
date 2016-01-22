@@ -1,0 +1,46 @@
+{if $DESCRIPTION}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                {$DESCRIPTION nofilter}
+            </div>
+        </div>
+    </div>
+{/if}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row vertical-row-space">
+            <div class="col-xs-6">
+                {form_field field="language"}
+                    <div>
+                        <label for="{$label_attr.for}">
+                            {$label}
+                        </label>
+                    </div>
+                    <div>
+                        <select id="{$label_attr.for}" name="{$name}" required>
+                            {loop name="import-lang" type="lang"}
+                                <option value="{$ID}"{if $ID == {lang attr="id"}} selected{/if}>{$TITLE}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                {/form_field}
+            </div>
+            <div class="col-xs-6">
+                {form_field field="file_upload"}
+                    <div>
+                        <label form="{$label_attr.for}">
+                            {$label}
+                        </label>
+                    </div>
+
+                    <div>
+                        <input id="{$label_attr.for}" type="file" name="{$name}" accept="{$ALLOWED_MIME_TYPES}" required aria-required="true" />
+                        <div class="small">Accepted formats&nbsp;: {$ALLOWED_EXTENSIONS}</div>
+                    </div>
+                {/form_field}
+            </div>
+        </div>
+    </div>
+</div>

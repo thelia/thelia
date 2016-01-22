@@ -210,47 +210,54 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <!-- Archive builders -->
 
-        <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
-            <argument>%kernel.environment%</argument>
+        <!-- Serializers -->
+        <service id="thelia.serializer.manager" class="Thelia\Core\Serializer\SerializerManager" />
+
+        <!-- csv -->
+        <service id="thelia.serializer.csv" class="Thelia\Core\Serializer\Serializer\CSVSerializer">
+            <tag name="thelia.serializer" />
         </service>
 
+        <!-- xml -->
+        <service id="thelia.serializer.xml" class="Thelia\Core\Serializer\Serializer\XMLSerializer">
+            <tag name="thelia.serializer" />
+        </service>
+
+        <!-- json -->
+        <service id="thelia.serializer.json" class="Thelia\Core\Serializer\Serializer\JSONSerializer">
+            <tag name="thelia.serializer" />
+        </service>
+
+        <!-- yaml -->
+        <!--<service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">-->
+            <!--<tag name="thelia.serializer" />-->
+        <!--</service>-->
+
+
+        <!-- Archiver -->
+        <service id="thelia.archiver.manager" class="Thelia\Core\Archiver\ArchiverManager" />
+
         <!-- zip -->
-        <service id="thelia.archive_builder.zip" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.zip" class="Thelia\Core\Archiver\Archiver\ZipArchiver">
+            <tag name="thelia.archiver" />
         </service>
 
         <!-- tar -->
-        <service id="thelia.archive_builder.tar" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.tar" class="Thelia\Core\Archiver\Archiver\TarArchiver">
+            <tag name="thelia.archiver" />
         </service>
 
         <!-- tar.gz -->
-        <service id="thelia.archive_builder.tar_gz" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.tgz" class="Thelia\Core\Archiver\Archiver\TarGzArchiver">
+            <tag name="thelia.archiver" />
         </service>
 
         <!-- tar.bz2 -->
-        <service id="thelia.archive_builder.tar_bz2" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.bz2" class="Thelia\Core\Archiver\Archiver\TarBz2Archiver">
+            <tag name="thelia.archiver" />
         </service>
 
-        <!-- Formatters -->
-
-        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
-
-        <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
-            <tag name="thelia.formatter" />
-        </service>
-
-        <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
-            <tag name="thelia.formatter" />
-        </service>
-
-        <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
-            <tag name="thelia.formatter" />
-        </service>
 
         <!-- Thelia simple token provider -->
         <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider" scope="request">
@@ -298,5 +305,16 @@
 
         <!-- Thelia logger -->
         <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
+
+        <!-- Handlers -->
+        <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="thelia.serializer.manager" />
+            <argument type="service" id="thelia.archiver.manager" />
+        </service>
     </services>
 </config>

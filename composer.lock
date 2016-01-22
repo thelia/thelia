@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "09f38430f6d8185377330ccea78cf5b4",
-    "content-hash": "b5e76d0f245e338b72d87827a3701454",
+    "hash": "f14541001ff1d14d072f562d9d4e8936",
+    "content-hash": "df648c89ebe1ab738c0c00ab179ccda0",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -571,7 +571,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/f6641f27063ee7f70f9c1846cb93f02a1f5128ab",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/db5bbdad5eb962e60898a90006bd0ef4c81247ad",
                 "reference": "793aea6b762d9a72b083bfc49c74c574f67650c8",
                 "shasum": ""
             },
@@ -2069,32 +2069,48 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v2.3.21",
-            "target-dir": "Symfony/Component/Serializer",
+            "version": "v2.7.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "8711b73e39ff4c89ac1966283973bb66318d83fc"
+                "reference": "fb9ccedbd60871ad1d01f578a85e511152b2c97f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/8711b73e39ff4c89ac1966283973bb66318d83fc",
-                "reference": "8711b73e39ff4c89ac1966283973bb66318d83fc",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/fb9ccedbd60871ad1d01f578a85e511152b2c97f",
+                "reference": "fb9ccedbd60871ad1d01f578a85e511152b2c97f",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "doctrine/annotations": "~1.0",
+                "doctrine/cache": "~1.0",
+                "symfony/config": "~2.2",
+                "symfony/property-access": "~2.3",
+                "symfony/yaml": "~2.0,>=2.0.5"
+            },
+            "suggest": {
+                "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+                "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+                "symfony/config": "For using the XML mapping loader.",
+                "symfony/property-access": "For using the ObjectNormalizer.",
+                "symfony/yaml": "For using the default YAML mapping loader."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\Serializer\\": ""
-                }
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2102,17 +2118,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Serializer Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-09-22 08:32:35"
+            "homepage": "https://symfony.com",
+            "time": "2015-12-22 20:37:45"
         },
         {
             "name": "symfony/translation",

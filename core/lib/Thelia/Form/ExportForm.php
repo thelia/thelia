@@ -14,35 +14,70 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\LangQuery;
 
 /**
  * Class ExportForm
- * @package Thelia\Form
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ExportForm extends BaseForm
 {
+    public function getName()
+    {
+        return 'thelia_export';
+    }
+
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("formatter", "text", array(
-                "label" => $this->translator->trans("File format"),
-                "label_attr" => ["for" => "formatter"],
-                "required" => true,
-            ))
+            // Todo: use list
+            ->add(
+                'serializer',
+                'text',
+                [
+                    'required' => true,
+                    'label' => $this->translator->trans('File format'),
+                    'label_attr' => [
+                        'for' => 'serializer'
+                    ],
+                ]
+            )
+            // Todo: use list
+            ->add(
+                'language',
+                'integer',
+                [
+                    'required' => true,
+                    'label' => $this->translator->trans('Language'),
+                    'label_attr' => [
+                        'for' => 'language'
+                    ],
+                    'constraints' => [
+                        new Callback([
+                            'methods' => [
+                                [$this, 'checkLanguage'],
+                            ],
+                        ]),
+                    ],
+                ]
+            )
             ->add("do_compress", "checkbox", array(
                 "label" => $this->translator->trans("Do compress"),
                 "label_attr" => ["for" => "do_compress"],
                 "required" => false,
             ))
-            ->add("archive_builder", "text", array(
-                "label" => $this->translator->trans("Archive Format"),
-                "label_attr" => ["for" => "archive_builder"],
-                "required" => false,
-            ))
+            // Todo: use list
+            ->add(
+                'archiver',
+                'text',
+                [
+                    'required' => false,
+                    'label' => $this->translator->trans('Archive Format'),
+                    'label_attr' => [
+                        'for' => 'archiver'
+                    ],
+                ]
+            )
             ->add("images", "checkbox", array(
                 "label" => $this->translator->trans("Include images"),
                 "label_attr" => ["for" => "with_images"],
@@ -57,7 +92,7 @@ class ExportForm extends BaseForm
                 "label" => $this->translator->trans("Range date Start"),
                 "label_attr" => ["for" => "for_range_date_start"],
                 "required" => false,
-                'years' => range(date('Y'), date('Y')-5),
+                'years' => range(date('Y'), date('Y') - 5),
                 'input' => 'array',
                 'widget' => 'choice',
                 'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
@@ -67,30 +102,12 @@ class ExportForm extends BaseForm
                 "label" => $this->translator->trans("Range date End"),
                 "label_attr" => ["for" => "for_range_date_end"],
                 "required" => false,
-                'years' => range(date('Y'), date('Y')-5),
+                'years' => range(date('Y'), date('Y') - 5),
                 'input' => 'array',
                 'widget' => 'choice',
                 'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
                 'format' => 'yyyy-MM-d',
-            ))
-            ->add("language", "integer", array(
-                "label" => $this->translator->trans("Language"),
-                "label_attr" => ["for" => "language"],
-                "required" => true,
-                "constraints" => [
-                    new Callback([
-                        "methods" => [
-                            [$this, "checkLanguage"],
-                        ],
-                    ]),
-                ],
-            ))
-        ;
-    }
-
-    public function getName()
-    {
-        return "thelia_export";
+            ));
     }
 
     public function checkLanguage($value, ExecutionContextInterface $context)
