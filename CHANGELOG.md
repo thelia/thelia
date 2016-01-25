@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1939) Add `visible` and `visible_reverse` values in Product Loop order argument
 - (related to #1936) Fixed the module name vefication for command `module:position`
 - (related to #1928) Hook DI alert messages thrown as exceptions in dev. mode
 - (related to #1921) Modules 'configuration' and 'hook' buttons behavior fix
