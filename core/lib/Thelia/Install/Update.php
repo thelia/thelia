@@ -16,6 +16,7 @@ use Michelf\Markdown;
 use PDO;
 use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfiguration;
@@ -37,50 +38,7 @@ class Update
 
     const INSTRUCTION_DIR = 'update/instruction/';
 
-    protected static $version = array(
-        '0' => '2.0.0-beta1',
-        '1' => '2.0.0-beta2',
-        '2' => '2.0.0-beta3',
-        '3' => '2.0.0-beta4',
-        '4' => '2.0.0-RC1',
-        '5' => '2.0.0',
-        '6' => '2.0.1',
-        '7' => '2.0.2',
-        '8' => '2.0.3-beta',
-        '9' => '2.0.3-beta2',
-        '10' => '2.0.3',
-        '11' => '2.0.4',
-        '12' => '2.0.5',
-        '13' => '2.0.6',
-        '14' => '2.0.7',
-        '15' => '2.0.8',
-        '16' => '2.0.9',
-        '17' => '2.0.10',
-        '18' => '2.0.11',
-        '19' => '2.0.12',
-        '20' => '2.1.0-alpha1',
-        '21' => '2.1.0-alpha2',
-        '22' => '2.1.0-beta1',
-        '23' => '2.1.0-beta2',
-        '24' => '2.1.0',
-        '25' => '2.1.1',
-        '26' => '2.1.2',
-        '27' => '2.1.3',
-        '28' => '2.1.4',
-        '29' => '2.1.5',
-        '30' => '2.1.6',
-        '31' => '2.1.7',
-        '32' => '2.1.8',
-        '33' => '2.2.0-alpha1',
-        '34' => '2.2.0-alpha2',
-        '35' => '2.2.0-beta1',
-        '36' => '2.2.0-beta2',
-        '37' => '2.2.0-beta3',
-        '38' => '2.2.0',
-        '39' => '2.2.1',
-        '40' => '2.2.2',
-        '41' => '2.3.0-alpha1',
-    );
+    protected $version = null;
 
     /** @var bool */
     protected $usePropel = null;
@@ -134,6 +92,7 @@ class Update
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
+        $this->version = $this->getVersionList();
     }
 
     /**
@@ -182,7 +141,7 @@ class Update
         if (null === $version) {
             $version = $this->getCurrentVersion();
         }
-        $lastEntry = end(self::$version);
+        $lastEntry = end($this->version);
 
         return $lastEntry == $version;
     }
@@ -199,7 +158,7 @@ class Update
             throw new UpToDateException('You already have the latest version. No update available');
         }
 
-        $index = array_search($currentVersion, self::$version);
+        $index = array_search($currentVersion, $this->version);
 
         $this->connection->beginTransaction();
 
@@ -207,10 +166,10 @@ class Update
         $version = null;
 
         try {
-            $size = count(self::$version);
+            $size = count($this->version);
 
             for ($i = ++$index; $i < $size; $i++) {
-                $version = self::$version[$i];
+                $version = $this->version[$i];
                 $this->updateToVersion($version, $database);
                 $this->updatedVersions[] = $version;
             }
@@ -463,12 +422,12 @@ class Update
 
     public function getLatestVersion()
     {
-        return end(self::$version);
+        return end($this->version);
     }
 
     public function getVersions()
     {
-        return self::$version;
+        return $this->version;
     }
 
     /**
@@ -538,5 +497,20 @@ class Update
         return (count($this->postInstructions) !== 0);
     }
 
-
+    public function getVersionList()
+    {
+        $list = [];
+        $finder = new Finder();
+        $path = sprintf("%s%s", THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
+        $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
+            $a = strtolower(substr($a->getRelativePathname(), 0, -4));
+            $b = strtolower(substr($b->getRelativePathname(), 0, -4));
+            return version_compare($a, $b);
+        };
+        $files = $finder->name('*.sql')->in($path)->sort($sort);
+        foreach ($files as $file) {
+            $list[] = substr($file->getRelativePathname(), 0, -4);
+        }
+        return $list;
+    }
 }
