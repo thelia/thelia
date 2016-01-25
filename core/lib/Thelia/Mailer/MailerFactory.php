@@ -150,15 +150,17 @@ class MailerFactory
      * @param array  $from              From addresses. An array of (email-address => name)
      * @param array  $to                To addresses. An array of (email-address => name)
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
-     * @param string $locale.           If null, the default store locale is used.
+     * @param string $locale            If null, the default store locale is used.
+     * @param array  $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
+    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
     {
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
             if (! empty($to)) {
-                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale);
+                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc);
 
                 $sentCount = $this->send($instance, $failedRecipients);
 
@@ -191,14 +193,16 @@ class MailerFactory
      * @param  array  $from              From addresses. An array of (name => email-address)
      * @param  array  $to                To addresses. An array of (name => email-address)
      * @param  array  $messageParameters an array of (name => value) parameters that will be available in the message.
-     * @param string  $locale. If null, the default store locale is used.
+     * @param  string $locale            If null, the default store locale is used.
+     * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param  array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
      *
      * @return \Swift_Message the generated and built message.
      */
-    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
+    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
     {
         if (null !== $message = MessageQuery::getFromName($messageCode)) {
-            if ($locale == null) {
+            if ($locale === null) {
                 $locale = Lang::getDefaultLanguage()->getLocale();
             }
 
@@ -223,6 +227,16 @@ class MailerFactory
                 $instance->addTo($address, $name);
             }
 
+            // Add cc addresses
+            foreach ($cc as $address => $name) {
+                $instance->addCc($address, $name);
+            }
+            
+            // Add bcc addresses
+            foreach ($bcc as $address => $name) {
+                $instance->addBcc($address, $name);
+            }
+            
             $message->buildMessage($this->parser, $instance);
 
             return $instance;
