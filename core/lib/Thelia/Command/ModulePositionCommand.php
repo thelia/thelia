@@ -128,7 +128,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      */
     protected function checkModuleArgument($paramValue)
     {
-        if (!preg_match('#^([a-z]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
+        if (!preg_match('#^([a-z0-9]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
             throw new \InvalidArgumentException(
                 'Arguments must be in format moduleName:[+|-]position where position is an integer or up or down.'
             );
