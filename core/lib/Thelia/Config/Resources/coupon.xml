@@ -95,6 +95,11 @@
             <tag name="thelia.coupon.addCondition"/>
         </service>
 
+        <service id="thelia.condition.match_for_x_articles_include_quantity" class="Thelia\Condition\Implementation\MatchForXArticlesIncludeQuantity">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
+
         <service id="thelia.condition.match_delivery_countries" class="Thelia\Condition\Implementation\MatchDeliveryCountries">
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCondition"/>

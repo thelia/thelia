@@ -177,6 +177,18 @@ class BaseFacade implements FacadeInterface
         return count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
     }
 
+    public function getNbArticlesInCartIncludeQuantity()
+    {
+        $cartItems = $this->getCart()->getCartItems();
+        $quantity = 0;
+
+        foreach ($cartItems as $cartItem) {
+            $quantity += $cartItem->getQuantity();
+        }
+
+        return $quantity;
+    }
+
     /**
      * Return all Coupon given during the Checkout
      *
