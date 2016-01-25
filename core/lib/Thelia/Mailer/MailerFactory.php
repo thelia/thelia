@@ -202,7 +202,7 @@ class MailerFactory
     public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
     {
         if (null !== $message = MessageQuery::getFromName($messageCode)) {
-            if ($locale == null) {
+            if ($locale === null) {
                 $locale = Lang::getDefaultLanguage()->getLocale();
             }
 
