@@ -60,7 +60,7 @@ abstract class BaseController extends ContainerAware
     protected $templateHelper;
 
     /** @var bool Fallback on default template when setting the templateDefinition */
-    protected $useFallbackTemplate = false;
+    protected $useFallbackTemplate = true;
 
     /**
      * Return an empty response (after an ajax request, for example)
