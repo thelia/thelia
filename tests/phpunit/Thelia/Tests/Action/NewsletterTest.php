@@ -56,6 +56,8 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testSubscribe
+     * @param NewsletterModel $newsletter
+     * @return NewsletterModel
      */
     public function testUpdate(NewsletterModel $newsletter)
     {
@@ -83,6 +85,7 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testUpdate
+     * @param NewsletterModel $newsletter
      */
     public function testUnsubscribe(NewsletterModel $newsletter)
     {
@@ -95,6 +98,6 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
         $deletedNewsletter = $event->getNewsletter();
 
         $this->assertInstanceOf('Thelia\Model\Newsletter', $deletedNewsletter);
-        $this->assertTrue($deletedNewsletter->isDeleted());
+        $this->assertEquals(1, NewsletterQuery::create()->filterByEmail('test@foo.com')->filterByUnsubscribed(true)->count());
     }
 }

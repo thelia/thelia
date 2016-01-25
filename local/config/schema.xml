@@ -1413,6 +1413,7 @@
     <column name="firstname" size="255" type="VARCHAR" />
     <column name="lastname" size="255" type="VARCHAR" />
     <column name="locale" size="5" type="VARCHAR" />
+    <column name="unsubscribed" type="BOOLEAN" defaultValue="0"/>
     <unique name="email_UNIQUE">
       <unique-column name="email" />
     </unique>

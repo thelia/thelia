@@ -27,13 +27,17 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
 {
     public function subscribe(NewsletterEvent $event)
     {
-        $newsletter = new NewsletterModel();
+        // test if the email is already registered and unsubscribed
+        if (null === $newsletter = NewsletterQuery::create()->findOneByEmail($event->getEmail())) {
+            $newsletter = new NewsletterModel();
+        }
 
         $newsletter
             ->setEmail($event->getEmail())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
             ->setLocale($event->getLocale())
+            ->setUnsubscribed(false)
             ->save();
 
         $event->setNewsletter($newsletter);
@@ -42,7 +46,9 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
     public function unsubscribe(NewsletterEvent $event)
     {
         if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
-            $nl->delete();
+            $nl
+                ->setUnsubscribed(true)
+                ->save();
 
             $event->setNewsletter($nl);
         }

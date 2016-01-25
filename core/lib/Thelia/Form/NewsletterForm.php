@@ -81,7 +81,7 @@ class NewsletterForm extends BaseForm
 
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
-        $customer = NewsletterQuery::create()->findOneByEmail($value);
+        $customer = NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value);
         if ($customer) {
             $context->addViolation(Translator::getInstance()->trans("You are already registered!"));
         }

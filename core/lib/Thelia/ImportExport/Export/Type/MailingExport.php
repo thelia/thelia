@@ -32,6 +32,6 @@ class MailingExport extends AbstractExport
 
     protected function getData()
     {
-        return new NewsletterQuery;
+        return (new NewsletterQuery)->filterByUnsubscribed(false);
     }
 }
