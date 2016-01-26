@@ -84,13 +84,39 @@ if ($update->isLatestVersion()) {
     exit(3);
 }
 
+$current = $update->getCurrentVersion();
+$files   = $update->getLatestVersion();
+$web     = $update->getWebVersion();
+
 while (1) {
+
+    if ($files != $web) {
+        cliOutput(sprintf(
+            "Thelia server is reporting the current stable release version is %s ",
+            $web
+        ), 'warning');
+    }
+
     cliOutput(sprintf(
         "You are going to update Thelia from version %s to version %s.",
-        $update->getCurrentVersion(),
-        $update->getLatestVersion()
+        $current,
+        $files
     ), 'info');
-    cliOutput("Continue update process ? (Y/n)");
+
+    if ($files < $web) {
+
+        cliOutput(sprintf(
+            "Your files belongs to version %s, which is not the latest stable release.",
+            $web
+        ), 'warning');
+        cliOutput(sprintf(
+            "It is recommended to upgrade your files first then run this script again." . PHP_EOL
+            . "The latest version is available at http://thelia.net/#download ."
+        ), 'warning');
+        cliOutput("Continue update process anyway ? (Y/n)");
+    } else {
+        cliOutput("Continue update process ? (Y/n)");
+    }
 
     $rep = readStdin(true);
     if ($rep == 'y') {
