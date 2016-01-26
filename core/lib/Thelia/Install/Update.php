@@ -585,4 +585,17 @@ class Update
 
         return $this;
     }
+
+    public function getWebVersion()
+    {
+        $url = "http://thelia.net/version.php";
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+        $res = curl_exec($curl);
+        if (Version::parse($res))
+            return $res;
+    }
 }
