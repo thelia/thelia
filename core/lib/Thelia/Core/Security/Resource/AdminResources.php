@@ -22,6 +22,31 @@ use Thelia\Core\Security\Exception\ResourceException;
  */
 class AdminResources
 {
+    /**
+     * @deprecated 2.3
+     * @removed 2.5
+     */
+    private static $selfReflection = null;
+
+    /**
+     * @deprecated 2.3
+     * @removed 2.5
+     * @param $name
+     * @return string the constant value
+     */
+    public static function retrieve($name)
+    {
+        $constantName = strtoupper($name);
+        if (null === self::$selfReflection) {
+            self::$selfReflection = new \ReflectionClass(__CLASS__);
+        }
+        if (self::$selfReflection->hasConstant($constantName)) {
+            return self::$selfReflection->getConstant($constantName);
+        } else {
+            throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
+        }
+    }
+
     const SUPERADMINISTRATOR = "SUPERADMINISTRATOR";
 
     const ADDRESS = "admin.address";
