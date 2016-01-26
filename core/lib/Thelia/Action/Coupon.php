@@ -16,6 +16,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -24,7 +25,6 @@ use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
@@ -48,8 +48,8 @@ use Thelia\Model\OrderCouponModule;
  */
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var CouponFactory $couponFactory */
     protected $couponFactory;
@@ -64,13 +64,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     protected $conditionFactory;
 
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         CouponFactory $couponFactory,
         CouponManager $couponManager,
         ConditionInterface $noConditionRule,
         ConditionFactory $conditionFactory
     ) {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->couponFactory = $couponFactory;
         $this->couponManager = $couponManager;
         $this->noConditionRule = $noConditionRule;
@@ -149,7 +149,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         // Tell coupons to clear any data they may have stored
         $this->couponManager->clear();
 
-        $this->request->getSession()->setConsumedCoupons(array());
+        $this->getSession()->setConsumedCoupons(array());
 
         $this->updateOrderDiscount($event, $eventName, $dispatcher);
     }
@@ -173,18 +173,15 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $isValid = $coupon->isMatching();
 
             if ($isValid) {
-
                 $this->couponManager->pushCouponInSession($event->getCode());
                 $totalDiscount = $this->couponManager->getDiscount();
 
-                $this->request
-                    ->getSession()
+                $this->getSession()
                     ->getSessionCart($dispatcher)
                     ->setDiscount($totalDiscount)
                     ->save();
 
-                $this->request
-                    ->getSession()
+                $this->getSession()
                     ->getOrder()
                     ->setDiscount($totalDiscount)
                 ;
@@ -199,14 +196,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $discount = $this->couponManager->getDiscount();
 
-        $this->request
-            ->getSession()
+        $this->getSession()
             ->getSessionCart($dispatcher)
             ->setDiscount($discount)
             ->save();
 
-        $this->request
-            ->getSession()
+        $this->getSession()
             ->getOrder()
             ->setDiscount($discount);
     }
@@ -314,10 +309,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             try {
                 foreach ($consumedCoupons as $couponCode) {
-
                     $couponQuery = CouponQuery::create();
                     $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
-                    $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
+                    $couponModel->setLocale($this->getSession()->getLang()->getLocale());
 
                     /* decrease coupon quantity */
                     $this->couponManager->decrementQuantity($couponModel, $event->getOrder()->getCustomerId());
@@ -400,5 +394,15 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_DELETEITEM => array("updateOrderDiscount", 10),
         );
+    }
+
+    /**
+     * Returns the session from the current request
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

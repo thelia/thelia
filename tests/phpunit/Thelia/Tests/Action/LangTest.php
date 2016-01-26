@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Lang;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
@@ -35,7 +36,7 @@ class LangTest extends ContainerAwareTestCase
 {
     protected static $defaultId;
 
-    protected $request;
+    protected $requestStack;
 
     public static function setUpBeforeClass()
     {
@@ -52,8 +53,10 @@ class LangTest extends ContainerAwareTestCase
 
         $session = new Session(new MockArraySessionStorage());
 
-        $this->request = new Request();
-        $this->request->setSession($session);
+        $request = new Request();
+        $request->setSession($session);
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push($request);
     }
 
     public function testCreate()
@@ -71,7 +74,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimals("2")
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
         $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdLang = $event->getLang();
@@ -113,7 +116,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimals("1")
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
         $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
@@ -142,7 +145,7 @@ class LangTest extends ContainerAwareTestCase
     {
         $event = new LangToggleDefaultEvent($lang->getId());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
         $action->toggleDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
@@ -169,7 +172,7 @@ class LangTest extends ContainerAwareTestCase
 
         $event = new LangDeleteEvent($lang->getId());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
         $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedLang = $event->getLang();
@@ -189,7 +192,7 @@ class LangTest extends ContainerAwareTestCase
 
         $event = new LangDeleteEvent($lang->getId());
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
         $action->delete($event, null, $this->getMockEventDispatcher());
     }
 

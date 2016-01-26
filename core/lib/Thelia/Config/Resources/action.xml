@@ -22,14 +22,14 @@
         </service>
 
         <service id="thelia.action.order" class="Thelia\Action\Order">
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="mailer"/>
             <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.coupon" class="Thelia\Action\Coupon">
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.coupon.factory"/>
             <argument type="service" id="thelia.coupon.manager"/>
             <argument type="service" id="thelia.condition.match_for_everyone"/>
@@ -64,7 +64,7 @@
         </service>
 
         <service id="thelia.action.cart" class="Thelia\Action\Cart">
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.token_provider"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -188,7 +188,7 @@
 
         <service id="thelia.action.lang" class="Thelia\Action\Lang">
             <argument type="service" id="thelia.template_helper" />
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

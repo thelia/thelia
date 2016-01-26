@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
@@ -24,7 +25,6 @@ use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangToggleVisibleEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -43,13 +43,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
     /** @var TemplateHelperInterface  */
     protected $templateHelper;
 
-    /** @var  Request */
-    protected $request;
+    /** @var  RequestStack */
+    protected $requestStack;
 
-    public function __construct(TemplateHelperInterface $templateHelper, Request $request)
+    public function __construct(TemplateHelperInterface $templateHelper, RequestStack $requestStack)
     {
         $this->templateHelper = $templateHelper;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -156,7 +156,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 ->delete();
 
             /** @var Session $session */
-            $session = $this->request->getSession();
+            $session = $this->requestStack->getCurrentRequest()->getSession();
 
             // If we've just deleted the current admin edition language, set it to the default one.
             if ($lang->getId() == $session->getAdminEditionLang()->getId()) {

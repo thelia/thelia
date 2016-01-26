@@ -15,13 +15,13 @@ namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
@@ -55,8 +55,8 @@ use Thelia\Tools\I18n;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var MailerFactory */
     protected $mailer;
@@ -64,9 +64,9 @@ class Order extends BaseAction implements EventSubscriberInterface
     /** @var SecurityContext */
     protected $securityContext;
 
-    public function __construct(Request $request, MailerFactory $mailer, SecurityContext $securityContext)
+    public function __construct(RequestStack $requestStack, MailerFactory $mailer, SecurityContext $securityContext)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->mailer = $mailer;
         $this->securityContext = $securityContext;
     }
@@ -682,6 +682,6 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     protected function getSession()
     {
-        return $this->request->getSession();
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

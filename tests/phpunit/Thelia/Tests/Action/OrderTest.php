@@ -14,6 +14,7 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Order;
 use Thelia\Core\Event\Order\OrderAddressEvent;
@@ -82,22 +83,26 @@ class OrderTest extends BaseAction
      */
     protected $securityContext;
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     public function setUp()
     {
         $session = new Session(new MockArraySessionStorage());
 
-        $this->request = new Request();
-        $this->request->setSession($session);
+        $request = new Request();
+        $request->setSession($session);
 
-        $this->securityContext = new SecurityContext($this->request);
+        $this->securityContext = new SecurityContext($request);
 
         $this->container = new ContainerBuilder();
 
         $this->container->set("event_dispatcher", $this->getMockEventDispatcher());
-        $this->container->set('request', $this->request);
+        $this->container->set('request', $request);
+
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push($request);
+        $this->container->set('request_stack', $this->requestStack);
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 
@@ -107,7 +112,7 @@ class OrderTest extends BaseAction
         );
 
         $this->orderAction = new Order(
-            $this->request,
+            $this->requestStack,
             $mailerFactory,
             $this->securityContext
         );
@@ -178,7 +183,7 @@ class OrderTest extends BaseAction
             $this->cartItems[] = $cartItem;
         }
 
-        $this->request->getSession()->set("thelia.cart_id", $cart->getId());
+        $this->requestStack->getCurrentRequest()->getSession()->set("thelia.cart_id", $cart->getId());
 
         return $cart;
     }
@@ -330,7 +335,7 @@ class OrderTest extends BaseAction
         $this->assertEquals(OrderStatus::CODE_NOT_PAID, $placedOrder->getOrderStatus()->getCode(), 'status does not  match');
 
         /* check lang */
-        $this->assertEquals($this->request->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
+        $this->assertEquals($this->requestStack->getCurrentRequest()->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
         /* check ordered product */
         foreach ($this->cartItems as $index => $cartItem) {
@@ -404,7 +409,7 @@ class OrderTest extends BaseAction
         $orderManuelEvent = new OrderManualEvent(
             $orderCopy,
             $this->cart->getCurrency(),
-            $this->request->getSession()->getLang(),
+            $this->requestStack->getCurrentRequest()->getSession()->getLang(),
             $this->cart,
             $this->customer
         );
@@ -468,7 +473,7 @@ class OrderTest extends BaseAction
         $this->assertEquals(OrderStatus::CODE_NOT_PAID, $placedOrder->getOrderStatus()->getCode(), 'status does not  match');
 
         /* check lang */
-        $this->assertEquals($this->request->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
+        $this->assertEquals($this->requestStack->getCurrentRequest()->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
 
         // without address duplication
