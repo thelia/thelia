@@ -48,7 +48,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::VIEW);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::VIEW);
 
         $this->checkEntityExists($entity, $entityId);
 
@@ -80,7 +80,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::VIEW);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::VIEW);
 
         $this->checkEntityExists($entity, $entityId);
 
@@ -116,7 +116,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::UPDATE);
 
         $fileController = new FileController();
         $fileController->setContainer($this->getContainer());
@@ -145,7 +145,7 @@ class ImageController extends BaseApiController
         $request = $this->getRequest();
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::UPDATE);
 
         $this->checkEntityExists($entity, $entityId);
         $this->checkImage($entity, $imageId);
@@ -288,7 +288,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::UPDATE);
 
         $this->checkEntityExists($entity, $entityId);
 

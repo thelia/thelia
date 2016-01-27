@@ -20,22 +20,26 @@ use Thelia\Core\Security\Exception\ResourceException;
  *
  * @author Etienne roudeix <eroudeix@openstudio.fr>
  */
-final class AdminResources
+class AdminResources
 {
+    /**
+     * @deprecated 2.3
+     * @removed 2.5
+     */
     private static $selfReflection = null;
 
     /**
+     * @deprecated 2.3
+     * @removed 2.5
      * @param $name
      * @return string the constant value
      */
     public static function retrieve($name)
     {
         $constantName = strtoupper($name);
-
         if (null === self::$selfReflection) {
             self::$selfReflection = new \ReflectionClass(__CLASS__);
         }
-
         if (self::$selfReflection->hasConstant($constantName)) {
             return self::$selfReflection->getConstant($constantName);
         } else {
@@ -124,4 +128,86 @@ final class AdminResources
     const API = "admin.configuration.api";
 
     const TITLE = "admin.customer.title";
+
+    /**
+     * Stock all resources by modules
+     * Exemple :
+     * [
+     *      "thelia" => [
+     *          "ADDRESS" => "admin.address",
+     *          ...
+     *      ],
+     *      "Front" => [
+     *          ...
+     *      ]
+     * ]
+     * @var Array $resources
+     */
+    protected $resources;
+
+    /**
+     * Create a new AdminRessources instance.
+     *
+     * @param array $resources with format module => [ KEY => value ].
+     */
+    public function __construct($resources)
+    {
+        $this->resources = $resources;
+    }
+
+    /**
+     * @param string $name
+     * @param string $module
+     * @return string
+     */
+    public function getResource($name, $module = "thelia")
+    {
+        $constantName = strtoupper($name);
+
+        if (isset($this->resources[$module])) {
+            if (isset($this->resources[$module][$constantName])) {
+                return $this->resources[$module][$constantName];
+            } else {
+                throw new ResourceException(sprintf('Resource `%s` not found', $module),
+                    ResourceException::RESOURCE_NOT_FOUND);
+            }
+        } else {
+            throw new ResourceException(sprintf('Module `%s` not found', $module),
+                ResourceException::RESOURCE_NOT_FOUND);
+        }
+    }
+
+    /**
+     * @param $data with format
+     * [
+     *     "ADDRESS" => "admin.address",
+     *     ...
+     * ]
+     * @param $module string ModuleCode
+     * @throws \Exception
+     */
+    public function addModuleResources($data, $module = 'thelia')
+    {
+        if (null !== $data && is_array($data)) {
+            $this->resources[$module] = $data;
+        } else {
+            throw new \Exception("Format pass to addModuleResources method is not valid");
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     * @param string $module
+     */
+    public function addResource($name, $value, $module = 'thelia')
+    {
+        if (null !== $name && null !== $value) {
+            $nameFormated = strtoupper($name);
+            if (!$this->resources[$module]) {
+                $this->resources[$module] = [];
+            }
+            $this->resources[$module][$nameFormated] = $value;
+        }
+    }
 }

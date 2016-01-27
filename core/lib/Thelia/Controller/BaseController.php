@@ -59,6 +59,8 @@ abstract class BaseController extends ContainerAware
 
     protected $templateHelper;
 
+    protected $adminResources;
+
     /** @var bool Fallback on default template when setting the templateDefinition */
     protected $useFallbackTemplate = true;
 
@@ -200,6 +202,19 @@ abstract class BaseController extends ContainerAware
         }
 
         return $this->templateHelper;
+    }
+
+    /**
+     * @since 2.3
+     * @return \Thelia\Core\Security\Resource\AdminResources
+     */
+    protected function getAdminResources()
+    {
+        if (null === $this->adminResources) {
+            $this->adminResources = $this->container->get("thelia.admin.resources");
+        }
+
+        return $this->adminResources;
     }
 
     /**
