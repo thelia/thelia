@@ -376,6 +376,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
+                $fileList = ['images' => [], 'documentList' => []];
+
                 // Get product's files to delete after product deletion
                 $fileList['images']['list'] = ProductImageQuery::create()
                     ->findByProductId($event->getProductId());

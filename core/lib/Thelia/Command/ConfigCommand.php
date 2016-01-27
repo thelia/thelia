@@ -132,7 +132,7 @@ class ConfigCommand extends ContainerAwareCommand
             ->setHeaders(['Name', 'Value', 'secured', 'hidden'])
             ->setRows($rows)
         ;
-        $table->render($output);
+        $table->render();
     }
 
     private function getConfig(InputInterface $input, OutputInterface $output)

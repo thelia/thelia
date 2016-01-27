@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -39,9 +40,12 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        $container->set("request", new Request());
-        $container->get("request")->setSession(new Session(new MockArraySessionStorage()));
-        $container->enterScope("request");
+        $request = new Request();
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $requestStack->push($request);
     }
 
     /**

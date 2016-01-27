@@ -47,6 +47,8 @@ use Thelia\Type\TypeCollection;
  * @method int getPage() available if countable is true
  * @method int getLimit() available if countable is true
  * @method bool getReturnUrl() false for disable the generation of urls
+ * @method ModelCriteria buildModelCriteria()
+ * @method array buildArray()
  */
 abstract class BaseLoop
 {
@@ -334,7 +336,7 @@ abstract class BaseLoop
 
     /**
      * @param ModelCriteria    $search     the search request
-     * @param PropelModelPager $pagination the pagination part
+     * @param PropelModelPager|null $pagination the pagination part
      *
      * @return array|PropelModelPager|ObjectCollection
      * @throws \InvalidArgumentException               if the search mode is undefined.
@@ -426,7 +428,7 @@ abstract class BaseLoop
 
     /**
      * @param ModelCriteria    $search
-     * @param PropelModelPager $pagination
+     * @param PropelModelPager|null $pagination
      *
      * @return array|PropelModelPager
      */

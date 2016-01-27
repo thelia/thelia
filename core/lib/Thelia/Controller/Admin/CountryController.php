@@ -12,24 +12,22 @@
 
 namespace Thelia\Controller\Admin;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
 use Thelia\Core\Event\Country\CountryToggleVisibilityEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
-use Thelia\Model\Map\CountryTableMap;
-use Thelia\Model\Map\StateTableMap;
 use Thelia\Model\State;
 use Thelia\Model\StateQuery;
-use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
  * Class CustomerController
@@ -72,6 +70,7 @@ class CountryController extends AbstractCrudController
      * Hydrate the update form for this object, before passing it to the update template
      *
      * @param \Thelia\Model\Country $object
+     * @return BaseForm
      */
     protected function hydrateObjectForm($object)
     {
@@ -97,7 +96,8 @@ class CountryController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return CountryCreateEvent
      */
     protected function getCreationEvent($formData)
     {
@@ -109,7 +109,8 @@ class CountryController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return CountryUpdateEvent
      */
     protected function getUpdateEvent($formData)
     {
@@ -166,6 +167,7 @@ class CountryController extends AbstractCrudController
      * Get the created object from an event.
      *
      * @param unknown $createEvent
+     * @return Country
      */
     protected function getObjectFromEvent($event)
     {
@@ -191,6 +193,7 @@ class CountryController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.)
      *
      * @param \Thelia\Model\Country $object
+     * @return string
      */
     protected function getObjectLabel($object)
     {
@@ -201,6 +204,7 @@ class CountryController extends AbstractCrudController
      * Returns the object ID from the object
      *
      * @param \Thelia\Model\Country $object
+     * @return int
      */
     protected function getObjectId($object)
     {
@@ -211,6 +215,7 @@ class CountryController extends AbstractCrudController
      * Render the main list template
      *
      * @param unknown $currentOrder, if any, null otherwise.
+     * @return Response
      */
     protected function renderListTemplate($currentOrder)
     {

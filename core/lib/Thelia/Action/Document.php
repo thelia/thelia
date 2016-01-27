@@ -86,12 +86,12 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             $mode = ConfigQuery::read(self::CONFIG_DELIVERY_MODE, 'symlink');
 
             if ($mode == 'symlink') {
-                if (false == symlink($sourceFile, $originalDocumentPathInCache)) {
+                if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
             } else {
                 // mode = 'copy'
-                if (false == @copy($sourceFile, $originalDocumentPathInCache)) {
+                if (false === @copy($sourceFile, $originalDocumentPathInCache)) {
                     throw new DocumentException(sprintf("Failed to copy %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
             }

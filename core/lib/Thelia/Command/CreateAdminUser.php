@@ -115,7 +115,7 @@ class CreateAdminUser extends ContainerAwareCommand
             return $value;
         });
 
-        return $password = $helper->ask($input, $output, $question);
+        return $helper->ask($input, $output, $question);
     }
 
     /**

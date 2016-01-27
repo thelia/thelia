@@ -91,6 +91,7 @@ class HookCleanCommand extends ContainerAwareCommand
     private function askConfirmation(InputInterface $input, OutputInterface $output)
     {
         $assumeYes = $input->getOption("assume-yes");
+        $moduleCode = $input->getArgument("module");
 
         if (!$assumeYes) {
             /** @var QuestionHelper $helper */

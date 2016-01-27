@@ -42,7 +42,7 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var \PDO|ConnectionWrapper $connection */
+        /** @var ConnectionWrapper $connection */
         $connection = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         $connection = $connection->getWrappedConnection();
 

@@ -119,12 +119,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
-                    if (false == symlink($source_file, $originalImagePathInCache)) {
+                    if (false === symlink($source_file, $originalImagePathInCache)) {
                         throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
                     }
                 } else {
                     // mode = 'copy'
-                    if (false == @copy($source_file, $originalImagePathInCache)) {
+                    if (false === @copy($source_file, $originalImagePathInCache)) {
                         throw new ImageException(sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir));
                     }
                 }

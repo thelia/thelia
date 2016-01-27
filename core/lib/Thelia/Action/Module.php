@@ -330,7 +330,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             if ($activated) {
                 // deactivate
-                $toggleEvent = new ModuleToggleActivationEvent($oldModule);
+                $toggleEvent = new ModuleToggleActivationEvent($oldModule->getId());
                 // disable the check of the module because it's already done
                 $toggleEvent->setNoCheck(true);
 

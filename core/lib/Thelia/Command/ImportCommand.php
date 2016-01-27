@@ -135,7 +135,7 @@ class ImportCommand extends ContainerAwareCommand
                 'Title',
                 'Description'
             ])
-            ->render($output)
+            ->render()
         ;
     }
 }

@@ -169,7 +169,7 @@ class ExportCommand extends ContainerAwareCommand
                 'Title',
                 'Description'
             ])
-            ->render($output)
+            ->render()
         ;
     }
 
@@ -202,7 +202,7 @@ class ExportCommand extends ContainerAwareCommand
                 'Extension',
                 'MIME type'
             ])
-            ->render($output)
+            ->render()
         ;
     }
 
@@ -235,7 +235,7 @@ class ExportCommand extends ContainerAwareCommand
                 'Extension',
                 'MIME type'
             ])
-            ->render($output)
+            ->render()
         ;
     }
 }

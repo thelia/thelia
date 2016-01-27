@@ -129,6 +129,8 @@ class Content extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
+                $fileList = ['images' => [], 'documentList' => []];
+
                 $defaultFolderId = $content->getDefaultFolderId();
 
                 // Get content's files to delete after content deletion

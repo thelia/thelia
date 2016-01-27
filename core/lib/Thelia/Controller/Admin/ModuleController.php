@@ -29,6 +29,7 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
 use Thelia\Log\Tlog;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
 
@@ -137,11 +138,19 @@ class ModuleController extends AbstractCrudController
         return $module;
     }
 
+    /**
+     * @param Module $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param Module $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

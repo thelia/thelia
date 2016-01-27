@@ -116,6 +116,8 @@ class Category extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
+                $fileList = ['images' => [], 'documentList' => []];
+
                 // Get category's files to delete after category deletion
                 $fileList['images']['list'] = CategoryImageQuery::create()
                     ->findByCategoryId($event->getCategoryId());

@@ -101,7 +101,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     /**
      * Set uploaded file
      *
-     * @param UploadedFile $uploadedFile File being uploaded
+     * @param UploadedFile|null $uploadedFile File being uploaded
      *
      * @return $this
      */
@@ -115,7 +115,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     /**
      * Get uploaded file
      *
-     * @return UploadedFile
+     * @return UploadedFile|null
      */
     public function getUploadedFile()
     {

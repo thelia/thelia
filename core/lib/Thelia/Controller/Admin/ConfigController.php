@@ -19,6 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -136,11 +137,19 @@ class ConfigController extends AbstractCrudController
         return $config;
     }
 
+    /**
+     * @param Config $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getName();
     }
 
+    /**
+     * @param Config $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

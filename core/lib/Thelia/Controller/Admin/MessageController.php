@@ -22,6 +22,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -144,11 +145,19 @@ class MessageController extends AbstractCrudController
         return $message;
     }
 
+    /**
+     * @param Message $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getName();
     }
 
+    /**
+     * @param Message $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

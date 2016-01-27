@@ -125,8 +125,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param CurrencyUpdateEvent $event
-     * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function setVisible(CurrencyUpdateEvent $event)
     {

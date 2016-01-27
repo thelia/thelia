@@ -39,7 +39,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param string $locale
-     * @return $this;
+     * @return $this
      */
     public function setLocale($locale)
     {

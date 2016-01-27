@@ -76,6 +76,8 @@ class Folder extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
+                $fileList = ['images' => [], 'documentList' => []];
+
                 // Get folder's files to delete after folder deletion
                 $fileList['images']['list'] = FolderImageQuery::create()
                     ->findByFolderId($event->getFolderId());

@@ -231,13 +231,17 @@ class TaxRuleController extends AbstractCrudApiController
         return $data;
     }
 
+    /**
+     * @param int $taxRuleId
+     * @return array
+     */
     protected function getI18nPersistentData($taxRuleId)
     {
         $i18ns = TaxRuleI18NQuery::create()
             ->findById($taxRuleId)
         ;
 
-        $data["i18n"] = array();
+        $data = ['i18n' => []];
 
         /** @var \Thelia\Model\TaxRuleI18n $i18n */
         foreach ($i18ns as $i18n) {

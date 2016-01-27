@@ -46,7 +46,7 @@ class ModuleListCommand extends ContainerAwareCommand
 
         $helper
             ->setHeaders(["Code", "Active", "Type", "Version"])
-            ->render($output)
+            ->render()
         ;
     }
 

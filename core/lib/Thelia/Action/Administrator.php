@@ -22,7 +22,6 @@ use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\TokenProvider;
-use Thelia\Tools\URL;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
