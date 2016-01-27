@@ -64,7 +64,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
 
-        $token = new TokenProvider($request, $translator, 'test');
+        $token = new TokenProvider($this->requestStack, $translator, 'test');
 
         $this->dispatcher->addSubscriber(new \Thelia\Action\Cart($this->requestStack, $token));
 
@@ -75,7 +75,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         /** @var \Thelia\Action\Cart  cartAction */
         $this->cartAction = new \Thelia\Action\Cart(
             $this->requestStack,
-            new TokenProvider($request, $translator, 'baba au rhum')
+            new TokenProvider($this->requestStack, $translator, 'baba au rhum')
         );
 
         $this->dispatcherNull = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');

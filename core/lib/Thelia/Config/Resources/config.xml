@@ -309,7 +309,7 @@
 
         <!-- Thelia simple token provider -->
         <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.translator" />
             <argument>%thelia.token_id%</argument>
         </service>
