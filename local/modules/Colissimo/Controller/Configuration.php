@@ -14,41 +14,56 @@ namespace Colissimo\Controller;
 
 use Colissimo\Colissimo;
 use Colissimo\Model\Config\ColissimoConfigValue;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
 
 /**
- * Class FreeShipping
+ * Class Configuration
  * @package Colissimo\Controller
  * @author Thomas Arnaud <tarnaud@openstudio.fr>
  */
-class FreeShipping extends BaseAdminController
+class Configuration extends BaseAdminController
 {
-    public function set()
+    public function editConfiguration()
     {
-        $response = $this->checkAuth(AdminResources::MODULE, [Colissimo::DOMAIN_NAME], AccessManager::UPDATE);
-        if (null !== $response) {
+        if (null !== $response = $this->checkAuth(
+            AdminResources::MODULE,
+            [Colissimo::DOMAIN_NAME],
+            AccessManager::UPDATE
+        )) {
             return $response;
         }
 
-        $form = $this->createForm('colissimo.freeshipping.form');
-
+        $form = $this->createForm('colissimo.configuration');
+        $error_message = null;
 
         try {
             $validateForm = $this->validateForm($form);
             $data = $validateForm->getData();
 
-            Colissimo::setConfigValue(ColissimoConfigValue::FREE_SHIPPING, (int) ($data["freeshipping"]));
+            Colissimo::setConfigValue(
+                ColissimoConfigValue::ENABLED,
+                is_bool($data["enabled"]) ? (int) ($data["enabled"]) : $data["enabled"]
+            );
+
             return $this->redirectToConfigurationPage();
 
-        } catch (\Exception $e) {
-            $response = JsonResponse::create(array("error"=>$e->getMessage()), 500);
+        } catch (FormValidationException $e) {
+            $error_message = $this->createStandardFormValidationErrorMessage($e);
         }
 
+        if (null !== $error_message) {
+            $this->setupFormErrorContext(
+                'configuration',
+                $error_message,
+                $form
+            );
+            $response = $this->render("module-configure", ['module_code' => 'Colissimo']);
+        }
         return $response;
     }
 

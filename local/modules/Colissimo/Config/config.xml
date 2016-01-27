@@ -13,6 +13,7 @@
     <forms>
         <form name="colissimo.freeshipping.form" class="Colissimo\Form\FreeShipping" />
         <form name="colissimo.export.form" class="Colissimo\Form\Export" />
+        <form name="colissimo.configuration" class="Colissimo\Form\Configuration" />
     </forms>
 
     <services>
@@ -20,6 +21,13 @@
             <argument type="service" id="thelia.parser" />
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
+        </service>
+    </services>
+
+    <services>
+        <service id="area.deleted.listener" class="Colissimo\EventListener\AreaDeletedListener" scope="request">
+            <tag name="kernel.event_subscriber"/>
+            <argument type="service" id="request" />
         </service>
     </services>
 
