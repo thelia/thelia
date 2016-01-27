@@ -95,7 +95,7 @@
 
         <service id="smarty.url.module" class="TheliaSmarty\Template\Plugins\UrlGenerator">
             <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.token_provider"/>
             <argument type="service" id="service_container" />
         </service>
