@@ -12,18 +12,14 @@
 
 namespace TheliaSmarty\Template;
 
+use \Smarty;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use \Smarty;
-
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Template\ParserInterface;
-
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateHelperInterface;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Core\Template\TemplateDefinition;
 use Imagine\Exception\InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
@@ -39,27 +35,31 @@ class SmartyParser extends Smarty implements ParserInterface
 {
     public $plugins = array();
 
-    protected $request;
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
+
+    /** @var ParserContext */
     protected $parserContext;
+
+    /** @var TemplateHelperInterface */
     protected $templateHelper;
+
+    /** @var RequestStack */
+    protected $requestStack;
 
     protected $backOfficeTemplateDirectories = array();
     protected $frontOfficeTemplateDirectories = array();
 
     protected $templateDirectories = array();
 
-    /**
-     * @var TemplateDefinition
-     */
-    protected $templateDefinition = "";
+    /** @var TemplateDefinition */
+    protected $templateDefinition;
 
+    /** @var int */
     protected $status = 200;
 
-
-
     /**
-     * @param Request                  $request
+     * @param RequestStack             $requestStack
      * @param EventDispatcherInterface $dispatcher
      * @param ParserContext            $parserContext
      * @param TemplateHelperInterface  $templateHelper
@@ -67,7 +67,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool                     $debug
      */
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
         TemplateHelperInterface $templateHelper,
@@ -76,7 +76,7 @@ class SmartyParser extends Smarty implements ParserInterface
     ) {
         parent::__construct();
 
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->dispatcher = $dispatcher;
         $this->parserContext = $parserContext;
         $this->templateHelper = $templateHelper;
@@ -114,7 +114,7 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getRequest()
     {
-        return $this->request;
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -269,6 +269,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /**
      * @param TemplateDefinition $templateDefinition
+     * @param bool $useFallback
      */
     public function setTemplateDefinition(TemplateDefinition $templateDefinition, $useFallback = false)
     {

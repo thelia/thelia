@@ -15,6 +15,7 @@ namespace TheliaSmarty\Tests\Template\Plugin;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\TheliaFormValidator;
@@ -47,6 +48,9 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
             $request->setSession(new Session());
         }
 
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get("request_stack");
+
         $container->set("thelia.parser.forms", [
             "thelia.empty" => "Thelia\\Form\\EmptyForm",
             "thelia.empty.2" => "Thelia\\Form\\EmptyForm",
@@ -68,7 +72,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         ));
 
         $this->smarty = new SmartyParser(
-            $request,
+            $requestStack,
             $container->get("event_dispatcher"),
             $container->get("thelia.parser.context"),
             $templateHelper = new TheliaTemplateHelper()
