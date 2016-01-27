@@ -65,7 +65,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
 
         $container->set(
             "thelia.form_factory",
-            new TheliaFormFactory($request, $container, $container->get("thelia.parser.forms"))
+            new TheliaFormFactory($requestStack, $container, $container->get("thelia.parser.forms"))
         );
 
         $container->set("thelia.parser.context", new ParserContext(

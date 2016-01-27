@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Thelia\Core\Form\TheliaFormFactory;
@@ -33,7 +34,6 @@ class TheliaFormFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Thelia\Core\Form\TheliaFormFactory */
     protected $factory;
-
 
     protected function setUp()
     {
@@ -59,12 +59,15 @@ class TheliaFormFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $request->setSession(new Session(new MockArraySessionStorage()));
         $container->set("request", $request);
+        $container->set("request_stack", $requestStack);
         $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
         $container->set("event_dispatcher", new EventDispatcher());
 
-        $this->factory = new TheliaFormFactory($request, $container, $definition);
+        $this->factory = new TheliaFormFactory($requestStack, $container, $definition);
     }
 
     public function testCreateFormWithoutType()

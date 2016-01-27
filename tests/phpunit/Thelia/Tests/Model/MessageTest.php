@@ -34,11 +34,13 @@ use TheliaSmarty\Template\SmartyParser;
  */
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ContainerBuilder $container
-     */
+    /** @var ContainerBuilder */
     protected $container;
+
+    /** @var SmartyParser */
     protected $parser;
+
+    /** @var TheliaTemplateHelper */
     protected $templateHelper;
 
     private $backup_mail_template = 'undefined';
@@ -66,7 +68,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $parserContext = new ParserContext(
             $requestStack,
-            new TheliaFormFactory($request, $container, []),
+            new TheliaFormFactory($requestStack, $container, []),
             new TheliaFormValidator(new Translator($container), 'dev')
         );
 

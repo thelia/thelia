@@ -123,7 +123,6 @@
         </service>
 
         <!-- Tax engine -->
-
         <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine">
             <argument type="service" id="request" />
         </service>
@@ -335,7 +334,7 @@
         </service>
 
         <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="service_container" />
             <argument>%thelia.parser.forms%</argument>
         </service>
