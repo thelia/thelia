@@ -131,7 +131,7 @@
         <service id="smarty.plugin.esi" class="TheliaSmarty\Template\Plugins\Esi">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="fragment.renderer.esi" />
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="smarty.plugin.hook" class="TheliaSmarty\Template\Plugins\Hook">
