@@ -14,9 +14,9 @@ namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Controller\ControllerResolver;
-use Thelia\Core\HttpFoundation\Request;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -28,30 +28,24 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
  */
 class Render extends AbstractSmartyPlugin
 {
-    /**
-     * @var ControllerResolver
-     */
+    /** @var ControllerResolver */
     protected $controllerResolver;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
-    /**
-     * @var Container
-     */
+    /** @var Container */
     protected $container;
 
     /**
      * @param ControllerResolver $controllerResolver
-     * @param Request            $request
+     * @param RequestStack       $requestStack
      * @param Container          $container
      */
-    public function __construct(ControllerResolver $controllerResolver, Request $request, Container $container)
+    public function __construct(ControllerResolver $controllerResolver, RequestStack $requestStack, Container $container)
     {
         $this->controllerResolver = $controllerResolver;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->container = $container;
     }
 
@@ -99,7 +93,7 @@ class Render extends AbstractSmartyPlugin
         $method = strtoupper($this->popParameter($params, "method", "GET"));
 
         // Then build the request
-        $requestObject = clone $this->request;
+        $requestObject = clone $this->requestStack->getCurrentRequest();
         $requestObject->query = new ParameterBag($query);
         $requestObject->request = new ParameterBag($request);
         $requestObject->attributes = new ParameterBag(["_controller" => $action]);
