@@ -193,7 +193,7 @@
 		</service>
 
         <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.form_factory" />
             <argument type="service" id="thelia.form_validator" />
         </service>

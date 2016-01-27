@@ -65,7 +65,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $request->setSession($session);
 
         $parserContext = new ParserContext(
-            $request,
+            $requestStack,
             new TheliaFormFactory($request, $container, []),
             new TheliaFormValidator(new Translator($container), 'dev')
         );

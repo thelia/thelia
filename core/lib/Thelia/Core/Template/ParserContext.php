@@ -12,10 +12,10 @@
 
 namespace Thelia\Core\Template;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\TheliaFormValidatorInterface;
-use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Thelia;
 use Thelia\Form\BaseForm;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
@@ -34,21 +34,24 @@ class ParserContext implements \IteratorAggregate
     private $formStore = array();
     private $store = array();
 
-    private $formFactory ;
+    /** @var TheliaFormFactoryInterface */
+    private $formFactory;
+
+    /** @var TheliaFormValidatorInterface */
     private $formValidator;
 
-    /** @var  Request */
-    private $request;
+    /** @var  RequestStack */
+    private $requestStack;
 
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         TheliaFormFactoryInterface $formFactory,
         TheliaFormValidatorInterface $formValidator
     ) {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
 
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->formFactory = $formFactory;
         $this->formValidator = $formValidator;
 
@@ -72,6 +75,7 @@ class ParserContext implements \IteratorAggregate
     /**
      * Set the current form.
      *
+     * @param null|BaseForm $default
      * @return BaseForm|null
      */
     public function popCurrentForm($default = null)
@@ -127,7 +131,7 @@ class ParserContext implements \IteratorAggregate
      */
     public function addForm(BaseForm $form)
     {
-        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+        $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
@@ -136,12 +140,12 @@ class ParserContext implements \IteratorAggregate
             'data'              => $this->cleanFormData($form->getForm()->getData()),
             'hasError'          => $form->hasError(),
             'errorMessage'      => $form->getErrorMessage(),
-            'method'            => $this->request->getMethod(),
+            'method'            => $this->requestStack->getCurrentRequest()->getMethod(),
             'timestamp'         => time(),
             'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
         ];
 
-        $this->request->getSession()->setFormErrorInformation($formErrorInformation);
+        $this->getSession()->setFormErrorInformation($formErrorInformation);
 
         return $this;
     }
@@ -160,7 +164,7 @@ class ParserContext implements \IteratorAggregate
             return $this->store[$formClass . ":" . $formType];
         }
 
-        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+        $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
         if (isset($formErrorInformation[$formClass.":".$formType])) {
             $formInfo = $formErrorInformation[$formClass.":".$formType];
@@ -209,13 +213,13 @@ class ParserContext implements \IteratorAggregate
      */
     public function clearForm(BaseForm $form)
     {
-        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+        $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
         $formClass = get_class($form) . ':' . $form->getType();
 
         if (isset($formErrorInformation[$formClass])) {
             unset($formErrorInformation[$formClass]);
-            $this->request->getSession()->setFormErrorInformation($formErrorInformation);
+            $this->getSession()->setFormErrorInformation($formErrorInformation);
         }
 
         return $this;
@@ -226,7 +230,7 @@ class ParserContext implements \IteratorAggregate
      */
     protected function cleanOutdatedFormErrorInformation()
     {
-        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+        $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
         if (! empty($formErrorInformation)) {
             $now = time();
@@ -238,7 +242,7 @@ class ParserContext implements \IteratorAggregate
                 }
             }
 
-            $this->request->getSession()->setFormErrorInformation($formErrorInformation);
+            $this->getSession()->setFormErrorInformation($formErrorInformation);
         }
 
         return $this;
@@ -275,5 +279,13 @@ class ParserContext implements \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->store);
+    }
+
+    /**
+     * @return Session
+     */
+    public function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

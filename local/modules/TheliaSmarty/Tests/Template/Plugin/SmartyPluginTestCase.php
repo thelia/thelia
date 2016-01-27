@@ -51,6 +51,9 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         /** @var RequestStack $requestStack */
         $requestStack = $container->get("request_stack");
 
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $container->set("thelia.parser.forms", [
             "thelia.empty" => "Thelia\\Form\\EmptyForm",
             "thelia.empty.2" => "Thelia\\Form\\EmptyForm",
@@ -66,7 +69,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         );
 
         $container->set("thelia.parser.context", new ParserContext(
-            $request,
+            $requestStack,
             $container->get("thelia.form_factory"),
             new TheliaFormValidator(new Translator($container), 'dev')
         ));
