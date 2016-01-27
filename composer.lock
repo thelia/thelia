@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "699a41c078827f6cc6e21be59313e9d3",
-    "content-hash": "15a54e86e1879d657ca353c562298a6a",
+    "hash": "cdd0b808ef352895c85e5d5e7d2c2c60",
+    "content-hash": "5df2e490534893de8ff85076170e550e",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -505,6 +505,72 @@
                 "stylesheet"
             ],
             "time": "2014-06-05 16:09:50"
+        },
+        {
+            "name": "propel/propel",
+            "version": "dev-thelia-2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/Propel2.git",
+                "reference": "06e832d0d5fd5255a36c1a42d81487dcf6519e04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/Propel2/zipball/06e832d0d5fd5255a36c1a42d81487dcf6519e04",
+                "reference": "06e832d0d5fd5255a36c1a42d81487dcf6519e04",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "psr/log": "~1.0",
+                "symfony/console": "~2.2",
+                "symfony/filesystem": "~2.2",
+                "symfony/finder": "~2.2",
+                "symfony/validator": "~2.2",
+                "symfony/yaml": "~2.2"
+            },
+            "require-dev": {
+                "behat/behat": "~2.4",
+                "monolog/monolog": "~1.3",
+                "phpunit/phpunit": "3.7.*"
+            },
+            "suggest": {
+                "monolog/monolog": "The recommended logging library to use with Propel."
+            },
+            "bin": [
+                "bin/propel"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Propel": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "William Durand",
+                    "email": "william.durand1@gmail.com"
+                }
+            ],
+            "description": "Propel2 is an open-source Object-Relational Mapping (ORM) for PHP 5.4",
+            "homepage": "http://www.propelorm.org/",
+            "keywords": [
+                "Active Record",
+                "ORM",
+                "persistence"
+            ],
+            "support": {
+                "source": "https://github.com/thelia/Propel2/tree/thelia-2.3"
+            },
+            "time": "2016-01-26 14:41:16"
         },
         {
             "name": "psr/log",
@@ -2263,70 +2329,6 @@
             ],
             "description": "Number management library",
             "time": "2014-11-07 14:57:24"
-        },
-        {
-            "name": "thelia/propel",
-            "version": "dev-thelia-2.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thelia/Propel2.git",
-                "reference": "2bf81078514588e0a45f022b285fbd8d25a63f53"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Propel2/zipball/2bf81078514588e0a45f022b285fbd8d25a63f53",
-                "reference": "2bf81078514588e0a45f022b285fbd8d25a63f53",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4",
-                "psr/log": "~1.0",
-                "symfony/console": "~2.2",
-                "symfony/filesystem": "~2.2",
-                "symfony/finder": "~2.2",
-                "symfony/validator": "~2.2",
-                "symfony/yaml": "~2.2"
-            },
-            "require-dev": {
-                "behat/behat": "~2.4",
-                "monolog/monolog": "~1.3",
-                "phpunit/phpunit": "3.7.*"
-            },
-            "suggest": {
-                "monolog/monolog": "The recommended logging library to use with Propel."
-            },
-            "bin": [
-                "bin/propel"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Propel": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "William Durand",
-                    "email": "william.durand1@gmail.com"
-                }
-            ],
-            "description": "Propel2 is an open-source Object-Relational Mapping (ORM) for PHP 5.4",
-            "homepage": "http://www.propelorm.org/",
-            "keywords": [
-                "Active Record",
-                "orm",
-                "persistence"
-            ],
-            "time": "2016-01-22 13:57:07"
         }
     ],
     "packages-dev": [
@@ -3387,7 +3389,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "kriswallsmith/assetic": 20,
-        "thelia/propel": 20
+        "propel/propel": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
