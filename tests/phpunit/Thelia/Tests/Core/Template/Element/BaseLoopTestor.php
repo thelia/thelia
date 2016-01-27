@@ -60,6 +60,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();
+        $requestStack = new RequestStack();
 
         $request->setSession($session);
 
@@ -102,15 +103,15 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
                 $stubRequestContext
             ));
 
-        $requestStack = new RequestStack();
         $requestStack->push($request);
         $this->container->set('request', $request);
+        $this->container->set('request_stack', $requestStack);
         $this->container->set('event_dispatcher', new EventDispatcher());
         $this->container->set('thelia.translator', new Translator($this->container));
         $this->container->set('thelia.securityContext', new SecurityContext($requestStack));
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($this->container));
-        $this->container->set('thelia.taxEngine', new TaxEngine($request));
+        $this->container->set('thelia.taxEngine', new TaxEngine($requestStack));
 
         $this->instance = $this->getTestedInstance();
         $this->instance->initializeArgs($this->getMandatoryArguments());

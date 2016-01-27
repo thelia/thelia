@@ -124,7 +124,7 @@
 
         <!-- Tax engine -->
         <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <!--  The assets manager -->
