@@ -124,7 +124,7 @@
 
         <service id="smarty.plugin.flashMessage" class="TheliaSmarty\Template\Plugins\FlashMessage">
             <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.translator" />
         </service>
 
