@@ -77,8 +77,10 @@ class TaxEngine
 
                     foreach ($directoryIterator as $fileinfo) {
                         if ($fileinfo->isFile()) {
-                            $fileName  = $fileinfo->getFilename();
-                            $className = substr($fileName, 0, (1+strlen($fileinfo->getExtension())) * -1);
+                            $extension = $fileinfo->getExtension();
+                            if (strtolower($extension) !== 'php')
+                                continue;
+                            $className  = $fileinfo->getBaseName('.php');
 
                             try {
                                 $fullyQualifiedClassName = "$namespace\\$className";
