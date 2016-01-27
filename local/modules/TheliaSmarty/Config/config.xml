@@ -42,7 +42,7 @@
         </service>
 
         <service id="smarty.plugin.format" class="TheliaSmarty\Template\Plugins\Format">
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
