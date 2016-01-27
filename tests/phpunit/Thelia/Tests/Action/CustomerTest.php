@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Customer;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -51,7 +52,10 @@ class CustomerTest extends BaseAction
         $this->request = new Request();
         $this->request->setSession($session);
 
-        $this->securityContext = new SecurityContext($this->request);
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+
+        $this->securityContext = new SecurityContext($requestStack);
 
         $this->customerAction = new Customer(
             $this->securityContext,

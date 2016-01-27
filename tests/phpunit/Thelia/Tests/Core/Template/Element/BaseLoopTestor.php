@@ -14,6 +14,7 @@ namespace Thelia\Tests\Core\Template\Element;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -101,10 +102,12 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
                 $stubRequestContext
             ));
 
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $this->container->set('request', $request);
         $this->container->set('event_dispatcher', new EventDispatcher());
         $this->container->set('thelia.translator', new Translator($this->container));
-        $this->container->set('thelia.securityContext', new SecurityContext($request));
+        $this->container->set('thelia.securityContext', new SecurityContext($requestStack));
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($this->container));
         $this->container->set('thelia.taxEngine', new TaxEngine($request));

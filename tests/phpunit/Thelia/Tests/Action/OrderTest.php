@@ -93,8 +93,6 @@ class OrderTest extends BaseAction
         $request = new Request();
         $request->setSession($session);
 
-        $this->securityContext = new SecurityContext($request);
-
         $this->container = new ContainerBuilder();
 
         $this->container->set("event_dispatcher", $this->getMockEventDispatcher());
@@ -103,6 +101,8 @@ class OrderTest extends BaseAction
         $this->requestStack = new RequestStack();
         $this->requestStack->push($request);
         $this->container->set('request_stack', $this->requestStack);
+
+        $this->securityContext = new SecurityContext($this->requestStack);
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 

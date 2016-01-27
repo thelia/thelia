@@ -61,7 +61,7 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
         $container->set("request_stack", $requestStack);
 
         new Translator($container);
-        $container->set("thelia.securitycontext", new SecurityContext($request));
+        $container->set("thelia.securitycontext", new SecurityContext($requestStack));
 
         $this->buildContainer($container);
 

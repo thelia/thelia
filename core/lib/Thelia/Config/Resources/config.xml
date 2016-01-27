@@ -189,7 +189,7 @@
 		<!-- Security context for front and back office -->
 
 		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
 		</service>
 
         <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext">
