@@ -13,7 +13,8 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -25,14 +26,19 @@ use Thelia\Model\ModuleQuery;
 
 class Security extends AbstractSmartyPlugin
 {
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
-    protected $request;
+
+    /** @var RequestStack */
+    protected $requestStack;
+
+    /** @var SecurityContext */
     private $securityContext;
 
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
+    public function __construct(RequestStack $requestStack, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->dispatcher = $dispatcher;
     }
 
@@ -43,6 +49,8 @@ class Security extends AbstractSmartyPlugin
      * @param  \Smarty                                                 $smarty
      * @return string                                                  no text is returned.
      * @throws \Thelia\Core\Security\Exception\AuthenticationException
+     * @throws AuthenticationException
+     * @throws AuthorizationException
      */
     public function checkAuthFunction($params, &$smarty)
     {
@@ -88,7 +96,7 @@ class Security extends AbstractSmartyPlugin
 
     public function checkCartNotEmptyFunction($params, &$smarty)
     {
-        $cart = $this->request->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->getSession()->getSessionCart($this->dispatcher);
         if ($cart===null || $cart->countCartItems() == 0) {
             throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, array('empty' => 1));
         }
@@ -98,7 +106,7 @@ class Security extends AbstractSmartyPlugin
 
     public function checkValidDeliveryFunction($params, &$smarty)
     {
-        $order = $this->request->getSession()->getOrder();
+        $order = $this->getSession()->getOrder();
         /* Does address and module still exists ? We assume address owner can't change neither module type */
         if ($order !== null) {
             $checkAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
@@ -126,5 +134,13 @@ class Security extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'check_cart_not_empty', $this, 'checkCartNotEmptyFunction'),
             new SmartyPluginDescriptor('function', 'check_valid_delivery', $this, 'checkValidDeliveryFunction'),
         );
+    }
+
+    /**
+     * @return Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }
