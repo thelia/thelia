@@ -172,7 +172,7 @@ class Country extends BaseCountry
         $countryId = ConfigQuery::getStoreCountry();
 
         // return the default country if no shop country defined
-        if ($countryId === null) {
+        if (empty($countryId)) {
             return self::getDefaultCountry();
         }
 
