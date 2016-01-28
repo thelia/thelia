@@ -23,12 +23,12 @@ class CSVSerializer extends AbstractSerializer
     /**
      * @var string CSV delimiter char
      */
-    const DELIMITER = ',';
+    protected $delimiter = ',';
 
     /**
      * @var string CSV enclosure char
      */
-    const ENCLOSURE = '"';
+    protected $enclosure = '"';
 
     /**
      * @var null|array Headers
@@ -55,6 +55,34 @@ class CSVSerializer extends AbstractSerializer
         return 'text/csv';
     }
 
+    /**
+     * Set delimiter char
+     *
+     * @param string $delimiter Delimiter char
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setDelimiter($delimiter)
+    {
+        $this->delimiter = $delimiter;
+
+        return $this;
+    }
+
+    /**
+     * Set enclosure char
+     *
+     * @param string $enclosure Enclosure char
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setEnclosure($enclosure)
+    {
+        $this->enclosure = $enclosure;
+
+        return $this;
+    }
+
     public function prepareFile(\SplFileObject $fileObject)
     {
         $this->headers = null;
@@ -67,7 +95,7 @@ class CSVSerializer extends AbstractSerializer
         }
 
         $fd = fopen('php://memory', 'w+b');
-        fputcsv($fd, $data, static::DELIMITER, static::ENCLOSURE);
+        fputcsv($fd, $data, $this->delimiter, $this->enclosure);
         rewind($fd);
         $csvRow = stream_get_contents($fd);
         fclose($fd);
@@ -109,13 +137,13 @@ class CSVSerializer extends AbstractSerializer
             }
 
             if ($index === 0) {
-                $this->headers = str_getcsv($row, static::DELIMITER, static::ENCLOSURE);
+                $this->headers = str_getcsv($row, $this->delimiter, $this->enclosure);
                 continue;
             }
 
             $data[] = array_combine(
                 $this->headers,
-                str_getcsv($row, static::DELIMITER, static::ENCLOSURE)
+                str_getcsv($row, $this->delimiter, $this->enclosure)
             );
         }
 
