@@ -7,6 +7,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Type\BooleanOrBothType;
 
 class Folder extends BaseFolder implements FileModelParentInterface
 {
@@ -35,10 +36,13 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      *
      * count all products for current category and sub categories
-     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @return int
      */
-    public function countAllContents()
+    public function countAllContents($visible='1')
     {
         $children = FolderQuery::findAllChild($this->getId());
         array_push($children, $this);
@@ -46,9 +50,14 @@ class Folder extends BaseFolder implements FileModelParentInterface
         $contentsCount = 0;
 
         foreach ($children as $child) {
-            $contentsCount += ContentQuery::create()
-                ->filterByFolder($child)
-                ->count();
+            $search = ContentQuery::create();
+            $search->filterByFolder($child);
+
+            if ($visible !== BooleanOrBothType::ANY) {
+                $search->filterByVisible($visible ? 1 : 0);
+            }
+
+            $contentsCount += $search->count();
         }
 
         return $contentsCount;
