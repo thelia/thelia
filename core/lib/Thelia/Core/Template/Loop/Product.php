@@ -51,6 +51,7 @@ use Thelia\Type\TypeCollection;
  * @method int[] getBrand()
  * @method int[] getSale()
  * @method int[] getCategoryDefault()
+ * @method int[] getContent()
  * @method bool getNew()
  * @method bool getPromo()
  * @method float getMinPrice()
@@ -92,6 +93,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createIntListTypeArgument('brand'),
             Argument::createIntListTypeArgument('sale'),
             Argument::createIntListTypeArgument('category_default'),
+            Argument::createIntListTypeArgument('content'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('promo'),
             Argument::createFloatTypeArgument('min_price'),
@@ -591,6 +593,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         if ($brand_id !== null) {
             $search->filterByBrandId($brand_id, Criteria::IN);
+        }
+
+        $contentId = $this->getContent();
+
+        if ($contentId != null) {
+            $search->useProductAssociatedContentQuery()
+                ->filterByContentId($contentId, Criteria::IN)
+                ->endUse()
+            ;
         }
 
         $sale_id = $this->getSale();

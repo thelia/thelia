@@ -46,10 +46,11 @@ use Thelia\Model\Category as CategoryModel;
  *
  * {@inheritdoc}
  * @method int[] getId()
- * @method int getParent()
- * @method int getExcludeParent()
- * @method int getProduct()
- * @method int getExcludeProduct()
+ * @method int[] getParent()
+ * @method int[] getExcludeParent()
+ * @method int[] getProduct()
+ * @method int[] getExcludeProduct()
+ * @method int[] getContent()
  * @method bool getCurrent()
  * @method bool getNotEmpty()
  * @method bool getWithPrevNextInfo()
@@ -73,8 +74,9 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('parent'),
             Argument::createIntListTypeArgument('exclude_parent'),
-            Argument::createIntTypeArgument('product'),
-            Argument::createIntTypeArgument('exclude_product'),
+            Argument::createIntListTypeArgument('product'),
+            Argument::createIntListTypeArgument('exclude_product'),
+            Argument::createIntListTypeArgument('content'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
@@ -160,27 +162,36 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             $search->filterByVisible($visible ? 1 : 0);
         }
 
-        $product = $this->getProduct();
+        $products = $this->getProduct();
 
-        if ($product != null) {
-            $obj = ProductQuery::create()->findPk($product);
+        if ($products != null) {
+            $obj = ProductQuery::create()->findPks($products);
 
             if ($obj != null) {
                 $search->filterByProduct($obj, Criteria::IN);
             }
         }
 
-        $excludeProduct = $this->getExcludeProduct();
+        $excludeProducts = $this->getExcludeProduct();
 
-        if ($excludeProduct != null) {
-            $obj = ProductQuery::create()->findPk($excludeProduct);
+        if ($excludeProducts != null) {
+            $obj = ProductQuery::create()->findPks($excludeProducts);
 
             if ($obj != null) {
                 $search->filterByProduct($obj, Criteria::NOT_IN);
             }
         }
 
-        $orders  = $this->getOrder();
+        $contentId = $this->getContent();
+
+        if ($contentId != null) {
+            $search->useCategoryAssociatedContentQuery()
+                ->filterByContentId($contentId, Criteria::IN)
+                ->endUse()
+            ;
+        }
+
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
