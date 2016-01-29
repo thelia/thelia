@@ -456,12 +456,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $cart->setCustomer(CustomerQuery::create()->findPk($customer->getId()));
         }
 
-        $this->session->setSessionCart($cart);
+        $this->getSession()->setSessionCart($cart);
 
         if (ConfigQuery::read("cart.use_persistent_cookie", 1) == 1) {
             // set cart_use_cookie to "" to remove the cart cookie
             // see Thelia\Core\EventListener\ResponseListener
-            $this->session->set("cart_use_cookie", "");
+            $this->getSession()->set("cart_use_cookie", "");
         }
 
         $cartCreateEvent->setCart($cart);

@@ -15,6 +15,7 @@ namespace Thelia\Controller;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
@@ -177,9 +178,7 @@ abstract class BaseController
      */
     protected function getSession()
     {
-        $request = $this->getRequest();
-
-        return $request->getSession();
+        return $this->container->get('request_stack')->getCurrentRequest()->getSession();
     }
 
     /**
@@ -342,7 +341,7 @@ abstract class BaseController
         if ($form != null) {
             $url = $form->getFormDefinedUrl($parameterName);
         } else {
-            $url = $this->getRequest()->get($parameterName);
+            $url = $this->container->get('request_stack')->getCurrentRequest()->get($parameterName);
         }
 
         return $url;
@@ -532,7 +531,7 @@ abstract class BaseController
      */
     protected function checkXmlHttpRequest()
     {
-        if (false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
+        if (false === $this->container->get('request_stack')->getCurrentRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
             $this->accessDenied();
         }
     }

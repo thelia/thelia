@@ -15,6 +15,7 @@ namespace TheliaSmarty\Template\Plugins;
 use CommerceGuys\Addressing\Model\Address;
 use IntlDateFormatter;
 use Symfony\Component\DependencyInjection\Container;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Tools\AddressFormat;
@@ -387,7 +388,7 @@ class Format extends AbstractSmartyPlugin
 
         $htmlTag = $this->getParam($params, "html_tag", "p");
         $originCountry = $this->getParam($params, "origin_country", null);
-        $locale = $this->getParam($params, "locale", $this->request->getSession()->getLang()->getLocale());
+        $locale = $this->getParam($params, "locale", $this->getSession()->getLang()->getLocale());
         
         // extract html attributes
         $htmlAttributes = [];
@@ -483,5 +484,13 @@ class Format extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "format_array_2d", $this, "formatTwoDimensionalArray"),
             new SmartyPluginDescriptor("function", "format_address", $this, "formatAddress"),
         );
+    }
+
+    /**
+     * @return Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }
