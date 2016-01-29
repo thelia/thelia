@@ -63,7 +63,7 @@ class ViewListener implements EventSubscriberInterface
         $parser = $this->container->get('thelia.parser');
         $templateHelper = $this->container->get('thelia.template_helper');
         $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
-        $request = $this->container->get('request');
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         $response = null;
         try {
             $content = $parser->render($request->attributes->get('_view').".html");
@@ -96,7 +96,7 @@ class ViewListener implements EventSubscriberInterface
 
     public function beforeKernelView(GetResponseForControllerResultEvent $event)
     {
-        $request = $this->container->get('request');
+        $request = $this->container->get('request_stack')->getCurrentRequest();
 
         if (null === $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));

@@ -79,7 +79,7 @@ class ControllerResolver extends BaseControllerResolver
         /** @var BaseController $controller */
         $controller = new $class();
 
-        $this->container->get('request')->setControllerType(
+        $this->container->get('request_stack')->getCurrentRequest()->setControllerType(
             $controller->getControllerType()
         );
 

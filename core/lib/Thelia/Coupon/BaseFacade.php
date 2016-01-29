@@ -294,7 +294,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getRequest()
     {
-        return $this->container->get('request');
+        return $this->container->get('request_stack')->getCurrentRequest();
     }
 
     /**

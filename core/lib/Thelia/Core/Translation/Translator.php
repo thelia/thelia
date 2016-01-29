@@ -15,7 +15,6 @@ namespace Thelia\Core\Translation;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
-use Thelia\Core\HttpFoundation\Request;
 
 class Translator extends BaseTranslator
 {
