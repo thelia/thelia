@@ -64,6 +64,8 @@ use Thelia\Model\MetaData;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\ProductCategory;
+use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
@@ -189,7 +191,7 @@ class ProductController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-            $this->getRequest()->get('product_id', null),
+            array($this->getRequest()->get('product_id', null),$this->getRequest()->get('category_id', null)),
             $positionChangeMode,
             $positionValue
         );
@@ -502,8 +504,11 @@ class ProductController extends AbstractSeoCrudController
     protected function performAdditionalUpdatePositionAction($positionEvent)
     {
         return $this->generateRedirectFromRoute(
-            'admin.categories.default',
-            ['category_id' => $this->getCategoryId()]
+            'admin.products.default',
+            [
+                'category_id' => $this->getCategoryId(),
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 

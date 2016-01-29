@@ -24,7 +24,7 @@ use Thelia\Model\ProductCategoryQuery as ChildProductCategoryQuery;
 use Thelia\Model\ProductQuery as ChildProductQuery;
 use Thelia\Model\Map\ProductCategoryTableMap;
 
-abstract class ProductCategory implements ActiveRecordInterface
+abstract class ProductCategory implements ActiveRecordInterface 
 {
     /**
      * TableMap class name
@@ -77,6 +77,13 @@ abstract class ProductCategory implements ActiveRecordInterface
     protected $default_category;
 
     /**
+     * The value for the position field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -106,11 +113,38 @@ abstract class ProductCategory implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
+    // sortable behavior
+    
+    /**
+     * Queries to be executed in the save transaction
+     * @var        array
+     */
+    protected $sortableQueries = array();
+    
+    /**
+     * The old scope value.
+     * @var        int
+     */
+    protected $oldScope;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->position = 0;
+    }
+
     /**
      * Initializes internal state of Thelia\Model\Base\ProductCategory object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -366,7 +400,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Get the [product_id] column value.
-     *
+     * 
      * @return   int
      */
     public function getProductId()
@@ -377,7 +411,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Get the [category_id] column value.
-     *
+     * 
      * @return   int
      */
     public function getCategoryId()
@@ -388,7 +422,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Get the [default_category] column value.
-     *
+     * 
      * @return   boolean
      */
     public function getDefaultCategory()
@@ -398,8 +432,19 @@ abstract class ProductCategory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     * 
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
-     *
+     * 
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
@@ -419,7 +464,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Get the [optionally formatted] temporal [updated_at] column value.
-     *
+     * 
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
@@ -439,7 +484,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Set the value of [product_id] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
      */
@@ -464,7 +509,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Set the value of [category_id] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
      */
@@ -475,6 +520,9 @@ abstract class ProductCategory implements ActiveRecordInterface
         }
 
         if ($this->category_id !== $v) {
+            // sortable behavior
+            $this->oldScope = $this->category_id;
+
             $this->category_id = $v;
             $this->modifiedColumns[ProductCategoryTableMap::CATEGORY_ID] = true;
         }
@@ -493,7 +541,7 @@ abstract class ProductCategory implements ActiveRecordInterface
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
      * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
+     * 
      * @param      boolean|integer|string $v The new value
      * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
      */
@@ -517,8 +565,29 @@ abstract class ProductCategory implements ActiveRecordInterface
     } // setDefaultCategory()
 
     /**
+     * Set the value of [position] column.
+     * 
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[ProductCategoryTableMap::POSITION] = true;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-     *
+     * 
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
@@ -539,7 +608,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
+     * 
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
@@ -568,6 +637,10 @@ abstract class ProductCategory implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->position !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -604,13 +677,16 @@ abstract class ProductCategory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductCategoryTableMap::translateFieldName('DefaultCategory', TableMap::TYPE_PHPNAME, $indexType)];
             $this->default_category = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductCategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductCategoryTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductCategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductCategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductCategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -623,7 +699,7 @@ abstract class ProductCategory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = ProductCategoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ProductCategoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductCategory object", 0, $e);
@@ -719,6 +795,11 @@ abstract class ProductCategory implements ActiveRecordInterface
             $deleteQuery = ChildProductCategoryQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
+            // sortable behavior
+            
+            ChildProductCategoryQuery::sortableShiftRank(-1, $this->getPosition() + 1, null, $this->getScopeValue(), $con);
+            ProductCategoryTableMap::clearInstancePool();
+
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
@@ -760,6 +841,8 @@ abstract class ProductCategory implements ActiveRecordInterface
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // sortable behavior
+            $this->processSortableQueries($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -769,12 +852,24 @@ abstract class ProductCategory implements ActiveRecordInterface
                 if (!$this->isColumnModified(ProductCategoryTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
+                // sortable behavior
+                if (!$this->isColumnModified(ProductCategoryTableMap::RANK_COL)) {
+                    $this->setPosition(ChildProductCategoryQuery::create()->getMaxRankArray($this->getScopeValue(), $con) + 1);
+                }
+
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
                 if ($this->isModified() && !$this->isColumnModified(ProductCategoryTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
+                // sortable behavior
+                // if scope has changed and rank was not modified (if yes, assuming superior action)
+                // insert object to the end of new scope and cleanup old one
+                if (($this->isColumnModified(ProductCategoryTableMap::CATEGORY_ID)) && !$this->isColumnModified(ProductCategoryTableMap::RANK_COL)) { ChildProductCategoryQuery::sortableShiftRank(-1, $this->getPosition() + 1, null, $this->oldScope, $con);
+                    $this->insertAtBottom($con);
+                }
+
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -875,6 +970,9 @@ abstract class ProductCategory implements ActiveRecordInterface
         if ($this->isColumnModified(ProductCategoryTableMap::DEFAULT_CATEGORY)) {
             $modifiedColumns[':p' . $index++]  = '`DEFAULT_CATEGORY`';
         }
+        if ($this->isColumnModified(ProductCategoryTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+        }
         if ($this->isColumnModified(ProductCategoryTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -892,19 +990,22 @@ abstract class ProductCategory implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`PRODUCT_ID`':
+                    case '`PRODUCT_ID`':                        
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case '`CATEGORY_ID`':
+                    case '`CATEGORY_ID`':                        
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
                         break;
                     case '`DEFAULT_CATEGORY`':
                         $stmt->bindValue($identifier, (int) $this->default_category, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`POSITION`':                        
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
+                        break;
+                    case '`CREATED_AT`':                        
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`UPDATED_AT`':                        
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -972,9 +1073,12 @@ abstract class ProductCategory implements ActiveRecordInterface
                 return $this->getDefaultCategory();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1009,14 +1113,15 @@ abstract class ProductCategory implements ActiveRecordInterface
             $keys[0] => $this->getProductId(),
             $keys[1] => $this->getCategoryId(),
             $keys[2] => $this->getDefaultCategory(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
-
+        
         if ($includeForeignObjects) {
             if (null !== $this->aProduct) {
                 $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1068,9 +1173,12 @@ abstract class ProductCategory implements ActiveRecordInterface
                 $this->setDefaultCategory($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1100,8 +1208,9 @@ abstract class ProductCategory implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setProductId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCategoryId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setDefaultCategory($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1116,6 +1225,7 @@ abstract class ProductCategory implements ActiveRecordInterface
         if ($this->isColumnModified(ProductCategoryTableMap::PRODUCT_ID)) $criteria->add(ProductCategoryTableMap::PRODUCT_ID, $this->product_id);
         if ($this->isColumnModified(ProductCategoryTableMap::CATEGORY_ID)) $criteria->add(ProductCategoryTableMap::CATEGORY_ID, $this->category_id);
         if ($this->isColumnModified(ProductCategoryTableMap::DEFAULT_CATEGORY)) $criteria->add(ProductCategoryTableMap::DEFAULT_CATEGORY, $this->default_category);
+        if ($this->isColumnModified(ProductCategoryTableMap::POSITION)) $criteria->add(ProductCategoryTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ProductCategoryTableMap::CREATED_AT)) $criteria->add(ProductCategoryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductCategoryTableMap::UPDATED_AT)) $criteria->add(ProductCategoryTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1191,6 +1301,7 @@ abstract class ProductCategory implements ActiveRecordInterface
         $copyObj->setProductId($this->getProductId());
         $copyObj->setCategoryId($this->getCategoryId());
         $copyObj->setDefaultCategory($this->getDefaultCategory());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1330,10 +1441,12 @@ abstract class ProductCategory implements ActiveRecordInterface
         $this->product_id = null;
         $this->category_id = null;
         $this->default_category = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1368,7 +1481,7 @@ abstract class ProductCategory implements ActiveRecordInterface
     }
 
     // timestampable behavior
-
+    
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
@@ -1377,8 +1490,398 @@ abstract class ProductCategory implements ActiveRecordInterface
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[ProductCategoryTableMap::UPDATED_AT] = true;
-
+    
         return $this;
+    }
+
+    // sortable behavior
+    
+    /**
+     * Wrap the getter for rank value
+     *
+     * @return    int
+     */
+    public function getRank()
+    {
+        return $this->position;
+    }
+    
+    /**
+     * Wrap the setter for rank value
+     *
+     * @param     int
+     * @return    ChildProductCategory
+     */
+    public function setRank($v)
+    {
+        return $this->setPosition($v);
+    }
+    
+    /**
+     * Wrap the getter for scope value
+     *
+     * @param boolean $returnNulls If true and all scope values are null, this will return null instead of a array full with nulls
+     *
+     * @return    mixed A array or a native type
+     */
+    public function getScopeValue($returnNulls = true)
+    {
+    
+    
+        return $this->getCategoryId();
+    
+    }
+    
+    /**
+     * Wrap the setter for scope value
+     *
+     * @param     mixed A array or a native type
+     * @return    ChildProductCategory
+     */
+    public function setScopeValue($v)
+    {
+    
+    
+        return $this->setCategoryId($v);
+    
+    }
+    
+    /**
+     * Check if the object is first in the list, i.e. if it has 1 for rank
+     *
+     * @return    boolean
+     */
+    public function isFirst()
+    {
+        return $this->getPosition() == 1;
+    }
+    
+    /**
+     * Check if the object is last in the list, i.e. if its rank is the highest rank
+     *
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    boolean
+     */
+    public function isLast(ConnectionInterface $con = null)
+    {
+        return $this->getPosition() == ChildProductCategoryQuery::create()->getMaxRankArray($this->getScopeValue(), $con);
+    }
+    
+    /**
+     * Get the next item in the list, i.e. the one for which rank is immediately higher
+     *
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    ChildProductCategory
+     */
+    public function getNext(ConnectionInterface $con = null)
+    {
+    
+        $query = ChildProductCategoryQuery::create();
+    
+        $scope = $this->getScopeValue();
+        
+        $query->filterByRank($this->getPosition() + 1, $scope);
+    
+    
+        return $query->findOne($con);
+    }
+    
+    /**
+     * Get the previous item in the list, i.e. the one for which rank is immediately lower
+     *
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    ChildProductCategory
+     */
+    public function getPrevious(ConnectionInterface $con = null)
+    {
+    
+        $query = ChildProductCategoryQuery::create();
+    
+        $scope = $this->getScopeValue();
+        
+        $query->filterByRank($this->getPosition() - 1, $scope);
+    
+    
+        return $query->findOne($con);
+    }
+    
+    /**
+     * Insert at specified rank
+     * The modifications are not persisted until the object is saved.
+     *
+     * @param     integer    $rank rank value
+     * @param     ConnectionInterface  $con      optional connection
+     *
+     * @return    ChildProductCategory the current object
+     *
+     * @throws    PropelException
+     */
+    public function insertAtRank($rank, ConnectionInterface $con = null)
+    {
+        $maxRank = ChildProductCategoryQuery::create()->getMaxRankArray($this->getScopeValue(), $con);
+        if ($rank < 1 || $rank > $maxRank + 1) {
+            throw new PropelException('Invalid rank ' . $rank);
+        }
+        // move the object in the list, at the given rank
+        $this->setPosition($rank);
+        if ($rank != $maxRank + 1) {
+            // Keep the list modification query for the save() transaction
+            $this->sortableQueries []= array(
+                'callable'  => array('\Thelia\Model\ProductCategoryQuery', 'sortableShiftRank'),
+                'arguments' => array(1, $rank, null, $this->getScopeValue())
+            );
+        }
+    
+        return $this;
+    }
+    
+    /**
+     * Insert in the last rank
+     * The modifications are not persisted until the object is saved.
+     *
+     * @param ConnectionInterface $con optional connection
+     *
+     * @return    ChildProductCategory the current object
+     *
+     * @throws    PropelException
+     */
+    public function insertAtBottom(ConnectionInterface $con = null)
+    {
+        $this->setPosition(ChildProductCategoryQuery::create()->getMaxRankArray($this->getScopeValue(), $con) + 1);
+    
+        return $this;
+    }
+    
+    /**
+     * Insert in the first rank
+     * The modifications are not persisted until the object is saved.
+     *
+     * @return    ChildProductCategory the current object
+     */
+    public function insertAtTop()
+    {
+        return $this->insertAtRank(1);
+    }
+    
+    /**
+     * Move the object to a new rank, and shifts the rank
+     * Of the objects inbetween the old and new rank accordingly
+     *
+     * @param     integer   $newRank rank value
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    ChildProductCategory the current object
+     *
+     * @throws    PropelException
+     */
+    public function moveToRank($newRank, ConnectionInterface $con = null)
+    {
+        if ($this->isNew()) {
+            throw new PropelException('New objects cannot be moved. Please use insertAtRank() instead');
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductCategoryTableMap::DATABASE_NAME);
+        }
+        if ($newRank < 1 || $newRank > ChildProductCategoryQuery::create()->getMaxRankArray($this->getScopeValue(), $con)) {
+            throw new PropelException('Invalid rank ' . $newRank);
+        }
+    
+        $oldRank = $this->getPosition();
+        if ($oldRank == $newRank) {
+            return $this;
+        }
+    
+        $con->beginTransaction();
+        try {
+            // shift the objects between the old and the new rank
+            $delta = ($oldRank < $newRank) ? -1 : 1;
+            ChildProductCategoryQuery::sortableShiftRank($delta, min($oldRank, $newRank), max($oldRank, $newRank), $this->getScopeValue(), $con);
+    
+            // move the object to its new rank
+            $this->setPosition($newRank);
+            $this->save($con);
+    
+            $con->commit();
+    
+            return $this;
+        } catch (Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Exchange the rank of the object with the one passed as argument, and saves both objects
+     *
+     * @param     ChildProductCategory $object
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    ChildProductCategory the current object
+     *
+     * @throws Exception if the database cannot execute the two updates
+     */
+    public function swapWith($object, ConnectionInterface $con = null)
+    {
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductCategoryTableMap::DATABASE_NAME);
+        }
+        $con->beginTransaction();
+        try {
+            $oldScope = $this->getScopeValue();
+            $newScope = $object->getScopeValue();
+            if ($oldScope != $newScope) {
+                $this->setScopeValue($newScope);
+                $object->setScopeValue($oldScope);
+            }
+            $oldRank = $this->getPosition();
+            $newRank = $object->getPosition();
+    
+            $this->setPosition($newRank);
+            $object->setPosition($oldRank);
+    
+            $this->save($con);
+            $object->save($con);
+            $con->commit();
+    
+            return $this;
+        } catch (Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Move the object higher in the list, i.e. exchanges its rank with the one of the previous object
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    ChildProductCategory the current object
+     */
+    public function moveUp(ConnectionInterface $con = null)
+    {
+        if ($this->isFirst()) {
+            return $this;
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductCategoryTableMap::DATABASE_NAME);
+        }
+        $con->beginTransaction();
+        try {
+            $prev = $this->getPrevious($con);
+            $this->swapWith($prev, $con);
+            $con->commit();
+    
+            return $this;
+        } catch (Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Move the object higher in the list, i.e. exchanges its rank with the one of the next object
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    ChildProductCategory the current object
+     */
+    public function moveDown(ConnectionInterface $con = null)
+    {
+        if ($this->isLast($con)) {
+            return $this;
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductCategoryTableMap::DATABASE_NAME);
+        }
+        $con->beginTransaction();
+        try {
+            $next = $this->getNext($con);
+            $this->swapWith($next, $con);
+            $con->commit();
+    
+            return $this;
+        } catch (Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Move the object to the top of the list
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return    ChildProductCategory the current object
+     */
+    public function moveToTop(ConnectionInterface $con = null)
+    {
+        if ($this->isFirst()) {
+            return $this;
+        }
+    
+        return $this->moveToRank(1, $con);
+    }
+    
+    /**
+     * Move the object to the bottom of the list
+     *
+     * @param     ConnectionInterface $con optional connection
+     *
+     * @return integer the old object's rank
+     */
+    public function moveToBottom(ConnectionInterface $con = null)
+    {
+        if ($this->isLast($con)) {
+            return false;
+        }
+        if (null === $con) {
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductCategoryTableMap::DATABASE_NAME);
+        }
+        $con->beginTransaction();
+        try {
+            $bottom = ChildProductCategoryQuery::create()->getMaxRankArray($this->getScopeValue(), $con);
+            $res = $this->moveToRank($bottom, $con);
+            $con->commit();
+    
+            return $res;
+        } catch (Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Removes the current object from the list (moves it to the null scope).
+     * The modifications are not persisted until the object is saved.
+     *
+     * @return    ChildProductCategory the current object
+     */
+    public function removeFromList()
+    {
+        // check if object is already removed
+        if ($this->getScopeValue() === null) {
+            throw new PropelException('Object is already removed (has null scope)');
+        }
+    
+        // move the object to the end of null scope
+        $this->setScopeValue(null);
+    
+        return $this;
+    }
+    
+    /**
+     * Execute queries that were saved to be run inside the save transaction
+     */
+    protected function processSortableQueries($con)
+    {
+        foreach ($this->sortableQueries as $query) {
+            $query['arguments'][]= $con;
+            call_user_func_array($query['callable'], $query['arguments']);
+        }
+        $this->sortableQueries = array();
     }
 
     /**

@@ -881,6 +881,7 @@ return array(
     'Reference' => 'Reference',
     'Registration date' => 'Registration date',
     'Related content' => 'Related content',
+    'Related product. Go to the default product\'s category' => 'Related product. Go to the default product\'s category',
     'Remove a module from a hook' => 'Remove a module from a hook',
     'Remove an accessory' => 'Remove an accessory',
     'Remove associated folder' => 'Remove associated folder',

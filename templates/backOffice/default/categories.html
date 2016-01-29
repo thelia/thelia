@@ -292,8 +292,8 @@
                          </thead>
 
                          <tbody>
-                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products#}
-                         <tr>
+                         {loop name="product_list" type="product" visible="*" category=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products#}
+                         <tr {if $DEFAULT_CATEGORY ne $category_id} class="warning"{/if}>
                              <td>{$ID}</td>
 
                              <td>
@@ -307,6 +307,11 @@
                              <td class="object-title">
                                  <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
                                  {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
+                                 {if $DEFAULT_CATEGORY ne $category_id}
+                                    <a href="{url path='/admin/products/categories' category_id=$DEFAULT_CATEGORY}" data-toggle="tooltip" data-placement="right" title="{intl l='Related product. Go to the default product\'s category'}">
+                                    <span class="glyphicon glyphicon-import text-warning" ></span>
+                                    </a>
+                                 {/if}
                              </td>
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
@@ -333,7 +338,7 @@
                              {admin_position_block
                                  resource="admin.product"
                                  access="UPDATE"
-                                 path={url path='/admin/products/update-position' product_id=$ID}
+                                 path={url path='/admin/products/update-position' product_id=$ID category_id=$category_id page=$page}
                                  url_parameter="product_id"
                                  in_place_edit_class="productPositionChange"
                                  position=$POSITION
@@ -735,6 +740,7 @@
     {/javascripts}
     <script>
         $(function() {
+            $('[data-toggle="tooltip"]').tooltip();
 
             // Set proper category ID in delete from
             $('a.category-delete').click(function(ev) {
@@ -811,7 +817,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url noamp='1' path='/admin/products/update-position' product_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/products/update-position' category_id=$category_id product_id='__ID__' position='__POS__' page=$page}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))

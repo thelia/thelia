@@ -18,4 +18,30 @@ UPDATE `currency` SET `visible` = 1 WHERE 1;
 UPDATE `currency` SET `format` = '%n %s' WHERE `code` NOT IN ('USD', 'GBP');
 UPDATE `currency` SET `format` = '%s%n' WHERE `code` IN ('USD', 'GBP');
 
+--Update product's position
+ALTER TABLE  `product_category` ADD  `position` INT NOT NULL DEFAULT  '0' AFTER  `default_category` ;
+UPDATE product_category AS t1 SET position = (SELECT position FROM product AS t2 WHERE t2.id=t1.product_id) WHERE default_category = 1;
+DROP PROCEDURE IF EXISTS update_position;
+DELIMITER //
+CREATE PROCEDURE update_position()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE mproduct, mcategory,maxposition INT;
+    DECLARE cur1 CURSOR FOR SELECT product_id, category_id FROM product_category WHERE default_category = NULL OR default_category = 0;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    OPEN cur1;
+        read_loop: LOOP
+            FETCH cur1 INTO mproduct,mcategory;
+            IF done THEN
+                LEAVE read_loop;
+            END IF;
+            SELECT MAX(position)+1 into maxposition FROM product_category WHERE category_id = mcategory;
+            UPDATE product_category SET position = maxposition WHERE category_id = mcategory AND product_id = mproduct;
+        END LOOP;
+    CLOSE cur1;
+END//
+DELIMITER ;
+CALL update_position();
+DROP PROCEDURE IF EXISTS update_position;
+
 SET FOREIGN_KEY_CHECKS = 1;

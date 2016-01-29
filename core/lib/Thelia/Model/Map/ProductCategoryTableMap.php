@@ -58,7 +58,7 @@ class ProductCategoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ProductCategoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the PRODUCT_ID field
@@ -86,6 +86,11 @@ class ProductCategoryTableMap extends TableMap
     const DEFAULT_CATEGORY = 'product_category.DEFAULT_CATEGORY';
 
     /**
+     * the column name for the POSITION field
+     */
+    const POSITION = 'product_category.POSITION';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'product_category.CREATED_AT';
@@ -100,6 +105,20 @@ class ProductCategoryTableMap extends TableMap
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
 
+    // sortable behavior
+    /**
+     * rank column
+     */
+    const RANK_COL = "product_category.POSITION";
+    
+    
+        
+    /**
+    * Scope column for the set
+    */
+    const SCOPE_COL = 'product_category.CATEGORY_ID';
+    
+
     /**
      * holds an array of fieldnames
      *
@@ -107,12 +126,12 @@ class ProductCategoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ProductId', 'CategoryId', 'DefaultCategory', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('productId', 'categoryId', 'defaultCategory', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductCategoryTableMap::PRODUCT_ID, ProductCategoryTableMap::CATEGORY_ID, ProductCategoryTableMap::DEFAULT_CATEGORY, ProductCategoryTableMap::CREATED_AT, ProductCategoryTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('PRODUCT_ID', 'CATEGORY_ID', 'DEFAULT_CATEGORY', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('product_id', 'category_id', 'default_category', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('ProductId', 'CategoryId', 'DefaultCategory', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('productId', 'categoryId', 'defaultCategory', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProductCategoryTableMap::PRODUCT_ID, ProductCategoryTableMap::CATEGORY_ID, ProductCategoryTableMap::DEFAULT_CATEGORY, ProductCategoryTableMap::POSITION, ProductCategoryTableMap::CREATED_AT, ProductCategoryTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('PRODUCT_ID', 'CATEGORY_ID', 'DEFAULT_CATEGORY', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('product_id', 'category_id', 'default_category', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -122,12 +141,12 @@ class ProductCategoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ProductId' => 0, 'CategoryId' => 1, 'DefaultCategory' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('productId' => 0, 'categoryId' => 1, 'defaultCategory' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(ProductCategoryTableMap::PRODUCT_ID => 0, ProductCategoryTableMap::CATEGORY_ID => 1, ProductCategoryTableMap::DEFAULT_CATEGORY => 2, ProductCategoryTableMap::CREATED_AT => 3, ProductCategoryTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('PRODUCT_ID' => 0, 'CATEGORY_ID' => 1, 'DEFAULT_CATEGORY' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('product_id' => 0, 'category_id' => 1, 'default_category' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('ProductId' => 0, 'CategoryId' => 1, 'DefaultCategory' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('productId' => 0, 'categoryId' => 1, 'defaultCategory' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ProductCategoryTableMap::PRODUCT_ID => 0, ProductCategoryTableMap::CATEGORY_ID => 1, ProductCategoryTableMap::DEFAULT_CATEGORY => 2, ProductCategoryTableMap::POSITION => 3, ProductCategoryTableMap::CREATED_AT => 4, ProductCategoryTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('PRODUCT_ID' => 0, 'CATEGORY_ID' => 1, 'DEFAULT_CATEGORY' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('product_id' => 0, 'category_id' => 1, 'default_category' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -150,6 +169,7 @@ class ProductCategoryTableMap extends TableMap
         $this->addForeignPrimaryKey('PRODUCT_ID', 'ProductId', 'INTEGER' , 'product', 'ID', true, null, null);
         $this->addForeignPrimaryKey('CATEGORY_ID', 'CategoryId', 'INTEGER' , 'category', 'ID', true, null, null);
         $this->addColumn('DEFAULT_CATEGORY', 'DefaultCategory', 'BOOLEAN', false, 1, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -173,6 +193,7 @@ class ProductCategoryTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+            'sortable' => array('rank_column' => 'position', 'use_scope' => 'true', 'scope_column' => 'category_id', ),
         );
     } // getBehaviors()
 
@@ -267,7 +288,7 @@ class ProductCategoryTableMap extends TableMap
 
             return $pks;
     }
-
+    
     /**
      * The class that the tableMap will make instances of.
      *
@@ -327,7 +348,7 @@ class ProductCategoryTableMap extends TableMap
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
         $results = array();
-
+    
         // set the class once to avoid overhead in the loop
         $cls = static::getOMClass(false);
         // populate the object(s)
@@ -366,12 +387,14 @@ class ProductCategoryTableMap extends TableMap
             $criteria->addSelectColumn(ProductCategoryTableMap::PRODUCT_ID);
             $criteria->addSelectColumn(ProductCategoryTableMap::CATEGORY_ID);
             $criteria->addSelectColumn(ProductCategoryTableMap::DEFAULT_CATEGORY);
+            $criteria->addSelectColumn(ProductCategoryTableMap::POSITION);
             $criteria->addSelectColumn(ProductCategoryTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProductCategoryTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.CATEGORY_ID');
             $criteria->addSelectColumn($alias . '.DEFAULT_CATEGORY');
+            $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

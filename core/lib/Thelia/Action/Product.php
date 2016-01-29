@@ -412,7 +412,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        $this->genericUpdatePosition(ProductQuery::create(), $event);
+        $this->genericUpdatePosition(ProductCategoryQuery::create(), $event);
     }
 
     public function addContent(ProductAddContentEvent $event)
