@@ -36,13 +36,11 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      *
      * count all products for current category and sub categories
-     * @param     mixed $visible The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param  mixed $visible The value to use as filter.
+     *              true for visible / false for not visible / '*' for all contents.
      * @return int
      */
-    public function countAllContents($visible='1')
+    public function countAllContents($visible=true)
     {
         $children = FolderQuery::findAllChild($this->getId());
         array_push($children, $this);
