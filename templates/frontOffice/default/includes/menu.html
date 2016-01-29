@@ -23,12 +23,12 @@
                     {append var="parent_cat_ids" value=$ID}
                 {/loop}
             {/while}
-            
+
             {* filling category tree array *}
             {loop name="sidebar-menu" type="category-tree" category="0"}
                 {$category_tree[$PARENT][$ID] = ['TITLE'=>$TITLE, 'URL'=>$URL, 'CHILD_COUNT'=>$CHILD_COUNT, 'PRODUCT_COUNT'=>$PRODUCT_COUNT]}
             {/loop}
-            
+
             {* define the function *}
             {function menu parent=0 submenu=true}
                 {if $submenu}
@@ -41,7 +41,7 @@
                             {$category['TITLE']} {if $category['PRODUCT_COUNT']>0}({$category['PRODUCT_COUNT']}){/if}
                         </a>
                         {if $category['CHILD_COUNT'] > 0}
-                            <a href="#collapse{$id}" class="accordion-toggle {if in_array($id, $parent_cat_ids)}collapsed{/if}" data-toggle="collapse" data-parent="#collapse{$ID}"></a>
+                            <a href="#collapse{$id}" class="accordion-toggle {if !in_array($id, $parent_cat_ids)}collapsed{/if}" data-toggle="collapse" data-parent="#collapse{$ID}"></a>
                             {menu parent=$id}
                         {/if}
                     </li>
@@ -50,7 +50,7 @@
                     </ul>
                 {/if}
             {/function}
-            
+
             <ul id="category" class="accordion">
             {menu submenu=false}
             </ul>
