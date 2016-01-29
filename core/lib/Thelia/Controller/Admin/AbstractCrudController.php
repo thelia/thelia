@@ -200,10 +200,9 @@ abstract class AbstractCrudController extends BaseAdminController
     }
 
     /**
-     * @param Request $request
      * @return ActionEvent
      */
-    protected function createToggleVisibilityEvent(Request $request)
+    protected function createToggleVisibilityEvent()
     {
         throw new \LogicException("Toggle Visibility is not supported for this object");
     }
