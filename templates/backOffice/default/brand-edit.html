@@ -142,12 +142,13 @@
 
                                 <div class="tab-pane fade" id="seo">
                                     {include file = "includes/seo-tab.html"
-                                        formAction = {url path='/admin/brand/seo/save'}
-                                        pageUrl    = "{url path='/admin/brand/update'}/$brand_id"
-                                        closeUrl   = {url path='/admin/brand'}
-                                        current_id = $brand_id
-                                        seoType    = 'brand'
-                                        parentId   = $brand_id
+                                        formAction  = {url path='/admin/brand/seo/save'}
+                                        pageUrl     = "{url path='/admin/brand/update'}/$brand_id"
+                                        closeUrl    = {url path='/admin/brand'}
+                                        success_url = {url path='/admin/brand'}
+                                        current_id  = $brand_id
+                                        seoType     = 'brand'
+                                        parentId    = $brand_id
                                     }
                                 </div>
 

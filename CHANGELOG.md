@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1958) Fix missing success_url on Brand SEO update
 - (related to #1956) Fix UX right class in brand products pagination in the frontOffice
 - (related to #1946) Fix the automatic inclusion of the TaxType class only if extension == php
 - (related to #1939) Add `visible` and `visible_reverse` values in Product Loop order argument
