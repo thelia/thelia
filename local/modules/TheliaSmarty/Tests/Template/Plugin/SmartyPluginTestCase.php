@@ -82,11 +82,21 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
 
     protected function render($template, $data = [])
     {
+        return $this->internalRender('file', __DIR__.DS."fixtures".DS.$template, $data);
+    }
+
+    protected function renderString($template, $data = [])
+    {
+        return $this->internalRender('string', $template, $data);
+    }
+
+    protected function internalRender($resourceType, $resourceContent, array $data)
+    {
         foreach ($data as $key => $value) {
             $this->smarty->assign($key, $value);
         }
 
-        return $this->smarty->fetch(__DIR__.DS."fixtures".DS.$template);
+        return $this->smarty->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
     }
 
     /**
