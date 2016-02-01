@@ -156,9 +156,20 @@ try {
 
     $stmt->execute();
 
-    echo "Creating customers\n";
+    // default country (France)
+    $defaultCountry = [64, null];
 
-    //API
+    // Store info
+
+    echo "Creating Store information \n";
+
+    Model\ConfigQuery::write('store_name', 'Thelia V2');
+    Model\ConfigQuery::write('store_email', 'test@thelia.net');
+    Model\ConfigQuery::write('store_notification_emails', 'test@thelia.net');
+    Model\ConfigQuery::write('store_address1', "5 rue Rochon");
+    Model\ConfigQuery::write('store_zipcode', "63000");
+    Model\ConfigQuery::write('store_city', "Clermont-Ferrand");
+    Model\ConfigQuery::write('store_country', $defaultCountry[0]);
 
     $api = new Thelia\Model\Api();
 
@@ -168,9 +179,20 @@ try {
         ->setLabel("test")
         ->save();
 
-    //customer
+    // API
+    echo "Creating API key\n";
+
+    $api = new Thelia\Model\Api();
+
+    $api
+        ->setProfileId(null)
+        ->setApiKey('79E95BD784CADA0C9A578282E')
+        ->setLabel("test")
+        ->save();
+
+    // Customer
+    echo "Creating customers\n";
     $customer = new Thelia\Model\Customer();
-    $country = getRandomCountry();
 
     $customer->createOrUpdate(
         1,
@@ -183,7 +205,7 @@ try {
         "0601020304",
         "63000",
         "clermont-ferrand",
-        $country[0],
+        $defaultCountry[0],
         "test@thelia.net",
         "azerty",
         null,
@@ -193,11 +215,11 @@ try {
         null,
         null,
         false,
-        $country[1]
+        $defaultCountry[1]
     );
     for ($j = 0; $j <= 3; $j++) {
         $address = new Thelia\Model\Address();
-
+        $country = getRandomCountry();
         $address->setLabel(getRealText(20))
             ->setTitleId(rand(1, 3))
             ->setFirstname($faker->firstname)

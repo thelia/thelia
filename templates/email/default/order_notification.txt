@@ -10,23 +10,11 @@
 {hook name="email-txt.order-notification.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
 {/ifhook}
 {elsehook rel="email-txt.order-notification.delivery-address"}
-{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-{if $COMPANY != ""}{$COMPANY}
-{/if}{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
-{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
-{$ZIPCODE} {$CITY}
-{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop} {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}
-{/loop}
+{format_address order_address=$DELIVERY_ADDRESS locale=$locale html="0"}
 {/elsehook}
 
 {intl l="* Billing address"}
-{loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
-{if $COMPANY != ""}{$COMPANY}
-{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
-{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
-{$ZIPCODE} {$CITY}
-{loop type="country" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop} {if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}
-{/loop}
+{format_address order_address=$INVOICE_ADDRESS locale=$locale html="0"}
 
 {hook name="email-txt.order-notification.after-address" order=$order_id}
 
