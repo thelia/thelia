@@ -140,7 +140,11 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <div class="header row">
                     <h1 class="logo container hidden-xs">
                         <a href="{navigate to="index"}" title="{$store_name}">
-                            <img src="{image file='assets/dist/img/logo.gif'}" alt="{$store_name}">
+                            {$image = {image file='assets/dist/img/logo.png' failsafe=true}}
+                            {if $image == null}
+                                {$image = {image file='assets/dist/img/logo.gif' failsafe=true}}
+                            {/if}
+                            <img src="{$image}" alt="{$store_name}">
                         </a>
                     </h1>
                     {hook name="main.navbar-primary"}
