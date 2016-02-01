@@ -12,8 +12,8 @@ class BrandI18n extends BaseBrandI18n
 
     public function postInsert(ConnectionInterface $con = null)
     {
-        $content = $this->getBrand();
+        $brand = $this->getBrand();
 
-        $content->generateRewrittenUrl($this->getLocale());
+        $brand->generateRewrittenUrl($this->getLocale());
     }
 }
