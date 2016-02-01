@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 use Thelia\Core\Event\Cart\CartEvent;
@@ -11,11 +12,33 @@ use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
 {
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
     public function setDisptacher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        if ($this->dispatcher) {
+            $cartItemEvent = new CartItemEvent($this);
+            $this->dispatcher->dispatch(TheliaEvents::CART_ITEM_CREATE_BEFORE, $cartItemEvent);
+        }
+        return true;
+    }
+
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        if ($this->dispatcher) {
+            $cartItemEvent = new CartItemEvent($this);
+            $this->dispatcher->dispatch(TheliaEvents::CART_ITEM_UPDATE_BEFORE, $cartItemEvent);
+        }
+        return true;
     }
 
     public function postInsert(ConnectionInterface $con = null)
