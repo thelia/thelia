@@ -27,6 +27,11 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 {/foreach}
 ;
 
+-- Insert a fake email address for administrators, to trigger the admin update dialog
+-- at next admin login.
+
+UPDATE `admin` set email = 'CHANGE_ME';
+
 -- additional config variables
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
