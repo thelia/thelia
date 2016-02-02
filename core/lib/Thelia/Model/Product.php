@@ -22,6 +22,44 @@ class Product extends BaseProduct implements FileModelParentInterface
     use \Thelia\Model\Tools\UrlRewritingTrait;
 
     /**
+     * {@inheritdoc}
+     * @deprecated since version 2.3, was moved in the \Thelia\Model\ProductCategory::setPosition
+     */
+    public function setPosition($v)
+    {
+        // create a fallback for backward compatibility
+        return parent::setPosition($v);
+    }
+    /**
+     * {@inheritdoc}
+     * @deprecated since version 2.3, was moved in the \Thelia\Model\ProductCategory::getPosition
+     */
+    public function getPosition()
+    {
+        // create a fallback for backward compatibility
+        return parent::getPosition();
+    }
+    /**
+     * {@inheritdoc}
+     * @deprecated since version 2.3, was moved in the \Thelia\Model\ProductCategory::getPosition
+     */
+    public function getByPosition($pos)
+    {
+        // create a fallback for backward compatibility
+        return parent::getByPosition($pos);
+    }
+    /**
+     * {@inheritdoc}
+     * @deprecated since version 2.3, was moved in the \Thelia\Model\ProductCategory::setByPosition
+     */
+    public function setByPosition($pos, $value)
+    {
+        // create a fallback for backward compatibility
+        return parent::setByPosition($pos, $value);
+    }
+
+
+    /**
      * {@inheritDoc}
      */
     public function getRewrittenUrlViewName()

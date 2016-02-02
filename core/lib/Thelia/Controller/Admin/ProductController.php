@@ -497,7 +497,10 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.products.default',
-            ['category_id' => $this->getCategoryId()]
+            [
+                'category_id' => $this->getCategoryId(),
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 

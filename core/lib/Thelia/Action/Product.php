@@ -363,6 +363,26 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->findByProductId($event->getProductId());
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
 
+
+                /*
+                // Delete in product_category
+                $categoryList = ProductCategoryQuery::create()->filterByProductId($event->getProductId());
+                foreach($categoryList as $aCategory){
+                    $eventDelete = new ProductDeleteCategoryEvent(
+                        $event->getProduct(),
+                        $aCategory->getCategoryId()
+                    );
+
+                    $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_REMOVE_CATEGORY, $eventDelete);
+                }
+                */
+
+                // Delete in product_category
+                $categoryList = ProductCategoryQuery::create()->filterByProductId($event->getProductId());
+                foreach($categoryList as $aCategory){
+                    $aCategory->delete();
+                }
+
                 // Delete product
                 $product
                     ->setDispatcher($event->getDispatcher())
