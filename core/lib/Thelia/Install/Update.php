@@ -23,6 +23,7 @@ use Thelia\Config\DefinePropel;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
+use Thelia\Tools\Version\Version;
 
 /**
  * Class Update
@@ -171,6 +172,20 @@ class Update
                 $version = $this->version[$i];
                 $this->updateToVersion($version, $database);
                 $this->updatedVersions[] = $version;
+            }
+
+            $currentVersion = Version::parse();
+            $this->log('debug', sprintf('setting database configuration to %s', $currentVersion['version']));
+            $updateConfigVersion = [
+                'thelia_version'         => $currentVersion['version'],
+                'thelia_major_version'   => $currentVersion['major'],
+                'thelia_minus_version'   => $currentVersion['minus'],
+                'thelia_release_version' => $currentVersion['release'],
+                'thelia_extr_version'    => $currentVersion['extra'],
+            ];
+
+            foreach ($updateConfigVersion as $name => $value) {
+                ConfigQuery::write($name, $value);
             }
 
             $this->connection->commit();
@@ -494,6 +509,7 @@ class Update
             $b = strtolower(substr($b->getRelativePathname(), 0, -4));
             return version_compare($a, $b);
         };
+
         $files = $finder->name('*.sql')->in($path)->sort($sort);
         foreach ($files as $file) {
             $list[] = substr($file->getRelativePathname(), 0, -4);
