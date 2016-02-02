@@ -1,10 +1,11 @@
 # 2.2.3
 
+- (related to #1962) Fix exception when cloning a product if the i18n in specific locale does not exist
 - (related to #1958) Fix missing success_url on Brand SEO update
 - (related to #1956) Fix UX right class in brand products pagination in the frontOffice
 - (related to #1946) Fix the automatic inclusion of the TaxType class only if extension == php
 - (related to #1939) Add `visible` and `visible_reverse` values in Product Loop order argument
-- (related to #1936) Fixed the module name vefication for command `module:position`
+- (related to #1936) Fixed the module name verification for command `module:position`
 - (related to #1928) Hook DI alert messages thrown as exceptions in dev. mode
 - (related to #1921) Modules 'configuration' and 'hook' buttons behavior fix
 - (related to #1920) Fixed coupons conditions label translation
