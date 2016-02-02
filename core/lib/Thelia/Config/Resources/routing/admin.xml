@@ -69,7 +69,7 @@
     <route id="admin.set-email-address" path="/admin/set-email-address">
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::setEmailAction</default>
     </route>
-
+    
     <!-- Route to the administration logout page -->
     <route id="admin.logout" path="/admin/logout">
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLogoutAction</default>
