@@ -66,5 +66,9 @@ return array(
     'Published by OpenStudio' => 'Développé par OpenStudio',
     'Thelia support forum' => 'Forum de Thelia',
     'Thelia contributions' => 'Contributions de Thelia',
-    'Please wait ...' => 'Veuillez patienter ...'
+    'Please wait ...' => 'Veuillez patienter ...',
+    'The update cannot delete the folder : "%s". Please delete this folder manually.' => 'La mise à jour n\'a pas pu supprimer le dossier : "%s". Merci de le supprimer manuellement.',
+    'Thelia as been successfully updated to version %version' => 'Thalia a été mis à jour à la version la %version',
+    'Update proccess' => 'Processus de mise à jour',
+    'Update proccess trace' => 'Traves du processus de mise à jour',
 );
