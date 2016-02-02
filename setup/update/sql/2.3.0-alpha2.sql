@@ -24,6 +24,11 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),    (@max, 'es_ES', NULL, NULL, NULL, NULL),    (@max, 'fr_FR', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL);
 
+-- Insert a fake email address for administrators, to trigger the admin update dialog
+-- at next admin login.
+
+UPDATE `admin` set email = 'CHANGE_ME';
+
 -- additional config variables
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
