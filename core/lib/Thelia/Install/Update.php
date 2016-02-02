@@ -17,6 +17,7 @@ use PDO;
 use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfiguration;
@@ -65,6 +66,12 @@ class Update
 
     /** @var string */
     protected $backupDir = 'local/backup/';
+
+    /** @var array */
+    protected $messages = [];
+
+    /** @var Translator */
+    protected $translator;
 
     public function __construct($usePropel = true)
     {
@@ -529,5 +536,45 @@ class Update
             $list[] = substr($file->getRelativePathname(), 0, -4);
         }
         return $list;
+    }
+
+    /**
+     * @param string $message
+     * @param string $type
+     * @return $this
+     */
+    public function setMessage($message, $type = 'info')
+    {
+        $this->messages[] = [$message, $type];
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    public function trans($string)
+    {
+        return $this->translator ? $this->translator->trans($string) : $string;
+    }
+
+    /**
+     * @param Translator $translator
+     * @return $this
+     */
+    public function setTranslator(Translator $translator)
+    {
+        $this->translator = $translator;
+
+        return $this;
     }
 }

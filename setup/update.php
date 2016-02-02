@@ -50,13 +50,13 @@ if (!$bootstraped) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
-        echo "No autoload file found. Please use the -b argument to include yours";
+        cliOutput('No autoload file found. Please use the -b argument to include yours', 'error');
         exit(1);
     }
 }
 
 if (php_sapi_name() != 'cli') {
-    echo 'this script can only be launched with cli sapi' . PHP_EOL;
+    cliOutput('this script can only be launched with cli sapi', 'error');
     exit(1);
 }
 
@@ -71,7 +71,7 @@ use Thelia\Install\Exception\UpdateException;
 try {
     $update = new \Thelia\Install\Update(false);
 } catch (UpdateException $ex) {
-    echo $ex->getMessage() . PHP_EOL;
+    cliOutput($ex->getMessage(), 'error');
     exit(2);
 }
 
@@ -80,30 +80,30 @@ try {
  ***************************************************/
 
 if ($update->isLatestVersion()) {
-    echo "You already have the latest version of Thelia : " . $update->getCurrentVersion() . PHP_EOL;
+    cliOutput("You already have the latest version of Thelia : " . $update->getCurrentVersion(), 'success');
     exit(3);
 }
 
 while (1) {
-    echo sprintf(
-        "You are going to update Thelia from version %s to version %s." . PHP_EOL,
+    cliOutput(sprintf(
+        "You are going to update Thelia from version %s to version %s.",
         $update->getCurrentVersion(),
         $update->getLatestVersion()
-    );
-    echo "Continue update process ? (Y/n)" . PHP_EOL;
+    ), 'info');
+    cliOutput("Continue update process ? (Y/n)");
 
     $rep = readStdin(true);
     if ($rep == 'y') {
         break;
     } elseif ($rep == 'n') {
-        echo "Update aborted" . PHP_EOL;
+        cliOutput("Update aborted", 'warning');
         exit(0);
     }
 }
 
 $backup = false;
 while (1) {
-    echo sprintf("Would you like to backup the current database before proceeding ? (Y/n)" . PHP_EOL);
+    cliOutput(sprintf("Would you like to backup the current database before proceeding ? (Y/n)"));
 
     $rep = readStdin(true);
     if ($rep == 'y') {
@@ -126,9 +126,9 @@ try {
     if (true === $backup) {
         try {
             $update->backupDb();
-            echo sprintf(PHP_EOL . 'Your database has been backed up. The sql file : %s'. PHP_EOL, $update->getBackupFile());
+            cliOutput(sprintf('Your database has been backed up. The sql file : %s', $update->getBackupFile()), 'info');
         } catch (\Exception $e) {
-            echo PHP_EOL . 'Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage() . PHP_EOL;
+            cliOutput('Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage(), 'error');
             exit(4);
         }
     }
@@ -138,40 +138,44 @@ try {
     $updateError = $ex;
 }
 
+
+
+foreach ($update->getMessages() as $message) {
+    cliOutput($message[0], $message[1]);
+}
+
 if (null === $updateError) {
-    echo sprintf(PHP_EOL . 'Thelia as been successfully updated to version %s' . PHP_EOL, $update->getCurrentVersion());
+    cliOutput(sprintf('Thelia as been successfully updated to version %s', $update->getCurrentVersion()), 'success');
     if ($update->hasPostInstructions()) {
-        echo PHP_EOL . '===================================' . PHP_EOL;
-        echo $update->getPostInstructions();
-        echo PHP_EOL . '===================================' . PHP_EOL;
+        cliOutput('===================================');
+        cliOutput($update->getPostInstructions());
+        cliOutput('===================================');
     }
 
 } else {
-    echo sprintf(PHP_EOL . 'Sorry, an unexpected error has occured : %s' . PHP_EOL, $updateError->getMessage());
+    cliOutput(sprintf('Sorry, an unexpected error has occured : %s', $updateError->getMessage()), 'error');
     print $updateError->getTraceAsString() . PHP_EOL;
     print "Trace: " . PHP_EOL;
     foreach ($update->getLogs() as $log) {
-        echo sprintf('[%s] %s' . PHP_EOL, $log[0], $log[1]);
+        cliOutput(sprintf('[%s] %s' . PHP_EOL, $log[0], $log[1]), 'error');
     }
 
     if (true === $backup) {
-
         while (1) {
-            echo "Would you like to restore the backup database ? (Y/n)" . PHP_EOL;
+            cliOutput("Would you like to restore the backup database ? (Y/n)");
 
             $rep = readStdin(true);
             if ($rep == 'y') {
-
-                echo "Database restore started. Wait, it could take a while..." . PHP_EOL;
+                cliOutput("Database restore started. Wait, it could take a while...");
 
                 if (false === $update->restoreDb()) {
-                    echo sprintf(
-                        PHP_EOL . 'Sorry, your database can\'t be restore. Try to do it manually : %s' . PHP_EOL,
+                    cliOutput(sprintf(
+                        'Sorry, your database can\'t be restore. Try to do it manually : %s',
                         $update->getBackupFile()
-                    );
+                    ), 'error');
                     exit(5);
                 } else {
-                    echo "Database successfully restore." . PHP_EOL;
+                    cliOutput("Database successfully restore.");
                     exit(5);
                 }
                 break;
@@ -193,7 +197,7 @@ $hasDeleteError = false;
 
 $finder->files()->in(THELIA_CACHE_DIR);
 
-echo sprintf("Try to delete cache in : %s" . PHP_EOL, THELIA_CACHE_DIR);
+cliOutput(sprintf("Try to delete cache in : %s", THELIA_CACHE_DIR), 'info');
 
 foreach ($finder as $file) {
     try {
@@ -204,12 +208,11 @@ foreach ($finder as $file) {
 }
 
 if (true === $hasDeleteError) {
-    echo "The cache has not been cleared properly. Try to run the command manually : " .
-        "(sudo) php Thelia cache:clear (--env=prod)." . PHP_EOL;
+    cliOutput("The cache has not been cleared properly. Try to run the command manually : " .
+        "(sudo) php Thelia cache:clear (--env=prod).");
 }
 
-echo "Update process finished." . PHP_EOL;
-
+cliOutput("Update process finished.", 'info');
 exit(0);
 
 
@@ -246,4 +249,26 @@ function joinPaths()
     }
 
     return $path;
+}
+
+function cliOutput($message, $type = null)
+{
+    switch ($type) {
+        case 'success':
+            $color = "\033[0;32m";
+            break;
+        case 'info':
+            $color = "\033[0;34m";
+            break;
+        case 'error':
+            $color = "\033[0;31m";
+            break;
+        case 'warning':
+            $color = "\033[1;33m";
+            break;
+        default:
+            $color = "\033[0m";
+    }
+
+    echo PHP_EOL . $color . $message . "\033[0m" . PHP_EOL;
 }
