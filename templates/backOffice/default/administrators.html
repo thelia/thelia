@@ -70,7 +70,14 @@
                                     </td>
                                     <td data-field-class="js-firstname">{$FIRSTNAME}</td>
                                     <td data-field-class="js-lastname">{$LASTNAME}</td>
-                                    <td data-field-class="js-email">{$EMAIL}</td>
+                                    {* Do not display invalid emails *}
+                                    {if $EMAIL|strpos:'@'}
+                                        <td data-field-class="js-email">{$EMAIL}</td>
+                                    {else}
+                                        <td class="text-warning">
+                                            <span class="glyphicon glyphicon-exclamation-sign"></span> {intl l="No email defined"}
+                                        </td>
+                                    {/if}
                                     <td data-field-class="js-locale" data-value="{$LOCALE}">{$LOCALE}</td>
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                        {if $PROFILE}
@@ -134,39 +141,56 @@
 
     {form_hidden_fields}
 
-    {render_form_field field='login'}
-    {render_form_field field='firstname'}
-    {render_form_field field='lastname'}
-    {render_form_field field='email'}
+    <div class="row">
+        <div class="col-md-6">
+            {render_form_field field='login'}
+            {render_form_field field='email'}
+        </div>
+        <div class="col-md-6">
+            {render_form_field field='firstname'}
+            {render_form_field field='lastname'}
+        </div>
+    </div>
 
     {form_field field='password_confirm'}
-    {$passwordError = $error}
+        {$passwordError = $error}
     {/form_field}
 
-    {render_form_field field='password'}
-    {render_form_field field='password_confirm'}
+    <div class="row">
+        <div class="col-md-6">
+            {render_form_field field='password'}
+        </div>
+        <div class="col-md-6">
+            {render_form_field field='password_confirm'}
+        </div>
+    </div>
 
-    {custom_render_form_field field="locale"}
-        <select {form_field_attributes field="locale" no_standard_classes=1} data-toggle="selectpicker">
-            {loop name='lang-admin' type="lang"}
-                <option value="{$LOCALE}">{$LOCALE}: {$TITLE}</option>
-            {/loop}
-        </select>
-    {/custom_render_form_field}
-
-    {custom_render_form_field field="profile"}
-        <select {form_field_attributes field="profile" no_standard_classes=1} data-toggle="selectpicker">
-            {foreach $choices as $choice}
-                {if $choice->value == 0}
-                    <option value="0">{intl l='Superadministrator'}</option>
-                {else}
-                    {loop name='profile' type="profile" id=$choice->value}
-                        <option value="{$ID}">{$TITLE}</option>
+    <div class="row">
+        <div class="col-md-6">
+            {custom_render_form_field field="locale"}
+                <select {form_field_attributes field="locale" no_standard_classes=1} data-toggle="selectpicker">
+                    {loop name='lang-admin' type="lang"}
+                        <option value="{$LOCALE}">{$LOCALE}: {$TITLE}</option>
                     {/loop}
-                {/if}
-            {/foreach}
-        </select>
-    {/custom_render_form_field}
+                </select>
+            {/custom_render_form_field}
+        </div>
+        <div class="col-md-6">
+            {custom_render_form_field field="profile"}
+                <select {form_field_attributes field="profile" no_standard_classes=1} data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0">{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}">{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+            {/custom_render_form_field}
+        </div>
+    </div>
 
     {hook name="administrator.create-form" location="administrator_create_form" }
 {/capture}
@@ -202,44 +226,69 @@
 
     {form_hidden_fields}
 
-    {render_form_field field='login' extra_classes='js-login'}
-    {render_form_field field='firstname' extra_classes='js-firstname'}
-    {render_form_field field='lastname' extra_classes='js-lastname'}
-    {render_form_field field='email' extra_classes='js-email'}
+    {if $show_email_change_notice}
+        <div class="alert alert-warning">
+            {intl l="From Thelia 2.3, you have to <strong>add an email address</strong> to your administrator profile. Please enter your email address below."}
+        </div>
+    {/if}
+
+    <div class="row">
+        <div class="col-md-6">
+            {render_form_field field='login' extra_classes='js-login'}
+            {render_form_field field='firstname' extra_classes='js-firstname'}
+
+        </div>
+        <div class="col-md-6">
+            {custom_render_form_field field='email'}
+                <input type="email" {form_field_attributes field="email" extra_classes='js-email'}{if $show_email_change_notice} autofocus{/if}>
+            {/custom_render_form_field}
+            {render_form_field field='lastname' extra_classes='js-lastname'}
+        </div>
+    </div>
 
     {form_field field='password_confirm'}
-    {$passwordError = $error}
+        {$passwordError = $error}
     {/form_field}
 
-    {custom_render_form_field field='password'}
-        <input type="password" {form_field_attributes field="password"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
-    {/custom_render_form_field}
+    <div class="row">
+        <div class="col-md-6">
+            {custom_render_form_field field='password'}
+                <input type="password" {form_field_attributes field="password"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
+            {/custom_render_form_field}
+        </div>
+        <div class="col-md-6">
+            {custom_render_form_field field='password_confirm'}
+                <input type="password" {form_field_attributes field="password_confirm"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
+            {/custom_render_form_field}
+        </div>
+    </div>
 
-    {custom_render_form_field field='password_confirm'}
-        <input type="password" {form_field_attributes field="password_confirm"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
-    {/custom_render_form_field}
-
-    {custom_render_form_field field="locale"}
-        <select {form_field_attributes field="locale" no_standard_classes=1 extra_classes='js-locale'} data-toggle="selectpicker">
-            {loop name='lang-admin' type="lang"}
-                <option value="{$LOCALE}" {if $LOCALE == $value}selected="selected"{/if}>{$LOCALE}: {$TITLE}</option>
-            {/loop}
-        </select>
-    {/custom_render_form_field}
-
-    {custom_render_form_field field="profile"}
-        <select {form_field_attributes field="profile" no_standard_classes=1 extra_classes='js-profile'} data-toggle="selectpicker">
-            {foreach $choices as $choice}
-                {if $choice->value == 0}
-                    <option value="0">{intl l='Superadministrator'}</option>
-                {else}
-                    {loop name='profile' type="profile" id=$choice->value}
-                        <option value="{$ID}">{$TITLE}</option>
+    <div class="row">
+        <div class="col-md-6">
+            {custom_render_form_field field="locale"}
+                <select {form_field_attributes field="locale" no_standard_classes=1 extra_classes='js-locale'} data-toggle="selectpicker">
+                    {loop name='lang-admin' type="lang"}
+                        <option value="{$LOCALE}" {if $LOCALE == $value}selected="selected"{/if}>{$LOCALE}: {$TITLE}</option>
                     {/loop}
-                {/if}
-            {/foreach}
-        </select>
-    {/custom_render_form_field}
+                </select>
+            {/custom_render_form_field}
+        </div>
+        <div class="col-md-6">
+            {custom_render_form_field field="profile"}
+                <select {form_field_attributes field="profile" no_standard_classes=1 extra_classes='js-profile'} data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0">{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}">{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+            {/custom_render_form_field}
+        </div>
+    </div>
 
     {hook name="administrator.update-form" location="administrator_update_form" }
 {/capture}
@@ -345,6 +394,16 @@ jQuery(function($) {
     {if $show_update_dialog}
         <script>
             jQuery(function($) {
+                {if $show_email_change_notice}
+                    {* We have to change email, highlight the field and set focus *}
+                    $('#administrator_update_dialog').on('shown.bs.modal', function (e) {
+                        var $emailInput = $('.js-email', $(this));
+
+                        $emailInput.closest('.form-group').addClass('has-error');
+                        $emailInput.focus();
+                    });
+                {/if}
+
                 $('.js-update-administrator[data-id={admin attr='id'}]').first().click();
             });
         </script>

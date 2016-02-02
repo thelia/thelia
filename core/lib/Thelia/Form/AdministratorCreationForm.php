@@ -55,6 +55,7 @@ class AdministratorCreationForm extends BaseForm
                 "label" => $this->translator->trans("Email address"),
                 "label_attr" => array(
                     "for" => "email",
+                    'help' => $this->translator->trans("Please enter a valid email address")
                 ),
                 'attr'        => [
                     'placeholder' => $this->translator->trans('Administrator email address'),

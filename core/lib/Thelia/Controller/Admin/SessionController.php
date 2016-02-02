@@ -24,6 +24,7 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
@@ -233,6 +234,7 @@ class SessionController extends BaseAdminController
 
             $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
 
+            /** @var Admin $user */
             $user = $authenticator->getAuthentifiedUser();
 
             // Success -> store user in security context
@@ -243,9 +245,6 @@ class SessionController extends BaseAdminController
 
             $this->applyUserLocale($user);
 
-            /**
-             * we have tou find a way to send cookie
-             */
             if (intval($form->get('remember_me')->getData()) > 0) {
                 // If a remember me field if present and set in the form, create
                 // the cookie thant store "remember me" information
@@ -257,6 +256,12 @@ class SessionController extends BaseAdminController
             }
 
             $this->dispatch(TheliaEvents::ADMIN_LOGIN);
+
+            // Check if we have to ask the user to set its address email.
+            // This is the case if Thelia has been updated from a pre 2.3.0 version
+            if (false === strpos($user->getEmail(), '@')) {
+                return $this->generateRedirectFromRoute('admin.set-email-address');
+            }
 
             // Redirect to the success URL, passing the cookie if one exists.
             return $this->generateSuccessRedirect($adminLoginForm);

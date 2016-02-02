@@ -40,6 +40,18 @@ class AdministratorController extends AbstractCrudController
         return $this->render('administrators', [ 'show_update_dialog' => true ]);
     }
 
+    public function setEmailAction()
+    {
+        // Open the update dialog for the current administrator, and display the "set email address" notice.
+        return $this->render(
+            'administrators',
+            [
+                'show_update_dialog' => true,
+                'show_email_change_notice' => true
+            ]
+        );
+    }
+
     protected function getCreationForm()
     {
         return $this->createForm(AdminForm::ADMINISTRATOR_CREATION);
