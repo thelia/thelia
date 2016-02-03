@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -63,7 +65,6 @@ class Delivery extends BaseSpecificModule
 
             if (null === $areaDeliveryModule && false === $virtual) {
                 continue;
-
             }
 
             /** @var DeliveryModuleInterface $moduleInstance */
@@ -81,9 +82,15 @@ class Delivery extends BaseSpecificModule
             try {
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
+                $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $country, $state);
+                $this->dispatcher->dispatch(
+                    TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                    $deliveryPostageEvent
+                );
 
-                if ($moduleInstance->isValidDelivery($country)) {
-                    $postage = OrderPostage::loadFromPostage($moduleInstance->getPostage($country));
+                if ($deliveryPostageEvent->isValidModule()) {
+
+                    $postage = $deliveryPostageEvent->getPostage();
 
                     $loopResultRow
                         ->set('ID', $deliveryModule->getId())
@@ -96,7 +103,9 @@ class Delivery extends BaseSpecificModule
                         ->set('POSTAGE_TAX', $postage->getAmountTax())
                         ->set('POSTAGE_UNTAXED', $postage->getAmount() - $postage->getAmountTax())
                         ->set('POSTAGE_TAX_RULE_TITLE', $postage->getTaxRuleTitle())
+                        ->set('DELIVERY_DATE', $deliveryPostageEvent->getDeliveryDate())
                     ;
+
                     $this->addOutputFields($loopResultRow, $deliveryModule);
 
                     $loopResult->addRow($loopResultRow);
