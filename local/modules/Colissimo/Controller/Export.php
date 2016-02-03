@@ -121,7 +121,7 @@ class Export extends BaseAdminController
                         ."\";\"".$address->getAddress3()
                         ."\";\"".$address->getZipcode()
                         ."\";\"".$address->getCity()
-                        ."\";\"".$country->getTitle()
+                        ."\";\"".$country->getIsoalpha2()
                         ."\";\"".$phone
                         ."\";\"" .$cellphone
                         ."\";\"".$weight
