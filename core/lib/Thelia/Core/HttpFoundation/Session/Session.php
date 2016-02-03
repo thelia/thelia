@@ -206,6 +206,7 @@ class Session extends BaseSession
     {
         if (null === $cart || $cart->isNew()) {
             self::$transientCart = $cart;
+            $this->remove("thelia.cart_id");
         } else {
             self::$transientCart = null;
             $this->set("thelia.cart_id", $cart->getId());
