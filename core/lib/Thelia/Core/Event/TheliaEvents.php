@@ -826,8 +826,9 @@ final class TheliaEvents
         return sprintf("%s.%s", $eventName, $moduleCode);
     }
 
-    /* Invoke payment module */
+    /* Payment module */
     const MODULE_PAY = 'thelia.module.pay';
+    const MODULE_PAYMENT_IS_VALID = 'thelia.module.payment.is_valid';
 
     /* Delivery module */
     const MODULE_DELIVERY_GET_POSTAGE = 'thelia.module.delivery.postage';
