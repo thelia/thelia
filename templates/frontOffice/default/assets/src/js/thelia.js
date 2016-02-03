@@ -47,7 +47,8 @@ var pseManager = (function($){
             "options": {},
             "pseId": null,
             "useFallback": false,
-            "fallback": $("#pse-options .pse-fallback")
+            "fallback": $("#pse-options .pse-fallback"),
+            "thumbnails": $('#product-thumbnails')
         };
     }
 
@@ -149,6 +150,8 @@ var pseManager = (function($){
                     // not exists, revert
                     displayNotice();
                     setPseForm();
+                    selection = getFormSelection();
+                    pseId = pseExist(selection);
                 } else {
                     $pse.validity.hide();
                 }
@@ -236,6 +239,29 @@ var pseManager = (function($){
             } else {
                 $pse.priceOld.html("");
                 $pse.price.html(pse.price);
+            }
+
+            // images
+            if (pse.images.length > 0) {
+                i = 0;
+                $pse.thumbnails.find('.thumbnail').each(function() {
+                    if (jQuery.inArray($(this).data('thumbId'), pse.images) !== -1) {
+                        $(this).filter('.disabled').removeClass('disabled');
+                        if (i === 0) {
+                            if (!$(this).hasClass('active')) {
+                                $(this).trigger('click.thumbnails');
+                                if ($(this).filter(":visible").length != 1) {
+                                    $pse.thumbnails.carousel('next');
+                                }
+                            }
+                            i++;
+                        }
+                    } else {
+                        $(this).not('.disabled').addClass('disabled');
+                    }
+                });
+            } else {
+                $pse.thumbnails.find('.thumbnail.disabled').removeClass('disabled');
             }
         }
         else {
