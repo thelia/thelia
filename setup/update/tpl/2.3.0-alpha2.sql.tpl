@@ -13,6 +13,8 @@ ALTER TABLE `newsletter` ADD `unsubscribed` TINYINT(1) NOT NULL DEFAULT '0' AFTE
 ALTER TABLE  `admin` ADD  `email` VARCHAR(255) NOT NULL AFTER `remember_me_serial` ;
 ALTER TABLE  `admin` ADD  `password_renew_token` VARCHAR(255) NOT NULL AFTER `email` ;
 
+ALTER TABLE `admin` ADD UNIQUE `email_UNIQUE` (`email`);
+
 -- add admin password renew message
 
 SELECT @max := MAX(`id`) FROM `message`;
