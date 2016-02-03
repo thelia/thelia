@@ -201,9 +201,9 @@ class ImportHandler
 
         $event->setErrors($errors);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_FINISHED, $event);
+        $this->eventDispatcher->dispatch(TheliaEvents::IMPORT_FINISHED, $event);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_SUCCESS, $event);
+        $this->eventDispatcher->dispatch(TheliaEvents::IMPORT_SUCCESS, $event);
 
         return $event;
     }
