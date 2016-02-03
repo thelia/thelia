@@ -829,6 +829,7 @@ final class TheliaEvents
     /* Payment module */
     const MODULE_PAY = 'thelia.module.pay';
     const MODULE_PAYMENT_IS_VALID = 'thelia.module.payment.is_valid';
+    const MODULE_PAYMENT_MANAGE_STOCK = 'thelia.module.payment.manage_stock';
 
     /* Delivery module */
     const MODULE_DELIVERY_GET_POSTAGE = 'thelia.module.delivery.postage';

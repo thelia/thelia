@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -20,6 +21,7 @@ use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
+use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
@@ -45,6 +47,7 @@ use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleI18n;
+use Thelia\Module\PaymentModuleInterface;
 use Thelia\Tools\I18n;
 
 /**
@@ -397,7 +400,10 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getLang(),
                 $event->getCart(),
                 $event->getCustomer(),
-                $paymentModuleInstance->manageStockOnCreation(),
+                $this->isModuleManageStockOnCreation(
+                    $event->getDispatcher(),
+                    $paymentModuleInstance
+                ),
                 $event->getUseOrderDefinedAddresses()
             )
         );
@@ -429,7 +435,10 @@ class Order extends BaseAction implements EventSubscriberInterface
             $session->getLang(),
             $session->getSessionCart($dispatcher),
             $this->securityContext->getCustomerUser(),
-            $paymentModuleInstance->manageStockOnCreation()
+            $this->isModuleManageStockOnCreation(
+                $event->getDispatcher(),
+                $paymentModuleInstance
+            )
         );
 
         $dispatcher->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
@@ -518,8 +527,14 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $order = $event->getOrder();
         $newStatus = $event->getStatus();
+        $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
-        $this->updateQuantity($order, $newStatus);
+        $manageStockOnCreation = $this->isModuleManageStockOnCreation(
+            $event->getDispatcher(),
+            $paymentModule
+        );
+
+        $this->updateQuantity($order, $newStatus, $manageStockOnCreation);
 
         $order->setStatusId($newStatus);
         $order->save();
@@ -532,14 +547,14 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param $newStatus $newStatus the new status ID
      * @throws \Thelia\Exception\TheliaProcessException
      */
-    public function updateQuantity(ModelOrder $order, $newStatus)
+    public function updateQuantity(ModelOrder $order, $newStatus, $manageStockOnCreation = true)
     {
         $canceledStatus = OrderStatusQuery::getCancelledStatus()->getId();
         $paidStatus = OrderStatusQuery::getPaidStatus()->getId();
         if ($newStatus == $canceledStatus || $order->isCancelled()) {
             $this->updateQuantityForCanceledOrder($order, $newStatus, $canceledStatus);
         } elseif ($paidStatus == $newStatus && $order->isNotPaid() && $order->getVersion() == 1) {
-            $this->updateQuantityForPaidOrder($order);
+            $this->updateQuantityForPaidOrder($order, $manageStockOnCreation);
         }
     }
 
@@ -548,14 +563,14 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function updateQuantityForPaidOrder(ModelOrder $order)
+    protected function updateQuantityForPaidOrder(ModelOrder $order, $manageStockOnCreation)
     {
         $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
         /** @var \Thelia\Module\PaymentModuleInterface $paymentModuleInstance */
         $paymentModuleInstance = $paymentModule->createInstance();
 
-        if (false === $paymentModuleInstance->manageStockOnCreation()) {
+        if (false === $manageStockOnCreation) {
             $orderProductList = $order->getOrderProducts();
 
             /** @var OrderProduct  $orderProduct */
@@ -650,6 +665,29 @@ class Order extends BaseAction implements EventSubscriberInterface
         $orderAddress->save();
 
         $event->setOrderAddress($orderAddress);
+    }
+
+    /**
+     * Check if a payment module manage stock on creation
+     *
+     * @param EventDispatcher $dispatcher
+     * @param PaymentModuleInterface $module
+     * @return bool if the module manage stock on creation, false otherwise
+     */
+    protected function isModuleManageStockOnCreation(EventDispatcherInterface $dispatcher, PaymentModuleInterface $module)
+    {
+        $event = new ManageStockOnCreationEvent($module);
+
+        $dispatcher->dispatch(
+            TheliaEvents::getModuleEvent(
+                TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
+                $module->getCode()
+            )
+        );
+
+        return (null !== $event->getManageStock())
+            ? $event->getManageStock()
+            : $module->manageStockOnCreation();
     }
 
     /**

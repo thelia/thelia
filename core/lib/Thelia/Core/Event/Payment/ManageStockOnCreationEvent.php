@@ -13,65 +13,41 @@
 
 namespace Thelia\Core\Event\Payment;
 
-use Thelia\Model\Cart;
 use Thelia\Module\PaymentModuleInterface;
 
 /**
- * Class IsValidPaymentEvent
+ * Class ManageStockOnCreationEvent
  * @package Thelia\Core\Event\Payment
  * @author Julien Chanséaume <julien@thelia.net>
  */
-class IsValidPaymentEvent extends BasePaymentEvent
+class ManageStockOnCreationEvent extends BasePaymentEvent
 {
-    /** @var Cart */
-    protected $cart = null;
-
-    /** @var bool */
-    protected $validModule = false;
+    /** @var bool|null */
+    protected $manageStock = null;
 
     /**
-     * IsValidPaymentEvent constructor.
-     *
-     * @param PaymentModuleInterface $module
-     * @param Cart $cart
+     * ManageStockOnCreationEvent constructor.
+     * @param bool|null $manageStock
      */
-    public function __construct(PaymentModuleInterface $module, Cart $cart)
+    public function __construct(PaymentModuleInterface $module)
     {
         parent::__construct($module);
-        $this->cart = $cart;
     }
 
     /**
-     * @return Cart
+     * @return bool|null
      */
-    public function getCart()
+    public function getManageStock()
     {
-        return $this->cart;
+        return $this->manageStock;
     }
 
     /**
-     * @param Cart $cart
+     * @param bool|null $manageStock
      */
-    public function setCart($cart)
+    public function setManageStock($manageStock)
     {
-        $this->cart = $cart;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isValidModule()
-    {
-        return $this->validModule;
-    }
-
-    /**
-     * @param boolean $validModule
-     */
-    public function setValidModule($validModule)
-    {
-        $this->validModule = $validModule;
+        $this->manageStock = $manageStock;
         return $this;
     }
 }
