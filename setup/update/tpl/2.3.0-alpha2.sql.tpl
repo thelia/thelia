@@ -30,7 +30,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 -- Insert a fake email address for administrators, to trigger the admin update dialog
 -- at next admin login.
 
-UPDATE `admin` set email = 'CHANGE_ME';
+UPDATE `admin` set email = CONCAT('CHANGE_ME_', ID);
 
 -- additional config variables
 
