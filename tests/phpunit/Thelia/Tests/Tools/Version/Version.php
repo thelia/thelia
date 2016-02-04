@@ -67,9 +67,15 @@ class Version extends \PHPUnit_Framework_TestCase
             ['2.2', '<2.2', false],
             ['2.2', '~2.2', true],
             ['2.2.0-alpha1', '>=2.2', true],
-            ['2.2.0-alpha1', '>2.1', false],
+            ['2.2.0-alpha1', '>2.1', true],
+            ['2.2.0-alpha1', '<2.1', false],
             ['2.2.0-alpha1', '=2.2', true],
             ['2.2.0-alpha1', '~2.2', true],
+            ['2.2.0-alpha2', '>=2.2', true],
+            ['2.2.0-alpha2', '>2.1', true],
+            ['2.2.0-alpha2', '<2.1', false],
+            ['2.2.0-alpha2', '=2.2', true],
+            ['2.2.0-alpha2', '~2.2', true],
         ];
     }
 
@@ -89,4 +95,5 @@ class Version extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($result, Tester::test($version, $expression, $strict), $message);
     }
+
 }
