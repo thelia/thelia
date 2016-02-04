@@ -484,7 +484,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
         $dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
 
-        return $cartEvent->getCart();
+        return $cartEvent->getDuplicatedCart();
     }
 
     /**
