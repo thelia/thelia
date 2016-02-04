@@ -86,4 +86,47 @@ class Version
 
         return $constraintsList;
     }
+
+    /**
+     * Split a version into an associative array
+     * [version, major, minus, release, extra]
+     *
+     * @param string $version   the version to split
+     * @return array            associative array
+     * [
+     *     'version' => 'digit',
+     *     'major' => 'digit',
+     *     'minus' => 'digit',
+     *     'release' => 'digit',
+     *     'extra' => 'alphanumeric'
+     * ]
+     */
+    public static function parse($version = null)
+    {
+        if (is_null($version))
+            $version = \Thelia\Core\Thelia::THELIA_VERSION;
+
+        $pattern = "`^(?<version>
+            (?<major>[0-9]+)\.
+            (?<minus>[0-9]+)\.
+            (?<release>[0-9]+)
+            -?(?<extra>[a-zA-Z0-9]*) # extra_version will also match empty string
+        )$`x";
+        if (!preg_match($pattern, $version, $match)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Invalid version number provided : %s".PHP_EOL,
+                    $version
+                )
+            );
+        }
+
+        return [
+            'version' => $match['version'],
+            'major'   => $match['major'],
+            'minus'   => $match['minus'],
+            'release' => $match['release'],
+            'extra'   => $match['extra'],
+        ];
+    }
 }
