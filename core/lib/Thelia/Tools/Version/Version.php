@@ -46,7 +46,7 @@ class Version
      */
     public static function test($version, $constraints, $strict = false, $defaultComparison = "=")
     {
-        $constraints = self::parse($constraints, $defaultComparison);
+        $constraints = self::parseConstraints($constraints, $defaultComparison);
 
         /** @var ConstraintInterface $constraint */
         foreach ($constraints as $constraint) {
@@ -58,7 +58,7 @@ class Version
         return true;
     }
 
-    private static function parse($constraints, $defaultComparison = "=")
+    private static function parseConstraints($constraints, $defaultComparison = "=")
     {
         $constraintsList = [];
 
