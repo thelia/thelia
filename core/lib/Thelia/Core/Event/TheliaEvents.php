@@ -69,6 +69,9 @@ final class TheliaEvents
      * Sent once the administrator is successfully logged in.
      */
     const ADMIN_LOGIN  = "action.admin_login";
+
+    const ADMIN_PASSWORD_RENEW  = "action.admin_renew_password";
+
     // -- END ADMIN EVENTS --------------------------------------------------------
 
 
@@ -659,7 +662,8 @@ final class TheliaEvents
     const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
-    const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
+    const ADMINISTRATOR_UPDATEPASSWORD            = 'action.generatePassword';
+    const ADMINISTRATOR_CREATEPASSWORD            = 'action.createPassword';
 
     // -- Api management ---------------------------------------------
 

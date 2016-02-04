@@ -43,6 +43,7 @@
                                     <th>{intl l="Login"}</th>
                                     <th>{intl l="First Name"}</th>
                                     <th>{intl l="Last Name"}</th>
+                                    <th>{intl l="E-mail"}</th>
                                     <th>{intl l="Locale"}</th>
                                     <th>{intl l="Profile"}</th>
                                     {hook name="administrators.header" location="administrator_list_header" }
@@ -69,7 +70,15 @@
                                     </td>
                                     <td data-field-class="js-firstname">{$FIRSTNAME}</td>
                                     <td data-field-class="js-lastname">{$LASTNAME}</td>
-                                    <td data-field-class="js-locale">{$LOCALE}</td>
+                                    {* Do not display invalid emails *}
+                                    {if $EMAIL|strpos:'@'}
+                                        <td data-field-class="js-email">{$EMAIL}</td>
+                                    {else}
+                                        <td class="text-warning">
+                                            <span class="glyphicon glyphicon-exclamation-sign"></span> {intl l="No email defined"}
+                                        </td>
+                                    {/if}
+                                    <td data-field-class="js-locale" data-value="{$LOCALE}">{$LOCALE}</td>
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                        {if $PROFILE}
                                             {loop type="profile" name="admin-profile" id={$PROFILE}}
@@ -132,76 +141,57 @@
 
     {form_hidden_fields}
 
-    {form_field field='login'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control" value="{if $form_error}{$value}{/if}">
+    <div class="row">
+        <div class="col-md-6">
+            {render_form_field field='login'}
+            {render_form_field field='email'}
         </div>
-    {/form_field}
-
-    {form_field field='firstname'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control" value="{if $form_error}{$value}{/if}">
+        <div class="col-md-6">
+            {render_form_field field='firstname'}
+            {render_form_field field='lastname'}
         </div>
-    {/form_field}
-
-    {form_field field='lastname'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control" value="{if $form_error}{$value}{/if}">
-        </div>
-    {/form_field}
+    </div>
 
     {form_field field='password_confirm'}
-    {$passwordError = $error}
+        {$passwordError = $error}
     {/form_field}
 
-    {form_field field='password'}
-        <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
+    <div class="row">
+        <div class="col-md-6">
+            {render_form_field field='password'}
         </div>
-    {/form_field}
-
-    {form_field field='password_confirm'}
-        <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="password" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Password'}" class="form-control">
+        <div class="col-md-6">
+            {render_form_field field='password_confirm'}
         </div>
-    {/form_field}
+    </div>
 
-    {form_field field='locale'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
-            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
-                {loop name='lang-admin' type="lang"}
-                    <option value="{$LOCALE}">{$LOCALE}: {$TITLE}</option>
-                {/loop}
-            </select>
-
+    <div class="row">
+        <div class="col-md-6">
+            {custom_render_form_field field="locale"}
+                <select {form_field_attributes field="locale" no_standard_classes=1} data-toggle="selectpicker">
+                    {loop name='lang-admin' type="lang"}
+                        <option value="{$LOCALE}">{$LOCALE}: {$TITLE}</option>
+                    {/loop}
+                </select>
+            {/custom_render_form_field}
         </div>
-    {/form_field}
-
-    {form_field field='profile'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
-            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
-                {foreach $choices as $choice}
-                    {if $choice->value == 0}
-                        <option value="0">{intl l='Superadministrator'}</option>
-                    {else}
-                        {loop name='profile' type="profile" id=$choice->value}
-                            <option value="{$ID}">{$TITLE}</option>
-                        {/loop}
-                    {/if}
-                {/foreach}
-            </select>
-
+        <div class="col-md-6">
+            {custom_render_form_field field="profile"}
+                <select {form_field_attributes field="profile" no_standard_classes=1} data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0">{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}">{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+            {/custom_render_form_field}
         </div>
-    {/form_field}
+    </div>
+
     {hook name="administrator.create-form" location="administrator_create_form" }
 {/capture}
 
@@ -236,76 +226,70 @@
 
     {form_hidden_fields}
 
-    {form_field field='login'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Login'}" placeholder="{intl l='Login'}" class="form-control js-login" value="{if $form_error}{$value}{/if}">
+    {if $show_email_change_notice}
+        <div class="alert alert-warning">
+            {intl l="From Thelia 2.3, you have to <strong>add an email address</strong> to your administrator profile. Please enter your email address below."}
         </div>
-    {/form_field}
+    {/if}
 
-    {form_field field='firstname'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='FirstName'}" placeholder="{intl l='FirstName'}" class="form-control js-firstname" value="{if $form_error}{$value}{/if}">
-        </div>
-    {/form_field}
+    <div class="row">
+        <div class="col-md-6">
+            {render_form_field field='login' extra_classes='js-login'}
+            {render_form_field field='firstname' extra_classes='js-firstname'}
 
-    {form_field field='lastname'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='LastName'}" placeholder="{intl l='LastName'}" class="form-control js-lastname" value="{if $form_error}{$value}{/if}">
         </div>
-    {/form_field}
+        <div class="col-md-6">
+            {custom_render_form_field field='email'}
+                <input type="email" {form_field_attributes field="email" extra_classes='js-email'}{if $show_email_change_notice} autofocus{/if}>
+            {/custom_render_form_field}
+            {render_form_field field='lastname' extra_classes='js-lastname'}
+        </div>
+    </div>
 
     {form_field field='password_confirm'}
         {$passwordError = $error}
     {/form_field}
 
-    {form_field field='password'}
-        <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
+    <div class="row">
+        <div class="col-md-6">
+            {custom_render_form_field field='password'}
+                <input type="password" {form_field_attributes field="password"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
+            {/custom_render_form_field}
         </div>
-    {/form_field}
-
-    {form_field field='password_confirm'}
-        <div class="form-group {if $passwordError}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="password" id="{$label_attr.for}" name="{$name}" title="{intl l='Password'}" placeholder="{intl l='Leave empty to keep current password'}" class="form-control">
+        <div class="col-md-6">
+            {custom_render_form_field field='password_confirm'}
+                <input type="password" {form_field_attributes field="password_confirm"} autocomplete="off" placeholder="{intl l='Leave empty to keep current password'}">
+            {/custom_render_form_field}
         </div>
-    {/form_field}
+    </div>
 
-    {form_field field='locale'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label}: </label>
-
-            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
-                {loop name='lang-admin' type="lang"}
-                    <option value="{$LOCALE}" {if $LOCALE == $value}selected="selected"{/if}>{$LOCALE}: {$TITLE}</option>
-                {/loop}
-            </select>
-
+    <div class="row">
+        <div class="col-md-6">
+            {custom_render_form_field field="locale"}
+                <select {form_field_attributes field="locale" no_standard_classes=1 extra_classes='js-locale'} data-toggle="selectpicker">
+                    {loop name='lang-admin' type="lang"}
+                        <option value="{$LOCALE}" {if $LOCALE == $value}selected="selected"{/if}>{$LOCALE}: {$TITLE}</option>
+                    {/loop}
+                </select>
+            {/custom_render_form_field}
         </div>
-    {/form_field}
-
-    {form_field field='profile'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
-            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker" class="js-profile">
-                {foreach $choices as $choice}
-                    {if $choice->value == 0}
-                        <option value="0">{intl l='Superadministrator'}</option>
-                    {else}
-                        {loop name='profile' type="profile" id=$choice->value}
-                            <option value="{$ID}">{$TITLE}</option>
-                        {/loop}
-                    {/if}
-                {/foreach}
-            </select>
-
+        <div class="col-md-6">
+            {custom_render_form_field field="profile"}
+                <select {form_field_attributes field="profile" no_standard_classes=1 extra_classes='js-profile'} data-toggle="selectpicker">
+                    {foreach $choices as $choice}
+                        {if $choice->value == 0}
+                            <option value="0">{intl l='Superadministrator'}</option>
+                        {else}
+                            {loop name='profile' type="profile" id=$choice->value}
+                                <option value="{$ID}">{$TITLE}</option>
+                            {/loop}
+                        {/if}
+                    {/foreach}
+                </select>
+            {/custom_render_form_field}
         </div>
-    {/form_field}
+    </div>
+
     {hook name="administrator.update-form" location="administrator_update_form" }
 {/capture}
 
@@ -381,18 +365,21 @@ jQuery(function($) {
         $('#administrator_update_id').val($(this).data('id'));
 
         $('.js-admin-' + $(this).data('id')).find('td').each(function(k, v) {
-            if(!$(v).data('field-class')) {
+            $v = $(v);
+
+            if(!$v.data('field-class')) {
                 return true;
             }
-            if($(v).data('value')) {
-                var fieldValue = $(v).data('value');
+            if($v.data('value')) {
+                var fieldValue = $v.data('value');
             } else {
-                var fieldValue = $(v).text();
+                var fieldValue = $v.text();
             }
 
-            $('.' + $(v).data('field-class')).val($.trim(fieldValue));
-            if($('.' + $(v).data('field-class')).is('select')) {
-                $('.' + $(v).data('field-class')).selectpicker('refresh');
+            $('.' + $v.data('field-class')).val($.trim(fieldValue));
+
+            if($('.' + $v.data('field-class')).is('select')) {
+                $('.' + $v.data('field-class')).selectpicker('refresh');
             }
         });
     });
@@ -403,4 +390,21 @@ jQuery(function($) {
 
 {block name="javascript-last-call"}
     {hook name="administrators.js" location="administrators-js" }
+
+    {if $show_update_dialog}
+        <script>
+            jQuery(function($) {
+                {if $show_email_change_notice}
+                    {* We have to change email, highlight the field and set focus *}
+                    $('#administrator_update_dialog').on('shown.bs.modal', function (e) {
+                        var $emailInput = $('.js-email', $(this));
+
+                        $emailInput.closest('.form-group').addClass('has-error');
+                        $emailInput.focus();
+                    });
+                {/if}
+                $('.js-update-administrator[data-id={admin attr='id'}]').first().click();
+            });
+        </script>
+    {/if}
 {/block}

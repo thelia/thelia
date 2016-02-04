@@ -89,7 +89,11 @@ try {
 	<div class="alert alert-danger">
 	    <?php echo $trans->trans('Missing password'); ?>
 	</div>
-	<?php } if ($errCode & 4) { ?>
+	<?php } if ($errCode & 3) { ?>
+        <div class="alert alert-danger">
+            <?php echo $trans->trans('Missing email-address'); ?>
+        </div>
+    <?php } if ($errCode & 4) { ?>
 	<div class="alert alert-danger">
 	    <?php echo $trans->trans("The given passwords do not match"); ?>
 	</div>
@@ -99,6 +103,10 @@ try {
             <div class="form-group">
                 <label for="admin_login"><?php echo $trans->trans('Administrator login :'); ?></label>
                 <input id="admin_login" class="form-control" type="text" name="admin_login" placeholder="admin" value="<?php if(isset($_GET["admin_login"])) { echo htmlspecialchars(addslashes($_GET["admin_login"])); } ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="admin_email"><?php echo $trans->trans('Administrator email :'); ?></label>
+                <input id="admin_email" class="form-control" type="email" name="admin_email" placeholder="admin" value="<?php if(isset($_GET["admin_email"])) { echo htmlspecialchars(addslashes($_GET["admin_email"])); } ?>" required>
             </div>
             <div class="form-group">
                 <label for="admin_password"><?php echo $trans->trans('Administrator password :'); ?></label>

@@ -17,6 +17,8 @@
         <form name="thelia.front.newsletter" class="Thelia\Form\NewsletterForm"/>
 
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
+        <form name="thelia.admin.lostpassword" class="Thelia\Form\AdminLostPassword"/>
+        <form name="thelia.admin.createpassword" class="Thelia\Form\AdminCreatePassword"/>
         <form name="thelia.admin.seo" class="Thelia\Form\SeoForm"/>
 
         <form name="thelia.admin.customer.create" class="Thelia\Form\CustomerCreateForm"/>

@@ -144,7 +144,5 @@ class CouponController extends BaseFrontController
                 ->addForm($couponCodeForm)
                 ->setGeneralError($message);
         }
-
-        return $this->generateErrorRedirect($couponCodeForm);
     }
 }

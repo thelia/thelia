@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
@@ -124,20 +123,6 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
-  <table name="state" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column defaultValue="0" name="visible" required="true" type="TINYINT" />
-    <column name="isocode" required="true" size="4" type="VARCHAR" />
-    <column name="title" size="255" type="VARCHAR" />
-    <column name="country_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="country" name="fk_state_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="country_id" />
-    </foreign-key>
-    <behavior name="timestampable" />
-    <behavior name="i18n">
-      <parameter name="i18n_columns" value="title" />
-    </behavior>
-  </table>
   <table name="tax" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="type" required="true" size="255" type="VARCHAR" />
@@ -187,13 +172,13 @@
     <index name="idx_tax_rule_country_country_id">
       <index-column name="country_id" />
     </index>
-    <index name="idx_tax_rule_country_state_id">
-      <index-column name="state_id" />
-    </index>
     <index name="idx_tax_rule_country_tax_rule_id_country_id_position">
       <index-column name="tax_rule_id" />
       <index-column name="country_id" />
       <index-column name="position" />
+    </index>
+    <index name="idx_tax_rule_country_state_id">
+      <index-column name="state_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -414,7 +399,7 @@
     <column name="reseller" type="TINYINT" />
     <column name="lang" size="10" type="VARCHAR" />
     <column name="sponsor" size="50" type="VARCHAR" />
-    <column defaultValue="0.000000" name="discount" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
     <column name="remember_me_token" size="255" type="VARCHAR" />
     <column name="remember_me_serial" size="255" type="VARCHAR" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
@@ -446,7 +431,7 @@
     <column name="zipcode" required="true" size="10" type="VARCHAR" />
     <column name="city" required="true" size="255" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
-    <column name="state_id" required="false" type="INTEGER" />
+    <column name="state_id" type="INTEGER" />
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
     <column defaultValue="0" name="is_default" type="TINYINT" />
@@ -470,6 +455,9 @@
     </index>
     <index name="idx_address_country_id">
       <index-column name="country_id" />
+    </index>
+    <index name="fk_address_state_id_idx">
+      <index-column name="state_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -495,9 +483,9 @@
     <column name="datetime_format" size="45" type="VARCHAR" />
     <column name="decimal_separator" size="45" type="VARCHAR" />
     <column name="thousands_separator" size="45" type="VARCHAR" />
-    <column name="decimals" size="45" type="VARCHAR" />
     <column defaultValue="0" name="active" type="BOOLEAN" />
     <column defaultValue="0" name="visible" type="TINYINT" />
+    <column name="decimals" size="45" type="VARCHAR" />
     <column name="by_default" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <index name="idx_lang_by_default">
@@ -604,9 +592,9 @@
     <column description="transaction reference - usually use to identify a transaction with banking modules" name="transaction_ref" size="100" type="VARCHAR" />
     <column description="delivery reference - usually use to identify a delivery progress on a distant delivery tracker website" name="delivery_ref" size="100" type="VARCHAR" />
     <column description="the invoice reference" name="invoice_ref" size="100" type="VARCHAR" />
-    <column defaultValue="0.000000" name="discount" type="DECIMAL" size="16" scale="6" />
-    <column defaultValue="0.000000" name="postage" required="true" type="DECIMAL" size="16" scale="6" />
-    <column defaultValue="0.000000" name="postage_tax" required="true" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="postage" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="postage_tax" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
     <column name="payment_module_id" required="true" type="INTEGER" />
     <column name="delivery_module_id" required="true" type="INTEGER" />
@@ -708,7 +696,7 @@
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
-    <column name="state_id" required="false" type="INTEGER" />
+    <column name="state_id" type="INTEGER" />
     <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_title_id" />
     </foreign-key>
@@ -724,6 +712,9 @@
     <index name="fk_order_address_country_id_idx">
       <index-column name="country_id" />
     </index>
+    <index name="fk_order_address_state_id_idx">
+      <index-column name="state_id" />
+    </index>
     <behavior name="timestampable" />
   </table>
   <table name="order_product" namespace="Thelia\Model">
@@ -737,8 +728,8 @@
     <column name="description" type="CLOB" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
-    <column defaultValue="0.000000" name="price" required="true" type="DECIMAL" size="16" scale="6" />
-    <column defaultValue="0.000000" name="promo_price" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />
     <column name="was_new" required="true" type="TINYINT" />
     <column name="was_in_promo" required="true" type="TINYINT" />
     <column name="weight" size="45" type="VARCHAR" />
@@ -793,7 +784,7 @@
   <table name="module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="55" type="VARCHAR" />
-    <column name="version" required="true" size="10" type="VARCHAR" default="" />
+    <column defaultValue="" name="version" required="true" size="10" type="VARCHAR" />
     <column name="type" required="true" type="TINYINT" />
     <column defaultValue="classic" name="category" required="true" size="50" type="VARCHAR" />
     <column name="activate" type="TINYINT" />
@@ -903,6 +894,8 @@
     <column name="salt" size="128" type="VARCHAR" />
     <column name="remember_me_token" size="255" type="VARCHAR" />
     <column name="remember_me_serial" size="255" type="VARCHAR" />
+    <column name="email" required="true" size="255" type="VARCHAR" />
+    <column name="password_renew_token" size="255" type="VARCHAR" />
     <foreign-key foreignTable="profile" name="fk_admin_profile_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="profile_id" />
     </foreign-key>
@@ -911,6 +904,9 @@
     </index>
     <unique name="login_UNIQUE">
       <unique-column name="login" />
+    </unique>
+    <unique name="email_UNIQUE">
+      <unique-column name="email" />
     </unique>
     <behavior name="timestampable" />
   </table>
@@ -1067,7 +1063,7 @@
     <column name="address_delivery_id" type="INTEGER" />
     <column name="address_invoice_id" type="INTEGER" />
     <column name="currency_id" type="INTEGER" />
-    <column defaultValue="0.000000" name="discount" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -1103,8 +1099,8 @@
     <column name="product_id" required="true" type="INTEGER" />
     <column defaultValue="1" name="quantity" type="FLOAT" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
-    <column defaultValue="0.000000" name="price" type="DECIMAL" size="16" scale="6" />
-    <column defaultValue="0.000000" name="promo_price" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="price" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />
     <column name="price_end_of_life" type="TIMESTAMP" />
     <column name="promo" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -1130,8 +1126,8 @@
   <table name="product_price" namespace="Thelia\Model">
     <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
-    <column defaultValue="0.000000" name="price" type="DECIMAL" size="16" scale="6" />
-    <column defaultValue="0.000000" name="promo_price" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="promo_price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
     <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id" onDelete="CASCADE">
       <reference foreign="id" local="product_sale_elements_id" />
@@ -1325,7 +1321,7 @@
   </table>
   <table name="rewriting_url" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" required="true" size="255" type="VARCHAR" sqlType="VARBINARY(255)" />
+    <column name="url" required="true" size="255" sqlType="VARBINARY(255)" type="VARCHAR" />
     <column name="view" size="255" type="VARCHAR" />
     <column name="view_id" size="255" type="VARCHAR" />
     <column name="view_locale" size="255" type="VARCHAR" />
@@ -1397,8 +1393,8 @@
     <column name="order_product_id" required="true" type="INTEGER" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
-    <column defaultValue="0.000000" name="amount" required="true" type="DECIMAL" size="16" scale="6" />
-    <column defaultValue="0.000000" name="promo_amount" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="amount" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0.000000" name="promo_amount" scale="6" size="16" type="DECIMAL" />
     <foreign-key foreignTable="order_product" name="fk_ order_product_tax_order_product_id0" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_product_id" />
     </foreign-key>
@@ -1424,7 +1420,7 @@
     <column name="order_id" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
-    <column defaultValue="0.000000" name="amount" required="true" type="DECIMAL" size="16" scale="6" />
+    <column defaultValue="0.000000" name="amount" required="true" scale="6" size="16" type="DECIMAL" />
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
@@ -1863,11 +1859,6 @@
     <foreign-key foreignTable="country" name="fk_country_area_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="country_id" />
     </foreign-key>
-    <!-- not possible as propel generates 2 methods filterByState in Country model.
-    <foreign-key foreignTable="state" refPhpName="AreaState" name="fk_country_area_state_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="state_id" />
-    </foreign-key>
-    -->
     <index name="country_area_area_id_idx">
       <index-column name="area_id" />
     </index>
@@ -1897,5 +1888,22 @@
       <index-column name="hook_id" />
     </index>
     <behavior name="timestampable" />
+  </table>
+  <table name="state" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0" name="visible" required="true" type="TINYINT" />
+    <column name="isocode" size="4" type="VARCHAR" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="country_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="country" name="fk_state_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="country_id" />
+    </foreign-key>
+    <index name="fk_state_country_id_idx">
+      <index-column name="country_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title" />
+    </behavior>
   </table>
 </database>
