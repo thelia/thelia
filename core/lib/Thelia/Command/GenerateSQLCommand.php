@@ -23,6 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Tools\Version\Version;
 use TheliaSmarty\Template\SmartyParser;
 
 /**
@@ -61,22 +62,10 @@ class GenerateSQLCommand extends ContainerAwareCommand
     {
         $this->init($input);
 
-        $pattern = "`^(?<thelia_version>
-            (?<thelia_major_version>[0-9]+)\.
-            (?<thelia_minor_version>[0-9]+)\.
-            (?<thelia_release_version>[0-9]+)
-            -?(?<thelia_extra_version>.*)) # extra_version will also match empty string
-            $`x";
-        if (!preg_match($pattern, \Thelia\Core\Thelia::THELIA_VERSION, $version_string)) {
-            throw new \RuntimeException(
-                sprintf(
-                    "THELIA_VERSION has a value incompatible with that command : %s".PHP_EOL,
-                    \Thelia\Core\Thelia::THELIA_VERSION
-                )
-            );
-        }
+        // Main insert.sql file
         $content = file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql.tpl');
-        $content = $this->parser->renderString($content, $version_string, false);
+        $version = Version::parse();
+        $content = $this->parser->renderString($content, $version, false);
 
         if (false === file_put_contents(THELIA_SETUP_DIRECTORY . 'insert.sql', $content)) {
             $output->writeln("Can't write file " . THELIA_SETUP_DIRECTORY . 'insert.sql');
