@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\Admin;
+use Thelia\Model\AdminQuery;
 
 class CreateAdminUser extends ContainerAwareCommand
 {
@@ -88,17 +89,17 @@ class CreateAdminUser extends ContainerAwareCommand
             ));
     }
 
-    protected function enterData($dialog, $output, $label, $error_message, $hidden = false)
+    protected function enterData($dialog, $output, $label, $errorMessage = null, $hidden = false)
     {
         $command = $hidden ? 'askHiddenResponse' : 'askAndValidate';
 
         return $dialog->$command(
             $output,
             $this->decorateInfo($label),
-            function ($answer) {
+            function ($answer) use ($errorMessage) {
                 $answer = trim($answer);
                 if (empty($answer)) {
-                    throw new \RuntimeException("This information is mandatory.");
+                    throw new \RuntimeException($errorMessage ? $errorMessage : "This information is mandatory.");
                 }
 
                 return $answer;
@@ -119,11 +120,11 @@ class CreateAdminUser extends ContainerAwareCommand
 
         $admin = new Admin();
 
-        $admin->setLogin($input->getOption("login_name") ?: $this->enterData($dialog, $output, "Admin login name : ", "Please enter a login name."));
+        $admin->setLogin($input->getOption("login_name") ?: $this->enterLogin($dialog, $output));
         $admin->setFirstname($input->getOption("first_name") ?: $this->enterData($dialog, $output, "User first name : ", "Please enter user first name."));
         $admin->setLastname($input->getOption("last_name") ?: $this->enterData($dialog, $output, "User last name : ", "Please enter user last name."));
         $admin->setLocale($input->getOption("locale") ?: 'en_US');
-        $admin->setEmail($input->getOption("email") ?: '');
+        $admin->setEmail($input->getOption("email") ?: $this->enterEmail($dialog, $output));
 
         do {
             $password = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password : ", "Please enter a password.", true);
@@ -146,5 +147,37 @@ class CreateAdminUser extends ContainerAwareCommand
     protected function decorateInfo($text)
     {
         return sprintf("<info>%s</info>", $text);
+    }
+
+    protected function enterLogin($dialog, $output)
+    {
+        return $dialog->askAndValidate($output, $this->decorateInfo("Admin login name : "), function($answer) {
+            $answer = trim($answer);
+            if (empty($answer)) {
+                throw new \RuntimeException("Please enter a login name.");
+            }
+
+            if (AdminQuery::create()->findOneByLogin($answer)) {
+                throw new \RuntimeException("An administrator with this login already exists.");
+            }
+
+            return $answer;
+        });
+    }
+
+    protected function enterEmail($dialog, $output)
+    {
+        return $email = $dialog->askAndValidate($output, $this->decorateInfo("Admin email or empty value : "), function($answer) {
+            $answer = trim($answer);
+            if (!empty($answer) && !filter_var($answer, FILTER_VALIDATE_EMAIL)) {
+                throw new \RuntimeException("Please enter an email or an empty value.");
+            }
+
+            if (AdminQuery::create()->findOneByEmail($answer)) {
+                throw new \RuntimeException("An administrator with this email already exists.");
+            }
+
+            return !empty($answer) ? $answer : uniqid('CHANGE_ME_');
+        });
     }
 }
