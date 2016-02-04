@@ -249,7 +249,9 @@ var pseManager = (function($){
                         $(this).filter('.disabled').removeClass('disabled');
                         if (i === 0) {
                             if (!$(this).hasClass('active')) {
-                                $(this).trigger('click.thumbnails');
+                                $pse.thumbnails.find('.thumbnail.active').removeClass('active');
+                                $('.product-image > img', $(this).closest("#product-gallery")).attr('src',$(this).attr('href'));
+                                $(this).addClass('active');
                                 if ($(this).filter(":visible").length != 1) {
                                     $pse.thumbnails.carousel('next');
                                 }
