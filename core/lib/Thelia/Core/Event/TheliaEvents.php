@@ -408,6 +408,12 @@ final class TheliaEvents
     const CART_DELETEITEM = "action.deleteArticle";
     const CART_CLEAR = "action.clear";
 
+    /** before inserting a cart item in database */
+    const CART_ITEM_CREATE_BEFORE = "action.cart.item.create.before";
+
+    /** before updating a cart item in database */
+    const CART_ITEM_UPDATE_BEFORE = "action.cart.item.update.before";
+
     /**
      * Order linked event
      */
