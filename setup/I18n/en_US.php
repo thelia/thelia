@@ -1419,4 +1419,5 @@ return array(
     'Saint Barthélemy' => 'Saint Barthélemy',
     'Saint Martin (French part)' => 'Saint Martin (French part)',
     'French Southern Territories' => 'French Southern Territories',
+    'The update cannot delete the folder : "%s". Please delete this folder manually.' => 'The update cannot delete the folder : "%s". Please delete this folder manually.'
 );
