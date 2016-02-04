@@ -16,11 +16,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\TokenProvider;
+use Thelia\Tools\URL;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
+    /** @var MailerFactory  */
+    protected $mailer;
+
+    /** @var  TokenProvider */
+    protected $tokenProvider;
+
+    public function __construct(MailerFactory $mailer, TokenProvider $tokenProvider)
+    {
+        $this->mailer = $mailer;
+        $this->tokenProvider = $tokenProvider;
+    }
+
     /**
      * @param AdministratorEvent $event
      */
@@ -32,6 +48,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->setDispatcher($event->getDispatcher())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
+            ->setEmail($event->getEmail())
             ->setLogin($event->getLogin())
             ->setPassword($event->getPassword())
             ->setProfileId($event->getProfile())
@@ -54,6 +71,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setLogin($event->getLogin())
+                ->setEmail($event->getEmail())
                 ->setProfileId($event->getProfile())
                 ->setLocale($event->getLocale())
             ;
@@ -85,8 +103,36 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     public function updatePassword(AdministratorUpdatePasswordEvent $event)
     {
         $admin = $event->getAdmin();
-        $admin->setPassword($event->getPassword())
+
+        $admin
+            ->setPassword($event->getPassword())
+            ->setPasswordRenewToken(null)
             ->save();
+    }
+
+    public function createPassword(AdministratorEvent $event)
+    {
+        $admin = $event->getAdministrator();
+
+        $email = $admin->getEmail();
+
+        if (! empty($email)) {
+            $renewToken = $this->tokenProvider->getToken();
+
+            $admin
+                ->setPasswordRenewToken($renewToken)
+                ->save();
+
+            $this->mailer->sendEmailMessage(
+                'new_admin_password',
+                [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+                [ $email => $admin->getFirstname() . ' ' . $admin->getLastname() ],
+                [
+                    'token'     => $renewToken,
+                    'admin'     => $admin
+                ]
+            );
+        }
     }
 
     /**
@@ -98,7 +144,8 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ADMINISTRATOR_CREATE                        => array('create', 128),
             TheliaEvents::ADMINISTRATOR_UPDATE                        => array('update', 128),
             TheliaEvents::ADMINISTRATOR_DELETE                        => array('delete', 128),
-            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD              => array('updatePassword', 128)
+            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD                => array('updatePassword', 128),
+            TheliaEvents::ADMINISTRATOR_CREATEPASSWORD                => array('createPassword', 128)
         );
     }
 }

@@ -21,6 +21,9 @@ namespace Thelia\Form\Definition;
 final class AdminForm
 {
     const ADMIN_LOGIN = 'thelia.admin.login';
+    const ADMIN_LOST_PASSWORD = 'thelia.admin.lostpassword';
+    const ADMIN_CREATE_PASSWORD = 'thelia.admin.createpassword';
+
     const SEO = 'thelia.admin.seo';
 
     const CUSTOMER_CREATE = 'thelia.admin.customer.create';

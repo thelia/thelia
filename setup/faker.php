@@ -223,6 +223,7 @@ try {
         ->setLogin('thelia')
         ->setPassword('thelia')
         ->setLocale('en_US')
+        ->setEmail('')
         ->save();
 
     for ($i=0; $i<3; $i++) {
@@ -233,6 +234,7 @@ try {
             ->setLogin($faker->firstname)
             ->setPassword('azerty')
             ->setLocale('en_US')
+            ->setEmail($faker->email)
             ->save();
     }
 
@@ -423,7 +425,6 @@ try {
                 $document = new \Thelia\Model\ContentDocument();
                 $document->setContentId($contentId);
                 generate_document($document, 'content', $contentId);
-
             }
         }
     }

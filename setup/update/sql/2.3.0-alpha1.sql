@@ -125,16 +125,16 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 8, 'es_ES', NULL, '',  ''),
 (@max_id + 9, 'es_ES', NULL, '', ''),
 (@max_id + 10, 'es_ES', NULL, '', ''),
-(@max_id + 1, 'fr_FR', NULL, '', ''),
-(@max_id + 2, 'fr_FR', NULL, '', ''),
-(@max_id + 3, 'fr_FR', NULL, '', ''),
-(@max_id + 4, 'fr_FR', NULL, '', ''),
-(@max_id + 5, 'fr_FR', NULL, '',    ''),
-(@max_id + 6, 'fr_FR', NULL, '', ''),
-(@max_id + 7, 'fr_FR', NULL, '', ''),
-(@max_id + 8, 'fr_FR', NULL, '',  ''),
-(@max_id + 9, 'fr_FR', NULL, '', ''),
-(@max_id + 10, 'fr_FR', NULL, '', '')
+(@max_id + 1, 'fr_FR', 'state-edit - at the top', '', ''),
+(@max_id + 2, 'fr_FR', 'state-edit - bottom', '', ''),
+(@max_id + 3, 'fr_FR', 'state - Edit JavaScript', '', ''),
+(@max_id + 4, 'fr_FR', 'states - at the top', '', ''),
+(@max_id + 5, 'fr_FR', 'states - table header', '',    ''),
+(@max_id + 6, 'fr_FR', 'states - table row', '', ''),
+(@max_id + 7, 'fr_FR', 'states - bottom', '', ''),
+(@max_id + 8, 'fr_FR', 'state - creation form', '',  ''),
+(@max_id + 9, 'fr_FR', 'state - delete form', '', ''),
+(@max_id + 10, 'fr_FR', 'states - JavaScript', '', '')
 ;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
