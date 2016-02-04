@@ -42,14 +42,10 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request();
         $request->setSession($session);
-
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-        $parser = $this->getMock("Thelia\\Core\\Template\\ParserInterface");
-
-        $this->mailerFactory = new MailerFactory(
-            $dispatcher,
-            $parser
-        );
+        
+        $this->mailerFactory = $this->getMockBuilder("Thelia\\Mailer\\MailerFactory")
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $translator = new Translator(new Container());
 
