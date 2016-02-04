@@ -13,8 +13,6 @@ ALTER TABLE `newsletter` ADD `unsubscribed` TINYINT(1) NOT NULL DEFAULT '0' AFTE
 ALTER TABLE  `admin` ADD  `email` VARCHAR(255) NOT NULL AFTER `remember_me_serial` ;
 ALTER TABLE  `admin` ADD  `password_renew_token` VARCHAR(255) NOT NULL AFTER `email` ;
 
-ALTER TABLE `admin` ADD UNIQUE `email_UNIQUE` (`email`);
-
 -- add admin password renew message
 
 SELECT @max := MAX(`id`) FROM `message`;
@@ -33,6 +31,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 -- at next admin login.
 
 UPDATE `admin` set email = CONCAT('CHANGE_ME_', ID);
+
+ALTER TABLE `admin` ADD UNIQUE `email_UNIQUE` (`email`);
 
 -- additional config variables
 
