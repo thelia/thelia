@@ -16,19 +16,19 @@ use Thelia\Model\Cart;
 
 class CartDuplicationEvent extends CartEvent
 {
-    protected $oldCart;
+    protected $originalCart;
 
-    public function __construct(Cart $newCart, Cart $oldCart)
+    public function __construct(Cart $duplicatedCart, Cart $originalCart)
     {
-        parent::__construct($newCart);
+        parent::__construct($duplicatedCart);
 
-        $this->oldCart = $oldCart;
+        $this->originalCart = $originalCart;
     }
 
     /**
      * @return Cart
      */
-    public function getNewCart()
+    public function getDuplicatedCart()
     {
         return $this->cart;
     }
@@ -36,8 +36,8 @@ class CartDuplicationEvent extends CartEvent
     /**
      * @return Cart
      */
-    public function getOldCart()
+    public function getOriginalCart()
     {
-        return $this->oldCart;
+        return $this->originalCart;
     }
 }
