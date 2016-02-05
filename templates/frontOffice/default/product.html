@@ -153,12 +153,13 @@
                             <meta itemprop="category" content="{$TITLE}">
                         {/loop}
                         {* List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition *}
-                        <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
+                        <meta itemprop="itemCondition" itemtype="http://schema.org/ItemCondition" content="NewCondition">
                         {* List of currency : The currency used to describe the product price, in three-letter ISO format. *}
-                        <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
+                        <meta itemprop="priceCurrency" content="{currency attr="code"}">
 
                         <span id="pse-promo">
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE}</span></span>
+                            <span class="special-price"><span class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
+                            <meta itemprop="price" content="{$TAXED_PROMO_PRICE}">
                             {if $SHOW_ORIGINAL_PRICE}
                                 <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE}</span></span>
                             {/if}
