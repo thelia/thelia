@@ -823,7 +823,7 @@ final class TheliaEvents
      */
     public static function getModuleEvent($eventName, $moduleCode)
     {
-        return sprintf("%s.%s", $eventName, $moduleCode);
+        return sprintf("%s.%s", $eventName, strtolower($moduleCode));
     }
 
     /* Payment module */
