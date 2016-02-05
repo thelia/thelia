@@ -22,7 +22,6 @@ use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
-use Thelia\Model\OrderPostage;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;

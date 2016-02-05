@@ -154,7 +154,7 @@
                                     {/if}
                                     {if $delivery_id != 0 }
                                     <div>
-                                        {intl l="with:"} {loop type="delivery" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
+                                        {intl l="with:"} {loop type="module" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
                                     </div>
                                     {else}
                                     <div class="alert alert-danger">
