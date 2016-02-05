@@ -101,22 +101,25 @@ class Version
      *     'extra' => 'alphanumeric'
      * ]
      */
-    public static function parse($version = null)
+    public static function parse($version = null, $releaseMandatory = true)
     {
         if (is_null($version)) {
             $version = \Thelia\Core\Thelia::THELIA_VERSION;
         }
 
+        $release = $releaseMandatory?'':'?';
         $pattern = "`^(?<version>
             (?<major>[0-9]+)\.
-            (?<minus>[0-9]+)\.
-            (?<release>[0-9]+)
-            -?(?<extra>
-                [a-zA-Z0-9]*    # extra_version can match alphanumeric or empty string
-                (?:(?<!-)-dev)? # -dev suffix optional (but not --dev), and will be included it in the extra string
-            )
-            )$`x";
-
+            (?<minus>[0-9]+)
+            \.$release
+            (?:
+                (?<release>[0-9]+)
+                -?(?<extra>
+                    [a-zA-Z0-9]*    # extra_version can match alphanumeric or empty string
+                    (?:(?<!-)-dev)? # -dev suffix optional (but not --dev), and will be included it in the extra string
+                )
+            )$release      # release number is not mandatory (major.minus allowed)
+        )$`x";
         if (!preg_match($pattern, $version, $match)) {
             throw new \InvalidArgumentException(
                 sprintf(
@@ -124,6 +127,15 @@ class Version
                     $version
                 )
             );
+        }
+
+        if ($releaseMandatory !== true) {
+            if (!isset($match['release'])) {
+                $match['release'] = '';
+            }
+            if (!isset($match['extra'])) {
+                $match['extra'] = '';
+            }
         }
 
         return [

@@ -82,40 +82,61 @@ class Version extends \PHPUnit_Framework_TestCase
     public function parseProvider()
     {
         return [
-            [ '2.1.0', [
+            [ '2.1.0', true, [
                 'version'         => '2.1.0',
                 'major'           => '2',
                 'minus'           => '1',
                 'release'         => '0',
                 'extra'           => '',
             ] ],
-            [ '2.5.0', [
+            [ '2.5.0', true, [
                 'version' => '2.5.0',
                 'major'   => '2',
                 'minus'   => '5',
                 'release' => '0',
                 'extra'   => '',
             ], ],
-            [ '2.3.0-alpha2', [
+            [ '2.3.0-alpha2', true, [
                 'version' => '2.3.0-alpha2',
                 'major'   => '2',
                 'minus'   => '3',
                 'release' => '0',
                 'extra'   => 'alpha2',
             ], ],
-            [ '2.3.0-alpha3-dev', [
+            [ '2.3.0-alpha3-dev', true, [
                 'version' => '2.3.0-alpha3-dev',
                 'major'   => '2',
                 'minus'   => '3',
                 'release' => '0',
                 'extra'   => 'alpha3-dev',
             ], ],
-            [ '2.3.0-dev', [
+            [ '2.3.0-dev', true, [
                 'version' => '2.3.0-dev',
                 'major'   => '2',
                 'minus'   => '3',
                 'release' => '0',
                 'extra'   => 'dev',
+            ], ],
+            [ '2.3.0', true, [
+                'version' => '2.3.0',
+                'major'   => '2',
+                'minus'   => '3',
+                'release' => '0',
+                'extra'   => '',
+            ], ],
+            [ '2.3.0', false, [
+                'version' => '2.3.0',
+                'major'   => '2',
+                'minus'   => '3',
+                'release' => '0',
+                'extra'   => '',
+            ], ],
+            [ '2.3', false, [
+                'version' => '2.3',
+                'major'   => '2',
+                'minus'   => '3',
+                'release' => '',
+                'extra'   => '',
             ], ],
         ];
     }
@@ -123,18 +144,20 @@ class Version extends \PHPUnit_Framework_TestCase
     public function exceptionParseProvider()
     {
         return [
-            ['x.3.1',         ],
-            ['2.x.1',         ],
-            ['2.3.x',         ],
-            ['2.3.1-alpha.2', ],
-            ['2.1',           ],
-            ['a.4',           ],
-            ['2.1.2.4',       ],
-            ['2.1.2.4.5',     ],
-            ['1.alpha.8',     ],
-            ['.1.2',          ],
-            [ '2.3.-dev',     ],
-            [ '2.3.2--dev',   ],
+            ['x.3.1',         true,],
+            ['2.x.1',         true,],
+            ['2.3.x',         true,],
+            ['2.3.1-alpha.2', true,],
+            ['2.1',           true,],
+            ['a.4',           true,],
+            ['2.1.2.4',       true,],
+            ['2.1.2.4.5',     true,],
+            ['1.alpha.8',     true,],
+            ['.1.2',          true,],
+            [ '2.3.-dev',     true,],
+            [ '2.3.2--dev',   true,],
+            [ '2.3',          true,],
+            [ '2.3',          true,],
         ];
     }
 
@@ -158,22 +181,22 @@ class Version extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider ParseProvider
      */
-    public function testParse($version, $expected)
+    public function testParse($version, $releaseMandatory, $expected)
     {
         $message = sprintf(
             "=====\n\tVersion: %s\n\t expected: %s\n======\n",
             var_export($version, true),
             var_export($expected, true)
         );
-        $this->assertEquals($expected, Tester::parse($version), $message);
+        $this->assertEquals($expected, Tester::parse($version, $releaseMandatory), $message);
     }
 
     /**
      * @dataProvider exceptionParseProvider
      * @expectedException InvalidArgumentException
      */
-    public function testExceptionParse($version)
+    public function testExceptionParse($version, $releaseMandatory)
     {
-        Tester::parse($version);
+        Tester::parse($version, $releaseMandatory);
     }
 }
