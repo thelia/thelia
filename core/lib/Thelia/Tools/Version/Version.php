@@ -111,8 +111,11 @@ class Version
             (?<major>[0-9]+)\.
             (?<minus>[0-9]+)\.
             (?<release>[0-9]+)
-            -?(?<extra>[a-zA-Z0-9]*) # extra_version will also match empty string
-        )$`x";
+            -?(?<extra>
+                [a-zA-Z0-9]*    # extra_version can match alphanumeric or empty string
+                (?:(?<!-)-dev)? # -dev suffix optional (but not --dev), and will be included it in the extra string
+            )
+            )$`x";
 
         if (!preg_match($pattern, $version, $match)) {
             throw new \InvalidArgumentException(

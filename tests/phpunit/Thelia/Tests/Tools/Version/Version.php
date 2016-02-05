@@ -103,6 +103,20 @@ class Version extends \PHPUnit_Framework_TestCase
                 'release' => '0',
                 'extra'   => 'alpha2',
             ], ],
+            [ '2.3.0-alpha3-dev', [
+                'version' => '2.3.0-alpha3-dev',
+                'major'   => '2',
+                'minus'   => '3',
+                'release' => '0',
+                'extra'   => 'alpha3-dev',
+            ], ],
+            [ '2.3.0-dev', [
+                'version' => '2.3.0-dev',
+                'major'   => '2',
+                'minus'   => '3',
+                'release' => '0',
+                'extra'   => 'dev',
+            ], ],
         ];
     }
 
@@ -119,6 +133,8 @@ class Version extends \PHPUnit_Framework_TestCase
             ['2.1.2.4.5',     ],
             ['1.alpha.8',     ],
             ['.1.2',          ],
+            [ '2.3.-dev',     ],
+            [ '2.3.2--dev',   ],
         ];
     }
 
