@@ -177,3 +177,4 @@ catch (\Exception $ex) {
 
 include('footer.php');
 }
+
