@@ -197,14 +197,6 @@ class Delivery extends BaseSpecificModule
             $address = AddressQuery::create()->findPk($addressId);
         }
 
-        /*
-        if (null === $address) {
-            throw new DeliveryException(
-                $this->translator->trans('A delivery address is required for Delivery loop.')
-            );
-        }
-        */
-
         return $address;
     }
 }

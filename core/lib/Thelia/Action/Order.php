@@ -528,10 +528,12 @@ class Order extends BaseAction implements EventSubscriberInterface
         $order = $event->getOrder();
         $newStatus = $event->getStatus();
         $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
+        /** @var PaymentModuleInterface $paymentModuleInstance */
+        $paymentModuleInstance = $paymentModule->createInstance();
 
         $manageStockOnCreation = $this->isModuleManageStockOnCreation(
             $event->getDispatcher(),
-            $paymentModule
+            $paymentModuleInstance
         );
 
         $this->updateQuantity($order, $newStatus, $manageStockOnCreation);

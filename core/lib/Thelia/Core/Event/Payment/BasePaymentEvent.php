@@ -23,7 +23,7 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class BasePaymentEvent extends ActionEvent
 {
-    /** @var PaymentModuleInterface  */
+    /** @var PaymentModuleInterface */
     protected $module = null;
 
     /**

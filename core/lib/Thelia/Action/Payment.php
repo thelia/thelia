@@ -14,7 +14,6 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -57,7 +56,7 @@ class Payment implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::MODULE_PAYMENT_IS_VALID=> ['isValid', 128],
+            TheliaEvents::MODULE_PAYMENT_IS_VALID => ['isValid', 128],
         ];
     }
 }
