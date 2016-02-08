@@ -182,7 +182,7 @@ class ModuleTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 55, null);
-        $this->addColumn('VERSION', 'Version', 'VARCHAR', true, 10, '');
+        $this->addColumn('VERSION', 'Version', 'VARCHAR', true, 25, '');
         $this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
         $this->addColumn('CATEGORY', 'Category', 'VARCHAR', true, 50, 'classic');
         $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);

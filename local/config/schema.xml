@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
@@ -784,7 +784,7 @@
   <table name="module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="55" type="VARCHAR" />
-    <column defaultValue="" name="version" required="true" size="10" type="VARCHAR" />
+    <column defaultValue="" name="version" required="true" size="25" type="VARCHAR" />
     <column name="type" required="true" type="TINYINT" />
     <column defaultValue="classic" name="category" required="true" size="50" type="VARCHAR" />
     <column name="activate" type="TINYINT" />
