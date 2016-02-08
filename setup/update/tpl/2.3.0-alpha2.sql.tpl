@@ -50,4 +50,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 {/foreach}
 ;
 
+
+-- Update module version column
+
+ALTER TABLE `module` MODIFY `version` varchar(25) NOT NULL DEFAULT '';
+
 SET FOREIGN_KEY_CHECKS = 1;

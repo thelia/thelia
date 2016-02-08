@@ -47,4 +47,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),    (@max_id + 1, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (@max_id + 2, 'fr_FR', 'Autoriser les administrateurs à recréer leur mot de passe', NULL, NULL, NULL);
 
+
+-- Update module version column
+
+ALTER TABLE `module` MODIFY `version` varchar(25) NOT NULL DEFAULT '';
+
 SET FOREIGN_KEY_CHECKS = 1;
