@@ -61,7 +61,7 @@ try {
             ->setFirstname('admin')
             ->setLastname('admin')
             ->setLocale(empty($_POST['admin_locale']) ? 'en_US' : $_POST['admin_locale'])
-            ->setLocale($_POST['admin_email'])
+            ->setEmail($_POST['admin_email'])
             ->save();
 
 
