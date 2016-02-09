@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Cart\CartEvent;
@@ -480,11 +481,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $dispatcher
         );
 
-        $cartEvent = new CartEvent($newCart);
-
+        $cartEvent = new CartDuplicationEvent($newCart, $cart);
         $dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
 
-        return $cartEvent->getCart();
+        return $cartEvent->getDuplicatedCart();
     }
 
     /**
