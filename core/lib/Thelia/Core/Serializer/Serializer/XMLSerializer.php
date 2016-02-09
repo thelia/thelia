@@ -31,7 +31,15 @@ class XMLSerializer extends AbstractSerializer
      */
     private $xmlDataStart;
 
-    private $rootNodeName = 'data';
+    /**
+     * @var string Root node name
+     */
+    private $rootNodeName = 'root';
+
+    /**
+     * @var string Data node name
+     */
+    private $dataNodeName = 'data';
 
     /**
      * Class constructor.
@@ -39,7 +47,7 @@ class XMLSerializer extends AbstractSerializer
     public function __construct()
     {
         $this->xmlEncoder = new XmlEncoder;
-        $this->xmlEncoder->setRootNodeName($this->rootNodeName);
+        $this->xmlEncoder->setRootNodeName($this->dataNodeName);
     }
 
     public function getId()
@@ -62,11 +70,61 @@ class XMLSerializer extends AbstractSerializer
         return 'application/xml';
     }
 
+    /**
+     * Get root node name
+     *
+     * @return string Root node name
+     */
+    public function getRootNodeName()
+    {
+        return $this->rootNodeName;
+    }
+
+    /**
+     * Set root node name
+     *
+     * @param string $rootNodeName Root node name
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setRootNodeName($rootNodeName)
+    {
+        $this->rootNodeName = $rootNodeName;
+
+        return $this;
+    }
+
+    /**
+     * Get data node name
+     *
+     * @return string Root node name
+     */
+    public function getDataNodeName()
+    {
+        return $this->dataNodeName;
+    }
+
+    /**
+     * Set data node name
+     *
+     * @param string $dataNodeName Root node name
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setDataNodeName($dataNodeName)
+    {
+        $this->dataNodeName = $dataNodeName;
+
+        return $this;
+    }
+
     public function prepareFile(\SplFileObject $fileObject)
     {
         $this->xmlDataStart = null;
 
-        $fileObject->fwrite('<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<root>' . PHP_EOL);
+        $fileObject->fwrite(
+            '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<' . $this->rootNodeName . '>' . PHP_EOL
+        );
     }
 
     public function serialize($data)
@@ -74,7 +132,7 @@ class XMLSerializer extends AbstractSerializer
         $xml = $this->xmlEncoder->encode($data, 'array');
 
         if ($this->xmlDataStart === null) {
-            $this->xmlDataStart = strpos($xml, '<' . $this->rootNodeName . '>');
+            $this->xmlDataStart = strpos($xml, '<' . $this->dataNodeName . '>');
         }
 
         return substr($xml, $this->xmlDataStart, -1);
@@ -87,7 +145,7 @@ class XMLSerializer extends AbstractSerializer
 
     public function finalizeFile(\SplFileObject $fileObject)
     {
-        $fileObject->fwrite(PHP_EOL . '</root>');
+        $fileObject->fwrite(PHP_EOL . '</' . $this->rootNodeName . '>');
     }
 
     public function unserialize(\SplFileObject $fileObject)
