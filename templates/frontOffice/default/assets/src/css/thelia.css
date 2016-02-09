@@ -8798,6 +8798,10 @@ header .header .language-container .currency-switch .select {
   padding: 0;
   width: 19%;
 }
+#product #product-gallery #product-thumbnails ul > li .thumbnail.disabled {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
 #product #product-details .name {
   margin-top: 0;
 }
