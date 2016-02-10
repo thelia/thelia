@@ -112,7 +112,7 @@ class CSVSerializer extends AbstractSerializer
 
             // Copy file content into tmp file
             $fileObject->rewind();
-            fwrite($fd, $fileObject->fread($fileObject->getSize()));
+            fwrite($fd, file_get_contents($fileObject->getPathname()));
 
             // Overwrite file content with tmp content
             rewind($fd);
