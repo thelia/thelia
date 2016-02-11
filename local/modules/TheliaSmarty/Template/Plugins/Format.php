@@ -195,8 +195,10 @@ class Format extends AbstractSmartyPlugin
      *  dec_point => separator for the decimal point
      *  thousands_sep => thousands separator
      *  symbol => Currency symbol
+     *  remove_zero_decimal => remove zero after the dec_point
      *
      *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
+     *  ex : {format_money number="1246.00" decimals="2" dec_point="," thousands_sep=" " symbol="€" remove_zero_decimal=true} will output "1 246 €"
      *
      * @param $params
      * @param  null                                                   $template
@@ -217,7 +219,8 @@ class Format extends AbstractSmartyPlugin
                 $this->getParam($params, "decimals", null),
                 $this->getParam($params, "dec_point", null),
                 $this->getParam($params, "thousands_sep", null),
-                $this->getParam($params, "currency_id", null)
+                $this->getParam($params, "currency_id", null),
+                $this->getParam($params, "remove_zero_decimal", false)
             );
         }
 
@@ -226,7 +229,8 @@ class Format extends AbstractSmartyPlugin
             $this->getParam($params, "decimals", null),
             $this->getParam($params, "dec_point", null),
             $this->getParam($params, "thousands_sep", null),
-            $this->getParam($params, "symbol", null)
+            $this->getParam($params, "symbol", null),
+            $this->getParam($params, "remove_zero_decimal", false)
         );
     }
 
