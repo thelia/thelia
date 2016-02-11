@@ -81,7 +81,8 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanTypeArgument('with_prev_next_info', false)
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
+            Argument::createBooleanOrBothTypeArgument('content_count_visible', 1)
         );
     }
 
@@ -221,6 +222,13 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var  $content_count_visible */
+        $content_count_visible = $this->getContentCountVisible();
+
+        if ($content_count_visible !== BooleanOrBothType::ANY) {
+            $content_count_visible = $content_count_visible ? 1 : 0;
+        }
+    
         /** @var \Thelia\Model\Folder $folder */
         foreach ($loopResult->getResultDataCollection() as $folder) {
             $loopResultRow = new LoopResultRow($folder);
@@ -240,7 +248,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("META_DESCRIPTION", $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $folder->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("CHILD_COUNT", $folder->countChild())
-                ->set("CONTENT_COUNT", $folder->countAllContents())
+                ->set("CONTENT_COUNT", $folder->countAllContents($content_count_visible))
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition());
 
