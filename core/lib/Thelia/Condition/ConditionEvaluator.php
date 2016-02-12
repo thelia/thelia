@@ -36,8 +36,7 @@ class ConditionEvaluator
         /** @var ConditionInterface $condition */
         foreach ($conditions as $condition) {
             if (!$condition->isMatching()) {
-                $isMatching = false;
-                break;
+                return false;
             }
         }
 
