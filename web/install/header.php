@@ -128,4 +128,3 @@ if ($context == "install") { ?>
                     </div>
 <?php
 }
-
