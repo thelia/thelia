@@ -239,7 +239,7 @@ class BaseAdminController extends BaseController
     protected function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->container->get('request')->duplicate($query, null, $path);
+        $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }

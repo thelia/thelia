@@ -57,7 +57,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.administrator" class="Thelia\Action\Administrator" scope="request">
+        <service id="thelia.action.administrator" class="Thelia\Action\Administrator">
             <argument type="service" id="mailer"/>
             <argument type="service" id="thelia.token_provider"/>
             <tag name="kernel.event_subscriber"/>
