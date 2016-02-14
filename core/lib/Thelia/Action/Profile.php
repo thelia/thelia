@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -29,13 +30,15 @@ class Profile extends BaseAction implements EventSubscriberInterface
 {
     /**
      * @param ProfileEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(ProfileEvent $event)
+    public function create(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $profile = new ProfileModel();
 
         $profile
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setCode($event->getCode())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -51,12 +54,14 @@ class Profile extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param ProfileEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(ProfileEvent $event)
+    public function update(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             $profile
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())

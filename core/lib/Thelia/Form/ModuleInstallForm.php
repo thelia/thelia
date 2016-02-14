@@ -15,7 +15,7 @@ namespace Thelia\Form;
 use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Module\Validator\ModuleValidator;

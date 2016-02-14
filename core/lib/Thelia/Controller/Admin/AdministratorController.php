@@ -141,11 +141,19 @@ class AdministratorController extends AbstractCrudController
             ->findOneById($this->getRequest()->get('administrator_id'));
     }
 
+    /**
+     * @param Admin $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getLogin();
     }
 
+    /**
+     * @param Admin $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

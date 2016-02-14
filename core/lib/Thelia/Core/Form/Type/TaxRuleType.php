@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Count;
 use Thelia\Core\Form\Type\Field\TaxRuleIdType;
@@ -34,9 +34,9 @@ class TaxRuleType extends AbstractTheliaType
         $this->taxRuleIdType = $taxRuleIdType;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->replaceDefaults([
+        $resolver->setDefaults([
             "cascade_validation" => true,
         ]);
     }

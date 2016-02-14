@@ -31,7 +31,7 @@ class FolderQuery extends BaseFolderQuery
     /**
      * find all contents for a given folder.
      *
-     * @param $folderId the folder id or an array of id
+     * @param  int $folderId the folder id or an array of id
      * @param  int                    $depth           max depth you want to search
      * @param  int                    $currentPosition don't change this param, it is used for recursion
      * @return \Thelia\Model\Folder[]

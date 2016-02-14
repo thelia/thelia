@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Tests\Template\Plugin;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CountryQuery;
@@ -28,12 +29,15 @@ use TheliaSmarty\Template\Plugins\Format;
  */
 class FormatTest extends SmartyPluginTestCase
 {
-    /** @var  Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     public function testFormatTwoDimensionalArray()
     {
-        $plugin = new Format(new Request());
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
+
+        $plugin = new Format($requestStack);
 
         $params['values'] = [
             'Colors' => ['Green', 'Yellow', 'Red'],
@@ -218,12 +222,13 @@ class FormatTest extends SmartyPluginTestCase
 
 
     /**
+     * @param ContainerBuilder $container
      * @return \TheliaSmarty\Template\AbstractSmartyPlugin
      */
     protected function getPlugin(ContainerBuilder $container)
     {
-        $this->request = $container->get("request");
+        $this->requestStack = $container->get("request_stack");
 
-        return new Format($this->request);
+        return new Format($this->requestStack);
     }
 }

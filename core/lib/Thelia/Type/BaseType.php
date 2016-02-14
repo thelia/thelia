@@ -12,7 +12,7 @@
 
 namespace Thelia\Type;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  *

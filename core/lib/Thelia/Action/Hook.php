@@ -33,9 +33,7 @@ use Thelia\Model\HookQuery;
  */
 class Hook extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheDir;
 
     public function __construct($cacheDir)
@@ -43,7 +41,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         $this->cacheDir = $cacheDir;
     }
 
-    public function create(HookCreateEvent $event)
+    public function create(HookCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $hook = new HookModel();
 
@@ -58,10 +56,10 @@ class Hook extends BaseAction implements EventSubscriberInterface
 
         $event->setHook($hook);
 
-        $this->cacheClear($event->getDispatcher());
+        $this->cacheClear($dispatcher);
     }
 
-    public function update(HookUpdateEvent $event)
+    public function update(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -78,17 +76,17 @@ class Hook extends BaseAction implements EventSubscriberInterface
                 ->save();
 
             $event->setHook($hook);
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
-    public function delete(HookDeleteEvent $event)
+    public function delete(HookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook->delete();
             $event->setHook($hook);
 
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
@@ -132,7 +130,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleActivation(HookToggleActivationEvent $event)
+    public function toggleActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -140,7 +138,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
                 ->save();
             $event->setHook($hook);
 
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
@@ -152,24 +150,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

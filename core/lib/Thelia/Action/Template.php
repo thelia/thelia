@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\TemplateTableMap;
@@ -39,13 +40,15 @@ class Template extends BaseAction implements EventSubscriberInterface
      * Create a new template entry
      *
      * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(TemplateCreateEvent $event)
+    public function create(TemplateCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $template = new TemplateModel();
 
         $template
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
 
             ->setLocale($event->getLocale())
             ->setName($event->getTemplateName())
@@ -60,12 +63,14 @@ class Template extends BaseAction implements EventSubscriberInterface
      * Change a product template
      *
      * @param \Thelia\Core\Event\Template\TemplateUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(TemplateUpdateEvent $event)
+    public function update(TemplateUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
             $template
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
 
                  ->setLocale($event->getLocale())
                  ->setName($event->getTemplateName())
@@ -79,9 +84,11 @@ class Template extends BaseAction implements EventSubscriberInterface
      * Delete a product template entry
      *
      * @param \Thelia\Core\Event\Template\TemplateDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      */
-    public function delete(TemplateDeleteEvent $event)
+    public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== ($template = TemplateQuery::create()->findPk($event->getTemplateId()))) {
             // Check if template is used by a product
@@ -93,7 +100,7 @@ class Template extends BaseAction implements EventSubscriberInterface
 
                 try {
                     $template
-                        ->setDispatcher($event->getDispatcher())
+                        ->setDispatcher($dispatcher)
                         ->delete($con);
 
                     // We have to also delete any reference of this template in category tables
@@ -137,20 +144,24 @@ class Template extends BaseAction implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updateAttributePosition(UpdatePositionEvent $event)
+    public function updateAttributePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event);
+        $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event, $dispatcher);
     }
 
     /**
      * Changes position, selecting absolute ou relative change.
      *
      * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updateFeaturePosition(UpdatePositionEvent $event)
+    public function updateFeaturePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
+        $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event, $dispatcher);
     }
 
     public function deleteAttribute(TemplateDeleteAttributeEvent $event)

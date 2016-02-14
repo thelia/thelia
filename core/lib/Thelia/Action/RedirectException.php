@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Tools\URL;
+use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\HttpKernel\Exception\RedirectException as ExceptionRedirectException;
 
 /**
  * Class RedirectException
@@ -25,9 +27,7 @@ use Thelia\Tools\URL;
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {
-    /**
-    * @var URL
-    */
+    /** @var URL */
     protected $urlManager;
 
     public function __construct(URL $urlManager)
@@ -38,10 +38,10 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
     public function checkRedirectException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        if ($exception instanceof \Thelia\Core\HttpKernel\Exception\RedirectException) {
+        if ($exception instanceof ExceptionRedirectException) {
             $response = RedirectResponse::create($exception->getUrl(), $exception->getStatusCode());
             $event->setResponse($response);
-        } elseif ($exception instanceof \Thelia\Core\Security\Exception\AuthenticationException) {
+        } elseif ($exception instanceof AuthenticationException) {
             // Redirect to the login template
             $response = RedirectResponse::create($this->urlManager->viewUrl($exception->getLoginTemplate()));
             $event->setResponse($response);
@@ -49,24 +49,7 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

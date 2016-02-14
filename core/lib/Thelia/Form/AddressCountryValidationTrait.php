@@ -13,7 +13,7 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;

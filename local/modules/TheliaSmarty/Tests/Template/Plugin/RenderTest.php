@@ -73,7 +73,7 @@ class RenderTest extends SmartyPluginTestCase
     {
         return new Render(
             new ControllerResolver($container),
-            $container->get("request"),
+            $container->get("request_stack"),
             $container
         );
     }

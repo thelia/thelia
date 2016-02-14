@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
@@ -49,11 +50,13 @@ class Brand extends BaseAction implements EventSubscriberInterface
      * process update brand
      *
      * @param BrandUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(BrandUpdateEvent $event)
+    public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-            $brand->setDispatcher($event->getDispatcher());
+            $brand->setDispatcher($dispatcher);
 
             $brand
                 ->setVisible($event->getVisible())
@@ -74,13 +77,17 @@ class Brand extends BaseAction implements EventSubscriberInterface
      * Toggle Brand visibility
      *
      * @param BrandToggleVisibilityEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleVisibility(BrandToggleVisibilityEvent $event)
+    public function toggleVisibility(BrandToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $brand = $event->getBrand();
 
         $brand
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setVisible(!$brand->getVisible())
             ->save();
 
@@ -90,30 +97,32 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * Change Brand SEO
      *
-     * @param \Thelia\Core\Event\UpdateSeoEvent $event
-     *
-     * @return mixed
+     * @param UpdateSeoEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return Object
      */
-    public function updateSeo(UpdateSeoEvent $event)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdateSeo(BrandQuery::create(), $event);
+        return $this->genericUpdateSeo(BrandQuery::create(), $event, $dispatcher);
     }
 
-    public function delete(BrandDeleteEvent $event)
+    public function delete(BrandDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-            $brand->setDispatcher($event->getDispatcher())->delete();
+            $brand->setDispatcher($dispatcher)->delete();
 
             $event->setBrand($brand);
         }
     }
 
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(BrandQuery::create(), $event);
+        $this->genericUpdatePosition(BrandQuery::create(), $event, $dispatcher);
     }
+
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

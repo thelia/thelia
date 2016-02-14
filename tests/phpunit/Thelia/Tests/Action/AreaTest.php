@@ -27,17 +27,16 @@ use Thelia\Model\CountryQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class AreaTest extends \PHPUnit_Framework_TestCase
+class AreaTest extends BaseAction
 {
     public function testCreate()
     {
         $event = new AreaCreateEvent();
         $event
-            ->setAreaName('foo')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+            ->setAreaName('foo');
 
         $areaAction = new Area();
-        $areaAction->create($event);
+        $areaAction->create($event, null, $this->getMockEventDispatcher());
 
         $createdArea = $event->getArea();
 
@@ -53,16 +52,16 @@ class AreaTest extends \PHPUnit_Framework_TestCase
     /**
      * @param AreaModel $area
      * @depends testCreate
+     * @return AreaModel
      */
     public function testUpdatePostage(AreaModel $area)
     {
         $event = new AreaUpdatePostageEvent($area->getId());
         $event
-            ->setPostage(20)
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+            ->setPostage(20);
 
         $areaAction = new Area();
-        $areaAction->updatePostage($event);
+        $areaAction->updatePostage($event, null, $this->getMockEventDispatcher());
 
         $updatedArea = $event->getArea();
 
@@ -75,13 +74,13 @@ class AreaTest extends \PHPUnit_Framework_TestCase
     /**
      * @param AreaModel $area
      * @depends testUpdatePostage
+     * @return AreaModel
      */
     public function testAddCountry(AreaModel $area)
     {
         $country = CountryQuery::create()->findOne();
 
         $event = new AreaAddCountryEvent($area->getId(), [ $country->getId() ]);
-        $event->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $areaAction = new Area();
         $areaAction->addCountry($event);
@@ -99,13 +98,13 @@ class AreaTest extends \PHPUnit_Framework_TestCase
     /**
      * @param AreaModel $area
      * @depends testAddCountry
+     * @return AreaModel
      */
     public function testRemoveCountry(AreaModel $area)
     {
         $country = CountryQuery::create()->filterByArea($area)->find()->getFirst();
 
         $event = new AreaRemoveCountryEvent($area->getId(), $country->getId());
-        $event->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $areaAction = new Area();
         $areaAction->removeCountry($event);
@@ -125,15 +124,15 @@ class AreaTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param AreaModel $area
      * @depends testRemoveCountry
      */
     public function testDelete(AreaModel $area)
     {
         $event = new AreaDeleteEvent($area->getId());
-        $event->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $areaAction = new Area();
-        $areaAction->delete($event);
+        $areaAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedArea = $event->getArea();
 

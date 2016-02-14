@@ -19,15 +19,20 @@ namespace Thelia\Core\Event\State;
  */
 class StateUpdateEvent extends StateCreateEvent
 {
+    /** @var int */
     protected $state_id;
 
+    /**
+     * @param int $state_id
+     */
     public function __construct($state_id)
     {
         $this->state_id = $state_id;
     }
 
     /**
-     * @param mixed $state_id
+     * @param int $state_id
+     * @return $this
      */
     public function setStateId($state_id)
     {
@@ -37,7 +42,7 @@ class StateUpdateEvent extends StateCreateEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getStateId()
     {

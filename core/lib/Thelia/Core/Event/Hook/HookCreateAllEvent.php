@@ -19,19 +19,39 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookCreateAllEvent extends HookEvent
 {
+    /** @var string */
     protected $locale;
+
+    /** @var string */
     protected $code;
+
+    /** @var int */
     protected $type;
+
+    /** @var bool */
     protected $native;
+
+    /** @var bool */
     protected $active;
+
+    /** @var bool */
     protected $by_module;
+
+    /** @var bool */
     protected $block;
+
+    /** @var string */
     protected $title;
+
+    /** @var string */
     protected $chapo;
+
+    /** @var string */
     protected $description;
 
     /**
-     * @param mixed $locale
+     * @param string $locale
+     * @return $this
      */
     public function setLocale($locale)
     {
@@ -41,7 +61,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLocale()
     {
@@ -49,7 +69,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $native
+     * @param bool $native
+     * @return $this
      */
     public function setNative($native)
     {
@@ -59,7 +80,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getNative()
     {
@@ -67,7 +88,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $title
+     * @param string $title
+     * @return $this
      */
     public function setTitle($title)
     {
@@ -77,7 +99,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getTitle()
     {
@@ -85,7 +107,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $type
+     * @param int $type
+     * @return $this
      */
     public function setType($type)
     {
@@ -95,7 +118,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getType()
     {
@@ -103,7 +126,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $active
+     * @param bool $active
+     * @return $this
      */
     public function setActive($active)
     {
@@ -113,7 +137,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getActive()
     {
@@ -121,7 +145,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $code
+     * @param string $code
+     * @return $this
      */
     public function setCode($code)
     {
@@ -131,7 +156,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getCode()
     {
@@ -139,7 +164,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $block
+     * @param bool $block
+     * @return $this
      */
     public function setBlock($block)
     {
@@ -149,7 +175,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getBlock()
     {
@@ -157,7 +183,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $by_module
+     * @param bool $by_module
+     * @return $this
      */
     public function setByModule($by_module)
     {
@@ -167,7 +194,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getByModule()
     {
@@ -175,7 +202,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $chapo
+     * @param string $chapo
+     * @return $this
      */
     public function setChapo($chapo)
     {
@@ -185,7 +213,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getChapo()
     {
@@ -193,7 +221,8 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @param mixed $description
+     * @param string $description
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -203,7 +232,7 @@ class HookCreateAllEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDescription()
     {

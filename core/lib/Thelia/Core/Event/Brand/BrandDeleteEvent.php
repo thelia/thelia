@@ -19,8 +19,12 @@ namespace Thelia\Core\Event\Brand;
  */
 class BrandDeleteEvent extends BrandEvent
 {
+    /** @var int */
     protected $brand_id;
 
+    /**
+     * @param int $brand_id
+     */
     public function __construct($brand_id)
     {
         $this->brand_id = $brand_id;

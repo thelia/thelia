@@ -28,11 +28,8 @@ use Thelia\Model\LangQuery;
  * @package Thelia\Tests\Action
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookTest extends \PHPUnit_Framework_TestCase
+class HookTest extends BaseAction
 {
-    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-    protected $dispatcher;
-
     /** @var Hook $action */
     protected $action;
 
@@ -42,12 +39,10 @@ class HookTest extends \PHPUnit_Framework_TestCase
     {
         $this->locale = LangQuery::create()->findOne()->getLocale();
 
-        $this->dispatcher = $this->getMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->action = new Hook($stubContainer);
+        $this->action = new Hook($stubContainer, $this->getMockEventDispatcher());
     }
 
     public function testCreate()
@@ -59,10 +54,9 @@ class HookTest extends \PHPUnit_Framework_TestCase
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test")
-            ->setDispatcher($this->dispatcher);
+            ->setTitle("Hook Test");
 
-        $this->action->create($event);
+        $this->action->create($event, null, $this->getMockEventDispatcher());
 
         $createdHook = $event->getHook();
 
@@ -93,8 +87,7 @@ class HookTest extends \PHPUnit_Framework_TestCase
             ->setDescription("Hook Description")
             ->setChapo("Hook Chapo")
             ->setBlock(false)
-            ->setByModule(false)
-            ->setDispatcher($this->dispatcher);
+            ->setByModule(false);
 
         $this->action->createAll($event);
 
@@ -117,7 +110,7 @@ class HookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params HookModel $hook
+     * @param HookModel $hook
      * @depends testCreate
      * @expectedException \Propel\Runtime\Exception\PropelException
      */
@@ -130,10 +123,9 @@ class HookTest extends \PHPUnit_Framework_TestCase
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test")
-            ->setDispatcher($this->dispatcher);
+            ->setTitle("Hook Test");
 
-        $this->action->create($event);
+        $this->action->create($event, null, $this->getMockEventDispatcher());
 
         $createdHook = $event->getHook();
 
@@ -142,13 +134,13 @@ class HookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params HookModel $hook
+     * @param HookModel $hook
      * @depends testCreate
+     * @return HookModel
      */
     public function testDeactivation(HookModel $hook)
     {
         $event = new HookDeactivationEvent($hook->getId());
-        $event->setDispatcher($this->dispatcher);
 
         $this->action->deactivation($event);
         $updatedHook = $event->getHook();
@@ -159,15 +151,15 @@ class HookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params HookModel $hook
+     * @param HookModel $hook
      * @depends testDeactivation
+     * @return HookModel
      */
     public function testToggleActivation(HookModel $hook)
     {
         $event = new HookToggleActivationEvent($hook->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $this->action->toggleActivation($event);
+        $this->action->toggleActivation($event, null, $this->getMockEventDispatcher());
         $updatedHook = $event->getHook();
 
         $this->assertTrue($updatedHook->getActivate());
@@ -176,8 +168,9 @@ class HookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params HookModel $hook
+     * @param HookModel $hook
      * @depends testToggleActivation
+     * @return HookModel
      */
     public function testUpdate(HookModel $hook)
     {
@@ -193,10 +186,9 @@ class HookTest extends \PHPUnit_Framework_TestCase
             ->setDescription("Updated Hook Description")
             ->setChapo("Updated Hook Chapo")
             ->setBlock(false)
-            ->setByModule(false)
-            ->setDispatcher($this->dispatcher);
+            ->setByModule(false);
 
-        $this->action->update($event);
+        $this->action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedHook = $event->getHook();
 
@@ -215,16 +207,14 @@ class HookTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @params HookModel $hook
+     * @param HookModel $hook
      * @depends testUpdate
      */
     public function testDelete(HookModel $hook)
     {
         $event = new HookDeleteEvent($hook->getId());
 
-        $event->setDispatcher($this->dispatcher);
-
-        $hookAction = $this->action->delete($event);
+        $this->action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedHook = $event->getHook();
 

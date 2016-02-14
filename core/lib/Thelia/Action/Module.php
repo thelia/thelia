@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
@@ -46,9 +47,7 @@ use Thelia\Module\Validator\ModuleValidator;
  */
 class Module extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     public function __construct(ContainerInterface $container)
@@ -56,7 +55,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         $this->container = $container;
     }
 
-    public function toggleActivation(ModuleToggleActivationEvent $event)
+    public function toggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleInstance = $module->createInstance();
@@ -72,12 +71,11 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             $event->setModule($module);
 
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
-
-    public function checkToggleActivation(ModuleToggleActivationEvent $event)
+    public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (true === $event->isNoCheck()) {
             return;
@@ -87,12 +85,12 @@ class Module extends BaseAction implements EventSubscriberInterface
             try {
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     if ($event->isRecursive()) {
-                        $this->recursiveDeactivation($event);
+                        $this->recursiveDeactivation($event, $eventName, $dispatcher);
                     }
                     $this->checkDeactivation($module);
                 } else {
                     if ($event->isRecursive()) {
-                        $this->recursiveActivation($event);
+                        $this->recursiveActivation($event, $eventName, $dispatcher);
                     }
                     $this->checkActivation($module);
                 }
@@ -159,9 +157,10 @@ class Module extends BaseAction implements EventSubscriberInterface
      * Get dependencies of the current module and activate it if needed
      *
      * @param ModuleToggleActivationEvent $event
-     *
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function recursiveActivation(ModuleToggleActivationEvent $event)
+    public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
@@ -172,7 +171,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if ($submodule && $submodule->getActivate() != BaseModule::IS_ACTIVATED) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
-                    $event->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
+                    $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
                 }
             }
         }
@@ -182,9 +181,10 @@ class Module extends BaseAction implements EventSubscriberInterface
      * Get modules having current module in dependence and deactivate it if needed
      *
      * @param ModuleToggleActivationEvent $event
-     *
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function recursiveDeactivation(ModuleToggleActivationEvent $event)
+    public function recursiveDeactivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
@@ -195,13 +195,13 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if ($submodule && $submodule->getActivate() == BaseModule::IS_ACTIVATED) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
-                    $event->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
+                    $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
                 }
             }
         }
     }
 
-    public function delete(ModuleDeleteEvent $event)
+    public function delete(ModuleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -275,7 +275,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $con->commit();
 
                 $event->setModule($module);
-                $this->cacheClear($event->getDispatcher());
+                $this->cacheClear($dispatcher);
             } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
@@ -285,12 +285,14 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param ModuleEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(ModuleEvent $event)
+    public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
             $module
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())
@@ -305,18 +307,18 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param \Thelia\Core\Event\Module\ModuleInstallEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      *
      * @throws \Exception
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      * @throws \Exception
      */
-    public function install(ModuleInstallEvent $event)
+    public function install(ModuleInstallEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $moduleDefinition = $event->getModuleDefinition();
 
         $oldModule = ModuleQuery::create()->findOneByFullNamespace($moduleDefinition->getNamespace());
-
-        $dispatcher = $event->getDispatcher();
 
         $fs = new Filesystem();
 
@@ -328,10 +330,9 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             if ($activated) {
                 // deactivate
-                $toggleEvent = new ModuleToggleActivationEvent($oldModule);
+                $toggleEvent = new ModuleToggleActivationEvent($oldModule->getId());
                 // disable the check of the module because it's already done
                 $toggleEvent->setNoCheck(true);
-                $toggleEvent->setDispatcher($dispatcher);
 
                 $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
             }
@@ -340,7 +341,6 @@ class Module extends BaseAction implements EventSubscriberInterface
             $modulePath = $oldModule->getAbsoluteBaseDir();
 
             $deleteEvent = new ModuleDeleteEvent($oldModule);
-            $deleteEvent->setDispatcher($dispatcher);
 
             try {
                 $dispatcher->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
@@ -373,7 +373,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         if ($activated) {
             $toggleEvent = new ModuleToggleActivationEvent($module->getId());
             $toggleEvent->setNoCheck(true);
-            $toggleEvent->setDispatcher($dispatcher);
 
             $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
         }
@@ -409,7 +408,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $response = $paymentModuleInstance->pay($order);
 
-        if (null !== $response && $response instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (null !== $response && $response instanceof Response) {
             $event->setResponse($response);
         }
     }
@@ -418,12 +417,14 @@ class Module extends BaseAction implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ModuleQuery::create(), $event);
+        $this->genericUpdatePosition(ModuleQuery::create(), $event, $dispatcher);
 
-        $this->cacheClear($event->getDispatcher());
+        $this->cacheClear($dispatcher);
     }
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)

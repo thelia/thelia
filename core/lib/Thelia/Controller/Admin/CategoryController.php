@@ -24,6 +24,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Category;
 use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
@@ -157,11 +158,19 @@ class CategoryController extends AbstractSeoCrudController
         return $category;
     }
 
+    /**
+     * @param Category $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param Category $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

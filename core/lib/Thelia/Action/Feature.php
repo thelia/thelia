@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\Feature as FeatureModel;
@@ -31,13 +32,15 @@ class Feature extends BaseAction implements EventSubscriberInterface
      * Create a new feature entry
      *
      * @param \Thelia\Core\Event\Feature\FeatureCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(FeatureCreateEvent $event)
+    public function create(FeatureCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $feature = new FeatureModel();
 
         $feature
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
 
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -57,12 +60,14 @@ class Feature extends BaseAction implements EventSubscriberInterface
      * Change a product feature
      *
      * @param \Thelia\Core\Event\Feature\FeatureUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(FeatureUpdateEvent $event)
+    public function update(FeatureUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
             $feature
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -80,12 +85,14 @@ class Feature extends BaseAction implements EventSubscriberInterface
      * Delete a product feature entry
      *
      * @param FeatureDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function delete(FeatureDeleteEvent $event)
+    public function delete(FeatureDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
             $feature
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 
@@ -97,10 +104,12 @@ class Feature extends BaseAction implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(FeatureQuery::create(), $event);
+        $this->genericUpdatePosition(FeatureQuery::create(), $event, $dispatcher);
     }
 
     protected function doAddToAllTemplates(FeatureModel $feature)

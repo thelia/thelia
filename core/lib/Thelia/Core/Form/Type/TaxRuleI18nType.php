@@ -13,7 +13,7 @@
 namespace Thelia\Core\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
@@ -32,9 +32,9 @@ class TaxRuleI18nType extends AbstractTheliaType
      */
     protected $formBuilder;
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->replaceDefaults([
+        $resolver->setDefaults([
             "cascade_validation" => true,
         ]);
     }

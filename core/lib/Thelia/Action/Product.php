@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
@@ -26,9 +27,11 @@ use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
+use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
@@ -62,6 +65,14 @@ use Propel\Runtime\Propel;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * Create a new product entry
      *
@@ -72,7 +83,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product = new ProductModel();
 
         $product
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($this->eventDispatcher)
 
             ->setRef($event->getRef())
             ->setLocale($event->getLocale())
@@ -115,7 +126,6 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Get important datas
             $lang = $event->getLang();
             $originalProduct = $event->getOriginalProduct();
-            $dispatcher = $event->getDispatcher();
 
             if (null === $originalProductDefaultI18n = ProductI18nQuery::create()
                 ->findPk([$originalProduct->getId(), $lang])) {
@@ -142,10 +152,10 @@ class Product extends BaseAction implements EventSubscriberInterface
             $this->cloneAccessories($event);
 
             // Dispatch event for file cloning
-            $dispatcher->dispatch(TheliaEvents::FILE_CLONE, $event);
+            $this->eventDispatcher->dispatch(TheliaEvents::FILE_CLONE, $event);
 
             // Dispatch event for PSE cloning
-            $dispatcher->dispatch(TheliaEvents::PSE_CLONE, $event);
+            $this->eventDispatcher->dispatch(TheliaEvents::PSE_CLONE, $event);
 
             $con->commit();
         } catch (\Exception $e) {
@@ -154,7 +164,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function createClone(ProductCloneEvent $event, $originalProductDefaultI18n, $originalProductDefaultPrice)
+    public function createClone(ProductCloneEvent $event, ProductI18n $originalProductDefaultI18n, ProductPrice $originalProductDefaultPrice)
     {
         // Build event and dispatch creation of the clone product
         $createCloneEvent = new ProductCreateEvent();
@@ -168,20 +178,20 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId())
             ->setBasePrice($originalProductDefaultPrice->getPrice())
             ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
-            ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
-            ->setDispatcher($event->getDispatcher());
+            ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight());
 
-        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_CREATE, $createCloneEvent);
+        $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_CREATE, $createCloneEvent);
 
         $event->setClonedProduct($createCloneEvent->getProduct());
     }
 
-    public function updateClone(ProductCloneEvent $event, $originalProductDefaultPrice)
+    public function updateClone(ProductCloneEvent $event, ProductPrice $originalProductDefaultPrice)
     {
         // Get original product's I18ns
         $originalProductI18ns = ProductI18nQuery::create()
             ->findById($event->getOriginalProduct()->getId());
 
+        /** @var ProductI18n $originalProductI18n */
         foreach ($originalProductI18ns as $originalProductI18n) {
             $clonedProductUpdateEvent = new ProductUpdateEvent($event->getClonedProduct()->getId());
             $clonedProductUpdateEvent
@@ -202,7 +212,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setBrandId($event->getOriginalProduct()->getBrandId())
                 ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId());
 
-            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_UPDATE, $clonedProductUpdateEvent);
+            $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE, $clonedProductUpdateEvent);
 
             // SEO info
             $clonedProductUpdateSeoEvent = new UpdateSeoEvent($event->getClonedProduct()->getId());
@@ -212,7 +222,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setMetaDescription($originalProductI18n->getMetaDescription())
                 ->setMetaKeywords($originalProductI18n->getMetaKeywords())
                 ->setUrl(null);
-            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_UPDATE_SEO, $clonedProductUpdateSeoEvent);
+            $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_SEO, $clonedProductUpdateSeoEvent);
         }
 
         $event->setClonedProduct($clonedProductUpdateEvent->getProduct());
@@ -223,7 +233,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             $event->getOriginalProduct()->getTemplateId(),
             $originalProductDefaultPrice->getCurrencyId()
         );
-        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_SET_TEMPLATE, $clonedProductUpdateTemplateEvent);
+
+        $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_SET_TEMPLATE, $clonedProductUpdateTemplateEvent);
     }
 
     public function cloneFeatureCombination(ProductCloneEvent $event)
@@ -233,12 +244,13 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->findByProductId($event->getOriginalProduct()->getId());
 
         // Set clone product FeatureProducts
+        /** @var FeatureProduct $originalProductFeature */
         foreach ($originalProductFeatureList as $originalProductFeature) {
-
             // Get original FeatureAvI18n list
             $originalProductFeatureAvI18nList = FeatureAvI18nQuery::create()
                 ->findById($originalProductFeature->getFeatureAvId());
 
+            /** @var FeatureAvI18n $originalProductFeatureAvI18n */
             foreach ($originalProductFeatureAvI18nList as $originalProductFeatureAvI18n) {
                 // Create a FeatureProduct for each FeatureAv (not for each FeatureAvI18n)
                 $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
@@ -254,7 +266,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                     $clonedProductCreateFeatureEvent->setIsTextValue(true);
                 }
 
-                $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
+                $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
             }
         }
     }
@@ -268,7 +280,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product associated contents
         foreach ($originalProductAssocConts as $originalProductAssocCont) {
             $clonedProductCreatePAC = new ProductAddContentEvent($event->getClonedProduct(), $originalProductAssocCont->getContentId());
-            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $clonedProductCreatePAC);
+            $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $clonedProductCreatePAC);
         }
     }
 
@@ -281,7 +293,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product accessories
         foreach ($originalProductAccessoryList as $originalProductAccessory) {
             $clonedProductAddAccessoryEvent = new ProductAddAccessoryEvent($event->getClonedProduct(), $originalProductAccessory->getAccessory());
-            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $clonedProductAddAccessoryEvent);
+            $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $clonedProductAddAccessoryEvent);
         }
     }
 
@@ -293,6 +305,8 @@ class Product extends BaseAction implements EventSubscriberInterface
      * Change a product
      *
      * @param \Thelia\Core\Event\Product\ProductUpdateEvent $event
+     * @throws PropelException
+     * @throws \Exception
      */
     public function update(ProductUpdateEvent $event)
     {
@@ -304,7 +318,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $prevRef = $product->getRef();
 
                 $product
-                    ->setDispatcher($event->getDispatcher())
+                    ->setDispatcher($this->eventDispatcher)
                     ->setRef($event->getRef())
                     ->setLocale($event->getLocale())
                     ->setTitle($event->getTitle())
@@ -339,19 +353,21 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a product SEO
-     *
-     * @param \Thelia\Core\Event\UpdateSeoEvent $event
+     * @param UpdateSeoEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return mixed
      */
-    public function updateSeo(UpdateSeoEvent $event)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdateSeo(ProductQuery::create(), $event);
+        return $this->genericUpdateSeo(ProductQuery::create(), $event, $dispatcher);
     }
 
     /**
      * Delete a product entry
      *
      * @param \Thelia\Core\Event\Product\ProductDeleteEvent $event
+     * @throws \Exception
      */
     public function delete(ProductDeleteEvent $event)
     {
@@ -360,6 +376,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
+                $fileList = ['images' => [], 'documentList' => []];
+
                 // Get product's files to delete after product deletion
                 $fileList['images']['list'] = ProductImageQuery::create()
                     ->findByProductId($event->getProductId());
@@ -371,7 +389,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 // Delete product
                 $product
-                    ->setDispatcher($event->getDispatcher())
+                    ->setDispatcher($this->eventDispatcher)
                     ->delete($con)
                 ;
 
@@ -381,7 +399,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $this->eventDispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
                     }
                 }
 
@@ -396,14 +414,14 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle product visibility. No form used here
      *
-     * @param ActionEvent $event
+     * @param ProductToggleVisibilityEvent $event
      */
     public function toggleVisibility(ProductToggleVisibilityEvent $event)
     {
         $product = $event->getProduct();
 
         $product
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($this->eventDispatcher)
             ->setVisible($product->getVisible() ? false : true)
             ->save()
             ;
@@ -414,11 +432,13 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param ProductChangePositionEvent $event
+     * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ProductQuery::create(), $event);
+        $this->genericUpdatePosition(ProductQuery::create(), $event, $dispatcher);
     }
 
     public function addContent(ProductAddContentEvent $event)
@@ -429,7 +449,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $content = new ProductAssociatedContent();
 
             $content
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($this->eventDispatcher)
                 ->setProduct($event->getProduct())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -446,7 +466,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         if ($content !== null) {
             $content
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($this->eventDispatcher)
                 ->delete()
             ;
         }
@@ -489,7 +509,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $accessory = new Accessory();
 
             $accessory
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($this->eventDispatcher)
                 ->setProductId($event->getProduct()->getId())
                 ->setAccessory($event->getAccessoryId())
             ->save()
@@ -506,7 +526,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         if ($accessory !== null) {
             $accessory
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($this->eventDispatcher)
                 ->delete()
             ;
         }
@@ -527,7 +547,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 foreach ($featureProducts as $featureProduct) {
                     $eventDelete = new FeatureProductDeleteEvent($product->getId(), $featureProduct->getFeatureId());
 
-                    $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $eventDelete);
+                    $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $eventDelete);
                 }
             }
 
@@ -580,21 +600,27 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes accessry position, selecting absolute ou relative change.
      *
-     * @param ProductChangePositionEvent $event
+     * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return Object
      */
-    public function updateAccessoryPosition(UpdatePositionEvent $event)
+    public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdatePosition(AccessoryQuery::create(), $event);
+        return $this->genericUpdatePosition(AccessoryQuery::create(), $event, $dispatcher);
     }
 
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param ProductChangePositionEvent $event
+     * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return Object
      */
-    public function updateContentPosition(UpdatePositionEvent $event)
+    public function updateContentPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event);
+        return $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event, $dispatcher);
     }
 
     /**
@@ -625,7 +651,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $featureProduct = new FeatureProduct();
 
             $featureProduct
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($this->eventDispatcher)
                 ->setProductId($event->getProductId())
                 ->setFeatureId($event->getFeatureId())
             ;
@@ -639,13 +665,12 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->setFeatureId($event->getFeatureId())
                     ->setLocale($event->getLocale())
                     ->setTitle($event->getFeatureValue());
-                $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_CREATE, $createFeatureAvEvent);
+                $this->eventDispatcher->dispatch(TheliaEvents::FEATURE_AV_CREATE, $createFeatureAvEvent);
 
                 $featureAvId = $createFeatureAvEvent->getFeatureAv()->getId();
             }
         } // Else if the FeatureProduct exists and is a free text value
         elseif ($featureProduct !== null && $event->getIsTextValue() === true) {
-
             // Get the FeatureAv
             $freeTextFeatureAv = FeatureAvQuery::create()
                 ->filterByFeatureProduct($featureProduct)
@@ -677,10 +702,10 @@ class Product extends BaseAction implements EventSubscriberInterface
                 // If there are no more FeatureAvI18ns for this FeatureAv, remove the corresponding FeatureProduct & FeatureAv
                 if (count($freeTextFeatureAvI18ns) == 0) {
                     $deleteFeatureProductEvent = new FeatureProductDeleteEvent($event->getProductId(), $event->getFeatureId());
-                    $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $deleteFeatureProductEvent);
+                    $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $deleteFeatureProductEvent);
 
                     $deleteFeatureAvEvent = new FeatureAvDeleteEvent($freeTextFeatureAv->getId());
-                    $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_DELETE, $deleteFeatureAvEvent);
+                    $this->eventDispatcher->dispatch(TheliaEvents::FEATURE_AV_DELETE, $deleteFeatureAvEvent);
 
                     return;
                 }

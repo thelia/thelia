@@ -23,15 +23,8 @@ use Thelia\Model\ProfileQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ProfileTest extends \PHPUnit_Framework_TestCase
+class ProfileTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public static function setUpBeforeClass()
     {
         ProfileQuery::create()
@@ -49,12 +42,11 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
             ->setTitle('test profile')
             ->setChapo('test chapo')
             ->setDescription('test description')
-            ->setPostscriptum('test postscriptum')
-            ->setDispatcher($this->dispatcher)
+            ->setPostscriptum('test postscriptum');
         ;
 
-        $action = new Profile();
-        $action->create($event);
+        $action = new Profile($this->getMockEventDispatcher());
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdProfile = $event->getProfile();
 
@@ -72,7 +64,9 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param ProfileModel $profile
      * @depends testCreate
+     * @return ProfileModel
      */
     public function testUpdate(ProfileModel $profile)
     {
@@ -84,12 +78,11 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
             ->setTitle('test update title')
             ->setChapo('test update chapo')
             ->setDescription('test update description')
-            ->setPostscriptum('test update postscriptum')
-            ->setDispatcher($this->dispatcher)
+            ->setPostscriptum('test update postscriptum');
         ;
 
-        $action = new Profile();
-        $action->update($event);
+        $action = new Profile($this->getMockEventDispatcher());
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedProfile = $event->getProfile();
 
@@ -106,6 +99,7 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param ProfileModel $profile
      * @depends testUpdate
      */
     public function testUpdateResourceAccess(ProfileModel $profile)
@@ -116,10 +110,9 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
             ->setResourceAccess(array(
                     'admin.address' => array(AccessManager::CREATE)
                 ))
-            ->setDispatcher($this->dispatcher);
         ;
 
-        $action = new Profile();
+        $action = new Profile($this->getMockEventDispatcher());
         $action->updateResourceAccess($event);
 
         $updatedProfile = $event->getProfile();

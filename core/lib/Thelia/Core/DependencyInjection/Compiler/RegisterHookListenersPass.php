@@ -211,6 +211,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      * Next, if the module, hook and module hook is active, a new listener is
      * added to the service definition.
      *
+     * @param ContainerBuilder $container
      * @param Definition $definition The service definition
      */
     protected function addHooksMethodCall(ContainerBuilder $container, Definition $definition)
@@ -368,11 +369,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
             $method = new ReflectionMethod($className, $methodName);
 
             $parameters = $method->getParameters();
-            if (count($parameters) !== 1) {
-                $this->logAlertMessage(sprintf("Method %s in %s does not have the right signature.", $methodName, $className));
-
-                return false;
-            }
 
             $eventType = ($block) ?
                 HookDefinition::RENDER_BLOCK_EVENT :

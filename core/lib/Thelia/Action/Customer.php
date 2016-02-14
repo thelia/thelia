@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -37,8 +38,10 @@ use Thelia\Tools\Password;
  */
 class Customer extends BaseAction implements EventSubscriberInterface
 {
+    /** @var SecurityContext */
     protected $securityContext;
 
+    /** @var MailerFactory */
     protected $mailer;
 
     public function __construct(SecurityContext $securityContext, MailerFactory $mailer)
@@ -47,20 +50,20 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->mailer = $mailer;
     }
 
-    public function create(CustomerCreateOrUpdateEvent $event)
+    public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $customer = new CustomerModel();
 
         $plainPassword = $event->getPassword();
 
-        $this->createOrUpdateCustomer($customer, $event);
+        $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
         if ($event->getNotifyCustomerOfAccountCreation()) {
             $this->mailer->sendEmailToCustomer('customer_account_created', $customer, [ 'password' => $plainPassword ]);
         }
     }
 
-    public function modify(CustomerCreateOrUpdateEvent $event)
+    public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $plainPassword = $event->getPassword();
 
@@ -68,18 +71,18 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $emailChanged = $customer->getEmail() !== $event->getEmail();
 
-        $this->createOrUpdateCustomer($customer, $event);
+        $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
         if (! empty($plainPassword) || $emailChanged) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
 
-    public function updateProfile(CustomerCreateOrUpdateEvent $event)
+    public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $customer = $event->getCustomer();
 
-        $customer->setDispatcher($event->getDispatcher());
+        $customer->setDispatcher($dispatcher);
 
         if ($event->getTitle() !== null) {
             $customer->setTitleId($event->getTitle());
@@ -129,9 +132,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
+    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
-        $customer->setDispatcher($event->getDispatcher());
+        $customer->setDispatcher($dispatcher);
 
         $customer->createOrUpdate(
             $event->getTitle(),
@@ -195,24 +198,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

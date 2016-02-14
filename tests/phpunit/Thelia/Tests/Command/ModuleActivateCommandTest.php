@@ -90,20 +90,14 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
         }
     }
 
-    public function getKernel()
-    {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
-
-        return $kernel;
-    }
-
     /**
      * Use this method to build the container with the services that you need.
+     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addSubscriber(new Module($container));
+        $eventDispatcher->addSubscriber(new Module($container, $eventDispatcher));
 
         $container->set("event_dispatcher", $eventDispatcher);
 

@@ -24,7 +24,7 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class AttributeAvTest extends \PHPUnit_Framework_TestCase
+class AttributeAvTest extends BaseAction
 {
     public function testCreate()
     {
@@ -35,11 +35,10 @@ class AttributeAvTest extends \PHPUnit_Framework_TestCase
         $event
             ->setAttributeId($attribute->getId())
             ->setLocale('en_US')
-            ->setTitle('foo')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+            ->setTitle('foo');
 
         $action = new AttributeAv();
-        $action->create($event);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $attributeAvCreated = $event->getAttributeAv();
 
@@ -58,6 +57,7 @@ class AttributeAvTest extends \PHPUnit_Framework_TestCase
     /**
      * @param AttributeAvModel $attributeAv
      * @depends testCreate
+     * @return AttributeAvModel
      */
     public function testUpdate(AttributeAvModel $attributeAv)
     {
@@ -69,11 +69,10 @@ class AttributeAvTest extends \PHPUnit_Framework_TestCase
             ->setDescription('bar description')
             ->setChapo('bar chapo')
             ->setPostscriptum('bar postscriptum')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"))
         ;
 
         $action = new AttributeAv();
-        $action->update($event);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedAttributeAv = $event->getAttributeAv();
 
@@ -88,15 +87,15 @@ class AttributeAvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param AttributeAvModel $attributeAv
      * @depends testUpdate
      */
     public function testDelete(AttributeAvModel $attributeAv)
     {
         $event = new AttributeAvDeleteEvent($attributeAv->getId());
-        $event->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $action = new AttributeAv();
-        $action->delete($event);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedAttributeAv = $event->getAttributeAv();
 

@@ -19,12 +19,16 @@ namespace Thelia\Core\Event\Content;
  */
 class ContentUpdateEvent extends ContentCreateEvent
 {
+    /** @var int */
     protected $content_id;
 
     protected $chapo;
     protected $description;
     protected $postscriptum;
 
+    /**
+     * @param int $content_id
+     */
     public function __construct($content_id)
     {
         $this->content_id = $content_id;

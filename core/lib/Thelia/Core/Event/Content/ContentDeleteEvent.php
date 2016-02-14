@@ -19,10 +19,15 @@ namespace Thelia\Core\Event\Content;
  */
 class ContentDeleteEvent extends ContentEvent
 {
+    /** @var int */
     protected $content_id;
 
+    /** @var int */
     protected $folder_id;
 
+    /**
+     * @param int $content_id
+     */
     public function __construct($content_id)
     {
         $this->content_id = $content_id;

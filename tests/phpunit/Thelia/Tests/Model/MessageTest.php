@@ -14,6 +14,7 @@ namespace Thelia\Tests\Model;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\TheliaFormValidator;
@@ -33,11 +34,13 @@ use TheliaSmarty\Template\SmartyParser;
  */
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ContainerBuilder $container
-     */
+    /** @var ContainerBuilder */
     protected $container;
+
+    /** @var SmartyParser */
     protected $parser;
+
+    /** @var TheliaTemplateHelper */
     protected $templateHelper;
 
     private $backup_mail_template = 'undefined';
@@ -56,26 +59,23 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $request->setSession($session);
 
         $parserContext = new ParserContext(
-            $request,
-            new TheliaFormFactory($request, $container, []),
+            $requestStack,
+            new TheliaFormFactory($requestStack, $container, []),
             new TheliaFormValidator(new Translator($container), 'dev')
         );
 
-        /*
-         *  public function __construct(
-            Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
-            $env = "prod", $debug = false)
-
-         */
         $container->set("event_dispatcher", $dispatcher);
         $container->set('request', $request);
 
-        $this->parser = new SmartyParser($request, $dispatcher, $parserContext, $this->templateHelper, 'dev', true);
+        $this->parser = new SmartyParser($requestStack, $dispatcher, $parserContext, $this->templateHelper, 'dev', true);
         $this->parser->setTemplateDefinition($this->templateHelper->getActiveMailTemplate());
 
         $container->set('thelia.parser', $this->parser);

@@ -18,8 +18,8 @@ use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\AttributeAvModificationForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
 
 /**
@@ -124,11 +124,19 @@ class AttributeAvController extends AbstractCrudController
         return $attributeAv;
     }
 
+    /**
+     * @param AttributeAv $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param AttributeAv $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

@@ -22,6 +22,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Attribute;
 use Thelia\Model\AttributeQuery;
 
 /**
@@ -159,11 +160,19 @@ class AttributeController extends AbstractCrudController
         return $attribute;
     }
 
+    /**
+     * @param Attribute $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param Attribute $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

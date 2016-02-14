@@ -14,6 +14,7 @@ namespace Thelia\Core\Event\Category;
 
 class CategoryUpdateEvent extends CategoryCreateEvent
 {
+    /** @var int */
     protected $category_id;
 
     protected $chapo;
@@ -24,6 +25,9 @@ class CategoryUpdateEvent extends CategoryCreateEvent
 
     protected $defaultTemplateId;
 
+    /**
+     * @param int $category_id
+     */
     public function __construct($category_id)
     {
         $this->category_id = $category_id;

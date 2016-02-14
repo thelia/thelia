@@ -19,8 +19,11 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 
 /**
@@ -66,6 +69,7 @@ class FolderController extends AbstractSeoCrudController
      * Hydrate the update form for this object, before passing it to the update template
      *
      * @param \Thelia\Model\Folder $object
+     * @return BaseForm
      */
     protected function hydrateObjectForm($object)
     {
@@ -91,7 +95,8 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return FolderCreateEvent
      */
     protected function getCreationEvent($formData)
     {
@@ -109,7 +114,8 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return FolderUpdateEvent
      */
     protected function getUpdateEvent($formData)
     {
@@ -162,6 +168,7 @@ class FolderController extends AbstractSeoCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param \Thelia\Core\Event\Folder\FolderEvent $event
+     * @return bool
      */
     protected function eventContainsObject($event)
     {
@@ -198,7 +205,8 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param Folder $object
+     * @return string
      */
     protected function getObjectLabel($object)
     {
@@ -208,7 +216,8 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param Folder $object
+     * @return int
      */
     protected function getObjectId($object)
     {
@@ -218,7 +227,8 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
+     * @param int $currentOrder, if any, null otherwise.
+     * @return Response
      */
     protected function renderListTemplate($currentOrder)
     {
@@ -305,6 +315,9 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * Redirect to the edition template
+     *
+     * @param Request|null $request
+     * @return Response
      */
     protected function redirectToEditionTemplate(Request $request = null)
     {

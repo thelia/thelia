@@ -25,15 +25,8 @@ use Thelia\Model\CountryQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class CountryTest extends \PHPUnit_Framework_TestCase
+class CountryTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public function testCreate()
     {
         $event = new CountryCreateEvent();
@@ -46,11 +39,10 @@ class CountryTest extends \PHPUnit_Framework_TestCase
             ->setHasStates(0)
             ->setLocale('en_US')
             ->setTitle('Test')
-            ->setDispatcher($this->dispatcher)
         ;
 
         $action = new Country();
-        $action->create($event);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdCountry = $event->getCountry();
 
@@ -72,6 +64,7 @@ class CountryTest extends \PHPUnit_Framework_TestCase
     /**
      * @param CountryModel $country
      * @depends testCreate
+     * @return CountryModel
      */
     public function testUpdate(CountryModel $country)
     {
@@ -85,11 +78,10 @@ class CountryTest extends \PHPUnit_Framework_TestCase
             ->setHasStates(0)
             ->setLocale('en_US')
             ->setTitle('Test')
-            ->setDispatcher($this->dispatcher)
         ;
 
         $action = new Country();
-        $action->update($event);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedCountry = $event->getCountry();
 
@@ -113,10 +105,9 @@ class CountryTest extends \PHPUnit_Framework_TestCase
     public function testDelete(CountryModel $country)
     {
         $event = new CountryDeleteEvent($country->getId());
-        $event->setDispatcher($this->dispatcher);
 
         $action = new Country();
-        $action->delete($event);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedCountry = $event->getCountry();
 
@@ -126,16 +117,16 @@ class CountryTest extends \PHPUnit_Framework_TestCase
 
     public function testToggleDefault()
     {
+        /** @var CountryModel $country */
         $country = CountryQuery::create()
             ->filterByByDefault(0)
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
 
         $event = new CountryToggleDefaultEvent($country->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $action = new Country();
-        $action->toggleDefault($event);
+        $action = new Country($this->getMockEventDispatcher());
+        $action->toggleDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedCountry = $event->getCountry();
 

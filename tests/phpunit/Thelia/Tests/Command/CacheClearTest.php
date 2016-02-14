@@ -94,15 +94,9 @@ class CacheClearTest extends ContainerAwareTestCase
         }
     }
 
-    public function getKernel()
-    {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
-
-        return $kernel;
-    }
-
     /**
      * Use this method to build the container with the services that you need.
+     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {

@@ -14,7 +14,6 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\Collection;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
@@ -29,6 +28,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
+use Thelia\Model\Content as ContentModel;
 
 /**
  * Class ContentTest
@@ -39,26 +39,16 @@ class ContentTest extends TestCaseWithURLToolSetup
 {
     use I18nTestTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
     protected static $folderForPositionTest = null;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
 
     public function getUpdateEvent(&$content)
     {
-        if (!$content instanceof \Thelia\Model\Content) {
+        if (!$content instanceof ContentModel) {
             $content = $this->getRandomContent();
         }
 
         $event = new ContentUpdateEvent($content->getId());
-        $event->setDispatcher($this->dispatcher);
+
         $event
             ->setVisible(1)
             ->setLocale($content->getLocale())
@@ -72,10 +62,16 @@ class ContentTest extends TestCaseWithURLToolSetup
         return $event;
     }
 
+    /**
+     * @param ContentUpdateEvent$event
+     * @return ContentModel
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function processUpdateAction($event)
     {
-        $contentAction = new Content($this->getContainer());
-        $contentAction->update($event);
+        $contentAction = new Content();
+        $contentAction->update($event, null, $this->getMockEventDispatcher());
 
         return $event->getContent();
     }
@@ -85,7 +81,6 @@ class ContentTest extends TestCaseWithURLToolSetup
         $folder = $this->getRandomFolder();
 
         $event = new ContentCreateEvent();
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setVisible(1)
             ->setLocale('en_US')
@@ -93,8 +88,8 @@ class ContentTest extends TestCaseWithURLToolSetup
             ->setDefaultFolder($folder->getId())
         ;
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->create($event);
+        $contentAction = new Content();
+        $contentAction->create($event, null, $this->getMockEventDispatcher());
 
         $createdContent = $event->getContent();
 
@@ -110,7 +105,6 @@ class ContentTest extends TestCaseWithURLToolSetup
         $folder = $this->getRandomFolder();
 
         $event = new ContentUpdateEvent($content->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setVisible(1)
             ->setLocale('en_US')
@@ -121,8 +115,8 @@ class ContentTest extends TestCaseWithURLToolSetup
             ->setDefaultFolder($folder->getId())
         ;
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->update($event);
+        $contentAction = new Content();
+        $contentAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedContent = $event->getContent();
 
@@ -140,10 +134,9 @@ class ContentTest extends TestCaseWithURLToolSetup
         $content = $this->getRandomContent();
 
         $event = new ContentDeleteEvent($content->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->delete($event);
+        $contentAction = new Content();
+        $contentAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedContent = $event->getContent();
 
@@ -158,10 +151,9 @@ class ContentTest extends TestCaseWithURLToolSetup
         $visibility = $content->getVisible();
 
         $event = new ContentToggleVisibilityEvent($content);
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->toggleVisibility($event);
+        $contentAction = new Content();
+        $contentAction->toggleVisibility($event, null, $this->getMockEventDispatcher());
 
         $updatedContent = $event->getContent();
 
@@ -183,10 +175,9 @@ class ContentTest extends TestCaseWithURLToolSetup
         $newPosition = $content->getPosition()-1;
 
         $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_UP);
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->updatePosition($event);
+        $contentAction = new Content();
+        $contentAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedContent = ContentQuery::create()->findPk($content->getId());
 
@@ -207,10 +198,9 @@ class ContentTest extends TestCaseWithURLToolSetup
         $newPosition = $content->getPosition()+1;
 
         $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_DOWN);
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->updatePosition($event);
+        $contentAction = new Content();
+        $contentAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedContent = ContentQuery::create()->findPk($content->getId());
 
@@ -229,10 +219,9 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->updatePosition($event);
+        $contentAction = new Content();
+        $contentAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedContent = ContentQuery::create()->findPk($content->getId());
 
@@ -252,10 +241,9 @@ class ContentTest extends TestCaseWithURLToolSetup
         } while ($test->count() > 0);
 
         $event = new ContentAddFolderEvent($content, $folder->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->addFolder($event);
+        $contentAction = new Content();
+        $contentAction->addFolder($event, null, $this->getMockEventDispatcher());
 
         $testAddFolder = ContentFolderQuery::create()
             ->filterByContent($content)
@@ -271,15 +259,15 @@ class ContentTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ContentFolder $association
      * @depends testAddFolderToContent
      */
     public function testRemoveFolder(ContentFolder $association)
     {
         $event = new ContentRemoveFolderEvent($association->getContent(), $association->getFolder()->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $contentAction = new Content($this->getContainer());
-        $contentAction->removeFolder($event);
+        $contentAction = new Content();
+        $contentAction->removeFolder($event, null, $this->getMockEventDispatcher());
 
         $testAssociation = ContentFolderQuery::create()
             ->filterByContent($association->getContent())
@@ -324,7 +312,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             $folder->save();
 
             for ($i = 0; $i < 4; $i++) {
-                $content = new \Thelia\Model\Content();
+                $content = new ContentModel();
 
                 $content->addFolder($folder);
                 $content->setVisible(1);

@@ -14,6 +14,7 @@ namespace Thelia\Core\Event\Product;
 
 class ProductUpdateEvent extends ProductCreateEvent
 {
+    /** @var int */
     protected $product_id;
 
     protected $chapo;
@@ -22,6 +23,9 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $brand_id;
     protected $virtual_document_id;
 
+    /**
+     * @param int $product_id
+     */
     public function __construct($product_id)
     {
         $this->product_id = $product_id;

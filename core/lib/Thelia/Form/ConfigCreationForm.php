@@ -14,7 +14,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Thelia\Model\ConfigQuery;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
 class ConfigCreationForm extends BaseForm

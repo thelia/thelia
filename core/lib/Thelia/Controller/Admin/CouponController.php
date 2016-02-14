@@ -58,9 +58,9 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        $args['coupon_order'] = $this->getListOrderFromSession('coupon', 'coupon_order', 'code');
-
-        return $this->render('coupon-list', $args);
+        return $this->render('coupon-list', [
+            'coupon_order' => $this->getListOrderFromSession('coupon', 'coupon_order', 'code')
+        ]);
     }
 
     /**
@@ -814,17 +814,22 @@ class CouponController extends BaseAdminController
         return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
     }
 
+    /**
+     * @param string $action
+     * @param Coupon|null $coupon
+     * @return \Thelia\Form\BaseForm
+     */
     protected function getForm($action, $coupon)
     {
-        $options["validation_groups"] = ["Default", $action];
-
         $data = array();
 
         if (null !== $coupon) {
             $data["code"] = $coupon->getCode();
         }
 
-        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, $options);
+        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, [
+            'validation_groups' => ["Default", $action]
+        ]);
     }
 
     public function deleteAction()

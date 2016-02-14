@@ -13,6 +13,7 @@
 namespace Thelia\Command;
 
 use Propel\Generator\Command\SqlBuildCommand;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,11 +69,15 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
             $output
         );
 
-        $output->renderBlock(array(
-            '',
-            'Sql generated successfully',
-            'File available in your module config directory',
-            ''
-        ), 'bg=green;fg=black');
+        /** @var FormatterHelper $formatter */
+        $formatter = $this->getHelper('formatter');
+        $formattedBlock = $formatter->formatBlock(
+            [
+                'Sql generated successfully',
+                'File available in your module config directory',
+            ],
+            'bg=green;fg=black'
+        );
+        $output->writeln($formattedBlock);
     }
 }

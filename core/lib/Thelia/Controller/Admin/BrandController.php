@@ -187,7 +187,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param $object \Thelia\Model\Brand
+     * @param Brand $object
      *
      * @return string brand title
      */
@@ -199,7 +199,7 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Returns the object ID from the object
      *
-     * @param $object \Thelia\Model\Brand
+     * @param Brand $object
      *
      * @return int brand id
      */
