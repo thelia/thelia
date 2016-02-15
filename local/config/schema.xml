@@ -773,6 +773,9 @@
   <table name="order_status" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
+    <column name="color" type="CHAR" size="7" />
+    <column name="position" type="INTEGER" />
+    <column name="protected_status" type="BOOLEAN" defaultValue="0" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
