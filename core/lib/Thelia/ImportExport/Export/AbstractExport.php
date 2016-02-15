@@ -423,8 +423,6 @@ abstract class AbstractExport implements \Iterator
         foreach ($data as $idx => &$value) {
             if ($value instanceof \DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
-            } elseif (is_array($value)) {
-                unset($data[$idx]);
             }
         }
 
