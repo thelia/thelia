@@ -15,6 +15,7 @@ namespace Thelia\Tools;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\CurrencyQuery;
 
+
 class MoneyFormat extends NumberFormat
 {
     public static function getInstance(Request $request)

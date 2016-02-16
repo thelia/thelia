@@ -67,3 +67,4 @@ config.codekit
 # Ignore casperjs screenshots
 tests/functionnal/casperjs/screenshot/
 tests/phpunit/Thelia/Tests/Api/fixtures/visuel*.png
+*.txt
