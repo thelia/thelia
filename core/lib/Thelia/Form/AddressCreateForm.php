@@ -125,6 +125,7 @@ class AddressCreateForm extends FirewallForm
                 ))
             ->add("zipcode", "text", array(
                     "constraints" => array(
+                        new Constraints\NotBlank(),
                         new Constraints\Callback(array(
                             "methods" => array(
                                 array($this, "verifyZipCode")
