@@ -981,4 +981,20 @@ final class TheliaEvents
 
     const TRANSLATION_GET_STRINGS = 'action.translation.get_strings';
     const TRANSLATION_WRITE_FILE = 'action.translation.write_file';
+
+    // -- ORDER STATUS EVENTS -----------------------------------------------
+    const BEFORE_CREATE_ORDER_STATUS    = "action.before_createOrderStatus";
+    const ORDER_STATUS_CREATE           = "action.createOrderStatus";
+    const AFTER_CREATE_ORDER_STATUS     = "action.after_createOrderStatus";
+
+    const BEFORE_UPDATE_ORDER_STATUS    = "action.before_updateOrderStatus";
+    const ORDER_STATUS_UPDATE           = "action.updateOrderStatus";
+    const AFTER_UPDATE_ORDER_STATUS     = "action.after_updateOrderStatus";
+
+    const BEFORE_DELETE_ORDER_STATUS    = "action.before_deleteOrderStatus";
+    const ORDER_STATUS_DELETE           = "action.deleteOrderStatus";
+    const AFTER_DELETE_ORDER_STATUS     = "action.after_deleteOrderStatus";
+
+    const ORDER_STATUS_UPDATE_POSITION  = "action.updateOrderStatusPosition";
+    // -- END ORDER STATUS EVENTS -----------------------------------------------
 }
