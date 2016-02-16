@@ -63,6 +63,7 @@
                 <parameter key="HOOK">admin.hook</parameter>
                 <parameter key="MODULE_HOOK">admin.module-hook</parameter>
                 <parameter key="ORDER">admin.order</parameter>
+                <parameter key="ORDER_STATUS">admin.configuration.order-status</parameter>
                 <parameter key="PRODUCT">admin.product</parameter>
                 <parameter key="PROFILE">admin.configuration.profile</parameter>
                 <parameter key="SHIPPING_ZONE">admin.configuration.shipping-zone</parameter>
