@@ -94,6 +94,12 @@ class CSVSerializer extends AbstractSerializer
             $this->headers = array_keys($data);
         }
 
+        foreach ($data as &$value) {
+            if (is_array($value)) {
+                $value = gettype($value);
+            }
+        }
+
         $fd = fopen('php://memory', 'w+b');
         fputcsv($fd, $data, $this->delimiter, $this->enclosure);
         rewind($fd);
