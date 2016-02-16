@@ -71,6 +71,9 @@ final class AdminForm
     const ORDER_PAYMENT = 'thelia.order.payment';
     const ORDER_UPDATE_ADDRESS = 'thelia.order.update.address';
 
+    const ORDER_STATUS_CREATION = 'thelia.admin.order-status.creation';
+    const ORDER_STATUS_MODIFICATION = 'thelia.admin.order-status.modification';
+
     const COUPON_CODE = 'thelia.order.coupon';
 
     const CONFIG_CREATION = 'thelia.admin.config.creation';

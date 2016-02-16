@@ -162,6 +162,9 @@
         <form name="thelia_api_create" class="Thelia\Form\Api\ApiCreateForm"/>
         <form name="thelia_api_update" class="Thelia\Form\Api\ApiUpdateForm"/>
 
+        <form name="thelia.admin.order-status.creation" class="Thelia\Form\OrderStatus\OrderStatusCreationForm"/>
+        <form name="thelia.admin.order-status.modification" class="Thelia\Form\OrderStatus\OrderStatusModificationForm"/>
+
     </forms>
 
 </config>
