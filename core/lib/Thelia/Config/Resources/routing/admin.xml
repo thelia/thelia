@@ -252,6 +252,36 @@
 
     <!-- end order management -->
 
+    <!-- order status management -->
+
+    <route id="admin.order-status.default" path="/admin/configuration/order-status">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::defaultAction</default>
+    </route>
+
+    <route id="admin.order-status.create" path="/admin/configuration/order-status/create">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::createAction</default>
+    </route>
+
+    <route id="admin.order-status.update" path="/admin/configuration/order-status/update/{order_status_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::updateAction</default>
+        <requirement key="order_status_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order-status.save" path="/admin/configuration/order-status/save/{order_status_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::processUpdateAction</default>
+        <requirement key="order_status_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order-status.delete" path="/admin/configuration/order-status/delete">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::deleteAction</default>
+    </route>
+
+    <route id="admin.order-status.update-position" path="/admin/configuration/order-status/update-position">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::updatePositionAction</default>
+    </route>
+
+    <!-- end order status management -->
+
     <!-- Categories management -->
 
     <route id="admin.categories.default" path="/admin/categories">
