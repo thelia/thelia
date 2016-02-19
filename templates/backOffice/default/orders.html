@@ -117,14 +117,7 @@
 
                                     {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
-                                        {assign "orderStatusCode" "order_$CODE"}
-                                        {if #$orderStatusCode# == ''}
-                                            {assign "defaultLabel" "label-default"}
-                                            {assign "orderStatusLabel" $CODE}
-                                        {else}
-                                            {assign "defaultLabel" ''}
-                                            {assign "orderStatusLabel" #$orderStatusCode#}
-                                        {/if}
+                                        {assign "orderStatusCodeColor" $COLOR}
                                     {/loop}
 
                                     <tr>
@@ -134,7 +127,7 @@
                                        	<td>{$orderInvoiceCompany}</td>
                                        	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                        	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</td>
-                                        <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
+                                        <td class="text-center"><span class="label" style="background-color: {$orderStatusCodeColor};">{$orderStatus}</span></td>
                                         {* *}
                                         {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
