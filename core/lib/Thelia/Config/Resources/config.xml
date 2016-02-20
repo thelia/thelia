@@ -222,8 +222,7 @@
             <argument id="base_http_kernel" type="service"/>
         </service>
 
-
-        <service id="request" synthetic="true" />
+        <service id="request" class="Thelia\Core\HttpFoundation\Request" />
 
         <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />
 
