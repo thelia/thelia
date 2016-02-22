@@ -246,7 +246,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getLocale(),
             $event->getFreeShippingForCountries(),
             $event->getFreeShippingForMethods(),
-            $event->getPerCustomerUsageCount()
+            $event->getPerCustomerUsageCount(),
+            $event->getStartDate()
         );
 
         $event->setCouponModel($coupon);
@@ -327,6 +328,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                         ->setShortDescription($couponModel->getShortDescription())
                         ->setDescription($couponModel->getDescription())
 
+                        ->setStartDate($couponModel->getStartDate())
                         ->setExpirationDate($couponModel->getExpirationDate())
                         ->setIsCumulative($couponModel->getIsCumulative())
                         ->setIsRemovingPostage($couponModel->getIsRemovingPostage())

@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
@@ -147,6 +148,21 @@ class CouponCreationForm extends BaseForm
                 []
             )
             ->add(
+                'startDate',
+                'text',
+                [
+                    'constraints' => [
+                        new Callback(
+                            [
+                                "methods" => [
+                                    [$this, "checkLocalizedDate"],
+                                ],
+                            ]
+                        ),
+                    ]
+                ]
+            )
+            ->add(
                 'expirationDate',
                 'text',
                 [
@@ -156,6 +172,7 @@ class CouponCreationForm extends BaseForm
                             [
                                 "methods" => [
                                     [$this, "checkLocalizedDate"],
+                                    [$this, "checkConsistencyDates"],
                                 ],
                             ]
                         ),
@@ -291,6 +308,30 @@ class CouponCreationForm extends BaseForm
                 )
             );
         }
+    }
+
+    /**
+     * @param $value
+     * @param ExecutionContextInterface $context
+     */
+    public function checkConsistencyDates($value, ExecutionContextInterface $context)
+    {
+        if (null === $startDate = $this->getForm()->get('startDate')->getData()) {
+            return;
+        }
+
+        $format = LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+
+        $startDate = \DateTime::createFromFormat($format, $startDate);
+        $expirationDate = \DateTime::createFromFormat($format, $value);
+
+        if ($startDate <= $expirationDate) {
+            return;
+        }
+
+        $context->addViolation(
+            Translator::getInstance()->trans("Start date and expiration date are inconsistent")
+        );
     }
 
     /**

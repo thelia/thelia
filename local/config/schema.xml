@@ -979,7 +979,8 @@
     <column name="is_enabled" required="true" type="BOOLEAN" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
-    <column name="expiration_date" required="true" type="TIMESTAMP" />
+    <column name="start_date" defaultValue="NULL" type="TIMESTAMP" />
+    <column name="expiration_date" type="TIMESTAMP" />
     <column name="max_usage" required="true" type="INTEGER" />
     <column name="is_cumulative" required="true" type="BOOLEAN" />
     <column name="is_removing_postage" required="true" type="BOOLEAN" />
@@ -998,6 +999,9 @@
     </index>
     <index name="idx_type">
       <index-column name="type" />
+    </index>
+    <index name="idx_start_date">
+      <index-column name="start_date" />
     </index>
     <index name="idx_expiration_date">
       <index-column name="expiration_date" />
@@ -1424,6 +1428,7 @@
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
+    <column name="start_date" defaultValue="NULL" type="TIMESTAMP" />
     <column name="expiration_date" required="true" type="TIMESTAMP" />
     <column name="is_cumulative" required="true" type="BOOLEAN" />
     <column name="is_removing_postage" required="true" type="BOOLEAN" />

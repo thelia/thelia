@@ -463,6 +463,7 @@ return array(
     'Sorry, you\'re not allowed to perform this action' => 'Sorry, you\'re not allowed to perform this action',
     'Source IP' => 'Source IP',
     'Start date' => 'Start date',
+    'Start date and expiration date are inconsistent' => 'Start date and expiration date are inconsistent',
     'Start date of sales' => 'Start date of sales',
     'State' => 'State',
     'State ID %id not found' => 'State ID %id not found',
