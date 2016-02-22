@@ -25,7 +25,6 @@ use Thelia\Config\DefinePropel;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
-use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Version\Version;
 
 /**
@@ -190,11 +189,20 @@ class Update
                 'thelia_major_version'   => $currentVersion['major'],
                 'thelia_minus_version'   => $currentVersion['minus'],
                 'thelia_release_version' => $currentVersion['release'],
-                'thelia_extr_version'    => $currentVersion['extra'],
+                'thelia_extra_version'    => $currentVersion['extra'],
             ];
 
             foreach ($updateConfigVersion as $name => $value) {
-                ConfigQuery::write($name, $value);
+                $stmt = $this->connection->prepare('SELECT * FROM `config` WHERE `name` = ?');
+                $stmt->execute([$name]);
+
+                if ($stmt->rowCount()) {
+                    $stmt = $this->connection->prepare('UPDATE `config` SET `value` = ? WHERE `name` = ?');
+                    $stmt->execute([$version, $value]);
+                } else {
+                    $stmt = $this->connection->prepare('INSERT INTO `config` (?) VALUES (?)');
+                    $stmt->execute([$version, $value]);
+                }
             }
 
             $this->connection->commit();
