@@ -90,7 +90,7 @@ class TranslationsController extends BaseAdminController
 
         // Find the i18n directory, and the directory to examine.
 
-        if (! empty($itemName) || $itemToTranslate == 'co' || $itemToTranslate == 'in') {
+        if (! empty($itemName) || $itemToTranslate == 'co' || $itemToTranslate == 'in' || $itemToTranslate == 'wi') {
             switch ($itemToTranslate) {
 
                 // Module core
@@ -191,6 +191,16 @@ class TranslationsController extends BaseAdminController
                     $domain = 'install';
                     $i18nDirectory = THELIA_SETUP_DIRECTORY . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
+                    // resources not loaded by default
+                    $this->loadTranslation($i18nDirectory, $domain);
+                    break;
+
+                // Thelia Install wizard
+                case 'wi':
+                    $directory = THELIA_SETUP_WIZARD_DIRECTORY;
+                    $domain = 'wizard';
+                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY . 'I18n';
+                    $walkMode = TranslationEvent::WALK_MODE_PHP;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
                     break;

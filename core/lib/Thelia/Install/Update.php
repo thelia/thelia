@@ -17,6 +17,7 @@ use PDO;
 use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfiguration;
@@ -24,7 +25,6 @@ use Thelia\Config\DefinePropel;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
-use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Version\Version;
 
 /**
@@ -65,6 +65,12 @@ class Update
 
     /** @var string */
     protected $backupDir = 'local/backup/';
+
+    /** @var array */
+    protected $messages = [];
+
+    /** @var Translator */
+    protected $translator;
 
     public function __construct($usePropel = true)
     {
@@ -183,11 +189,20 @@ class Update
                 'thelia_major_version'   => $currentVersion['major'],
                 'thelia_minus_version'   => $currentVersion['minus'],
                 'thelia_release_version' => $currentVersion['release'],
-                'thelia_extr_version'    => $currentVersion['extra'],
+                'thelia_extra_version'    => $currentVersion['extra'],
             ];
 
             foreach ($updateConfigVersion as $name => $value) {
-                ConfigQuery::write($name, $value);
+                $stmt = $this->connection->prepare('SELECT * FROM `config` WHERE `name` = ?');
+                $stmt->execute([$name]);
+
+                if ($stmt->rowCount()) {
+                    $stmt = $this->connection->prepare('UPDATE `config` SET `value` = ? WHERE `name` = ?');
+                    $stmt->execute([$version, $value]);
+                } else {
+                    $stmt = $this->connection->prepare('INSERT INTO `config` (?) VALUES (?)');
+                    $stmt->execute([$version, $value]);
+                }
             }
 
             $this->connection->commit();
@@ -529,5 +544,58 @@ class Update
             $list[] = substr($file->getRelativePathname(), 0, -4);
         }
         return $list;
+    }
+
+    /**
+     * @param string $message
+     * @param string $type
+     * @return $this
+     */
+    public function setMessage($message, $type = 'info')
+    {
+        $this->messages[] = [$message, $type];
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    public function trans($string)
+    {
+        return $this->translator ? $this->translator->trans($string) : $string;
+    }
+
+    /**
+     * @param Translator $translator
+     * @return $this
+     */
+    public function setTranslator(Translator $translator)
+    {
+        $this->translator = $translator;
+
+        return $this;
+    }
+
+    public function getWebVersion()
+    {
+        $url = "http://thelia.net/version.php";
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+        $res = curl_exec($curl);
+        if (Version::parse($res))
+            return $res;
     }
 }
