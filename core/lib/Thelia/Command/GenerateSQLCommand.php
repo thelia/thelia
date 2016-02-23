@@ -18,12 +18,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Tools\URL;
 use Thelia\Tools\Version\Version;
 use TheliaSmarty\Template\SmartyParser;
 
@@ -97,12 +95,9 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
     protected function init(InputInterface $input)
     {
-        $container = $this->getContainer();
+        $this->initRequest();
 
-        $request = new Request();
-        $request->setSession(new Session(new MockArraySessionStorage()));
-        $container->set("request_stack", new RequestStack());
-        $container->get('request_stack')->push($request);
+        $container = $this->getContainer();
 
         $this->translator = $container->get('thelia.translator');
         $this->parser = $container->get('thelia.parser');

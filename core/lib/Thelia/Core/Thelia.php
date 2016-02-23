@@ -99,6 +99,18 @@ class Thelia extends Kernel
     }
 
     /**
+     * Gets the container's base class.
+     *
+     * All names except Container must be fully qualified.
+     *
+     * @return string
+     */
+    protected function getContainerBaseClass()
+    {
+        return '\Thelia\Core\DependencyInjection\TheliaContainer';
+    }
+
+    /**
      *
      * process the configuration and create a cache.
      *
