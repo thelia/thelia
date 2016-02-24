@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2010) Improve product price edition tab
 - (related to #2005) Use a wider version requirement on thelia/installer for setup/
 - (related to #1999) Fix Folder breadcrumb, the parent url was not good if you edit a picture in a folder or a content
 - (related to #1980) Update database schema to increase module version field to 25 chars.
