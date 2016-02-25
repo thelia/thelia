@@ -6,6 +6,8 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
+{$searchTerm = {$smarty.get.search_term|trim}}
+
 <div class="modules">
 
     <div id="wrapper" class="container">
@@ -13,7 +15,7 @@
         <div class="clearfix">
             <ul class="breadcrumb pull-left">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-                <li><a href="#">{intl l="Search for '%term'" term=trim({$smarty.get.search_term})}</a></li>
+                <li><a href="#">{intl l="Search for '%term'" term=$searchTerm}</a></li>
             </ul>
         </div>
 
@@ -21,8 +23,7 @@
 
         <div class="row">
             <div class="col-md-12">
-
-                {if $smarty.get.search_term|trim|strlen > 2}
+                {if $searchTerm|strlen > 2}
                 {* customer search *}
                 <div class="general-block-decorator">
                     <div class="table-responsive">
@@ -30,6 +31,7 @@
                             <caption class="clearfix">
                                 {intl l='Customer'}
                             </caption>
+                            {ifloop rel="customer_list"}
                             <thead>
                             <tr>
                                 <th class="object-title">
@@ -59,7 +61,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_term=trim($smarty.get.search_term) search_in="ref,firstname,lastname,email"}
+                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_term=$searchTerm search_in="ref,firstname,lastname,email"}
                                 {assign "lastOrderDate" ''}
                                 {assign "lastOrderAmount" ''}
                                 {assign "lastOrderCurrency" ''}
@@ -121,7 +123,13 @@
                                 </tr>
                             {/loop}
                             </tbody>
+                            {/ifloop}
                         </table>
+                        {elseloop rel="customer_list"}
+                            <div class="alert alert-info">
+                                {intl l="No customer found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
                     </div>
                 </div>
                 {* end customer search *}
@@ -134,9 +142,13 @@
                                 {intl l='Orders'}
                             </caption>
                             <thead>
+                            {ifloop rel="order-search"}
                             <tr>
                                 <th>{intl l="Order n°"}</th>
                                 <th>{intl l="Date & Hour"}</th>
+                                <th>{intl l="Invoice"}</th>
+                                <th>{intl l="Delivery"}</th>
+                                <th>{intl l="Transaction"}</th>
                                 <th>{intl l="Company"}</th>
                                 <th>{intl l="Name"}</th>
                                 <th>{intl l="Amount"}</th>
@@ -147,7 +159,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="order" name="order-search" backend_context=1 customer="*" search_term=trim($smarty.get.search_term) search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email"}
+                            {loop type="order" name="order-search" backend_context=1 customer="*" search_term=$searchTerm search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email,invoice_ref,transaction_ref,delivery_ref"}
                                 {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                                 {assign "orderInvoiceLastName" $LASTNAME}
@@ -159,13 +171,20 @@
                                 {assign "orderStatusLabel" "order_$CODE"}
                                 {/loop}
 
+                                {loop type="currency" name="order-currency" id=$CURRENCY}
+                                {assign "currencySymbol" $SYMBOL}
+                                {/loop}
+
                                 <tr>
 
                                     <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
                                     <td>{format_date date=$CREATE_DATE}</td>
+                                    <td>{$INVOICE_REF}</td>
+                                    <td>{$DELIVERY_REF}</td>
+                                    <td>{$TRANSACTION_REF}</td>
                                     <td>{$orderInvoiceCompany}</td>
                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-                                    <td>{$TOTAL_TAXED_AMOUNT}</td>
+                                    <td>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$currencySymbol}</td>
                                     <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
 
                                     <td>
@@ -181,7 +200,13 @@
                                 </tr>
                             {/loop}
                             </tbody>
+                            {/ifloop}
                         </table>
+                        {elseloop rel="order-search"}
+                            <div class="alert alert-info">
+                                {intl l="No order found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
                     </div>
                 </div>
                 {* end order search *}
@@ -193,6 +218,7 @@
                             <caption class="clearfix">
                                 {intl l='Category'}
                             </caption>
+                            {ifloop rel="category-search"}
                             <thead>
                             <tr>
                                 <th>{intl l="ID"}</th>
@@ -206,7 +232,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title"}
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
@@ -243,7 +269,14 @@
                             </tr>
                             {/loop}
                             </tbody>
+                            {/ifloop}
                         </table>
+                        {elseloop rel="category-search"}
+                            <div class="alert alert-info">
+                                {intl l="No category found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
+
                     </div>
                 </div>
                 {* end category search *}
@@ -255,6 +288,7 @@
                             <caption class="clearfix">
                                 {intl l='Product'}
                             </caption>
+                            {ifloop rel="product-search"}
                             <thead>
                             <tr>
                                 <th>{intl l="ID"}</th>
@@ -272,7 +306,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="ref,title"}
+                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title"}
                                 {$id_product=$ID}
                                  <tr>
                                      <td>{$ID}</td>
@@ -294,7 +328,7 @@
 
                                      {hook name="products.row" location="product_list_row" product_id={$ID} }
 
-                                     <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
+                                     <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol={currency attr="symbol"}}</a></td>
 
                                      <td class="text-center">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
@@ -329,7 +363,13 @@
 
                             {/loop}
                             </tbody>
+                            {/ifloop}
                         </table>
+                        {elseloop rel="product-search"}
+                            <div class="alert alert-info">
+                                {intl l="No product found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
                     </div>
                 </div>
                 {* end product search *}
@@ -341,6 +381,7 @@
                             <caption class="clearfix">
                                 {intl l='Folder'}
                             </caption>
+                            {ifloop rel="folder-search"}
                             <thead>
                             <tr>
                                 <th>{intl l="ID"}</th>
@@ -354,7 +395,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title"}
 
                                 <tr>
                                     <td>{$ID}</td>
@@ -396,7 +437,13 @@
 
                             {/loop}
                             </tbody>
+                            {/ifloop}
                         </table>
+                        {elseloop rel="folder-search"}
+                            <div class="alert alert-info">
+                                {intl l="No folder found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
                     </div>
                 </div>
                 {* end folder search *}
@@ -408,6 +455,7 @@
                             <caption class="clearfix">
                                 {intl l='Content'}
                             </caption>
+                            {ifloop rel="content-search"}
                             <thead>
                             <tr>
                                 <th>{intl l="ID"}</th>
@@ -421,7 +469,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title"}
 
                                 <tr>
                                     <td>{$ID}</td>
@@ -461,7 +509,14 @@
 
                             {/loop}
                             </tbody>
+                            {/ifloop}
                         </table>
+                        {elseloop rel="content-search"}
+                            <div class="alert alert-info">
+                                {intl l="No content found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
+
                     </div>
                 </div>
                 {* end content search *}
