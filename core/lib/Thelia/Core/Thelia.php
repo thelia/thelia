@@ -89,6 +89,14 @@ class Thelia extends Kernel
         $con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
+        if ($this->isDebug()) {
+            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
+            Tlog::getInstance()->setLevel(Tlog::DEBUG);
+
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
+            $con->useDebug(true);
+        }
+
         // MySQL 5.6+ compatibility
         $result = $con->query("SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode, @@SESSION.sql_mode as session_sql_mode");
 
@@ -106,19 +114,13 @@ class Thelia extends Kernel
                 }
 
                 if (! empty($setQuery)) {
-                    if (null === $con->query()) {
+                    if (null === $con->query($setQuery)) {
                         throw new \RuntimeException('Failed to set MySQL 5.6+ global sql_mode to NO_ENGINE_SUBSTITUTION');
                     }
                 }
             }
-        }
-
-        if ($this->isDebug()) {
-            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-            Tlog::getInstance()->setLevel(Tlog::DEBUG);
-
-            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
-            $con->useDebug(true);
+        } else {
+            Tlog::getInstance()->addWarning("Failed to get MySQL version and sql_mode");
         }
     }
 
