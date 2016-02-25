@@ -96,6 +96,33 @@ class Thelia extends Kernel
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
+
+        // MySQL 5.6+ compatibility
+        $result = $con->query("SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode, @@SESSION.sql_mode as session_sql_mode");
+
+        if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
+            // MariaDB is not impacted by this problem
+            if (false === strpos($data['version'], 'MariaDB') && version_compare($data['version'], '5.6.0', '>=')) {
+                Tlog::getInstance()->addInfo("Setting global and session sql_mode to NO_ENGINE_SUBSTITUTION");
+
+                $setQuery = '';
+
+                if ($data['global_sql_mode'] != 'NO_ENGINE_SUBSTITUTION') {
+                    $setQuery .= "SET GLOBAL sql_mode='NO_ENGINE_SUBSTITUTION';";
+                }
+                if ($data['session_sql_mode'] != 'NO_ENGINE_SUBSTITUTION') {
+                    $setQuery .= "SET SESSION sql_mode='NO_ENGINE_SUBSTITUTION';";
+                }
+
+                if (! empty($setQuery)) {
+                    if (null === $con->query($setQuery)) {
+                        throw new \RuntimeException('Failed to set MySQL 5.6+ global sql_mode to NO_ENGINE_SUBSTITUTION');
+                    }
+                }
+            }
+        } else {
+            Tlog::getInstance()->addWarning("Failed to get MySQL version and sql_mode");
+        }
     }
 
     /**
