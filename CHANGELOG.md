@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2017) Add constraint of unicity in create and update hook form
 - (related to #2012) Checking MySQL version to set sql_mode automatically, this fixed the compatibility with MySQL > 5.6 for modes `STRICT_TRANS_TABLES`, `NO_ENGINE_SUBSTITUTION`
 - (related to #2010) Improve product price edition tab
 - (related to #2005) Use a wider version requirement on thelia/installer for setup/
