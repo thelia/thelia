@@ -13,6 +13,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -29,12 +30,12 @@ class Payment implements EventSubscriberInterface
      *
      * @param IsValidPaymentEvent $event
      */
-    public function isValid(IsValidPaymentEvent $event)
+    public function isValid(IsValidPaymentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $module = $event->getModule();
 
         // dispatch event to target specific module
-        $event->getDispatcher()->dispatch(
+        $dispatcher->dispatch(
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_IS_VALID,
                 $module->getCode()

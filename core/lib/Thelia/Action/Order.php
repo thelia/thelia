@@ -401,7 +401,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getCart(),
                 $event->getCustomer(),
                 $this->isModuleManageStockOnCreation(
-                    $event->getDispatcher(),
+                    $dispatcher,
                     $paymentModuleInstance
                 ),
                 $event->getUseOrderDefinedAddresses()
@@ -436,7 +436,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $session->getSessionCart($dispatcher),
             $this->securityContext->getCustomerUser(),
             $this->isModuleManageStockOnCreation(
-                $event->getDispatcher(),
+                $dispatcher,
                 $paymentModuleInstance
             )
         );
@@ -523,7 +523,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @param OrderEvent $event
      */
-    public function updateStatus(OrderEvent $event)
+    public function updateStatus(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $order = $event->getOrder();
         $newStatus = $event->getStatus();
@@ -532,7 +532,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $paymentModuleInstance = $paymentModule->createInstance();
 
         $manageStockOnCreation = $this->isModuleManageStockOnCreation(
-            $event->getDispatcher(),
+            $dispatcher,
             $paymentModuleInstance
         );
 

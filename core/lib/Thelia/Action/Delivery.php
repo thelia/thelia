@@ -13,6 +13,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -29,12 +30,12 @@ class Delivery implements EventSubscriberInterface
      *
      * @param DeliveryPostageEvent $event
      */
-    public function getPostage(DeliveryPostageEvent $event)
+    public function getPostage(DeliveryPostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $module = $event->getModule();
 
         // dispatch event to target specific module
-        $event->getDispatcher()->dispatch(
+        $dispatcher->dispatch(
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
                 $module->getCode()
