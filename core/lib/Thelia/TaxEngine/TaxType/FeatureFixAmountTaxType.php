@@ -63,7 +63,11 @@ class FeatureFixAmountTaxType extends BaseTaxType
     public function getRequirementsDefinition()
     {
         return array(
-            new TaxTypeRequirementDefinition('feature', new ModelValidIdType('Feature'))
+            new TaxTypeRequirementDefinition(
+                'feature',
+                new ModelValidIdType('Feature'),
+                Translator::getInstance()->trans("Feature")
+            )
         );
     }
 

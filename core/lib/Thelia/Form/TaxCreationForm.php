@@ -85,7 +85,7 @@ class TaxCreationForm extends BaseForm
                             "tag" => "requirements",
                             "tax_type" => Tax::escapeTypeName($name),
                         ),
-                        "label" => Translator::getInstance()->trans($requirement->getName()),
+                        "label" => Translator::getInstance()->trans($requirement->getTitle()),
                         "type" => $requirement->getType()->getFormType(),
                         "options" => $requirement->getType()->getFormOptions(),
                     ))
