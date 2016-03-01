@@ -1,0 +1,172 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'tools'}
+{/block}
+
+{block name="check-resource"}admin.order-status{/block}
+{block name="check-access"}view{/block}
+
+{block name="page-title"}{intl l='Edit order status'}{/block}
+
+{block name="main-content"}
+    <div class="order-status edit-order-status">
+        <div id="wrapper" class="container">
+            {loop name="order_status__edit" type="order-status" id=$order_status_id backend_context="1" lang=$edit_language_id}
+
+                <nav>
+                    <ul class="breadcrumb">
+                        <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                        <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                        <li><a href="{url path='/admin/configuration/order-status'}">{intl l="Order status"}</a></li>
+                        <li>{intl l='Editing order status "%title"' title="{$TITLE}"}</li>
+                    </ul>
+                </nav>
+
+            {hook name="order-status-edit.top" order_status_id=$order_status_id}
+
+                <div class="row">
+                    <div class="col-md-12 general-block-decorator">
+                        <div class="row">
+                            <div class="col-md-7 title">
+                                {intl l='Edit order status %title' title={$TITLE}}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                {hookblock name="order-status.tab" order_status_id="{$order_status_id}" fields="id,title,href,content"}
+
+                                {capture "order_status_tab_tab"}
+                                    {forhook rel="order-status.tab"}
+                                        <li>
+                                            <a href="#{$id}"
+                                               {if $href}data-href="{$href}"{/if}
+                                               data-toggle="tab">{$title}
+                                            </a>
+                                        </li>
+                                    {/forhook}
+                                {/capture}
+
+                                {capture "order_status_tab_content"}
+                                    {forhook rel="order-status.tab"}
+                                        <div class="tab-pane fade" id="{$id}">
+                                            {if $href}
+                                                {* ajax *}
+                                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                            {else}
+                                                {$content nofilter}
+                                            {/if}
+                                        </div>
+                                    {/forhook}
+                                {/capture}
+
+                                {/hookblock}
+                                <ul class="nav nav-tabs" id="tabbed-menu">
+                                    <li class="active">
+                                        <a href="#general" data-toggle="tab">{intl l="General description"}</a>
+                                    </li>
+                                    {$smarty.capture.order_status_tab_tab nofilter}
+                                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+
+                                    <div class="tab-pane fade active in" id="general">
+
+                                        <div class="form-container">
+
+                                            {form name="thelia.admin.order-status.modification"}
+
+                                                <form method="POST" action="{url path="/admin/configuration/order-status/save/%id" id=$ID}" class="clearfix">
+
+                                                    {include file="includes/inner-form-toolbar.html" close_url={url path='/admin/configuration/order-status'}}
+
+                                                    <input type="hidden" name="current_tab" value="general"/>
+
+                                                    {* Be sure to get the currency ID, even if the form could not be validated *}
+                                                    <input type="hidden" name="order_status_id" value="{$ID}" />
+
+                                                    {form_hidden_fields}
+
+                                                    {render_form_field field="success_url" value={url path="/admin/configuration/order-status"}}
+                                                    {render_form_field field="locale" value={$edit_language_locale}}
+
+                                                    {if $form_error}
+                                                        <div class="alert alert-danger">{$form_error_message}</div>
+                                                    {/if}
+
+                                                    <div class="row">
+                                                        <div class="col-md-8">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    {custom_render_form_field field="code"}
+                                                                        <div class="input-group">
+                                                                            <input type="text" {if $PROTECTED_STATUS}disabled{/if} class="form-control" {form_field_attributes field="code"}>
+                                                                        </div>
+                                                                    {/custom_render_form_field}
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    {custom_render_form_field field="color"}
+                                                                        <div class="input-group">
+                                                                            <input type="color" class="form-control" style="width: 100px;" {form_field_attributes field="color"}>
+                                                                        </div>
+                                                                    {/custom_render_form_field}
+                                                                </div>
+                                                            </div>
+                                                            {include file="includes/standard-description-form-fields.html"}
+                                                        </div>
+                                                        <div class="col-md-4">
+
+                                                        </div>
+                                                    </div>
+
+                                                    {hook name="order-status.update-form" order_status_id=$order_status_id}
+
+                                                    {include
+                                                    file="includes/inner-form-toolbar.html"
+                                                    hide_submit_buttons = false
+                                                    hide_flags = true
+
+                                                    close_url={url path="/admin/configuration/order-status"}
+                                                    }
+
+                                                    <small>{intl l='Order status created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE} }</small>
+                                                </form>
+                                            {/form}
+                                        </div>
+                                    </div>
+
+                                    {$smarty.capture.order_status_tab_content nofilter}
+
+                                    <div class="tab-pane fade" id="modules">
+                                        <div class="form-container">
+                                            {include
+                                            file = "includes/inner-form-toolbar.html"
+                                            hide_submit_buttons = true
+                                            page_url = $pageUrl
+                                            close_url = {$closeUrl}
+                                            current_tab = "modules"
+                                            }
+                                        </div>
+                                        {* bad fix : {hook name="brand.tab-content"} *}
+                                        {include file="includes/module-tab-content.html" hook="order-status.tab-content" id=$order_status_id view="order-status"}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {hook name="order-status-edit.bottom" order_status_id=$order_status_id}
+
+            {/loop}
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name='order-status.edit-js' order_status_id=$order_status_id}
+    {hook name="wysiwyg.js"}
+{/block}
