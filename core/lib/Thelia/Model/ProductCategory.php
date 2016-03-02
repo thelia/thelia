@@ -4,9 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProductCategory as BaseProductCategory;
 
-/**
- * Manages products position
- */
 class ProductCategory extends BaseProductCategory
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
