@@ -308,7 +308,7 @@
                                  <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
                                  {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
                                  {if $DEFAULT_CATEGORY ne $category_id}
-                                    <a href="{url path='/admin/products/categories' category_id=$DEFAULT_CATEGORY}" data-toggle="tooltip" data-placement="right" title="{intl l='Related product. Go to the default product\'s category'}">
+                                    <a href="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" data-toggle="tooltip" data-placement="right" title="{intl l='Related product. Go to the default product\'s category'}">
                                     <span class="glyphicon glyphicon-import text-warning" ></span>
                                     </a>
                                  {/if}
