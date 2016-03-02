@@ -12,7 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Template\Smarty\Plugins\an;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -20,20 +20,16 @@ use Thelia\Model\ModuleQuery;
 
 class Module extends AbstractSmartyPlugin
 {
-    /**
-     * @var bool application debug mode
-     */
+    /** @var bool application debug mode */
     protected $debug;
 
-    /**
-     * @var Request $request
-     */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
-    public function __construct($debug, Request $request)
+    public function __construct($debug, RequestStack $requestStack)
     {
         $this->debug = $debug;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
     /**
      * Process theliaModule template inclusion function
@@ -55,7 +51,7 @@ class Module extends AbstractSmartyPlugin
         $content = null;
         $count = 0;
         if (false !== $location = $this->getParam($params, 'location', false)) {
-            if ($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
+            if ($this->debug === true && $this->requestStack->getCurrentRequest()->get('SHOW_INCLUDE')) {
                 echo sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $location);
             }
 

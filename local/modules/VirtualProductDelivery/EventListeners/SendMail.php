@@ -13,6 +13,7 @@
 namespace VirtualProductDelivery\EventListeners;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -28,12 +29,16 @@ use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
  */
 class SendMail implements EventSubscriberInterface
 {
-
+    /** @var MailerFactory */
     protected $mailer;
 
-    public function __construct(MailerFactory $mailer)
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    public function __construct(MailerFactory $mailer, EventDispatcherInterface $eventDispatcher)
     {
         $this->mailer = $mailer;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function updateStatus(OrderEvent $event)
@@ -41,12 +46,10 @@ class SendMail implements EventSubscriberInterface
         $order = $event->getOrder();
 
         if ($order->hasVirtualProduct() && $order->isPaid(true)) {
-            $event
-                ->getDispatcher()
-                ->dispatch(
-                    VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE,
-                    $event
-                );
+            $this->eventDispatcher->dispatch(
+                VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE,
+                $event
+            );
         }
     }
 
@@ -68,7 +71,6 @@ class SendMail implements EventSubscriberInterface
             ->count();
 
         if ($virtualProductCount > 0) {
-
             $customer = $order->getCustomer();
 
             $this->mailer->sendEmailToCustomer(

@@ -21,6 +21,7 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleQuery;
 
@@ -129,6 +130,10 @@ class TaxRuleController extends AbstractCrudController
         return $this->createForm(AdminForm::TAX_RULE_MODIFICATION, "form", $data);
     }
 
+    /**
+     * @param TaxRule $object
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateTaxUpdateForm($object)
     {
         $data = array(
@@ -156,11 +161,19 @@ class TaxRuleController extends AbstractCrudController
         return $taxRule;
     }
 
+    /**
+     * @param TaxRule $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param TaxRule $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();
@@ -362,7 +375,6 @@ class TaxRuleController extends AbstractCrudController
         $taxRules = [];
 
         if (!$taxRuleCountries->isEmpty()) {
-
             $taxRuleCountry = $taxRuleCountries->getFirst();
             $currentCountryId = $taxRuleCountry->getCountryId();
             $currentStateId = intval($taxRuleCountry->getStateId());

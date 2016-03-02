@@ -58,9 +58,9 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        $args['coupon_order'] = $this->getListOrderFromSession('coupon', 'coupon_order', 'code');
-
-        return $this->render('coupon-list', $args);
+        return $this->render('coupon-list', [
+            'coupon_order' => $this->getListOrderFromSession('coupon', 'coupon_order', 'code')
+        ]);
     }
 
     /**
@@ -90,6 +90,7 @@ class CouponController extends BaseAdminController
         } else {
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
+            $args['nowDate'] = $defaultDate->format($this->getDefaultDateFormat());
             $args['defaultDate'] = $defaultDate->modify('+2 month')->format($this->getDefaultDateFormat());
         }
 
@@ -187,6 +188,7 @@ class CouponController extends BaseAdminController
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => $coupon->getIsEnabled(),
+                'startDate' => $coupon->getStartDate($this->getDefaultDateFormat()),
                 'expirationDate' => $coupon->getExpirationDate($this->getDefaultDateFormat()),
                 'isAvailableOnSpecialOffers' => $coupon->getIsAvailableOnSpecialOffers(),
                 'isCumulative' => $coupon->getIsCumulative(),
@@ -724,7 +726,8 @@ class CouponController extends BaseAdminController
             $data['locale'],
             $data['freeShippingForCountries'],
             $data['freeShippingForModules'],
-            $data['perCustomerUsageCount']
+            $data['perCustomerUsageCount'],
+            empty($data['startDate']) ? null : \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate'])
         );
 
         // If Update mode
@@ -785,7 +788,8 @@ class CouponController extends BaseAdminController
             $coupon->getLocale(),
             $coupon->getFreeShippingForCountries(),
             $coupon->getFreeShippingForModules(),
-            $coupon->getPerCustomerUsageCount()
+            $coupon->getPerCustomerUsageCount(),
+            $coupon->getStartDate()
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);
@@ -814,17 +818,22 @@ class CouponController extends BaseAdminController
         return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
     }
 
+    /**
+     * @param string $action
+     * @param Coupon|null $coupon
+     * @return \Thelia\Form\BaseForm
+     */
     protected function getForm($action, $coupon)
     {
-        $options["validation_groups"] = ["Default", $action];
-
         $data = array();
 
         if (null !== $coupon) {
             $data["code"] = $coupon->getCode();
         }
 
-        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, $options);
+        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, [
+            'validation_groups' => ["Default", $action]
+        ]);
     }
 
     public function deleteAction()

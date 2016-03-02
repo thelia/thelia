@@ -5,14 +5,14 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <services>
-        <service id="smarty.plugin.tinymce_lang" class="Tinymce\Smarty\TinyMCELanguage" scope="request">
+        <service id="smarty.plugin.tinymce_lang" class="Tinymce\Smarty\TinyMCELanguage">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="request"/>
         </service>
     </services>
 
     <hooks>
-        <hook id="tinymce.hook" class="Tinymce\Hook\HookManager" scope="request">
+        <hook id="tinymce.hook" class="Tinymce\Hook\HookManager">
             <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
             <tag name="hook.event_listener" event="wysiwyg.js" type="back" method="onJsWysiwyg" />
         </hook>

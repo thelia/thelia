@@ -14,7 +14,9 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -23,7 +25,6 @@ use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
@@ -47,10 +48,8 @@ use Thelia\Model\OrderCouponModule;
  */
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var \Thelia\Core\HttpFoundation\Request
-     */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var CouponFactory $couponFactory */
     protected $couponFactory;
@@ -65,13 +64,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     protected $conditionFactory;
 
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         CouponFactory $couponFactory,
         CouponManager $couponManager,
         ConditionInterface $noConditionRule,
         ConditionFactory $conditionFactory
     ) {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->couponFactory = $couponFactory;
         $this->couponManager = $couponManager;
         $this->noConditionRule = $noConditionRule;
@@ -82,24 +81,28 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon is about to be created
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
+      * @param $eventName
+      * @param EventDispatcherInterface $dispatcher
      */
-    public function create(CouponCreateOrUpdateEvent $event)
+    public function create(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $coupon = new CouponModel();
 
-        $this->createOrUpdate($coupon, $event);
+        $this->createOrUpdate($coupon, $event, $dispatcher);
     }
 
     /**
      * Occurring when a Coupon is about to be updated
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(CouponCreateOrUpdateEvent $event)
+    public function update(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $coupon = $event->getCouponModel();
 
-        $this->createOrUpdate($coupon, $event);
+        $this->createOrUpdate($coupon, $event, $dispatcher);
     }
 
     public function delete(CouponDeleteEvent $event)
@@ -124,35 +127,41 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon condition is about to be updated
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updateCondition(CouponCreateOrUpdateEvent $event)
+    public function updateCondition(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $modelCoupon = $event->getCouponModel();
 
-        $this->createOrUpdateCondition($modelCoupon, $event);
+        $this->createOrUpdateCondition($modelCoupon, $event, $dispatcher);
     }
 
     /**
      * Clear all coupons in session.
      *
      * @param Event $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function clearAllCoupons(Event $event)
+    public function clearAllCoupons(Event $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Tell coupons to clear any data they may have stored
         $this->couponManager->clear();
 
-        $this->request->getSession()->setConsumedCoupons(array());
+        $this->getSession()->setConsumedCoupons(array());
 
-        $this->updateOrderDiscount($event);
+        $this->updateOrderDiscount($event, $eventName, $dispatcher);
     }
 
     /**
      * Occurring when a Coupon condition is about to be consumed
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function consume(CouponConsumeEvent $event)
+    public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $totalDiscount = 0;
         $isValid = false;
@@ -164,18 +173,15 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $isValid = $coupon->isMatching();
 
             if ($isValid) {
-
                 $this->couponManager->pushCouponInSession($event->getCode());
                 $totalDiscount = $this->couponManager->getDiscount();
 
-                $this->request
-                    ->getSession()
-                    ->getSessionCart($event->getDispatcher())
+                $this->getSession()
+                    ->getSessionCart($dispatcher)
                     ->setDiscount($totalDiscount)
                     ->save();
 
-                $this->request
-                    ->getSession()
+                $this->getSession()
                     ->getOrder()
                     ->setDiscount($totalDiscount)
                 ;
@@ -186,18 +192,16 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setDiscount($totalDiscount);
     }
 
-    public function updateOrderDiscount(Event $event)
+    public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $discount = $this->couponManager->getDiscount();
 
-        $this->request
-            ->getSession()
-            ->getSessionCart($event->getDispatcher())
+        $this->getSession()
+            ->getSessionCart($dispatcher)
             ->setDiscount($discount)
             ->save();
 
-        $this->request
-            ->getSession()
+        $this->getSession()
             ->getOrder()
             ->setDiscount($discount);
     }
@@ -208,10 +212,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
+     * @param EventDispatcherInterface $dispatcher
      */
-    protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
+    protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
-        $coupon->setDispatcher($event->getDispatcher());
+        $coupon->setDispatcher($dispatcher);
 
         // Set default condition if none found
         /** @var ConditionInterface $noConditionRule */
@@ -241,7 +246,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getLocale(),
             $event->getFreeShippingForCountries(),
             $event->getFreeShippingForMethods(),
-            $event->getPerCustomerUsageCount()
+            $event->getPerCustomerUsageCount(),
+            $event->getStartDate()
         );
 
         $event->setCouponModel($coupon);
@@ -253,10 +259,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
+     * @param EventDispatcherInterface $dispatcher
      */
-    protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
+    protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
-        $coupon->setDispatcher($event->getDispatcher());
+        $coupon->setDispatcher($dispatcher);
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->conditionFactory;
@@ -289,8 +296,10 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param \Thelia\Core\Event\Order\OrderEvent $event
      *
      * @throws \Exception if something goes wrong.
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function afterOrder(OrderEvent $event)
+    public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         /** @var CouponInterface[] $consumedCoupons */
         $consumedCoupons = $this->couponManager->getCouponsKept();
@@ -301,10 +310,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             try {
                 foreach ($consumedCoupons as $couponCode) {
-
                     $couponQuery = CouponQuery::create();
                     $couponModel = $couponQuery->findOneByCode($couponCode->getCode());
-                    $couponModel->setLocale($this->request->getSession()->getLang()->getLocale());
+                    $couponModel->setLocale($this->getSession()->getLang()->getLocale());
 
                     /* decrease coupon quantity */
                     $this->couponManager->decrementQuantity($couponModel, $event->getOrder()->getCustomerId());
@@ -320,6 +328,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                         ->setShortDescription($couponModel->getShortDescription())
                         ->setDescription($couponModel->getDescription())
 
+                        ->setStartDate($couponModel->getStartDate())
                         ->setExpirationDate($couponModel->getExpirationDate())
                         ->setIsCumulative($couponModel->getIsCumulative())
                         ->setIsRemovingPostage($couponModel->getIsRemovingPostage())
@@ -366,28 +375,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         }
 
         // Clear all coupons.
-        $event->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
+        $dispatcher->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**
-     * Returns an array of event names this subscriber listens to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
@@ -404,5 +396,15 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_DELETEITEM => array("updateOrderDiscount", 10),
         );
+    }
+
+    /**
+     * Returns the session from the current request
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

@@ -15,13 +15,13 @@ namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
@@ -55,22 +55,18 @@ use Thelia\Tools\I18n;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var \Thelia\Core\HttpFoundation\Request
-     */
-    protected $request;
-    /**
-     * @var MailerFactory
-     */
+    /** @var RequestStack */
+    protected $requestStack;
+
+    /** @var MailerFactory */
     protected $mailer;
-    /**
-     * @var SecurityContext
-     */
+
+    /** @var SecurityContext */
     protected $securityContext;
 
-    public function __construct(Request $request, MailerFactory $mailer, SecurityContext $securityContext)
+    public function __construct(RequestStack $requestStack, MailerFactory $mailer, SecurityContext $securityContext)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->mailer = $mailer;
         $this->securityContext = $securityContext;
     }
@@ -383,8 +379,10 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
      * @param OrderManualEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function createManual(OrderManualEvent $event)
+    public function createManual(OrderManualEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $paymentModule = ModuleQuery::create()->findPk($event->getOrder()->getPaymentModuleId());
 
@@ -393,7 +391,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $event->setPlacedOrder(
             $this->createOrder(
-                $event->getDispatcher(),
+                $dispatcher,
                 $event->getOrder(),
                 $event->getCurrency(),
                 $event->getLang(),
@@ -411,12 +409,13 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param OrderEvent $event
      *
      * @throws \Thelia\Exception\TheliaProcessException
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(OrderEvent $event)
+    public function create(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $session = $this->getSession();
 
-        $dispatcher = $event->getDispatcher();
         $order = $event->getOrder();
         $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
@@ -424,7 +423,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $paymentModuleInstance = $paymentModule->createInstance();
 
         $placedOrder = $this->createOrder(
-            $event->getDispatcher(),
+            $dispatcher,
             $event->getOrder(),
             $session->getCurrency(),
             $session->getLang(),
@@ -433,7 +432,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $paymentModuleInstance->manageStockOnCreation()
         );
 
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
+        $dispatcher->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
         /* but memorize placed order */
         $event->setOrder(new OrderModel());
@@ -451,12 +450,14 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param OrderEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function orderBeforePayment(OrderEvent $event)
+    public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
+        $dispatcher ->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
 
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, clone $event);
+        $dispatcher->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, clone $event);
     }
 
     /**
@@ -464,13 +465,15 @@ class Order extends BaseAction implements EventSubscriberInterface
      * and the payment performed.
      *
      * @param OrderEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function orderCartClear(/** @noinspection PhpUnusedParameterInspection */ OrderEvent $event)
+    public function orderCartClear(/** @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Empty cart and clear current order
         $session = $this->getSession();
 
-        $session->clearSessionCart($event->getDispatcher());
+        $session->clearSessionCart($dispatcher);
 
         $session->setOrder(new OrderModel());
     }
@@ -650,24 +653,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
@@ -696,6 +682,6 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     protected function getSession()
     {
-        return $this->request->getSession();
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

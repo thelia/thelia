@@ -264,6 +264,7 @@ class CustomerController extends BaseFrontController
             $customerPasswordUpdateForm = $this->createForm(FrontForm::CUSTOMER_PASSWORD_UPDATE);
 
             try {
+                /** @var Customer $customer */
                 $customer = $this->getSecurityContext()->getCustomerUser();
 
                 $form = $this->validateForm($customerPasswordUpdateForm, "post");
@@ -428,6 +429,7 @@ class CustomerController extends BaseFrontController
                     try {
                         $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
+                        /** @var Customer $customer */
                         $customer = $authenticator->getAuthentifiedUser();
 
                         $this->processLogin($customer);
@@ -490,6 +492,10 @@ class CustomerController extends BaseFrontController
             $customerLoginForm->setErrorMessage($message);
 
             $this->getParserContext()->addForm($customerLoginForm);
+
+            if ($customerLoginForm->hasErrorUrl()) {
+                return $this->generateErrorRedirect($customerLoginForm);
+            }
         }
     }
 

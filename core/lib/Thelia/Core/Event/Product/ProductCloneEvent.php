@@ -104,6 +104,4 @@ class ProductCloneEvent extends ActionEvent
     {
         return $this->types;
     }
-
-
 }

@@ -21,24 +21,23 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.order" class="Thelia\Action\Order" scope="request">
-            <argument type="service" id="request"/>
+        <service id="thelia.action.order" class="Thelia\Action\Order">
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="mailer"/>
             <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.coupon" class="Thelia\Action\Coupon" scope="request">
-            <argument type="service" id="request"/>
+        <service id="thelia.action.coupon" class="Thelia\Action\Coupon">
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.coupon.factory"/>
             <argument type="service" id="thelia.coupon.manager"/>
             <argument type="service" id="thelia.condition.match_for_everyone"/>
             <argument type="service" id="thelia.condition.factory"/>
-
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.httpException" class="Thelia\Action\HttpException" scope="request">
+        <service id="thelia.action.httpException" class="Thelia\Action\HttpException">
             <argument type="service" id="thelia.parser" />
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -48,23 +47,24 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
+        <service id="thelia.action.customer" class="Thelia\Action\Customer">
             <argument type="service" id="thelia.securityContext"/>
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
         </service>
-
 
         <service id="thelia.action.address" class="Thelia\Action\Address">
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.administrator" class="Thelia\Action\Administrator">
+            <argument type="service" id="mailer"/>
+            <argument type="service" id="thelia.token_provider"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.cart" class="Thelia\Action\Cart" scope="request">
-            <argument type="service" id="request"/>
+        <service id="thelia.action.cart" class="Thelia\Action\Cart">
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.token_provider"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -77,6 +77,7 @@
             <argument type="service" id="thelia.file_manager"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
         <service id="thelia.action.document" class="Thelia\Action\Document">
             <argument type="service" id="thelia.file_manager"/>
             <tag name="kernel.event_subscriber"/>
@@ -87,10 +88,12 @@
         </service>
 
         <service id="thelia.action.product" class="Thelia\Action\Product">
+            <argument type="service" id="event_dispatcher" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.product_sale_element" class="Thelia\Action\ProductSaleElement">
+            <argument type="service" id="event_dispatcher" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -148,7 +151,6 @@
         </service>
 
         <service id="thelia.action.pdf" class="Thelia\Action\Pdf">
-
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -184,21 +186,19 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.lang" class="Thelia\Action\Lang" scope="request">
+        <service id="thelia.action.lang" class="Thelia\Action\Lang">
             <argument type="service" id="thelia.template_helper" />
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.export" class="Thelia\Action\Export">
             <argument type="service" id="thelia.export.handler" />
-
             <tag name="kernel.event_subscriber" />
         </service>
 
         <service id="thelia.action.import" class="Thelia\Action\Import">
             <argument type="service" id="thelia.import.handler" />
-
             <tag name="kernel.event_subscriber" />
         </service>
 

@@ -22,6 +22,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
+use Thelia\Model\Folder as FolderModel;
 
 /**
  * Class FolderTest
@@ -33,27 +34,16 @@ class FolderTest extends TestCaseWithURLToolSetup
     use RewrittenUrlTestTrait;
     use I18nTestTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
     /** @var int folder id used in position tests  */
     protected static $folderIdForPositionTest = null;
 
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public function getUpdateEvent(&$folder)
     {
-        if (!$folder instanceof \Thelia\Model\Folder) {
+        if (!$folder instanceof FolderModel) {
             $folder = $this->getRandomFolder();
         }
 
         $event = new FolderUpdateEvent($folder->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setVisible(1)
             ->setLocale($folder->getLocale())
@@ -69,12 +59,11 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     public function getUpdateSeoEvent(&$folder)
     {
-        if (!$folder instanceof \Thelia\Model\Folder) {
+        if (!$folder instanceof FolderModel) {
             $folder = $this->getRandomFolder();
         }
 
         $event = new UpdateSeoEvent($folder->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setLocale($folder->getLocale())
             ->setMetaTitle($folder->getMetaTitle())
@@ -88,13 +77,17 @@ class FolderTest extends TestCaseWithURLToolSetup
     {
         $contentAction = new Folder();
 
-        return $contentAction->updateSeo($event);
+        return $contentAction->updateSeo($event, null, $this->getMockEventDispatcher());
     }
 
+    /**
+     * @param FolderUpdateEvent $event
+     * @return FolderModel
+     */
     public function processUpdateAction($event)
     {
         $contentAction = new Folder();
-        $contentAction->update($event);
+        $contentAction->update($event, null, $this->getMockEventDispatcher());
 
         return $event->getFolder();
     }
@@ -106,7 +99,6 @@ class FolderTest extends TestCaseWithURLToolSetup
     public function testCreateFolder()
     {
         $event = new FolderCreateEvent();
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setParent(0)
             ->setVisible(1)
@@ -115,7 +107,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $folderAction = new Folder();
 
-        $folderAction->create($event);
+        $folderAction->create($event, null, $this->getMockEventDispatcher());
 
         $folder = $event->getFolder();
 
@@ -135,7 +127,6 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $visible = !$folder->getVisible();
         $event = new FolderUpdateEvent($folder->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setLocale('en_US')
             ->setTitle('test update folder')
@@ -147,7 +138,7 @@ class FolderTest extends TestCaseWithURLToolSetup
         ;
 
         $folderAction = new Folder();
-        $folderAction->update($event);
+        $folderAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = $event->getFolder();
 
@@ -169,9 +160,8 @@ class FolderTest extends TestCaseWithURLToolSetup
         $folder = $this->getRandomFolder();
 
         $event = new FolderDeleteEvent($folder->getId());
-        $event->setDispatcher($this->dispatcher);
         $folderAction = new Folder();
-        $folderAction->delete($event);
+        $folderAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedFolder = $event->getFolder();
 
@@ -189,10 +179,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         $visible = $folder->getVisible();
 
         $event = new FolderToggleVisibilityEvent($folder);
-        $event->setDispatcher($this->dispatcher);
 
         $folderAction = new Folder();
-        $folderAction->toggleVisibility($event);
+        $folderAction->toggleVisibility($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = $event->getFolder();
 
@@ -214,10 +203,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         $newPosition = $folder->getPosition()-1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_UP);
-        $event->setDispatcher($this->dispatcher);
 
         $folderAction = new Folder();
-        $folderAction->updatePosition($event);
+        $folderAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
@@ -247,10 +235,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         $newPosition = $folder->getPosition()+1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_DOWN);
-        $event->setDispatcher($this->dispatcher);
 
         $folderAction = new Folder();
-        $folderAction->updatePosition($event);
+        $folderAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
@@ -269,10 +256,9 @@ class FolderTest extends TestCaseWithURLToolSetup
         }
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
-        $event->setDispatcher($this->dispatcher);
 
         $folderAction = new Folder();
-        $folderAction->updatePosition($event);
+        $folderAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
@@ -287,7 +273,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     protected function getFolderIdForPositionTest()
     {
         if (null === self::$folderIdForPositionTest) {
-            $folder = new \Thelia\Model\Folder();
+            $folder = new FolderModel();
 
             $folder->setParent(0);
             $folder->setVisible(1);
@@ -298,7 +284,7 @@ class FolderTest extends TestCaseWithURLToolSetup
             $folder->save();
 
             for ($i = 0; $i < 4; $i++) {
-                $subFolder = new \Thelia\Model\Folder();
+                $subFolder = new FolderModel();
 
                 $subFolder->setParent($folder->getId());
                 $subFolder->setVisible(1);

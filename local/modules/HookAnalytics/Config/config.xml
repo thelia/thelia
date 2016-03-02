@@ -9,7 +9,7 @@
     </forms>
 
     <hooks>
-        <hook id="hookanalytics.hook.front" class="HookAnalytics\Hook\FrontHook" scope="request">
+        <hook id="hookanalytics.hook.front" class="HookAnalytics\Hook\FrontHook">
             <tag name="hook.event_listener" event="main.head-bottom" type="front" method="onMainHeadBottom" />
         </hook>
         <hook id="hookanalytics.hook.back">

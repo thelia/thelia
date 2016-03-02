@@ -69,6 +69,9 @@ final class TheliaEvents
      * Sent once the administrator is successfully logged in.
      */
     const ADMIN_LOGIN  = "action.admin_login";
+
+    const ADMIN_PASSWORD_RENEW  = "action.admin_renew_password";
+
     // -- END ADMIN EVENTS --------------------------------------------------------
 
 
@@ -405,6 +408,12 @@ final class TheliaEvents
     const CART_DELETEITEM = "action.deleteArticle";
     const CART_CLEAR = "action.clear";
 
+    /** before inserting a cart item in database */
+    const CART_ITEM_CREATE_BEFORE = "action.cart.item.create.before";
+
+    /** before updating a cart item in database */
+    const CART_ITEM_UPDATE_BEFORE = "action.cart.item.update.before";
+
     /**
      * Order linked event
      */
@@ -659,7 +668,8 @@ final class TheliaEvents
     const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
-    const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
+    const ADMINISTRATOR_UPDATEPASSWORD            = 'action.generatePassword';
+    const ADMINISTRATOR_CREATEPASSWORD            = 'action.createPassword';
 
     // -- Api management ---------------------------------------------
 

@@ -18,5 +18,6 @@ return array(
     'Thanks for signing up! We\'ll keep you posted whenever we have any new updates.' => 'Thanks for signing up! We\'ll keep you posted whenever we have any new updates.',
     'To enable the virtual product feature, the VirtualProductDelivery module should be activated' => 'To enable the virtual product feature, the VirtualProductDelivery module should be activated',
     'Wrong email or password. Please try again' => 'Wrong email or password. Please try again',
+    'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon' => 'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'You\'re currently logged in. Please log out before requesting a new password.',
 );

@@ -25,6 +25,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\Template;
 use Thelia\Model\TemplateQuery;
 
 /**
@@ -124,11 +125,19 @@ class TemplateController extends AbstractCrudController
         return $template;
     }
 
+    /**
+     * @param Template $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getName();
     }
 
+    /**
+     * @param Template $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();
@@ -164,7 +173,12 @@ class TemplateController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.templates.default');
     }
 
-    // Process delete failure, which may occurs if template is in use.
+    /**
+     * Process delete failure, which may occurs if template is in use.
+     *
+     * @param TemplateDeleteEvent $deleteEvent
+     * @return null|\Thelia\Core\HttpFoundation\Response
+     */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         if ($deleteEvent->getProductCount() > 0) {

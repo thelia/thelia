@@ -14,11 +14,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CountryQuery;
-use Thelia\Model\State;
-use Thelia\Model\StateQuery;
 
 /**
  * Class AddressCreateForm
@@ -129,6 +125,7 @@ class AddressCreateForm extends FirewallForm
                 ))
             ->add("zipcode", "text", array(
                     "constraints" => array(
+                        new Constraints\NotBlank(),
                         new Constraints\Callback(array(
                             "methods" => array(
                                 array($this, "verifyZipCode")

@@ -12,6 +12,10 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Template\ParserInterface;
+
 /**
  * Class BaseAction
  * @package Thelia\Tests\Action\ImageTest
@@ -19,13 +23,27 @@ namespace Thelia\Tests\Action;
  */
 class BaseAction extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getMockEventDispatcher()
+    {
+        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+    }
+
+    /**
+     * @return ParserInterface
+     */
+    protected function getMockParserInterface()
+    {
+        return $this->getMock("Thelia\\Core\\Template\\ParserInterface");
+    }
+
     public function getContainer()
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        $container = new ContainerBuilder();
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
-        $container->set("event_dispatcher", $dispatcher);
+        $container->set("event_dispatcher", $this->getMockEventDispatcher());
 
         return $container;
     }

@@ -14,7 +14,6 @@ namespace Thelia\Core\Controller;
 
 use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Thelia\Controller\BaseController;
 
@@ -80,11 +79,11 @@ class ControllerResolver extends BaseControllerResolver
         /** @var BaseController $controller */
         $controller = new $class();
 
-        $this->container->get('request')->setControllerType(
+        $this->container->get('request_stack')->getCurrentRequest()->setControllerType(
             $controller->getControllerType()
         );
 
-        if ($controller instanceof ContainerAwareInterface) {
+        if (method_exists($controller, 'setContainer')) {
             $controller->setContainer($this->container);
         }
 

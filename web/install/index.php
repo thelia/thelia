@@ -10,6 +10,8 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
+include("php_version_check.php");
+
 $step = 1;
 include("header.php");
 

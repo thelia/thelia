@@ -21,6 +21,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
@@ -141,11 +142,19 @@ class CurrencyController extends AbstractCrudController
         return $currency;
     }
 
+    /**
+     * @param Currency $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getName();
     }
 
+    /**
+     * @param Currency $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

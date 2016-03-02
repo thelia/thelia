@@ -12,8 +12,14 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use CommerceGuys\Addressing\Model\Address;
 use IntlDateFormatter;
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\Container;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\OrderAddressQuery;
+use Thelia\Tools\AddressFormat;
+use Symfony\Component\HttpFoundation\RequestStack;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -35,11 +41,12 @@ class Format extends AbstractSmartyPlugin
     private static $dateKeys = ["day", "month", "year"];
     private static $timeKeys = ["hour", "minute", "second"];
 
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -104,7 +111,7 @@ class Format extends AbstractSmartyPlugin
         $format = $this->getParam($params, "format", false);
 
         if ($format === false) {
-            $format = DateTimeFormat::getInstance($this->request)->getFormat($this->getParam($params, "output", null));
+            $format = DateTimeFormat::getInstance($this->requestStack->getCurrentRequest())->getFormat($this->getParam($params, "output", null));
         }
 
         $locale = $this->getParam($params, 'locale', false);
@@ -170,7 +177,7 @@ class Format extends AbstractSmartyPlugin
             return "";
         }
 
-        return NumberFormat::getInstance($this->request)->format(
+        return NumberFormat::getInstance($this->requestStack->getCurrentRequest())->format(
             $number,
             $this->getParam($params, "decimals", null),
             $this->getParam($params, "dec_point", null),
@@ -205,7 +212,7 @@ class Format extends AbstractSmartyPlugin
         }
 
         if ($this->getParam($params, "symbol", null) === null) {
-            return MoneyFormat::getInstance($this->request)->formatByCurrency(
+            return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())->formatByCurrency(
                 $number,
                 $this->getParam($params, "decimals", null),
                 $this->getParam($params, "dec_point", null),
@@ -214,7 +221,7 @@ class Format extends AbstractSmartyPlugin
             );
         }
 
-        return MoneyFormat::getInstance($this->request)->format(
+        return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())->format(
             $number,
             $this->getParam($params, "decimals", null),
             $this->getParam($params, "dec_point", null),
@@ -234,6 +241,9 @@ class Format extends AbstractSmartyPlugin
      * ex :
      *  {format_array_2d values=['Colors' => ['Green', 'Yellow', 'Red'], 'Material' => ['Wood']] separators=[' : ', ' / ', ' | ']}
      *  will output the format with specific format : "Colors : Green / Yellow / Red | Material : Wood"
+     *
+     * @param $params
+     * @return string
      */
     public function formatTwoDimensionalArray($params)
     {
@@ -246,7 +256,6 @@ class Format extends AbstractSmartyPlugin
         }
 
         foreach ($values as $key => $value) {
-
             if ($output !== '') {
                 $output .= $separators[2];
             }
@@ -347,6 +356,123 @@ class Format extends AbstractSmartyPlugin
     }
 
     /**
+     *
+     * display an address in expected format
+     *
+     * available parameters :
+     *  address => the id of the address to display
+     *  order_address => the id of the order address to display
+     *  from_country_id => the country id
+     *  dec_point => separator for the decimal point
+     *  thousands_sep => thousands separator
+     *  symbol => Currency symbol
+     *
+     *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
+     *
+     * @param $params
+     * @param  null                                                   $template
+     * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     * @return string                                                 the expected number formatted
+     */
+    public function formatAddress($params, $template = null)
+    {
+        $postal = filter_var(
+            $this->getParam($params, "postal", null),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        $html = filter_var(
+            $this->getParam($params, "html", true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        $htmlTag = $this->getParam($params, "html_tag", "p");
+        $originCountry = $this->getParam($params, "origin_country", null);
+        $locale = $this->getParam($params, "locale", $this->getSession()->getLang()->getLocale());
+        
+        // extract html attributes
+        $htmlAttributes = [];
+        foreach ($params as $k => $v) {
+            if (strpos($k, 'html_') !== false && $k !== 'html_tag') {
+                $htmlAttributes[substr($k, 5)] = $v;
+            }
+        }
+
+        // get address or order address
+        $address = null;
+        if (null !== $id = $this->getParam($params, "address", null)) {
+            if (null === $address = AddressQuery::create()->findPk($id)) {
+                return '';
+            }
+        } elseif (null !== $id = $this->getParam($params, "order_address", null)) {
+            if (null === $address = OrderAddressQuery::create()->findPk($id)) {
+                return '';
+            }
+        } else {
+            // try to parse arguments to build address
+            $address = $this->getAddressFormParams($params);
+        }
+
+        if (null === $address) {
+            throw new SmartyPluginException(
+                "Either address, order_address or full list of address fields should be provided"
+            );
+        }
+
+        $addressFormat = AddressFormat::getInstance();
+        if ($postal) {
+            if ($address instanceof Address) {
+                $formattedAddress = $addressFormat->postalLabelFormat($address, $locale, $originCountry);
+            } else {
+                $formattedAddress = $addressFormat->postalLabelFormatTheliaAddress($address, $locale, $originCountry);
+            }
+        } else {
+            if ($address instanceof Address) {
+                $formattedAddress = $addressFormat->format($address, $locale, $html, $htmlTag, $htmlAttributes);
+            } else {
+                $formattedAddress = $addressFormat->formatTheliaAddress($address, $locale, $html, $htmlTag, $htmlAttributes);
+            }
+        }
+
+        return $formattedAddress;
+    }
+
+    protected function getAddressFormParams($params)
+    {
+        // Check if there is arguments
+        $addressArgs = [
+            'country_code',
+            'administrative_area',
+            'locality',
+            'dependent_locality',
+            'postal_code',
+            'sorting_code',
+            'address_line1',
+            'address_line2',
+            'organization',
+            'recipient',
+            'locale'
+        ];
+        $valid = false;
+
+        $address = new Address();
+
+        foreach ($addressArgs as $arg) {
+            if (null !== $argVal = $this->getParam($params, $arg, null)) {
+                $valid = true;
+                $functionName = 'with' . Container::camelize($arg);
+                $address = $address->$functionName($argVal);
+            }
+        }
+
+        if (false === $valid) {
+            return null;
+        }
+
+        return $address;
+    }
+
+    /**
      * @return SmartyPluginDescriptor[]
      */
     public function getPluginDescriptors()
@@ -356,6 +482,15 @@ class Format extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
             new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney"),
             new SmartyPluginDescriptor("function", "format_array_2d", $this, "formatTwoDimensionalArray"),
+            new SmartyPluginDescriptor("function", "format_address", $this, "formatAddress"),
         );
+    }
+
+    /**
+     * @return Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

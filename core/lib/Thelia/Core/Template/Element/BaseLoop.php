@@ -17,12 +17,15 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Loop\LoopExtendsArgDefinitionsEvent;
 use Thelia\Core\Event\Loop\LoopExtendsBuildArrayEvent;
 use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
 use Thelia\Core\Event\Loop\LoopExtendsInitializeArgsEvent;
 use Thelia\Core\Event\Loop\LoopExtendsParseResultsEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -44,6 +47,8 @@ use Thelia\Type\TypeCollection;
  * @method int getPage() available if countable is true
  * @method int getLimit() available if countable is true
  * @method bool getReturnUrl() false for disable the generation of urls
+ * @method ModelCriteria buildModelCriteria()
+ * @method array buildArray()
  */
 abstract class BaseLoop
 {
@@ -53,19 +58,16 @@ abstract class BaseLoop
     /** @var array|null array of loop definitions (class => id) */
     protected static $loopDefinitions = null;
 
-    /**
-     * @var \Thelia\Core\HttpFoundation\Request
-     */
+    /** @var Request  */
     protected $request;
 
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
+    /** @var RequestStack */
+    protected $requestStack;
+
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @var SecurityContext
-     */
+    /** @var SecurityContext */
     protected $securityContext;
 
     /** @var ContainerInterface Service Container */
@@ -100,7 +102,8 @@ abstract class BaseLoop
 
         $this->checkInterface();
 
-        $this->request = $container->get('request');
+        $this->requestStack = $container->get('request_stack');
+        $this->request = $this->requestStack->getCurrentRequest();
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
 
@@ -333,7 +336,7 @@ abstract class BaseLoop
 
     /**
      * @param ModelCriteria    $search     the search request
-     * @param PropelModelPager $pagination the pagination part
+     * @param PropelModelPager|null $pagination the pagination part
      *
      * @return array|PropelModelPager|ObjectCollection
      * @throws \InvalidArgumentException               if the search mode is undefined.
@@ -425,7 +428,7 @@ abstract class BaseLoop
 
     /**
      * @param ModelCriteria    $search
-     * @param PropelModelPager $pagination
+     * @param PropelModelPager|null $pagination
      *
      * @return array|PropelModelPager
      */

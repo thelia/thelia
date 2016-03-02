@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -77,8 +78,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Put in this method post object update SEO processing if required.
      *
-     * @param  unknown  $updateSeoEvent the update event
-     * @return Response a response, or null to continue normal processing
+     * @param  UpdateSeoEvent  $updateSeoEvent the update event
+     * @return null|Response a response, or null to continue normal processing
      */
     protected function performAdditionalUpdateSeoAction($updateSeoEvent)
     {

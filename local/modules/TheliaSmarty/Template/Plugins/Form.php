@@ -18,13 +18,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\Type\TheliaType;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
@@ -183,13 +183,12 @@ class Form extends AbstractSmartyPlugin
 
         $template->assign('total_value_count', $total_value_count);
 
+        /** @var FormErrorIterator $errors */
         $errors = $fieldVars["errors"];
 
-        $template->assign("error", empty($errors) ? false : true);
+        $template->assign("error", $errors->count() ? true : false);
 
-        if (!empty($errors)) {
-            $this->assignFieldErrorVars($template, $errors);
-        }
+        $this->assignFieldErrorVars($template, $errors);
 
         $attr = array();
 
@@ -346,6 +345,7 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param  array $params
      * @param  string $content
+     * @param  string $templateFile
      * @param  \Smarty_Internal_Template $template
      * @return string
      */
@@ -371,6 +371,8 @@ class Form extends AbstractSmartyPlugin
 
             $field_name = $this->getParam($params, 'field', false);
             $field_extra_class = $this->getParam($params, 'extra_class', '');
+            $field_extra_class = $this->getParam($params, 'extra_classes', $field_extra_class);
+            $field_no_standard_classes = $this->getParam($params, 'no_standard_classes', false);
             $field_value = $this->getParam($params, 'value', '');
             $show_label = $this->getParam($params, 'show_label', true);
             $value_key = $this->getParam($params, 'value_key', false);
@@ -380,6 +382,7 @@ class Form extends AbstractSmartyPlugin
                 'form' => $form,
                 'field_name' => $field_name,
                 'field_extra_class' => $field_extra_class,
+                'field_no_standard_classes' => $field_no_standard_classes,
                 'field_value' => $field_value,
                 'field_template' => $templateStyle,
                 'value_key' => $value_key,
@@ -505,9 +508,10 @@ class Form extends AbstractSmartyPlugin
     {
         $formFieldView = $this->getFormFieldView($params);
 
+        /** @var FormErrorIterator $errors */
         $errors = $formFieldView->vars["errors"];
 
-        if (empty($errors)) {
+        if (!$errors->count()) {
             return "";
         }
 
@@ -518,11 +522,13 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
-    protected function assignFieldErrorVars(\Smarty_Internal_Template $template, array $errors)
+    protected function assignFieldErrorVars(\Smarty_Internal_Template $template, FormErrorIterator $errors)
     {
-        $template->assign("message", $errors[0]->getMessage());
-        $template->assign("parameters", $errors[0]->getMessageParameters());
-        $template->assign("pluralization", $errors[0]->getMessagePluralization());
+        if ($errors->count()) {
+            $template->assign("message", $errors[0]->getMessage());
+            $template->assign("parameters", $errors[0]->getMessageParameters());
+            $template->assign("pluralization", $errors[0]->getMessagePluralization());
+        }
     }
 
     protected function isHidden(FormView $formView)

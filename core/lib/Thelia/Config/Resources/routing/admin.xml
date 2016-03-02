@@ -34,6 +34,42 @@
         <default key="not-logged">1</default>
     </route>
 
+    <route id="admin.lost-password" path="/admin/lost-password">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::showLostPasswordAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-create" path="/admin/password-create-request">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-create-success" path="/admin/password-create-request-success">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestSuccessAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+
+    <route id="admin.password-create-form" path="/admin/password-create/{token}">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::displayCreateFormAction</default>
+        <requirement key="token">.*</requirement>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-renewed" path="/admin/password-created">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreatedAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-renewed-success" path="/admin/password-create-success">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreatedSuccessAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.set-email-address" path="/admin/set-email-address">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::setEmailAction</default>
+    </route>
+
     <!-- Route to the administration logout page -->
     <route id="admin.logout" path="/admin/logout">
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLogoutAction</default>
@@ -963,6 +999,10 @@
 
     <route id="admin.configuration.administrators.view" path="/admin/configuration/administrators">
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.view-profile" path="/admin/configuration/administrators/view">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::viewAction</default>
     </route>
 
     <route id="admin.configuration.administrators.add" path="/admin/configuration/administrators/add">

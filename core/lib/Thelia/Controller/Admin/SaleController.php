@@ -231,7 +231,7 @@ class SaleController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param $object \Thelia\Model\Sale
+     * @param Sale $object
      *
      * @return string sale title
      */
@@ -243,7 +243,7 @@ class SaleController extends AbstractCrudController
     /**
      * Returns the object ID from the object
      *
-     * @param $object \Thelia\Model\Sale
+     * @param Sale $object
      *
      * @return int sale id
      */

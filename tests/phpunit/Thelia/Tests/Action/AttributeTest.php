@@ -23,7 +23,7 @@ use Thelia\Core\Event\Attribute\AttributeCreateEvent;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class AttributeTest extends \PHPUnit_Framework_TestCase
+class AttributeTest extends BaseAction
 {
     public function testCreateSimple()
     {
@@ -31,11 +31,10 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
 
         $event
             ->setLocale('en_US')
-            ->setTitle('foo')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+            ->setTitle('foo');
 
-        $action = new Attribute();
-        $action->create($event);
+        $action = new Attribute($this->getMockEventDispatcher());
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdAttribute = $event->getAttribute();
 
@@ -49,6 +48,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
     /**
      * @param AttributeModel $attribute
      * @depends testCreateSimple
+     * @return AttributeModel
      */
     public function testUpdate(AttributeModel $attribute)
     {
@@ -59,11 +59,10 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
             ->setTitle('bar')
             ->setDescription('bar description')
             ->setChapo('bar chapo')
-            ->setPostscriptum('bar postscriptum')
-            ->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+            ->setPostscriptum('bar postscriptum');
 
         $action = new Attribute();
-        $action->update($event);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedAttribute = $event->getAttribute();
 
@@ -78,15 +77,15 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param AttributeModel $attribute
      * @depends testUpdate
      */
     public function testDelete(AttributeModel $attribute)
     {
         $event = new AttributeDeleteEvent($attribute->getId());
-        $event->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $action = new Attribute();
-        $action->delete($event);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedAttribute = $event->getAttribute();
 

@@ -41,9 +41,7 @@ use Thelia\Module\BaseModule;
  */
 class ModuleHook extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheDir;
 
     public function __construct($cacheDir)
@@ -129,7 +127,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $event->setModuleHook($moduleHook);
     }
 
-    public function updateModuleHook(ModuleHookUpdateEvent $event)
+    public function updateModuleHook(ModuleHookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             // todo: test if classname and method exists
@@ -145,11 +143,11 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
             $event->setModuleHook($moduleHook);
 
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
-    public function deleteModuleHook(ModuleHookDeleteEvent $event)
+    public function deleteModuleHook(ModuleHookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             $moduleHook->delete();
@@ -166,11 +164,11 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 ->setClassname($moduleHook->getClassname())
                 ->save();
 
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
-    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event)
+    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $moduleHook = $event->getModuleHook()) {
             if ($moduleHook->getModuleActive()) {
@@ -180,7 +178,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 throw new \LogicException(Translator::getInstance()->trans("The module has to be activated."));
             }
         }
-        $this->cacheClear($event->getDispatcher());
+        $this->cacheClear($dispatcher);
 
         return $event;
     }
@@ -189,36 +187,38 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      *
      * @return UpdatePositionEvent $event
      */
-    public function updateModuleHookPosition(UpdatePositionEvent $event)
+    public function updateModuleHookPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ModuleHookQuery::create(), $event);
-        $this->cacheClear($event->getDispatcher());
+        $this->genericUpdatePosition(ModuleHookQuery::create(), $event, $dispatcher);
+        $this->cacheClear($dispatcher);
 
         return $event;
     }
 
-    public function updateHook(HookUpdateEvent $event)
+    public function updateHook(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if ($event->hasHook()) {
             $hook = $event->getHook();
             ModuleHookQuery::create()
                 ->filterByHookId($hook->getId())
                 ->update(array('HookActive' => $hook->getActivate()));
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
-    public function toggleHookActivation(HookToggleActivationEvent $event)
+    public function toggleHookActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if ($event->hasHook()) {
             $hook = $event->getHook();
             ModuleHookQuery::create()
                 ->filterByHookId($hook->getId())
                 ->update(array('HookActive' => $hook->getActivate()));
-            $this->cacheClear($event->getDispatcher());
+            $this->cacheClear($dispatcher);
         }
     }
 
@@ -230,24 +230,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

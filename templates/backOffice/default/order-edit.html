@@ -168,10 +168,14 @@
                                                     <tr>
                                                         <td>
                                                             {ifloop rel="my_product_loop"}
-                                                                {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
+                                                                {loop type="product" name="my_product_loop" visible="*" ref=$REF}
                                                                     <a href="{url path='/admin/products/update' product_id=$ID}">{$REF} - {$TITLE}</a>
                                                                     {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
                                                                 {/loop}
+                                                                <dl class="dl-horizontal">
+                                                                    <dt>{intl l='Combination reference'}</dt>
+                                                                    <dd>{$PRODUCT_SALE_ELEMENTS_REF}</dd>
+                                                                </dl>
                                                             {/ifloop}
                                                             {elseloop rel="my_product_loop"}
                                                                 {* The product doesn't exist anymore *}

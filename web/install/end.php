@@ -30,6 +30,9 @@ try {
         if (empty($_POST['admin_login'])) {
             $query["err"] |= 1;
         }
+        if (empty($_POST['admin_email'])) {
+            $query["err"] |= 3;
+        }
         if (empty($_POST['admin_password'])) {
             $query["err"] |= 2;
         }
@@ -46,7 +49,7 @@ try {
         exit; // Don't forget to exit, otherwise, the script will continue to run.
     }
 
-    if($_SESSION['install']['step'] == 5) {
+    if($_SESSION['install']['step'] == 5){
 
         // Check now if we can create the App.
         $thelia = new \Thelia\Core\Thelia("install", true);
@@ -58,6 +61,7 @@ try {
             ->setFirstname('admin')
             ->setLastname('admin')
             ->setLocale(empty($_POST['admin_locale']) ? 'en_US' : $_POST['admin_locale'])
+            ->setEmail($_POST['admin_email'])
             ->save();
 
 
@@ -173,3 +177,4 @@ catch (\Exception $ex) {
 
 include('footer.php');
 }
+

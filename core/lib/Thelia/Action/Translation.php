@@ -29,9 +29,7 @@ use Thelia\Log\Tlog;
  */
 class Translation extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     public function __construct(ContainerInterface $container)
@@ -202,7 +200,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         return $numTexts;
     }
 
-    public function writeTranslationFile(TranslationEvent $event)
+    public function writeTranslationFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $file = $event->getTranslationFilePath();
 
@@ -214,7 +212,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             if (! $fs->exists($file)) {
                 $fs->mkdir($dir);
 
-                $this->cacheClear($event->getDispatcher());
+                $this->cacheClear($dispatcher);
             }
         }
 
@@ -252,7 +250,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function writeFallbackFile(TranslationEvent $event)
+    public function writeFallbackFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $file = THELIA_LOCAL_DIR . 'I18n' . DS . $event->getLocale() . '.php';
 
@@ -264,7 +262,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 $dir = dirname($file);
                 $fs->mkdir($dir);
 
-                $this->cacheClear($event->getDispatcher());
+                $this->cacheClear($dispatcher);
             } else {
                 throw new \RuntimeException(
                     Translator::getInstance()->trans(
@@ -358,6 +356,9 @@ class Translation extends BaseAction implements EventSubscriberInterface
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(

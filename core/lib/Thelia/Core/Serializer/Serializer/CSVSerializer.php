@@ -94,6 +94,12 @@ class CSVSerializer extends AbstractSerializer
             $this->headers = array_keys($data);
         }
 
+        foreach ($data as &$value) {
+            if (is_array($value)) {
+                $value = gettype($value);
+            }
+        }
+
         $fd = fopen('php://memory', 'w+b');
         fputcsv($fd, $data, $this->delimiter, $this->enclosure);
         rewind($fd);
@@ -112,7 +118,7 @@ class CSVSerializer extends AbstractSerializer
 
             // Copy file content into tmp file
             $fileObject->rewind();
-            fwrite($fd, $fileObject->fread($fileObject->getSize()));
+            fwrite($fd, file_get_contents($fileObject->getPathname()));
 
             // Overwrite file content with tmp content
             rewind($fd);

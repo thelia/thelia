@@ -110,10 +110,10 @@ class ParamInitMiddleware implements HttpKernelInterface
         if ($request->query->has("currency")) {
             $currency = CurrencyQuery::create()->findOneByCode($request->query->get("currency"));
             if ($currency) {
-                if (false === $this->app->getContainer()->isScopeActive('request')) {
+                /*if (false === $this->app->getContainer()->isScopeActive('request')) {
                     $this->app->getContainer()->enterScope('request');
                     $this->app->getContainer()->set('request', $request, 'request');
-                }
+                }*/
                 $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($currency, $request));
             }
         } else {

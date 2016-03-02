@@ -26,7 +26,7 @@ class AdminLogin extends BruteforceForm
                     new NotBlank(),
                     new Length(array("min" => 3)),
                 ),
-                "label" => Translator::getInstance()->trans("Username *"),
+                "label" => Translator::getInstance()->trans("Username or e-mail address *"),
                 "label_attr" => array(
                     "for" => "username",
                 ),

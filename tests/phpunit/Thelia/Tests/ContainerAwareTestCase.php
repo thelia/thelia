@@ -15,7 +15,10 @@ namespace Thelia\Tests;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
@@ -39,10 +42,10 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
     public function getContainer()
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        $container = new ContainerBuilder();
         $container->set("thelia.translator", new Translator(new Container()));
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $dispatcher = $this->getMockEventDispatcher();
 
         $container->set("event_dispatcher", $dispatcher);
 
@@ -51,7 +54,14 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
         $container->set("request", $request);
 
-        $container->set("thelia.securitycontext", new SecurityContext($request));
+        $requestStack = new RequestStack();
+
+        $requestStack->push($request);
+
+        $container->set("request_stack", $requestStack);
+
+        new Translator($container);
+        $container->set("thelia.securitycontext", new SecurityContext($requestStack));
 
         $this->buildContainer($container);
 
@@ -72,7 +82,26 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param ContainerBuilder $container
      * Use this method to build the container with the services that you need.
      */
     abstract protected function buildContainer(ContainerBuilder $container);
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getMockEventDispatcher()
+    {
+        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+    }
+
+    /**
+     * @return KernelInterface
+     */
+    public function getKernel()
+    {
+        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+
+        return $kernel;
+    }
 }

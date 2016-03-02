@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -26,12 +27,12 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     /**
      * @param TaxRuleEvent $event
      */
-    public function create(TaxRuleEvent $event)
+    public function create(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $taxRule = new TaxRuleModel();
 
         $taxRule
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())
@@ -45,11 +46,11 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     /**
      * @param TaxRuleEvent $event
      */
-    public function update(TaxRuleEvent $event)
+    public function update(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             $taxRule
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -66,7 +67,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function updateTaxes(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             $taxList = $this->getArrayFromJson($event->getTaxList());
             $countryList = $this->getArrayFromJson($event->getCountryList());
             $countryDeletedList = $this->getArrayFromJson($event->getCountryDeletedList());

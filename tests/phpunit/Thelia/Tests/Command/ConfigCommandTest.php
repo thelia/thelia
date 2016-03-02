@@ -24,7 +24,7 @@ use Thelia\Model\ConfigQuery;
  * @package Command
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ConfigCommandTest extends \PHPUnit_Framework_TestCase
+class ConfigCommandTest extends BaseCommandTest
 {
     /** @var ConfigCommand */
     protected $command;
@@ -181,13 +181,6 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
         ConfigQuery::create()
             ->filterByName(self::PREFIX_NAME . '%', Criteria::LIKE)
             ->delete();
-    }
-
-    public function getKernel()
-    {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
-
-        return $kernel;
     }
 
     protected function getRandomVariableName()

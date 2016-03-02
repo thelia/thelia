@@ -16,7 +16,7 @@ use Colissimo\Colissimo;
 use Colissimo\Model\ColissimoQuery;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 

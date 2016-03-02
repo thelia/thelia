@@ -14,12 +14,14 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
 use Thelia\Form\ProfileUpdateResourceAccessForm;
+use Thelia\Model\Profile;
 use Thelia\Model\ProfileQuery;
 
 class ProfileController extends AbstractCrudController
@@ -105,6 +107,10 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_MODIFICATION, "form", $data);
     }
 
+    /**
+     * @param Profile $object
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateResourceUpdateForm($object)
     {
         $data = array(
@@ -115,6 +121,10 @@ class ProfileController extends AbstractCrudController
         return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, "form", $data);
     }
 
+    /**
+     * @param Profile $object
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateModuleUpdateForm($object)
     {
         $data = array(
@@ -142,11 +152,19 @@ class ProfileController extends AbstractCrudController
         return $profile;
     }
 
+    /**
+     * @param Profile $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param Profile $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

@@ -245,7 +245,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param $object \Thelia\Model\Content
+     * @param Content $object
      *
      * @return string content title
      *
@@ -258,7 +258,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Returns the object ID from the object
      *
-     * @param $object \Thelia\Model\Content
+     * @param Content $object
      *
      * @return int content id
      */

@@ -8,7 +8,7 @@
   <commands>
     </commands>
   <hooks>
-    <hook id="hooknavigation.hook.front" class="HookNavigation\Hook\FrontHook" scope="request">
+    <hook id="hooknavigation.hook.front" class="HookNavigation\Hook\FrontHook">
       <tag name="hook.event_listener" event="main.navbar-primary" templates="render:main-navbar-primary.html" />
       <tag name="hook.event_listener" event="main.footer-bottom" type="front" active="1" method="onMainFooterBottom" />
       <tag name="hook.event_listener" event="main.footer-body" type="front" active="1" method="onMainFooterBody" />

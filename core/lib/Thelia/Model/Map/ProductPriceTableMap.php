@@ -158,8 +158,8 @@ class ProductPriceTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER' , 'product_sale_elements', 'ID', true, null, null);
         $this->addForeignPrimaryKey('CURRENCY_ID', 'CurrencyId', 'INTEGER' , 'currency', 'ID', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'DECIMAL', false, 16, 0);
-        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'DECIMAL', false, 16, 0);
+        $this->addColumn('PRICE', 'Price', 'DECIMAL', true, 16, 0);
+        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'DECIMAL', true, 16, 0);
         $this->addColumn('FROM_DEFAULT_CURRENCY', 'FromDefaultCurrency', 'BOOLEAN', true, 1, true);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

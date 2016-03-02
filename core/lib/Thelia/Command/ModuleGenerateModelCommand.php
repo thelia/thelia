@@ -13,6 +13,7 @@
 namespace Thelia\Command;
 
 use Propel\Generator\Command\ModelBuildCommand;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,11 +66,13 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
         $this->generateModel($output);
 
-        $output->renderBlock(array(
-           '',
-           'Model generated successfully',
-           ''
-        ), 'bg=green;fg=black');
+        /** @var FormatterHelper $formatter */
+        $formatter = $this->getHelper('formatter');
+        $formattedBlock = $formatter->formatBlock(
+            'Model generated successfully',
+            'bg=green;fg=black'
+        );
+        $output->writeln($formattedBlock);
 
         if ($input->getOption("generate-sql")) {
             $output->writeln(' ');

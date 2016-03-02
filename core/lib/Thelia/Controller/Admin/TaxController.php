@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Tax;
@@ -124,11 +125,19 @@ class TaxController extends AbstractCrudController
         return $tax;
     }
 
+    /**
+     * @param Tax $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param Tax $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

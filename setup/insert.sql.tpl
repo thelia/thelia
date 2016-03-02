@@ -50,11 +50,11 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (40, 'store_email','', 0, 1, NOW(), NOW()),
 (41, 'store_notification_emails','', 0, 1, NOW(), NOW()),
 (42, 'one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-(43, 'thelia_version','2.3.0-alpha1', 1, 1, NOW(), NOW()),
-(44, 'thelia_major_version','2', 1, 1, NOW(), NOW()),
-(45, 'thelia_minus_version','3', 1, 1, NOW(), NOW()),
-(46, 'thelia_release_version','0', 1, 1, NOW(), NOW()),
-(47, 'thelia_extra_version','alpha1', 1, 1, NOW(), NOW()),
+(43, 'thelia_version','{$version}', 1, 1, NOW(), NOW()),
+(44, 'thelia_major_version','{$major}', 1, 1, NOW(), NOW()),
+(45, 'thelia_minus_version','{$minus}', 1, 1, NOW(), NOW()),
+(46, 'thelia_release_version','{$release}', 1, 1, NOW(), NOW()),
+(47, 'thelia_extra_version','{$extra}', 1, 1, NOW(), NOW()),
 (48, 'front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 (49, 'front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
 (50, 'sitemap_ttl','7200', 1, 1, NOW(), NOW()),
@@ -69,7 +69,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (59, 'error_message.page_name', 'error.html', 0, 0, NOW(), NOW()),
 (60, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
-(62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW())
+(62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
+(63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
+(64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1902,8 +1904,9 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (2, 'lost_password', NULL, NULL, 'password.txt', NULL, 'password.html', NOW(), NOW()),
 (3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW()),
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
-(5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW());
-
+(5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
+(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW())
+;
 
 /**
 I18n
@@ -1958,8 +1961,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (59, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL),
     (60, '{$locale}', {intl l='Allow customers to change their email. 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
     (61, '{$locale}', {intl l='Ask the customers to confirm their email, 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
-    (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
-
+    (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL),
+    (63, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL),
+    (64, '{$locale}', {intl l='Allow an administrator to recreate a lost password' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -3403,7 +3407,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (2, '{$locale}', {intl l='Your new password' locale=$locale}, {intl l='Your new password for {config key="store_name"}' locale=$locale}, NULL, NULL),
     (3, '{$locale}', {intl l='Message sent to the shop owner when a new order is placed' locale=$locale}, {intl l='New order {$order_ref} placed on {config key="store_name"}' locale=$locale}, NULL, NULL),
     (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {config key="store_name"} has been changed.' locale=$locale}, NULL, NULL),
-    (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
+    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

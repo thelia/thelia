@@ -12,12 +12,13 @@ class AdminLog extends BaseAdminLog
     /**
      * A simple helper to insert an entry in the admin log
      *
-     * @param $resource
-     * @param $action
-     * @param $message
+     * @param string $resource
+     * @param string $action
+     * @param string $message
      * @param Request       $request
      * @param UserInterface $adminUser
      * @param bool          $withRequestContent
+     * @param int           $resourceId
      */
     public static function append(
         $resource,

@@ -14,13 +14,11 @@
 namespace TheliaMigrateCountry\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Form\Type\AbstractTheliaType;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
 
 /**
@@ -30,10 +28,9 @@ use Thelia\Model\StateQuery;
  */
 class CountryStateMigrationType extends AbstractTheliaType
 {
-
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->replaceDefaults(
+        $resolver->setDefaults(
             [
                 "cascade_validation" => true,
                 "constraints" => array(

@@ -13,10 +13,12 @@
 namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Action\Feature;
+use Thelia\Action\FeatureAv;
 use Thelia\Action\File;
 use Thelia\Action\Product;
 use Thelia\Action\ProductSaleElement;
-use Thelia\Core\Event\File\FileCloneEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
@@ -30,30 +32,39 @@ use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Thelia;
+use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\FeatureProduct;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
-use Thelia\Model\ProductDocumentI18nQuery;
+use Thelia\Model\ProductCategory;
+use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
-use Thelia\Model\ProductImageI18nQuery;
 use Thelia\Model\ProductImageQuery;
+use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
+use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
+use Thelia\Model\Category;
 
 /**
  * Class ProductTest
@@ -85,10 +96,9 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setBasePrice(10)
             ->setTaxRuleId($taxRuleId)
             ->setBaseWeight(10)
-            ->setCurrencyId($currencyId)
-            ->setDispatcher($this->getDispatcher());
+            ->setCurrencyId($currencyId);
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdProduct = $event->getProduct();
@@ -117,6 +127,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($createdProduct->getRef(), $defaultProductSaleElement->getRef());
         $this->assertEquals(10, $defaultProductSaleElement->getWeight());
 
+        /** @var ProductPrice $productPrice */
         $productPrice = $defaultProductSaleElement->getProductPrices()->getFirst();
 
         $this->assertEquals(10, $productPrice->getPrice());
@@ -128,6 +139,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     public function testCreateWithOptionalParametersAction()
     {
         $event = new ProductCreateEvent();
+        /** @var Category $defaultCategory */
         $defaultCategory = CategoryQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
         $taxRuleId = TaxRuleQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
         $currencyId = CurrencyQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
@@ -137,8 +149,9 @@ class ProductTest extends TestCaseWithURLToolSetup
             $templateId = TemplateQuery::create()->addAscendingOrderByColumn('RAND()')->findOne()->getId();
         }
 
+        $newRef = 'testCreateWithOptionalParameters' . uniqid('_');
         $event
-            ->setRef('testCreateWithOptionalParameters')
+            ->setRef($newRef)
             ->setLocale('fr_FR')
             ->setTitle('test create new product with optional parameters')
             ->setVisible(1)
@@ -148,10 +161,9 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setBaseWeight(10)
             ->setCurrencyId($currencyId)
             ->setBaseQuantity(10)
-            ->setTemplateId($templateId)
-            ->setDispatcher($this->getDispatcher());
+            ->setTemplateId($templateId);
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->create($event);
 
         $createdProduct = $event->getProduct();
@@ -163,7 +175,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $createdProduct->setLocale('fr_FR');
 
         $this->assertEquals('test create new product with optional parameters', $createdProduct->getTitle());
-        $this->assertEquals('testCreateWithOptionalParameters', $createdProduct->getRef());
+        $this->assertEquals($newRef, $createdProduct->getRef());
         $this->assertEquals(1, $createdProduct->getVisible());
         $this->assertEquals($defaultCategory->getId(), $createdProduct->getDefaultCategoryId());
         $this->assertGreaterThan(0, $createdProduct->getPosition());
@@ -182,6 +194,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(10, $defaultProductSaleElement->getWeight());
         $this->assertEquals(10, $defaultProductSaleElement->getQuantity());
 
+        /** @var ProductPrice $productPrice */
         $productPrice = $defaultProductSaleElement->getProductPrices()->getFirst();
 
         $this->assertEquals(10, $productPrice->getPrice());
@@ -189,14 +202,16 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testCreate
+     * @return ProductModel
      */
     public function testUpdate(ProductModel $product)
     {
         $event = new ProductUpdateEvent($product->getId());
         $defaultCategory = CategoryQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
         $brandId = BrandQuery::create()->findOne()->getId();
-        $newRef = $product->getRef() . '-new';
+        $newRef = $product->getRef() . '-new' . uniqid('_');
         $event
             ->setLocale('fr_FR')
             ->setTitle('test MAJ titre en français')
@@ -207,11 +222,9 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setDefaultCategory($defaultCategory)
             ->setBrandId($brandId)
             ->setRef($newRef)
-            ->setDispatcher($this->getDispatcher())
-
         ;
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->update($event);
 
         $updatedProduct = $event->getProduct();
@@ -231,14 +244,16 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(1, count($PSE));
 
         /** @var ProductSaleElements $defaultPSE */
-        $defaultPSE = $PSE->getFirst();
+        $defaultPSE = $product->getDefaultSaleElements();
         $this->assertEquals($newRef, $defaultPSE->getRef(), "Default PSE Ref was not change when product ref is changed.");
 
         return $updatedProduct;
     }
 
     /**
+     * @param ProductModel $product
      * @depends testUpdate
+     * @return ProductModel
      */
     public function testToggleVisibility(ProductModel $product)
     {
@@ -246,11 +261,10 @@ class ProductTest extends TestCaseWithURLToolSetup
         $event = new ProductToggleVisibilityEvent();
 
         $event
-            ->setProduct($product)
-            ->setDispatcher($this->getDispatcher())
+            ->setProduct($product);
         ;
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->toggleVisibility($event);
 
         $updatedProduct = $event->getProduct();
@@ -261,7 +275,9 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testToggleVisibility
+     * @return ProductModel
      */
     public function testAddContent(ProductModel $product)
     {
@@ -269,12 +285,12 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $this->assertEquals(0, count($contents));
 
+        /** @var Content $content */
         $content = ContentQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
 
         $event = new ProductAddContentEvent($product, $content->getId());
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->addContent($event);
         $product->clearProductAssociatedContents();
         $newContents = $product->getProductAssociatedContents();
@@ -287,6 +303,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @param ProductModel $product
      * @depends testAddContent
+     * @return ProductModel
      */
     public function testRemoveContent(ProductModel $product)
     {
@@ -298,9 +315,8 @@ class ProductTest extends TestCaseWithURLToolSetup
         $content = $contents->getFirst();
 
         $event = new ProductDeleteContentEvent($product, $content->getContentId());
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->removeContent($event);
         $product->clearProductAssociatedContents();
         $deletedContent = $product->getProductAssociatedContents();
@@ -311,7 +327,9 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testRemoveContent
+     * @return array
      */
     public function testAddCategory(ProductModel $product)
     {
@@ -321,15 +339,15 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $defaultCategory = $categories->getFirst();
 
+        /** @var Category $category */
         $category = CategoryQuery::create()
             ->filterById($defaultCategory->getCategoryId(), Criteria::NOT_IN)
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
 
         $event = new ProductAddCategoryEvent($product, $category->getId());
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->addCategory($event);
 
         $product->clearProductCategories();
@@ -345,11 +363,16 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductCategory[] $productCategory
      * @depends testAddCategory
+     * @return Product
      */
     public function testRemoveCategory(array $productCategory)
     {
+        /** @var ProductModel $product */
         $product = $productCategory['product'];
+
+        /** @var Category $category */
         $category = $productCategory['category'];
 
         $product->clearProductCategories();
@@ -357,9 +380,8 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(2, count($product->getProductCategories()));
 
         $event = new ProductDeleteCategoryEvent($product, $category->getId());
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->removeCategory($event);
 
         $product->clearProductCategories();
@@ -370,7 +392,9 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testRemoveCategory
+     * @return ProductModel
      */
     public function testAddAccessory(ProductModel $product)
     {
@@ -384,9 +408,8 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->findOne();
 
         $event = new ProductAddAccessoryEvent($product, $accessoryId);
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->addAccessory($event);
 
         $newAccessories = AccessoryQuery::create()->filterByProductId($product->getId())->count();
@@ -397,7 +420,9 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testAddAccessory
+     * @return ProductModel
      */
     public function testRemoveAccessory(ProductModel $product)
     {
@@ -406,9 +431,8 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $currentAccessory = $accessories->getFirst();
         $event = new ProductDeleteAccessoryEvent($product, $currentAccessory->getAccessory());
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->removeAccessory($event);
 
         $this->assertEquals(0, AccessoryQuery::create()->filterByProductId($product->getId())->count());
@@ -417,7 +441,9 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testRemoveAccessory
+     * @return ProductModel
      */
     public function testSetProductTemplate(ProductModel $product)
     {
@@ -432,9 +458,8 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals("Thelia\Model\ProductSaleElements", get_class($oldProductSaleElements), "There is no default pse for this product");
 
         $event = new ProductSetTemplateEvent($product, $templateId, $currencyId);
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->setProductTemplate($event);
 
         $updatedProduct = $event->getProduct();
@@ -465,14 +490,14 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @param ProductModel $product
      * @depends testSetProductTemplate
      */
     public function testDelete(ProductModel $product)
     {
         $event = new ProductDeleteEvent($product->getId());
-        $event->setDispatcher($this->getDispatcher());
 
-        $action = new Product();
+        $action = new Product($this->getMockEventDispatcher());
         $action->delete($event);
 
         $deletedProduct = $event->getProduct();
@@ -488,22 +513,23 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     public function testCreateClone()
     {
-        $kernel = new Thelia('test', true);
-        $kernel->boot();
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
 
         $originalProduct = ProductQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
         $newRef = uniqid('testClone-');
 
         $event = new ProductCloneEvent($newRef, 'fr_FR', $originalProduct);
-        $event->setDispatcher($kernel->getContainer()->get('event_dispatcher'));
 
         $originalProductDefaultI18n = ProductI18nQuery::create()->findPk([$originalProduct->getId(), $event->getLang()]);
         $originalProductDefaultPrice = ProductPriceQuery::create()->findOneByProductSaleElementsId($originalProduct->getDefaultSaleElements()->getId());
 
         // Call function to test
-        $action = new Product();
+        $action = new Product($eventDispatcher);
         $action->createClone($event, $originalProductDefaultI18n, $originalProductDefaultPrice);
 
+        /** @var ProductModel $cloneProduct */
         $cloneProduct = $event->getClonedProduct();
 
         // Check product information
@@ -546,11 +572,15 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testUpdateClone(ProductCloneEvent $event)
     {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+
         $originalProductPrice = ProductPriceQuery::create()
             ->findOneByProductSaleElementsId($event->getOriginalProduct()->getDefaultSaleElements()->getId());
 
         // Call function to test
-        $action = new Product();
+        $action = new Product($eventDispatcher);
         $action->updateClone($event, $originalProductPrice);
 
         $cloneProduct = $event->getClonedProduct();
@@ -572,6 +602,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(count($originalProductI18ns), $cloneProductI18ns, 'There must be the same quantity of I18ns');
 
         // Check each I18n
+        /** @var ProductI18n $originalProductI18n */
         foreach ($originalProductI18ns as $originalProductI18n) {
             $cloneProductI18n = ProductI18nQuery::create()
                 ->findPk([$cloneProduct->getId(), $originalProductI18n->getLocale()]);
@@ -629,8 +660,14 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testCloneFeatureCombination(ProductCloneEvent $event)
     {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+        $eventDispatcher->addSubscriber(new Feature($eventDispatcher));
+        $eventDispatcher->addSubscriber(new FeatureAv($eventDispatcher));
+
         // Call function to test
-        $action = new Product();
+        $action = new Product($eventDispatcher);
         $action->cloneFeatureCombination($event);
 
         // Get products' features
@@ -644,6 +681,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(count($originalProductFeatures), $cloneProductFeatures, 'There must be the same quantity of features');
 
         // Check clone product's features
+        /** @var FeatureProduct $originalProductFeature */
         foreach ($originalProductFeatures as $originalProductFeature) {
             $cloneProductFeatureQuery = FeatureProductQuery::create()
                 ->filterByProductId($event->getClonedProduct()->getId())
@@ -684,8 +722,12 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testCloneAssociatedContent(ProductCloneEvent $event)
     {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+
         // Call function to test
-        $action = new Product();
+        $action = new Product($eventDispatcher);
         $action->cloneAssociatedContent($event);
 
         // Get products' associated contents
@@ -699,6 +741,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(count($originalProductAssocConts), $cloneProductAssocConts, 'There must be the same quantity of associated contents');
 
         // Check clone product's associated contents
+        /** @var ProductAssociatedContent $originalProductAssocCont */
         foreach ($originalProductAssocConts as $originalProductAssocCont) {
             $cloneProductAssocCont = ProductAssociatedContentQuery::create()
                 ->filterByProductId($event->getClonedProduct()->getId())
@@ -726,8 +769,12 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testCloneAccessories(ProductCloneEvent $event)
     {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+
         // Call function to test
-        $action = new Product();
+        $action = new Product($eventDispatcher);
         $action->cloneAccessories($event);
 
         // Get products' associated contents
@@ -741,6 +788,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(count($originalProductAccessoryList), $cloneProductAccessoryList, 'There must be the same quantity of accessories');
 
         // Check clone product's accessories
+        /** @var Accessory $originalProductAccessory */
         foreach ($originalProductAccessoryList as $originalProductAccessory) {
             $cloneProductAccessory = AccessoryQuery::create()
                 ->filterByProductId($event->getClonedProduct()->getId())
@@ -769,11 +817,16 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testCloneFile(ProductCloneEvent $event)
     {
+        $kernel = new Thelia('test', true);
+        $kernel->boot();
+
         $action = new File();
-        $action->cloneFile($event);
+        $action->cloneFile($event, null, $kernel->getContainer()->get('event_dispatcher'));
 
         $originalProductId = $event->getOriginalProduct()->getId();
         $cloneProduct = $event->getClonedProduct();
+
+        $originalProductFiles = [];
 
         // For each type, check files
         foreach ($event->getTypes() as $type) {
@@ -804,6 +857,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             }
 
             // Check each file
+            /** @var ProductDocument $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
                 $srcPath = $originalProductFile->getUploadDir() . DS . $originalProductFile->getFile();
 
@@ -881,6 +935,11 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testCreateClonePSE(ProductCloneEvent $event)
     {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+        $eventDispatcher->addSubscriber(new ProductSaleElement($eventDispatcher));
+
         $originalProductPSE = ProductSaleElementsQuery::create()
             ->filterByProductId($event->getOriginalProduct()->getId())
             ->findOne();
@@ -891,7 +950,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->findOne();
 
         // Call function to test
-        $action = new ProductSaleElement();
+        $action = new ProductSaleElement($eventDispatcher);
         $clonedProductPSEId = $action->createClonePSE($event, $originalProductPSE, $currencyId);
 
         // Get created PSE
@@ -937,12 +996,20 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testUpdateClonePSE(array $params)
     {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+        $eventDispatcher->addSubscriber(new ProductSaleElement($eventDispatcher));
+
+        /** @var ProductCloneEvent $event */
         $event = $params['event'];
+        /** @var ProductSaleElements $originalPSE */
         $originalPSE = $params['originalPSE'];
+        /** @var ProductSaleElements $clonePSE */
         $clonePSE = $params['clonePSE'];
 
         // Call function to test
-        $action = new ProductSaleElement();
+        $action = new ProductSaleElement($eventDispatcher);
         $action->updateClonePSE($event, $clonePSE->getId(), $originalPSE, 1);
 
         // Get updated PSE
@@ -997,9 +1064,13 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testClonePSEAssociatedFiles(array $params)
     {
+        /** @var ProductCloneEvent $event */
         $event = $params['event'];
+        /** @var int $cloneProductId */
         $cloneProductId = $params['cloneProductId'];
+        /** @var int $clonePSEId */
         $clonePSEId = $params['clonePSEId'];
+        /** @var ProductSaleElements $originalPSE */
         $originalPSE = $params['originalPSE'];
 
         foreach ($event->getTypes() as $type) {
@@ -1009,7 +1080,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         ->findByProductSaleElementsId($originalPSE->getId());
 
                     // Call function to test
-                    $action = new ProductSaleElement();
+                    $action = new ProductSaleElement($this->getMockEventDispatcher());
                     $action->clonePSEAssociatedFiles($cloneProductId, $clonePSEId, $originalPSEFiles, 'image');
 
                     $originalPSEImages = ProductSaleElementsProductImageQuery::create()
@@ -1020,6 +1091,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
                     $this->assertEquals(count($originalPSEImages), count($clonePSEImages), 'There must be the same quantity of PSE product image');
 
+                    /** @var ProductSaleElementsProductImage $clonePSEImage */
                     foreach ($clonePSEImages as $clonePSEImage) {
                         $cloneProductImage = ProductImageQuery::create()
                             ->findOneById($clonePSEImage->getProductImageId());
@@ -1039,7 +1111,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         ->findByProductSaleElementsId($originalPSE->getId());
 
                     // Call function to test
-                    $action = new ProductSaleElement();
+                    $action = new ProductSaleElement($this->getMockEventDispatcher());
                     $action->clonePSEAssociatedFiles($cloneProductId, $clonePSEId, $originalPSEFiles, 'document');
 
                     $originalPSEDocuments = ProductSaleElementsProductDocumentQuery::create()
@@ -1050,6 +1122,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
                     $this->assertEquals(count($originalPSEDocuments), count($clonePSEDocuments), 'There must be the same quantity of PSE product document');
 
+                    /** @var ProductSaleElementsProductDocument $clonePSEDocument */
                     foreach ($clonePSEDocuments as $clonePSEDocument) {
                         $cloneProductDocument = ProductDocumentQuery::create()
                             ->findOneById($clonePSEDocument->getProductDocumentId());

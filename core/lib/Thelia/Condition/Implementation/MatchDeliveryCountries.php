@@ -12,6 +12,8 @@
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Exception\UnmatchableConditionException;
+
 /**
  * Check a Checkout against its Product number
  *
@@ -34,7 +36,13 @@ class MatchDeliveryCountries extends AbstractMatchCountries
      */
     public function isMatching()
     {
-        $deliveryAddress = $this->facade->getDeliveryAddress();
+        if (null === $customer = $this->facade->getCustomer()) {
+            throw new UnmatchableConditionException();
+        }
+
+        if (null === $deliveryAddress = $this->facade->getDeliveryAddress()) {
+            throw new UnmatchableConditionException();
+        }
 
         return $this->conditionValidator->variableOpComparison(
             $deliveryAddress->getCountryId(),

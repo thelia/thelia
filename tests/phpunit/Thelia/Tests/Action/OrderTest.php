@@ -14,6 +14,7 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Order;
 use Thelia\Core\Event\Order\OrderAddressEvent;
@@ -45,7 +46,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Tests\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderTest extends \PHPUnit_Framework_TestCase
+class OrderTest extends BaseAction
 {
     /**
      * @var ContainerBuilder $container
@@ -82,36 +83,36 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     protected $securityContext;
 
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     public function setUp()
     {
         $session = new Session(new MockArraySessionStorage());
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
-        $this->request = new Request();
-        $this->request->setSession($session);
-
-        $this->securityContext = new SecurityContext($this->request);
+        $request = new Request();
+        $request->setSession($session);
 
         $this->container = new ContainerBuilder();
 
-        $this->container->set("event_dispatcher", $dispatcher);
-        $this->container->set('request', $this->request);
+        $this->container->set("event_dispatcher", $this->getMockEventDispatcher());
+        $this->container->set('request', $request);
+
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push($request);
+        $this->container->set('request_stack', $this->requestStack);
+
+        $this->securityContext = new SecurityContext($this->requestStack);
 
         $this->orderEvent = new OrderEvent(new OrderModel());
 
-        $this->orderEvent->setDispatcher($dispatcher);
-
-        $parser = $this->getMock("Thelia\\Core\\Template\\ParserInterface");
         $mailerFactory = new MailerFactory(
-            $dispatcher,
-            $parser
+            $this->getMockEventDispatcher(),
+            $this->getMockParserInterface()
         );
 
         $this->orderAction = new Order(
-            $this->request,
+            $this->requestStack,
             $mailerFactory,
             $this->securityContext
         );
@@ -182,7 +183,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             $this->cartItems[] = $cartItem;
         }
 
-        $this->request->getSession()->set("thelia.cart_id", $cart->getId());
+        $this->requestStack->getCurrentRequest()->getSession()->set("thelia.cart_id", $cart->getId());
 
         return $cart;
     }
@@ -281,7 +282,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             $itemsStock[$index] = $cartItem->getProductSaleElements()->getQuantity();
         }
 
-        $this->orderAction->create($this->orderEvent);
+        $this->orderAction->create($this->orderEvent, null, $this->getMockEventDispatcher());
 
         $placedOrder = $this->orderEvent->getPlacedOrder();
 
@@ -334,7 +335,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OrderStatus::CODE_NOT_PAID, $placedOrder->getOrderStatus()->getCode(), 'status does not  match');
 
         /* check lang */
-        $this->assertEquals($this->request->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
+        $this->assertEquals($this->requestStack->getCurrentRequest()->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
         /* check ordered product */
         foreach ($this->cartItems as $index => $cartItem) {
@@ -395,8 +396,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testCreate
-     *
      * @param OrderModel $order
+     * @return OrderModel
      */
     public function testCreateManual(OrderModel $order)
     {
@@ -408,18 +409,18 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $orderManuelEvent = new OrderManualEvent(
             $orderCopy,
             $this->cart->getCurrency(),
-            $this->request->getSession()->getLang(),
+            $this->requestStack->getCurrentRequest()->getSession()->getLang(),
             $this->cart,
             $this->customer
         );
-        $orderManuelEvent->setDispatcher($this->orderEvent->getDispatcher());
+
         $orderManuelEvent->getOrder()->setChoosenDeliveryAddress($validDeliveryAddress->getId());
         $orderManuelEvent->getOrder()->setChoosenInvoiceAddress($validInvoiceAddress->getId());
 
         $deliveryModuleId = $orderCopy->getDeliveryModuleId();
         $paymentModuleId = $orderCopy->getPaymentModuleId();
 
-        $this->orderAction->createManual($orderManuelEvent);
+        $this->orderAction->createManual($orderManuelEvent, null, $this->getMockEventDispatcher());
 
         $placedOrder = $orderManuelEvent->getPlacedOrder();
 
@@ -472,7 +473,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(OrderStatus::CODE_NOT_PAID, $placedOrder->getOrderStatus()->getCode(), 'status does not  match');
 
         /* check lang */
-        $this->assertEquals($this->request->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
+        $this->assertEquals($this->requestStack->getCurrentRequest()->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
 
         // without address duplication
@@ -485,7 +486,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $validDeliveryAddressId = $orderCopy->getDeliveryOrderAddressId();
         $validInvoiceAddressId = $orderCopy->getInvoiceOrderAddressId();
 
-        $this->orderAction->createManual($orderManuelEvent);
+        $this->orderAction->createManual($orderManuelEvent, null, $this->getMockEventDispatcher());
 
         $placedOrder = $orderManuelEvent->getPlacedOrder();
 
@@ -651,7 +652,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateAddress(OrderModel $order)
     {
-        $deliveryRef = uniqid('DELREF');
         $orderAddress = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId());
         $title = $orderAddress->getCustomerTitleId() == 3 ? 1 : 3;
         $country = $orderAddress->getCountryId() == 64 ? 1 : 64;

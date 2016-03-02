@@ -106,7 +106,7 @@ class FileManager
      * @param ConnectionInterface $con         current transaction with database
      *
      * @throws \Thelia\Exception\ImageException
-     * @return UploadedFile
+     * @return UploadedFile|null
      */
     public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile, ConnectionInterface $con = null)
     {

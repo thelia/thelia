@@ -12,6 +12,8 @@
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Exception\UnmatchableConditionException;
+
 /**
  * Check a Checkout against its Product number
  *
@@ -34,7 +36,11 @@ class MatchBillingCountries extends AbstractMatchCountries
      */
     public function isMatching()
     {
-        $billingAddress = $this->facade->getCustomer()->getDefaultAddress();
+        if (null === $customer = $this->facade->getCustomer()) {
+            throw new UnmatchableConditionException();
+        }
+
+        $billingAddress = $customer->getDefaultAddress();
 
         return $this->conditionValidator->variableOpComparison(
             $billingAddress->getCountryId(),

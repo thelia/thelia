@@ -133,6 +133,15 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * @since 2.3.0-alpha2
+     * @return int|null the store country id
+     */
+    public static function getStoreCountry()
+    {
+        return self::read('store_country', null);
+    }
+
+    /**
      * @return array a list of email addresses to send the shop's notifications
      */
     public static function getNotificationEmailsList()
@@ -293,6 +302,11 @@ class ConfigQuery extends BaseConfigQuery
     public static function isMultiDomainActivated()
     {
         return (bool) self::read("one_domain_foreach_lang", false);
+    }
+
+    public static function getMinimuAdminPasswordLength()
+    {
+        return self::read("minimum_admin_password_length", 4);
     }
 }
 // ConfigQuery

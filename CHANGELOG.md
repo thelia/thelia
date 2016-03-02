@@ -1,9 +1,55 @@
 # 2.3.0-alpha2
 
-
+- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New minimum_admin_password_length and enable_lost_admin_password_recovery configuration variable.
+- #1962 Fix exception when cloning a product if the i18n in specific locale does not exist
+- #1933 Upgrade Symfony 2.3 to Symfony 2.8
+- #1994 Allow coupon in first cart step
+- #1993 Fix the default language isocode link in backOffice languages page
+- #1992 Add method to find category path `Thelia/Model/CategoryQuery::getPathToCategory`
+- #1977 Fixed translation domain in NewsletterController
+- #1980 Update database schema to increase module version field to 25 chars.
+- #1971 Adds an address email to the administrator profile and adds the password lost functionality for administrators
+- #1970 Add `CartDuplicationEvent` which provide both original and duplicated cart to listeners
+- #1967 Module Colissimo : Replace country title by isoalpha2 in export for expeditor
+- #1964 Fixed cart not deleted after an order placed
+- #1960 Add events `CART_ITEM_CREATE_BEFORE` and `CART_ITEM_UPDATE_BEFORE`
+- #1959 Add the ability to format an address by country
+- #1907 Administrator email management and features
+    - adds an address email to the administrator profile
+    - This address email can now be used to login just like the login name
+    - An administrator could now recover a lost password, just like a regular customer
+- #1958 Fix missing success_url on Brand SEO update
+- #1956 Fix UX right class in brand products pagination in the frontOffice
+- #1948 Allow to define custom delimiter and enclosure char for CSV serializer
+- #1947 Added a way to get category/product from related content ID
+- #1946 Fix l'inclusion automatique of the TaxType class only if extension == php
+- #1939 Add `visible` and `visible_reverse` values in Product Loop order argument
+- #1936 Fixed the module name vefication for command `module:position`
+- #1931 Add a optional parameters CC and BCC in method `\Thelia\Mailer\MailerFactory::sendEmailMessage`
+- #1929 Mod: BaseController useFallbackTemplate set to true by default
+- #1928 Hook DI alert messages thrown as exceptions in dev. mode
+- #1926 Fix redirection after coupon consume
+- #1923 Re enabled functional tests for back office
+- #1922 Colissimo Move the prices from a json to a config
+- #1921 Modules 'configuration' and 'hook' buttons behavior fix
+- #1920 Fixed coupons conditions label translation
+- #1917 Fixed translations bug in user mode with view only missing translations activated
+- #1916 Fix upload document. The document title is missing after upload
+- #1914 The module list in the translation page is now ordered by module code instead of module title
+- #1913 Conservation the emails after unsubscribe on newsletter
+- #1911 Add 'admin_current_location' arg for 'main.in-top-menu-items' Hook
+- #1908 A fix for "terms & conditions" bootbox height
+- #1906 Fix coupon create form data
+- #1904 Update tinyMCE
+- #1903 Added missing generateErrorRedirect()
+- #1895 Add a link to the contact page in the front footer and update bootstrap
+- #1881 Display only the zones affected to Colissimo in the backOffice
+- #1853 Coupon, add condition match for cart item include quantity
+- #1815 #1963 #1984 #1989 Import/export complete rework
 
 # 2.3.0-alpha1
 
+- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New ```minimum_admin_password_length``` and ```enable_lost_admin_password_recovery``` configuration variable.
 - #1902 Update Colissimo export, add link to order and to customer, add package weight
 - #1801 Fixed cart duplication conditions at user login/logout
 - #1892 Add a name verification when creating a module with a command

@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Currency;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
@@ -30,12 +31,12 @@ use Thelia\Tests\ContainerAwareTestCase;
  */
 class CurrencyTest extends ContainerAwareTestCase
 {
-    protected $dispatcher;
-
-    public function setUp()
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getMockEventDispatcher()
     {
-        parent::setUp();
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     public function testCreate()
@@ -49,11 +50,10 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setLocale('en_US')
             ->setSymbol('ù')
             ->setFormat('%n %c')
-            ->setDispatcher($this->dispatcher)
         ;
 
         $action = new Currency($this->getCurrencyConverter());
-        $action->create($event);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdCurrency = $event->getCurrency();
 
@@ -86,11 +86,10 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setLocale('en_US')
             ->setSymbol('ù')
             ->setFormat('%n %c')
-            ->setDispatcher($this->dispatcher)
             ;
 
         $action = new Currency($this->getCurrencyConverter());
-        $action->update($event);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedCurrency = $event->getCurrency();
 
@@ -114,11 +113,10 @@ class CurrencyTest extends ContainerAwareTestCase
     {
         $event = new CurrencyUpdateEvent($currency->getId());
         $event
-            ->setIsDefault(1)
-            ->setDispatcher($this->dispatcher);
+            ->setIsDefault(1);
 
         $action = new Currency($this->getCurrencyConverter());
-        $action->setDefault($event);
+        $action->setDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedCurrency = $event->getCurrency();
 
@@ -140,10 +138,9 @@ class CurrencyTest extends ContainerAwareTestCase
             ->save();
 
         $event = new CurrencyDeleteEvent($currency->getId());
-        $event->setDispatcher($this->dispatcher);
 
         $action = new Currency($this->getCurrencyConverter());
-        $action->delete($event);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedCurrency = $event->getCurrency();
 
@@ -166,10 +163,9 @@ class CurrencyTest extends ContainerAwareTestCase
         $currency = CurrencyQuery::create()->findOneByByDefault(1);
 
         $event = new CurrencyDeleteEvent($currency->getId());
-        $event->setDispatcher($this->dispatcher);
 
         $action = new Currency($this->getCurrencyConverter());
-        $action->delete($event);
+        $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
     public static function tearDownAfterClass()
@@ -181,6 +177,7 @@ class CurrencyTest extends ContainerAwareTestCase
     }
 
     /**
+     * @param ContainerBuilder $container
      * Use this method to build the container with the services that you need.
      */
     protected function buildContainer(ContainerBuilder $container)

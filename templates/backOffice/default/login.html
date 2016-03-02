@@ -27,10 +27,11 @@
                     <label for="{$label_attr.for}" class="control-label hidden">{$label} : </label>
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control input-lg" title="{$label}" placeholder="{intl l='Username'}" autofocus>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control input-lg" title="{$label}" placeholder="{intl l='Username or e-mail address'}" autofocus>
                     </div>
                 </div>
                 {/form_field}
+
                 {form_field field='password'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label hidden">{$label} : </label>
@@ -41,15 +42,28 @@
                 </div>
                 {/form_field}
 
-                {form_field field='remember_me'}
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label for="{$label_attr.for}">
-                            <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {$label}
-                        </label>
+                <div class="row">
+                    <div class="col-xs-6">
+                        {form_field field='remember_me'}
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label for="{$label_attr.for}">
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {$label}
+                                </label>
+                            </div>
+                        </div>
+                        {/form_field}
                     </div>
+                    {if {config key='enable_lost_admin_password_recovery'}}
+                    <div class="col-xs-6">
+                        <div class="form-group text-right">
+                            <div class="text-right">
+                                <a class="form-control-static" href="{url path='/admin/lost-password'}">{intl l='Forgot your password ?'}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
-                {/form_field}
 
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group">

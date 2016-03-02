@@ -12,14 +12,17 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Config\Definition\Builder\ValidationBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Validator\Validation;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\TheliaFormEvent;
@@ -135,10 +138,9 @@ abstract class BaseForm
             $this->formFactoryBuilder
                 ->addExtension(
                     new CsrfExtension(
-                        new SessionCsrfProvider(
-                            $this->getRequest()->getSession(),
-                            isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                        )
+                        new CsrfTokenManager(null, new SessionTokenStorage(
+                            $this->getRequest()->getSession()
+                        ))
                     )
                 )
             ;
@@ -210,16 +212,15 @@ abstract class BaseForm
 
     public function initFormWithContainer($type, $data, $options)
     {
+        /** @var Translator translator */
         $this->translator = $this->container->get("thelia.translator");
 
-        /**
-         * @var \Symfony\Component\Form\FormFactoryBuilderInterface $formFactoryBuilder
-         */
+        /** @var FormFactoryBuilderInterface formFactoryBuilder */
         $this->formFactoryBuilder = $this->container->get("thelia.form_factory_builder");
 
+        /** @var ValidationBuilder validatorBuilder */
         $this->validatorBuilder = $this->container->get("thelia.forms.validator_builder");
     }
-
 
     protected function initFormWithRequest($type, $data, $options)
     {

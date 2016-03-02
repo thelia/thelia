@@ -27,6 +27,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method     ChildCouponQuery orderBySerializedEffects($order = Criteria::ASC) Order by the serialized_effects column
  * @method     ChildCouponQuery orderByIsEnabled($order = Criteria::ASC) Order by the is_enabled column
+ * @method     ChildCouponQuery orderByStartDate($order = Criteria::ASC) Order by the start_date column
  * @method     ChildCouponQuery orderByExpirationDate($order = Criteria::ASC) Order by the expiration_date column
  * @method     ChildCouponQuery orderByMaxUsage($order = Criteria::ASC) Order by the max_usage column
  * @method     ChildCouponQuery orderByIsCumulative($order = Criteria::ASC) Order by the is_cumulative column
@@ -46,6 +47,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery groupByType() Group by the type column
  * @method     ChildCouponQuery groupBySerializedEffects() Group by the serialized_effects column
  * @method     ChildCouponQuery groupByIsEnabled() Group by the is_enabled column
+ * @method     ChildCouponQuery groupByStartDate() Group by the start_date column
  * @method     ChildCouponQuery groupByExpirationDate() Group by the expiration_date column
  * @method     ChildCouponQuery groupByMaxUsage() Group by the max_usage column
  * @method     ChildCouponQuery groupByIsCumulative() Group by the is_cumulative column
@@ -92,6 +94,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCoupon findOneByType(string $type) Return the first ChildCoupon filtered by the type column
  * @method     ChildCoupon findOneBySerializedEffects(string $serialized_effects) Return the first ChildCoupon filtered by the serialized_effects column
  * @method     ChildCoupon findOneByIsEnabled(boolean $is_enabled) Return the first ChildCoupon filtered by the is_enabled column
+ * @method     ChildCoupon findOneByStartDate(string $start_date) Return the first ChildCoupon filtered by the start_date column
  * @method     ChildCoupon findOneByExpirationDate(string $expiration_date) Return the first ChildCoupon filtered by the expiration_date column
  * @method     ChildCoupon findOneByMaxUsage(int $max_usage) Return the first ChildCoupon filtered by the max_usage column
  * @method     ChildCoupon findOneByIsCumulative(boolean $is_cumulative) Return the first ChildCoupon filtered by the is_cumulative column
@@ -111,6 +114,7 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     array findByType(string $type) Return ChildCoupon objects filtered by the type column
  * @method     array findBySerializedEffects(string $serialized_effects) Return ChildCoupon objects filtered by the serialized_effects column
  * @method     array findByIsEnabled(boolean $is_enabled) Return ChildCoupon objects filtered by the is_enabled column
+ * @method     array findByStartDate(string $start_date) Return ChildCoupon objects filtered by the start_date column
  * @method     array findByExpirationDate(string $expiration_date) Return ChildCoupon objects filtered by the expiration_date column
  * @method     array findByMaxUsage(int $max_usage) Return ChildCoupon objects filtered by the max_usage column
  * @method     array findByIsCumulative(boolean $is_cumulative) Return ChildCoupon objects filtered by the is_cumulative column
@@ -219,7 +223,7 @@ abstract class CouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `START_DATE`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -461,6 +465,49 @@ abstract class CouponQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponTableMap::IS_ENABLED, $isEnabled, $comparison);
+    }
+
+    /**
+     * Filter the query on the start_date column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStartDate('2011-03-14'); // WHERE start_date = '2011-03-14'
+     * $query->filterByStartDate('now'); // WHERE start_date = '2011-03-14'
+     * $query->filterByStartDate(array('max' => 'yesterday')); // WHERE start_date > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $startDate The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function filterByStartDate($startDate = null, $comparison = null)
+    {
+        if (is_array($startDate)) {
+            $useMinMax = false;
+            if (isset($startDate['min'])) {
+                $this->addUsingAlias(CouponTableMap::START_DATE, $startDate['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($startDate['max'])) {
+                $this->addUsingAlias(CouponTableMap::START_DATE, $startDate['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CouponTableMap::START_DATE, $startDate, $comparison);
     }
 
     /**

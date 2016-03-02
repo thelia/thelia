@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <hooks>
-        <hook id="hookcontact.hook.front" class="HookContact\Hook\FrontHook" scope="request">
+        <hook id="hookcontact.hook.front" class="HookContact\Hook\FrontHook">
             <tag name="hook.event_listener" event="main.footer-body" />
         </hook>
     </hooks>

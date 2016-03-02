@@ -23,6 +23,7 @@
 
 namespace Front\Controller;
 
+use Front\Front;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
@@ -82,7 +83,9 @@ class NewsletterController extends BaseFrontController
             return new JsonResponse([
                 "success" => ($errorMessage) ? false : true,
                 "message" => ($errorMessage) ? $errorMessage : $this->getTranslator()->trans(
-                    "Thanks for signing up! We'll keep you posted whenever we have any new updates."
+                    "Thanks for signing up! We'll keep you posted whenever we have any new updates.",
+                    [],
+                    Front::MESSAGE_DOMAIN
                 )
             ], ($errorMessage) ? 500 : 200);
         }

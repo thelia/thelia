@@ -16,6 +16,7 @@ use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Admin;
 use Thelia\Model\AdminQuery;
 
 class AdministratorController extends AbstractCrudController
@@ -30,6 +31,24 @@ class AdministratorController extends AbstractCrudController
             TheliaEvents::ADMINISTRATOR_CREATE,
             TheliaEvents::ADMINISTRATOR_UPDATE,
             TheliaEvents::ADMINISTRATOR_DELETE
+        );
+    }
+
+    public function viewAction()
+    {
+        // Open the update dialog for the current administrator
+        return $this->render('administrators', [ 'show_update_dialog' => true ]);
+    }
+
+    public function setEmailAction()
+    {
+        // Open the update dialog for the current administrator, and display the "set email address" notice.
+        return $this->render(
+            'administrators',
+            [
+                'show_update_dialog' => true,
+                'show_email_change_notice' => true
+            ]
         );
     }
 
@@ -53,6 +72,7 @@ class AdministratorController extends AbstractCrudController
         $event->setPassword($formData['password']);
         $event->setProfile($formData['profile'] ? : null);
         $event->setLocale($formData['locale']);
+        $event->setEmail($formData['email']);
 
         return $event;
     }
@@ -68,6 +88,7 @@ class AdministratorController extends AbstractCrudController
         $event->setPassword($formData['password']);
         $event->setProfile($formData['profile'] ? : null);
         $event->setLocale($formData['locale']);
+        $event->setEmail($formData['email']);
 
         return $event;
     }
@@ -88,6 +109,11 @@ class AdministratorController extends AbstractCrudController
         return $event->hasAdministrator();
     }
 
+    /**
+     * @param Admin $object
+     *
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateObjectForm($object)
     {
         $data = array(
@@ -96,7 +122,8 @@ class AdministratorController extends AbstractCrudController
             'lastname'          => $object->getLastname(),
             'login'             => $object->getLogin(),
             'profile'           => $object->getProfileId(),
-            'locale'            => $object->getLocale()
+            'locale'            => $object->getLocale(),
+            'email'             => $object->getEmail()
         );
 
         // Setup the object form
@@ -114,11 +141,19 @@ class AdministratorController extends AbstractCrudController
             ->findOneById($this->getRequest()->get('administrator_id'));
     }
 
+    /**
+     * @param Admin $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getLogin();
     }
 
+    /**
+     * @param Admin $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

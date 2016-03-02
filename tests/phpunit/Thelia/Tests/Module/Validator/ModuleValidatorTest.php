@@ -13,7 +13,7 @@
 namespace Thelia\Tests\Module\Validator;
 
 use Thelia\Core\Thelia;
-use Thelia\Exception\ModuleException;
+use Thelia\Core\Translation\Translator;
 use Thelia\Module\Validator\ModuleValidator;
 use Thelia\Tools\Version\Version;
 
@@ -74,7 +74,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("2.2.0", $moduleDefinition->getTheliaVersion());
         $this->assertTrue(
             Version::test(
-                Thelia::RELEASE_VERSION,
+                Thelia::THELIA_VERSION,
                 $moduleDefinition->getTheliaVersion(),
                 false,
                 ">="
@@ -96,6 +96,8 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider authorsProvider
+     * @param $path
+     * @param $expectedAuthors
      */
     public function testAuthorsTag($path, $expectedAuthors)
     {
@@ -120,6 +122,9 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider validatorProvider
+     * @param $path
+     * @param $exceptionExpected
+     * @param $exceptionMessage
      */
     public function testValidator($path, $exceptionExpected, $exceptionMessage)
     {
@@ -171,7 +176,9 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         new ModuleValidator($moduleChuckNorrisPath, $this->getStubTranslator());
     }
 
-
+    /**
+     * @return Translator
+     */
     private function getStubTranslator()
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')

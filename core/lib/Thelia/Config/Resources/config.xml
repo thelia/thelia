@@ -123,9 +123,8 @@
         </service>
 
         <!-- Tax engine -->
-
-        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine">
+            <argument type="service" id="request_stack" />
         </service>
 
         <!--  The assets manager -->
@@ -188,12 +187,12 @@
 
 		<!-- Security context for front and back office -->
 
-		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">
-            <argument type="service" id="request" />
+		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext">
+            <argument type="service" id="request_stack" />
 		</service>
 
-        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext">
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.form_factory" />
             <argument type="service" id="thelia.form_validator" />
         </service>
@@ -209,6 +208,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="stack_factory" class="Stack\Builder" />
@@ -222,15 +222,15 @@
             <argument id="base_http_kernel" type="service"/>
         </service>
 
+        <service id="request" class="Thelia\Core\HttpFoundation\Request" />
 
-        <service id="request" scope="request" synthetic="true" />
+        <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />
 
         <service id="service_container" synthetic="true" />
 
         <service id="kernel" synthetic="true" />
 
-
-        <service id="mailer" class="Thelia\Mailer\MailerFactory" scope="request">
+        <service id="mailer" class="Thelia\Mailer\MailerFactory">
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser"/>
         </service>
@@ -243,16 +243,16 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener" scope="request">
+        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener">
             <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener" scope="request">
+        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener">
             <argument>%kernel.environment%</argument>
             <argument type="service" id="thelia.parser"/>
             <argument type="service" id="thelia.securityContext"/>
-
+            <argument type="service" id="event_dispatcher" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -306,8 +306,8 @@
 
 
         <!-- Thelia simple token provider -->
-        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider">
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.translator" />
             <argument>%thelia.token_id%</argument>
         </service>
@@ -322,7 +322,7 @@
             </call>
         </service>
 
-        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" scope="request" />
+        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" />
 
         <service id="thelia.forms.extension.http_foundation_extension" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension">
             <tag name="thelia.forms.extension" />
@@ -332,8 +332,8 @@
             <tag name="thelia.forms.extension" />
         </service>
 
-        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory">
+            <argument type="service" id="request_stack" />
             <argument type="service" id="service_container" />
             <argument>%thelia.parser.forms%</argument>
         </service>

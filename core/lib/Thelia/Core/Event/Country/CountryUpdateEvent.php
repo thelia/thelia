@@ -19,25 +19,35 @@ namespace Thelia\Core\Event\Country;
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
+    /** @var  $country_id */
     protected $country_id;
 
     /** @var bool */
     protected $needZipCode;
+
     /** @var string */
     protected $zipCodeFormat;
-    /** @var int area zone */
 
+    /** @var string */
     protected $chapo;
+
+    /** @var string */
     protected $description;
+
+    /** @var string */
     protected $postscriptum;
 
+    /**
+     * @param int $country_id
+     */
     public function __construct($country_id)
     {
         $this->country_id = $country_id;
     }
 
     /**
-     * @param mixed $chapo
+     * @param string $chapo
+     * @return $this
      */
     public function setChapo($chapo)
     {
@@ -47,7 +57,7 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getChapo()
     {
@@ -55,7 +65,8 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @param mixed $description
+     * @param string $description
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -73,7 +84,8 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @param mixed $postscriptum
+     * @param string $postscriptum
+     * @return $this
      */
     public function setPostscriptum($postscriptum)
     {
@@ -91,7 +103,8 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @param mixed $country_id
+     * @param int $country_id
+     * @return $this
      */
     public function setCountryId($country_id)
     {
@@ -101,7 +114,7 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getCountryId()
     {
@@ -109,7 +122,7 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @return boolean
+     * @return string
      */
     public function isNeedZipCode()
     {
@@ -118,6 +131,7 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param boolean $needZipCode
+     * @return $this
      */
     public function setNeedZipCode($needZipCode)
     {
@@ -135,6 +149,7 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param string $zipCodeFormat
+     * @return $this
      */
     public function setZipCodeFormat($zipCodeFormat)
     {
