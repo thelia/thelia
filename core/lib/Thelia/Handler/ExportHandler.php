@@ -12,6 +12,7 @@
 
 namespace Thelia\Handler;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -36,14 +37,19 @@ class ExportHandler
      */
     protected $eventDispatcher;
 
+    /** @var ContainerInterface */
+    protected $container;
+
     /**
      * Class constructor
      *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher An event dispatcher interface
+     * @param ContainerInterface $container
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(EventDispatcherInterface $eventDispatcher, ContainerInterface $container)
     {
         $this->eventDispatcher = $eventDispatcher;
+        $this->container = $container;
     }
 
     /**
@@ -156,6 +162,7 @@ class ExportHandler
 
         /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
         $instance = new $exportHandleClass;
+        $instance->setContainer($this->container);
 
         // Configure handle class
         $instance->setLang($language);

@@ -361,12 +361,14 @@
         <!-- Handlers -->
         <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
             <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="thelia.serializer.manager" />
             <argument type="service" id="thelia.archiver.manager" />
+            <argument type="service" id="service_container" />
         </service>
     </services>
 </config>
