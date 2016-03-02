@@ -18,7 +18,6 @@ UPDATE `currency` SET `visible` = 1 WHERE 1;
 UPDATE `currency` SET `format` = '%n %s' WHERE `code` NOT IN ('USD', 'GBP');
 UPDATE `currency` SET `format` = '%s%n' WHERE `code` IN ('USD', 'GBP');
 
-
 -- Additional hooks
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;

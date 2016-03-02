@@ -10,7 +10,7 @@ Parameters:
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='bo.default'}
 
-{hook name="tab-image.top" id=$parentId type=$documentType}
+{hook name="tab-document.top" id=$parentId type=$documentType}
 
 <div class="document-manager" >
     <form action="{url path="/admin/document/type/%document/%id/save-ajax" document=$documentType id=$parentId}" method="post" class="dropzone" id="documents-dropzone" enctype="multipart/form-data">
@@ -38,7 +38,7 @@ Parameters:
 
 </div>
 
-{hook name="tab-image.bottom" id=$parentId type=$documentType}
+{hook name="tab-document.bottom" id=$parentId type=$documentType}
 
 <script>
     var documentDropZoneUrl = "{url path="/admin/document/type/%document/%id/save-ajax" document=$documentType id=$parentId}";

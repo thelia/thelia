@@ -82,7 +82,7 @@ class SmartyHelper implements ParserHelperInterface
                     continue;
                 } else {
                     // skip {
-                    if (in_array($char, array("/", "$", "'", "\""))) {
+                    if (in_array($char, array("/", "$", "#", "'", "\""))) {
                         $inFunction = false;
                     } else {
                         $buffer .= $char;

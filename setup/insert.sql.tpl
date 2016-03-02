@@ -321,7 +321,19 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (220, 'account-order.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
 (222, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(223, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(223, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(224, 'sale.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(225, 'sale.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(226, 'sale.main-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(227, 'sale.main-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(228, 'sale.content-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(229, 'sale.content-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(230, 'sale.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(231, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(232, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(233, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(234, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+
 ;
 
 -- Insert admin hooks
@@ -2218,7 +2230,18 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (220, '{$locale}', {intl l='Order details - javascript initialization' locale=$locale}, NULL, NULL),
     (221, '{$locale}', {intl l='Customer account - additional information' locale=$locale}, NULL, NULL),
     (222, '{$locale}', {intl l='Order details - after product' locale=$locale}, NULL, NULL),
-    (223, '{$locale}', {intl l='Mini cart' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (223, '{$locale}', {intl l='Mini cart' locale=$locale}, NULL, NULL),
+    (224, '{$locale}', {intl l='Sale - at the top' locale=$locale}, NULL, NULL),
+    (225, '{$locale}', {intl l='Sale - at the bottom' locale=$locale}, NULL, NULL),
+    (226, '{$locale}', {intl l='Sale - at the top of the main area' locale=$locale}, NULL, NULL),
+    (227, '{$locale}', {intl l='Sale - at the bottom of the main area' locale=$locale}, NULL, NULL),
+    (228, '{$locale}', {intl l='Sale - before the main content area' locale=$locale}, NULL, NULL),
+    (229, '{$locale}', {intl l='Sale - after the main content area' locale=$locale}, NULL, NULL),
+    (230, '{$locale}', {intl l='Sale - CSS stylesheet' locale=$locale}, NULL, NULL),
+    (231, '{$locale}', {intl l='Sale - after javascript include' locale=$locale}, NULL, NULL),
+    (232, '{$locale}', {intl l='Sale - javascript initialization' locale=$locale}, NULL, NULL),
+    (233, '{$locale}', {intl l='Order details - after invoice address' locale=$locale}, NULL, NULL),
+    (234, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
