@@ -117,7 +117,7 @@ class ModuleManagement
 
             // Update the module images, title and description when the module is installed, but not after
             // as these data may have been modified byt the administrator
-            if ('install' === $action) {
+            if (in_array($action, ['update', 'install'])) {
                 $this->saveDescription($module, $content, $con);
 
                 if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
