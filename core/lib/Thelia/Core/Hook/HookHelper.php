@@ -103,7 +103,7 @@ class HookHelper
      */
     public function walkDir($directory, &$hooks)
     {
-        $allowed_exts = array('html', 'tpl', 'xml');
+        $allowed_exts = array('html', 'tpl', 'xml', 'txt');
 
         try {
             /** @var \DirectoryIterator $fileInfo */
@@ -150,11 +150,18 @@ class HookHelper
             $params      = explode(".", $attributes['name']);
 
             if (count($params) != 2) {
-                throw new \UnexpectedValueException("hook name should contain a . : " . $attributes['name']);
+                // the hook does not respect the convention
+                if (false === strpos($attributes['name'], "$")) {
+                    $ret['context'] = $attributes['name'];
+                    $ret['type']    = '';
+                } else {
+                    throw new \UnexpectedValueException("skipping hook as name contains variable : " . $attributes['name']);
+                }
+            } else {
+                $ret['context'] = $params[0];
+                $ret['type']    = $params[1];
             }
             unset($attributes['name']);
-            $ret['context'] = $params[0];
-            $ret['type']    = $params[1];
 
             $ret['module'] = false;
             if (array_key_exists("module", $attributes)) {

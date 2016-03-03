@@ -94,6 +94,7 @@
                             {format_address order_address=$DELIVERY_ADDRESS}
                         {/elsehook}
 
+                        {hook name="account-order.delivery-address-bottom" module="{$delivery_id}" order="{$order_id}"}
                     </div>
                 </div>
             </div>
@@ -122,7 +123,7 @@
                             {format_address order_address=$DELIVERY_ADDRESS}
                         {/elsehook}
 
-                        {hook name="account-order.invoice-address-bottom" module="{$delivery_id}" order="{$order_id}"}
+                        {hook name="account-order.invoice-address-bottom" module="{$payment_id}" order="{$order_id}"}
                     </div>
                 </div>
             </div>

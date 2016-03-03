@@ -50,6 +50,44 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 {/foreach}
 ;
 
+-- Additional hooks
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+    (@max_id+1, 'sale.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+2, 'sale.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+3, 'sale.main-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+4, 'sale.main-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+5, 'sale.content-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+6, 'sale.content-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+7, 'sale.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+8, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+9, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+10, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+11, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+{foreach $locales as $locale}
+    (@max_id+1, '{$locale}', {intl l='Sale - at the top' locale=$locale}, NULL, NULL),
+    (@max_id+2, '{$locale}', {intl l='Sale - at the bottom' locale=$locale}, NULL, NULL),
+    (@max_id+3, '{$locale}', {intl l='Sale - at the top of the main area' locale=$locale}, NULL, NULL),
+    (@max_id+4, '{$locale}', {intl l='Sale - at the bottom of the main area' locale=$locale}, NULL, NULL),
+    (@max_id+5, '{$locale}', {intl l='Sale - before the main content area' locale=$locale}, NULL, NULL),
+    (@max_id+6, '{$locale}', {intl l='Sale - after the main content area' locale=$locale}, NULL, NULL),
+    (@max_id+7, '{$locale}', {intl l='Sale - CSS stylesheet' locale=$locale}, NULL, NULL),
+    (@max_id+8, '{$locale}', {intl l='Sale - after javascript include' locale=$locale}, NULL, NULL),
+    (@max_id+9, '{$locale}', {intl l='Sale - javascript initialization' locale=$locale}, NULL, NULL),
+    (@max_id+10, '{$locale}', {intl l='Order details - after invoice address' locale=$locale}, NULL, NULL),
+    (@max_id+11, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
+
+
+
 
 -- Update module version column
 

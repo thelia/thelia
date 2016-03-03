@@ -47,6 +47,74 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),    (@max_id + 1, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (@max_id + 2, 'fr_FR', 'Autoriser les administrateurs à recréer leur mot de passe', NULL, NULL, NULL);
 
+-- Additional hooks
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+    (@max_id+1, 'sale.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+2, 'sale.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+3, 'sale.main-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+4, 'sale.main-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+5, 'sale.content-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+6, 'sale.content-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+7, 'sale.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+8, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+9, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+10, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+11, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+    (@max_id+1, 'de_DE', NULL, NULL, NULL),
+    (@max_id+2, 'de_DE', NULL, NULL, NULL),
+    (@max_id+3, 'de_DE', NULL, NULL, NULL),
+    (@max_id+4, 'de_DE', NULL, NULL, NULL),
+    (@max_id+5, 'de_DE', NULL, NULL, NULL),
+    (@max_id+6, 'de_DE', NULL, NULL, NULL),
+    (@max_id+7, 'de_DE', NULL, NULL, NULL),
+    (@max_id+8, 'de_DE', NULL, NULL, NULL),
+    (@max_id+9, 'de_DE', NULL, NULL, NULL),
+    (@max_id+10, 'de_DE', NULL, NULL, NULL),
+    (@max_id+11, 'de_DE', NULL, NULL, NULL),
+    (@max_id+1, 'en_US', NULL, NULL, NULL),
+    (@max_id+2, 'en_US', NULL, NULL, NULL),
+    (@max_id+3, 'en_US', NULL, NULL, NULL),
+    (@max_id+4, 'en_US', NULL, NULL, NULL),
+    (@max_id+5, 'en_US', NULL, NULL, NULL),
+    (@max_id+6, 'en_US', NULL, NULL, NULL),
+    (@max_id+7, 'en_US', NULL, NULL, NULL),
+    (@max_id+8, 'en_US', NULL, NULL, NULL),
+    (@max_id+9, 'en_US', NULL, NULL, NULL),
+    (@max_id+10, 'en_US', NULL, NULL, NULL),
+    (@max_id+11, 'en_US', NULL, NULL, NULL),
+    (@max_id+1, 'es_ES', NULL, NULL, NULL),
+    (@max_id+2, 'es_ES', NULL, NULL, NULL),
+    (@max_id+3, 'es_ES', NULL, NULL, NULL),
+    (@max_id+4, 'es_ES', NULL, NULL, NULL),
+    (@max_id+5, 'es_ES', NULL, NULL, NULL),
+    (@max_id+6, 'es_ES', NULL, NULL, NULL),
+    (@max_id+7, 'es_ES', NULL, NULL, NULL),
+    (@max_id+8, 'es_ES', NULL, NULL, NULL),
+    (@max_id+9, 'es_ES', NULL, NULL, NULL),
+    (@max_id+10, 'es_ES', NULL, NULL, NULL),
+    (@max_id+11, 'es_ES', NULL, NULL, NULL),
+    (@max_id+1, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+2, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+3, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+4, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+5, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+6, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+7, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+8, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+9, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+10, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+11, 'fr_FR', NULL, NULL, NULL)
+;
+
+
+
+
 
 -- Update module version column
 

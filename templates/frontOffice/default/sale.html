@@ -12,14 +12,18 @@
 {/block}
 
 {block name="main-content"}
-    <div class="main">
 
     {* Parameters *}
     {$limit={$smarty.get.limit|default:8}}
     {$product_page={$smarty.get.page|default:1}}
     {$product_sale={$smarty.get.sale|default:''}}
 
+    {hook name="sale.top" sale={$product_sale}}
+
+    <div class="main">
+    {hook name="sale.main-top" sale={$product_sale}}
     <article id="sale-details" class="col-main {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
+        {hook name="sale.content-top" sale={$product_sale}}
 
         {loop name="sale-details" type="sale" id={$product_sale}}
             <h1 id="main-label" class="page-header">{$SALE_LABEL}</h1>
@@ -47,7 +51,7 @@
 
             {assign var="amount" value="{count type="product" sale=$ID}"}
 
-            {hook name="sale.top"}
+
 
             {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
 
@@ -70,23 +74,26 @@
             {ifloop rel="product_list"}
                 {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
             {/ifloop}
-        {/loop}
 
-        {if $POSTSCRIPTUM}
-        <small class="postscriptum">
-            {$POSTSCRIPTUM}
-        </small>
-        {/if}
+            {if $POSTSCRIPTUM}
+            <small class="postscriptum">
+                {$POSTSCRIPTUM}
+            </small>
+            {/if}
+        {/loop}
 
         {elseloop  rel="sale-details"}
             <h2 class="text-center">{intl l="Sale was not found"} </h2>
         {/elseloop}
 
-    {hook name="sale.bottom"}
+        {hook name="sale.content-bottom" sale={$product_sale}}
 
-</article>
+    </article>
+
+    {hook name="sale.main-bottom" sale={$product_sale}}
 
 </div><!-- /.layout -->
+{hook name="sale.bottom" sale={$product_sale}}
 {/block}
 
 
