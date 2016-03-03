@@ -14,6 +14,7 @@ namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
@@ -52,6 +53,11 @@ abstract class AbstractExport implements \Iterator
      * @var boolean True if data is array, false otherwise
      */
     private $dataIsArray;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @var \Thelia\Model\Lang A language model
@@ -439,6 +445,22 @@ abstract class AbstractExport implements \Iterator
     public function afterSerialize($data)
     {
         return $data;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        return $this->container;
     }
 
     /**

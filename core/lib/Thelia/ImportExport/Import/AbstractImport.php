@@ -12,6 +12,7 @@
 
 namespace Thelia\ImportExport\Import;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
@@ -41,6 +42,11 @@ abstract class AbstractImport implements \Iterator
      * @var array Mandatory columns
      */
     protected $mandatoryColumns = [];
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @var integer Imported row count
@@ -191,6 +197,21 @@ abstract class AbstractImport implements \Iterator
         return $this;
     }
 
+    /**
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        return $this->container;
+    }
 
     /**
      * Import data
