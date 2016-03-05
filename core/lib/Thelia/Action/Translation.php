@@ -78,7 +78,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             $allowedExts = array('php');
         } elseif ($walkMode == TranslationEvent::WALK_MODE_TEMPLATE) {
-            $prefix = '\{intl(?:.*?)l=[\s]*';
+            $prefix = '\{intl(?:.*?)[\s]l=[\s]*';
 
             $allowedExts = array('html', 'tpl', 'xml', 'txt');
         } else {
