@@ -12,9 +12,12 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Mailer\MailerFactory;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Newsletter as NewsletterModel;
 
@@ -25,6 +28,18 @@ use Thelia\Model\Newsletter as NewsletterModel;
  */
 class Newsletter extends BaseAction implements EventSubscriberInterface
 {
+    /** @var  MailerFactory */
+    protected $mailer;
+
+    /** @var EventDispatcherInterface  */
+    protected $dispatcher;
+
+    public function __construct(MailerFactory $mailer, EventDispatcherInterface $dispatcher)
+    {
+        $this->mailer = $mailer;
+        $this->dispatcher = $dispatcher;
+    }
+
     public function subscribe(NewsletterEvent $event)
     {
         // test if the email is already registered and unsubscribed
@@ -41,6 +56,8 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setNewsletter($newsletter);
+
+        $this->dispatcher->dispatch(TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION, $event);
     }
 
     public function unsubscribe(NewsletterEvent $event)
@@ -67,6 +84,21 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function confirmSubscription(NewsletterEvent $event)
+    {
+        $this->mailer->sendEmailMessage(
+            'newsletter_subscription_confirmation',
+            [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+            [ $event->getEmail() => $event->getFirstname()." ".$event->getLastname() ],
+            [
+                'email' => $event->getEmail(),
+                'firstname' => $event->getFirstname(),
+                'lastname' => $event->getLastname()
+            ],
+            $event->getLocale()
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -75,7 +107,8 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::NEWSLETTER_SUBSCRIBE => array('subscribe', 128),
             TheliaEvents::NEWSLETTER_UPDATE => array('update', 128),
-            TheliaEvents::NEWSLETTER_UNSUBSCRIBE => array('unsubscribe', 128)
+            TheliaEvents::NEWSLETTER_UNSUBSCRIBE => array('unsubscribe', 128),
+            TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION => array('confirmSubscription', 128)
         );
     }
 }

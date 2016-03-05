@@ -849,6 +849,7 @@ final class TheliaEvents
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
     const NEWSLETTER_UPDATE = 'thelia.newsletter.update';
     const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
+    const NEWSLETTER_CONFIRM_SUBSCRIPTION = 'thelia.newsletter.confirmSubscription';
 
     /************ LANG MANAGEMENT ****************************/
 

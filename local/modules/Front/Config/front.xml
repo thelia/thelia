@@ -231,6 +231,12 @@
         <default key="_controller">Front\Controller\NewsletterController::subscribeAction</default>
         <default key="_view">newsletter</default>
     </route>
+
+    <route id="newsletter.unsubscribe" path="/newsletter-unsubscribe" methods="post">
+        <default key="_controller">Front\Controller\NewsletterController::unsubscribeAction</default>
+        <default key="_view">newsletter-unsubscribe</default>
+    </route>
+
     <!-- end newsletter management -->
 
     <!-- sitemap generator -->

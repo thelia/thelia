@@ -65,7 +65,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
     (@max_id+8, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
     (@max_id+9, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
     (@max_id+10, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
-    (@max_id+11, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+    (@max_id+11, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+12, 'newsletter-unsubscribe.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+13, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+14, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+15, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+16, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -80,8 +85,12 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+8, '{$locale}', {intl l='Sale - after javascript include' locale=$locale}, NULL, NULL),
     (@max_id+9, '{$locale}', {intl l='Sale - javascript initialization' locale=$locale}, NULL, NULL),
     (@max_id+10, '{$locale}', {intl l='Order details - after invoice address' locale=$locale}, NULL, NULL),
-    (@max_id+11, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (@max_id+11, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL),
+    (@max_id+12, '{$locale}', {intl l='Newsletter unsubscribe page - at the top' locale=$locale}, NULL, NULL),
+    (@max_id+13, '{$locale}', {intl l='Newsletter unsubscribe page - at the bottom' locale=$locale}, NULL, NULL),
+    (@max_id+14, '{$locale}', {intl l='Newsletter unsubscribe page - CSS stylesheet' locale=$locale}, NULL, NULL),
+    (@max_id+15, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
+    (@max_id+16, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -100,5 +109,20 @@ ALTER TABLE `order_coupon` ADD `start_date` DATETIME AFTER`description`;
 
 -- Add new column in attribute combination table
 ALTER TABLE `attribute_combination` ADD `position` INT NULL AFTER `product_sale_elements_id`;
+
+-- Add newsletter subscription confirmation message
+
+SELECT @max := MAX(`id`) FROM `message`;
+SET @max := @max+1;
+
+INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+(@max, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW());
+
+INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
+{foreach $locales as $locale}
+    (@max, '{$locale}', {intl l='Mail sent after a subscription to newsletter' locale=$locale}, {intl l='Your subscription to {config key="store_name"} newsletter' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+{/foreach}
+;
+>>>>>>> Newsletter: mail when subscribing, unsubscription page
 
 SET FOREIGN_KEY_CHECKS = 1;

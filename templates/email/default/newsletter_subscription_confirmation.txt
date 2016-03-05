@@ -1,0 +1,10 @@
+{default_translation_domain domain='email.default'}
+{if $firstname || $lastname}
+{intl l="Dear %firstname %lastname," firstname=$firstname lastname=$lastname}
+{else}
+{intl l="Hello,"}
+{/if}
+{intl l="Thank you for your registration. You'll now receive the %store newsletter on your email address %email." store={config key="store_name"} email=$email}
+{intl l="To unsubscribe from our newsletter, please go to the following web address:"}
+    {url path="/newsletter-unsubscribe" email=$email}
+{intl l="The %store team." store={config key="store_name"}}

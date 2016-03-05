@@ -332,8 +332,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (231, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (232, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (233, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
-(234, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW())
-
+(234, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(235, 'newsletter-unsubscribe.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(236, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(237, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -1917,7 +1921,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW()),
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
 (5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
-(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW())
+(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
+(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW())
 ;
 
 /**
@@ -2241,8 +2246,12 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (231, '{$locale}', {intl l='Sale - after javascript include' locale=$locale}, NULL, NULL),
     (232, '{$locale}', {intl l='Sale - javascript initialization' locale=$locale}, NULL, NULL),
     (233, '{$locale}', {intl l='Order details - after invoice address' locale=$locale}, NULL, NULL),
-    (234, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (234, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL),
+    (235, '{$locale}', {intl l='Newsletter unsubscribe page - at the top' locale=$locale}, NULL, NULL),
+    (236, '{$locale}', {intl l='Newsletter unsubscribe page - at the bottom' locale=$locale}, NULL, NULL),
+    (237, '{$locale}', {intl l='Newsletter unsubscribe page - CSS stylesheet' locale=$locale}, NULL, NULL),
+    (238, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
+    (238, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -3431,7 +3440,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, '{$locale}', {intl l='Message sent to the shop owner when a new order is placed' locale=$locale}, {intl l='New order {$order_ref} placed on {config key="store_name"}' locale=$locale}, NULL, NULL),
     (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {config key="store_name"} has been changed.' locale=$locale}, NULL, NULL),
     (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
-    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL),
+    (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;

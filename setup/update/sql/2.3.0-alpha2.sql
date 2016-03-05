@@ -62,7 +62,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
     (@max_id+8, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
     (@max_id+9, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
     (@max_id+10, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
-    (@max_id+11, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+    (@max_id+11, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+12, 'newsletter-unsubscribe.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+13, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+14, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+15, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+16, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -77,18 +82,26 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+9, 'de_DE', NULL, NULL, NULL),
     (@max_id+10, 'de_DE', NULL, NULL, NULL),
     (@max_id+11, 'de_DE', NULL, NULL, NULL),
-    (@max_id+1, 'en_US', NULL, NULL, NULL),
-    (@max_id+2, 'en_US', NULL, NULL, NULL),
-    (@max_id+3, 'en_US', NULL, NULL, NULL),
-    (@max_id+4, 'en_US', NULL, NULL, NULL),
-    (@max_id+5, 'en_US', NULL, NULL, NULL),
-    (@max_id+6, 'en_US', NULL, NULL, NULL),
-    (@max_id+7, 'en_US', NULL, NULL, NULL),
-    (@max_id+8, 'en_US', NULL, NULL, NULL),
-    (@max_id+9, 'en_US', NULL, NULL, NULL),
-    (@max_id+10, 'en_US', NULL, NULL, NULL),
-    (@max_id+11, 'en_US', NULL, NULL, NULL),
-    (@max_id+1, 'es_ES', NULL, NULL, NULL),
+    (@max_id+12, 'de_DE', NULL, NULL, NULL),
+    (@max_id+13, 'de_DE', NULL, NULL, NULL),
+    (@max_id+14, 'de_DE', NULL, NULL, NULL),
+    (@max_id+15, 'de_DE', NULL, NULL, NULL),
+    (@max_id+16, 'de_DE', NULL, NULL, NULL),    (@max_id+1, 'en_US', 'Sale - at the top', NULL, NULL),
+    (@max_id+2, 'en_US', 'Sale - at the bottom', NULL, NULL),
+    (@max_id+3, 'en_US', 'Sale - at the top of the main area', NULL, NULL),
+    (@max_id+4, 'en_US', 'Sale - at the bottom of the main area', NULL, NULL),
+    (@max_id+5, 'en_US', 'Sale - before the main content area', NULL, NULL),
+    (@max_id+6, 'en_US', 'Sale - after the main content area', NULL, NULL),
+    (@max_id+7, 'en_US', 'Sale - CSS stylesheet', NULL, NULL),
+    (@max_id+8, 'en_US', 'Sale - after javascript include', NULL, NULL),
+    (@max_id+9, 'en_US', 'Sale - javascript initialization', NULL, NULL),
+    (@max_id+10, 'en_US', 'Order details - after invoice address', NULL, NULL),
+    (@max_id+11, 'en_US', 'Order details - after delivery address', NULL, NULL),
+    (@max_id+12, 'en_US', 'Newsletter unsubscribe page - at the top', NULL, NULL),
+    (@max_id+13, 'en_US', 'Newsletter unsubscribe page - at the bottom', NULL, NULL),
+    (@max_id+14, 'en_US', 'Newsletter unsubscribe page - CSS stylesheet', NULL, NULL),
+    (@max_id+15, 'en_US', 'Newsletter unsubscribe page - after javascript include', NULL, NULL),
+    (@max_id+16, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),    (@max_id+1, 'es_ES', NULL, NULL, NULL),
     (@max_id+2, 'es_ES', NULL, NULL, NULL),
     (@max_id+3, 'es_ES', NULL, NULL, NULL),
     (@max_id+4, 'es_ES', NULL, NULL, NULL),
@@ -99,7 +112,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+9, 'es_ES', NULL, NULL, NULL),
     (@max_id+10, 'es_ES', NULL, NULL, NULL),
     (@max_id+11, 'es_ES', NULL, NULL, NULL),
-    (@max_id+1, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+12, 'es_ES', NULL, NULL, NULL),
+    (@max_id+13, 'es_ES', NULL, NULL, NULL),
+    (@max_id+14, 'es_ES', NULL, NULL, NULL),
+    (@max_id+15, 'es_ES', NULL, NULL, NULL),
+    (@max_id+16, 'es_ES', NULL, NULL, NULL),    (@max_id+1, 'fr_FR', NULL, NULL, NULL),
     (@max_id+2, 'fr_FR', NULL, NULL, NULL),
     (@max_id+3, 'fr_FR', NULL, NULL, NULL),
     (@max_id+4, 'fr_FR', NULL, NULL, NULL),
@@ -109,8 +126,12 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+8, 'fr_FR', NULL, NULL, NULL),
     (@max_id+9, 'fr_FR', NULL, NULL, NULL),
     (@max_id+10, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+11, 'fr_FR', NULL, NULL, NULL)
-;
+    (@max_id+11, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+12, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+13, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+14, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+15, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+16, 'fr_FR', NULL, NULL, NULL);
 
 -- Update module version column
 ALTER TABLE `module` MODIFY `version` varchar(25) NOT NULL DEFAULT '';
@@ -127,5 +148,17 @@ ALTER TABLE `order_coupon` ADD `start_date` DATETIME AFTER`description`;
 
 -- Add new column in attribute combination table
 ALTER TABLE `attribute_combination` ADD `position` INT NULL AFTER `product_sale_elements_id`;
+
+-- Add newsletter subscription confirmation message
+
+SELECT @max := MAX(`id`) FROM `message`;
+SET @max := @max+1;
+
+INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+(@max, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW());
+
+INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
+    (@max, 'de_DE', NULL, NULL, NULL, NULL),    (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),    (@max, 'es_ES', NULL, NULL, NULL, NULL),    (@max, 'fr_FR', NULL, NULL, NULL, NULL);
+>>>>>>> Newsletter: mail when subscribing, unsubscription page
 
 SET FOREIGN_KEY_CHECKS = 1;
