@@ -45,11 +45,11 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 2, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'de_DE', NULL, NULL, NULL, NULL),    (@max_id + 1, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
-    (@max_id + 2, 'en_US', 'Allow an administrator to recreate a lost password', NULL, NULL, NULL),
-    (@max_id + 3, 'en_US', 'Send a confirmation email to newsletter subscribers (Yes:1, No:0)', NULL, NULL, NULL),    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 2, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
+    (@max_id + 3, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),    (@max_id + 1, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
-    (@max_id + 2, 'fr_FR', 'Autoriser les administrateurs à recréer leur mot de passe', NULL, NULL, NULL),
+    (@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'fr_FR', NULL, NULL, NULL, NULL);
 
 -- Additional hooks

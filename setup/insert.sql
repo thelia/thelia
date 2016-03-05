@@ -71,7 +71,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
 (63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
-(64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW())
+(64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW()),
+(65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1979,7 +1980,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (61, 'de_DE', 'Den Kunden fragen, ihre E-Mail-Adresse zu bestätigen. 1 für Jan, 0 für Nein', NULL, NULL, NULL),
     (62, 'de_DE', NULL, NULL, NULL, NULL),
     (63, 'de_DE', NULL, NULL, NULL, NULL),
-    (64, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
+    (64, 'de_DE', NULL, NULL, NULL, NULL),
+    (65, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
     (4, 'en_US', 'Name of the active PDF template', NULL, NULL, NULL),
@@ -2028,7 +2030,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (61, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
     (62, 'en_US', 'Secret key for form CSRF token', NULL, NULL, NULL),
     (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
-    (64, 'en_US', 'Allow an administrator to recreate a lost password', NULL, NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL, NULL),
+    (64, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
+    (65, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL, NULL),
     (4, 'es_ES', NULL, NULL, NULL, NULL),
@@ -2077,7 +2080,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (61, 'es_ES', NULL, NULL, NULL, NULL),
     (62, 'es_ES', NULL, NULL, NULL, NULL),
     (63, 'es_ES', NULL, NULL, NULL, NULL),
-    (64, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
+    (64, 'es_ES', NULL, NULL, NULL, NULL),
+    (65, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
     (4, 'fr_FR', 'Nom du modèle PDF actif', NULL, NULL, NULL),
@@ -2126,7 +2130,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (61, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
     (62, 'fr_FR', 'Clé secrète pour le jeton CSRF des formulaires', NULL, NULL, NULL),
     (63, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
-    (64, 'fr_FR', 'Autoriser les administrateurs à recréer leur mot de passe', NULL, NULL, NULL);
+    (64, 'fr_FR', NULL, NULL, NULL, NULL),
+    (65, 'fr_FR', NULL, NULL, NULL, NULL);
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'de_DE', 'Ein Bilder-Karussel auf Ihre Startseite', NULL, NULL, NULL),
@@ -2451,7 +2456,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, 'de_DE', NULL, NULL, NULL),
     (237, 'de_DE', NULL, NULL, NULL),
     (238, 'de_DE', NULL, NULL, NULL),
-    (238, 'de_DE', NULL, NULL, NULL),    (1, 'en_US', 'Invoice choice - at the top', NULL, NULL),
+    (239, 'de_DE', NULL, NULL, NULL),    (1, 'en_US', 'Invoice choice - at the top', NULL, NULL),
     (2, 'en_US', 'Invoice choice - delivery address', NULL, NULL),
     (3, 'en_US', 'Invoice choice - extra payment zone', NULL, NULL),
     (4, 'en_US', 'Invoice choice - at the bottom', NULL, NULL),
@@ -2689,7 +2694,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, 'en_US', 'Newsletter unsubscribe page - at the bottom', NULL, NULL),
     (237, 'en_US', 'Newsletter unsubscribe page - CSS stylesheet', NULL, NULL),
     (238, 'en_US', 'Newsletter unsubscribe page - after javascript include', NULL, NULL),
-    (238, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL),
+    (239, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL),
     (4, 'es_ES', NULL, NULL, NULL),
@@ -2927,7 +2932,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, 'es_ES', NULL, NULL, NULL),
     (237, 'es_ES', NULL, NULL, NULL),
     (238, 'es_ES', NULL, NULL, NULL),
-    (238, 'es_ES', NULL, NULL, NULL),    (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
+    (239, 'es_ES', NULL, NULL, NULL),    (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
     (2, 'fr_FR', 'Choix du mode de paiement - adresse de livraison', NULL, NULL),
     (3, 'fr_FR', 'Choix du mode de paiement - zone de paiement supplémentaire', NULL, NULL),
     (4, 'fr_FR', 'Choix du mode de paiement - en bas', NULL, NULL),
@@ -3165,7 +3170,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, 'fr_FR', NULL, NULL, NULL),
     (237, 'fr_FR', NULL, NULL, NULL),
     (238, 'fr_FR', NULL, NULL, NULL),
-    (238, 'fr_FR', NULL, NULL, NULL);
+    (239, 'fr_FR', NULL, NULL, NULL);
 
 -- Insert I18n admin hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
