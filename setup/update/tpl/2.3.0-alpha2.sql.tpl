@@ -40,13 +40,15 @@ SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 (@max_id + 1, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
-(@max_id + 2, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW())
+(@max_id + 2, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW()),
+(@max_id + 3, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 {foreach $locales as $locale}
     (@max_id + 1, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL),
-    (@max_id + 2, '{$locale}', {intl l='Allow an administrator to recreate a lost password' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (@max_id + 2, '{$locale}', {intl l='Allow an administrator to recreate a lost password' locale=$locale}, NULL, NULL, NULL),
+    (@max_id + 3, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (Yes:1, No:0)' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 

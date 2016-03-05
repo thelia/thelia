@@ -40,6 +40,9 @@ use Thelia\Model\NewsletterQuery;
  */
 class NewsletterController extends BaseFrontController
 {
+    /**
+     * @since 2.3.0-alpha2
+     */
     public function unsubscribeAction()
     {
         $errorMessage = false;

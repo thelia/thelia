@@ -1185,6 +1185,7 @@ return array(
     'Search page - after javascript include' => 'Search page - after javascript include',
     'Search page - after javascript initialisation' => 'Search page - after javascript initialisation',
     'Secret key for form CSRF token' => 'Secret key for form CSRF token',
+    'Send a confirmation email to newsletter subscribers (Yes:1, No:0)' => 'Send a confirmation email to newsletter subscribers (Yes:1, No:0)',
     'Senegal' => 'Senegal',
     'Sent' => 'Sent',
     'Seychelles' => 'Seychelles',
