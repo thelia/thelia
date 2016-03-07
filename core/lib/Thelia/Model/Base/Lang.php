@@ -2056,7 +2056,7 @@ abstract class Lang implements ActiveRecordInterface
                 $this->initCustomers();
             } else {
                 $collCustomers = ChildCustomerQuery::create(null, $criteria)
-                    ->filterByLang($this)
+                    ->filterByLangModel($this)
                     ->find($con);
 
                 if (null !== $criteria) {
@@ -2111,7 +2111,7 @@ abstract class Lang implements ActiveRecordInterface
         $this->customersScheduledForDeletion = $customersToDelete;
 
         foreach ($customersToDelete as $customerRemoved) {
-            $customerRemoved->setLang(null);
+            $customerRemoved->setLangModel(null);
         }
 
         $this->collCustomers = null;
@@ -2152,7 +2152,7 @@ abstract class Lang implements ActiveRecordInterface
             }
 
             return $query
-                ->filterByLang($this)
+                ->filterByLangModel($this)
                 ->count($con);
         }
 
@@ -2186,7 +2186,7 @@ abstract class Lang implements ActiveRecordInterface
     protected function doAddCustomer($customer)
     {
         $this->collCustomers[]= $customer;
-        $customer->setLang($this);
+        $customer->setLangModel($this);
     }
 
     /**
@@ -2202,7 +2202,7 @@ abstract class Lang implements ActiveRecordInterface
                 $this->customersScheduledForDeletion->clear();
             }
             $this->customersScheduledForDeletion[]= $customer;
-            $customer->setLang(null);
+            $customer->setLangModel(null);
         }
 
         return $this;

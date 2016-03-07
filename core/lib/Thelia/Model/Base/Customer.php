@@ -198,7 +198,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * @var        Lang
      */
-    protected $aLang;
+    protected $aLangModel;
 
     /**
      * @var        ObjectCollection|ChildAddress[] Collection to store aggregation of ChildAddress objects.
@@ -858,8 +858,8 @@ abstract class Customer implements ActiveRecordInterface
             $this->modifiedColumns[CustomerTableMap::LANG_ID] = true;
         }
 
-        if ($this->aLang !== null && $this->aLang->getId() !== $v) {
-            $this->aLang = null;
+        if ($this->aLangModel !== null && $this->aLangModel->getId() !== $v) {
+            $this->aLangModel = null;
         }
 
 
@@ -1345,8 +1345,8 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->aCustomerTitle !== null && $this->title_id !== $this->aCustomerTitle->getId()) {
             $this->aCustomerTitle = null;
         }
-        if ($this->aLang !== null && $this->lang_id !== $this->aLang->getId()) {
-            $this->aLang = null;
+        if ($this->aLangModel !== null && $this->lang_id !== $this->aLangModel->getId()) {
+            $this->aLangModel = null;
         }
     } // ensureConsistency
 
@@ -1388,7 +1388,7 @@ abstract class Customer implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCustomerTitle = null;
-            $this->aLang = null;
+            $this->aLangModel = null;
             $this->collAddresses = null;
 
             $this->collOrders = null;
@@ -1546,11 +1546,11 @@ abstract class Customer implements ActiveRecordInterface
                 $this->setCustomerTitle($this->aCustomerTitle);
             }
 
-            if ($this->aLang !== null) {
-                if ($this->aLang->isModified() || $this->aLang->isNew()) {
-                    $affectedRows += $this->aLang->save($con);
+            if ($this->aLangModel !== null) {
+                if ($this->aLangModel->isModified() || $this->aLangModel->isNew()) {
+                    $affectedRows += $this->aLangModel->save($con);
                 }
-                $this->setLang($this->aLang);
+                $this->setLangModel($this->aLangModel);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -2004,8 +2004,8 @@ abstract class Customer implements ActiveRecordInterface
             if (null !== $this->aCustomerTitle) {
                 $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aLang) {
-                $result['Lang'] = $this->aLang->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aLangModel) {
+                $result['LangModel'] = $this->aLangModel->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collAddresses) {
                 $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2391,7 +2391,7 @@ abstract class Customer implements ActiveRecordInterface
      * @return                 \Thelia\Model\Customer The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setLang(ChildLang $v = null)
+    public function setLangModel(ChildLang $v = null)
     {
         if ($v === null) {
             $this->setLangId(NULL);
@@ -2399,7 +2399,7 @@ abstract class Customer implements ActiveRecordInterface
             $this->setLangId($v->getId());
         }
 
-        $this->aLang = $v;
+        $this->aLangModel = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildLang object, it will not be re-added.
@@ -2419,20 +2419,20 @@ abstract class Customer implements ActiveRecordInterface
      * @return                 ChildLang The associated ChildLang object.
      * @throws PropelException
      */
-    public function getLang(ConnectionInterface $con = null)
+    public function getLangModel(ConnectionInterface $con = null)
     {
-        if ($this->aLang === null && ($this->lang_id !== null)) {
-            $this->aLang = ChildLangQuery::create()->findPk($this->lang_id, $con);
+        if ($this->aLangModel === null && ($this->lang_id !== null)) {
+            $this->aLangModel = ChildLangQuery::create()->findPk($this->lang_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aLang->addCustomers($this);
+                $this->aLangModel->addCustomers($this);
              */
         }
 
-        return $this->aLang;
+        return $this->aLangModel;
     }
 
 
@@ -4175,7 +4175,7 @@ abstract class Customer implements ActiveRecordInterface
         $this->collCustomerVersions = null;
         $this->collCoupons = null;
         $this->aCustomerTitle = null;
-        $this->aLang = null;
+        $this->aLangModel = null;
     }
 
     /**

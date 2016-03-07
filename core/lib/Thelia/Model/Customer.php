@@ -175,6 +175,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @deprecated 2.3.0 It's not the good way to get lang identifier
      *
      * @see \Thelia\Model\Customer::getLangId()
+     * @see \Thelia\Model\Customer::getLangModel()
      */
     public function getLang()
     {
@@ -191,36 +192,11 @@ class Customer extends BaseCustomer implements UserInterface
      * @deprecated 2.3.0 It's not the good way to set lang identifier
      *
      * @see \Thelia\Model\Customer::setLangId()
+     * @see \Thelia\Model\Customer::setLangModel()
      */
     public function setLang($langId)
     {
         return parent::setLangId($langId);
-    }
-
-    /**
-     * Get lang model
-     *
-     * @return \Thelia\Model\Lang Lang model
-     *
-     * @since 2.3.0
-     */
-    public function getLangModel()
-    {
-        return parent::getLang();
-    }
-
-    /**
-     * Set lang model
-     *
-     * @param Lang $lang Lang model
-     *
-     * @return $this Return $this, allow chaining
-     *
-     * @since 2.3.0
-     */
-    public function setLangModel(Lang $lang)
-    {
-        return parent::setLang($lang);
     }
 
     protected function generateRef()

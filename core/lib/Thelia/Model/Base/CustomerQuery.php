@@ -69,9 +69,9 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery rightJoinCustomerTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitle relation
  * @method     ChildCustomerQuery innerJoinCustomerTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitle relation
  *
- * @method     ChildCustomerQuery leftJoinLang($relationAlias = null) Adds a LEFT JOIN clause to the query using the Lang relation
- * @method     ChildCustomerQuery rightJoinLang($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Lang relation
- * @method     ChildCustomerQuery innerJoinLang($relationAlias = null) Adds a INNER JOIN clause to the query using the Lang relation
+ * @method     ChildCustomerQuery leftJoinLangModel($relationAlias = null) Adds a LEFT JOIN clause to the query using the LangModel relation
+ * @method     ChildCustomerQuery rightJoinLangModel($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LangModel relation
+ * @method     ChildCustomerQuery innerJoinLangModel($relationAlias = null) Adds a INNER JOIN clause to the query using the LangModel relation
  *
  * @method     ChildCustomerQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
  * @method     ChildCustomerQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
@@ -413,7 +413,7 @@ abstract class CustomerQuery extends ModelCriteria
      * $query->filterByLangId(array('min' => 12)); // WHERE lang_id > 12
      * </code>
      *
-     * @see       filterByLang()
+     * @see       filterByLangModel()
      *
      * @param     mixed $langId The value to use as filter.
      *              Use scalar values for equality.
@@ -1071,7 +1071,7 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
-    public function filterByLang($lang, $comparison = null)
+    public function filterByLangModel($lang, $comparison = null)
     {
         if ($lang instanceof \Thelia\Model\Lang) {
             return $this
@@ -1084,22 +1084,22 @@ abstract class CustomerQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CustomerTableMap::LANG_ID, $lang->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByLang() only accepts arguments of type \Thelia\Model\Lang or Collection');
+            throw new PropelException('filterByLangModel() only accepts arguments of type \Thelia\Model\Lang or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Lang relation
+     * Adds a JOIN clause to the query using the LangModel relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
-    public function joinLang($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinLangModel($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Lang');
+        $relationMap = $tableMap->getRelation('LangModel');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1114,14 +1114,14 @@ abstract class CustomerQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Lang');
+            $this->addJoinObject($join, 'LangModel');
         }
 
         return $this;
     }
 
     /**
-     * Use the Lang relation Lang object
+     * Use the LangModel relation Lang object
      *
      * @see useQuery()
      *
@@ -1131,11 +1131,11 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\LangQuery A secondary query class using the current class as primary query
      */
-    public function useLangQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useLangModelQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinLang($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Lang', '\Thelia\Model\LangQuery');
+            ->joinLangModel($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LangModel', '\Thelia\Model\LangQuery');
     }
 
     /**

@@ -426,7 +426,7 @@
       <reference foreign="id" local="title_id" />
     </foreign-key>
 
-    <foreign-key foreignTable="lang" name="fk__customer__lang" onDelete="setNull" onUpdate="restrict">
+    <foreign-key foreignTable="lang" phpName="LangModel" name="fk__customer__lang" onDelete="setNull" onUpdate="restrict">
       <reference foreign="id" local="lang_id" />
     </foreign-key>
 

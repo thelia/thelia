@@ -1631,10 +1631,10 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCustomer[] List of ChildCustomer objects
      */
-    public function getCustomersJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCustomersJoinLangModel($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCustomerQuery::create(null, $criteria);
-        $query->joinWith('Lang', $joinBehavior);
+        $query->joinWith('LangModel', $joinBehavior);
 
         return $this->getCustomers($query, $con);
     }
