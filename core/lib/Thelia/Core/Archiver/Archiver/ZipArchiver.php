@@ -69,6 +69,11 @@ class ZipArchiver extends AbstractArchiver
 
     public function save()
     {
+        return $this->close();
+    }
+
+    public function close()
+    {
         return $this->archive->close();
     }
 }
