@@ -22,15 +22,15 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  *
  *
  * @method     ChildCustomerVersionQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildCustomerVersionQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildCustomerVersionQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
+ * @method     ChildCustomerVersionQuery orderByLangId($order = Criteria::ASC) Order by the lang_id column
+ * @method     ChildCustomerVersionQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildCustomerVersionQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildCustomerVersionQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildCustomerVersionQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildCustomerVersionQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildCustomerVersionQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
  * @method     ChildCustomerVersionQuery orderByReseller($order = Criteria::ASC) Order by the reseller column
- * @method     ChildCustomerVersionQuery orderByLang($order = Criteria::ASC) Order by the lang column
  * @method     ChildCustomerVersionQuery orderBySponsor($order = Criteria::ASC) Order by the sponsor column
  * @method     ChildCustomerVersionQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildCustomerVersionQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
@@ -44,15 +44,15 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersionQuery orderByOrderVersions($order = Criteria::ASC) Order by the order_versions column
  *
  * @method     ChildCustomerVersionQuery groupById() Group by the id column
- * @method     ChildCustomerVersionQuery groupByRef() Group by the ref column
  * @method     ChildCustomerVersionQuery groupByTitleId() Group by the title_id column
+ * @method     ChildCustomerVersionQuery groupByLangId() Group by the lang_id column
+ * @method     ChildCustomerVersionQuery groupByRef() Group by the ref column
  * @method     ChildCustomerVersionQuery groupByFirstname() Group by the firstname column
  * @method     ChildCustomerVersionQuery groupByLastname() Group by the lastname column
  * @method     ChildCustomerVersionQuery groupByEmail() Group by the email column
  * @method     ChildCustomerVersionQuery groupByPassword() Group by the password column
  * @method     ChildCustomerVersionQuery groupByAlgo() Group by the algo column
  * @method     ChildCustomerVersionQuery groupByReseller() Group by the reseller column
- * @method     ChildCustomerVersionQuery groupByLang() Group by the lang column
  * @method     ChildCustomerVersionQuery groupBySponsor() Group by the sponsor column
  * @method     ChildCustomerVersionQuery groupByDiscount() Group by the discount column
  * @method     ChildCustomerVersionQuery groupByRememberMeToken() Group by the remember_me_token column
@@ -77,15 +77,15 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersion findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomerVersion matching the query, or a new ChildCustomerVersion object populated from the query conditions when no match is found
  *
  * @method     ChildCustomerVersion findOneById(int $id) Return the first ChildCustomerVersion filtered by the id column
- * @method     ChildCustomerVersion findOneByRef(string $ref) Return the first ChildCustomerVersion filtered by the ref column
  * @method     ChildCustomerVersion findOneByTitleId(int $title_id) Return the first ChildCustomerVersion filtered by the title_id column
+ * @method     ChildCustomerVersion findOneByLangId(int $lang_id) Return the first ChildCustomerVersion filtered by the lang_id column
+ * @method     ChildCustomerVersion findOneByRef(string $ref) Return the first ChildCustomerVersion filtered by the ref column
  * @method     ChildCustomerVersion findOneByFirstname(string $firstname) Return the first ChildCustomerVersion filtered by the firstname column
  * @method     ChildCustomerVersion findOneByLastname(string $lastname) Return the first ChildCustomerVersion filtered by the lastname column
  * @method     ChildCustomerVersion findOneByEmail(string $email) Return the first ChildCustomerVersion filtered by the email column
  * @method     ChildCustomerVersion findOneByPassword(string $password) Return the first ChildCustomerVersion filtered by the password column
  * @method     ChildCustomerVersion findOneByAlgo(string $algo) Return the first ChildCustomerVersion filtered by the algo column
  * @method     ChildCustomerVersion findOneByReseller(int $reseller) Return the first ChildCustomerVersion filtered by the reseller column
- * @method     ChildCustomerVersion findOneByLang(string $lang) Return the first ChildCustomerVersion filtered by the lang column
  * @method     ChildCustomerVersion findOneBySponsor(string $sponsor) Return the first ChildCustomerVersion filtered by the sponsor column
  * @method     ChildCustomerVersion findOneByDiscount(string $discount) Return the first ChildCustomerVersion filtered by the discount column
  * @method     ChildCustomerVersion findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomerVersion filtered by the remember_me_token column
@@ -99,15 +99,15 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersion findOneByOrderVersions(array $order_versions) Return the first ChildCustomerVersion filtered by the order_versions column
  *
  * @method     array findById(int $id) Return ChildCustomerVersion objects filtered by the id column
- * @method     array findByRef(string $ref) Return ChildCustomerVersion objects filtered by the ref column
  * @method     array findByTitleId(int $title_id) Return ChildCustomerVersion objects filtered by the title_id column
+ * @method     array findByLangId(int $lang_id) Return ChildCustomerVersion objects filtered by the lang_id column
+ * @method     array findByRef(string $ref) Return ChildCustomerVersion objects filtered by the ref column
  * @method     array findByFirstname(string $firstname) Return ChildCustomerVersion objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildCustomerVersion objects filtered by the lastname column
  * @method     array findByEmail(string $email) Return ChildCustomerVersion objects filtered by the email column
  * @method     array findByPassword(string $password) Return ChildCustomerVersion objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildCustomerVersion objects filtered by the algo column
  * @method     array findByReseller(int $reseller) Return ChildCustomerVersion objects filtered by the reseller column
- * @method     array findByLang(string $lang) Return ChildCustomerVersion objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomerVersion objects filtered by the sponsor column
  * @method     array findByDiscount(string $discount) Return ChildCustomerVersion objects filtered by the discount column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomerVersion objects filtered by the remember_me_token column
@@ -207,7 +207,7 @@ abstract class CustomerVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `TITLE_ID`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `ORDER_IDS`, `ORDER_VERSIONS` FROM `customer_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `TITLE_ID`, `LANG_ID`, `REF`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `ORDER_IDS`, `ORDER_VERSIONS` FROM `customer_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -352,35 +352,6 @@ abstract class CustomerVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the ref column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
-     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerVersionQuery The current query, for fluid interface
-     */
-    public function filterByRef($ref = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($ref)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $ref)) {
-                $ref = str_replace('*', '%', $ref);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerVersionTableMap::REF, $ref, $comparison);
-    }
-
-    /**
      * Filter the query on the title_id column
      *
      * Example usage:
@@ -419,6 +390,76 @@ abstract class CustomerVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerVersionTableMap::TITLE_ID, $titleId, $comparison);
+    }
+
+    /**
+     * Filter the query on the lang_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLangId(1234); // WHERE lang_id = 1234
+     * $query->filterByLangId(array(12, 34)); // WHERE lang_id IN (12, 34)
+     * $query->filterByLangId(array('min' => 12)); // WHERE lang_id > 12
+     * </code>
+     *
+     * @param     mixed $langId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerVersionQuery The current query, for fluid interface
+     */
+    public function filterByLangId($langId = null, $comparison = null)
+    {
+        if (is_array($langId)) {
+            $useMinMax = false;
+            if (isset($langId['min'])) {
+                $this->addUsingAlias(CustomerVersionTableMap::LANG_ID, $langId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($langId['max'])) {
+                $this->addUsingAlias(CustomerVersionTableMap::LANG_ID, $langId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerVersionTableMap::LANG_ID, $langId, $comparison);
+    }
+
+    /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerVersionQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $ref)) {
+                $ref = str_replace('*', '%', $ref);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerVersionTableMap::REF, $ref, $comparison);
     }
 
     /**
@@ -605,35 +646,6 @@ abstract class CustomerVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerVersionTableMap::RESELLER, $reseller, $comparison);
-    }
-
-    /**
-     * Filter the query on the lang column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLang('fooValue');   // WHERE lang = 'fooValue'
-     * $query->filterByLang('%fooValue%'); // WHERE lang LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $lang The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerVersionQuery The current query, for fluid interface
-     */
-    public function filterByLang($lang = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($lang)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $lang)) {
-                $lang = str_replace('*', '%', $lang);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerVersionTableMap::LANG, $lang, $comparison);
     }
 
     /**

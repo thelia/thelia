@@ -91,7 +91,7 @@ class Customer extends BaseCustomer implements UserInterface
         ;
 
         if (!is_null($lang)) {
-            $this->setLang($lang);
+            $this->setLangId($lang);
         }
 
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
@@ -151,20 +151,76 @@ class Customer extends BaseCustomer implements UserInterface
     /**
      * Return the customer lang, or the default one if none is defined.
      *
-     * @return Lang the customer lang
+     * @return \Thelia\Model\Lang Lang model
      */
     public function getCustomerLang()
     {
-        if ($this->getLang() !== null) {
-            $lang = LangQuery::create()
-                ->findPk($this->getLang());
-        } else {
-            $lang = LangQuery::create()
+        $lang = parent::getLang();
+
+        if ($lang === null) {
+            $lang = (new LangQuery)
                 ->filterByByDefault(1)
-                ->findOne();
+                ->findOne()
+            ;
         }
 
         return $lang;
+    }
+
+    /**
+     * Get lang identifier
+     *
+     * @return integer Lang id
+     *
+     * @deprecated 2.3.0 It's not the good way to get lang identifier
+     *
+     * @see \Thelia\Model\Customer::getLangId()
+     */
+    public function getLang()
+    {
+        return parent::getLangId();
+    }
+
+    /**
+     * Set lang identifier
+     *
+     * @param integer $langId Lang identifier
+     *
+     * @return $this Return $this, allow chaining
+     *
+     * @deprecated 2.3.0 It's not the good way to set lang identifier
+     *
+     * @see \Thelia\Model\Customer::setLangId()
+     */
+    public function setLang($langId)
+    {
+        return parent::setLangId($langId);
+    }
+
+    /**
+     * Get lang model
+     *
+     * @return \Thelia\Model\Lang Lang model
+     *
+     * @since 2.3.0
+     */
+    public function getLangModel()
+    {
+        return parent::getLang();
+    }
+
+    /**
+     * Set lang model
+     *
+     * @param Lang $lang Lang model
+     *
+     * @return $this Return $this, allow chaining
+     *
+     * @since 2.3.0
+     */
+    public function setLangModel(Lang $lang)
+    {
+        return parent::setLang($lang);
     }
 
     protected function generateRef()

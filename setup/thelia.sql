@@ -461,15 +461,15 @@ DROP TABLE IF EXISTS `customer`;
 CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(50),
     `title_id` INTEGER NOT NULL,
+    `lang_id` INTEGER,
+    `ref` VARCHAR(50),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),
     `reseller` TINYINT,
-    `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),
@@ -480,13 +480,20 @@ CREATE TABLE `customer`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `ref_UNIQUE` (`ref`),
-    INDEX `idx_customer_customer_title_id` (`title_id`),
-    CONSTRAINT `fk_customer_customer_title_id`
+    UNIQUE INDEX `uni_ref` (`ref`),
+    INDEX `fk_title_id` (`title_id`),
+    INDEX `fk_lang` (`lang_id`),
+    INDEX `idx_email` (`email`),
+    CONSTRAINT `fk__customer__customer_title`
         FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk__customer__lang`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -1692,12 +1699,13 @@ CREATE TABLE `newsletter`
     `email` VARCHAR(255) NOT NULL,
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
-    `locale` VARCHAR(5),
-    `unsubscribed` TINYINT(1) DEFAULT 0,
+    `locale` CHAR(5),
+    `unsubscribed` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `email_UNIQUE` (`email`)
+    UNIQUE INDEX `uni_email` (`email`),
+    INDEX `idx_unsubscribed` (`unsubscribed`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -3262,15 +3270,15 @@ DROP TABLE IF EXISTS `customer_version`;
 CREATE TABLE `customer_version`
 (
     `id` INTEGER NOT NULL,
-    `ref` VARCHAR(50),
     `title_id` INTEGER NOT NULL,
+    `lang_id` INTEGER,
+    `ref` VARCHAR(50),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),
     `reseller` TINYINT,
-    `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),

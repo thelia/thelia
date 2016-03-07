@@ -218,4 +218,28 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (@max_id+1, 'fr_FR', 'Affiche les blocs par défaut sur la page d\'accueil de l\'administration', NULL,  NULL,  NULL)
 ;
 
+-- Update customer lang FK
+ALTER TABLE `customer` CHANGE `lang` `lang_id` INT(11)  NULL  DEFAULT NULL;
+ALTER TABLE `customer` DROP FOREIGN KEY `fk_customer_customer_title_id`;
+ALTER TABLE `customer` DROP INDEX `ref_UNIQUE`;
+ALTER TABLE `customer` DROP INDEX `idx_customer_customer_title_id`;
+ALTER TABLE `customer` ADD UNIQUE INDEX `uni_ref` (`ref`);
+ALTER TABLE `customer` ADD INDEX `idx_email` (`email`);
+ALTER TABLE `customer` ADD INDEX `fk_title_id` (`title_id`);
+ALTER TABLE `customer` ADD INDEX `fk_lang_id` (`lang_id`);
+ALTER TABLE `customer` ADD CONSTRAINT `fk__customer__customer_title` FOREIGN KEY (`title_id`) REFERENCES `customer_title` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `customer` ADD CONSTRAINT `fk__customer__lang` FOREIGN KEY (`lang_id`) REFERENCES `lang` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+OPTIMIZE TABLE `customer`;
+
+
+-- Update newletter index
+ALTER TABLE `newsletter` DROP INDEX `email_UNIQUE`;
+ALTER TABLE `newsletter` ADD UNIQUE INDEX `uni_email` (`email`);
+ALTER TABLE `newsletter` ADD INDEX `idx_unsubscribed` (`unsubscribed`);
+
+OPTIMIZE TABLE `newsletter`;
+
+>>>>>>> Improve schema
+
 SET FOREIGN_KEY_CHECKS = 1;

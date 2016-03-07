@@ -34,7 +34,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $state;
     protected $email;
     protected $password;
-    protected $lang;
+    protected $langId;
     protected $reseller;
     protected $sponsor;
     protected $discount;
@@ -57,7 +57,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param int    $country   the country id
      * @param string $email
      * @param string $password  plain password, don't put hash password, it will hashes again
-     * @param $lang
+     * @param $langId
      * @param int    $reseller  if customer is a reseller
      * @param int    $sponsor   customer's id sponsor
      * @param float  $discount
@@ -78,7 +78,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $country,
         $email,
         $password,
-        $lang,
+        $langId,
         $reseller,
         $sponsor,
         $discount,
@@ -93,7 +93,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $this->state = $state;
         $this->email = $email;
         $this->firstname = $firstname;
-        $this->lang = $lang;
+        $this->langId = $langId;
         $this->lastname = $lastname;
         $this->password = $password;
         $this->phone = $phone;
@@ -175,9 +175,9 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return mixed
      */
-    public function getLang()
+    public function getLangId()
     {
-        return $this->lang;
+        return $this->langId;
     }
 
     /**

@@ -389,30 +389,49 @@
     </behavior>
   </table>
   <table name="customer" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="ref" size="50" type="VARCHAR" />
-    <column name="title_id" required="true" type="INTEGER" />
-    <column name="firstname" required="true" size="255" type="VARCHAR" />
-    <column name="lastname" required="true" size="255" type="VARCHAR" />
-    <column name="email" size="255" type="VARCHAR" />
-    <column name="password" size="255" type="VARCHAR" />
-    <column name="algo" size="128" type="VARCHAR" />
-    <column name="reseller" type="TINYINT" />
-    <column name="lang" size="10" type="VARCHAR" />
-    <column name="sponsor" size="50" type="VARCHAR" />
-    <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
-    <column name="remember_me_token" size="255" type="VARCHAR" />
-    <column name="remember_me_serial" size="255" type="VARCHAR" />
-    <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
-      <reference foreign="id" local="title_id" />
-    </foreign-key>
-    <index name="idx_customer_customer_title_id">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+
+    <column name="title_id" type="integer" required="true" />
+    <column name="lang_id" type="integer" required="false" />
+
+    <column name="ref" type="varchar" size="50" />
+    <column name="firstname" type="varchar" size="255" required="true" />
+    <column name="lastname" type="varchar" size="255" required="true" />
+    <column name="email" type="varchar" size="255" />
+    <column name="password" type="varchar" size="255" />
+    <column name="algo" type="varchar" size="128" />
+    <column name="reseller" type="tinyint" />
+    <column name="sponsor" type="varchar" size="50" />
+    <column name="discount" type="decimal" scale="6" size="16" defaultValue="0.000000" />
+    <column name="remember_me_token" type="varchar" size="255" />
+    <column name="remember_me_serial" type="varchar" size="255" />
+
+    <index name="fk_title_id">
       <index-column name="title_id" />
     </index>
-    <unique name="ref_UNIQUE">
+
+    <index name="fk_lang">
+      <index-column name="lang_id" />
+    </index>
+
+    <unique name="uni_ref">
       <unique-column name="ref" />
     </unique>
+
+    <index name="idx_email">
+      <index-column name="email" />
+    </index>
+
+    <foreign-key foreignTable="customer_title" name="fk__customer__customer_title" onDelete="restrict" onUpdate="restrict">
+      <reference foreign="id" local="title_id" />
+    </foreign-key>
+
+    <foreign-key foreignTable="lang" name="fk__customer__lang" onDelete="setNull" onUpdate="restrict">
+      <reference foreign="id" local="lang_id" />
+    </foreign-key>
+
     <behavior name="timestampable" />
+
     <behavior name="versionable">
       <parameter name="log_created_at" value="true" />
       <parameter name="log_created_by" value="true" />
@@ -1409,15 +1428,22 @@
     <behavior name="timestampable" />
   </table>
   <table name="newsletter" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="email" required="true" size="255" type="VARCHAR" />
-    <column name="firstname" size="255" type="VARCHAR" />
-    <column name="lastname" size="255" type="VARCHAR" />
-    <column name="locale" size="5" type="VARCHAR" />
-    <column name="unsubscribed" type="BOOLEAN" defaultValue="0"/>
-    <unique name="email_UNIQUE">
+    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+
+    <column name="email" type="varchar" size="255" required="true" />
+    <column name="firstname" type="varchar" size="255" />
+    <column name="lastname" type="varchar" size="255" />
+    <column name="locale" type="char" size="5" />
+    <column name="unsubscribed" type="boolean" required="true" defaultValue="false"/>
+
+    <unique name="uni_email">
       <unique-column name="email" />
     </unique>
+
+    <index name="idx_unsubscribed">
+      <index-column name="unsubscribed" />
+    </index>
+
     <behavior name="timestampable" />
   </table>
   <table name="order_coupon" namespace="Thelia\Model">
