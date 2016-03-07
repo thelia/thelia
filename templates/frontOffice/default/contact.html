@@ -15,7 +15,11 @@
         {/ifhook}
         {elsehook rel="contact.top"}
         <div id="google-map">
-            {assign var="address" value="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, {config key="store_city"}, {config key="store_country"}"}
+            {assign var="address" value="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, "}
+            {if {config key="store_country"}}
+                {loop type="country" name="contact.country.title" id={config key="store_country"}}{assign var="address" value="{$address|cat:$ISOALPHA2|cat:'-'}"}{/loop}
+            {/if}
+            {assign var="address" value="{$address|cat:{config key="store_zipcode"}|cat:' '|cat:{config key="store_city"}}"}
             <iframe class="map" width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?f=q&source=s_q&geocode=&q={$address|escape:'url'}&output=embed"></iframe>
         </div><!-- / #google-map-->
         {/elsehook}
