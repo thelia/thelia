@@ -155,7 +155,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function getCustomerLang()
     {
-        $lang = parent::getLang();
+        $lang = parent::getLangModel();
 
         if ($lang === null) {
             $lang = (new LangQuery)
