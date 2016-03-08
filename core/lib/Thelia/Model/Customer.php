@@ -155,7 +155,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function getCustomerLang()
     {
-        $lang = parent::getLangModel();
+        $lang = $this->getLangModel();
 
         if ($lang === null) {
             $lang = (new LangQuery)
@@ -179,7 +179,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function getLang()
     {
-        return parent::getLangId();
+        return $this->getLangId();
     }
 
     /**
@@ -196,7 +196,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function setLang($langId)
     {
-        return parent::setLangId($langId);
+        return $this->setLangId($langId);
     }
 
     protected function generateRef()
