@@ -12,7 +12,11 @@
         </tr>
         <tr>
             <td class="col-md-4">
-                {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
+                {assign var="product_image_id" value=null}
+                {loop name="pse-image" type="product-sale-elements-image" product_sale_elements_id={$smarty.get.pse_id} limit="1"}
+                    {assign var="product_image_id" value=$PRODUCT_IMAGE_ID}
+                {/loop}
+                {loop name="product_thumbnail" type="image" id=$product_image_id product=$ID width="218" height="146" resize_mode="borders" limit="1"}
                     <img itemprop="image" src="{$IMAGE_URL nofilter}" alt="Product #{$LOOP_COUNT}">
                 {/loop}
             </td>

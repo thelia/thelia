@@ -16,7 +16,11 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-                            {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
+                            {assign var="product_image_id" value=null}
+                            {loop name="pse-image" type="product-sale-elements-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                {assign var="product_image_id" value=$PRODUCT_IMAGE_ID}
+                            {/loop}
+                            {loop type="image" name="product-image" id=$product_image_id product=$PRODUCT_ID limit="1" width="118" height="60"}
                                 <img src="{$IMAGE_URL}" alt="{$TITLE}">
                             {/loop}
                         </td>
