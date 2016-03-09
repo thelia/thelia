@@ -350,6 +350,7 @@ CREATE TABLE `attribute_combination`
     `attribute_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER NOT NULL,
     `product_sale_elements_id` INTEGER NOT NULL,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`attribute_id`,`attribute_av_id`,`product_sale_elements_id`),

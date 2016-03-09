@@ -304,6 +304,7 @@
     <column name="attribute_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="position" type="INTEGER" />
     <foreign-key foreignTable="attribute" name="fk_attribute_combination_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>

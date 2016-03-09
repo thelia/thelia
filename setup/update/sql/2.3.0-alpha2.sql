@@ -112,12 +112,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+11, 'fr_FR', NULL, NULL, NULL)
 ;
 
-
-
-
-
 -- Update module version column
-
 ALTER TABLE `module` MODIFY `version` varchar(25) NOT NULL DEFAULT '';
 
 -- Add new column in coupon table
@@ -129,5 +124,8 @@ ALTER TABLE `coupon_version` ADD `start_date` DATETIME AFTER`is_enabled`;
 
 -- Add new column in order coupon table
 ALTER TABLE `order_coupon` ADD `start_date` DATETIME AFTER`description`;
+
+-- Add new column in attribute combination table
+ALTER TABLE `attribute_combination` ADD `position` INT NULL AFTER `product_sale_elements_id`;
 
 SET FOREIGN_KEY_CHECKS = 1;

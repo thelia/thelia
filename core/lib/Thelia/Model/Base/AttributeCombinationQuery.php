@@ -24,12 +24,14 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  * @method     ChildAttributeCombinationQuery orderByAttributeId($order = Criteria::ASC) Order by the attribute_id column
  * @method     ChildAttributeCombinationQuery orderByAttributeAvId($order = Criteria::ASC) Order by the attribute_av_id column
  * @method     ChildAttributeCombinationQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
+ * @method     ChildAttributeCombinationQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildAttributeCombinationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeCombinationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAttributeCombinationQuery groupByAttributeId() Group by the attribute_id column
  * @method     ChildAttributeCombinationQuery groupByAttributeAvId() Group by the attribute_av_id column
  * @method     ChildAttributeCombinationQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
+ * @method     ChildAttributeCombinationQuery groupByPosition() Group by the position column
  * @method     ChildAttributeCombinationQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeCombinationQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -55,12 +57,14 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  * @method     ChildAttributeCombination findOneByAttributeId(int $attribute_id) Return the first ChildAttributeCombination filtered by the attribute_id column
  * @method     ChildAttributeCombination findOneByAttributeAvId(int $attribute_av_id) Return the first ChildAttributeCombination filtered by the attribute_av_id column
  * @method     ChildAttributeCombination findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildAttributeCombination filtered by the product_sale_elements_id column
+ * @method     ChildAttributeCombination findOneByPosition(int $position) Return the first ChildAttributeCombination filtered by the position column
  * @method     ChildAttributeCombination findOneByCreatedAt(string $created_at) Return the first ChildAttributeCombination filtered by the created_at column
  * @method     ChildAttributeCombination findOneByUpdatedAt(string $updated_at) Return the first ChildAttributeCombination filtered by the updated_at column
  *
  * @method     array findByAttributeId(int $attribute_id) Return ChildAttributeCombination objects filtered by the attribute_id column
  * @method     array findByAttributeAvId(int $attribute_av_id) Return ChildAttributeCombination objects filtered by the attribute_av_id column
  * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildAttributeCombination objects filtered by the product_sale_elements_id column
+ * @method     array findByPosition(int $position) Return ChildAttributeCombination objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttributeCombination objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttributeCombination objects filtered by the updated_at column
  *
@@ -151,7 +155,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ATTRIBUTE_ID`, `ATTRIBUTE_AV_ID`, `PRODUCT_SALE_ELEMENTS_ID`, `CREATED_AT`, `UPDATED_AT` FROM `attribute_combination` WHERE `ATTRIBUTE_ID` = :p0 AND `ATTRIBUTE_AV_ID` = :p1 AND `PRODUCT_SALE_ELEMENTS_ID` = :p2';
+        $sql = 'SELECT `ATTRIBUTE_ID`, `ATTRIBUTE_AV_ID`, `PRODUCT_SALE_ELEMENTS_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `attribute_combination` WHERE `ATTRIBUTE_ID` = :p0 AND `ATTRIBUTE_AV_ID` = :p1 AND `PRODUCT_SALE_ELEMENTS_ID` = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -383,6 +387,47 @@ abstract class AttributeCombinationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(AttributeCombinationTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(AttributeCombinationTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AttributeCombinationTableMap::POSITION, $position, $comparison);
     }
 
     /**
