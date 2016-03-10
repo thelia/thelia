@@ -87,14 +87,16 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
      */
     protected function initRequest(Lang $lang = null)
     {
+        $container = $this->getContainer();
+
         $request = Request::create($this->getBaseUrl($lang));
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $this->container->set("request_stack", new RequestStack());
-        $this->container->get('request_stack')->push($request);
+        $container->set("request_stack", new RequestStack());
+        $container->get('request_stack')->push($request);
 
         $requestContext = new RequestContext();
         $requestContext->fromRequest($request);
-        $url = new URL($this->container);
+        $url = new URL($container);
         $url->setRequestContext($requestContext);
     }
 
