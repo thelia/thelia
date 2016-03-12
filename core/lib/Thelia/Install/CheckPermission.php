@@ -26,22 +26,9 @@ use Symfony\Component\Translation\Translator;
  */
 class CheckPermission extends BaseInstall
 {
-    const DIR_CONF =            'local/config';
-    const DIR_LOG  =            'log';
-    const DIR_CACHE =           'cache';
-    const DIR_WEB =             'web';
-    const DIR_SESSION =         'local/session';
-    const DIR_MEDIA =           'local/media';
 
     /** @var array Directory needed to be writable */
-    protected $directoriesToBeWritable = array(
-        self::DIR_CONF,
-        self::DIR_LOG,
-        self::DIR_CACHE,
-        self::DIR_WEB,
-        self::DIR_SESSION,
-        self::DIR_MEDIA
-    );
+    protected $directoriesToBeWritable = array();
 
     /** @var array Minimum server configuration necessary */
     protected $minServerConfigurationNecessary = array(
@@ -84,6 +71,15 @@ class CheckPermission extends BaseInstall
             'status' => true
         );
 
+        $this->directoriesToBeWritable = array(
+            THELIA_CONF_DIR,
+            THELIA_LOG_DIR,
+            THELIA_CACHE_DIR,
+            THELIA_WEB_DIR,
+            THELIA_LOCAL_DIR . DS . 'session',
+            THELIA_LOCAL_DIR . DS . 'media'
+        );
+
         foreach ($this->directoriesToBeWritable as $directory) {
             $this->validationMessages[$directory] =  array(
                 'text' => '',
@@ -124,13 +120,12 @@ class CheckPermission extends BaseInstall
         }
 
         foreach ($this->directoriesToBeWritable as $directory) {
-            $fullDirectory = THELIA_ROOT . $directory;
-            $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, true);
-            if (is_writable($fullDirectory) === false) {
-                if (!$this->makeDirectoryWritable($fullDirectory)) {
+            $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($directory, true);
+            if (is_writable($directory) === false) {
+                if (!$this->makeDirectoryWritable($directory)) {
                     $this->isValid = false;
                     $this->validationMessages[$directory]['status'] = false;
-                    $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, false);
+                    $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($directory, false);
                 }
             }
         }
