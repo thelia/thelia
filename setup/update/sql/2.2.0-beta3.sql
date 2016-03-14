@@ -33,7 +33,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 4, 'en_US', 'Administrators - header', '', ''),
     (@max_id + 5, 'en_US', 'Administrators - row', '', ''),
     (@max_id + 6, 'en_US', 'Advanced Configuration', '', ''),
-    (@max_id + 7, 'en_US', 'Advanced Configuration - JavaScript', '', ''),
+    (@max_id + 7, 'en_US', 'Advanced Configuration - Javascript', '', ''),
     (@max_id + 1, 'es_ES', NULL, '', ''),
     (@max_id + 2, 'es_ES', NULL, '', ''),
     (@max_id + 3, 'es_ES', NULL, '', ''),

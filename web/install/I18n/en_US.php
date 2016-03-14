@@ -2,6 +2,7 @@
 
 return array(
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>',
+    'Administrator email :' => 'Administrator email :',
     'Administrator login :' => 'Administrator login :',
     'Administrator password :' => 'Administrator password :',
     'Administrator password verification :' => 'Administrator password verification :',
@@ -31,6 +32,7 @@ return array(
     'It seems that Thelia database is already up to date.' => 'It seems that Thelia database is already up to date.',
     'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.' => 'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.',
     'It\'s strongly recommended to make a backup before proceeding.' => 'It\'s strongly recommended to make a backup before proceeding.',
+    'Missing email-address' => 'Missing email-address',
     'Missing or invalid login' => 'Missing or invalid login',
     'Missing password' => 'Missing password',
     'Password :' => 'Password :',
