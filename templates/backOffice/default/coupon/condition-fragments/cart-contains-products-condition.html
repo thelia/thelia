@@ -7,7 +7,7 @@
 <div class="form-group">
     <label for="{$products_field_name}-value">{intl l="The selected products :"}</label>
     <select required multiple size="5" class="form-control" id="{$products_field_name}-value" name="{$products_field_name}[value][]">
-        {loop type="product" name="list-of-products" order="alpha" backend_context=1}
+        {loop type="product" name="list-of-products" order="alpha" backend_context=1 return_url=false}
             <option value="{$ID}" {if in_array($ID, $values)}selected="selected"{/if}>{$TITLE}</option>
         {/loop}
     </select>

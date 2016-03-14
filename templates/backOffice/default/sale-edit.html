@@ -145,7 +145,7 @@
                                         <select {form_field_attributes field='categories'}'>
                                         {* protect ourselves against empty $value, which causes all categories to be displayed *}
                                         {if empty($value)}{$value = [ 0 ]}{/if}
-                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1}
+                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1 return_url=false}
                                             <option value="{$ID}">{$TITLE}</option>
                                         {/loop}
                                         </select>

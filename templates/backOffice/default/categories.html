@@ -97,7 +97,7 @@
                                  </thead>
 
                                  <tbody>
-                                 {loop name="category_list" type="category" visible="*" parent=$category_id order=$category_order backend_context="1" lang=$lang_id}
+                                 {loop name="category_list" type="category" visible="*" parent=$category_id order=$category_order backend_context="1" lang=$lang_id return_url=false}
                                  <tr>
                                      <td>{$ID}</td>
 
@@ -292,7 +292,7 @@
                          </thead>
 
                          <tbody>
-                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products#}
+                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products# return_url=false}
                          <tr>
                              <td>{$ID}</td>
 
