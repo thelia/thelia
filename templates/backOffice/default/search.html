@@ -8,6 +8,18 @@
 {block name="main-content"}
 {$searchTerm = {$smarty.get.search_term|trim}}
 
+{capture name="more_results"}
+    <tr>
+        <td colspan="99">
+            <div class="alert alert-info text-center">
+                {intl l="More results are available."}
+                <br/>
+                {intl l="Please refine your search to see the other results."}
+            </div>
+        </td>
+    </tr>
+{/capture}
+
 <div class="modules">
 
     <div id="wrapper" class="container">
@@ -61,7 +73,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_term=$searchTerm search_in="ref,firstname,lastname,email"}
+                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_term=$searchTerm search_in="ref,firstname,lastname,email" limit=26}
                                 {assign "lastOrderDate" ''}
                                 {assign "lastOrderAmount" ''}
                                 {assign "lastOrderCurrency" ''}
@@ -76,6 +88,7 @@
                                 {$hasOrders = true}
                                 {/loop}
 
+                                {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td><a href="{url path='/admin/customer/update' customer_id=$ID}">{$REF}</a></td>
 
@@ -121,6 +134,9 @@
                                     </td>
 
                                 </tr>
+                                {else}
+                                    {$smarty.capture.more_results nofilter}
+                                {/if}
                             {/loop}
                             </tbody>
                             {/ifloop}
@@ -159,7 +175,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="order" name="order-search" backend_context=1 customer="*" search_term=$searchTerm search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email,invoice_ref,transaction_ref,delivery_ref"}
+                            {loop type="order" name="order-search" backend_context=1 customer="*" search_term=$searchTerm search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email,invoice_ref,transaction_ref,delivery_ref" limit=26}
                                 {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                                 {assign "orderInvoiceLastName" $LASTNAME}
@@ -175,6 +191,7 @@
                                 {assign "currencySymbol" $SYMBOL}
                                 {/loop}
 
+                            {if $LOOP_COUNT < 26}
                                 <tr>
 
                                     <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
@@ -198,6 +215,9 @@
                                         </div>
                                     </td>
                                 </tr>
+                            {else}
+                                {$smarty.capture.more_results nofilter}
+                            {/if}
                             {/loop}
                             </tbody>
                             {/ifloop}
@@ -232,7 +252,9 @@
                             </thead>
 
                             <tbody>
-                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false}
+                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+
+                            {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
@@ -267,6 +289,9 @@
                                      </div>
                                   </td>
                             </tr>
+                            {else}
+                                {$smarty.capture.more_results nofilter}
+                            {/if}
                             {/loop}
                             </tbody>
                             {/ifloop}
@@ -306,7 +331,8 @@
                             </thead>
 
                             <tbody>
-                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title" return_url=false}
+                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title" return_url=false  limit=26}
+                            {if $LOOP_COUNT < 26}
                                 {$id_product=$ID}
                                  <tr>
                                      <td>{$ID}</td>
@@ -360,7 +386,9 @@
                                          </div>
                                       </td>
                                  </tr>
-
+                            {else}
+                                {$smarty.capture.more_results nofilter}
+                            {/if}
                             {/loop}
                             </tbody>
                             {/ifloop}
@@ -395,8 +423,8 @@
                             </thead>
 
                             <tbody>
-                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false}
-
+                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td>{$ID}</td>
                                     <td></td>
@@ -434,7 +462,9 @@
                                         </div>
                                     </td>
                                 </tr>
-
+                            {else}
+                                {$smarty.capture.more_results nofilter}
+                            {/if}
                             {/loop}
                             </tbody>
                             {/ifloop}
@@ -469,8 +499,8 @@
                             </thead>
 
                             <tbody>
-                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false}
-
+                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td>{$ID}</td>
                                     <td></td>
@@ -506,7 +536,9 @@
                                         </div>
                                     </td>
                                 </tr>
-
+                            {else}
+                                {$smarty.capture.more_results nofilter}
+                            {/if}
                             {/loop}
                             </tbody>
                             {/ifloop}
