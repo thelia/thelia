@@ -26,7 +26,7 @@ $('#module_id').change(function(ev) {
 
                 // For initializing the selected option when editing a module hook
                 if ('' != currentClassname) {
-                    $classnameSelect.val(currentClassname).change();
+                    $classnameSelect.val(currentClassname);
                     currentClassname = '';
                 }
             }
@@ -41,7 +41,7 @@ $('#module_id').change(function(ev) {
 });
 
 
-// Get module hook classnames when a module is selected in the creation dialog
+// Get module hook methods when a module is selected in the creation dialog
 $('#classname').change(function(ev) {
     var $methodSelect = $('#method');
 
