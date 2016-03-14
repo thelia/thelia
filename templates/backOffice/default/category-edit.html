@@ -117,8 +117,12 @@
                                                     {custom_render_form_field field='parent'}
                                                          <select {form_field_attributes field='parent' extra_class="form_control"}>
                                                               <option value="0">{intl l="Top level"}</option>
+                                                              {$excludeCategories = []}
+                                                              {loop name="exclude-categories" type="category" parent=$category_id}
+                                                                {$excludeCategories[] = $ID}
+                                                              {/loop}
                                                               {$myparent=$PARENT}
-                                                              {loop name="cat-parent" type="category-tree" visible="*" category="0"}
+                                                              {loop name="cat-parent" type="category-tree" visible="*" category="0" exclude={','|implode:$excludeCategories}}
                                                                    <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
                                                               {/loop}
                                                         </select>
