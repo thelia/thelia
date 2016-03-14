@@ -22,7 +22,11 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (@max, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-    (@max, 'de_DE', NULL, NULL, NULL, NULL),    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),    (@max, 'es_ES', NULL, NULL, NULL, NULL),    (@max, 'fr_FR', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL);
+    (@max, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
+    (@max, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max, 'fr_FR', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL)
+;
 
 -- Insert a fake email address for administrators, to trigger the admin update dialog
 -- at next admin login.
@@ -44,13 +48,17 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 2, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'de_DE', NULL, NULL, NULL, NULL),    (@max_id + 1, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
+    (@max_id + 3, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (@max_id + 2, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
-    (@max_id + 3, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 3, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),
+    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),    (@max_id + 1, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
+    (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'fr_FR', NULL, NULL, NULL, NULL);
+    (@max_id + 3, 'fr_FR', NULL, NULL, NULL, NULL)
+;
 
 -- Additional hooks
 
@@ -91,7 +99,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+13, 'de_DE', NULL, NULL, NULL),
     (@max_id+14, 'de_DE', NULL, NULL, NULL),
     (@max_id+15, 'de_DE', NULL, NULL, NULL),
-    (@max_id+16, 'de_DE', NULL, NULL, NULL),    (@max_id+1, 'en_US', 'Sale - at the top', NULL, NULL),
+    (@max_id+16, 'de_DE', NULL, NULL, NULL),
+    (@max_id+1, 'en_US', 'Sale - at the top', NULL, NULL),
     (@max_id+2, 'en_US', 'Sale - at the bottom', NULL, NULL),
     (@max_id+3, 'en_US', 'Sale - at the top of the main area', NULL, NULL),
     (@max_id+4, 'en_US', 'Sale - at the bottom of the main area', NULL, NULL),
@@ -106,7 +115,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+13, 'en_US', 'Newsletter unsubscribe page - at the bottom', NULL, NULL),
     (@max_id+14, 'en_US', 'Newsletter unsubscribe page - CSS stylesheet', NULL, NULL),
     (@max_id+15, 'en_US', 'Newsletter unsubscribe page - after javascript include', NULL, NULL),
-    (@max_id+16, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),    (@max_id+1, 'es_ES', NULL, NULL, NULL),
+    (@max_id+16, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),
+    (@max_id+1, 'es_ES', NULL, NULL, NULL),
     (@max_id+2, 'es_ES', NULL, NULL, NULL),
     (@max_id+3, 'es_ES', NULL, NULL, NULL),
     (@max_id+4, 'es_ES', NULL, NULL, NULL),
@@ -121,7 +131,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+13, 'es_ES', NULL, NULL, NULL),
     (@max_id+14, 'es_ES', NULL, NULL, NULL),
     (@max_id+15, 'es_ES', NULL, NULL, NULL),
-    (@max_id+16, 'es_ES', NULL, NULL, NULL),    (@max_id+1, 'fr_FR', NULL, NULL, NULL),
+    (@max_id+16, 'es_ES', NULL, NULL, NULL),
+    (@max_id+1, 'fr_FR', NULL, NULL, NULL),
     (@max_id+2, 'fr_FR', NULL, NULL, NULL),
     (@max_id+3, 'fr_FR', NULL, NULL, NULL),
     (@max_id+4, 'fr_FR', NULL, NULL, NULL),
@@ -136,7 +147,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+13, 'fr_FR', NULL, NULL, NULL),
     (@max_id+14, 'fr_FR', NULL, NULL, NULL),
     (@max_id+15, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+16, 'fr_FR', NULL, NULL, NULL);
+    (@max_id+16, 'fr_FR', NULL, NULL, NULL)
+;
 
 -- Update module version column
 ALTER TABLE `module` MODIFY `version` varchar(25) NOT NULL DEFAULT '';
@@ -163,7 +175,10 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (@max, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-    (@max, 'de_DE', NULL, NULL, NULL, NULL),    (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),    (@max, 'es_ES', NULL, NULL, NULL, NULL),    (@max, 'fr_FR', NULL, NULL, NULL, NULL);
->>>>>>> Newsletter: mail when subscribing, unsubscription page
+    (@max, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),
+    (@max, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max, 'fr_FR', NULL, NULL, NULL, NULL)
+;
 
 SET FOREIGN_KEY_CHECKS = 1;
