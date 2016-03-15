@@ -232,7 +232,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title"}
+                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false}
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
@@ -306,7 +306,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title"}
+                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title" return_url=false}
                                 {$id_product=$ID}
                                  <tr>
                                      <td>{$ID}</td>
@@ -395,7 +395,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title"}
+                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false}
 
                                 <tr>
                                     <td>{$ID}</td>
@@ -469,7 +469,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title"}
+                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false}
 
                                 <tr>
                                     <td>{$ID}</td>

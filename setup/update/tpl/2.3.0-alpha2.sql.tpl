@@ -24,6 +24,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
     (@max, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -49,6 +50,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 1, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL),
     (@max_id + 2, '{$locale}', {intl l='Allow an administrator to recreate a lost password (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
     (@max_id + 3, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -93,6 +95,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+14, '{$locale}', {intl l='Newsletter unsubscribe page - CSS stylesheet' locale=$locale}, NULL, NULL),
     (@max_id+15, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
     (@max_id+16, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -123,8 +126,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
     (@max, '{$locale}', {intl l='Mail sent after a subscription to newsletter' locale=$locale}, {intl l='Your subscription to {config key="store_name"} newsletter' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
->>>>>>> Newsletter: mail when subscribing, unsubscription page
 
 SET FOREIGN_KEY_CHECKS = 1;
