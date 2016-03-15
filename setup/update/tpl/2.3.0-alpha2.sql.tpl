@@ -23,7 +23,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
-    (@max, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (@max, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -125,7 +125,23 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
-    (@max, '{$locale}', {intl l='Mail sent after a subscription to newsletter' locale=$locale}, {intl l='Your subscription to {config key="store_name"} newsletter' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (@max, '{$locale}', {intl l='Mail sent after a subscription to newsletter' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
+-- add new config variables number_default_results_per_page
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+1, 'number_default_results_per_page.product_list', '20', '0', '0', NOW(), NOW());
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+2, 'number_default_results_per_page.order_list', '20', '0', '0', NOW(), NOW());
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+3, 'number_default_results_per_page.customer_list', '20', '0', '0', NOW(), NOW());
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+{foreach $locales as $locale}
+    (@max+1, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
+    (@max+2, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
+    (@max+3, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

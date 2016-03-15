@@ -72,7 +72,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
 (63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
 (64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW()),
-(65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW())
+(65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
+(66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
+(67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1982,7 +1985,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL),
     (63, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL),
     (64, '{$locale}', {intl l='Allow an administrator to recreate a lost password (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
-    (65, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (65, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
+    (66, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
+    (67, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
+    (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -3442,7 +3448,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, '{$locale}', {intl l='Message sent to the shop owner when a new order is placed' locale=$locale}, {intl l='New order {$order_ref} placed on {config key="store_name"}' locale=$locale}, NULL, NULL),
     (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {config key="store_name"} has been changed.' locale=$locale}, NULL, NULL),
     (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
-    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL),
+    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' store={config key="store_name"} locale=$locale}, NULL, NULL),
     (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;

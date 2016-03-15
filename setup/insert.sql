@@ -72,7 +72,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
 (63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
 (64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW()),
-(65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW())
+(65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
+(66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
+(67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1981,7 +1984,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (62, 'de_DE', NULL, NULL, NULL, NULL),
     (63, 'de_DE', NULL, NULL, NULL, NULL),
     (64, 'de_DE', NULL, NULL, NULL, NULL),
-    (65, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
+    (65, 'de_DE', NULL, NULL, NULL, NULL),
+    (66, 'de_DE', NULL, NUll, NULL, NULL),
+    (67, 'de_DE', NULL, NUll, NULL, NULL),
+    (68, 'de_DE', NULL, NUll, NULL, NULL),    (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
     (4, 'en_US', 'Name of the active PDF template', NULL, NULL, NULL),
@@ -2031,7 +2037,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (62, 'en_US', 'Secret key for form CSRF token', NULL, NULL, NULL),
     (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (64, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
-    (65, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL, NULL),
+    (65, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),
+    (66, 'en_US', 'Number by default of results per page for product list', NUll, NULL, NULL),
+    (67, 'en_US', 'Number by default of results per page for order list', NUll, NULL, NULL),
+    (68, 'en_US', 'Number by default of results per page for customer list', NUll, NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL, NULL),
     (4, 'es_ES', NULL, NULL, NULL, NULL),
@@ -2081,7 +2090,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (62, 'es_ES', NULL, NULL, NULL, NULL),
     (63, 'es_ES', NULL, NULL, NULL, NULL),
     (64, 'es_ES', NULL, NULL, NULL, NULL),
-    (65, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
+    (65, 'es_ES', NULL, NULL, NULL, NULL),
+    (66, 'es_ES', NULL, NUll, NULL, NULL),
+    (67, 'es_ES', NULL, NUll, NULL, NULL),
+    (68, 'es_ES', NULL, NUll, NULL, NULL),    (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
     (4, 'fr_FR', 'Nom du modèle PDF actif', NULL, NULL, NULL),
@@ -2131,7 +2143,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (62, 'fr_FR', 'Clé secrète pour le jeton CSRF des formulaires', NULL, NULL, NULL),
     (63, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (64, 'fr_FR', NULL, NULL, NULL, NULL),
-    (65, 'fr_FR', NULL, NULL, NULL, NULL);
+    (65, 'fr_FR', NULL, NULL, NULL, NULL),
+    (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
+    (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
+    (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL);
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'de_DE', 'Ein Bilder-Karussel auf Ihre Startseite', NULL, NULL, NULL),
@@ -7650,7 +7665,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key=\"store_name\"}', NULL, NULL),
     (4, 'en_US', 'Mail sent to the customer when its password or email is changed in the back-office', 'Your account information on {config key=\"store_name\"} has been changed.', NULL, NULL),
     (5, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key=\"store_name\"} account has been created for you', NULL, NULL),
-    (6, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
+    (6, 'en_US', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
     (7, 'en_US', 'Newsletter subscription confirmation mail', 'Your subscription to %store newsletter', NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL, NULL),
@@ -7662,5 +7677,5 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d\'une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key=\"store_name\"}', NULL, NULL),
     (4, 'fr_FR', 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office', 'L\'accès à votre compte {config key=\"store_name\"} a changé', NULL, NULL),
     (5, 'fr_FR', 'Mail envoyé au client lorsque son compte est créé depuis le back-office par un administrateur', 'Un compte {config key=\"store_name\"} vient d\'être créé pour vous.', NULL, NULL),
-    (6, 'fr_FR', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
-    (7, 'fr_FR', NULL, NULL, NULL, NULL);
+    (6, 'fr_FR', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
+    (7, 'fr_FR', 'Mail de confirmation d\'inscription à la newsletter', 'Vous avez souscrit à la newsletter du site %store', NULL, NULL);
