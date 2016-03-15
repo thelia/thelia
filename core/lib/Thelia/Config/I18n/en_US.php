@@ -472,7 +472,6 @@ return array(
     'State' => 'State',
     'State ID %id not found' => 'State ID %id not found',
     'State title' => 'State title',
-    'Stats on %month/%year' => 'Stats on %month/%year',
     'Stock' => 'Stock',
     'Store Business Identification Number (SIRET, etc).' => 'Store Business Identification Number (SIRET, etc).',
     'Store Information' => 'Store Information',
