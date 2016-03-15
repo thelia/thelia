@@ -10,21 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace HookAdminHome;
 
-use Thelia\Core\Security\AccessManager;
+use Thelia\Module\BaseModule;
 
-class HomeController extends BaseAdminController
+class HookAdminHome extends BaseModule
 {
-    const RESOURCE_CODE = "admin.home";
-
-    public function defaultAction()
-    {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
-            return $response;
-        }
-
-        // Render the edition template.
-        return $this->render('home');
-    }
+    /** @var string */
+    const DOMAIN_NAME = 'hookadminhome';
 }

@@ -1,7 +1,7 @@
 {* this template is loaded via Ajax in the login page, to prevent login page slowdown *}
 
 {* Set the default translation domain, that will be used by intl when the 'd' parameter is not set *}
-{default_translation_domain domain='bo.default'}
+{default_translation_domain domain='hookadminhome.bo.default'}
 
 <div class="panel-group" id="accordion">
 	{loop type="feed" name="thelia_feeds" url="http://thelia.net/feeds/?lang={$lang_code}" limit="3"}
@@ -20,7 +20,7 @@
          			<p>{$DESCRIPTION|strip_tags|unescape:"htmlall"|truncate:250:"...":true nofilter}</p>
 				</div>
 				<div class="panel-footer">
-					<a href="{$URL nofilter}" target="_blank" class="btn btn-defaut btn-primary"><span class="glyphicon glyphicon-book"></span> {intl l='Lire la suite'}</a>
+					<a href="{$URL nofilter}" target="_blank" class="btn btn-defaut btn-primary"><span class="glyphicon glyphicon-book"></span> {intl l='Read more'}</a>
 				</div>
 			</div>
 		</div>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <hooks>
+        <hook id="hookadminhome.hook.css">
+            <tag name="hook.event_listener" event="main.head-css"  type="back" templates="css:assets/css/home.css" />
+        </hook>
+
+        <hook id="hookadminhome.hook.block_information">
+            <tag name="hook.event_listener" event="home.top" type="back" templates="render:block-information.html" />
+        </hook>
+
+        <hook id="hookadminhome.hook.block_statistics" class="HookAdminHome\Hook\AdminHook">
+            <tag name="hook.event_listener" event="home.top" type="back" method="blockStatistics" />
+            <tag name="hook.event_listener" event="home.js" type="back" method="blockStatisticsJs" />
+        </hook>
+
+        <hook id="hookadminhome.hook.block_sales_statistics" class="HookAdminHome\Hook\AdminHook">
+            <tag name="hook.event_listener" event="home.block" type="back"  method="blockSalesStatistics" />
+        </hook>
+
+        <hook id="hookadminhome.hook.block_news" class="HookAdminHome\Hook\AdminHook">
+            <tag name="hook.event_listener" event="home.block" type="back" method="blockNews" />
+            <tag name="hook.event_listener" event="home.js" type="back" templates="render:block-news-js.html" />
+        </hook>
+
+        <hook id="hookadminhome.hook.block_thelia_informations" class="HookAdminHome\Hook\AdminHook">
+            <tag name="hook.event_listener" event="home.block"  type="back" method="blockTheliaInformation" />
+        </hook>
+    </hooks>
+
+</config>

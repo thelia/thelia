@@ -181,4 +181,19 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (@max, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
 
+-- Add module HookAdminHome
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `module`;
+SELECT @max_classic_position := IFNULL(MAX(`position`),0) FROM `module` WHERE `type`=1;
+
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
+(@max_id+1, 'HookAdminHome', 1, 1, @max_classic_position+1, 'HookAdminHome\\HookAdminHome', NOW(), NOW())
+;
+
+INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id+1, 'de_DE', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'en_US', ' Displays the default blocks on the homepage of the administration', NULL,  NULL,  NULL),
+(@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'fr_FR', 'Affiche les blocs par défaut sur la page d\'accueil de l\'administration', NULL,  NULL,  NULL)
+;
+
 SET FOREIGN_KEY_CHECKS = 1;
