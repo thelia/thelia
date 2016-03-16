@@ -218,4 +218,22 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (@max_id+1, 'fr_FR', 'Affiche les blocs par défaut sur la page d\'accueil de l\'administration', NULL,  NULL,  NULL)
 ;
 
+-- Update customer lang FK
+ALTER TABLE `customer` CHANGE `lang` `lang_id` INT(11)  NULL  DEFAULT NULL;
+ALTER TABLE `customer` ADD INDEX `idx_email` (`email`);
+ALTER TABLE `customer` ADD INDEX `idx_customer_lang_id` (`lang_id`);
+ALTER TABLE `customer` ADD CONSTRAINT `fk_customer_lang_id` FOREIGN KEY (`lang_id`) REFERENCES `lang` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+OPTIMIZE TABLE `customer`;
+
+
+-- Update customer version
+ALTER TABLE `customer_version` CHANGE `lang` `lang_id` INT(11)  NULL  DEFAULT NULL;
+
+
+-- Update newletter index
+ALTER TABLE `newsletter` ADD INDEX `idx_unsubscribed` (`unsubscribed`);
+
+OPTIMIZE TABLE `newsletter`;
+
 SET FOREIGN_KEY_CHECKS = 1;

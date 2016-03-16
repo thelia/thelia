@@ -17,6 +17,8 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Customer as ChildCustomer;
+use Thelia\Model\CustomerQuery as ChildCustomerQuery;
 use Thelia\Model\Lang as ChildLang;
 use Thelia\Model\LangQuery as ChildLangQuery;
 use Thelia\Model\Order as ChildOrder;
@@ -162,6 +164,12 @@ abstract class Lang implements ActiveRecordInterface
     protected $updated_at;
 
     /**
+     * @var        ObjectCollection|ChildCustomer[] Collection to store aggregation of ChildCustomer objects.
+     */
+    protected $collCustomers;
+    protected $collCustomersPartial;
+
+    /**
      * @var        ObjectCollection|ChildOrder[] Collection to store aggregation of ChildOrder objects.
      */
     protected $collOrders;
@@ -174,6 +182,12 @@ abstract class Lang implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $customersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1193,6 +1207,8 @@ abstract class Lang implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collCustomers = null;
+
             $this->collOrders = null;
 
         } // if (deep)
@@ -1326,6 +1342,24 @@ abstract class Lang implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->customersScheduledForDeletion !== null) {
+                if (!$this->customersScheduledForDeletion->isEmpty()) {
+                    foreach ($this->customersScheduledForDeletion as $customer) {
+                        // need to save related object because we set the relation to null
+                        $customer->save($con);
+                    }
+                    $this->customersScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCustomers !== null) {
+            foreach ($this->collCustomers as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->ordersScheduledForDeletion !== null) {
@@ -1650,6 +1684,9 @@ abstract class Lang implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->collCustomers) {
+                $result['Customers'] = $this->collCustomers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collOrders) {
                 $result['Orders'] = $this->collOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1892,6 +1929,12 @@ abstract class Lang implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getCustomers() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomer($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getOrders() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addOrder($relObj->copy($deepCopy));
@@ -1939,9 +1982,255 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('Customer' == $relationName) {
+            return $this->initCustomers();
+        }
         if ('Order' == $relationName) {
             return $this->initOrders();
         }
+    }
+
+    /**
+     * Clears out the collCustomers collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomers()
+     */
+    public function clearCustomers()
+    {
+        $this->collCustomers = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomers collection loaded partially.
+     */
+    public function resetPartialCustomers($v = true)
+    {
+        $this->collCustomersPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomers collection.
+     *
+     * By default this just sets the collCustomers collection to an empty array (like clearcollCustomers());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomers($overrideExisting = true)
+    {
+        if (null !== $this->collCustomers && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomers = new ObjectCollection();
+        $this->collCustomers->setModel('\Thelia\Model\Customer');
+    }
+
+    /**
+     * Gets an array of ChildCustomer objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildLang is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCustomer[] List of ChildCustomer objects
+     * @throws PropelException
+     */
+    public function getCustomers($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomersPartial && !$this->isNew();
+        if (null === $this->collCustomers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomers) {
+                // return empty collection
+                $this->initCustomers();
+            } else {
+                $collCustomers = ChildCustomerQuery::create(null, $criteria)
+                    ->filterByLangModel($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomersPartial && count($collCustomers)) {
+                        $this->initCustomers(false);
+
+                        foreach ($collCustomers as $obj) {
+                            if (false == $this->collCustomers->contains($obj)) {
+                                $this->collCustomers->append($obj);
+                            }
+                        }
+
+                        $this->collCustomersPartial = true;
+                    }
+
+                    reset($collCustomers);
+
+                    return $collCustomers;
+                }
+
+                if ($partial && $this->collCustomers) {
+                    foreach ($this->collCustomers as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomers[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomers = $collCustomers;
+                $this->collCustomersPartial = false;
+            }
+        }
+
+        return $this->collCustomers;
+    }
+
+    /**
+     * Sets a collection of Customer objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customers A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildLang The current object (for fluent API support)
+     */
+    public function setCustomers(Collection $customers, ConnectionInterface $con = null)
+    {
+        $customersToDelete = $this->getCustomers(new Criteria(), $con)->diff($customers);
+
+
+        $this->customersScheduledForDeletion = $customersToDelete;
+
+        foreach ($customersToDelete as $customerRemoved) {
+            $customerRemoved->setLangModel(null);
+        }
+
+        $this->collCustomers = null;
+        foreach ($customers as $customer) {
+            $this->addCustomer($customer);
+        }
+
+        $this->collCustomers = $customers;
+        $this->collCustomersPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Customer objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Customer objects.
+     * @throws PropelException
+     */
+    public function countCustomers(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomersPartial && !$this->isNew();
+        if (null === $this->collCustomers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomers) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomers());
+            }
+
+            $query = ChildCustomerQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByLangModel($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomers);
+    }
+
+    /**
+     * Method called to associate a ChildCustomer object to this object
+     * through the ChildCustomer foreign key attribute.
+     *
+     * @param    ChildCustomer $l ChildCustomer
+     * @return   \Thelia\Model\Lang The current object (for fluent API support)
+     */
+    public function addCustomer(ChildCustomer $l)
+    {
+        if ($this->collCustomers === null) {
+            $this->initCustomers();
+            $this->collCustomersPartial = true;
+        }
+
+        if (!in_array($l, $this->collCustomers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomer($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Customer $customer The customer object to add.
+     */
+    protected function doAddCustomer($customer)
+    {
+        $this->collCustomers[]= $customer;
+        $customer->setLangModel($this);
+    }
+
+    /**
+     * @param  Customer $customer The customer object to remove.
+     * @return ChildLang The current object (for fluent API support)
+     */
+    public function removeCustomer($customer)
+    {
+        if ($this->getCustomers()->contains($customer)) {
+            $this->collCustomers->remove($this->collCustomers->search($customer));
+            if (null === $this->customersScheduledForDeletion) {
+                $this->customersScheduledForDeletion = clone $this->collCustomers;
+                $this->customersScheduledForDeletion->clear();
+            }
+            $this->customersScheduledForDeletion[]= $customer;
+            $customer->setLangModel(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Lang is new, it will return
+     * an empty collection; or if this Lang has previously
+     * been saved, it will retrieve related Customers from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Lang.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCustomer[] List of ChildCustomer objects
+     */
+    public function getCustomersJoinCustomerTitle($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCustomerQuery::create(null, $criteria);
+        $query->joinWith('CustomerTitle', $joinBehavior);
+
+        return $this->getCustomers($query, $con);
     }
 
     /**
@@ -2379,6 +2668,11 @@ abstract class Lang implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collCustomers) {
+                foreach ($this->collCustomers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collOrders) {
                 foreach ($this->collOrders as $o) {
                     $o->clearAllReferences($deep);
@@ -2386,6 +2680,7 @@ abstract class Lang implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collCustomers = null;
         $this->collOrders = null;
     }
 

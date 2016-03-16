@@ -22,15 +22,15 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  *
  * @method     ChildCustomerQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildCustomerQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildCustomerQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
+ * @method     ChildCustomerQuery orderByLangId($order = Criteria::ASC) Order by the lang_id column
+ * @method     ChildCustomerQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildCustomerQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildCustomerQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildCustomerQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildCustomerQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildCustomerQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
  * @method     ChildCustomerQuery orderByReseller($order = Criteria::ASC) Order by the reseller column
- * @method     ChildCustomerQuery orderByLang($order = Criteria::ASC) Order by the lang column
  * @method     ChildCustomerQuery orderBySponsor($order = Criteria::ASC) Order by the sponsor column
  * @method     ChildCustomerQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildCustomerQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
@@ -42,15 +42,15 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method     ChildCustomerQuery groupById() Group by the id column
- * @method     ChildCustomerQuery groupByRef() Group by the ref column
  * @method     ChildCustomerQuery groupByTitleId() Group by the title_id column
+ * @method     ChildCustomerQuery groupByLangId() Group by the lang_id column
+ * @method     ChildCustomerQuery groupByRef() Group by the ref column
  * @method     ChildCustomerQuery groupByFirstname() Group by the firstname column
  * @method     ChildCustomerQuery groupByLastname() Group by the lastname column
  * @method     ChildCustomerQuery groupByEmail() Group by the email column
  * @method     ChildCustomerQuery groupByPassword() Group by the password column
  * @method     ChildCustomerQuery groupByAlgo() Group by the algo column
  * @method     ChildCustomerQuery groupByReseller() Group by the reseller column
- * @method     ChildCustomerQuery groupByLang() Group by the lang column
  * @method     ChildCustomerQuery groupBySponsor() Group by the sponsor column
  * @method     ChildCustomerQuery groupByDiscount() Group by the discount column
  * @method     ChildCustomerQuery groupByRememberMeToken() Group by the remember_me_token column
@@ -68,6 +68,10 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery leftJoinCustomerTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitle relation
  * @method     ChildCustomerQuery rightJoinCustomerTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitle relation
  * @method     ChildCustomerQuery innerJoinCustomerTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitle relation
+ *
+ * @method     ChildCustomerQuery leftJoinLangModel($relationAlias = null) Adds a LEFT JOIN clause to the query using the LangModel relation
+ * @method     ChildCustomerQuery rightJoinLangModel($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LangModel relation
+ * @method     ChildCustomerQuery innerJoinLangModel($relationAlias = null) Adds a INNER JOIN clause to the query using the LangModel relation
  *
  * @method     ChildCustomerQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
  * @method     ChildCustomerQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
@@ -93,15 +97,15 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomer findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomer matching the query, or a new ChildCustomer object populated from the query conditions when no match is found
  *
  * @method     ChildCustomer findOneById(int $id) Return the first ChildCustomer filtered by the id column
- * @method     ChildCustomer findOneByRef(string $ref) Return the first ChildCustomer filtered by the ref column
  * @method     ChildCustomer findOneByTitleId(int $title_id) Return the first ChildCustomer filtered by the title_id column
+ * @method     ChildCustomer findOneByLangId(int $lang_id) Return the first ChildCustomer filtered by the lang_id column
+ * @method     ChildCustomer findOneByRef(string $ref) Return the first ChildCustomer filtered by the ref column
  * @method     ChildCustomer findOneByFirstname(string $firstname) Return the first ChildCustomer filtered by the firstname column
  * @method     ChildCustomer findOneByLastname(string $lastname) Return the first ChildCustomer filtered by the lastname column
  * @method     ChildCustomer findOneByEmail(string $email) Return the first ChildCustomer filtered by the email column
  * @method     ChildCustomer findOneByPassword(string $password) Return the first ChildCustomer filtered by the password column
  * @method     ChildCustomer findOneByAlgo(string $algo) Return the first ChildCustomer filtered by the algo column
  * @method     ChildCustomer findOneByReseller(int $reseller) Return the first ChildCustomer filtered by the reseller column
- * @method     ChildCustomer findOneByLang(string $lang) Return the first ChildCustomer filtered by the lang column
  * @method     ChildCustomer findOneBySponsor(string $sponsor) Return the first ChildCustomer filtered by the sponsor column
  * @method     ChildCustomer findOneByDiscount(string $discount) Return the first ChildCustomer filtered by the discount column
  * @method     ChildCustomer findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomer filtered by the remember_me_token column
@@ -113,15 +117,15 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomer findOneByVersionCreatedBy(string $version_created_by) Return the first ChildCustomer filtered by the version_created_by column
  *
  * @method     array findById(int $id) Return ChildCustomer objects filtered by the id column
- * @method     array findByRef(string $ref) Return ChildCustomer objects filtered by the ref column
  * @method     array findByTitleId(int $title_id) Return ChildCustomer objects filtered by the title_id column
+ * @method     array findByLangId(int $lang_id) Return ChildCustomer objects filtered by the lang_id column
+ * @method     array findByRef(string $ref) Return ChildCustomer objects filtered by the ref column
  * @method     array findByFirstname(string $firstname) Return ChildCustomer objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildCustomer objects filtered by the lastname column
  * @method     array findByEmail(string $email) Return ChildCustomer objects filtered by the email column
  * @method     array findByPassword(string $password) Return ChildCustomer objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildCustomer objects filtered by the algo column
  * @method     array findByReseller(int $reseller) Return ChildCustomer objects filtered by the reseller column
- * @method     array findByLang(string $lang) Return ChildCustomer objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomer objects filtered by the sponsor column
  * @method     array findByDiscount(string $discount) Return ChildCustomer objects filtered by the discount column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomer objects filtered by the remember_me_token column
@@ -226,7 +230,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `TITLE_ID`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `customer` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TITLE_ID`, `LANG_ID`, `REF`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `customer` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -357,35 +361,6 @@ abstract class CustomerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the ref column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
-     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByRef($ref = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($ref)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $ref)) {
-                $ref = str_replace('*', '%', $ref);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::REF, $ref, $comparison);
-    }
-
-    /**
      * Filter the query on the title_id column
      *
      * Example usage:
@@ -426,6 +401,78 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId, $comparison);
+    }
+
+    /**
+     * Filter the query on the lang_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLangId(1234); // WHERE lang_id = 1234
+     * $query->filterByLangId(array(12, 34)); // WHERE lang_id IN (12, 34)
+     * $query->filterByLangId(array('min' => 12)); // WHERE lang_id > 12
+     * </code>
+     *
+     * @see       filterByLangModel()
+     *
+     * @param     mixed $langId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByLangId($langId = null, $comparison = null)
+    {
+        if (is_array($langId)) {
+            $useMinMax = false;
+            if (isset($langId['min'])) {
+                $this->addUsingAlias(CustomerTableMap::LANG_ID, $langId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($langId['max'])) {
+                $this->addUsingAlias(CustomerTableMap::LANG_ID, $langId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::LANG_ID, $langId, $comparison);
+    }
+
+    /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $ref)) {
+                $ref = str_replace('*', '%', $ref);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::REF, $ref, $comparison);
     }
 
     /**
@@ -612,35 +659,6 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::RESELLER, $reseller, $comparison);
-    }
-
-    /**
-     * Filter the query on the lang column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLang('fooValue');   // WHERE lang = 'fooValue'
-     * $query->filterByLang('%fooValue%'); // WHERE lang LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $lang The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByLang($lang = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($lang)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $lang)) {
-                $lang = str_replace('*', '%', $lang);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::LANG, $lang, $comparison);
     }
 
     /**
@@ -1043,6 +1061,81 @@ abstract class CustomerQuery extends ModelCriteria
         return $this
             ->joinCustomerTitle($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CustomerTitle', '\Thelia\Model\CustomerTitleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Lang object
+     *
+     * @param \Thelia\Model\Lang|ObjectCollection $lang The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByLangModel($lang, $comparison = null)
+    {
+        if ($lang instanceof \Thelia\Model\Lang) {
+            return $this
+                ->addUsingAlias(CustomerTableMap::LANG_ID, $lang->getId(), $comparison);
+        } elseif ($lang instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(CustomerTableMap::LANG_ID, $lang->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByLangModel() only accepts arguments of type \Thelia\Model\Lang or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the LangModel relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function joinLangModel($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('LangModel');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'LangModel');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the LangModel relation Lang object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\LangQuery A secondary query class using the current class as primary query
+     */
+    public function useLangModelQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinLangModel($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LangModel', '\Thelia\Model\LangQuery');
     }
 
     /**

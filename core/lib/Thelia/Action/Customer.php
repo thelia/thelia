@@ -150,7 +150,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getCountry(),
             $event->getEmail(),
             $event->getPassword(),
-            $event->getLang(),
+            $event->getLangId(),
             $event->getReseller(),
             $event->getSponsor(),
             $event->getDiscount(),
