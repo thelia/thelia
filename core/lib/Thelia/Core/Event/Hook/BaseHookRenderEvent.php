@@ -25,13 +25,16 @@ class BaseHookRenderEvent extends Event
     protected $code = null;
 
     /** @var  array $arguments an array of arguments passed to the template engine function */
-    protected $arguments = array();
+    protected $arguments = [];
 
+    /** @var array $templateVars the variable currently defined in the template */
+    protected $templateVars = [];
 
-    public function __construct($code, array $arguments = array())
+    public function __construct($code, array $arguments = [], array $templateVars = [])
     {
         $this->code = $code;
         $this->arguments = $arguments;
+        $this->templateVars = $templateVars;
     }
 
     /**
@@ -114,5 +117,34 @@ class BaseHookRenderEvent extends Event
     public function hasArgument($key)
     {
         return array_key_exists($key, $this->arguments);
+    }
+
+    /**
+     * Return a template variable value. An exception is thorwn if the variable is not defined.
+     *
+     * @param string $templateVariableName the variable name
+     *
+     * @return mixed the variable value
+     * @throws \InvalidArgumentException if the variable is not defined
+     */
+    public function getTemplateVar($templateVariableName)
+    {
+        if (! isset($this->templateVars[$templateVariableName])) {
+            throw new \InvalidArgumentException(sprintf("Template variable '%s' is not defined.", $templateVariableName));
+        }
+
+        return $this->templateVars[$templateVariableName];
+    }
+
+    /**
+     * Check if a template variable is defined.
+     *
+     * @param $templateVariableName
+     *
+     * @return bool true if the template variable is defined, false otherwise
+     */
+    public function hasTemplateVar($templateVariableName)
+    {
+        return isset($this->templateVars[$templateVariableName]);
     }
 }

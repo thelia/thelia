@@ -28,9 +28,9 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     /** @var array fields that can be added, if empty array any fields can be added */
     protected $fields = [];
 
-    public function __construct($code, array $arguments = [], array $fields = [])
+    public function __construct($code, array $arguments = [], array $fields = [], array $templateVariables = [])
     {
-        parent::__construct($code, $arguments);
+        parent::__construct($code, $arguments, $templateVariables);
         $this->fragmentBag = new FragmentBag();
         $this->fields = $fields;
     }
