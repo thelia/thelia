@@ -23,9 +23,9 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
+    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
     (@max, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max, 'fr_FR', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL)
+    (@max, 'fr_FR', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL)
 ;
 
 -- Insert a fake email address for administrators, to trigger the admin update dialog
@@ -176,9 +176,31 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),
+    (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to %store newsletter', NULL, NULL),
     (@max, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max, 'fr_FR', NULL, NULL, NULL, NULL)
+    (@max, 'fr_FR', 'Email envoyé après l\'inscription à la newsletter', 'Vous avez souscrit à la newsletter du site %store', NULL, NULL)
+;
+
+-- add new config variables number_default_results_per_page
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+1, 'number_default_results_per_page.product_list', '20', '0', '0', NOW(), NOW());
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+2, 'number_default_results_per_page.order_list', '20', '0', '0', NOW(), NOW());
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+3, 'number_default_results_per_page.customer_list', '20', '0', '0', NOW(), NOW());
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),
+    (@max+2, 'de_DE', NULL, NUll, NULL, NULL),
+    (@max+3, 'de_DE', NULL, NUll, NULL, NULL),
+    (@max+1, 'en_US', 'Number by default of results per page for product list', NUll, NULL, NULL),
+    (@max+2, 'en_US', 'Number by default of results per page for order list', NUll, NULL, NULL),
+    (@max+3, 'en_US', 'Number by default of results per page for customer list', NUll, NULL, NULL),
+    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),
+    (@max+2, 'es_ES', NULL, NUll, NULL, NULL),
+    (@max+3, 'es_ES', NULL, NUll, NULL, NULL),
+    (@max+1, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
+    (@max+2, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
+    (@max+3, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL)
 ;
 
 -- Add module HookAdminHome
