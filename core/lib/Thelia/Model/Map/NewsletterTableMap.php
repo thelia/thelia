@@ -165,7 +165,7 @@ class NewsletterTableMap extends TableMap
         $this->addColumn('EMAIL', 'Email', 'VARCHAR', true, 255, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', false, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', false, 255, null);
-        $this->addColumn('LOCALE', 'Locale', 'CHAR', false, 5, null);
+        $this->addColumn('LOCALE', 'Locale', 'VARCHAR', false, 5, null);
         $this->addColumn('UNSUBSCRIBED', 'Unsubscribed', 'BOOLEAN', true, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

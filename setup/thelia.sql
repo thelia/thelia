@@ -480,16 +480,16 @@ CREATE TABLE `customer`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `uni_ref` (`ref`),
-    INDEX `fk_title_id` (`title_id`),
-    INDEX `fk_lang` (`lang_id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    INDEX `idx_customer_customer_title_id` (`title_id`),
+    INDEX `idx_customer_lang_id` (`lang_id`),
     INDEX `idx_email` (`email`),
-    CONSTRAINT `fk__customer__customer_title`
+    CONSTRAINT `fk_customer_customer_title_id`
         FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `fk__customer__lang`
+    CONSTRAINT `fk_customer_lang_id`
         FOREIGN KEY (`lang_id`)
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
@@ -1699,12 +1699,12 @@ CREATE TABLE `newsletter`
     `email` VARCHAR(255) NOT NULL,
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
-    `locale` CHAR(5),
+    `locale` VARCHAR(5),
     `unsubscribed` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `uni_email` (`email`),
+    UNIQUE INDEX `email_UNIQUE` (`email`),
     INDEX `idx_unsubscribed` (`unsubscribed`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

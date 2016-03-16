@@ -389,44 +389,44 @@
     </behavior>
   </table>
   <table name="customer" namespace="Thelia\Model">
-    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+    <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
 
-    <column name="title_id" type="integer" required="true" />
-    <column name="lang_id" type="integer" required="false" />
+    <column name="title_id" type="INTEGER" required="true" />
+    <column name="lang_id" type="INTEGER" required="false" />
 
-    <column name="ref" type="varchar" size="50" />
-    <column name="firstname" type="varchar" size="255" required="true" />
-    <column name="lastname" type="varchar" size="255" required="true" />
-    <column name="email" type="varchar" size="255" />
-    <column name="password" type="varchar" size="255" />
-    <column name="algo" type="varchar" size="128" />
-    <column name="reseller" type="tinyint" />
-    <column name="sponsor" type="varchar" size="50" />
-    <column name="discount" type="decimal" scale="6" size="16" defaultValue="0.000000" />
-    <column name="remember_me_token" type="varchar" size="255" />
-    <column name="remember_me_serial" type="varchar" size="255" />
+    <column name="ref" type="VARCHAR" size="50" />
+    <column name="firstname" type="VARCHAR" size="255" required="true" />
+    <column name="lastname" type="VARCHAR" size="255" required="true" />
+    <column name="email" type="VARCHAR" size="255" />
+    <column name="password" type="VARCHAR" size="255" />
+    <column name="algo" type="VARCHAR" size="128" />
+    <column name="reseller" type="TINYINT" />
+    <column name="sponsor" type="VARCHAR" size="50" />
+    <column name="discount" type="DECIMAL" scale="6" size="16" defaultValue="0.000000" />
+    <column name="remember_me_token" type="VARCHAR" size="255" />
+    <column name="remember_me_serial" type="VARCHAR" size="255" />
 
-    <index name="fk_title_id">
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
+
+    <index name="idx_customer_customer_title_id">
       <index-column name="title_id" />
     </index>
 
-    <index name="fk_lang">
+    <index name="idx_customer_lang_id">
       <index-column name="lang_id" />
     </index>
-
-    <unique name="uni_ref">
-      <unique-column name="ref" />
-    </unique>
 
     <index name="idx_email">
       <index-column name="email" />
     </index>
 
-    <foreign-key foreignTable="customer_title" name="fk__customer__customer_title" onDelete="restrict" onUpdate="restrict">
+    <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
 
-    <foreign-key foreignTable="lang" phpName="LangModel" name="fk__customer__lang" onDelete="setNull" onUpdate="restrict">
+    <foreign-key foreignTable="lang" phpName="LangModel" name="fk_customer_lang_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="lang_id" />
     </foreign-key>
 
@@ -1428,15 +1428,15 @@
     <behavior name="timestampable" />
   </table>
   <table name="newsletter" namespace="Thelia\Model">
-    <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+    <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
 
-    <column name="email" type="varchar" size="255" required="true" />
-    <column name="firstname" type="varchar" size="255" />
-    <column name="lastname" type="varchar" size="255" />
-    <column name="locale" type="char" size="5" />
-    <column name="unsubscribed" type="boolean" required="true" defaultValue="false"/>
+    <column name="email" type="VARCHAR" size="255" required="true" />
+    <column name="firstname" type="VARCHAR" size="255" />
+    <column name="lastname" type="VARCHAR" size="255" />
+    <column name="locale" type="VARCHAR" size="5" />
+    <column name="unsubscribed" type="BOOLEAN" required="true" defaultValue="false"/>
 
-    <unique name="uni_email">
+    <unique name="email_UNIQUE">
       <unique-column name="email" />
     </unique>
 
