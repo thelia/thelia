@@ -87,7 +87,7 @@ class Hook extends AbstractSmartyPlugin
 
         $type = $smarty->getTemplateDefinition()->getType();
 
-        $event = new HookRenderEvent($hookName, $params);
+        $event = new HookRenderEvent($hookName, $params, $smarty->getTemplateVars());
 
         $event->setArguments($this->getArgumentsFromParams($params));
 
@@ -233,7 +233,7 @@ class Hook extends AbstractSmartyPlugin
 
         $type = $smarty->getTemplateDefinition()->getType();
 
-        $event = new HookRenderBlockEvent($hookName, $params, $fields);
+        $event = new HookRenderBlockEvent($hookName, $params, $fields, $smarty->getTemplateVars());
 
         $event->setArguments($this->getArgumentsFromParams($params));
 
