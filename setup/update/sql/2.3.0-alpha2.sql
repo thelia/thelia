@@ -236,6 +236,4 @@ ALTER TABLE `newsletter` ADD INDEX `idx_unsubscribed` (`unsubscribed`);
 
 OPTIMIZE TABLE `newsletter`;
 
->>>>>>> Improve schema
-
 SET FOREIGN_KEY_CHECKS = 1;
