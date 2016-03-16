@@ -16,16 +16,6 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.stats" path="/admin/home/stats">
-        <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
-    </route>
-
-    <route id="admin.news-feed" path="/admin/ajax/thelia_news_feed">
-        <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
-        <default key="template">ajax/thelia_news_feed</default>
-        <default key="not-logged">1</default>
-    </route>
-
     <!-- end home -->
 
     <!-- Route to the administration login page -->

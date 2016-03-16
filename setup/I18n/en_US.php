@@ -426,6 +426,7 @@ return array(
     'Denmark' => 'Denmark',
     'Dinar' => 'Dinar',
     'Display and process prices with (0) or without (1) taxes.' => 'Display and process prices with (0) or without (1) taxes.',
+    'Displays the default blocks on the homepage of the administration' => ' Displays the default blocks on the homepage of the administration',
     'District of Columbia' => 'District of Columbia',
     'Distrito Federal' => 'Distrito Federal',
     'Djibouti' => 'Djibouti',
