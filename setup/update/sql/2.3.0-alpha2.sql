@@ -227,6 +227,10 @@ ALTER TABLE `customer` ADD CONSTRAINT `fk_customer_lang_id` FOREIGN KEY (`lang_i
 OPTIMIZE TABLE `customer`;
 
 
+-- Update customer version
+ALTER TABLE `customer_version` CHANGE `lang` `lang_id` INT(11)  NULL  DEFAULT NULL;
+
+
 -- Update newletter index
 ALTER TABLE `newsletter` ADD INDEX `idx_unsubscribed` (`unsubscribed`);
 
