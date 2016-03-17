@@ -1,3 +1,7 @@
+# 2.3.0-beta1
+
+
+
 # 2.3.0-alpha2
 
 - #1985 Add delivery and payment events `MODULE_PAYMENT_IS_VALID`, `MODULE_PAYMENT_MANAGE_STOCK`, `MODULE_DELIVERY_GET_POSTAGE`
