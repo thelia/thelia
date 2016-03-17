@@ -182,7 +182,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 ;
 
 -- add new config variables number_default_results_per_page
-SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+SELECT @max := IFNULL(MAX(`id`),0) FROM `config`;
 
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+1, 'number_default_results_per_page.product_list', '20', '0', '0', NOW(), NOW());
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+2, 'number_default_results_per_page.order_list', '20', '0', '0', NOW(), NOW());
@@ -213,7 +213,7 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (@max_id+1, 'de_DE', NULL, NULL,  NULL,  NULL),
-(@max_id+1, 'en_US', ' Displays the default blocks on the homepage of the administration', NULL,  NULL,  NULL),
+(@max_id+1, 'en_US', 'Displays the default blocks on the homepage of the administration', NULL,  NULL,  NULL),
 (@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'fr_FR', 'Affiche les blocs par défaut sur la page d\'accueil de l\'administration', NULL,  NULL,  NULL)
 ;

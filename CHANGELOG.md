@@ -1,14 +1,32 @@
 # 2.3.0-alpha2
 
+- #1985 Add delivery and payment events `MODULE_PAYMENT_IS_VALID`, `MODULE_PAYMENT_MANAGE_STOCK`, `MODULE_DELIVERY_GET_POSTAGE`
+- #2045 Moves the backOffice statistics in the new module HookAdminHome
+- #2044 Add possibility to change number by default of results per page for the product list, the order list and the customer list in the backOffice
+- #2042 Avoid having too many results in the backOffice search page
+- #2021 Fixes hooks `mini-cart`, `sale.top`, `sale.bottom`, `sale.main-top`, `sale.main-bottom`, `sale.content-top`, `sale.content-bottom`, `sale.stylesheet`, `sale.after-javascript-include`, `sale.javascript-initialization`, `account-order.invoice-address-bottom`, `account-order.delivery-address-bottom`
+- #2041 Fix possible circular reference for category tree and folder tree
+- #2039 Disable the output of the url by the loops on the BackOffice
+- #2034 Add column position in attribute combination table
+- #2028 Fixed translation regexp prefix for templates
+- #2027 Confirmation email when subscribing to newsletter, and subscription cancel page
+- #2017 Add constraint of unicity in create and update hook form
+- #2012 Checking MySQL version to set sql_mode automatically, this fixed the compatibility with MySQL > 5.6 for modes `STRICT_TRANS_TABLES`, `NO_ENGINE_SUBSTITUTION`
+- #2009 Display PSE ref in backOffice order edit for the product list
+- #2001 Check PHP version before trying to do anything in install process
+- #1999 Fix Folder breadcrumb, the parent url was not good if you edit a picture in a folder or a content
+- #1998 Add not blank constraint on zipcode in address create form
+- #1988 Fix hide module-install if auth are not right in the BackOffice
 - #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New minimum_admin_password_length and enable_lost_admin_password_recovery configuration variable.
 - #1962 Fix exception when cloning a product if the i18n in specific locale does not exist
-- #1933 Upgrade Symfony 2.3 to Symfony 2.8
+- #1933 #2006 #2016 #2033 Upgrade Symfony 2.3 to Symfony 2.8
+- #1995 Added order search options, improved search page in the backOffice
 - #1994 Allow coupon in first cart step
 - #1993 Fix the default language isocode link in backOffice languages page
 - #1992 Add method to find category path `Thelia/Model/CategoryQuery::getPathToCategory`
 - #1977 Fixed translation domain in NewsletterController
 - #1980 Update database schema to increase module version field to 25 chars.
-- #1971 Adds an address email to the administrator profile and adds the password lost functionality for administrators
+- #1971 #1973 Adds an address email to the administrator profile and adds the password lost functionality for administrators
 - #1970 Add `CartDuplicationEvent` which provide both original and duplicated cart to listeners
 - #1967 Module Colissimo : Replace country title by isoalpha2 in export for expeditor
 - #1964 Fixed cart not deleted after an order placed
@@ -45,7 +63,7 @@
 - #1895 Add a link to the contact page in the front footer and update bootstrap
 - #1881 Display only the zones affected to Colissimo in the backOffice
 - #1853 Coupon, add condition match for cart item include quantity
-- #1815 #1963 #1984 #1989 Import/export complete rework
+- #1815 #1963 #1984 #1989 #1997 #2013 #2019 Import/export complete rework
 
 # 2.3.0-alpha1
 
