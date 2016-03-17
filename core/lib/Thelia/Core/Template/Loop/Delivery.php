@@ -12,13 +12,16 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
-use Thelia\Model\OrderPostage;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
@@ -31,8 +34,11 @@ use Thelia\Module\Exception\DeliveryException;
  * @author Etienne Roudeix <eroudeix@gmail.com>
  *
  * {@inheritdoc}
+ *
+ * @method int getAddress()
  * @method int getCountry()
  * @method int getState()
+ *
  */
 class Delivery extends BaseSpecificModule
 {
@@ -41,6 +47,7 @@ class Delivery extends BaseSpecificModule
         $collection = parent::getArgDefinitions();
 
         $collection
+            ->addArgument(Argument::createIntTypeArgument("address"))
             ->addArgument(Argument::createIntTypeArgument("country"))
             ->addArgument(Argument::createIntTypeArgument("state"))
         ;
@@ -50,9 +57,19 @@ class Delivery extends BaseSpecificModule
 
     public function parseResults(LoopResult $loopResult)
     {
-        $country = $this->getCurrentCountry();
-        $state = $this->getCurrentState();
         $cart = $this->request->getSession()->getSessionCart($this->dispatcher);
+        $address = $this->getDeliveryAddress();
+
+        // todo: remove country and state. just here for backward compatibility
+        $country = $this->getCurrentCountry($address);
+        if (null === $country) {
+            $country = $address->getCountry();
+        }
+        $state = $this->getCurrentState($address);
+        if (null === $state) {
+            $country = $address->getCountry();
+        }
+
         $virtual = $cart->isVirtual();
 
         /** @var Module $deliveryModule */
@@ -63,7 +80,6 @@ class Delivery extends BaseSpecificModule
 
             if (null === $areaDeliveryModule && false === $virtual) {
                 continue;
-
             }
 
             /** @var DeliveryModuleInterface $moduleInstance */
@@ -81,9 +97,17 @@ class Delivery extends BaseSpecificModule
             try {
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
+                /** @var Cart $cart */
+                $cart->getAddressDeliveryId();
+                $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
+                $this->dispatcher->dispatch(
+                    TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                    $deliveryPostageEvent
+                );
 
-                if ($moduleInstance->isValidDelivery($country)) {
-                    $postage = OrderPostage::loadFromPostage($moduleInstance->getPostage($country));
+                if ($deliveryPostageEvent->isValidModule()) {
+
+                    $postage = $deliveryPostageEvent->getPostage();
 
                     $loopResultRow
                         ->set('ID', $deliveryModule->getId())
@@ -96,7 +120,16 @@ class Delivery extends BaseSpecificModule
                         ->set('POSTAGE_TAX', $postage->getAmountTax())
                         ->set('POSTAGE_UNTAXED', $postage->getAmount() - $postage->getAmountTax())
                         ->set('POSTAGE_TAX_RULE_TITLE', $postage->getTaxRuleTitle())
+                        ->set('DELIVERY_DATE', $deliveryPostageEvent->getDeliveryDate())
                     ;
+
+                    // add additional data if it exists
+                    if ($deliveryPostageEvent->hasAdditionalData()) {
+                        foreach ($deliveryPostageEvent->getAdditionalData() as $key => $value) {
+                            $loopResultRow->set($key, $value);
+                        }
+                    }
+
                     $this->addOutputFields($loopResultRow, $deliveryModule);
 
                     $loopResult->addRow($loopResultRow);
@@ -126,10 +159,9 @@ class Delivery extends BaseSpecificModule
                 throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
             }
             return $country;
-        } else {
-            $country = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
-            return $country;
         }
+
+        return null;
     }
 
     /**
@@ -144,9 +176,27 @@ class Delivery extends BaseSpecificModule
                 throw new \InvalidArgumentException('Cannot found state id: `' . $stateId . '` in delivery loop');
             }
             return $state;
-        } else {
-            $state = $this->container->get('thelia.taxEngine')->getDeliveryState();
-            return $state;
         }
+
+        return null;
+    }
+
+    /**
+     * @return array|mixed|\Thelia\Model\Address
+     */
+    protected function getDeliveryAddress()
+    {
+        $address = null;
+
+        $addressId = $this->getAddress();
+        if (empty($addressId)) {
+            $addressId = $this->request->getSession()->getOrder()->getChoosenDeliveryAddress();
+        }
+
+        if (!empty($addressId)) {
+            $address = AddressQuery::create()->findPk($addressId);
+        }
+
+        return $address;
     }
 }

@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Event\Payment\IsValidPaymentEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -34,13 +36,21 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        $cart = $this->request->getSession()->getSessionCart($this->dispatcher);
+
         /** @var \Thelia\Model\Module $paymentModule */
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {
             $loopResultRow = new LoopResultRow($paymentModule);
 
             $moduleInstance = $paymentModule->getPaymentModuleInstance($this->container);
 
-            if (false === $moduleInstance->isValidPayment()) {
+            $isValidPaymentEvent = new IsValidPaymentEvent($moduleInstance, $cart);
+            $this->dispatcher->dispatch(
+                TheliaEvents::MODULE_PAYMENT_IS_VALID,
+                $isValidPaymentEvent
+            );
+
+            if (false === $isValidPaymentEvent->isValidModule()) {
                 continue;
             }
 

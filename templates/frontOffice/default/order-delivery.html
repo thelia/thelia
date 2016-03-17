@@ -58,7 +58,7 @@
                                 {if $value == $ID}
                                     {assign var="isDeliveryAddressChecked" value="1"}
                                 {/if}
-                            {elseif $DEFAULT}
+                            {elseif $delivery_address_id == $ID}
                                 {assign var="isDeliveryAddressChecked" value="1"}
                             {/if}
                             <tr>

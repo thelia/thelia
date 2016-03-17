@@ -225,6 +225,14 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.module.delivery" class="Thelia\Action\Delivery">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.module.payment" class="Thelia\Action\Payment">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 
 </config>
