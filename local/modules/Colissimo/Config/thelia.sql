@@ -3,6 +3,23 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------------------------------------------------
+-- colissimo_freeshipping
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `colissimo_freeshipping`;
+
+CREATE TABLE `colissimo_freeshipping`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `active` TINYINT(1) NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+INSERT INTO `colissimo_freeshipping`(`active`, `created_at`, `updated_at`) VALUES (0, NOW(), NOW());
+
+-- ---------------------------------------------------------------------
 -- Mail templates for colissimo
 -- ---------------------------------------------------------------------
 
