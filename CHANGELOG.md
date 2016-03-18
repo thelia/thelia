@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2052) Fix #2040 Missing trait PositionManagementTrait in ModuleImage
 - (related to #2041) Fix possible circular reference for category tree and folder tree
 - (related to #2017) Add constraint of unicity in create and update hook form
 - (related to #2012) Checking MySQL version to set sql_mode automatically, this fixed the compatibility with MySQL > 5.6 for modes `STRICT_TRANS_TABLES`, `NO_ENGINE_SUBSTITUTION`
