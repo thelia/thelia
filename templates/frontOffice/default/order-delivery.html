@@ -157,8 +157,6 @@
 
     <script type="text/javascript">
         jQuery(function($) {
-            $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');
-
             $('.js-change-delivery-address').change(function(e) {
                 if (this.checked) {
                     $('#delivery-module-list-block').load(
@@ -172,6 +170,8 @@
                     );
                 }
             });
+
+            $('.js-change-delivery-address:checked').change();
         });
     </script>
     {hook name="order-delivery.javascript-initialization"}
