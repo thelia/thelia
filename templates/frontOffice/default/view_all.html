@@ -22,7 +22,7 @@
     <article class="col-main  {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
 
         <h1 id="main-label" class="page-header">{if $product_type == "new"}{intl l="Latest products"}{elseif $product_type == "offers"}{intl l="Product Offers"}{/if}</h1>
-        {assign var="amount" value="{count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}"}
+        {assign var="amount" value={count type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}"}}
 
         {hook name="viewall.top"}
 
@@ -31,7 +31,7 @@
             <div class="products-content">
                 {ifloop rel="product_list"}
                     <ul class="list-unstyled row">
-                        {loop type="product" promo="{$product_type == "offers"}" new="{$product_type == "new"}" name="product_list" limit=$limit page=$product_page order=$product_order}
+                        {loop type="product" promo={$product_type == "offers"} new={$product_type == "new"} name="product_list" limit=$limit page=$product_page order=$product_order}
                             {include file="includes/single-product.html" colClass="col-sm-4" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
                         {/loop}
                     </ul>

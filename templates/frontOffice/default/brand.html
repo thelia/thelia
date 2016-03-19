@@ -88,10 +88,11 @@
 
                 {ifloop rel="product_list"}
                     <hr/>
+
                     {assign var="amount" value={count type="product" brand=$ID}}
                     <div class="toolbar toolbar-top" role="toolbar">
                         <div class="sorter-container clearfix">
-                            <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb={$amount}}{else}{intl l="%nb Item" nb={$amount}}{/if}</span>
+                            <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb=$amount}{else}{intl l="%nb Item" nb=$amount}{/if}</span>
 
                             <span class="limiter">
                                 <label for="limit-top">{intl l="Show"}</label>

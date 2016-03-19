@@ -18,7 +18,7 @@
             {hook name="currency.top"}
             <ul class="nav nav-tabs nav-justified" style="margin-bottom:60px;">
             {loop type="currency" name="currency_available"}
-              <li{if $ID eq "{currency attr="id"}"} class="active"{/if}><a href="{url current="1" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+              <li{if $ID eq {currency attr="id"}} class="active"{/if}><a href="{url current="1" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
             {/loop}
             </ul>
             {hook name="currency.bottom"}

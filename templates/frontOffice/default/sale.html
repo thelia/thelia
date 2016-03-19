@@ -6,7 +6,7 @@
 {block name='no-return-functions' append}
     {loop name="sale-details" type="sale" id={$product_sale}}
         {$breadcrumbs = [
-            ['title' => "{$SALE_LABEL}", 'url'=>{url path="/sale" sale="{$ID}"}]
+            ['title' => "{$SALE_LABEL}", 'url'=>{url path="/sale" sale={$ID}}]
         ]}
     {/loop}
 {/block}
@@ -49,7 +49,7 @@
                 {/if}
             </div>
 
-            {assign var="amount" value="{count type="product" sale=$ID}"}
+            {assign var="amount" value={count type="product" sale=$ID}}
 
 
 
@@ -59,7 +59,7 @@
                 <div class="products-content">
                     {ifloop rel="product_list"}
                         <ul class="list-unstyled row">
-                        {loop type="product" sale="{$ID}" name="product_list" limit=$limit page=$product_page order=$product_order}
+                        {loop type="product" sale={$ID} name="product_list" limit=$limit page=$product_page order=$product_order}
                             {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
                         {/loop}
                         </ul>

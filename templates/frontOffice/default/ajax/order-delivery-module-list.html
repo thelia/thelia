@@ -45,7 +45,7 @@
             <td>
                 <div class="price">
                     {if $POSTAGE}
-                        {format_money number=$POSTAGE}
+                        {format_money number=$POSTAGE symbol={currency attr='symbol'}}
                     {else}
                         &nbsp;
                     {/if}
