@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2058) Fix bug when sending the attribute combination builder form if the user had not selected attribute
 - (related to #2052) Fix #2040 Missing trait PositionManagementTrait in ModuleImage
 - (related to #2041) Fix possible circular reference for category tree and folder tree
 - (related to #2017) Add constraint of unicity in create and update hook form

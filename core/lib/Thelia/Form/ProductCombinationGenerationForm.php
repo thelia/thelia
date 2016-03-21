@@ -12,7 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
 class ProductCombinationGenerationForm extends BaseForm
@@ -68,8 +70,24 @@ class ProductCombinationGenerationForm extends BaseForm
                 'label_attr'   => array('for' => 'combination_builder_attribute_av_id'),
                 'allow_add'    => true,
                 'allow_delete' => true,
+                "constraints" => array(
+                    new Callback(array(
+                        "methods" => array(array($this, "checkAttributeAv")),
+                    )),
+                )
         ))
         ;
+    }
+
+    public function checkAttributeAv($value, ExecutionContextInterface $context)
+    {
+        if (empty($value)) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    "You must select at least one attribute."
+                )
+            );
+        }
     }
 
     public function getName()
