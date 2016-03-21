@@ -1,5 +1,6 @@
 # 2.3.0-beta1
 
+- #2058 Fix bug when sending the attribute combination builder form if the user had not selected attribute
 - #2056 Fix UX bug on product list in the frontOffice, the grid icon or the list icon do not lock
 - #2040 Fix bug when change image position on the module config page. The trait `PositionManagementTrait` was missing in `ModuleImage`
 - #2054 Fix the update process for the Collissimo module
