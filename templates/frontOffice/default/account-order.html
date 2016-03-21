@@ -26,9 +26,9 @@
 
     <article class="col-main" role="main" aria-labelledby="main-label">
 
-        <h1 id="main-label" class="page-header">{intl l="Order details %ref" ref="{$REF}"}</h1>
+        <h1 id="main-label" class="page-header">{intl l="Order details %ref" ref={$REF}}</h1>
 
-        {hook name="account-order.top" order="{$order_id}"}
+        {hook name="account-order.top" order={$order_id}}
 
         {* Infos *}
         <dl class="order-information dl-horizontal">
@@ -60,7 +60,7 @@
             <dt>{intl l="Customer Number"}</dt>
             <dd>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</dd>
 
-            {hookblock name="account-order.information" order="{$order_id}" fields="title,value"}
+            {hookblock name="account-order.information" order={$order_id} fields="title,value"}
             {forhook rel="account-order.information"}
                 <dt>{$title}</dt>
                 <dd>{$value}</dd>
@@ -68,7 +68,7 @@
             {/hookblock}
         </dl>
 
-        {hook name="account-order.after-information" order="{$order_id}"}
+        {hook name="account-order.after-information" order={$order_id}}
 
         {* Addresses *}
         <div id="order-addresses" class="row">
@@ -78,7 +78,7 @@
                     <div class="panel-body">
                         <h4>{intl l="Delivery Mode"}</h4>
                         {ifhook rel="account-order.delivery-information"}
-                            {hook name="account-order.delivery-information" module="{$delivery_id}" order="{$order_id}"}
+                            {hook name="account-order.delivery-information" module={$delivery_id} order={$order_id}}
                         {/ifhook}
                         {elsehook rel="account-order.delivery-information"}
                             <p>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</p>
@@ -88,13 +88,13 @@
 
                         {ifhook rel="account-order.delivery-address"}
                             {* delivery module can customize the delivery address *}
-                            {hook name="account-order.delivery-address" module="{$delivery_id}" order="{$order_id}"}
+                            {hook name="account-order.delivery-address" module={$delivery_id} order={$order_id}}
                         {/ifhook}
                         {elsehook rel="account-order.delivery-address"}
                             {format_address order_address=$DELIVERY_ADDRESS}
                         {/elsehook}
 
-                        {hook name="account-order.delivery-address-bottom" module="{$delivery_id}" order="{$order_id}"}
+                        {hook name="account-order.delivery-address-bottom" module={$delivery_id} order={$order_id}}
                     </div>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                     <div class="panel-body">
                         <h4>{intl l="Billing Mode"}</h4>
                         {ifhook rel="account-order.invoice-information"}
-                            {hook name="account-order.invoice-information" module="{$payment_id}" order="{$order_id}"}
+                            {hook name="account-order.invoice-information" module={$payment_id} order={$order_id}}
                         {/ifhook}
                         {elsehook rel="account-order.invoice-information"}
                             <p>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</p>
@@ -117,19 +117,19 @@
 
                         {ifhook rel="account-order.invoice-address"}
                             {* payment module can customize the delivery address *}
-                            {hook name="account-order.invoice-address" module="{$payment_id}" order="{$order_id}"}
+                            {hook name="account-order.invoice-address" module={$payment_id} order={$order_id}}
                         {/ifhook}
                         {elsehook rel="account-order.invoice-address"}
                             {format_address order_address=$DELIVERY_ADDRESS}
                         {/elsehook}
 
-                        {hook name="account-order.invoice-address-bottom" module="{$payment_id}" order="{$order_id}"}
+                        {hook name="account-order.invoice-address-bottom" module={$payment_id} order={$order_id}}
                     </div>
                 </div>
             </div>
         </div>
 
-        {hook name="account-order.after-addresses" order="{$order_id}"}
+        {hook name="account-order.after-addresses" order={$order_id}}
 
         {* products *}
         <table class="table table-order table-bordered order-products">
@@ -162,7 +162,7 @@
             {ifhook rel="account-order.products-top"}
             <tr>
                 <td class="products-top" colspan="5">
-                    {hook name="account-order.products-top" order="{$order_id}"}
+                    {hook name="account-order.products-top" order={$order_id}}
                 </td>
             </tr>
             {/ifhook}
@@ -182,7 +182,7 @@
 
                 {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
 
-                <tr data-id="{$ID}"  data-product-id="{$PRODUCT_ID}" data-pse-id="{$PRODUCT_SALE_ELEMENTS_ID}">
+                <tr data-id={$ID}  data-product-id={$PRODUCT_ID} data-pse-id={$PRODUCT_SALE_ELEMENTS_ID}>
                     <td class="product" >
                         <p>{$TITLE}</p>
                         {ifloop rel="combinations"}
@@ -201,7 +201,7 @@
                 {ifhook rel="account-order.product-extra"}
                 <tr>
                     <td class="product-extra" colspan="5">
-                        {hook name="account-order.product-extra" order="{$order_id}" order_product="{$ID}" product="{$PRODUCT_ID}"}
+                        {hook name="account-order.product-extra" order={$order_id} order_product={$ID} product={$PRODUCT_ID}}
                     </td>
                 </tr>
                 {/ifhook}
@@ -210,7 +210,7 @@
             {ifhook rel="account-order.products-bottom"}
             <tr>
                 <td class="products-bottom" colspan="5">
-                    {hook name="account-order.products-bottom" order="{$order_id}"}
+                    {hook name="account-order.products-bottom" order={$order_id}}
                 </td>
             </tr>
             {/ifhook}
@@ -218,7 +218,7 @@
             </tbody>
         </table>
 
-        {hook name="account-order.after-products" order="{$order_id}"}
+        {hook name="account-order.after-products" order={$order_id}}
 
         <div class="row">
             <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
@@ -270,7 +270,7 @@
             </div>
         </div>
 
-        {hook name="account-order.bottom" order="{$order_id}"}
+        {hook name="account-order.bottom" order={$order_id}}
 
     </article>
 

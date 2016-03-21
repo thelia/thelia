@@ -41,7 +41,7 @@
 
 {* Content *}
 {block name="main-content"}
-{assign var="$folder_id" value="{folder attr="id"}"}
+{assign var="$folder_id" value={folder attr="id"}}
     {hook name="folder.top" folder="$folder_id"}
     <div class="main">
         {hook name="folder.main-top" folder="$folder_id"}
@@ -103,7 +103,7 @@
                 {ifloop rel="blog.document"}
                 <div class="documents">
                     <ul>
-                    {loop name="blog.document"  type="document" folder="{$ID}"}
+                    {loop name="blog.document"  type="document" folder={$ID}}
                     <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
                     {/loop}  
                     </ul>
