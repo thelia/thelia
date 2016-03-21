@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
@@ -177,5 +178,22 @@ class Category extends BaseCategory implements FileModelParentInterface
         }
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
+    }
+
+    /**
+     * Overload for the position management
+     * @param Base\ProductCategory $productCategory
+     * @inheritdoc
+     */
+    protected function doAddProductCategory($productCategory)
+    {
+        parent::doAddProductCategory($productCategory);
+
+        $productCategoryPosition = ProductCategoryQuery::create()
+            ->filterByCategoryId($productCategory->getCategoryId())
+            ->orderByPosition(Criteria::DESC)
+            ->findOne();
+
+        $productCategory->setPosition($productCategoryPosition !== null ? $productCategoryPosition->getPosition() + 1 : 1);
     }
 }
