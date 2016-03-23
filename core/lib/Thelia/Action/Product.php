@@ -454,7 +454,13 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ProductQuery::create(), $event, $dispatcher);
+        $this->genericUpdateDelegatePosition(
+            ProductCategoryQuery::create()
+                ->filterByProductId($event->getObjectId())
+                ->filterByCategoryId($event->getReferrerId()),
+            $event,
+            $dispatcher
+        );
     }
 
     public function addContent(ProductAddContentEvent $event)
@@ -494,14 +500,14 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByProduct($event->getProduct())
             ->filterByCategoryId($event->getCategoryId())
             ->count() <= 0) {
-            $productCategory = new ProductCategory();
-
-            $productCategory
+            $productCategory = (new ProductCategory())
                 ->setProduct($event->getProduct())
                 ->setCategoryId($event->getCategoryId())
-                ->setDefaultCategory(false)
-                ->save()
-            ;
+                ->setDefaultCategory(false);
+
+            $productCategory
+                ->setPosition($productCategory->getNextPosition())
+                ->save();
         }
     }
 

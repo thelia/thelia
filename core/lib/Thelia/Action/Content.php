@@ -107,7 +107,13 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ContentQuery::create(), $event, $dispatcher);
+        $this->genericUpdateDelegatePosition(
+            ContentFolderQuery::create()
+                ->filterByContentId($event->getObjectId())
+                ->filterByFolderId($event->getReferrerId()),
+            $event,
+            $dispatcher
+        );
     }
 
     public function toggleVisibility(ContentToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -178,12 +184,13 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->filterByFolderId($event->getFolderId())
             ->count() <= 0
         ) {
-            $contentFolder = new ContentFolder();
-
-            $contentFolder
+            $contentFolder = (new ContentFolder())
                 ->setFolderId($event->getFolderId())
                 ->setContent($event->getContent())
-                ->setDefaultFolder(false)
+                ->setDefaultFolder(false);
+
+            $contentFolder
+                ->setPosition($contentFolder->getNextPosition())
                 ->save();
         }
     }
