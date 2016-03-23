@@ -262,7 +262,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="content_list" type="content" visible="*" folder_default=$parent order=$content_order return_url=false}
+                            {loop name="content_list" type="content" visible="*" folder=$parent order=$content_order return_url=false}
                                 <tr>
                                     <td>{$ID}</td>
 
@@ -295,7 +295,7 @@
                                         {admin_position_block
                                             resource="admin.content"
                                             access="UPDATE"
-                                            path={url path='/admin/content/update-position' content_id=$ID}
+                                            path={url path='/admin/content/update-position' content_id=$ID folder_id=$parent}
                                             url_parameter="content_id"
                                             in_place_edit_class="contentPositionChange"
                                             position=$POSITION
@@ -617,7 +617,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url noamp=1 path='/admin/content/update-position' content_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp=1 path='/admin/content/update-position' content_id='__ID__' position='__POS__' folder_id=$parent}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))
