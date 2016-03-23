@@ -42,6 +42,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ProductModificationForm;
@@ -139,7 +140,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getUpdateForm()
     {
-        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", [], [], $this->container);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", [], []);
     }
 
     protected function getCreationEvent($formData)
@@ -363,7 +364,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Setup the object form
-        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", $data, [], $this->container);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", $data, []);
     }
 
     /**
@@ -508,6 +509,11 @@ class ProductController extends AbstractSeoCrudController
     }
 
 
+    /**
+     * @param ProductUpdateEvent $updateEvent
+     *
+     * @return Response
+     */
     protected function performAdditionalUpdateAction($updateEvent)
     {
         // Associate the file if it's a virtual product
@@ -530,6 +536,8 @@ class ProductController extends AbstractSeoCrudController
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -583,7 +591,7 @@ class ProductController extends AbstractSeoCrudController
             $list = ContentQuery::create()
                 ->joinWithI18n($this->getCurrentEditionLocale())
                 ->filterByFolder($folders, Criteria::IN)
-                ->filterById(ProductAssociatedContentQuery::create()->select('content_id')->findByProductId($productId), Criteria::NOT_IN)
+                ->filterById(ProductAssociatedContentQuery::create()->filterByProductId($productId)->select('content_id')->find(), Criteria::NOT_IN)
                 ->find();
             ;
 
@@ -662,7 +670,7 @@ class ProductController extends AbstractSeoCrudController
             $list = ProductQuery::create()
             ->joinWithI18n($this->getCurrentEditionLocale())
             ->filterByCategory($categories, Criteria::IN)
-            ->filterById(AccessoryQuery::create()->select('accessory')->findByProductId($productId), Criteria::NOT_IN)
+            ->filterById(AccessoryQuery::create()->filterByProductId($productId)->select('accessory')->find(), Criteria::NOT_IN)
             ->find();
             ;
 
@@ -784,6 +792,11 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Update product attributes and features
+     *
+     * @param int $productId
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateAttributesAndFeaturesAction($productId)
     {
@@ -823,7 +836,6 @@ class ProductController extends AbstractSeoCrudController
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
 
                 foreach ($featureTextValues as $featureId => $featureValue) {
-
                     // Check if a FeatureProduct exists for this product and this feature (for another lang)
                     $freeTextFeatureProduct = FeatureProductQuery::create()
                         ->filterByProductId($productId)
@@ -858,7 +870,7 @@ class ProductController extends AbstractSeoCrudController
         // If we have to stay on the same page, do not redirect to the successUrl,
         // just redirect to the edit page again.
         if ($this->getRequest()->get('save_mode') == 'stay') {
-            return $this->redirectToEditionTemplate($this->getRequest());
+            return $this->redirectToEditionTemplate();
         }
 
         // Redirect to the category/product list
@@ -965,7 +977,7 @@ class ProductController extends AbstractSeoCrudController
                 $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
 
                 if ($attrAv !== null) {
-                    if ($attrAv->getAttributeId() == $attribute->getId()) {
+                    if ($attrAv->getId() == $attributeAv->getId()) {
                         $result['error'] = $this->getTranslator()->trans(
                             'A value for attribute "%name" is already present in the combination',
                             array('%name' => $attribute->getTitle())
@@ -1087,6 +1099,10 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Change a product sale element
+     *
+     * @param BaseForm $changeForm
+     *
+     * @return mixed|null|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response
      */
     protected function processProductSaleElementUpdate($changeForm)
     {
@@ -1133,7 +1149,7 @@ class ProductController extends AbstractSeoCrudController
 
             // If we have to stay on the same page, do not redirect to the successUrl, just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                return $this->redirectToEditionTemplate($this->getRequest());
+                return $this->redirectToEditionTemplate();
             }
 
            // Redirect to the success URL
