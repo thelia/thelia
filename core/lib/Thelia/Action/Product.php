@@ -159,7 +159,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $con->commit();
         } catch (\Exception $e) {
-            $con->rollback();
+            $con->rollBack();
             throw $e;
         }
     }
@@ -387,6 +387,22 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->findByProductId($event->getProductId());
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
 
+                // Delete free_text_feature AV (see issue #2061)
+                $featureAvs = FeatureAvQuery::create()
+                    ->useFeatureProductQuery()
+                    ->filterByFreeTextValue(true)
+                    ->filterByProductId($event->getProductId())
+                    ->endUse()
+                    ->find($con)
+                ;
+
+                foreach ($featureAvs as $featureAv) {
+                    $featureAv
+                        ->setDispatcher($this->eventDispatcher)
+                        ->delete($con)
+                    ;
+                }
+
                 // Delete product
                 $product
                     ->setDispatcher($this->eventDispatcher)
@@ -405,7 +421,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 $con->commit();
             } catch (\Exception $e) {
-                $con->rollback();
+                $con->rollBack();
                 throw $e;
             }
         }
@@ -591,7 +607,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Store all the stuff !
             $con->commit();
         } catch (\Exception $ex) {
-            $con->rollback();
+            $con->rollBack();
 
             throw $ex;
         }
