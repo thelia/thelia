@@ -192,7 +192,8 @@ class ProductController extends AbstractSeoCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('product_id', null),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
+            $this->getRequest()->get('category_id', null)
         );
     }
 
