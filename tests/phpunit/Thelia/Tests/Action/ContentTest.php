@@ -163,69 +163,95 @@ class ContentTest extends TestCaseWithURLToolSetup
 
     public function testUpdatePositionUp()
     {
-        $content = ContentQuery::create()
-            ->filterByFolder($this->getFolderForPositionTest(), Criteria::EQUAL)
-            ->filterByPosition(1, Criteria::GREATER_THAN)
+        $contentFolderQuery = ContentFolderQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest())
+            ->filterByPosition(2, Criteria::GREATER_THAN)
             ->findOne();
 
-        if (null === $content) {
+        if (null === $contentFolderQuery) {
             $this->fail('use fixtures before launching test, there is no content in database');
         }
 
-        $newPosition = $content->getPosition()-1;
+        $newPosition = $contentFolderQuery->getPosition()-1;
 
-        $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_UP);
+        $event = new UpdatePositionEvent(
+            $contentFolderQuery->getContentId(),
+            UpdatePositionEvent::POSITION_UP,
+            null,
+            $contentFolderQuery->getFolderId()
+        );
 
         $contentAction = new Content();
         $contentAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
-        $updatedContent = ContentQuery::create()->findPk($content->getId());
+        $updatedContent = ContentFolderQuery::create()
+            ->filterByFolderId($contentFolderQuery->getFolderId())
+            ->filterByContentId($contentFolderQuery->getContentId())
+            ->findOne();
 
-        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
+        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
     public function testUpdatePositionDown()
     {
-        $content = ContentQuery::create()
+        $contentFolderQuery = ContentFolderQuery::create()
             ->filterByFolder($this->getFolderForPositionTest())
             ->filterByPosition(1)
             ->findOne();
 
-        if (null === $content) {
+        if (null === $contentFolderQuery) {
             $this->fail('use fixtures before launching test, there is no content in database');
         }
 
-        $newPosition = $content->getPosition()+1;
+        $newPosition = $contentFolderQuery->getPosition()+1;
 
-        $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_DOWN);
+        $event = new UpdatePositionEvent(
+            $contentFolderQuery->getContentId(),
+            UpdatePositionEvent::POSITION_DOWN,
+            null,
+            $contentFolderQuery->getFolderId()
+        );
 
         $contentAction = new Content();
         $contentAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
-        $updatedContent = ContentQuery::create()->findPk($content->getId());
+        $updatedContent = ContentFolderQuery::create()
+            ->filterByFolderId($contentFolderQuery->getFolderId())
+            ->filterByContentId($contentFolderQuery->getContentId())
+            ->findOne();
+        ;
 
-        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
+        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
     public function testUpdatePositionWithSpecificPosition()
     {
-        $content = ContentQuery::create()
+        $contentFolderQuery = ContentFolderQuery::create()
             ->filterByFolder($this->getFolderForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
-        if (null === $content) {
+        if (null === $contentFolderQuery) {
             $this->fail('use fixtures before launching test, there is no content in database');
         }
 
-        $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
+        $event = new UpdatePositionEvent(
+            $contentFolderQuery->getContentId(),
+            UpdatePositionEvent::POSITION_ABSOLUTE,
+            1,
+            $contentFolderQuery->getFolderId()
+        );
 
         $contentAction = new Content();
         $contentAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
-        $updatedContent = ContentQuery::create()->findPk($content->getId());
+        $updatedContent = ContentFolderQuery::create()
+            ->filterByFolderId($contentFolderQuery->getFolderId())
+            ->filterByContentId($contentFolderQuery->getContentId())
+            ->findOne();
+        ;
 
-        $this->assertEquals(1, $updatedContent->getPosition(), sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getId()));
+        $this->assertEquals(1, $updatedContent->getPosition(), sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
     public function testAddFolderToContent()
@@ -314,16 +340,11 @@ class ContentTest extends TestCaseWithURLToolSetup
             for ($i = 0; $i < 4; $i++) {
                 $content = new ContentModel();
 
-                $content->addFolder($folder);
                 $content->setVisible(1);
-                $content->setPosition($i + 1);
+
+                $content->addFolder($folder);
 
                 $this->setI18n($content);
-
-                $contentFolders = $content->getContentFolders();
-                $collection     = new Collection();
-                $collection->prepend($contentFolders[0]->setDefaultFolder(1));
-                $content->setContentFolders($collection);
 
                 $content->save();
             }
