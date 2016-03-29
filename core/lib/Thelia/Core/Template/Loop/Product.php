@@ -416,6 +416,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
     }
 
+    /**
+     * @param ProductQuery $search
+     * @param string[] $feature_availability
+     */
     protected function manageFeatureAv(&$search, $feature_availability)
     {
         if (null !== $feature_availability) {
@@ -447,6 +451,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
     }
 
+    /**
+     * @param ProductQuery $search
+     * @param string[] $feature_values
+     */
     protected function manageFeatureValue(&$search, $feature_values)
     {
         if (null !== $feature_values) {

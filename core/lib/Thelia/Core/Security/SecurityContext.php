@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Model\Customer;
 
 /**
  * A simple security manager, in charge of checking user
@@ -69,7 +70,7 @@ class SecurityContext
     /**
      * Gets the currently authenticated customer, or null if none is defined
      *
-     * @return UserInterface|null A UserInterface instance or null if no user is available
+     * @return Customer|null A UserInterface instance or null if no user is available
      */
     public function getCustomerUser()
     {
