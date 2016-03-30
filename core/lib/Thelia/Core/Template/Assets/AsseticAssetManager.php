@@ -17,7 +17,6 @@ use Assetic\FilterManager;
 use Assetic\Filter;
 use Assetic\Factory\AssetFactory;
 use Assetic\AssetWriter;
-use Thelia\Core\Template\Assets\Filter\LessDotPhpFilter;
 use Thelia\Model\ConfigQuery;
 use Thelia\Log\Tlog;
 use Symfony\Component\Filesystem\Filesystem;
@@ -92,6 +91,9 @@ class AsseticAssetManager implements AssetManagerInterface
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
+        $fs->mkdir($to_directory, 0777);
+
+        /** @var \RecursiveDirectoryIterator $iterator */
         foreach ($iterator as $item) {
             if ($item->isDir()) {
                 $dest_dir = $to_directory . DS . $iterator->getSubPathName();
@@ -177,24 +179,12 @@ class AsseticAssetManager implements AssetManagerInterface
 
             // Put in place the new directory
             $fs->rename($tmp_dir, $to_directory);
-            /*
-                            // Release the lock
-                            flock($fp, LOCK_UN);
 
-                            // Remove the lock file
-                            @fclose($fp);
-
-                            $fs->remove($lock_file);
-            */
             if (false === @file_put_contents($stamp_file_path, $curr_stamp)) {
                 throw new \RuntimeException(
                     "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that."
                 );
             }
-            /*            } else {
-                            @fclose($fp);
-                        }
-            */
         }
     }
 
@@ -325,7 +315,7 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-     * Register an asset filter
+     * @inheritdoc
      */
     public function registerAssetFilter($filterIdentifier, $filter)
     {
