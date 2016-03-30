@@ -1,5 +1,15 @@
 # 2.3.0-beta1
 
+- #2062 Remove composer dependency leafo/lessphp
+- #2060 Fix BC, TaxRule action introduces a compatibility break
+- #2080 Fix missing function `addoutputfields` in the loops
+- #2078 Fixed checkbox and radio automatic rendrering. The "checked" status of checkboxes and radios was not correctly managed by form-field-attributes-renderer.html
+- #2079 BackOffice : UX improvements on tablets, the right menu was too broad
+- #2067 Fix esi render. The sub-request was not a Thelia request
+- #2066 Fix the problem of position if a product or content in several sections and folders
+- #2073 Use template default fallback in View Listener. Module views was not properly processed when the active front template is not "default"
+- #2068 Fix customer edit view ACL, replace `update` by `view` for edit a customer
+- #2063 Fix, when deleting a product with a free text feature value, the free text feature value was not removed
 - #2058 Fix bug when sending the attribute combination builder form if the user had not selected attribute
 - #2056 Fix UX bug on product list in the frontOffice, the grid icon or the list icon do not lock
 - #2040 Fix bug when change image position on the module config page. The trait `PositionManagementTrait` was missing in `ModuleImage`
