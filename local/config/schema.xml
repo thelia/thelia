@@ -83,6 +83,7 @@
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" primaryKey="true" type="INTEGER" />
     <column name="default_category" type="BOOLEAN" />
+    <column name="position" required="true" type="INTEGER" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -1063,6 +1064,7 @@
     <column name="content_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="default_folder" type="BOOLEAN" />
+    <column name="position" required="true" type="INTEGER" />
     <foreign-key foreignTable="content" name="fk_content_folder_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="content_id" />
     </foreign-key>

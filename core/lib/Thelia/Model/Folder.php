@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
@@ -128,5 +129,22 @@ class Folder extends BaseFolder implements FileModelParentInterface
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
+    }
+
+    /**
+     * Overload for the position management
+     * @param Base\ContentFolder $contentFolder
+     * @inheritdoc
+     */
+    protected function doAddContentFolder($contentFolder)
+    {
+        parent::doAddContentFolder($contentFolder);
+
+        $contentFolderPosition = ContentFolderQuery::create()
+            ->filterByFolderId($contentFolder->getFolderId())
+            ->orderByPosition(Criteria::DESC)
+            ->findOne();
+
+        $contentFolder->setPosition($contentFolderPosition !== null ? $contentFolderPosition->getPosition() + 1 : 1);
     }
 }

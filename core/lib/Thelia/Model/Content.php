@@ -32,6 +32,9 @@ class Content extends BaseContent implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our parent
+     *
+     * @param ContentQuery $query
+     * @deprecated since 2.3, and will be removed in 2.4
      */
     protected function addCriteriaToPositionQuery($query)
     {
@@ -58,28 +61,11 @@ class Content extends BaseContent implements FileModelParentInterface
         return $default_folder == null ? 0 : $default_folder->getFolderId();
     }
 
-    public function setDefaultFolder($folderId)
-    {
-        // Unset previous category
-        ContentFolderQuery::create()
-            ->filterByContentId($this->getId())
-            ->filterByDefaultFolder(true)
-            ->find()
-            ->setByDefault(false)
-            ->save();
-
-        // Set new default category
-        ContentFolderQuery::create()
-            ->filterByContentId($this->getId())
-            ->filterByFolderId($folderId)
-            ->find()
-            ->setByDefault(true)
-            ->save();
-
-        return $this;
-    }
-
-    public function updateDefaultFolder($defaultFolderId)
+    /**
+     * @param int $defaultFolderId
+     * @return $this
+     */
+    public function setDefaultFolder($defaultFolderId)
     {
         // Allow uncategorized content (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultFolderId <= 0) {
@@ -87,27 +73,41 @@ class Content extends BaseContent implements FileModelParentInterface
         }
 
         if ($defaultFolderId == $this->getDefaultFolderId()) {
-            return;
+            return $this;
         }
-
-        ContentFolderQuery::create()
-            ->filterByContentId($this->getId())
-            ->update(array('DefaultFolder' => 0));
 
         $contentFolder = ContentFolderQuery::create()
             ->filterByContentId($this->getId())
-            ->filterByFolderId($defaultFolderId)
+            ->filterByDefaultFolder(true)
             ->findOne();
 
-        if (null === $contentFolder) {
-            $contentFolder = new ContentFolder();
-
-            $contentFolder->setContentId($this->getId())
-                ->setFolderId($defaultFolderId);
+        if (null !== $contentFolder) {
+            $contentFolder->setFolderId($defaultFolderId);
+        } else {
+            $contentFolder = (new ContentFolder())
+                ->setContentId($this->getId())
+                ->setFolderId($defaultFolderId)
+                ->setDefaultFolder(true);
         }
 
-        $contentFolder->setDefaultFolder(true)
-            ->save();
+        $contentFolder->setPosition($contentFolder->getNextPosition());
+
+        $contentFolder->save();
+
+        // For BC, will be removed in 2.4
+        $this->setPosition($contentFolder->getPosition());
+
+        return $this;
+    }
+
+    /**
+     * @deprecated since 2.3, and will be removed in 2.4, please use Content::setDefaultFolder
+     * @param int $defaultFolderId
+     * @return $this
+     */
+    public function updateDefaultFolder($defaultFolderId)
+    {
+        return $this->setDefaultFolder($defaultFolderId);
     }
 
     /**
@@ -132,13 +132,7 @@ class Content extends BaseContent implements FileModelParentInterface
         try {
             $this->save($con);
 
-            $cf = new ContentFolder();
-            $cf->setContentId($this->getId())
-                ->setFolderId($defaultFolderId)
-                ->setDefaultFolder(1)
-                ->save($con);
-
-            $this->setPosition($this->getNextPosition())->save($con);
+            $this->setDefaultFolder($defaultFolderId)->save($con);
 
             $con->commit();
 
@@ -176,5 +170,56 @@ class Content extends BaseContent implements FileModelParentInterface
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONTENT, new ContentEvent($this));
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::setPosition
+     */
+    public function setPosition($v)
+    {
+        return parent::setPosition($v);
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::getPosition
+     */
+    public function getPosition()
+    {
+        return parent::getPosition();
+    }
+
+    public function postSave(ConnectionInterface $con = null)
+    {
+        // For BC, will be removed in 2.4
+        if (!$this->isNew()) {
+            if (isset($this->modifiedColumns[ContentTableMap::POSITION]) && $this->modifiedColumns[ContentTableMap::POSITION]) {
+                if (null !== $productCategory = ContentFolderQuery::create()
+                        ->filterByContent($this)
+                        ->filterByDefaultFolder(true)
+                        ->findOne()
+                ) {
+                    $productCategory->changeAbsolutePosition($this->getPosition());
+                }
+            }
+        }
+    }
+
+    /**
+     * Overload for the position management
+     * @param ContentFolder $contentFolder
+     * @inheritdoc
+     */
+    protected function doAddContentFolder($contentFolder)
+    {
+        parent::doAddContentFolder($contentFolder);
+
+        $contentFolderPosition = ContentFolderQuery::create()
+            ->filterByFolderId($contentFolder->getFolderId())
+            ->orderByPosition(Criteria::DESC)
+            ->findOne();
+
+        $contentFolder->setPosition($contentFolderPosition !== null ? $contentFolderPosition->getPosition() + 1 : 1);
     }
 }

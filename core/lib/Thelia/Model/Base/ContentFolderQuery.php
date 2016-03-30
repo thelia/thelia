@@ -24,12 +24,14 @@ use Thelia\Model\Map\ContentFolderTableMap;
  * @method     ChildContentFolderQuery orderByContentId($order = Criteria::ASC) Order by the content_id column
  * @method     ChildContentFolderQuery orderByFolderId($order = Criteria::ASC) Order by the folder_id column
  * @method     ChildContentFolderQuery orderByDefaultFolder($order = Criteria::ASC) Order by the default_folder column
+ * @method     ChildContentFolderQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildContentFolderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildContentFolderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildContentFolderQuery groupByContentId() Group by the content_id column
  * @method     ChildContentFolderQuery groupByFolderId() Group by the folder_id column
  * @method     ChildContentFolderQuery groupByDefaultFolder() Group by the default_folder column
+ * @method     ChildContentFolderQuery groupByPosition() Group by the position column
  * @method     ChildContentFolderQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildContentFolderQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -51,12 +53,14 @@ use Thelia\Model\Map\ContentFolderTableMap;
  * @method     ChildContentFolder findOneByContentId(int $content_id) Return the first ChildContentFolder filtered by the content_id column
  * @method     ChildContentFolder findOneByFolderId(int $folder_id) Return the first ChildContentFolder filtered by the folder_id column
  * @method     ChildContentFolder findOneByDefaultFolder(boolean $default_folder) Return the first ChildContentFolder filtered by the default_folder column
+ * @method     ChildContentFolder findOneByPosition(int $position) Return the first ChildContentFolder filtered by the position column
  * @method     ChildContentFolder findOneByCreatedAt(string $created_at) Return the first ChildContentFolder filtered by the created_at column
  * @method     ChildContentFolder findOneByUpdatedAt(string $updated_at) Return the first ChildContentFolder filtered by the updated_at column
  *
  * @method     array findByContentId(int $content_id) Return ChildContentFolder objects filtered by the content_id column
  * @method     array findByFolderId(int $folder_id) Return ChildContentFolder objects filtered by the folder_id column
  * @method     array findByDefaultFolder(boolean $default_folder) Return ChildContentFolder objects filtered by the default_folder column
+ * @method     array findByPosition(int $position) Return ChildContentFolder objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildContentFolder objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildContentFolder objects filtered by the updated_at column
  *
@@ -147,7 +151,7 @@ abstract class ContentFolderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `CONTENT_ID`, `FOLDER_ID`, `DEFAULT_FOLDER`, `CREATED_AT`, `UPDATED_AT` FROM `content_folder` WHERE `CONTENT_ID` = :p0 AND `FOLDER_ID` = :p1';
+        $sql = 'SELECT `CONTENT_ID`, `FOLDER_ID`, `DEFAULT_FOLDER`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `content_folder` WHERE `CONTENT_ID` = :p0 AND `FOLDER_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -359,6 +363,47 @@ abstract class ContentFolderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ContentFolderTableMap::DEFAULT_FOLDER, $defaultFolder, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildContentFolderQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(ContentFolderTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(ContentFolderTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContentFolderTableMap::POSITION, $position, $comparison);
     }
 
     /**
