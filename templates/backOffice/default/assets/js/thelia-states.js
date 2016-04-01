@@ -5,7 +5,7 @@
         var addressState = (function () {
 
             // A private function which logs any arguments
-            initialize = function( element ) {
+            var initialize = function( element ) {
                 var elm = {};
 
                 elm.state = $(element);
