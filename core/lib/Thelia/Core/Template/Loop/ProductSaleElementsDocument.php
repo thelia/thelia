@@ -45,6 +45,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
                 ->set("PRODUCT_DOCUMENT_ID", $productSaleElementDocument->getProductDocumentId())
             ;
 
+            $this->addOutputFields($row, $productSaleElementDocument);
             $loopResult->addRow($row);
         }
 

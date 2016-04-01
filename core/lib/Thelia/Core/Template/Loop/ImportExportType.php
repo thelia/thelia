@@ -64,6 +64,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
             } catch (\ErrorException $e) {
             }
 
+            $this->addOutputFields($loopResultRow, $type);
             $loopResult->addRow($loopResultRow);
         }
 

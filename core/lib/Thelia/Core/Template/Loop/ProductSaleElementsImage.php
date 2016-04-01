@@ -45,6 +45,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
                 ->set("PRODUCT_IMAGE_ID", $productSaleElementImage->getProductImageId())
             ;
 
+            $this->addOutputFields($row, $productSaleElementImage);
             $loopResult->addRow($row);
         }
 

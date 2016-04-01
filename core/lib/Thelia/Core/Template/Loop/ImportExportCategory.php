@@ -48,6 +48,7 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
                 ->set("POSITION", $category->getPosition())
             ;
 
+            $this->addOutputFields($loopResultRow, $category);
             $loopResult->addRow($loopResultRow);
         }
 

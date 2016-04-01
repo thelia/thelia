@@ -70,6 +70,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TemplateDefinition $template */
         foreach ($loopResult->getResultDataCollection() as $template) {
             $loopResultRow = new LoopResultRow($template);
 

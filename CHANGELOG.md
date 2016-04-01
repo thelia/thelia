@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2080) Fix missing function `addoutputfields` in the loops
 - (related to #2078) Fixed checkbox and radio automatic rendrering. The "checked" status of checkboxes and radios was not correctly managed by form-field-attributes-renderer.html
 - (related to #2068) Use template default fallback in View Listener. Module views was not properly processed when the active front template is not "default"
 - (related to #2068) Fix customer edit view ACL, replace `update` by `view` for edit a customer
