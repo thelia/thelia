@@ -79,6 +79,7 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
                 ->set('EXTENSION', $serializer->getExtension())
                 ->set('MIME_TYPE', $serializer->getMimeType());
 
+            $this->addOutputFields($loopResultRow, $serializer);
             $loopResult->addRow($loopResultRow);
         }
 

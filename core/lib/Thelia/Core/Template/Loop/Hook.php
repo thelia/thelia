@@ -187,6 +187,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("POSITION", $hook->getPosition())
                 ;
 
+                $this->addOutputFields($loopResultRow, $hook);
                 $loopResult->addRow($loopResultRow);
             }
         }

@@ -86,6 +86,8 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
                 ->set('EXTENSION', $archiver->getExtension())
                 ->set('MIME_TYPE', $archiver->getMimeType());
 
+            $this->addOutputFields($loopResultRow, $archiver);
+            
             $loopResult->addRow($loopResultRow);
         }
 

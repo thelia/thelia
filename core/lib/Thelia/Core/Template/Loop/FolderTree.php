@@ -104,6 +104,8 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
             foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }
+
+            $this->addOutputFields($loopResultRow, $result);
             $loopResult->addRow($loopResultRow);
         }
 
