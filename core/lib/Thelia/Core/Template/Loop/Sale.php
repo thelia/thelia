@@ -243,6 +243,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 ->set("PRICE_OFFSET_VALUE", $sale->getVirtualColumn('price_offset_value'))
             ;
 
+            $this->addOutputFields($loopResultRow, $sale);
             $loopResult->addRow($loopResultRow);
         }
 
