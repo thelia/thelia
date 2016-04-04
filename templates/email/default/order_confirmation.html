@@ -76,7 +76,7 @@
             {/if}
                 <tr>
                     <td style="border-bottom:1px solid #000">
-                        <b>{$TITLE}</b> <i>({$REF})</i>
+                        <b>{$TITLE}</b> <i>({$REF}{if $REF != $PRODUCT_SALE_ELEMENTS_REF}, {$PRODUCT_SALE_ELEMENTS_REF}{/if})</i>
                         {ifloop rel="combinations"}<br />
                         {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
                             <span style="color:#999;display:block;font-size:11px;line-height:1.2">* {$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}</span>
