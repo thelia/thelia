@@ -255,6 +255,10 @@
             <tr class="table-2">
                 <td>
                     <p>{$TITLE}</p>
+                    <p>
+                        {intl l="Product ref : "}{$REF}<br>
+                        {intl l="Combination ref : "}{$PRODUCT_SALE_ELEMENTS_REF}
+                    </p>
                     {ifloop rel="combinations"}
                     {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
