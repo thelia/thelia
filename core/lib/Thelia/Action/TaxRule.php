@@ -36,7 +36,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())
-         ;
+        ;
 
         $taxRule->save();
 
@@ -68,8 +68,8 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             $taxList = $this->getArrayFromJson($event->getTaxList());
-            $countryList = $this->getArrayFromJson($event->getCountryList());
-            $countryDeletedList = $this->getArrayFromJson($event->getCountryDeletedList());
+            $countryList = $this->getArrayFromJson22Compat($event->getCountryList());
+            $countryDeletedList = $this->getArrayFromJson22Compat($event->getCountryDeletedList());
 
             /* clean the current tax rule for the countries/states */
             $deletes = array_merge($countryList, $countryDeletedList);
@@ -118,9 +118,45 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
 
     protected function getArrayFromJson($obj)
     {
-        return is_array($obj)
-            ? $obj
-            : json_decode($obj, true);
+        if (is_null($obj)) {
+            $obj = [];
+        } else {
+            $obj = is_array($obj)
+                ? $obj
+                : json_decode($obj, true);
+        }
+
+        return $obj;
+    }
+
+    /**
+     * This method ensures compatibility with the 2.2.x country arrays passed throught the TaxRuleEvent
+     *
+     * In 2.2.x, the TaxRuleEvent::getXXXCountryList() methods returned an array of country IDs. [ country ID, country ID ...].
+     * From 2.3.0-alpha1, these functions are expected to return an array of arrays, each one containing a country ID and
+     * a state ID. [ [ country ID, state ID], [ country ID, state ID], ...].
+     *
+     * This method checks the $obj parameter, and create a 2.3.0-alpha1 compatible return value if $obj is expressed using
+     * the 2.2.x form.
+     *
+     * @param array $obj
+     *
+     * @return array
+     */
+    protected function getArrayFromJson22Compat($obj)
+    {
+        $obj = $this->getArrayFromJson($obj);
+
+        if (isset($obj[0]) && ! is_array($obj[0])) {
+            $objEx = [];
+            foreach ($obj as $item) {
+                $objEx[] = [$item, 0];
+            }
+
+            return $objEx;
+        }
+
+        return $obj;
     }
 
     /**
