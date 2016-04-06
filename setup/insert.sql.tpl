@@ -342,7 +342,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (236, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (237, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(240, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -2261,7 +2263,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, '{$locale}', {intl l='Newsletter unsubscribe page - at the bottom' locale=$locale}, NULL, NULL),
     (237, '{$locale}', {intl l='Newsletter unsubscribe page - CSS stylesheet' locale=$locale}, NULL, NULL),
     (238, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
-    (239, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (239, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL),
+    (240, '{$locale}', {intl l='Order invoice page - bottom of coupon form' locale=$locale}, NULL, NULL),
+    (241, '{$locale}', {intl l='Order invoice page - bottom of payment form' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

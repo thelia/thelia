@@ -23,7 +23,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
+    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on %store', NULL, NULL),
     (@max, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', NULL, NULL, NULL),
     (@max, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', NULL, NULL, NULL)
 ;

@@ -342,7 +342,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (236, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (237, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(240, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -2477,6 +2479,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, 'de_DE', NULL, NULL, NULL),
     (238, 'de_DE', NULL, NULL, NULL),
     (239, 'de_DE', NULL, NULL, NULL),
+    (240, 'de_DE', NULL, NULL, NULL),
+    (241, 'de_DE', NULL, NULL, NULL),
     (1, 'en_US', 'Invoice choice - at the top', NULL, NULL),
     (2, 'en_US', 'Invoice choice - delivery address', NULL, NULL),
     (3, 'en_US', 'Invoice choice - extra payment zone', NULL, NULL),
@@ -2716,6 +2720,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, 'en_US', 'Newsletter unsubscribe page - CSS stylesheet', NULL, NULL),
     (238, 'en_US', 'Newsletter unsubscribe page - after javascript include', NULL, NULL),
     (239, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),
+    (240, 'en_US', 'Order invoice page - bottom of coupon form', NULL, NULL),
+    (241, 'en_US', 'Order invoice page - bottom of payment form', NULL, NULL),
     (1, 'es_ES', 'Opción de factura - en la parte superior', NULL, NULL),
     (2, 'es_ES', 'Opción de factura - dirección de envío', NULL, NULL),
     (3, 'es_ES', 'Opción de factura - zona de pago extra', NULL, NULL),
@@ -2955,6 +2961,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, 'es_ES', 'Página de baja del boletín - Hoja de estilos CSS', NULL, NULL),
     (238, 'es_ES', 'Página de baja del boletín - después de incluir JavaScript', NULL, NULL),
     (239, 'es_ES', 'Página de baja del boletín - después de la inicialización de JavaScript', NULL, NULL),
+    (240, 'es_ES', NULL, NULL, NULL),
+    (241, 'es_ES', NULL, NULL, NULL),
     (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
     (2, 'fr_FR', 'Choix du mode de paiement - adresse de livraison', NULL, NULL),
     (3, 'fr_FR', 'Choix du mode de paiement - zone de paiement supplémentaire', NULL, NULL),
@@ -3193,7 +3201,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, 'fr_FR', 'Désabonnement newsletter - en bas', NULL, NULL),
     (237, 'fr_FR', 'Désabonnement newsletter - feuille de style CSS', NULL, NULL),
     (238, 'fr_FR', 'Désabonnement newsletter - après l\'inclusion du JavaScript', NULL, NULL),
-    (239, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL)
+    (239, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL),
+    (240, 'fr_FR', NULL, NULL, NULL),
+    (241, 'fr_FR', NULL, NULL, NULL)
 ;
 
 -- Insert I18n admin hooks
@@ -7675,7 +7685,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key=\"store_name\"}', NULL, NULL),
     (4, 'en_US', 'Mail sent to the customer when its password or email is changed in the back-office', 'Your account information on {config key=\"store_name\"} has been changed.', NULL, NULL),
     (5, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key=\"store_name\"} account has been created for you', NULL, NULL),
-    (6, 'en_US', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
+    (6, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on %store', NULL, NULL),
     (7, 'en_US', 'Newsletter subscription confirmation mail', 'Your subscription to %store newsletter', NULL, NULL),
     (1, 'es_ES', 'Confirmación de la orden enviada al cliente', 'Su orden {$order_ref} en {tecla config = \"store_name\"}', NULL, NULL),
     (2, 'es_ES', 'Su nueva contraseña', 'Su nueva contraseña para {tecla config = \"store_name\"}', NULL, NULL),

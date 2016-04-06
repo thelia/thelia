@@ -215,6 +215,7 @@
                         </table>
                     </div>
                 </div>
+                {hook name="order-invoice.coupon-form"}
                 </form>
             {/form}
             
@@ -265,41 +266,39 @@
                         {/if}
 
                         <div class="panel-body">
-
-                        {loop type="address" name="invoice-address"}
-                            {assign var="isInvoiceAddressChecked" value="0"}
-                            {if $isPost}
-                                {if $value == $ID && $value != ""}
-                                    {assign var="isInvoiceAddressChecked" value="1"}
+                            {loop type="address" name="invoice-address"}
+                                {assign var="isInvoiceAddressChecked" value="0"}
+                                {if $isPost}
+                                    {if $value == $ID && $value != ""}
+                                        {assign var="isInvoiceAddressChecked" value="1"}
+                                    {elseif $DEFAULT}
+                                        {assign var="isInvoiceAddressChecked" value="1"}
+                                    {/if}
                                 {elseif $DEFAULT}
                                     {assign var="isInvoiceAddressChecked" value="1"}
                                 {/if}
-                            {elseif $DEFAULT}
-                                {assign var="isInvoiceAddressChecked" value="1"}
-                            {/if}
 
-                            <div class="radio">
-                                <label for="invoice-address_{$ID}">
-                                    <input type="radio" name="{$name}" id="invoice-address_{$ID}" value="{$ID}"{if $isInvoiceAddressChecked} checked="checked"{/if}>
-                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
-                                    <span class="org">{$COMPANY}</span>
-                                    <address class="adr">
-                                        <span class="street-address">{$ADDRESS1}</span><br>
-                                        {if $ADDRESS2 != ""}
-                                            <span class="street-address">{$ADDRESS2}</span><br>
-                                        {/if}
-                                        {if $ADDRESS3 != ""}
-                                            <span class="street-address">{$ADDRESS3}</span><br>
-                                        {/if}
-                                        <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY},
-                                        <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
-                                        {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
-                                    </address>
-                                </label>
-                            </div>
-                        {/loop}
-
+                                <div class="radio">
+                                    <label for="invoice-address_{$ID}">
+                                        <input type="radio" name="{$name}" id="invoice-address_{$ID}" value="{$ID}"{if $isInvoiceAddressChecked} checked="checked"{/if}>
+                                        <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                        <span class="org">{$COMPANY}</span>
+                                        <address class="adr">
+                                            <span class="street-address">{$ADDRESS1}</span><br>
+                                            {if $ADDRESS2 != ""}
+                                                <span class="street-address">{$ADDRESS2}</span><br>
+                                            {/if}
+                                            {if $ADDRESS3 != ""}
+                                                <span class="street-address">{$ADDRESS3}</span><br>
+                                            {/if}
+                                            <span class="postal-code">{$ZIPCODE}</span>
+                                            <span class="locality">{$CITY},
+                                            <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                            {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
+                                        </address>
+                                    </label>
+                                </div>
+                            {/loop}
                             <a href="#" class="btn btn-change-address btn-link hidden"><i class="fa fa-pencil"></i> {intl l="Change address"}</a>
                         </div>
 
@@ -360,6 +359,8 @@
                     </div><!--/.form-group-->
                 </div>
                 {/form_field}
+
+                {hook name="order-invoice.payment-form"}
 
                 <a href="{url path="/order/delivery"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Back"}</a>
                 <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Next Step"}</button>

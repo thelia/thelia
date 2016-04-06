@@ -1,3 +1,8 @@
+# 2.3.4
+- (related to 2106) Added order-invoice form hooks
+- (related to #2109) Module routers priority improvement
+- (related to #1912) Fix for feature loop with product filter
+
 # 2.3.3
 
 - (related to #2249) Fix identical queries in the productSaleElement loop and the Product loop
