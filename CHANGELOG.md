@@ -1,5 +1,9 @@
 # 2.2.3
 
+- (related to #2125) Fix construct in GenerateRewrittenUrlEvent
+- (related to #2118) Module TinyMCE, fix the path for the Java uploader
+- (related to #2096) Fix currency change, an exception was thrown if the currency does not exist
+- (related to #2090) Fix GenerateRewrittenUrlEvent, add getters and setters
 - (related to #2084) Check if customer exist in coupon builder
 - (related to #2080) Fix missing function `addoutputfields` in the loops
 - (related to #2078) Fixed checkbox and radio automatic rendrering. The "checked" status of checkboxes and radios was not correctly managed by form-field-attributes-renderer.html
