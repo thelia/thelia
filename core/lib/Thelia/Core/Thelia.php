@@ -101,7 +101,8 @@ class Thelia extends Kernel
         $result = $con->query("SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode, @@SESSION.sql_mode as session_sql_mode");
 
         if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
-            if (version_compare($data['version'], '5.6.0', '>=')) {
+            // MariaDB is not impacted by this problem
+            if (false === strpos($data['version'], 'MariaDB') && version_compare($data['version'], '5.6.0', '>=')) {
                 Tlog::getInstance()->addInfo("Setting global and session sql_mode to NO_ENGINE_SUBSTITUTION");
 
                 $setQuery = '';
