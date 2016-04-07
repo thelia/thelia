@@ -15,8 +15,10 @@ namespace TheliaSmarty\Template\Plugins;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
@@ -36,8 +38,14 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
  */
 class CartPostage extends AbstractSmartyPlugin
 {
-    /** @var \Thelia\Core\HttpFoundation\Request The Request */
+    /**
+     * @var \Thelia\Core\HttpFoundation\Request The Request
+     * @deprecated since 2.3, please use requestStack
+     */
     protected $request;
+
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
@@ -70,7 +78,9 @@ class CartPostage extends AbstractSmartyPlugin
     {
         $this->container = $container;
 
-        $this->request = $container->get('request');
+        $this->requestStack = $container->get('request_stack');
+
+        $this->request = $this->getCurrentRequest();
 
         $this->dispatcher = $container->get('event_dispatcher');
     }
@@ -92,7 +102,7 @@ class CartPostage extends AbstractSmartyPlugin
             return (null !== $this->countryId) ? $content : "";
         }
 
-        $customer = $this->request->getSession()->getCustomerUser();
+        $customer = $this->getCurrentRequest()->getSession()->getCustomerUser();
         /** @var Address $address */
         /** @var Country $country */
         list($address, $country, $state) = $this->getDeliveryInformation($customer);
@@ -129,7 +139,7 @@ class CartPostage extends AbstractSmartyPlugin
     {
         $address = null;
         // get the selected delivery address
-        if (null !== $addressId = $this->request->getSession()->getOrder()->getChoosenDeliveryAddress()) {
+        if (null !== $addressId = $this->getCurrentRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()) {
             if (null !== $address = AddressQuery::create()->findPk($addressId)) {
                 $this->isCustomizable = false;
                 return [$address, $address->getCountry(), null];
@@ -153,8 +163,8 @@ class CartPostage extends AbstractSmartyPlugin
 
         // get country from cookie
         $cookieName = ConfigQuery::read('front_cart_country_cookie_name', 'fcccn');
-        if ($this->request->cookies->has($cookieName)) {
-            $cookieVal = $this->request->cookies->getInt($cookieName, 0);
+        if ($this->getCurrentRequest()->cookies->has($cookieName)) {
+            $cookieVal = $this->getCurrentRequest()->cookies->getInt($cookieName, 0);
             if (0 !== $cookieVal) {
                 $country = CountryQuery::create()->findPk($cookieVal);
                 if (null !== $country) {
@@ -178,18 +188,19 @@ class CartPostage extends AbstractSmartyPlugin
     /**
      * Retrieve the cheapest delivery for country
      *
-     * @param  \Thelia\Model\Country $country
+     * @param Address $address
+     * @param \Thelia\Model\Country $country
      * @return DeliveryModuleInterface
      */
     protected function getCheapestDelivery(Address $address = null, Country $country = null)
     {
-        $cart = $this->request->getSession()->getSessionCart();
+        $cart = $this->getCurrentRequest()->getSession()->getSessionCart();
 
         $deliveryModules = ModuleQuery::create()
             ->filterByActivate(1)
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL)
             ->find()
-        ;;
+        ;
 
         /** @var \Thelia\Model\Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
@@ -228,5 +239,13 @@ class CartPostage extends AbstractSmartyPlugin
         return array(
             new SmartyPluginDescriptor('block', 'postage', $this, 'postage')
         );
+    }
+
+    /**
+     * @return null|Request
+     */
+    protected function getCurrentRequest()
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 }
