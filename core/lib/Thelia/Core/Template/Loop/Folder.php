@@ -147,9 +147,9 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("folder_id"));
+            $search->filterById($this->getCurrentRequest()->get("folder_id"));
         } elseif ($current === false) {
-            $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get("folder_id"), Criteria::NOT_IN);
         }
 
         $exclude = $this->getExclude();

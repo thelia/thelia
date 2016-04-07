@@ -246,7 +246,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var ProductDocument $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Create document processing event
-            $event = new DocumentEvent($this->request);
+            $event = new DocumentEvent();
 
             // Put source document file path
             $sourceFilePath = sprintf(
