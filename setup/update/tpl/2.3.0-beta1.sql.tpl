@@ -11,7 +11,6 @@ ALTER TABLE `product_category` ADD `position` INT(11) NOT NULL AFTER `default_ca
 ALTER TABLE `content_folder` ADD `position` INT(11) NOT NULL AFTER `default_folder`;
 
 UPDATE `product_category` INNER JOIN `product` ON `product_category`.`product_id`=`product`.`id` SET `product_category`.`position`=`product`.`position`;
-UPDATE `content_folder` INNER JOIN `folder` ON `content_folder`.`folder_id`=`folder`.`id` SET `content_folder`.`position`=`folder`.`position`;
 
 ALTER TABLE `product` CHANGE `position` `position` INT(11) COMMENT 'This column is deprecated since 2.3, and will be removed in 2.5';
 ALTER TABLE `content` CHANGE `position` `position` INT(11) COMMENT 'This column is deprecated since 2.3, and will be removed in 2.5';
