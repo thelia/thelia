@@ -260,6 +260,7 @@
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                     {/loop}
                     {/ifloop}
+                    {hook name="invoice.product-list" order_product=$ID order=$order_id}
                 </td>
                 <td><p class="align-right">{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
                 <td><p class="align-right">{format_money number=$realTax currency_id=$CURRENCY}</p></td>
