@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Stack;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,7 +25,6 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -99,32 +99,7 @@ class ParamInitMiddleware implements HttpKernelInterface
             $request->getSession()->setLang($lang);
         }
 
-        $request->getSession()->setCurrency($this->defineCurrency($request));
-
         return null;
-    }
-
-    protected function defineCurrency(TheliaRequest $request)
-    {
-        $currency = null;
-        if ($request->query->has("currency")) {
-            $currency = CurrencyQuery::create()->findOneByCode($request->query->get("currency"));
-            if ($currency) {
-                /*if (false === $this->app->getContainer()->isScopeActive('request')) {
-                    $this->app->getContainer()->enterScope('request');
-                    $this->app->getContainer()->set('request', $request, 'request');
-                }*/
-                $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($currency, $request));
-            }
-        } else {
-            $currency = $request->getSession()->getCurrency(false);
-        }
-
-        if (null === $currency) {
-            $currency = Currency::getDefaultCurrency();
-        }
-
-        return $currency;
     }
 
     /**
@@ -144,7 +119,6 @@ class ParamInitMiddleware implements HttpKernelInterface
         // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
         // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
         if (null !== $requestedLangCodeOrLocale) {
-
             if (strlen($requestedLangCodeOrLocale) > 2) {
                 $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
             } else {
