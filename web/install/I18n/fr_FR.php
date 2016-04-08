@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Désolé, une erreur inattendue s\'est produite</strong>: %err</p><p>Détails:</p><p>%details</p>',
     'Administrator email :' => 'Courriel de l\'administrateur :',
     'Administrator login :' => 'Identifiant administrateur :',
@@ -75,4 +75,4 @@ return array(
     'or' => 'ou',
     'update to version %version' => 'mise à jour vers la version %version',
     'website url :' => 'URL du site :',
-);
+];

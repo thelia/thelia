@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'Ordens abortadas',
     'Click here' => 'Clique aqui',
-);
+];

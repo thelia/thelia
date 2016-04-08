@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '*If you choose this option, the exported orders would not be available on this page anymore' => '* Si vous choisissez cette option, les commandes exportées ne seront plus affichée sur cette page.',
     'Actions' => 'Actions',
     'An error occured' => 'Une erreur est survenue',
@@ -11,6 +11,7 @@ return array(
     'Create' => 'Créer',
     'Create a new price slice' => 'Créer une nouvelle tranche de prix',
     'Create a price slice' => 'Créer une tranche de prix',
+    'Customer' => 'Client',
     'Date' => 'Date',
     'Delete' => 'Supprimer',
     'Delete a price slice' => 'Supprimer une tranche de prix',
@@ -22,6 +23,8 @@ return array(
     'Edit this price slice' => 'Modifier cette tranche de prix',
     'Export' => 'Export',
     'Export expeditor inet file' => 'Exporter le fichier Expeditor INET',
+    'Number of packages' => 'Nombre de colis',
+    'Packages weight' => 'Poids des colis',
     'Please change the access rights' => 'Merci de modifier les droits d\'accès',
     'Price (€)' => 'Prix (€)',
     'Price slices' => 'Prix et poids',
@@ -31,7 +34,4 @@ return array(
     'There is currently not orders to export' => 'Il n\'y a pas de commande à exporter pour le moment',
     'Total taxed amount' => 'Total TTC',
     'Weight up to ... (kg)' => 'Jusqu\'au poids (Kg)',
-    'Customer' => 'Client',
-    'Number of packages' => 'Nombre de colis',
-    'Packages weight' => 'Poids des colis'
-);
+];

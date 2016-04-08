@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Customer Number' => 'Müşteri numarası',
     'DELIVERY' => 'TESLİMAT',
     'Delivery address' => 'Teslimat adresi',
@@ -28,4 +28,4 @@ return array(
     'invoice.imprint' => 'Fatura Şekli',
     'page' => 'sayfa',
     'product' => 'Ürün',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array(
-    '+ View All' => '',
-    'Offers' => '',
-);
+return [
+    '+ View All' => '+ Mostra tutto',
+    'Offers' => 'Offerte',
+];

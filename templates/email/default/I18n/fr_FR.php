@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '* Billing address' => '* Adresse de facturation',
     '* Delivery address' => '* Adresse de livraison',
     '* Items ordered:' => '* Articles commandés',
@@ -41,7 +41,7 @@ return array(
     'Thank you for your order!' => 'Merci pour votre commande',
     'Thanks' => 'Merci',
     'The %store team.' => 'L\'équipe %store.',
-    'Thelia V2' => 'Thelia V2',
+    'Thelia V2' => 'Thelia v2',
     'To login, please use the email address <span style="font-family: courier, fixed; font-size: 120%">%email</span>' => 'Pour vous connecter, merci d\'utiliser l\'adresse e-mail <span style="font-family: courier, fixed; font-size: 120%">%email</span>',
     'Total' => 'Total',
     'Total due   : %amount' => 'Total à payer : %amount',
@@ -65,4 +65,4 @@ return array(
     'Your order confirmation Nº %ref' => 'Confirmation de commande N° %ref',
     'Your password for %store' => 'Votre mot de passe pour %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Votre mot de passe est <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
-);
+];

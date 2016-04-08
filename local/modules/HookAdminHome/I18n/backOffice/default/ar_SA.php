@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'تم إحباط الطلبات',
     'Average cart' => 'متوسط العربة',
     'Categories' => 'الفئات',
@@ -8,4 +8,4 @@ return array(
     'Current version' => 'النسخة الحالية',
     'Customers' => 'العملاء',
     'Dashboard' => 'لوحة المعلومات',
-);
+];

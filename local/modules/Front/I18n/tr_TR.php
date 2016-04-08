@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Coupon code can\'t be empty' => 'Kupon şifre boş olamaz',
     'Delivery address does not belong to the current customer' => 'Teslimat adresi geçerli müşteriye ait değil',
     'Delivery module cannot be use with selected delivery address' => 'Teslim modülü seçili teslimat adresi kullanılamaz',
@@ -19,4 +19,4 @@ return array(
     'To enable the virtual product feature, the VirtualProductDelivery module should be activated' => 'Sanal ürün özelliği etkinleştirmek için VirtualProductDelivery modülü etkinleştirilmesi',
     'Wrong email or password. Please try again' => 'Email adresi veya şifre hatalı. Lütfen tekrar deneyiniz',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'Şu anda logged içinde. Lütfen yeni bir parola istemeden önce çıkış.',
-);
+];

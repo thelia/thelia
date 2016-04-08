@@ -1,7 +1,5 @@
 <?php
 
-return array(
-    'An error occured' => '',
-    'Edit your analytics configuration.' => '',
+return [
     'Save' => 'Salvare',
-);
+];

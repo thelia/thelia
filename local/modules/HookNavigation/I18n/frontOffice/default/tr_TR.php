@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Latest articles' => 'Son Makaleler',
     'No articles currently' => 'Hiç makale yok',
-);
+];

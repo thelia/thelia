@@ -1,10 +1,9 @@
 <?php
 
-return array(
+return [
     '%nb Item' => '%nb élément',
     '%nb Items' => '%nb éléments',
     '+' => '+',
-    '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Désolé !</strong>Nous ne pouvons pas trouver de mode de livraison pour votre commande.',
     'A new password has been sent to your e-mail address. Please check your mailbox.' => 'Un nouveau mot de passe vient d\'être envoyé à votre adresse e-mail. Merci de vérifier votre boite de réception.',
     'A problem occured' => 'Un problème est survenu',
@@ -124,7 +123,7 @@ return array(
     'No.' => 'N°',
     'Ok' => 'Ok',
     'Options' => 'Options',
-    'Order details' => 'Détail de commande',
+    'Order details' => 'Détail de la commande',
     'Order details %ref' => 'Détail de la commande %ref',
     'Order number' => 'Commande numéro',
     'Orders over $50' => 'Commande supérieure à 50€',
@@ -139,7 +138,7 @@ return array(
     'Placeholder address1' => 'Adresse',
     'Placeholder address2' => 'Adresse',
     'Placeholder cellphone' => 'Numéro de portable',
-    'Placeholder city' => 'Ville',
+    'Placeholder city' => 'New York',
     'Placeholder company' => 'Compagnie',
     'Placeholder contact email' => 'Pour me permettre de vous contacter',
     'Placeholder contact message' => 'Votre commentaire',
@@ -256,4 +255,5 @@ return array(
     'per page' => 'par page',
     'update' => 'mettre à jour',
     'with:' => 'avec :',
-);
+    '404' => '404',
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Customer Number' => 'Numéro de client',
     'DELIVERY' => 'LIVRAISON',
     'Delivery address' => 'Adresse de livraison',
@@ -8,7 +8,7 @@ return array(
     'Discount' => 'Remise',
     'Email: ' => 'Email :',
     'INVOICE' => 'FACTURE',
-    'Invoice REF' => 'Ref de facture',
+    'Invoice REF' => 'Numéro de facture',
     'Invoice address' => 'Adresse de facturation',
     'Invoice date' => 'Date de facturation',
     'Payment module' => 'Module de paiement',
@@ -17,8 +17,8 @@ return array(
     'Product' => 'Produit',
     'Quantity' => 'Quantité',
     'Ref' => 'Réf.',
-    'Tax' => 'Taxes',
-    'Taxed total' => 'Montant total des taxes',
+    'Tax' => 'Taxe',
+    'Taxed total' => 'Total TTC',
     'Total' => 'Total',
     'Total with tax' => 'Total TTC',
     'Total without tax' => 'Total HT',
@@ -28,4 +28,4 @@ return array(
     'invoice.imprint' => 'invoice.imprint',
     'page' => 'page',
     'product' => 'Produit',
-);
+];

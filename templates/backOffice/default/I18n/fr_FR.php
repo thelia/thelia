@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' (default)' => '(défaut)',
     '%count more...' => '%count de plus...',
     '%count shipping zone(s) are attached to this module: %zones. Click here to change' => '%count zone(s) de livraison sont couvertes par ce module: %zones. Cliquez ici pour modifier',
@@ -100,8 +100,8 @@ return array(
     'Attribute information' => 'Information sur la déclinaison',
     'Attribute title' => 'Titre de la déclinaison',
     'Attribute values' => 'Valeurs de la déclinaison',
-    'Attributes' => 'Déclinaisons',
-    'Attributes &amp; Features' => 'Déclinaisons &amp; caractéristiques',
+    'Attributes' => 'Attributs',
+    'Attributes &amp; Features' => 'Attributs &amp; caractéristiques',
     'Auth Mode' => 'Mode d\'authentification',
     'Auth Mode :' => 'Mode d\'authentification :',
     'Author' => 'Auteur',
@@ -531,7 +531,7 @@ return array(
     'Editing module' => 'Module en cours de modification',
     'Editing profile' => 'Modification du profil',
     'Editing profile \'%name\'' => 'Edition du profil \'%name\' ',
-    'Editing shipping configuration for module "%name"' => 'Configuration des zones de livraison du module "%name" ',
+    'Editing shipping configuration for module "%name"' => 'Configuration des zones de livraison du module "%name"',
     'Editing shipping zone "%name"' => 'Modification de la zone de livraison "%name"',
     'Editing state "%name"' => 'Modification l\'État «%name »',
     'Editing tax' => 'En cours de modification de la taxe',
@@ -655,7 +655,7 @@ return array(
     'Hook positions' => 'Positions des points d\'accroche',
     'Hooks' => 'Points d\'accroche',
     'Host' => 'Nom de l\'hôte',
-    'Host :' => 'Host',
+    'Host :' => 'Hôte :',
     'ID' => 'ID',
     'IP Addresses' => 'Adresse IP',
     'ISO 4217 Code' => 'Code ISO 4217',
@@ -755,7 +755,7 @@ return array(
     'No Folders found' => 'Aucun dossier trouvé',
     'No administration profile defined yet. Click the + button to create one.' => 'Aucun profil d\'administration n\'a encore été créé. Cliquer le bouton + pour en ajouter un.',
     'No area defined with this id' => 'Pas de zone définie avec cette id',
-    'No attributes.' => 'Aucune déclinaison.',
+    'No attributes.' => 'Aucun attribut.',
     'No available content in this folder' => 'Ce dossier n\'a pas de contenu',
     'No available product in this category' => 'Aucun produit disponible dans cette rubrique',
     'No available value for this attribute' => 'Aucune valeur disponible pour cette déclinaison',
@@ -1044,7 +1044,7 @@ return array(
     'System parameters' => 'Paramètres système ',
     'System variables' => 'Gestion des variables',
     'Tags' => 'Catégories',
-    'Tax' => 'Taxes',
+    'Tax' => 'Taxe',
     'Tax created on %date_create. Last modification: %date_change' => 'Taxe créée le %date_create. Dernière modification: %date_change',
     'Tax rule created on %date_create. Last modification: %date_change' => 'Règle de taxe créée le %date_create. Dernière modification le %date_change',
     'Tax rules' => 'Règles de taxes',
@@ -1083,7 +1083,7 @@ return array(
     'Thelia Languages' => 'Langue Thelia',
     'Thelia Mailing System' => 'Configuration des envois de mails',
     'Thelia Mailing Templates' => 'Template de Mailing Thelia',
-    'Thelia Product Attributes' => 'Déclinaisons du produit Thelia',
+    'Thelia Product Attributes' => 'Attributs produit Thelia',
     'Thelia Product Features' => 'Caractéristiques produit de Thelia',
     'Thelia Product Templates' => 'Gabarits produit Thelia',
     'Thelia Shipping configuration' => 'Configuration des livraisons Thelia',
@@ -1174,7 +1174,7 @@ return array(
     'Update rates' => 'Mettre à jour les taux',
     'Update tax rule taxes' => 'Mettre à jour les taxes de la règle de taxe',
     'Update this image' => 'Modifier cette image',
-    'Usage count' => 'Nombre d\'utilisations',
+    'Usage count' => 'Utilisations restantes',
     'Usages left' => 'Utilisations restantes',
     'Use Ctrl+click to select (or deselect) more that one attribute value' => 'Ctrl+clic permet de sélectionner (ou dé-sélectionner) plusieurs valeurs de déclinaison.',
     'Use Ctrl+click to select (or deselect) more that one category' => 'Ctrl+Clic permet de sélectionner ou dé-sélectionner plus d\'une catégorie',
@@ -1301,4 +1301,4 @@ return array(
     'version' => 'Version',
     'warning' => 'Attention',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l\'une après l\'autre ou en même temps: cela permet d\'appliquer des taxes sur un produit déjà taxé ou non.',
-);
+];

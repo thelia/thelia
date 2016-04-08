@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'Ordini annullati',
     'Average cart' => 'Carrello medio',
     'Categories' => 'Categorie',
@@ -22,10 +22,11 @@ return array(
     'Previous month sales' => 'Vendite del mese precedente',
     'Previous year sales' => 'Vendite dell\'anno precedente',
     'Products' => 'Prodotti',
+    'Read more' => 'Per saperne di più',
     'Sales' => 'Vendite',
     'Sales excluding shipping' => 'Vendite escluse spese di spedizione',
     'This month' => 'Questo mese',
     'This year' => 'Quest\'anno',
     'Today' => 'Oggi',
     'Yesterday sales' => 'Vendite di ieri',
-);
+];

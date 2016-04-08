@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'A descriptive title' => 'Açıklayıcı bir başlık',
     'A short description, used when a summary or an introduction is required' => 'Bir Özeti veya giriş gerekli olduğunda kullanılan kısa bir açıklama',
     'A short text, used when an additional or supplemental information is required.' => 'Bir ek ya da tamamlayıcı bilgi gerekli olduğunda kullanılan kısa bir metin.',
@@ -17,4 +17,4 @@ return array(
     'Summary' => 'Özet',
     'The detailed description.' => 'Ayrıntılı açıklama.',
     'Title' => 'Başlık',
-);
+];

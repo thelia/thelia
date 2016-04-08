@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Email address' => 'Eposta adresi',
     'Forgot your Password?' => 'Parolanızı mı unuttunuz?',
     'Log In!' => 'Oturum aç!',
@@ -10,4 +10,4 @@ return array(
     'Register' => 'Kaydol',
     'Register!' => 'Kayıt ol!',
     'Sign In' => 'Oturum Aç',
-);
+];

@@ -1,5 +1,5 @@
 <?php
 
-return array(
+return [
     'Newsletter' => 'Lettre d\'information',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'İptal edilen siparişler',
     'Average cart' => 'Sepet Ortalaması',
     'Categories' => 'Katogoriler',
@@ -28,4 +28,4 @@ return array(
     'This year' => 'Bu yıl',
     'Today' => 'bugün',
     'Yesterday sales' => 'Dün satış',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les utilisateurs d\'administration',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les clients',
     '"Remember me" cookie name for administration users' => 'Nom du cookie "Remember me" pour les utilisateurs d\'administration',
@@ -444,7 +444,7 @@ return array(
     'Egypt' => 'Égypte',
     'Ehime' => 'Ehime',
     'El Salvador' => 'Salvador',
-    'Email html - layout - CSS' => 'Email html - CSS',
+    'Email html - layout - CSS' => 'Email html - layout - CSS',
     'Email html - layout - footer' => 'Email html - layout - pied de page',
     'Email html - order confirmation - after address' => 'Email html - confirmation commande - après adresses',
     'Email html - order confirmation - after products' => 'Email html - confirmation commande - après produits',
@@ -822,7 +822,7 @@ return array(
     'Minnesota' => 'Minnesota',
     'Misiones' => 'Misiones',
     'Miss' => 'Mademoiselle',
-    'Miss_short' => 'Mademoiselle',
+    'Miss_short' => 'Mlle',
     'Misses' => 'Madame',
     'Mississippi' => 'Mississippi',
     'Missouri' => 'Missouri',
@@ -886,7 +886,7 @@ return array(
     'New Jersey' => 'New Jersey',
     'New Mexico' => 'Nouveau-Mexique',
     'New Products block' => 'Bloc nouveaux produits',
-    'New York' => 'Ville',
+    'New York' => 'New York',
     'New Zealand' => 'Nouvelle-Zélande',
     'New order {$order_ref} placed on {config key="store_name"}' => 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}',
     'New password request on {config key="store_name"}' => 'Nouvelle demande de mot de passe sur {config key="store_name"}',
@@ -1447,4 +1447,4 @@ return array(
     'tinymce wysiwyg editor' => 'Editeur TinyMCE',
     'Đồng' => 'Đồng',
     'Гривна' => 'Hryvnia Ukrainien',
-);
+];

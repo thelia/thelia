@@ -1,10 +1,10 @@
 <?php
 
-return array(
+return [
     'Cart' => 'Carrello',
-    'Checkout' => '',
-    'Log out!' => '',
+    'Checkout' => 'Procedi all\'acquisto',
+    'Log out!' => 'Esci!',
     'Login' => 'Login',
     'My Account' => 'Mio account',
     'Register' => 'Registrati',
-);
+];

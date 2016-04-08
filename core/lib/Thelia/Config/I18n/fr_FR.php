@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' content create form' => 'Formulaire de création de contenu',
     ' note: only non-visible documents can be associated.' => 'remarque : seuls ces modules. les documents non visibles peuvent être associés.',
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'Le paramètre "%param" ne peut être vide dans la boucle type: %type, nom: %name ',
@@ -744,7 +744,7 @@ return array(
     'decimal separator' => 'séparateur décimal',
     'delete form' => 'formulaire de suppression',
     'delivery address' => 'adresse de livraison',
-    'delivery module %s is not a Thelia\Module\DeliveryModuleInterface' => 'Le module de livraison %s n\'est pas du type Thelia\\Module\\DeliveryModuleInterface',
+    'delivery module %s is not a Thelia\Module\DeliveryModuleInterface' => 'Le module de livraison %s n\'est pas du type Thelia\Module\DeliveryModuleInterface',
     'details pricing form' => 'Formulaire détails des prix',
     'details promotion form' => 'Formulaire détail promotion',
     'email' => 'e-mail',
@@ -791,7 +791,7 @@ return array(
     'minute(s)' => 'minute(s)',
     'password confirmation is not the same as password field' => 'le mot de passe de confirmation n\'est pas le même que le champ mot de passe',
     'password must be composed of at least 4 characters' => 'le mot de passe doit être composé d\'au moins 4 caractères',
-    'payment module %s is not a Thelia\Module\PaymentModuleInterface' => 'Le module de paiement %s n\'est pas une instance de Thelia\\Module\\PaymentModuleInterface ',
+    'payment module %s is not a Thelia\Module\PaymentModuleInterface' => 'Le module de paiement %s n\'est pas une instance de Thelia\Module\PaymentModuleInterface ',
     'pdf' => 'pdf',
     'permanent discount (in percent)' => 'Remise permanente (en pourcentage)',
     'photo gallery' => 'gallerie photos',
@@ -820,4 +820,4 @@ return array(
     'update form' => 'Formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
-);
+];

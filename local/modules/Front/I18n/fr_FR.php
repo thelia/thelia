@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Coupon code can\'t be empty' => 'Le code promo ne peut être vide',
     'Delivery address does not belong to the current customer' => 'L\'adresse de livraison n\'appartient pas au client en cours',
     'Delivery module cannot be use with selected delivery address' => 'Le module de livraison ne peut pas être utilisé avec cette adresse de livraison',
@@ -20,4 +20,4 @@ return array(
     'Wrong email or password. Please try again' => 'Adresse email ou mot de passe incorrect. Merci de ré-essayer.',
     'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon' => 'Vous devez <a href="%sign"> vous connecter</a> ou <a href="%register"> vous inscrire</a> pour utiliser ce coupon',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'Vous être actuellement connecté au site. Vous devez vous déconnecter pour demander un nouveau mot de passe.',
-);
+];
