@@ -1990,6 +1990,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
     (67, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
     (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -2261,6 +2262,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, '{$locale}', {intl l='Newsletter unsubscribe page - CSS stylesheet' locale=$locale}, NULL, NULL),
     (238, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
     (239, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -3451,5 +3453,6 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
     (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' store={config key="store_name"} locale=$locale}, NULL, NULL),
     (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
