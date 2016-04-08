@@ -837,7 +837,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (3023, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3024, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3025, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3027, 'email-html.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3028, 'email-txt.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2770,8 +2772,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3023, '{$locale}', {intl l='Email txt - order notification - after address' locale=$locale}, NULL, NULL),
     (3024, '{$locale}', {intl l='Email txt - order notification - order product' locale=$locale}, NULL, NULL),
     (3025, '{$locale}', {intl l='Email txt - order notification - before products' locale=$locale}, NULL, NULL),
-    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL),
+    (3027, '{$locale}', {intl l='Email html - order notification - after product information' locale=$locale}, NULL, NULL),
+    (3028, '{$locale}', {intl l='Email txt - order notification - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
