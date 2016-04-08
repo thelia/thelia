@@ -15,9 +15,9 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max_id + 1, 'admin.search', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max_id + 1, 'de_DE', 'Suche'),
+(@max_id + 1, 'de_DE', 'Suchen'),
 (@max_id + 1, 'en_US', 'Search'),
-(@max_id + 1, 'es_ES', NULL),
+(@max_id + 1, 'es_ES', 'Buscar'),
 (@max_id + 1, 'fr_FR', 'Recherche')
 ;
 
