@@ -38,18 +38,16 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
     protected $smarty;
 
     /**
+     * @param ContainerBuilder $container
      * Use this method to build the container with the services that you need.
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         /** @var Request $request */
-        $request = $container->get("request");
+        $request = $container->get("request_stack")->getCurrentRequest();
         if (null === $request->getSession()) {
             $request->setSession(new Session());
         }
-
-        /** @var RequestStack $requestStack */
-        $requestStack = $container->get("request_stack");
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -107,6 +105,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
     }
 
     /**
+     * @param ContainerBuilder $container
      * @return \TheliaSmarty\Template\AbstractSmartyPlugin
      */
     abstract protected function getPlugin(ContainerBuilder $container);

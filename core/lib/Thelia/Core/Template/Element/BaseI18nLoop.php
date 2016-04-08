@@ -62,7 +62,7 @@ abstract class BaseI18nLoop extends BaseLoop
             $this->getBackendContext(),
             $this->getLang(),
             $search,
-            $this->request->getSession()->getLang()->getLocale(),
+            $this->getCurrentRequest()->getSession()->getLang()->getLocale(),
             $columns,
             $foreignTable,
             $foreignKey,

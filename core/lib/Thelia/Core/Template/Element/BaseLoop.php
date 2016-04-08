@@ -36,7 +36,6 @@ use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
  * Class BaseLoop
  * @package TThelia\Core\Template\Element
  *
@@ -58,7 +57,10 @@ abstract class BaseLoop
     /** @var array|null array of loop definitions (class => id) */
     protected static $loopDefinitions = null;
 
-    /** @var Request  */
+    /**
+     * @var Request
+     * @deprecated since 2.3, please use getCurrentRequest()
+     */
     protected $request;
 
     /** @var RequestStack */
@@ -103,7 +105,7 @@ abstract class BaseLoop
         $this->checkInterface();
 
         $this->requestStack = $container->get('request_stack');
-        $this->request = $this->requestStack->getCurrentRequest();
+        $this->request = $this->getCurrentRequest();
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
 
@@ -745,5 +747,14 @@ abstract class BaseLoop
     public function getLoopName()
     {
         return $this->loopName;
+    }
+
+    /**
+     * @return null|Request
+     * @since 2.3
+     */
+    protected function getCurrentRequest()
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 }

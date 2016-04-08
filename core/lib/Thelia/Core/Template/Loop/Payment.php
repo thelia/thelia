@@ -36,7 +36,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
-        $cart = $this->request->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
 
         /** @var \Thelia\Model\Module $paymentModule */
         foreach ($loopResult->getResultDataCollection() as $paymentModule) {

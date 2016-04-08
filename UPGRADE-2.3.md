@@ -76,7 +76,7 @@ Request and RequestStack
         public function buildModelCriteria()
         {
             // Get the current request
-            $request = $this->request;
+            $request = $this->getCurrentRequest();
             // Or
             $request = $this->requestStack->getCurrentRequest();
 
