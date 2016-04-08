@@ -27,12 +27,18 @@
 
             {include file="misc/checkout-progress.tpl" step="last"}
 
-            {loop type="order" name="failed-order" id=$failed_order_id}
-
             <div id="payment-failure" class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    <h3 class="panel-title">
+                        {loop type="order" name="failed-order" id=$failed_order_id}
+                            {intl l="You choose to pay by"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span>
+                        {/loop}
+                        {elseloop rel="failed-order"}
+                            {intl l="Your order payment"}
+                        {/elseloop}
+                    </h3>
                 </div>
+
                 <div class="panel-body">
                     <h3>{intl l="We're sorry, a problem occured and your payment was not successful."}</h3>
                     {if null !== $failed_order_message}
@@ -42,8 +48,6 @@
                     <a href="{url path="/order/invoice"}" role="button" class="btn btn-primary">{intl l="Try again"}</a>
                 </div>
             </div>
-
-            {/loop}
 
             {hook name="order-failed.bottom"}
 
