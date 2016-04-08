@@ -27,7 +27,7 @@ return array(
     'Price slices' => 'Prix et poids',
     'Processing' => 'Traitement',
     'REF' => 'REF',
-    'Sent' => 'Envoyé',
+    'Sent' => 'Envoyée',
     'There is currently not orders to export' => 'Il n\'y a pas de commande à exporter pour le moment',
     'Total taxed amount' => 'Total TTC',
     'Weight up to ... (kg)' => 'Jusqu\'au poids (Kg)',

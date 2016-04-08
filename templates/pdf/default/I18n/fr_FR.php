@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'Customer Number' => 'Numéro Client',
+    'Customer Number' => 'Numéro de client',
     'DELIVERY' => 'LIVRAISON',
     'Delivery address' => 'Adresse de livraison',
     'Delivery module' => 'Module de livraison',
@@ -18,7 +18,7 @@ return array(
     'Quantity' => 'Quantité',
     'Ref' => 'Réf.',
     'Tax' => 'Taxes',
-    'Taxed total' => 'Total TTC',
+    'Taxed total' => 'Montant total des taxes',
     'Total' => 'Total',
     'Total with tax' => 'Total TTC',
     'Total without tax' => 'Total HT',
