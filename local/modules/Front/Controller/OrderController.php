@@ -394,31 +394,33 @@ class OrderController extends BaseFrontController
 
     public function orderFailed($order_id, $message)
     {
-        /* check if the placed order matched the customer */
-        $failedOrder = OrderQuery::create()->findPk(
-            $this->getRequest()->attributes->get('order_id')
-        );
-
-        if (null === $failedOrder) {
-            throw new TheliaProcessException("No failed order", TheliaProcessException::NO_PLACED_ORDER, $failedOrder);
+        if (empty($order_id)) {
+            // Fallback to request parameter if the method parameter is empty.
+            $order_id = $this->getRequest()->get('order_id');
         }
 
-        $customer = $this->getSecurityContext()->getCustomerUser();
+        $failedOrder = OrderQuery::create()->findPk($order_id);
 
-        if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
-            throw new TheliaProcessException(
-                $this->getTranslator()->trans(
-                    "Received failed order id does not belong to the current customer",
-                    [],
-                    Front::MESSAGE_DOMAIN
-                ),
-                TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
-                $failedOrder
-            );
+        if (null !== $failedOrder) {
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
+                throw new TheliaProcessException(
+                    $this->getTranslator()->trans(
+                        "Received failed order id does not belong to the current customer",
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    ),
+                    TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
+                    $failedOrder
+                );
+            }
+        } else {
+            Tlog::getInstance()->warning("Failed order ID '$order_id' not found.");
         }
 
         $this->getParserContext()
-            ->set("failed_order_id", $failedOrder->getId())
+            ->set("failed_order_id", $order_id)
             ->set("failed_order_message", $message)
         ;
     }
