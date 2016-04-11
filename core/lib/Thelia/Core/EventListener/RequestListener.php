@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\EventListener;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
@@ -31,6 +33,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\RememberMeTrait;
@@ -259,6 +262,23 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
+    public function checkCurrency(GetResponseEvent $event)
+    {
+        /** @var Request $request */
+        $request = $event->getRequest();
+
+        if ($request->query->has("currency")) {
+            if (null !== $find = CurrencyQuery::create()
+                    ->filterById($request->getSession()->getCurrency(true)->getId(), Criteria::NOT_EQUAL)
+                    ->filterByCode($request->query->get("currency"))
+                    ->findOne()
+            ) {
+                $request->getSession()->setCurrency($find);
+                $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($find, $request));
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      * api
@@ -267,6 +287,7 @@ class RequestListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
+                ['checkCurrency', 256],
                 ["registerValidatorTranslator", 128],
                 ["rememberMeLoader", 128],
                 ['jsonBody', 128]

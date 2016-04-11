@@ -177,7 +177,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     public function updateCart(CurrencyChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $cart = $this->getSession()->getSessionCart($dispatcher);
+        $cart = $event->getRequest()->getSession()->getSessionCart($dispatcher);
 
         if (null !== $cart) {
             $this->updateCartPrices($cart, $event->getCurrency());
