@@ -1,7 +1,8 @@
 <?php
 
-return array(
+return [
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Désolé, une erreur inattendue s\'est produite</strong>: %err</p><p>Détails:</p><p>%details</p>',
+    'Administrator email :' => 'Courriel de l\'administrateur :',
     'Administrator login :' => 'Identifiant administrateur :',
     'Administrator password :' => 'Mot de passe administrateur :',
     'Administrator password verification :' => 'Vérification mot de passe administrateur :',
@@ -31,6 +32,7 @@ return array(
     'It seems that Thelia database is already up to date.' => 'Il semble que votre base de données soit déjà à jour.',
     'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.' => 'Il semblerait que Thelia soit déjà installé sur ce serveur. Merci de vérifier la configuration et d\'apporter les corrections nécessaires avant de ré-essayer.',
     'It\'s strongly recommended to make a backup before proceeding.' => 'Il est chaudement recommendé d\'effectuer une sauvegarde avant de procéder.',
+    'Missing email-address' => 'Adresse e-mail manquant',
     'Missing or invalid login' => 'Login manquant ou invalide',
     'Missing password' => 'Mot de passe manquant',
     'Password :' => 'Mot de passe : ',
@@ -41,7 +43,7 @@ return array(
     'Refresh' => 'Rafraîchir',
     'Select below the one you want to use.' => 'Selectionnez ci-dessous la base de données que vous souhaitez utiliser.',
     'Shop preferred locale :' => 'Langue par défaut :',
-    'Sorry, your database can\'t be backed up. Reason : ' => 'Désolé, votre base de données ne peut pas être sauvegardé. raison:',
+    'Sorry, your database can\'t be backed up. Reason : ' => 'Désolé, votre base de données ne peut pas être sauvegardée. raison:',
     'Sorry, your database can\'t be restored. Try to do it manually' => 'Désolé, votre base de données n\'a pas pu être restauré. Essayez de le faire manuellement.',
     'Thanks' => 'Merci',
     'The SQL server contains multiple databases.' => 'Le serveur de MySQL contient plusieurs bases de données.',
@@ -55,10 +57,10 @@ return array(
     'Thelia is now installed. Thank you !' => 'Thelia est maintenant installé. Merci !',
     'Thelia support forum' => 'Forum de Thelia',
     'Unexpected error occured: %err' => 'Une erreur inattendue est survenue: %err',
-    'Update' => 'Mise à jour',
+    'Update' => 'Mettre à jour',
     'Update Thelia' => 'Mettre à jour Thelia',
     'Update proccess' => 'Processus de mise à jour',
-    'Update proccess trace' => 'Traves du processus de mise à jour',
+    'Update proccess trace' => 'Trace du processus de mise à jour.',
     'Updating Thelia.' => 'Mise à jour de Thelia.',
     'Username :' => 'Nom d\'utilisateur : ',
     'Version' => 'Version',
@@ -73,4 +75,4 @@ return array(
     'or' => 'ou',
     'update to version %version' => 'mise à jour vers la version %version',
     'website url :' => 'URL du site :',
-);
+];

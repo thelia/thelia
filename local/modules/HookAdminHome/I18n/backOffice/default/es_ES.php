@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'Pedidos abandonados',
     'Average cart' => 'Carrito medio',
     'Categories' => 'Categorías',
@@ -28,4 +28,4 @@ return array(
     'This year' => 'Este año',
     'Today' => 'Hoy',
     'Yesterday sales' => 'Ventas de ayer',
-);
+];

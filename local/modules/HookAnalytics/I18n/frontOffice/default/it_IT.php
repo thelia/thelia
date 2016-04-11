@@ -1,10 +1,10 @@
 <?php
 
-return array(
-    'Facebook' => '',
-    'Google+' => '',
-    'Instagram' => '',
-    'RSS' => '',
-    'Twitter' => '',
-    'Youtube' => '',
-);
+return [
+    'Facebook' => 'Facebook',
+    'Google+' => 'Google +',
+    'Instagram' => 'Instagram',
+    'RSS' => 'RSS Feed',
+    'Twitter' => 'Twitter',
+    'Youtube' => 'Youtube',
+];

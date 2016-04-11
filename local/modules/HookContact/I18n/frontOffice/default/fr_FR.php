@@ -1,5 +1,5 @@
 <?php
 
-return array(
+return [
     'Find us, Contact us' => 'Nous trouver, Nous contacter',
-);
+];

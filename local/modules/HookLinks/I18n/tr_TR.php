@@ -1,5 +1,5 @@
 <?php
 
-return array(
+return [
     'Useful links' => 'Faydalı Linkler',
-);
+];

@@ -1,9 +1,8 @@
 <?php
 
-return array(
+return [
     'Delivery address' => 'Indirizzo di consegna',
-    'Download' => '',
     'File' => 'File',
-    'List of downloadable files' => '',
-    'No delivery address for this delivery method' => '',
-);
+    'List of downloadable files' => 'Elenco dei file scaricabili',
+    'No delivery address for this delivery method' => 'Nessun indirizzo di consegna per questo metodo di consegna',
+];

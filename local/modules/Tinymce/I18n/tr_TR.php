@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Add responsive class to images' => 'Resimlere duyarlı sınıf ekleme',
     'Custom CSS available in the editor' => 'Özel CSS Düzenleyicisi içinde kullanılabilir',
     'Enter CSS or LESS code. You may also customize the editor.less file in the plugin template directory.' => 'CSS veya daha az kod girin. Ayrıca eklenti şablonu dizinindeki editor.less dosyasını özelleştirebilir.',
@@ -12,4 +12,4 @@ return array(
     'Show the TinyMCE menu bar' => 'TinyMCE menü çubuğunu göster',
     'This is a sample text editor, to view actual configuration.' => 'Bu gerçek yapılandırmasını görüntülemek için bir örnek metin editörü olan.',
     'Tinymce configuration' => 'TinyMCE yapılandırma',
-);
+];

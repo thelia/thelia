@@ -1,31 +1,15 @@
 <?php
 
-return array(
-    'Customer Number' => '',
+return [
     'DELIVERY' => 'ΠΑΡΑΔΟΣΗ',
-    'Delivery address' => '',
-    'Delivery module' => 'Ενότητα παράδοσης',
-    'Discount' => '',
-    'Email: ' => '',
+    'Delivery address' => 'Διεύθυνση παράδοσης',
     'INVOICE' => 'ΤΙΜΟΛΟΓΙΟ',
     'Invoice REF' => 'Αναφ Τιμολογίου',
-    'Invoice address' => '',
-    'Invoice date' => 'Ημ/νία Τιμολόγησης',
-    'Payment module' => 'Ενότητα πληρωμής',
-    'Phone: ' => '',
-    'Postage' => 'Ταχυδρομικά έξοδα',
-    'Product' => 'Προϊόν',
     'Quantity' => 'Ποσότητα',
     'Ref' => 'Αναφ',
-    'Tax' => 'Φόρος',
-    'Taxed total' => 'Συνολικοί Φόροι',
     'Total' => 'Σύνολο',
     'Total with tax' => 'Σύνολο με ΦΠΑ',
     'Total without tax' => 'Σύνολο χωρίς ΦΠΑ',
-    'Unit taxed price' => 'Τιμή φορολογημένης μονάδας',
-    'Unit. price' => 'Τιμή τμχ.',
-    'delivery.imprint' => '',
-    'invoice.imprint' => '',
     'page' => 'σελίδα',
     'product' => 'προϊόν',
-);
+];

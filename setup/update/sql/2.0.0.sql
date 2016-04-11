@@ -41,7 +41,7 @@ INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'de_DE', 'Konfiguration / Cache'),
 (@max, 'en_US', 'Configuration / Cache'),
-(@max, 'es_ES', NULL),
+(@max, 'es_ES', 'Configuración / caché'),
 (@max, 'fr_FR', 'Configuration / Cache')
 ;
 
@@ -53,7 +53,7 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'de_DE', 'Back-Office Startseite'),
 (@max, 'en_US', 'Back-office home page'),
-(@max, 'es_ES', NULL),
+(@max, 'es_ES', 'Página de inicio de back office'),
 (@max, 'fr_FR', 'Page d\'acceuil de l\'administration')
 ;
 

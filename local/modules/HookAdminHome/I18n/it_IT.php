@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Sales statistics' => 'Statistiche di vendita',
     'Thelia informations' => 'Thelia informazioni',
-);
+];

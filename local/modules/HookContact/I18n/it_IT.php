@@ -1,5 +1,5 @@
 <?php
 
-return array(
-    'Contact' => '',
-);
+return [
+    'Contact' => 'Contatta',
+];

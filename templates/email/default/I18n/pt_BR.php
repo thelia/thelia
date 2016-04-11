@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '* Billing address' => '* Endereço de cobrança',
     '* Delivery address' => '* Endereço de entrega',
     '* Items ordered:' => '* Itens do pedido:',
@@ -21,7 +21,7 @@ return array(
     'Hello, a new order has been placed.' => 'Olá, um novo pedido foi criado.',
     'Here are the details of your purchase:' => 'Aqui estão os detalhes da sua compra:',
     'Here is the details of your order %ref placed on %date' => 'Aqui estão os detalhes do seu pedido %ref criado em %date',
-    'Item : %item' => 'Item : %item',
+    'Item : %item' => 'Item: %item',
     'Items ordered:' => 'Itens do pedido:',
     'Items total : %amount' => 'Total de itens : %amount',
     'Kind regards' => 'Atenciosamente',
@@ -65,4 +65,4 @@ return array(
     'Your order confirmation Nº %ref' => 'Sua confirmação de pedido Nº %ref',
     'Your password for %store' => 'Sua senha para %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Sua senha é <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Add an image to the carousel' => 'Slayt için bir resim ekle',
     'Add this image to the carousel' => 'slayt için bu resim ekleme',
     'Carousel image' => 'slayt görüntü',
@@ -10,4 +10,4 @@ return array(
     'Edit your carousel.' => 'slayt  düzenleyin.',
     'Remove this image' => 'Bu resmi kaldırma',
     'Your carousel contains no image. Please add one using the form above.' => 'Senin slayt hiçbir görüntü içermiyor . Lütfen yukarıdaki formu kullanarak ekleyin.',
-);
+];

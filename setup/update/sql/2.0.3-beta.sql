@@ -25,9 +25,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max + 1, 'en_US', 'Default available stock when check-available-stock is set to 0.', NULL, NULL, NULL),
 (@max + 2, 'en_US', 'The ID of the folder containing your information pages : terms, imprint, ...', NULL, NULL, NULL),
 (@max + 3, 'en_US', 'The ID of the \'Terms & Conditions\' content.', NULL, NULL, NULL),
-(@max + 1, 'es_ES', NULL, NULL, NULL, NULL),
-(@max + 2, 'es_ES', NULL, NULL, NULL, NULL),
-(@max + 3, 'es_ES', NULL, NULL, NULL, NULL),
+(@max + 1, 'es_ES', 'Cuando check-available-stock es 0 stock disponible por defecto.', NULL, NULL, NULL),
+(@max + 2, 'es_ES', 'El ID de la carpeta que contiene sus páginas de información: términos, impresión,...', NULL, NULL, NULL),
+(@max + 3, 'es_ES', 'El ID de los contenidos de \'Términos y condiciones\'.', NULL, NULL, NULL),
 (@max + 1, 'fr_FR', 'Stock disponible par défaut quand check-available-stock est à 0.', NULL, NULL, NULL),
 (@max + 2, 'fr_FR', 'L\'ID du dossier contenant vos pages d\'informations : CGV, mentions légales, ...', NULL, NULL, NULL),
 (@max + 3, 'fr_FR', 'L\'ID du contenu de vos \'CGV\'.', NULL, NULL, NULL)

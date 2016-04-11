@@ -1,7 +1,6 @@
 <?php
 
-return array(
-    'An error occured' => '',
-    'Edit your social accounts.' => '',
+return [
+    'Edit your social accounts.' => 'Modifica i tuoi account social.',
     'Save' => 'Salvare',
-);
+];

@@ -1,12 +1,7 @@
 <?php
 
-return array(
-    'Categories' => 'Categorie',
+return [
     'Home' => 'Home',
-    'No articles currently' => '',
-    'Toggle navigation' => 'Toggle navigation',
-    'HookNavigation configuration' => '',
-
-    'Folder in footer body' => '',
-    'Folder in footer bottom' => '',
-);
+    'Modules' => 'Moduli',
+    'Select a folder' => 'Seleziona una cartella',
+];

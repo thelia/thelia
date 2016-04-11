@@ -24,8 +24,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
     (@max, 'en_US', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
-    (@max, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max, 'fr_FR', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL)
+    (@max, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', NULL, NULL, NULL),
+    (@max, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', NULL, NULL, NULL)
 ;
 
 -- Insert a fake email address for administrators, to trigger the admin update dialog
@@ -52,12 +52,12 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 1, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (@max_id + 2, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
     (@max_id + 3, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),
-    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'es_ES', 'La longitud mínima de la contraseña de administrador', NULL, NULL, NULL),
     (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max_id + 1, 'fr_FR', 'The minimum length required for an administrator password', NULL, NULL, NULL),
-    (@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'fr_FR', NULL, NULL, NULL, NULL)
+    (@max_id + 1, 'fr_FR', 'La longueur minimale requise pour un mot de passe administrateur', NULL, NULL, NULL),
+    (@max_id + 2, 'fr_FR', 'Permettre à un administrateur de recréer un mot de passe perdu (1 = Oui, 0 = non)', NULL, NULL, NULL),
+    (@max_id + 3, 'fr_FR', 'Envoyer un email de confirmation aux abonnés de la newsletter (1 = Oui, 0 = non)', NULL, NULL, NULL)
 ;
 
 -- Additional hooks
@@ -116,38 +116,38 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+14, 'en_US', 'Newsletter unsubscribe page - CSS stylesheet', NULL, NULL),
     (@max_id+15, 'en_US', 'Newsletter unsubscribe page - after javascript include', NULL, NULL),
     (@max_id+16, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),
-    (@max_id+1, 'es_ES', NULL, NULL, NULL),
-    (@max_id+2, 'es_ES', NULL, NULL, NULL),
-    (@max_id+3, 'es_ES', NULL, NULL, NULL),
-    (@max_id+4, 'es_ES', NULL, NULL, NULL),
-    (@max_id+5, 'es_ES', NULL, NULL, NULL),
-    (@max_id+6, 'es_ES', NULL, NULL, NULL),
-    (@max_id+7, 'es_ES', NULL, NULL, NULL),
-    (@max_id+8, 'es_ES', NULL, NULL, NULL),
-    (@max_id+9, 'es_ES', NULL, NULL, NULL),
-    (@max_id+10, 'es_ES', NULL, NULL, NULL),
-    (@max_id+11, 'es_ES', NULL, NULL, NULL),
-    (@max_id+12, 'es_ES', NULL, NULL, NULL),
-    (@max_id+13, 'es_ES', NULL, NULL, NULL),
-    (@max_id+14, 'es_ES', NULL, NULL, NULL),
-    (@max_id+15, 'es_ES', NULL, NULL, NULL),
-    (@max_id+16, 'es_ES', NULL, NULL, NULL),
-    (@max_id+1, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+2, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+3, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+4, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+5, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+6, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+7, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+8, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+9, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+10, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+11, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+12, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+13, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+14, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+15, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+16, 'fr_FR', NULL, NULL, NULL)
+    (@max_id+1, 'es_ES', 'Venta - encabezado', NULL, NULL),
+    (@max_id+2, 'es_ES', 'Venta - al pie', NULL, NULL),
+    (@max_id+3, 'es_ES', 'Venta - encabezado del área principal', NULL, NULL),
+    (@max_id+4, 'es_ES', 'Venta - al pie del área principal', NULL, NULL),
+    (@max_id+5, 'es_ES', 'Venta - antes del área de contenido principal', NULL, NULL),
+    (@max_id+6, 'es_ES', 'Venta - después del área de contenido principal', NULL, NULL),
+    (@max_id+7, 'es_ES', 'Venta - Hoja de estilos CSS', NULL, NULL),
+    (@max_id+8, 'es_ES', 'Venta - después de incluir JavaScript', NULL, NULL),
+    (@max_id+9, 'es_ES', 'Venta - inicialización de JavaScript', NULL, NULL),
+    (@max_id+10, 'es_ES', 'Detalles de pedido - después de la dirección de facturación', NULL, NULL),
+    (@max_id+11, 'es_ES', 'Detalles de pedido - después de la dirección de entrega', NULL, NULL),
+    (@max_id+12, 'es_ES', 'Página de baja del boletín - en la parte superior', NULL, NULL),
+    (@max_id+13, 'es_ES', 'Página de baja del boletín - al pie', NULL, NULL),
+    (@max_id+14, 'es_ES', 'Página de baja del boletín - Hoja de estilos CSS', NULL, NULL),
+    (@max_id+15, 'es_ES', 'Página de baja del boletín - después de incluir JavaScript', NULL, NULL),
+    (@max_id+16, 'es_ES', 'Página de baja del boletín - después de la inicialización de JavaScript', NULL, NULL),
+    (@max_id+1, 'fr_FR', 'Promotion - en haut', NULL, NULL),
+    (@max_id+2, 'fr_FR', 'Promotion - en bas', NULL, NULL),
+    (@max_id+3, 'fr_FR', 'Promotion - en haut de la zone principal', NULL, NULL),
+    (@max_id+4, 'fr_FR', 'Promotion - en bas de la zone principal', NULL, NULL),
+    (@max_id+5, 'fr_FR', 'Promotion - au dessous de la zone de contenu principale', NULL, NULL),
+    (@max_id+6, 'fr_FR', 'Promotion - en dessous de la zone de contenu principale', NULL, NULL),
+    (@max_id+7, 'fr_FR', 'Promotion - feuille de style CSS', NULL, NULL),
+    (@max_id+8, 'fr_FR', 'Promotion - après l\'inclusion du JavaScript', NULL, NULL),
+    (@max_id+9, 'fr_FR', 'Promotion - initialisation du JavaScript', NULL, NULL),
+    (@max_id+10, 'fr_FR', 'Détail d\'une commande - après l\'adresse de facturation', NULL, NULL),
+    (@max_id+11, 'fr_FR', 'Détails d\'une commande - après l\'adresse de livraison', NULL, NULL),
+    (@max_id+12, 'fr_FR', 'Désabonnement newsletter - en haut', NULL, NULL),
+    (@max_id+13, 'fr_FR', 'Désabonnement newsletter - en bas', NULL, NULL),
+    (@max_id+14, 'fr_FR', 'Désabonnement newsletter - feuille de style CSS', NULL, NULL),
+    (@max_id+15, 'fr_FR', 'Désabonnement newsletter - après l\'inclusion du JavaScript', NULL, NULL),
+    (@max_id+16, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL)
 ;
 
 -- Update module version column
@@ -177,7 +177,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
     (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to %store newsletter', NULL, NULL),
-    (@max, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max, 'es_ES', 'Correo enviado después de la suscripción al boletín de noticias', 'Tu suscripción al boletín de %store', NULL, NULL),
     (@max, 'fr_FR', 'Email envoyé après l\'inscription à la newsletter', 'Vous avez souscrit à la newsletter du site %store', NULL, NULL)
 ;
 
@@ -195,9 +195,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max+1, 'en_US', 'Number by default of results per page for product list', NUll, NULL, NULL),
     (@max+2, 'en_US', 'Number by default of results per page for order list', NUll, NULL, NULL),
     (@max+3, 'en_US', 'Number by default of results per page for customer list', NUll, NULL, NULL),
-    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),
-    (@max+2, 'es_ES', NULL, NUll, NULL, NULL),
-    (@max+3, 'es_ES', NULL, NUll, NULL, NULL),
+    (@max+1, 'es_ES', 'Número predeterminado de resultados por página para la lista de productos', NUll, NULL, NULL),
+    (@max+2, 'es_ES', 'Número predeterminado de resultados por página para la lista de pedidos', NUll, NULL, NULL),
+    (@max+3, 'es_ES', 'Número predeterminado de resultados por página para la lista de clientes', NUll, NULL, NULL),
     (@max+1, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (@max+2, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (@max+3, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL)

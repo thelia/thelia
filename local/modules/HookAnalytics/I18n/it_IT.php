@@ -1,5 +1,5 @@
 <?php
 
-return array(
-    'Tracking Code' => '',
-);
+return [
+    'Tracking Code' => 'Codice di monitoraggio',
+];

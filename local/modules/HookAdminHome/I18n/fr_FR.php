@@ -1,7 +1,7 @@
 <?php
 
-return array(
+return [
+    'Sales statistics' => 'Statistiques de vente',
     'Stats on %month/%year' => 'Statistiques pour %month/%year',
     'Thelia informations' => 'Informations Thelia',
-    'Sales statistics' => 'Statistiques de vente',
-);
+];
