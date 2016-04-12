@@ -129,6 +129,12 @@ class ModuleInstallForm extends BaseForm
     protected function unzipModule(UploadedFile $file)
     {
         $extractPath = false;
+        if (!class_exists('ZipArchive')) {
+            throw new Exception(
+                Translator::getInstance()->trans("Please install the php extension \"zip\" first.")
+            );
+        }
+
         $zip = new ZipArchive();
         if ($zip->open($file->getRealPath()) === true) {
             $extractPath = $this->tempdir();
