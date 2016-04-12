@@ -33,6 +33,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -276,6 +277,8 @@ class RequestListener implements EventSubscriberInterface
                 $request->getSession()->setCurrency($find);
                 $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($find, $request));
             }
+        } else {
+            $request->getSession()->setCurrency(Currency::getDefaultCurrency());
         }
     }
 

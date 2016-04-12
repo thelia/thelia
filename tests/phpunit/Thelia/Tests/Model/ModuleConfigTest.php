@@ -18,7 +18,7 @@ use Thelia\Model\ModuleConfigQuery;
 
 /**
  * Class ModuleConfigTest
- * @package Thelia\Tests\Action
+ * @package Thelia\Tests\Model
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class ModuleConfigTest extends \PHPUnit_Framework_TestCase

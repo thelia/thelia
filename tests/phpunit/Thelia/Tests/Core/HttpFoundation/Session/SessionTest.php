@@ -21,6 +21,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Tools\TokenProvider;
 
@@ -217,5 +218,40 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($cart);
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
+    }
+
+    public function testSetCurrency()
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        $currentCurrency = (new Currency())->setId(99);
+        $session->setCurrency($currentCurrency);
+        $this->assertEquals($currentCurrency->getId(), $session->getCurrency()->getId());
+    }
+
+    public function testGetCurrencyWithParameterForceDefault()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $this->assertNull($session->getCurrency(false));
+    }
+
+    public function testGetCurrency()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $this->assertInstanceOf('Thelia\Model\Currency', $session->getCurrency());
+    }
+
+    public function testGetAdminEditionCurrencyWithCurrencyInSession()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $currentCurrency = (new Currency())->setId(99);
+        $session->setAdminEditionCurrency($currentCurrency);
+        $this->assertEquals($currentCurrency->getId(), $session->getAdminEditionCurrency()->getId());
+    }
+
+    public function testGetAdminEditionCurrencyWithNoCurrencyInSession()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $this->assertInstanceOf('Thelia\Model\Currency', $session->getAdminEditionCurrency());
     }
 }
