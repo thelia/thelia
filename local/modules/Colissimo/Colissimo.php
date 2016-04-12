@@ -167,7 +167,7 @@ class Colissimo extends AbstractDeliveryModule
         if (Colissimo::getConfigValue(ColissimoConfigValue::FREE_SHIPPING, null) == null && $tableExists) {
             $result = $database->execute('SELECT active FROM colissimo_freeshipping WHERE id=1')->fetch()["active"];
             Colissimo::setConfigValue(ColissimoConfigValue::FREE_SHIPPING, $result);
-            $database->execute("DROP TABLE 'colissimo_freeshipping'");
+            $database->execute("DROP TABLE `colissimo_freeshipping`");
         }
 
         if (is_readable($uploadDir) && Colissimo::getConfigValue(ColissimoConfigValue::PRICES, null) == null) {
