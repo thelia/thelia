@@ -1,3 +1,15 @@
+# 2.3.0-beta2
+
+- #2030 Fix ziparchive not found, add a message to prevent that the zip extension was not found on the server
+- #2104 Fixed update function issue in Colissimo module
+- #2096 #2103 Fix currency change, an exception was thrown if the currency does not exist
+- #2097 Fixed and improved cancel order processing
+- #2095 Updated translations from Crowdin
+- #2092 Fix Module TheliaSmarty, replace the request service by requestStack service
+- #2091 Fixed NO_ENGINE_SUBSTITUTION setting for MariaDB
+- #2090 Fix GenerateRewrittenUrlEvent, add getters and setters
+- #2084 Check if customer exist in coupon builder
+
 # 2.3.0-beta1
 
 - #2062 Remove composer dependency leafo/lessphp
