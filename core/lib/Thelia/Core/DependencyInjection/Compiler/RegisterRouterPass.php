@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 
 /**
  *
@@ -52,8 +54,9 @@ class RegisterRouterPass implements CompilerPassInterface
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
         }
         if (defined("THELIA_INSTALL_MODE") === false) {
-            $modules = \Thelia\Model\ModuleQuery::getActivated();
+            $modules = ModuleQuery::getActivated();
 
+            /** @var Module $module */
             foreach ($modules as $module) {
                 $moduleBaseDir = $module->getBaseDir();
                 $routingConfigFilePath = $module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml";
@@ -76,7 +79,7 @@ class RegisterRouterPass implements CompilerPassInterface
 
                     $container->setDefinition("router.".$moduleBaseDir, $definition);
 
-                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleBaseDir), 150));
+                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleBaseDir), 150 + $module->getPosition()));
                 }
             }
         }
