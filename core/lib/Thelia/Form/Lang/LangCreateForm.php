@@ -73,6 +73,15 @@ class LangCreateForm extends BaseForm
                     'for' => 'locale_lang',
                 ),
             ))
+            ->add('date_time_format', 'text', array(
+                'constraints' => array(
+                    new NotBlank(),
+                ),
+                'label' => Translator::getInstance()->trans('date/time format'),
+                'label_attr' => array(
+                    'for' => 'date_time_format',
+                ),
+            ))
             ->add('date_format', 'text', array(
                 'constraints' => array(
                     new NotBlank(),
@@ -101,6 +110,7 @@ class LangCreateForm extends BaseForm
                 ),
             ))
             ->add('thousands_separator', 'text', array(
+                'trim' => false,
                 'label' => Translator::getInstance()->trans('thousands separator'),
                 'label_attr' => array(
                     'for' => 'thousands_separator',

@@ -107,7 +107,11 @@ class Lang extends BaseLang
 
     public function preSave(ConnectionInterface $con = null)
     {
-        $this->setDatetimeFormat(sprintf("%s %s", $this->getDateFormat(), $this->getTimeFormat()));
+        // If the date/time format is not specified, generate it.
+        $dateTimeFormat = $this->getDateTimeFormat();
+        if (empty($dateTimeFormat)) {
+            $this->setDatetimeFormat(sprintf("%s %s", $this->getDateFormat(), $this->getTimeFormat()));
+        }
 
         return true;
     }

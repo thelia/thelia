@@ -22,6 +22,7 @@ class LangCreateEvent extends LangEvent
     protected $title;
     protected $code;
     protected $locale;
+    protected $date_time_format;
     protected $date_format;
     protected $time_format;
     protected $decimal_separator;
@@ -51,6 +52,24 @@ class LangCreateEvent extends LangEvent
     {
         return $this->code;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDateTimeFormat()
+    {
+        return $this->date_time_format;
+    }
+
+    /**
+     * @param mixed $date_time_format
+     */
+    public function setDateTimeFormat($date_time_format)
+    {
+        $this->date_time_format = $date_time_format;
+        return $this;
+    }
+
 
     /**
      * @param mixed $date_format
