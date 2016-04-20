@@ -40,7 +40,7 @@ return [
     'Chieti' => 'Chieti',
     'Colorado' => 'Colorado',
     'Como' => 'Como',
-    'Configuration' => 'Impostazione',
+    'Configuration' => 'Impostazioni',
     'Content' => 'Contenuto',
     'Cosenza' => 'Cosenza',
     'Coupon' => 'Promozione',

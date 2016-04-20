@@ -189,7 +189,6 @@ return [
     'You will receive a link to reset your password.' => 'سوف تتلقى رابط إعادة تعيين كلمة المرور الخاصة بك.',
     'Your Cart' => 'عربة التسوق الخاصة بك',
     'Your order will be confirmed by us upon receipt of your payment.' => 'سيتم تأكيد طلبك من قبلنا عند استلام قيمة الدفع الخاص بك.',
-    'deliveries' => 'عمليات التوصيل',
     'for' => 'لـ',
     'instead of' => 'بدلا من',
     'missing or invalid data' => 'بيانات مفقودة أو غير صالحة',

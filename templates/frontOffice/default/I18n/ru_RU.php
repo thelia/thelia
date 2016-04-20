@@ -243,7 +243,6 @@ return [
     'You will receive a link to reset your password.' => 'Вы получите ссылку для сброса пароля.',
     'Your Cart' => 'Ваша корзина',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Ваш заказ будет подтвержден после получения платежа.',
-    'deliveries' => 'доставки',
     'for' => 'для',
     'instead of' => 'вместо',
     'missing or invalid data' => 'отсутствуют или неневерные данные',

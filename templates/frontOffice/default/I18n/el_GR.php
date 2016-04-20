@@ -191,7 +191,6 @@ return [
     'You will receive a link to reset your password.' => 'Θα λάβετε ένα σύνδεσμο για να επαναδημιουργήσετε τον κωδικό πρόσβασής σας.',
     'Your Cart' => 'Το καλάθι σας',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Παραγγελία σας θα επιβεβαιωθεί από εμάς, μετά την παραλαβή της πληρωμής σας.',
-    'deliveries' => 'παραδόσεις',
     'for' => 'για',
     'instead of' => 'αντί για',
     'missing or invalid data' => 'ελλειπή ή αναληθή δεδομένα',
