@@ -20,14 +20,14 @@ while($cycle && $i<$max_cycles){
 	require_once($path."config.php");
 	$cycle=false;
     }
-    $path=fix_dirname($path)."/";
+    $path=fix_dirname($path).DS;
 }
 
-$path="../".$current_path.$_GET['path'];
+$path=$current_path.$_GET['path'];
 
 if(strpos($_GET['path'],'../')!==FALSE || strpos($_GET['path'],'./')!==FALSE || strpos($_GET['path'],'/')===0) die ('path error');
 
-$path=str_replace(' ','~',$path);
+$path=str_replace([' ','/'],['~',DS],$path);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////   The user callback function, that can be called after upload   ////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
