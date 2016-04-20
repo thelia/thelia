@@ -62,7 +62,7 @@
                                 {loop type="lang" name="lang.list" backend_context="1" active="*"}
                                 <tr>
                                     <td>{$ID}</td>
-                                    <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$CODE}" /></td>
+                                    <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png" failsafe="on"}" alt="{$CODE}" /></td>
                                     <td>{$TITLE}</td>
                                     <td>{$CODE}</td>
                                     <td>{$LOCALE}</td>
@@ -213,6 +213,13 @@
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                 <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='en_US'}">
+            </div>
+        {/form_field}
+        {form_field field='date_time_format'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='d-m-Y H:i:s'}">
+                <span class="help-block">{intl l='The syntax used is identical to the PHP <a href="http://www.php.net/date" target="_other">date()</a> function'}</span>
             </div>
         {/form_field}
         {form_field field='date_format'}
