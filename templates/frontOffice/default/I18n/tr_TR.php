@@ -247,7 +247,6 @@ return [
     'You will receive a link to reset your password.' => 'Şifrenizi sıfırlamak için bir bağlantı alacaksınız.',
     'Your Cart' => 'Sepetiniz',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Sipariş, ödeme aldıktan sonra bizim tarafımızdan teyit edilecektir.',
-    'deliveries' => 'teslimat',
     'for' => 'için',
     'instead of' => 'Bunun Yerine',
     'missing or invalid data' => 'eksik veya geçersiz veri',

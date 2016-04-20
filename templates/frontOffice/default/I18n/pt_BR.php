@@ -243,7 +243,6 @@ return [
     'You will receive a link to reset your password.' => 'Você irá receber um link para resetar sua senha.',
     'Your Cart' => 'Seu carrinho',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Seu pedido sera confirmado por nós após o recebimento do seu pagamento.',
-    'deliveries' => 'entregas',
     'for' => 'para',
     'instead of' => 'ao invés de',
     'missing or invalid data' => 'dados faltando ou inválidos',

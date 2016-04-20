@@ -53,8 +53,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 2, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
     (@max_id + 3, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),
     (@max_id + 1, 'es_ES', 'La longitud mínima de la contraseña de administrador', NULL, NULL, NULL),
-    (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 2, 'es_ES', 'Permite a un administrador recrear una contraseña perdida (1 = sí, 0 = no)', NULL, NULL, NULL),
+    (@max_id + 3, 'es_ES', 'Enviar un correo de confirmación a los suscriptores del boletín (1 = sí, 0 = no)', NULL, NULL, NULL),
     (@max_id + 1, 'fr_FR', 'La longueur minimale requise pour un mot de passe administrateur', NULL, NULL, NULL),
     (@max_id + 2, 'fr_FR', 'Permettre à un administrateur de recréer un mot de passe perdu (1 = Oui, 0 = non)', NULL, NULL, NULL),
     (@max_id + 3, 'fr_FR', 'Envoyer un email de confirmation aux abonnés de la newsletter (1 = Oui, 0 = non)', NULL, NULL, NULL)

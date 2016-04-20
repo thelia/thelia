@@ -249,7 +249,6 @@ return [
     'You will receive a link to reset your password.' => 'به زودی شما ایمیلی حاوی لینکی برای بازیابی رمز عبور خود دریافت خواهید کرد.',
     'Your Cart' => 'سبد خرید شما',
     'Your order will be confirmed by us upon receipt of your payment.' => 'سفارش شما به زودی توسط ما به محض دریافت تاییدیه‌ی پرداخت شما تایید خواهد شد.',
-    'deliveries' => 'تحویل',
     'for' => 'برای',
     'instead of' => 'به جای',
     'missing or invalid data' => 'داده‌های گم شده یا نامعتبر',

@@ -244,7 +244,6 @@ return [
     'You will receive a link to reset your password.' => 'Dostanete odkaz na obnovenie hesla.',
     'Your Cart' => 'Váš košík',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Vaša objednávka bude vybavená po obdržaní vašej platby.',
-    'deliveries' => 'dodávky',
     'for' => 'pre',
     'instead of' => 'namiesto',
     'missing or invalid data' => 'chýbajúce alebo neplatné údaje',

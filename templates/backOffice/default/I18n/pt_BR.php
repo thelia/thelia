@@ -297,6 +297,7 @@ return [
     'Edit this address' => 'Editar este endereço',
     'End Date' => 'Data de Término',
     'Enter here the product stock' => 'Digite aqui o estoque de produto',
+    'Errors' => 'Erros',
     'Feature information' => 'Informações sobre recursos',
     'Features' => 'Funcionalidades',
     'File' => 'Arquivo',
