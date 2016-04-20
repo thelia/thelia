@@ -82,7 +82,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $administrator = AdminQuery::create()->findOneByEmail($value);
 
         if (null !== $administrator && $administrator->getId() != $data['id']) {
-            $context->addViolation($this->translator->trans("An administrator with thie email address already exists"));
+            $context->addViolation($this->translator->trans("An administrator with this email address already exists"));
         }
     }
 
@@ -90,12 +90,14 @@ class AdministratorModificationForm extends AdministratorCreationForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
-        }
+        if (!empty($data["password"])) {
+            if ($data["password"] != $data["password_confirm"]) {
+                $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
+            }
 
-        if ($data["password"] !== '' && strlen($data["password"]) < 4) {
-            $context->addViolation(Translator::getInstance()->trans("password must be composed of at least 4 characters"));
+            if ($data["password"] !== '' && strlen($data["password"]) < 4) {
+                $context->addViolation(Translator::getInstance()->trans("password must be composed of at least 4 characters"));
+            }
         }
     }
 }

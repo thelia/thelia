@@ -52,7 +52,7 @@ return array(
     'All countries' => 'All countries',
     'All shipping methods' => 'All shipping methods',
     'Amount' => 'Amount',
-    'An administrator with thie email address already exists' => 'An administrator with thie email address already exists',
+    'An administrator with this email address already exists' => 'An administrator with this email address already exists',
     'An invalid token was provided, your password cannot be changed' => 'An invalid token was provided, your password cannot be changed',
     'Apply exchange rates on price in %sym' => 'Apply exchange rates on price in %sym',
     'Archive Format' => 'Archive Format',

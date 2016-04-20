@@ -31,7 +31,7 @@ return [
     'All Products' => 'Tutti i prodotti',
     'All countries' => 'Tutti i paesi',
     'Amount' => 'Importo',
-    'An administrator with thie email address already exists' => 'Un amministratore con questo indirizzo email esiste già',
+    'An administrator with this email address already exists' => 'Un amministratore con questo indirizzo email esiste già',
     'An invalid token was provided, your password cannot be changed' => 'È stato fornito un token non valido, la password non può essere modificata',
     'Apply exchange rates on price in %sym' => 'Applicare i tassi di cambio sui prezzi in %sym',
     'Attribute ID:Attribute AV ID' => 'Attribute ID:Attribute AV ID',

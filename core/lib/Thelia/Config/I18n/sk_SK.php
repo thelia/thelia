@@ -51,7 +51,7 @@ return [
     'All countries' => 'Všetky krajiny',
     'All shipping methods' => 'Všetky spôsoby dopravy',
     'Amount' => 'Množstvo',
-    'An administrator with thie email address already exists' => 'Účet s touto e-mailovou adresou už existuje',
+    'An administrator with this email address already exists' => 'Účet s touto e-mailovou adresou už existuje',
     'An invalid token was provided, your password cannot be changed' => 'Neplatný token boli poskytnuté, nie je možné zmeniť heslo',
     'Apply exchange rates on price in %sym' => 'Uplatňovať výmenný kurz na ceny v %sym',
     'Archive Format' => 'Formát archívu',

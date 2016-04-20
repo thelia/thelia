@@ -51,7 +51,7 @@ return [
     'All countries' => 'Tous les pays',
     'All shipping methods' => 'Tous les modes de livraison',
     'Amount' => 'Montant',
-    'An administrator with thie email address already exists' => 'Un compte administrateur avec cette adresse mail existe déjà',
+    'An administrator with this email address already exists' => 'Un compte administrateur avec cette adresse mail existe déjà',
     'An invalid token was provided, your password cannot be changed' => 'Un jeton non valide a été fourni, votre mot de passe ne peuvent pas être modifié',
     'Apply exchange rates on price in %sym' => 'Appliquer le taux de change sur le prix en %sym',
     'Archive Format' => 'Format d\'archive',
