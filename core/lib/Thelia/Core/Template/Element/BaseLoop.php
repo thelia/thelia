@@ -349,6 +349,17 @@ abstract class BaseLoop
             return $search->find();
         }
 
+        $this->setupSearchContext($search);
+
+        if ($this->getArgValue('page') !== null) {
+            return $this->searchWithPagination($search, $pagination);
+        } else {
+            return $this->searchWithOffset($search);
+        }
+    }
+
+    protected function setupSearchContext(ModelCriteria $search)
+    {
         if ($this instanceof SearchLoopInterface) {
             $searchTerm = $this->getArgValue('search_term');
             $searchIn   = $this->getArgValue('search_in');
@@ -375,12 +386,6 @@ abstract class BaseLoop
 
                 $this->doSearch($search, $searchTerm, $searchIn, $searchCriteria);
             }
-        }
-
-        if ($this->getArgValue('page') !== null) {
-            return $this->searchWithPagination($search, $pagination);
-        } else {
-            return $this->searchWithOffset($search);
         }
     }
 
@@ -463,6 +468,8 @@ abstract class BaseLoop
             if (null === $searchModelCriteria) {
                 $count = 0;
             } else {
+                $this->setupSearchContext($searchModelCriteria);
+
                 $count = $searchModelCriteria->count();
             }
         } elseif ($this instanceof ArraySearchLoopInterface) {
