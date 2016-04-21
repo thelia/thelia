@@ -51,7 +51,7 @@ return [
     'All countries' => 'Todos los países',
     'All shipping methods' => 'Todos los métodos de envío',
     'Amount' => 'Importe',
-    'An administrator with thie email address already exists' => 'Un administrador con la dirección de correo electrónico ya existe',
+    'An administrator with this email address already exists' => 'Un administrador con la dirección de correo electrónico ya existe',
     'An invalid token was provided, your password cannot be changed' => 'Se proporcionó un código no válido, no se puede cambiar su contraseña',
     'Apply exchange rates on price in %sym' => 'Aplicar los tipos de cambio sobre el precio en %sym',
     'Archive Format' => 'Formato de archivo',
