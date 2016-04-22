@@ -19,7 +19,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\Cart;
+use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
@@ -60,14 +60,18 @@ class Delivery extends BaseSpecificModule
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
         $address = $this->getDeliveryAddress();
 
-        // todo: remove country and state. just here for backward compatibility
-        $country = $this->getCurrentCountry($address);
+        $country = $this->getCurrentCountry();
         if (null === $country) {
-            $country = $address->getCountry();
+            if ($address !== null) {
+                $country = $address->getCountry();
+            } else {
+                $country = CountryQuery::create()->findOneByByDefault(true);
+            }
         }
-        $state = $this->getCurrentState($address);
+
+        $state = $this->getCurrentState();
         if (null === $state) {
-            $country = $address->getCountry();
+            $state = $address->getState();
         }
 
         $virtual = $cart->isVirtual();
@@ -97,7 +101,7 @@ class Delivery extends BaseSpecificModule
             try {
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
-                /** @var Cart $cart */
+                /** @var CartModel $cart */
                 $cart->getAddressDeliveryId();
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
                 $this->dispatcher->dispatch(
@@ -106,7 +110,6 @@ class Delivery extends BaseSpecificModule
                 );
 
                 if ($deliveryPostageEvent->isValidModule()) {
-
                     $postage = $deliveryPostageEvent->getPostage();
 
                     $loopResultRow
