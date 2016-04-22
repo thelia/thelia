@@ -1,3 +1,12 @@
+# 2.3.0
+
+- #2121 Fix possible Compile Error in delivery loop
+- #2117 Fix Admin update, the password is no longer required for update of an admin
+- #2118 Module TinyMCE, fix the path for the Java uploader
+- #2120 Fix {count} in search context, {count} doesn't work when searching (since 2.3.0 alpha-1)
+- #2116 Updated translations from Crowdin
+- #2110 Added a way to set specific date/time format for lang, fixed date/time format for fr_FR
+
 # 2.3.0-beta2
 
 - #2030 Fix ziparchive not found, add a message to prevent that the zip extension was not found on the server
