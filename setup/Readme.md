@@ -20,7 +20,7 @@ A repository containing all thelia modules is available at this address : https:
 Requirements
 ------------
 
-* php 5.4
+* php 5.5
     * Required extensions :
         * PDO_Mysql
         * mcrypt
