@@ -71,7 +71,9 @@ class Delivery extends BaseSpecificModule
 
         $state = $this->getCurrentState();
         if (null === $state) {
-            $state = $address->getState();
+            if ($address !== null) {
+                $state = $address->getState();
+            }
         }
 
         $virtual = $cart->isVirtual();
