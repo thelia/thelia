@@ -1,3 +1,7 @@
+# 2.3.1
+
+- (related to #2125) Fix construct in GenerateRewrittenUrlEvent
+
 # 2.3.0
 
 - #2121 Fix possible Compile Error in delivery loop
