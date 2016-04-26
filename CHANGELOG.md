@@ -1,5 +1,6 @@
 # 2.3.1
 
+- (related to #2128) Fix address state check in delivery cost estimation and fix login error due to symfony update
 - (related to #2127) Fix 2.3.0 major BC break in Thelia\Core\Event\Order\OrderPaymentEvent
 - (related to #2125) Fix construct in GenerateRewrittenUrlEvent
 
