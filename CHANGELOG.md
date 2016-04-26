@@ -1,5 +1,6 @@
 # 2.1.9
 
+- (related to #2125) fix construct in GenerateRewrittenUrlEvent
 - (related to #1920) Fixed coupons conditions label translation
 - (related to #1946) Fix TaxType class only if extension == php
 - (related to #1958) Missing success_url on Brand SEO update
