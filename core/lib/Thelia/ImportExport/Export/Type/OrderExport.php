@@ -30,7 +30,6 @@ use Thelia\Tools\I18n;
 
 /**
  * Class OrderExport
- * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class OrderExport extends AbstractExport
@@ -87,7 +86,20 @@ class OrderExport extends AbstractExport
 
     public function current()
     {
-        $order = parent::current();
+        do {
+            $order = parent::current();
+
+            $getNext = false;
+            if ($this->rangeDate !== null
+                && (
+                    $order[OrderTableMap::CREATED_AT] < $this->rangeDate['start']
+                    || $order[OrderTableMap::CREATED_AT] > $this->rangeDate['end']
+                )
+            ) {
+                $this->next();
+                $getNext = true;
+            }
+        } while ($getNext && $this->valid());
 
         $locale = $this->language->getLocale();
 
@@ -274,17 +286,9 @@ class OrderExport extends AbstractExport
             $locale
         );
 
-
-//        if ($this->rangeDate !== null) {
-//            $start_date = \DateTime::createFromFormat('Y-n-d', $this->rangeDate['start']['year'].'-'.$this->rangeDate['start']['month'].'-'.$this->rangeDate['start']['day']);
-//            $end_date = \DateTime::createFromFormat('Y-n-d', $this->rangeDate['end']['year'].'-'.$this->rangeDate['end']['month'].'-'.$this->rangeDate['start']['day']);
-//
-//            $query
-//                ->filterByCreatedAt(sprintf('%s 00:00:00', $start_date->format('Y-m-d')), Criteria::GREATER_EQUAL)
-//                ->filterByCreatedAt(sprintf('%s 23:59:59', $end_date->format('Y-m-d')), Criteria::LESS_EQUAL);
-//        }
-
-        $data = $query->findPk($order[OrderTableMap::ID]);
+        $data = $query
+            ->filterById($order[OrderTableMap::ID])
+            ->findOne();
 
         $order = (new Order)
             ->setId($order[OrderTableMap::ID])
