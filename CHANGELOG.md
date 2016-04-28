@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1928) Hook DI alert messages thrown as exceptions in dev. mode
 - (related to #1921) Modules 'configuration' and 'hook' buttons behavior fix
 - (related to #1920) Fixed coupons conditions label translation
 - (related to #1917) Fixed translations bug in user mode with view only missing translations activated
