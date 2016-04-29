@@ -62,7 +62,7 @@ class ViewListener implements EventSubscriberInterface
     {
         $parser = $this->container->get('thelia.parser');
         $templateHelper = $this->container->get('thelia.template_helper');
-        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
+        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate(), true);
         $request = $this->container->get('request');
         $response = null;
         try {

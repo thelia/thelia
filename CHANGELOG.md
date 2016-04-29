@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2068) Use template default fallback in View Listener. Module views was not properly processed when the active front template is not "default"
 - (related to #2068) Fix customer edit view ACL, replace `update` by `view` for edit a customer
 - (related to #2058) Fix bug when sending the attribute combination builder form if the user had not selected attribute
 - (related to #2052) Fix #2040 Missing trait PositionManagementTrait in ModuleImage
