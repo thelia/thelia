@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1980) Update database schema to increase module version field to 25 chars.
 - (related to #1967) Module Colissimo : Replace country title by isoalpha2 in export for expeditor
 - (related to #1962) Fix exception when cloning a product if the i18n in specific locale does not exist
 - (related to #1958) Fix missing success_url on Brand SEO update
