@@ -1,5 +1,6 @@
 # 2.3.1
 
+- (related to #2132) Fix change default category and default folder. Since the pull request #2066, it's no longer possible to change the default category of a product or the default folder of a content.
 - (related to #2129) Fix order export date interval
 - (related to #2128) Fix address state check in delivery cost estimation and fix login error due to symfony update
 - (related to #2127) Fix 2.3.0 major BC break in Thelia\Core\Event\Order\OrderPaymentEvent
