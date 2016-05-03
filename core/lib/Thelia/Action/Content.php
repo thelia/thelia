@@ -81,7 +81,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                     ->save($con)
                 ;
 
-                $content->updateDefaultFolder($event->getDefaultFolder());
+                $content->setDefaultFolder($event->getDefaultFolder());
 
                 $event->setContent($content);
                 $con->commit();

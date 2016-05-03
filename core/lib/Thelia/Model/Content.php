@@ -8,6 +8,7 @@ use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
+use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentTableMap;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
@@ -50,6 +51,9 @@ class Content extends BaseContent implements FileModelParentInterface
         }
     }
 
+    /**
+     * @return int
+     */
     public function getDefaultFolderId()
     {
         // Find default folder
@@ -72,30 +76,35 @@ class Content extends BaseContent implements FileModelParentInterface
             $defaultFolderId = null;
         }
 
-        if ($defaultFolderId == $this->getDefaultFolderId()) {
-            return $this;
-        }
-
         $contentFolder = ContentFolderQuery::create()
             ->filterByContentId($this->getId())
             ->filterByDefaultFolder(true)
             ->findOne();
 
-        if (null !== $contentFolder) {
-            $contentFolder->setFolderId($defaultFolderId);
-        } else {
-            $contentFolder = (new ContentFolder())
-                ->setContentId($this->getId())
-                ->setFolderId($defaultFolderId)
-                ->setDefaultFolder(true);
+        if ($contentFolder !== null && (int) $contentFolder->getFolderId() === (int) $defaultFolderId) {
+            return $this;
         }
 
-        $contentFolder->setPosition($contentFolder->getNextPosition());
+        if ($contentFolder !== null) {
+            $contentFolder->delete();
+        }
 
-        $contentFolder->save();
+        // checks if the content is already associated with the folder and but not default
+        if (null !== $contentFolder = ContentFolderQuery::create()->filterByContent($this)->filterByFolderId($defaultFolderId)->findOne()) {
+            $contentFolder->setDefaultFolder(true)->save();
+        } else {
+            $position = (new ContentFolder())->setFolderId($defaultFolderId)->getNextPosition();
 
-        // For BC, will be removed in 2.4
-        $this->setPosition($contentFolder->getPosition());
+            (new ContentFolder())
+                ->setContent($this)
+                ->setFolderId($defaultFolderId)
+                ->setDefaultFolder(true)
+                ->setPosition($position)
+                ->save();
+
+            // For BC, will be removed in 2.4
+            $this->setPosition($position);
+        }
 
         return $this;
     }
