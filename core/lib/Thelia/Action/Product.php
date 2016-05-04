@@ -341,7 +341,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 }
 
                 // Update default category (if required)
-                $product->updateDefaultCategory($event->getDefaultCategory());
+                $product->setDefaultCategory($event->getDefaultCategory());
 
                 $event->setProduct($product);
                 $con->commit();
