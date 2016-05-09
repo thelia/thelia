@@ -344,7 +344,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (240, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(242, 'account-order.product-list', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -803,7 +804,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2037, 'delivery.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2038, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert email hooks
@@ -834,7 +837,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (3023, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3024, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3025, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3027, 'email-html.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3028, 'email-txt.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2481,6 +2486,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (239, 'de_DE', NULL, NULL, NULL),
     (240, 'de_DE', NULL, NULL, NULL),
     (241, 'de_DE', NULL, NULL, NULL),
+    (242, 'de_DE', NULL, NULL, NULL),
     (1, 'en_US', 'Invoice choice - at the top', NULL, NULL),
     (2, 'en_US', 'Invoice choice - delivery address', NULL, NULL),
     (3, 'en_US', 'Invoice choice - extra payment zone', NULL, NULL),
@@ -2722,6 +2728,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (239, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),
     (240, 'en_US', 'Order invoice page - bottom of coupon form', NULL, NULL),
     (241, 'en_US', 'Order invoice page - bottom of payment form', NULL, NULL),
+    (242, 'en_US', 'Account order - after product information', NULL, NULL),
     (1, 'es_ES', 'Opción de factura - en la parte superior', NULL, NULL),
     (2, 'es_ES', 'Opción de factura - dirección de envío', NULL, NULL),
     (3, 'es_ES', 'Opción de factura - zona de pago extra', NULL, NULL),
@@ -2963,6 +2970,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (239, 'es_ES', 'Página de baja del boletín - después de la inicialización de JavaScript', NULL, NULL),
     (240, 'es_ES', NULL, NULL, NULL),
     (241, 'es_ES', NULL, NULL, NULL),
+    (242, 'es_ES', NULL, NULL, NULL),
     (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
     (2, 'fr_FR', 'Choix du mode de paiement - adresse de livraison', NULL, NULL),
     (3, 'fr_FR', 'Choix du mode de paiement - zone de paiement supplémentaire', NULL, NULL),
@@ -3203,7 +3211,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (238, 'fr_FR', 'Désabonnement newsletter - après l\'inclusion du JavaScript', NULL, NULL),
     (239, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL),
     (240, 'fr_FR', NULL, NULL, NULL),
-    (241, 'fr_FR', NULL, NULL, NULL)
+    (241, 'fr_FR', NULL, NULL, NULL),
+    (242, 'fr_FR', NULL, NULL, NULL)
 ;
 
 -- Insert I18n admin hooks
@@ -4912,7 +4921,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, 'de_DE', 'Lieferung - Nach dem Liefermodul', NULL, NULL),
     (2035, 'de_DE', 'Rechnung - Weitere Produktinformationen', NULL, NULL),
     (2036, 'de_DE', 'Lieferung - Weitere Produktinformationen', NULL, NULL),
-    (2001, 'en_US', 'Invoice - CSS', NULL, NULL),
+    (2037, 'de_DE', NULL, NULL, NULL),
+    (2038, 'de_DE', NULL, NULL, NULL),    (2001, 'en_US', 'Invoice - CSS', NULL, NULL),
     (2002, 'en_US', 'Invoice - in the header', NULL, NULL),
     (2003, 'en_US', 'Invoice - at the top of the footer', NULL, NULL),
     (2004, 'en_US', 'Invoice - imprint', NULL, NULL),
@@ -4948,7 +4958,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, 'en_US', 'Delivery - After delivery module', NULL, NULL),
     (2035, 'en_US', 'Invoice - additional product information', NULL, NULL),
     (2036, 'en_US', 'Delivery - additional product information', NULL, NULL),
-    (2001, 'es_ES', 'Factura - CSS', NULL, NULL),
+    (2037, 'en_US', 'Delivery - after product information', NULL, NULL),
+    (2038, 'en_US', 'Invoice - after product information', NULL, NULL),    (2001, 'es_ES', 'Factura - CSS', NULL, NULL),
     (2002, 'es_ES', 'Factura - en la cabecera', NULL, NULL),
     (2003, 'es_ES', 'Factura - en la parte superior del pie de página', NULL, NULL),
     (2004, 'es_ES', 'Factura - pie de imprenta', NULL, NULL),
@@ -4984,7 +4995,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, 'es_ES', 'Entrega - después del módulo de entrega', NULL, NULL),
     (2035, 'es_ES', 'Factura - información adicional del producto', NULL, NULL),
     (2036, 'es_ES', 'Entrega - información adicional del producto', NULL, NULL),
-    (2001, 'fr_FR', 'Facture - CSS', NULL, NULL),
+    (2037, 'es_ES', NULL, NULL, NULL),
+    (2038, 'es_ES', NULL, NULL, NULL),    (2001, 'fr_FR', 'Facture - CSS', NULL, NULL),
     (2002, 'fr_FR', 'Facture - dans l\'en-tête', NULL, NULL),
     (2003, 'fr_FR', 'Facture - en haut du pied de page', NULL, NULL),
     (2004, 'fr_FR', 'Facture - mentions légales', NULL, NULL),
@@ -5019,8 +5031,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
     (2034, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
     (2035, 'fr_FR', 'Facture - informations additionnelles pour un produit', NULL, NULL),
-    (2036, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', NULL, NULL)
-;
+    (2036, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', NULL, NULL),
+    (2037, 'fr_FR', NULL, NULL, NULL),
+    (2038, 'fr_FR', NULL, NULL, NULL);
 
 -- Insert I18n email hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
@@ -5051,7 +5064,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3024, 'de_DE', NULL, NULL, NULL),
     (3025, 'de_DE', NULL, NULL, NULL),
     (3026, 'de_DE', NULL, NULL, NULL),
-    (3000, 'en_US', 'Email html - layout - CSS', NULL, NULL),
+    (3027, 'de_DE', NULL, NULL, NULL),
+    (3028, 'de_DE', NULL, NULL, NULL),    (3000, 'en_US', 'Email html - layout - CSS', NULL, NULL),
     (3001, 'en_US', 'Email html - layout - footer', NULL, NULL),
     (3002, 'en_US', 'Email html - order confirmation - before address', NULL, NULL),
     (3003, 'en_US', 'Email html - order confirmation - delivery address', NULL, NULL),
@@ -5078,7 +5092,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3024, 'en_US', 'Email txt - order notification - order product', NULL, NULL),
     (3025, 'en_US', 'Email txt - order notification - before products', NULL, NULL),
     (3026, 'en_US', 'Email txt - order notification - after products', NULL, NULL),
-    (3000, 'es_ES', 'Email HTML - Interfaz - CSS', NULL, NULL),
+    (3027, 'en_US', 'Email html - order notification - after product information', NULL, NULL),
+    (3028, 'en_US', 'Email txt - order notification - after product information', NULL, NULL),    (3000, 'es_ES', 'Email HTML - Interfaz - CSS', NULL, NULL),
     (3001, 'es_ES', 'Email HTML - Interfaz - pie', NULL, NULL),
     (3002, 'es_ES', NULL, NULL, NULL),
     (3003, 'es_ES', NULL, NULL, NULL),
@@ -5105,7 +5120,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3024, 'es_ES', NULL, NULL, NULL),
     (3025, 'es_ES', NULL, NULL, NULL),
     (3026, 'es_ES', NULL, NULL, NULL),
-    (3000, 'fr_FR', 'Email html - layout - CSS', NULL, NULL),
+    (3027, 'es_ES', NULL, NULL, NULL),
+    (3028, 'es_ES', NULL, NULL, NULL),    (3000, 'fr_FR', 'Email html - layout - CSS', NULL, NULL),
     (3001, 'fr_FR', 'Email html - layout - pied de page', NULL, NULL),
     (3002, 'fr_FR', 'Email html - confirmation commande - avant adresses', NULL, NULL),
     (3003, 'fr_FR', 'Email html - confirmation commande - adresse de livraison', NULL, NULL),
@@ -5131,8 +5147,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3023, 'fr_FR', 'Email txt - notification commande - après adresses', NULL, NULL),
     (3024, 'fr_FR', 'Email txt - notification commande - produit de la commande', NULL, NULL),
     (3025, 'fr_FR', 'Email txt - notification commande - avant produits', NULL, NULL),
-    (3026, 'fr_FR', 'Email txt - notification commande - après produits', NULL, NULL)
-;
+    (3026, 'fr_FR', 'Email txt - notification commande - après produits', NULL, NULL),
+    (3027, 'fr_FR', NULL, NULL, NULL),
+    (3028, 'fr_FR', NULL, NULL, NULL);
 
 INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
     (1, 'de_DE', 'Hr.', 'Herr'),

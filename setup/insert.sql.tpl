@@ -344,7 +344,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (240, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(242, 'account-order.product-list', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -803,7 +804,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2037, 'delivery.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2038, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert email hooks
@@ -834,7 +837,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (3023, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3024, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3025, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3027, 'email-html.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3028, 'email-txt.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2265,7 +2270,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (238, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
     (239, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL),
     (240, '{$locale}', {intl l='Order invoice page - bottom of coupon form' locale=$locale}, NULL, NULL),
-    (241, '{$locale}', {intl l='Order invoice page - bottom of payment form' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (241, '{$locale}', {intl l='Order invoice page - bottom of payment form' locale=$locale}, NULL, NULL),
+    (242, '{$locale}', {intl l='Account order - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -2731,8 +2737,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, '{$locale}', {intl l='Invoice - After delivery module' locale=$locale}, NULL, NULL),
     (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL),
     (2035, '{$locale}', {intl l='Invoice - additional product information' locale=$locale}, NULL, NULL),
-    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL),
+    (2037, '{$locale}', {intl l='Delivery - after product information' locale=$locale}, NULL, NULL),
+    (2038, '{$locale}', {intl l='Invoice - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -2765,8 +2772,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3023, '{$locale}', {intl l='Email txt - order notification - after address' locale=$locale}, NULL, NULL),
     (3024, '{$locale}', {intl l='Email txt - order notification - order product' locale=$locale}, NULL, NULL),
     (3025, '{$locale}', {intl l='Email txt - order notification - before products' locale=$locale}, NULL, NULL),
-    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL),
+    (3027, '{$locale}', {intl l='Email html - order notification - after product information' locale=$locale}, NULL, NULL),
+    (3028, '{$locale}', {intl l='Email txt - order notification - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 

@@ -82,6 +82,7 @@
                             <span style="color:#999;display:block;font-size:11px;line-height:1.2">* {$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}</span>
                         {/loop}
                         {/ifloop}
+                        {hook name="email-html.order-confirmation.product-list" order=$order_id order_product=$ID}
                     </td>
                     <td align="right" style="border-bottom:1px solid #000; white-space:nowrap">
                         {$QUANTITY} x {format_money number=$realTaxedPrice currency_id=$CURRENCY}
