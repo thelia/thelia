@@ -82,9 +82,10 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::ORDER_STATUS_CREATE => array("create"),
-            TheliaEvents::ORDER_STATUS_UPDATE => array("update"),
-            TheliaEvents::ORDER_STATUS_DELETE => array("delete"),
+            TheliaEvents::ORDER_STATUS_CREATE => ["create", 128],
+            TheliaEvents::ORDER_STATUS_UPDATE => ["update", 128],
+            TheliaEvents::ORDER_STATUS_DELETE => ["delete", 128],
+            TheliaEvents::ORDER_STATUS_UPDATE_POSITION => ["updatePosition", 128]
         );
     }
 
