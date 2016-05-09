@@ -766,7 +766,16 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1412, 'states.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1413, 'state.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1414, 'state.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1416, 'configuration.order-path.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1417, 'configuration.order-path.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1418, 'order-status.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1419, 'order-status.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1420, 'order-status.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1421, 'order-status.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -1865,13 +1874,13 @@ VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
 
-INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', NOW(), NOW()),
-(2, 'paid', NOW(), NOW()),
-(3, 'processing', NOW(), NOW()),
-(4, 'sent', NOW(), NOW()),
-(5, 'canceled', NOW(), NOW()),
-(6, 'refunded', NOW(), NOW());
+INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', '#f0ad4e', 1, 1, NOW(), NOW()),
+(2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
+(3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
+(4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
+(5, 'canceled', '#d9534f', 5, 1, NOW(), NOW()),
+(6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
@@ -1925,7 +1934,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (46, 'admin.profile', NOW(), NOW()),
 (47, 'admin.search', NOW(), NOW()),
 (48, 'admin.configuration.api', NOW(), NOW()),
-(49, 'admin.customer.title', NOW(), NOW())
+(49, 'admin.customer.title', NOW(), NOW()),
+(50, 'admin.configuration.order-status', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2697,7 +2707,16 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1412, '{$locale}', {intl l='states - bottom' locale=$locale}, '', ''),
     (1413, '{$locale}', {intl l='state - creation form' locale=$locale}, '',  ''),
     (1414, '{$locale}', {intl l='state - delete form' locale=$locale}, '', ''),
-    (1415, '{$locale}', {intl l='states - JavaScript' locale=$locale}, '', ''){if ! $locale@last},{/if}
+    (1415, '{$locale}', {intl l='states - JavaScript' locale=$locale}, '', ''),
+    (1416,  '{$locale}', {intl l='Configuration - Order path - top' locale=$locale}, NULL, NULL),
+    (1417,  '{$locale}', {intl l='Configuration - Order path - bottom' locale=$locale}, NULL, NULL),
+    (1418,  '{$locale}', {intl l='Order status - top' locale=$locale}, NULL, NULL),
+    (1419,  '{$locale}', {intl l='Order status - bottom' locale=$locale}, NULL, NULL),
+    (1420,  '{$locale}', {intl l='Order status - table header' locale=$locale}, NULL, NULL),
+    (1421,  '{$locale}', {intl l='Order status - table row' locale=$locale}, NULL, NULL),
+    (1422,  '{$locale}', {intl l='Order status - form creation' locale=$locale}, NULL, NULL),
+    (1423,  '{$locale}', {intl l='Order status - form modification' locale=$locale}, NULL, NULL),
+    (1424, '{$locale}', {intl l='Order status - JavaScript' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -3453,7 +3472,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (46, '{$locale}', {intl l='Administration profiles management' locale=$locale}, NULL, NULL, NULL),
     (47, '{$locale}', {intl l='Back-office search function' locale=$locale}, NULL, NULL, NULL),
     (48, '{$locale}', {intl l='API Configuration' locale=$locale}, NULL, NULL, NULL),
-    (49, '{$locale}', {intl l='Customer title' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (49, '{$locale}', {intl l='Customer title' locale=$locale}, NULL, NULL, NULL),
+    (50, '{$locale}', {intl l='Configuration order status' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
