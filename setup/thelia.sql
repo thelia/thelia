@@ -890,6 +890,9 @@ CREATE TABLE `order_status`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
+    `color` CHAR(7),
+    `position` INTEGER,
+    `protected_status` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
