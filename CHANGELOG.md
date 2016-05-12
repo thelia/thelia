@@ -1,5 +1,6 @@
 # 2.3.1
 
+- (related to #2144) Fix automatic configuration for the sql_mode
 - (related to #2142) Force utf8 on thelia update
 - (related to #2139) Start page correction for the loops
 - (related to #2135) Fix ressources check for translation view
