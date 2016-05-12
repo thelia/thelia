@@ -298,7 +298,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             if ($totalPageCount > $displayedPageCount) {
                 $startPage = $currentPage - round($displayedPageCount / 2);
 
-                if ($startPage < 0) {
+                if ($startPage <= 0) {
                     $startPage = 1;
                 }
             }
