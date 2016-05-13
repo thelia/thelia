@@ -1,5 +1,6 @@
 # 2.3.1
 
+- (related to #2142) Force utf8 on thelia update
 - (related to #2139) Start page correction for the loops
 - (related to #2135) Fix ressources check for translation view
 - (related to #2132) Fix change default category and default folder. Since the pull request #2066, it's no longer possible to change the default category of a product or the default folder of a content.
