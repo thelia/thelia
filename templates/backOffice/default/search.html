@@ -73,7 +73,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_term=$searchTerm search_in="ref,firstname,lastname,email" limit=26}
+                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_mode="sentence" search_term=$searchTerm search_in="ref,firstname,lastname,email" limit=26}
                                 {assign "lastOrderDate" ''}
                                 {assign "lastOrderAmount" ''}
                                 {assign "lastOrderCurrency" ''}
