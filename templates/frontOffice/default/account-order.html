@@ -120,7 +120,7 @@
                             {hook name="account-order.invoice-address" module={$payment_id} order={$order_id}}
                         {/ifhook}
                         {elsehook rel="account-order.invoice-address"}
-                            {format_address order_address=$DELIVERY_ADDRESS}
+                            {format_address order_address=$INVOICE_ADDRESS}
                         {/elsehook}
 
                         {hook name="account-order.invoice-address-bottom" module={$payment_id} order={$order_id}}
