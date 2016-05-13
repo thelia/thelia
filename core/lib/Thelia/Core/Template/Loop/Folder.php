@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\ContentQuery;
@@ -45,6 +46,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+
     protected $timestampable = true;
     protected $versionable = true;
 
@@ -90,22 +93,20 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return $this->getStandardI18nSearchFields();
     }
 
     /**
      * @param FolderQuery $search
      * @param string $searchTerm
-     * @param string $searchIn
+     * @param array $searchIn
      * @param string $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-
-        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
+        
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()

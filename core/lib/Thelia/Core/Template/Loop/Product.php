@@ -19,6 +19,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
@@ -81,6 +82,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     protected $timestampable = true;
     protected $versionable = true;
 
+    use StandardI18nFieldsSearchTrait;
+    
     /**
      * @return ArgumentCollection
      */
@@ -172,10 +175,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function getSearchIn()
     {
-        return [
-            "ref",
-            "title",
-        ];
+        return array_merge(
+            [ 'ref' ],
+            $this->getStandardI18nSearchFields()
+        );
     }
 
     /**
@@ -187,6 +190,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
+
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
                 $search->_or();
@@ -195,11 +199,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 case "ref":
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
-                case "title":
-                    $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
-                    break;
             }
         }
+
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function parseResults(LoopResult $loopResult)

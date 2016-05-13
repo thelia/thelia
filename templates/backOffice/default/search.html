@@ -252,7 +252,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="category" name="category-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {loop type="category" name="category-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
 
                             {if $LOOP_COUNT < 26}
                             <tr>
@@ -331,7 +331,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="product" name="product-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title" return_url=false  limit=26}
+                            {loop type="product" name="product-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 {$id_product=$ID}
                                  <tr>
@@ -423,7 +423,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="folder" name="folder-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {loop type="folder" name="folder-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td>{$ID}</td>
@@ -499,7 +499,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="content" name="content-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {loop type="content" name="content-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td>{$ID}</td>

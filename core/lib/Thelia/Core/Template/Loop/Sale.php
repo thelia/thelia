@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\SaleQuery;
@@ -42,6 +43,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+    
     protected $timestampable = true;
 
     /**
@@ -89,17 +92,34 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return array_merge(
+            [ "sale_label" ],
+            $this->getStandardI18nSearchFields()
+        );
     }
 
+    /**
+     * @param SaleQuery $search
+     * @param string $searchTerm
+     * @param array $searchIn
+     * @param string $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
-        /** @var SaleQuery $search */
         $search->_and();
+        
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
+                $search->_or();
+            }
+            switch ($searchInElement) {
+                case "sale_label":
+                    $this->addSearchInI18nColumn($search, 'SALE_LABEL', $searchCriteria, $searchTerm);
+                    break;
+            }
+        }
     
-        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()
