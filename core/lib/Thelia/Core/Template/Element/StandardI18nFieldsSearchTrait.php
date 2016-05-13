@@ -26,7 +26,7 @@ trait StandardI18nFieldsSearchTrait
         "postscriptum"
     ];
 
-    public function getStandardI18nSearchFields()
+    protected function getStandardI18nSearchFields()
     {
         return self::$standardI18nSearchFields;
     }
@@ -36,7 +36,7 @@ trait StandardI18nFieldsSearchTrait
      * @param $searchTerm
      * @param $searchCriteria
      */
-    public function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria)
+    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria)
     {
         foreach (self::$standardI18nSearchFields as $index => $searchInElement) {
             if ($index > 0) {
