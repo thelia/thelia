@@ -105,13 +105,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
     {
         $search->_and();
 
-        $search->where(
-            "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-            THEN `requested_locale_i18n`.`TITLE`ELSE `default_locale_i18n`.`TITLE`
-            END ".$searchCriteria." ?",
-            $searchTerm,
-            \PDO::PARAM_STR
-        );
+        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
     }
 
     public function buildModelCriteria()
@@ -153,14 +147,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where(
-                "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-                THEN `requested_locale_i18n`.`TITLE`
-                ELSE `default_locale_i18n`.`TITLE`
-                END ".Criteria::LIKE." ?",
-                "%".$title."%",
-                \PDO::PARAM_STR
-            );
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $current = $this->getCurrent();

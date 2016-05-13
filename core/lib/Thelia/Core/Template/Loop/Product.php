@@ -197,14 +197,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
                 case "title":
-                    $search->where(
-                        "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-                        THEN `requested_locale_i18n`.`TITLE`
-                        ELSE `default_locale_i18n`.`TITLE`
-                        END ".$searchCriteria." ?",
-                        $searchTerm,
-                        \PDO::PARAM_STR
-                    );
+                    $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
                     break;
             }
         }
@@ -575,7 +568,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $manualOrderAllowed = false;

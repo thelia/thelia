@@ -113,8 +113,8 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+    
+        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
     }
 
     public function buildModelCriteria()
