@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2142) Force utf8 on thelia update
 - (related to #2139) Start page correction for the loops
 - (related to #2135) Fix ressources check for translation view
 - (related to #2125) Fix construct in GenerateRewrittenUrlEvent

@@ -87,7 +87,8 @@ class Update
             $this->connection = new \PDO(
                 $dbConfig['dsn'],
                 $dbConfig['user'],
-                $dbConfig['password']
+                $dbConfig['password'],
+                [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"]
             );
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
