@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Element;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -54,8 +55,13 @@ abstract class BaseI18nLoop extends BaseLoop
      *
      * @return mixed the locale
      */
-    protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false)
-    {
+    protected function configureI18nProcessing(
+        ModelCriteria $search,
+        $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+        $foreignTable = null,
+        $foreignKey = 'ID',
+        $forceReturn = false
+    ) {
         /* manage translations */
 
         $this->locale = ModelCriteriaTools::getI18n(
@@ -68,5 +74,35 @@ abstract class BaseI18nLoop extends BaseLoop
             $foreignKey,
             $this->getForceReturn()
         );
+    }
+
+
+    /**
+     * Add the search clause for an I18N column, taking care of the back/front context, as default_locale_i18n is
+     * not defined in the backEnd I18N context.
+     *
+     * @param ModelCriteria $search
+     * @param string $columnName the column to search into, such as TITLE
+     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc.
+     * @param string $searchTerm the searched term
+     */
+    public function addSearchInI18nColumn($search, $columnName, $searchCriteria, $searchTerm)
+    {
+        if (! $this->getBackendContext()) {
+            $search->where(
+                "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
+                        THEN `requested_locale_i18n`.`$columnName`
+                        ELSE `default_locale_i18n`.`$columnName`
+                        END " . $searchCriteria . " ?",
+                $searchTerm,
+                \PDO::PARAM_STR
+            );
+        } else {
+            $search->where(
+                "`requested_locale_i18n`.`$columnName` $searchCriteria ?",
+                $searchTerm,
+                \PDO::PARAM_STR
+            );
+        }
     }
 }

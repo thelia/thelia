@@ -118,8 +118,8 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+    
+        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
     }
 
     public function buildModelCriteria()
@@ -198,7 +198,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $search->withColumn('`FolderSelect`.POSITION', 'position_delegate');

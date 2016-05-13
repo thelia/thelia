@@ -98,8 +98,8 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
     {
         /** @var SaleQuery $search */
         $search->_and();
-
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+    
+        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
     }
 
     public function buildModelCriteria()

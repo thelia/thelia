@@ -105,21 +105,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
     {
         $search->_and();
 
-        $this->addTitleSearchWhereClause($search, $searchCriteria, $searchTerm);
-    }
-
-    /**
-     * @param FolderQuery $search
-     * @param string $criteria
-     * @param string $value
-     */
-    protected function addTitleSearchWhereClause($search, $criteria, $value)
-    {
-        $search->where(
-            "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$criteria." ?",
-            $value,
-            \PDO::PARAM_STR
-        );
+        $this->addSearchInI18nColumn($search, 'TITLE', $searchCriteria, $searchTerm);
     }
 
     public function buildModelCriteria()
@@ -171,7 +157,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $this->addTitleSearchWhereClause($search, Criteria::LIKE, '%'.$title.'%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $visible = $this->getVisible();
