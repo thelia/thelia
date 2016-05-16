@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2147) Fixed help text display if show_label is false
 - (related to #2144) Fix automatic configuration for the sql_mode
 - (related to #2142) Force utf8 on thelia update
 - (related to #2139) Start page correction for the loops
