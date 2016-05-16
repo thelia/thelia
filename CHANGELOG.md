@@ -1,5 +1,6 @@
 # 2.3.1
 
+- (related to #2147) Fixed help text display if show_label is false
 - (related to #2145) Fix for taxes & tax rules description display in Taxes rules page
 - (related to #2144) Fix automatic configuration for the sql_mode
 - (related to #2142) Force utf8 on thelia update
