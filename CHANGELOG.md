@@ -1,5 +1,6 @@
 # 2.3.1
 
+- (related to #2150) Fix form and validator translations
 - (related to #2147) Fixed help text display if show_label is false
 - (related to #2145) Fix for taxes & tax rules description display in Taxes rules page
 - (related to #2144) Fix automatic configuration for the sql_mode
