@@ -151,7 +151,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     $search->orderByQuantity(Criteria::DESC);
                     break;
                 case "min_price":
-                    $search->addAscendingOrderByColumn('price_FINAL_PRICE', Criteria::ASC);
+                    $search->addAscendingOrderByColumn('price_FINAL_PRICE');
                     break;
                 case "max_price":
                     $search->addDescendingOrderByColumn('price_FINAL_PRICE');
@@ -276,11 +276,32 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     {
         return [
             "ref",
+            "ean_code"
         ];
     }
 
+    /**
+     * @param ProductSaleElementsQuery $search
+     * @param $searchTerm
+     * @param $searchIn
+     * @param $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
-        $search->filterByRef($searchTerm, $searchCriteria);
+        $search->_and();
+
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
+                $search->_or();
+            }
+            switch ($searchInElement) {
+                case "ref":
+                    $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case "ean_code":
+                    $search->filterByEanCode($searchTerm, $searchCriteria);
+                    break;
+            }
+        }
     }
 }
