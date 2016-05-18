@@ -3,8 +3,9 @@ This file defines the standard fields attributes, depending on input types.
 
 In addition to the standard form_field block output, this fragment uses the following additional variables :
 
-- field_template : the template style ('standard', or somethingelse)
-- field_value : the value of the input field, which is used if the form_field value is empty.
+- field_template : the template style ('standard', or something else)
+- field_value : the value of the input field, which is used if the form_field value is empty. For radios and checkboxes,
+  the field is supposed to set the checked property if the form checked status is not defined: 0 -> not checked, != 0 -> checked.
 - field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
 *}
 
@@ -12,8 +13,16 @@ In addition to the standard form_field block output, this fragment uses the foll
 Use the optionnal $field_value parameter if no value is defined
  Do not use empty(), as empty(0), empty("0") are true
 *}
-{if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
-    {$value = $field_value}
+{if $type == 'checkbox' || $type == 'radio'}
+    {* we will not manage the "value" attribute, but the "checked" property. The field is checked if the provied field value is non-zero *}
+    {if ($checked == '' || $checked == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
+        {$checked = $field_value != 0}
+    {/if}
+{else}
+    {* for other field types, juste manage the "value" attribute. *}
+    {if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
+        {$value = $field_value}
+    {/if}
 {/if}
 
 {* Synthetize an ID if none was given *}

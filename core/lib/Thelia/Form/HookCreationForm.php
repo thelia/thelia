@@ -12,9 +12,13 @@
 
 namespace Thelia\Form;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\HookQuery;
 
 /**
  * Class HookCreationForm
@@ -29,6 +33,9 @@ class HookCreationForm extends BaseForm
             ->add("code", "text", array(
                 "constraints" => array(
                     new NotBlank(),
+                    new Callback(array(
+                        "methods" => array(array($this, "checkCodeUnicity"))
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Hook code"),
                 "label_attr" => array(
@@ -79,6 +86,26 @@ class HookCreationForm extends BaseForm
                 ),
             ))
         ;
+    }
+
+    public function checkCodeUnicity($code, ExecutionContextInterface $context)
+    {
+        $type = $context->getRoot()->getData()['type'];
+
+        $query = HookQuery::create()->filterByCode($code)->filterByType($type);
+
+        if ($this->form->has('id')) {
+            $query->filterById($this->form->getRoot()->getData()['id'], Criteria::NOT_EQUAL);
+        }
+
+        if ($query->count() > 0) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    "A Hook with code %name already exists. Please choose another code.",
+                    array('%name' => $code)
+                )
+            );
+        }
     }
 
     public function getName()

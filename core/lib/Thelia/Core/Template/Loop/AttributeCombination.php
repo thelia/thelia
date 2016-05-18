@@ -22,8 +22,9 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\AttributeTableMap;
+use Thelia\Model\Map\AttributeTemplateTableMap;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Type;
-use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -44,11 +45,11 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('product_sale_elements', null, true),
-            new Argument(
+            Argument::createEnumListTypeArgument(
                 'order',
-                new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse'))
-                ),
+                [
+                    'alpha', 'alpha_reverse', 'manual', 'manual_reverse'
+                ],
                 'alpha'
             )
         );
@@ -88,6 +89,12 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
+                case "manual":
+                    $this->orderByTemplateAttributePosition($search, Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $this->orderByTemplateAttributePosition($search, Criteria::DESC);
+                    break;
             }
         }
 
@@ -119,5 +126,28 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         }
 
         return $loopResult;
+    }
+
+    /**
+     * @param AttributeCombinationQuery $search
+     * @param string $order Criteria::ASC|Criteria::DESC
+     * @return AttributeCombinationQuery
+     */
+    protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, $order)
+    {
+        $search
+            ->useProductSaleElementsQuery()
+                ->joinProduct()
+            ->endUse()
+            ->useAttributeQuery()
+                ->joinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
+                ->addJoinCondition(
+                    AttributeTemplateTableMap::TABLE_NAME,
+                    AttributeTemplateTableMap::TEMPLATE_ID . Criteria::EQUAL . ProductTableMap::TEMPLATE_ID
+                )
+            ->endUse()
+            ->orderBy(AttributeTemplateTableMap::POSITION, $order);
+
+        return $search;
     }
 }

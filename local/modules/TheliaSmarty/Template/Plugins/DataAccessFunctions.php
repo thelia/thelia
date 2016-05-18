@@ -476,7 +476,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $startDate->setTime(0, 0, 0);
         } elseif ($params['startDate'] == 'last_year') {
             $startDate = new \DateTime();
-            $startDate->modify('first day of December last year');
+            $startDate->modify('first day of January last year');
             $startDate->setTime(0, 0, 0);
         } else {
             try {
@@ -509,7 +509,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $endDate->setTime(0, 0, 0);
         } elseif ($params['endDate'] == 'last_year') {
             $endDate = new \DateTime();
-            $endDate->modify('last day of January last year');
+            $endDate->modify('last day of December last year');
             $endDate->setTime(0, 0, 0);
         } else {
             try {

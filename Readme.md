@@ -86,7 +86,7 @@ $ php composer.phar install
 ### Using composer for both download and dependencies
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.1.8 (2.2.2 or 2.0.12)
+$ php composer.phar create-project thelia/thelia path/ 2.2.3 (2.1.9 or 2.0.12)
 ```
 
 ## Install it

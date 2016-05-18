@@ -160,10 +160,15 @@
                }).always(function(){
                    $("#loading-event").remove();
                }).done(function() {
-            	   if (is_checked)
-            		   $('.config-btn-' + module_id).removeClass('disabled');
-            	   else
-                       $('.config-btn-' + module_id).addClass('disabled');
+            	   if (is_checked) {
+                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
+                           .removeClass('disabled')
+                           .removeClass('no-follow-link');
+                   } else {
+                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
+                           .addClass('disabled')
+                           .addClass('no-follow-link');
+                   }
 
                }).fail(function(jqXHR, textStatus, errorThrown){
                     checkbox.bootstrapSwitch('toggleState', true);

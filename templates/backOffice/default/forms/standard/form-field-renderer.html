@@ -93,7 +93,7 @@ Use the optionnal $field_value parameter if no value is defined
                 {/form_error}
             </label>
 
-            {if $multiple}
+            {if $multiple && $show_label}
                 <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one item'}</span>
             {/if}
         {/if}
@@ -145,7 +145,7 @@ Use the optionnal $field_value parameter if no value is defined
             {$content nofilter}
         {/if}
 
-        {if ! empty($label_attr.help)}
+        {if $show_label  && ! empty($label_attr.help)}
             <span class="help-block">{$label_attr.help nofilter}</span>
         {/if}
     </div>

@@ -120,12 +120,14 @@
 
 		                                                <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
 		                                                      <option value="0">{intl l="Top level"}</option>
-
+                                                              {$excludeFolders = []}
+                                                              {loop name="exclude-folders" type="folder" parent=$folder_id}
+                                                                {$excludeFolders[] = $ID}
+                                                              {/loop}
                                                               {$myparent=$PARENT}
-		                                                      {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
+		                                                      {loop name="fold-parent" type="folder-tree" visible="*" folder="0" exclude={','|implode:$excludeFolders}}
 		                                                           <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $folder_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
 		                                                      {/loop}
-
 		                                                </select>
 		                                             </div>
 		                                        {/form_field}

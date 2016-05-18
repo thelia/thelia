@@ -155,6 +155,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("SECURED", $result->getSecured())
             ;
 
+            $this->addOutputFields($loopResultRow, $result);
             $loopResult->addRow($loopResultRow);
         }
 

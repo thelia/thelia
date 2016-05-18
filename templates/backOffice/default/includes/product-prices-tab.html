@@ -464,7 +464,7 @@
                                 {/form_field}
                             </tr>
 
-                            {hook name="product.combinations-row" pse="$current_pse_id"}
+                            {hook name="product.combinations-row" pse=$current_pse_id idx=$idx}
 
 	                        {/for}
 					    </tbody>
@@ -508,9 +508,6 @@
 		    </div>
 		</div>
     {/if}
-
-    {hook name="product.after-combinations" location="product_after_combinations" }
-
 </div>
 
 {* PSE / Image-Document combination modal *}
@@ -680,7 +677,7 @@
 		            <li>
 		                <strong>{$TITLE}</strong>
 		                <ul class="list-unstyled">
-		                {loop name="product-attributes-av" type="attribute_availability" attribute="{$ID}" order="manual" backend_context="1" lang=$edit_language_id}
+		                {loop name="product-attributes-av" type="attribute_availability" attribute=$ID order="manual" backend_context="1" lang=$edit_language_id}
 		                    <li>
 			                    <div class="checkbox">
 			                        <label>
@@ -700,6 +697,7 @@
 		    </div>
 		</div>
 
+        {loop type="product_sale_elements" name="product_sale_elements_combination_form" product=$product_id default="yes"}
 		<div class="col-md-6">
          {form_field field='price'}
              <div class="form-group {if $error}has-error{/if}">
@@ -790,6 +788,7 @@
              </div>
          </div>
          {/form_field}
+		{/loop}
 
          <div class="well well-sm" style="margin-bottom: 0"><b>{intl l='<span id="number_of_generated_combinations">0</span> combinations'}</b></div>
     </div>
