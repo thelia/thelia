@@ -114,24 +114,26 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    {form_field form=$form field='parent'}
-                                                        <div class="form-group {if $error}has-error{/if}">
 
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                        {form_field field='parent' form=$form}
                                                             <label for="{$label_attr.for}" class="control-label">
                                                                 {$label} :
                                                             </label>
 
                                                             <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                                                                  <option value="0">{intl l="Top level"}</option>
-
-                                                                  {$myparent=$PARENT}
-                                                                  {loop name="cat-parent" type="category-tree" visible="*" category="0"}
-                                                                       <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
-                                                                  {/loop}
-
+                                                                <option value="0">{intl l="Top level"}</option>
+                                                                {$excludeCategories = []}
+                                                                {loop name="exclude-categories" type="category" parent=$category_id}
+                                                                {$excludeCategories[] = $ID}
+                                                                {/loop}
+                                                                {$myparent=$PARENT}
+                                                                {loop name="cat-parent" type="category-tree" visible="*" category="0" exclude={','|implode:$excludeCategories}}
+                                                                    <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                                                                {/loop}
                                                             </select>
+                                                        {/form_field}
                                                          </div>
-                                                    {/form_field}
 
                                                     {form_field form=$form field='visible'}
                                                         <div class="form-group {if $error}has-error{/if}">

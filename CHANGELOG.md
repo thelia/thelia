@@ -1,3 +1,21 @@
+# 2.1.9
+
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2125) fix construct in GenerateRewrittenUrlEvent
+- (related to #1920) Fixed coupons conditions label translation
+- (related to #1946) Fix TaxType class only if extension == php
+- (related to #1958) Missing success_url on Brand SEO update
+- (related to #1967) Replace country title by isoalpha2 in export for expeditor
+- (related to #1999) Update FolderBreadcrumbTrait.php
+- (related to #2005) Use a wider version requirement on thelia/installer for setup
+- (related to #2091) Checking MySQL version to set sql_mode automatically
+- (related to #2041) Fix possible circular reference for category tree and folder tree
+- (related to #2058) Fix Bug on submit combination builder empty form
+- (related to #2068) Fix customer edit access
+- (related to #2073) Use template default fallback in View Listener
+
 # 2.1.8
 
 - Fix Colissimo module external-schema (related to #1838)

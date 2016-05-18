@@ -89,6 +89,8 @@ class AsseticAssetManager implements AssetManagerInterface
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
+        $fs->mkdir($to_directory, 0777);
+
         foreach ($iterator as $item) {
             if ($item->isDir()) {
                 $dest_dir = $to_directory . DS . $iterator->getSubPathName();
