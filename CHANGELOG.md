@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #2135) Fix ressources check for translation view
 - (related to #2125) Fix construct in GenerateRewrittenUrlEvent
 - (related to #2118) Module TinyMCE, fix the path for the Java uploader
 - (related to #2096) Fix currency change, an exception was thrown if the currency does not exist
