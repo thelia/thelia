@@ -12,6 +12,7 @@
 
 namespace Thelia\Install;
 
+use Michelf\Markdown;
 use PDO;
 use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -23,6 +24,7 @@ use Thelia\Config\DefinePropel;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Version\Version;
 
 /**
@@ -186,7 +188,16 @@ class Update
             ];
 
             foreach ($updateConfigVersion as $name => $value) {
-                ConfigQuery::write($name, $value);
+                $stmt = $this->connection->prepare('SELECT * FROM `config` WHERE `name` = ?');
+                $stmt->execute([$name]);
+
+                if ($stmt->rowCount()) {
+                    $stmt = $this->connection->prepare('UPDATE `config` SET `value` = ? WHERE `name` = ?');
+                    $stmt->execute([$version, $value]);
+                } else {
+                    $stmt = $this->connection->prepare('INSERT INTO `config` (?) VALUES (?)');
+                    $stmt->execute([$version, $value]);
+                }
             }
 
             $this->connection->commit();
