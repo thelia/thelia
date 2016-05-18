@@ -1,3 +1,18 @@
+# 2.3.1
+
+- (related to #2150) Fix form and validator translations
+- (related to #2147) Fixed help text display if show_label is false
+- (related to #2145) Fix for taxes & tax rules description display in Taxes rules page
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2142) Force utf8 on thelia update
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2132) Fix change default category and default folder. Since the pull request #2066, it's no longer possible to change the default category of a product or the default folder of a content.
+- (related to #2129) Fix order export date interval
+- (related to #2128) Fix address state check in delivery cost estimation and fix login error due to symfony update
+- (related to #2127) Fix 2.3.0 major BC break in Thelia\Core\Event\Order\OrderPaymentEvent
+- (related to #2125) Fix construct in GenerateRewrittenUrlEvent
+
 # 2.3.0
 
 - #2121 Fix possible Compile Error in delivery loop
@@ -201,6 +216,49 @@
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
 
+# 2.2.3
+
+- (related to #2147) Fixed help text display if show_label is false
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2142) Force utf8 on thelia update
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2125) Fix construct in GenerateRewrittenUrlEvent
+- (related to #2118) Module TinyMCE, fix the path for the Java uploader
+- (related to #2096) Fix currency change, an exception was thrown if the currency does not exist
+- (related to #2090) Fix GenerateRewrittenUrlEvent, add getters and setters
+- (related to #2084) Check if customer exist in coupon builder
+- (related to #2080) Fix missing function `addoutputfields` in the loops
+- (related to #2078) Fixed checkbox and radio automatic rendrering. The "checked" status of checkboxes and radios was not correctly managed by form-field-attributes-renderer.html
+- (related to #2068) Use template default fallback in View Listener. Module views was not properly processed when the active front template is not "default"
+- (related to #2068) Fix customer edit view ACL, replace `update` by `view` for edit a customer
+- (related to #2058) Fix bug when sending the attribute combination builder form if the user had not selected attribute
+- (related to #2052) Fix #2040 Missing trait PositionManagementTrait in ModuleImage
+- (related to #2041) Fix possible circular reference for category tree and folder tree
+- (related to #2017) Add constraint of unicity in create and update hook form
+- (related to #2012) Checking MySQL version to set sql_mode automatically, this fixed the compatibility with MySQL > 5.6 for modes `STRICT_TRANS_TABLES`, `NO_ENGINE_SUBSTITUTION`
+- (related to #2010) Improve product price edition tab
+- (related to #2005) Use a wider version requirement on thelia/installer for setup/
+- (related to #1999) Fix Folder breadcrumb, the parent url was not good if you edit a picture in a folder or a content
+- (related to #1980) Update database schema to increase module version field to 25 chars.
+- (related to #1967) Module Colissimo : Replace country title by isoalpha2 in export for expeditor
+- (related to #1962) Fix exception when cloning a product if the i18n in specific locale does not exist
+- (related to #1958) Fix missing success_url on Brand SEO update
+- (related to #1956) Fix UX right class in brand products pagination in the frontOffice
+- (related to #1946) Fix the automatic inclusion of the TaxType class only if extension == php
+- (related to #1939) Add `visible` and `visible_reverse` values in Product Loop order argument
+- (related to #1936) Fixed the module name verification for command `module:position`
+- (related to #1928) Hook DI alert messages thrown as exceptions in dev. mode
+- (related to #1921) Modules 'configuration' and 'hook' buttons behavior fix
+- (related to #1920) Fixed coupons conditions label translation
+- (related to #1917) Fixed translations bug in user mode with view only missing translations activated
+- (related to #1914) The module list in the translation page is now ordered by module code instead of module title
+- (related to #1908) A fix for "terms & conditions" bootbox height
+- (related to #1906) Fix coupon create form data
+- (related to #1799) Fixed the redirection to rewritten URL
+- (related to #1797) Fix order manual and manual_reverse in AttributeCombination loop
+- #1901 Update Colissimo export, add link to order and to customer, add package weight
+
 # 2.2.2
 
 - #1901 Update Colissimo export, add link to order and to customer, add package weight
@@ -402,6 +460,24 @@
 - Imagine package is updated to 0.6.2, which provides a better support for transparency.
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
+
+# 2.1.9
+
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2125) fix construct in GenerateRewrittenUrlEvent
+- (related to #1920) Fixed coupons conditions label translation
+- (related to #1946) Fix TaxType class only if extension == php
+- (related to #1958) Missing success_url on Brand SEO update
+- (related to #1967) Replace country title by isoalpha2 in export for expeditor
+- (related to #1999) Update FolderBreadcrumbTrait.php
+- (related to #2005) Use a wider version requirement on thelia/installer for setup
+- (related to #2091) Checking MySQL version to set sql_mode automatically
+- (related to #2041) Fix possible circular reference for category tree and folder tree
+- (related to #2058) Fix Bug on submit combination builder empty form
+- (related to #2068) Fix customer edit access
+- (related to #2073) Use template default fallback in View Listener
 
 # 2.1.8
 

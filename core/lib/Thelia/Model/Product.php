@@ -105,37 +105,42 @@ class Product extends BaseProduct implements FileModelParentInterface
             $defaultCategoryId = null;
         }
 
-        // Update the default category
+        /** @var ProductCategory $productCategory */
         $productCategory = ProductCategoryQuery::create()
             ->filterByProductId($this->getId())
             ->filterByDefaultCategory(true)
             ->findOne()
         ;
 
-        if ($productCategory === null || $productCategory->getCategoryId() != $defaultCategoryId) {
-            // Delete the old default category
-            if ($productCategory !== null) {
-                $productCategory->setCategoryId($defaultCategoryId);
-            } else {
-                $productCategory = (new ProductCategory())
-                    ->setProduct($this)
-                    ->setCategoryId($defaultCategoryId)
-                    ->setDefaultCategory(true);
-            }
+        if ($productCategory !== null && (int) $productCategory->getCategoryId() === (int) $defaultCategoryId) {
+            return $this;
+        }
 
-            $productCategory->setPosition($productCategory->getNextPosition());
+        if ($productCategory !== null) {
+            $productCategory->delete();
+        }
 
-            $productCategory->save();
+        // checks if the product is already associated with the category and but not default
+        if (null !== $productCategory = ProductCategoryQuery::create()->filterByProduct($this)->filterByCategoryId($defaultCategoryId)->findOne()) {
+            $productCategory->setDefaultCategory(true)->save();
+        } else {
+            $position = (new ProductCategory())->setCategoryId($defaultCategoryId)->getNextPosition();
 
-            // For BC, will be removed in 2.4
-            $this->setPosition($productCategory->getPosition());
+            (new ProductCategory())
+                ->setProduct($this)
+                ->setCategoryId($defaultCategoryId)
+                ->setDefaultCategory(true)
+                ->setPosition($position)
+                ->save();
+
+            $this->setPosition($position);
         }
 
         return $this;
     }
 
     /**
-     * @deprecated since 2.3, and will be removed in 2.4, please use Product::setDefaultFolder
+     * @deprecated since 2.3, and will be removed in 2.4, please use Product::setDefaultCategory
      * @param int $defaultCategoryId
      * @return $this
      */

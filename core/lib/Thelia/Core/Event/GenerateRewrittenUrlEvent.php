@@ -35,8 +35,8 @@ class GenerateRewrittenUrlEvent extends ActionEvent
      */
     public function __construct($object, $locale)
     {
-        $this->object;
-        $this->locale;
+        $this->object = $object;
+        $this->locale = $locale;
     }
 
     /**

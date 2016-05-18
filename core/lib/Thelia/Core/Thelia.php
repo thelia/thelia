@@ -50,7 +50,7 @@ use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.3.0';
+    const THELIA_VERSION = '2.3.1';
 
     public function __construct($environment, $debug)
     {
@@ -97,27 +97,51 @@ class Thelia extends Kernel
             $con->useDebug(true);
         }
 
-        // MySQL 5.6+ compatibility
-        $result = $con->query("SELECT VERSION() as version, @@GLOBAL.sql_mode as global_sql_mode, @@SESSION.sql_mode as session_sql_mode");
+        $this->checkMySQLConfigurations($con);
+    }
+
+    protected function checkMySQLConfigurations(ConnectionWrapper $con)
+    {
+        // todo add cache for this test
+        $result = $con->query("SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode");
 
         if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
+            $sessionSqlMode = explode(',', $data['session_sql_mode']);
+            if (empty($sessionSqlMode[0])) {
+                unset($sessionSqlMode[0]);
+            }
+            $canUpdate = false;
+
             // MariaDB is not impacted by this problem
-            if (false === strpos($data['version'], 'MariaDB') && version_compare($data['version'], '5.6.0', '>=')) {
-                Tlog::getInstance()->addInfo("Setting global and session sql_mode to NO_ENGINE_SUBSTITUTION");
-
-                $setQuery = '';
-
-                if ($data['global_sql_mode'] != 'NO_ENGINE_SUBSTITUTION') {
-                    $setQuery .= "SET GLOBAL sql_mode='NO_ENGINE_SUBSTITUTION';";
-                }
-                if ($data['session_sql_mode'] != 'NO_ENGINE_SUBSTITUTION') {
-                    $setQuery .= "SET SESSION sql_mode='NO_ENGINE_SUBSTITUTION';";
-                }
-
-                if (! empty($setQuery)) {
-                    if (null === $con->query($setQuery)) {
-                        throw new \RuntimeException('Failed to set MySQL 5.6+ global sql_mode to NO_ENGINE_SUBSTITUTION');
+            if (false === strpos($data['version'], 'MariaDB')) {
+                // MySQL 5.6+ compatibility
+                if (version_compare($data['version'], '5.6.0', '>=')) {
+                    // add NO_ENGINE_SUBSTITUTION
+                    if (!in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                        $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
                     }
+
+                    // remove STRICT_TRANS_TABLES
+                    if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
+                        unset($sessionSqlMode[$key]);
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.");
+                    }
+
+                    // remove ONLY_FULL_GROUP_BY
+                    if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode)) !== false) {
+                        unset($sessionSqlMode[$key]);
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.");
+                    }
+                }
+            }
+
+            if (! empty($canUpdate)) {
+                if (null === $con->query("SET SESSION sql_mode='" . implode(',', $sessionSqlMode) . "';")) {
+                    throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
                 }
             }
         } else {

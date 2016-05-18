@@ -7,7 +7,7 @@
     <descriptive locale="fr_FR">
         <title>Intégration du moteur de template Smarty</title>
     </descriptive>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <author>
         <name>Manuel Raynaud</name>
         <email>manu@raynaud.io</email>
