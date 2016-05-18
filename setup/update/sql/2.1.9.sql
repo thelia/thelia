@@ -6,4 +6,4 @@ UPDATE `config` SET `value`='1' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='9' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
- SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 1;
