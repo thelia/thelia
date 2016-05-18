@@ -6,4 +6,6 @@ UPDATE `config` SET `value`='1' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='8' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
+UPDATE hook SET by_module = '1' WHERE hook.code = 'module.configuration';
+
 SET FOREIGN_KEY_CHECKS = 1;
