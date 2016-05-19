@@ -1,3 +1,7 @@
+# 2.3.2
+
+- (related to #2154) Add Test range dates exists before testing type
+
 # 2.3.1
 
 - (related to #2150) Fix form and validator translations
