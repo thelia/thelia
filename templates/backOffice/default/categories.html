@@ -539,14 +539,15 @@
 
                     {* If current category has no template, get a parent's one *}
                     {if !$product_template}
-                        {* Be sure to prevent infinite loops, in the case a module has modified the category loop behaviour *}
-                        {$limit = 100}
-                        {while $limit > 0 && $parent_category != 0 && !$product_template}
+                        {while $parent_category != 0 && !$product_template}
                             {loop type="category" name="parent_category" backend_context=1 visible="*" id=$parent_category}
-                            {assign var="parent_category" value=$PARENT}
-                            {assign var="product_template" value=$TEMPLATE}
+                                {$parent_category = $PARENT}
+                                {$product_template = $TEMPLATE}
                             {/loop}
-                            {$limit = $limit - 1}
+                            {* Be sure to prevent infinite loops *}
+                            {elseloop rel="parent_category"}
+                                {$parent_category = 0}
+                            {/elseloop}
                         {/while}
                     {/if}
 
