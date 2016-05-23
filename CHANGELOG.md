@@ -1,5 +1,6 @@
 # 2.3.2
 
+- (related to #2160) Added missing home.block 'class' parameter
 - (related to #2157) Prevent an infinite loop in new product dialog
 - (related to #2154) Add Test range dates exists before testing type
 
