@@ -289,7 +289,7 @@
                 });
 
                 if (addedStates.length > 0 || isSelectedCountry(country.id, 0)) {
-                    addedList.push(prepareCountry(country, addedStates, true));
+                    addedList.push(prepareCountry(country, addedStates, isSelectedCountry(country.id, 0)));
                 }
 
                 if (addStates.length > 0) {
