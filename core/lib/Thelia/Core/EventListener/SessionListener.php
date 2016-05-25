@@ -14,6 +14,7 @@ namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
@@ -26,19 +27,25 @@ use Thelia\Model\ConfigQuery;
  * Class SessionListener
  * @package Thelia\Core\EventListener
  * @author manuel raynaud <manu@raynaud.io>
+ * @author gilles bourgeat <gbourgeat@openstudio.fr>
  */
 class SessionListener implements EventSubscriberInterface
 {
     public function prodSession(SessionEvent $event)
     {
-        $storage = new NativeSessionStorage(
-            [ 'cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0) ]
-        );
-        $storage->setSaveHandler(
-            new NativeFileSessionHandler(
-                ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')
-            )
-        );
+        if ($this->isBot($event)) {
+            $storage = new MockArraySessionStorage();
+        } else {
+            $storage = new NativeSessionStorage(
+                [ 'cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0) ]
+            );
+            $storage->setSaveHandler(
+                new NativeFileSessionHandler(
+                    ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')
+                )
+            );
+        }
+
         $event->setSession($this->getSession($storage));
     }
 
@@ -54,6 +61,19 @@ class SessionListener implements EventSubscriberInterface
     public function getSession(SessionStorageInterface $storage)
     {
         return new Session($storage);
+    }
+
+    protected function isBot(SessionEvent $event)
+    {
+        if ($event->getRequest() !== null) {
+            $userAgent = $event->getRequest()->headers->get('User-Agent');
+
+            if (preg_match('/bot|crawl|slurp|spider/i', $userAgent)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
