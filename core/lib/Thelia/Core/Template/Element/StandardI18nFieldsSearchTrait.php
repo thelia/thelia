@@ -16,25 +16,34 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 /**
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-interface SearchLoopInterface
+trait StandardI18nFieldsSearchTrait
 {
-    const MODE_ANY_WORD = 'any_word';
-    const MODE_SENTENCE = 'sentence';
-    const MODE_STRICT_SENTENCE = 'strict_sentence';
+    protected static $standardI18nSearchFields = [
+        "title",
+        "chapo",
+        "description",
+        "postscriptum"
+    ];
+
+    protected function getStandardI18nSearchFields()
+    {
+        return self::$standardI18nSearchFields;
+    }
 
     /**
-     * @return array of available field to search in
+     * @param ModelCriteria $search
+     * @param $searchTerm
+     * @param $searchCriteria
      */
-    public function getSearchIn();
+    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria)
+    {
+        foreach (self::$standardI18nSearchFields as $index => $searchInElement) {
+            if ($index > 0) {
+                $search->_or();
+            }
 
-    /**
-     * @param ModelCriteria $search a query
-     * @param string $searchTerm the searched term
-     * @param array $searchIn available field to search in
-     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc.
-     */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria);
+            $this->addSearchInI18nColumn($search, strtoupper($searchInElement), $searchCriteria, $searchTerm);
+        }
+    }
 }
