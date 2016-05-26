@@ -13,11 +13,14 @@
 namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\UserProvider\UserProviderInterface;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Form\BaseForm;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Customer;
 
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 {
@@ -70,6 +73,15 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 
             if ($user === null) {
                 throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
+            }
+
+            if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer) {
+
+                // Customer (confirmation_token & enable) introduces since Thelia 2.4
+                // this test prevent backward compatibility
+                if ($user->getConfirmationToken() !== null && ! $user->getEnable()) {
+                    throw new AuthenticationException();
+                }
             }
 
             // Check user password
