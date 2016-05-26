@@ -29,20 +29,6 @@ use Thelia\Model\OrderStatus as OrderStatusModel;
  */
 class OrderStatusTest extends TestCaseWithURLToolSetup
 {
-    public function setUp()
-    {
-        parent::setUp();
-
-        OrderStatusQuery::create()->filterByCode(['order_status_test', 'order_status_test2'], Criteria::IN)->delete();
-        if (null !== $find = OrderStatusQuery::create()->findOneByCode('paid_force_update')) {
-            $find->setCode('paid')->save();
-        }
-
-        if (null === OrderStatusQuery::create()->findOneByCode('paid')) {
-            $this->fail('it\'s not possible to run the tests, because the order status "paid" not found');
-        }
-    }
-
     /**
      * @param OrderStatusModel $orderStatus
      * @return OrderStatusUpdateEvent
@@ -81,6 +67,8 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      */
     public function testCreateOrderStatus()
     {
+        OrderStatusQuery::create()->filterByCode(['order_status_test', 'order_status_test2'], Criteria::IN)->delete();
+
         $code = 'order_status_test';
 
         $event = new OrderStatusCreateEvent();
@@ -106,6 +94,14 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      */
     public function testUpdateOrderStatusProtected()
     {
+        if (null !== $find = OrderStatusQuery::create()->findOneByCode('paid_force_update')) {
+            $find->setCode('paid')->save();
+        }
+
+        if (null === OrderStatusQuery::create()->findOneByCode('paid')) {
+            $this->fail('It\'s not possible to run the tests, because the order status "paid" not found');
+        }
+
         $event = $this->getUpdateEvent(OrderStatusQuery::create()->findOneByCode('paid'));
 
         $event->setDescription('test');
@@ -165,7 +161,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     /**
      * test order status removal
      * @covers Thelia\Action\OrderStatus::delete
-     * @depends testUpdateOrderStatusNotProtected
+     * @depends testUpdateOrderStatusProtected
      */
     public function testDeleteOrderStatusProtected()
     {
@@ -209,11 +205,11 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionUp()
     {
         $orderStatus = OrderStatusQuery::create()
-            ->filterByPosition(1)
+            ->filterByPosition(2)
             ->findOne();
 
         if (null === $orderStatus) {
-            $this->fail('use fixtures before launching test, there is not enough folder in database');
+            $this->fail('Use fixtures before launching test, there is not enough folder in database');
         }
 
         $newPosition = $orderStatus->getPosition()-1;
@@ -223,7 +219,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
         $orderStatusAction = new OrderStatusAction();
         $orderStatusAction->updatePosition($event, null, $this->getMockEventDispatcher());
 
-        $orderStatusUpdated = OrderStatusQuery::create()->findPk($orderStatus->getId());
+        $orderStatusUpdated = OrderStatusQuery::create()->findOneById($orderStatus->getId());
 
         $this->assertEquals($newPosition, $orderStatusUpdated->getPosition(), sprintf("new position is %d, new position expected is %d for order status %d", $newPosition, $orderStatusUpdated->getPosition(), $orderStatusUpdated->getCode()));
     }
