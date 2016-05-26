@@ -121,7 +121,6 @@ class Customer extends BaseCustomer implements UserInterface
                 $this->addAddress($address);
                 
                 if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
-                    /** @todo : need feedback Thelia Token vs Symfony strategy (Symfony\Component\Security\Core\Util\SecureRandom */
                     $this->setConfirmationToken(bin2hex(random_bytes(32)));
                 }
             } else {

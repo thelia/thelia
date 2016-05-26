@@ -24,6 +24,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\CustomerException;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tools\Password;
@@ -60,6 +61,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         if ($event->getNotifyCustomerOfAccountCreation()) {
             $this->mailer->sendEmailToCustomer('customer_account_created', $customer, [ 'password' => $plainPassword ]);
+        }
+
+        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
+            $this->mailer->sendEmailToCustomer('customer_confirmation', $customer, ['customer' => $customer]);
         }
     }
 
