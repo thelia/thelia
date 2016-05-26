@@ -74,6 +74,8 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         }
 
         $orderStatus->delete();
+
+        $event->setOrderStatus($orderStatus);
     }
 
     /**
@@ -136,7 +138,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     {
         if (null === $orderStatus = OrderStatusQuery::create()->findOneById($event->getId())) {
             throw new \LogicException(
-                "Order status nt found"
+                "Order status not found"
             );
         }
 
