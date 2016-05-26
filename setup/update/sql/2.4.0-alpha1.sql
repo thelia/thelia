@@ -51,4 +51,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+7, 'fr_FR', NULL, NULL, NULL)
 ;
 
+ALTER TABLE `customer` ADD `enable` TINYINT(1) DEFAULT 0 AFTER `remember_me_serial`;
+ALTER TABLE `customer` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
+
 SET FOREIGN_KEY_CHECKS = 1;
