@@ -406,6 +406,8 @@
     <column name="discount" type="DECIMAL" scale="6" size="16" defaultValue="0.000000" />
     <column name="remember_me_token" type="VARCHAR" size="255" />
     <column name="remember_me_serial" type="VARCHAR" size="255" />
+    <column defaultValue="0" name="enable" type="TINYINT" />
+    <column name="confirmation_token" size="255" type="VARCHAR" />
 
     <unique name="ref_UNIQUE">
       <unique-column name="ref" />

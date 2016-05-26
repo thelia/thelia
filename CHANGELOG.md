@@ -1,5 +1,15 @@
 # 2.3.4
-- (related to 2106) Added order-invoice form hooks
+
+- (related to #2164) New confirmation email option after customer creation 
+- (related to #2153) Lighten placeholders color to be more different than filled inputs
+- (related to #2149) Fixed status_id parameter access
+- (related to #2148) Added search by EAN code to product sale elements loop
+- (related to #2146) Fix search in i18n fields when backend_context=1, and search improvements. The loop search system is imporved, by providing the StandardI18nFieldsSearchTrait, which manages searches in the standard internationalized fields (title, chapo, description and postscriptum). In the back-office, customer search is now in sentence (%term%) mode, to allow incomplete word matches, such as part of an email address.
+- (related to #2140) Added missing "calendar" PHP extension to docker config
+- (related to #2107) Add create function for AlphaNumStringType argument
+- (related to #2082) Product and PSE references added to invoice template
+- (related to #2093) Fix #1662 add of hooks in pdf email and account-order
+- (related to #2106) Added order-invoice form hooks
 - (related to #2109) Module routers priority improvement
 - (related to #1912) Fix for feature loop with product filter
 
