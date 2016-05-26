@@ -475,6 +475,7 @@ return array(
     'Email txt - order notification - before products' => 'Email txt - order notification - before products',
     'Email txt - order notification - delivery address' => 'Email txt - order notification - delivery address',
     'Email txt - order notification - order product' => 'Email txt - order notification - order product',
+    'Enable (1) or disable (0) customer email confirmation' => 'Enable (1) or disable (0) customer email confirmation',
     'Enable (1) or disable (0) URL rewriting' => 'Enable (1) or disable (0) URL rewriting',
     'Enna' => 'Enna',
     'Entre Ríos' => 'Entre Ríos',

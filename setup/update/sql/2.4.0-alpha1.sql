@@ -51,7 +51,18 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+7, 'fr_FR', NULL, NULL, NULL)
 ;
 
-ALTER TABLE `customer` ADD `enable` TINYINT(1) DEFAULT 0 AFTER `remember_me_serial`;
+ALTER TABLE `customer` ADD `enable` TINYINT DEFAULT 0 AFTER `remember_me_serial`;
 ALTER TABLE `customer` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW());
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
+    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL)
 
 SET FOREIGN_KEY_CHECKS = 1;
