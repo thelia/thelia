@@ -35,6 +35,8 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersionQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildCustomerVersionQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
  * @method     ChildCustomerVersionQuery orderByRememberMeSerial($order = Criteria::ASC) Order by the remember_me_serial column
+ * @method     ChildCustomerVersionQuery orderByEnable($order = Criteria::ASC) Order by the enable column
+ * @method     ChildCustomerVersionQuery orderByConfirmationToken($order = Criteria::ASC) Order by the confirmation_token column
  * @method     ChildCustomerVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCustomerVersionQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCustomerVersionQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -57,6 +59,8 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersionQuery groupByDiscount() Group by the discount column
  * @method     ChildCustomerVersionQuery groupByRememberMeToken() Group by the remember_me_token column
  * @method     ChildCustomerVersionQuery groupByRememberMeSerial() Group by the remember_me_serial column
+ * @method     ChildCustomerVersionQuery groupByEnable() Group by the enable column
+ * @method     ChildCustomerVersionQuery groupByConfirmationToken() Group by the confirmation_token column
  * @method     ChildCustomerVersionQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCustomerVersionQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCustomerVersionQuery groupByVersion() Group by the version column
@@ -90,6 +94,8 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersion findOneByDiscount(string $discount) Return the first ChildCustomerVersion filtered by the discount column
  * @method     ChildCustomerVersion findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomerVersion filtered by the remember_me_token column
  * @method     ChildCustomerVersion findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildCustomerVersion filtered by the remember_me_serial column
+ * @method     ChildCustomerVersion findOneByEnable(int $enable) Return the first ChildCustomerVersion filtered by the enable column
+ * @method     ChildCustomerVersion findOneByConfirmationToken(string $confirmation_token) Return the first ChildCustomerVersion filtered by the confirmation_token column
  * @method     ChildCustomerVersion findOneByCreatedAt(string $created_at) Return the first ChildCustomerVersion filtered by the created_at column
  * @method     ChildCustomerVersion findOneByUpdatedAt(string $updated_at) Return the first ChildCustomerVersion filtered by the updated_at column
  * @method     ChildCustomerVersion findOneByVersion(int $version) Return the first ChildCustomerVersion filtered by the version column
@@ -112,6 +118,8 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     array findByDiscount(string $discount) Return ChildCustomerVersion objects filtered by the discount column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomerVersion objects filtered by the remember_me_token column
  * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildCustomerVersion objects filtered by the remember_me_serial column
+ * @method     array findByEnable(int $enable) Return ChildCustomerVersion objects filtered by the enable column
+ * @method     array findByConfirmationToken(string $confirmation_token) Return ChildCustomerVersion objects filtered by the confirmation_token column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomerVersion objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCustomerVersion objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCustomerVersion objects filtered by the version column
@@ -207,7 +215,7 @@ abstract class CustomerVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE_ID`, `LANG_ID`, `REF`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `ORDER_IDS`, `ORDER_VERSIONS` FROM `customer_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `TITLE_ID`, `LANG_ID`, `REF`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `ENABLE`, `CONFIRMATION_TOKEN`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `ORDER_IDS`, `ORDER_VERSIONS` FROM `customer_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -774,6 +782,76 @@ abstract class CustomerVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerVersionTableMap::REMEMBER_ME_SERIAL, $rememberMeSerial, $comparison);
+    }
+
+    /**
+     * Filter the query on the enable column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEnable(1234); // WHERE enable = 1234
+     * $query->filterByEnable(array(12, 34)); // WHERE enable IN (12, 34)
+     * $query->filterByEnable(array('min' => 12)); // WHERE enable > 12
+     * </code>
+     *
+     * @param     mixed $enable The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerVersionQuery The current query, for fluid interface
+     */
+    public function filterByEnable($enable = null, $comparison = null)
+    {
+        if (is_array($enable)) {
+            $useMinMax = false;
+            if (isset($enable['min'])) {
+                $this->addUsingAlias(CustomerVersionTableMap::ENABLE, $enable['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($enable['max'])) {
+                $this->addUsingAlias(CustomerVersionTableMap::ENABLE, $enable['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerVersionTableMap::ENABLE, $enable, $comparison);
+    }
+
+    /**
+     * Filter the query on the confirmation_token column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByConfirmationToken('fooValue');   // WHERE confirmation_token = 'fooValue'
+     * $query->filterByConfirmationToken('%fooValue%'); // WHERE confirmation_token LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $confirmationToken The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerVersionQuery The current query, for fluid interface
+     */
+    public function filterByConfirmationToken($confirmationToken = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($confirmationToken)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $confirmationToken)) {
+                $confirmationToken = str_replace('*', '%', $confirmationToken);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerVersionTableMap::CONFIRMATION_TOKEN, $confirmationToken, $comparison);
     }
 
     /**
