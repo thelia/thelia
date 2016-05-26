@@ -75,7 +75,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
 (66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
 (67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
-(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW())
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
+(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1996,7 +1997,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (65, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
     (66, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
     (67, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
-    (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
+    (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL),
+    (69, '{$locale}', {intl l='Enable (1) or disable (0) customer email confirmation' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
