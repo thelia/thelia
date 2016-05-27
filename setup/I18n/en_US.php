@@ -285,6 +285,7 @@ return array(
     'Configuration / Template' => 'Configuration / Template',
     'Configuration variables' => 'Configuration variables',
     'Confirm your %store account' => 'Confirm your %store account',
+    'Congo' => 'Congo',
     'Connecticut' => 'Connecticut',
     'Contact block' => 'Contact block',
     'Contact page - CSS stylesheet' => 'Contact page - CSS stylesheet',

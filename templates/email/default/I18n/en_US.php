@@ -9,6 +9,9 @@ return array(
     'An account at %store_name has been created by one of our managers.' => 'An account at %store_name has been created by one of our managers.',
     'Billing address:' => 'Billing address:',
     'Copyright' => 'Copyright',
+    'Confirm now' => 'Confirm now',
+    'Confirm your %store account' => 'Confirm your %store account',
+    'Confirm your email to complete your account' => 'Confirm your email to complete your account',
     'Customer billing address:' => 'Customer billing address:',
     'Customer delivery address:' => 'Customer delivery address:',
     'Delivery address:' => 'Delivery address:',
@@ -24,6 +27,7 @@ return array(
     'Item : %item' => 'Item : %item',
     'Items ordered:' => 'Items ordered:',
     'Items total : %amount' => 'Items total : %amount',
+    'just click the button below : ' => 'just click the button below : ',
     'Kind regards' => 'Kind regards',
     'New order placed on %store_name Nº %ref' => 'New order placed on %store_name Nº %ref',
     'Order Number:' => 'Order Number:',
@@ -65,4 +69,5 @@ return array(
     'Your order confirmation Nº %ref' => 'Your order confirmation Nº %ref',
     'Your password for %store' => 'Your password for %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
+    'Welcome to %store,' => 'Welcome to %store,',
 );
