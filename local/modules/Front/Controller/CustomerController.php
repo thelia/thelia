@@ -30,7 +30,6 @@ use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
@@ -547,7 +546,7 @@ class CustomerController extends BaseFrontController
             ->save()
         ;
 
-        return $this->render('customer.login.view');
+        return $this->generateRedirectFromRoute('customer.login.view');
     }
 
     /**

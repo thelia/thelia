@@ -5614,7 +5614,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (40, 'en_US', 'Cyprus', NULL, NULL, NULL),
     (41, 'en_US', 'Colombia', NULL, NULL, NULL),
     (42, 'en_US', 'Comoros', NULL, NULL, NULL),
-    (43, 'en_US', NULL, NULL, NULL, NULL),
+    (43, 'en_US', 'Congo', NULL, NULL, NULL),
     (44, 'en_US', 'Cook Islands', NULL, NULL, NULL),
     (45, 'en_US', 'North Korea', NULL, NULL, NULL),
     (46, 'en_US', 'South Korea', NULL, NULL, NULL),
