@@ -51,6 +51,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+7, 'fr_FR', NULL, NULL, NULL)
 ;
 
+-- Customer confirmation
+
 ALTER TABLE `customer` ADD `enable` TINYINT DEFAULT 0 AFTER `remember_me_serial`;
 ALTER TABLE `customer` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
 
@@ -64,5 +66,17 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max_id + 1, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
     (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL)
+;
+
+SELECT @max_id :=IFNULL(MAX(`id`),0) FROM `message`;
+INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+(@max_id+1, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW());
+
+INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
+    (@max_id+1, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max_id+1, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your %store account', NULL, NULL),
+    (@max_id+1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id+1, 'fr_FR', NULL, NULL, NULL, NULL)
+;
 
 SET FOREIGN_KEY_CHECKS = 1;
