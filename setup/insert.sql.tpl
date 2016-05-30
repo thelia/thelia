@@ -75,7 +75,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
 (66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
 (67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
-(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW())
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
+(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1934,7 +1935,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
 (5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
 (6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
-(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW())
+(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
+(8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW())
 ;
 
 /**
@@ -1996,7 +1998,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (65, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
     (66, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
     (67, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
-    (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
+    (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL),
+    (69, '{$locale}', {intl l='Enable (1) or disable (0) customer email confirmation' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -3464,7 +3467,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {config key="store_name"} has been changed.' locale=$locale}, NULL, NULL),
     (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
     (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' store={config key="store_name"} locale=$locale}, NULL, NULL),
-    (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL),
+    (8, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your %store account' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

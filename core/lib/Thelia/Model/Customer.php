@@ -119,6 +119,10 @@ class Customer extends BaseCustomer implements UserInterface
                     ;
 
                 $this->addAddress($address);
+                
+                if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
+                    $this->setConfirmationToken(bin2hex(random_bytes(32)));
+                }
             } else {
                 $address = $this->getDefaultAddress();
 

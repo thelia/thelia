@@ -50,6 +50,11 @@
         <default key="_controller">Front\Controller\CustomerController::logoutAction</default>
     </route>
 
+    <!-- Confirm customer -->
+    <route id="customer.confirm.token" path="/customer/confirm/{token}">
+        <default key="_controller">Front\Controller\CustomerController::confirmCustomerAction</default>
+    </route>
+
     <!-- Account -->
 
     <route id="customer.home" path="/account" methods="get">

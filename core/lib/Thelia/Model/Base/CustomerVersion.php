@@ -141,6 +141,19 @@ abstract class CustomerVersion implements ActiveRecordInterface
     protected $remember_me_serial;
 
     /**
+     * The value for the enable field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $enable;
+
+    /**
+     * The value for the confirmation_token field.
+     * @var        string
+     */
+    protected $confirmation_token;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -219,6 +232,7 @@ abstract class CustomerVersion implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->discount = '0.000000';
+        $this->enable = 0;
         $this->version = 0;
     }
 
@@ -634,6 +648,28 @@ abstract class CustomerVersion implements ActiveRecordInterface
     {
 
         return $this->remember_me_serial;
+    }
+
+    /**
+     * Get the [enable] column value.
+     *
+     * @return   int
+     */
+    public function getEnable()
+    {
+
+        return $this->enable;
+    }
+
+    /**
+     * Get the [confirmation_token] column value.
+     *
+     * @return   string
+     */
+    public function getConfirmationToken()
+    {
+
+        return $this->confirmation_token;
     }
 
     /**
@@ -1075,6 +1111,48 @@ abstract class CustomerVersion implements ActiveRecordInterface
     } // setRememberMeSerial()
 
     /**
+     * Set the value of [enable] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setEnable($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->enable !== $v) {
+            $this->enable = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::ENABLE] = true;
+        }
+
+
+        return $this;
+    } // setEnable()
+
+    /**
+     * Set the value of [confirmation_token] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setConfirmationToken($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->confirmation_token !== $v) {
+            $this->confirmation_token = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::CONFIRMATION_TOKEN] = true;
+        }
+
+
+        return $this;
+    } // setConfirmationToken()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -1297,6 +1375,10 @@ abstract class CustomerVersion implements ActiveRecordInterface
                 return false;
             }
 
+            if ($this->enable !== 0) {
+                return false;
+            }
+
             if ($this->version !== 0) {
                 return false;
             }
@@ -1370,35 +1452,41 @@ abstract class CustomerVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CustomerVersionTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_serial = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CustomerVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CustomerVersionTableMap::translateFieldName('Enable', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->enable = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CustomerVersionTableMap::translateFieldName('ConfirmationToken', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->confirmation_token = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : CustomerVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CustomerVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : CustomerVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : CustomerVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : CustomerVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : CustomerVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : CustomerVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : CustomerVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : CustomerVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : CustomerVersionTableMap::translateFieldName('OrderIds', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : CustomerVersionTableMap::translateFieldName('OrderIds', TableMap::TYPE_PHPNAME, $indexType)];
             $this->order_ids = $col;
             $this->order_ids_unserialized = null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : CustomerVersionTableMap::translateFieldName('OrderVersions', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : CustomerVersionTableMap::translateFieldName('OrderVersions', TableMap::TYPE_PHPNAME, $indexType)];
             $this->order_versions = $col;
             $this->order_versions_unserialized = null;
             $this->resetModified();
@@ -1409,7 +1497,7 @@ abstract class CustomerVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 21; // 21 = CustomerVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 23; // 23 = CustomerVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CustomerVersion object", 0, $e);
@@ -1672,6 +1760,12 @@ abstract class CustomerVersion implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_SERIAL)) {
             $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_SERIAL`';
         }
+        if ($this->isColumnModified(CustomerVersionTableMap::ENABLE)) {
+            $modifiedColumns[':p' . $index++]  = '`ENABLE`';
+        }
+        if ($this->isColumnModified(CustomerVersionTableMap::CONFIRMATION_TOKEN)) {
+            $modifiedColumns[':p' . $index++]  = '`CONFIRMATION_TOKEN`';
+        }
         if ($this->isColumnModified(CustomerVersionTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1745,6 +1839,12 @@ abstract class CustomerVersion implements ActiveRecordInterface
                         break;
                     case '`REMEMBER_ME_SERIAL`':
                         $stmt->bindValue($identifier, $this->remember_me_serial, PDO::PARAM_STR);
+                        break;
+                    case '`ENABLE`':
+                        $stmt->bindValue($identifier, $this->enable, PDO::PARAM_INT);
+                        break;
+                    case '`CONFIRMATION_TOKEN`':
+                        $stmt->bindValue($identifier, $this->confirmation_token, PDO::PARAM_STR);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1865,24 +1965,30 @@ abstract class CustomerVersion implements ActiveRecordInterface
                 return $this->getRememberMeSerial();
                 break;
             case 14:
-                return $this->getCreatedAt();
+                return $this->getEnable();
                 break;
             case 15:
-                return $this->getUpdatedAt();
+                return $this->getConfirmationToken();
                 break;
             case 16:
-                return $this->getVersion();
+                return $this->getCreatedAt();
                 break;
             case 17:
-                return $this->getVersionCreatedAt();
+                return $this->getUpdatedAt();
                 break;
             case 18:
-                return $this->getVersionCreatedBy();
+                return $this->getVersion();
                 break;
             case 19:
-                return $this->getOrderIds();
+                return $this->getVersionCreatedAt();
                 break;
             case 20:
+                return $this->getVersionCreatedBy();
+                break;
+            case 21:
+                return $this->getOrderIds();
+                break;
+            case 22:
                 return $this->getOrderVersions();
                 break;
             default:
@@ -1928,13 +2034,15 @@ abstract class CustomerVersion implements ActiveRecordInterface
             $keys[11] => $this->getDiscount(),
             $keys[12] => $this->getRememberMeToken(),
             $keys[13] => $this->getRememberMeSerial(),
-            $keys[14] => $this->getCreatedAt(),
-            $keys[15] => $this->getUpdatedAt(),
-            $keys[16] => $this->getVersion(),
-            $keys[17] => $this->getVersionCreatedAt(),
-            $keys[18] => $this->getVersionCreatedBy(),
-            $keys[19] => $this->getOrderIds(),
-            $keys[20] => $this->getOrderVersions(),
+            $keys[14] => $this->getEnable(),
+            $keys[15] => $this->getConfirmationToken(),
+            $keys[16] => $this->getCreatedAt(),
+            $keys[17] => $this->getUpdatedAt(),
+            $keys[18] => $this->getVersion(),
+            $keys[19] => $this->getVersionCreatedAt(),
+            $keys[20] => $this->getVersionCreatedBy(),
+            $keys[21] => $this->getOrderIds(),
+            $keys[22] => $this->getOrderVersions(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -2022,28 +2130,34 @@ abstract class CustomerVersion implements ActiveRecordInterface
                 $this->setRememberMeSerial($value);
                 break;
             case 14:
-                $this->setCreatedAt($value);
+                $this->setEnable($value);
                 break;
             case 15:
-                $this->setUpdatedAt($value);
+                $this->setConfirmationToken($value);
                 break;
             case 16:
-                $this->setVersion($value);
+                $this->setCreatedAt($value);
                 break;
             case 17:
-                $this->setVersionCreatedAt($value);
+                $this->setUpdatedAt($value);
                 break;
             case 18:
-                $this->setVersionCreatedBy($value);
+                $this->setVersion($value);
                 break;
             case 19:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 20:
+                $this->setVersionCreatedBy($value);
+                break;
+            case 21:
                 if (!is_array($value)) {
                     $v = trim(substr($value, 2, -2));
                     $value = $v ? explode(' | ', $v) : array();
                 }
                 $this->setOrderIds($value);
                 break;
-            case 20:
+            case 22:
                 if (!is_array($value)) {
                     $v = trim(substr($value, 2, -2));
                     $value = $v ? explode(' | ', $v) : array();
@@ -2088,13 +2202,15 @@ abstract class CustomerVersion implements ActiveRecordInterface
         if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setRememberMeToken($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setRememberMeSerial($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setVersion($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setVersionCreatedAt($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setVersionCreatedBy($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setOrderIds($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setOrderVersions($arr[$keys[20]]);
+        if (array_key_exists($keys[14], $arr)) $this->setEnable($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setConfirmationToken($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setVersion($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setVersionCreatedAt($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setVersionCreatedBy($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setOrderIds($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setOrderVersions($arr[$keys[22]]);
     }
 
     /**
@@ -2120,6 +2236,8 @@ abstract class CustomerVersion implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerVersionTableMap::DISCOUNT)) $criteria->add(CustomerVersionTableMap::DISCOUNT, $this->discount);
         if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_TOKEN)) $criteria->add(CustomerVersionTableMap::REMEMBER_ME_TOKEN, $this->remember_me_token);
         if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_SERIAL)) $criteria->add(CustomerVersionTableMap::REMEMBER_ME_SERIAL, $this->remember_me_serial);
+        if ($this->isColumnModified(CustomerVersionTableMap::ENABLE)) $criteria->add(CustomerVersionTableMap::ENABLE, $this->enable);
+        if ($this->isColumnModified(CustomerVersionTableMap::CONFIRMATION_TOKEN)) $criteria->add(CustomerVersionTableMap::CONFIRMATION_TOKEN, $this->confirmation_token);
         if ($this->isColumnModified(CustomerVersionTableMap::CREATED_AT)) $criteria->add(CustomerVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CustomerVersionTableMap::UPDATED_AT)) $criteria->add(CustomerVersionTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(CustomerVersionTableMap::VERSION)) $criteria->add(CustomerVersionTableMap::VERSION, $this->version);
@@ -2211,6 +2329,8 @@ abstract class CustomerVersion implements ActiveRecordInterface
         $copyObj->setDiscount($this->getDiscount());
         $copyObj->setRememberMeToken($this->getRememberMeToken());
         $copyObj->setRememberMeSerial($this->getRememberMeSerial());
+        $copyObj->setEnable($this->getEnable());
+        $copyObj->setConfirmationToken($this->getConfirmationToken());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -2315,6 +2435,8 @@ abstract class CustomerVersion implements ActiveRecordInterface
         $this->discount = null;
         $this->remember_me_token = null;
         $this->remember_me_serial = null;
+        $this->enable = null;
+        $this->confirmation_token = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;

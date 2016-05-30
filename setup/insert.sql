@@ -75,7 +75,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
 (66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
 (67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
-(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW())
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
+(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1934,7 +1935,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
 (5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
 (6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
-(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW())
+(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
+(8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW())
 ;
 
 /**
@@ -1996,6 +1998,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'de_DE', NULL, NUll, NULL, NULL),
     (67, 'de_DE', NULL, NUll, NULL, NULL),
     (68, 'de_DE', NULL, NUll, NULL, NULL),
+    (69, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2050,6 +2053,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'en_US', 'Number by default of results per page for product list', NUll, NULL, NULL),
     (67, 'en_US', 'Number by default of results per page for order list', NUll, NULL, NULL),
     (68, 'en_US', 'Number by default of results per page for customer list', NUll, NULL, NULL),
+    (69, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2104,6 +2108,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'es_ES', 'Número predeterminado de resultados por página para la lista de productos', NUll, NULL, NULL),
     (67, 'es_ES', 'Número predeterminado de resultados por página para la lista de pedidos', NUll, NULL, NULL),
     (68, 'es_ES', 'Número predeterminado de resultados por página para la lista de clientes', NUll, NULL, NULL),
+    (69, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2157,7 +2162,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (65, 'fr_FR', 'Envoyer un email de confirmation aux abonnés de la newsletter (1 = Oui, 0 = non)', NULL, NULL, NULL),
     (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
-    (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL)
+    (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
+    (69, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
@@ -7697,6 +7703,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (5, 'de_DE', 'Mail an den Kunden geschickt, wenn sein Konto von einem Administrator im Back-Office erstellt wird', 'Ein Konto {config key=\"store_name\"} wurde für Sie erstellt.', NULL, NULL),
     (6, 'de_DE', NULL, NULL, NULL, NULL),
     (7, 'de_DE', NULL, NULL, NULL, NULL),
+    (8, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Order confirmation sent to the customer', 'Your order {$order_ref} at {config key=\"store_name\"}', NULL, NULL),
     (2, 'en_US', 'Your new password', 'Your new password for {config key=\"store_name\"}', NULL, NULL),
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key=\"store_name\"}', NULL, NULL),
@@ -7704,6 +7711,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (5, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key=\"store_name\"} account has been created for you', NULL, NULL),
     (6, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on %store', NULL, NULL),
     (7, 'en_US', 'Newsletter subscription confirmation mail', 'Your subscription to %store newsletter', NULL, NULL),
+    (8, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your %store account', NULL, NULL),
     (1, 'es_ES', 'Confirmación de la orden enviada al cliente', 'Su orden {$order_ref} en {tecla config = \"store_name\"}', NULL, NULL),
     (2, 'es_ES', 'Su nueva contraseña', 'Su nueva contraseña para {tecla config = \"store_name\"}', NULL, NULL),
     (3, 'es_ES', 'Mensaje enviado al propietario de la tienda cuando se envía una nueva orden', 'Nueva orden {$order_ref} ubicada en {tecla config = \"store_name\"}', NULL, NULL),
@@ -7711,11 +7719,13 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (5, 'es_ES', 'Correo enviado al cliente cuando se crea su cuenta por un administrador en el back-office', 'Una {config key=\"store_name\"} cuenta ha sido creada para ti', NULL, NULL),
     (6, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', NULL, NULL, NULL),
     (7, 'es_ES', 'Confirmación de suscripción por correo al boletín', 'Tu suscripción al boletín de %store', NULL, NULL),
+    (8, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Confirmation de commande envoyée au client', 'Votre commande {$order_ref} chez {config key=\"store_name\"}', NULL, NULL),
     (2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe {config key=\"store_name\"}', NULL, NULL),
     (3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d\'une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key=\"store_name\"}', NULL, NULL),
     (4, 'fr_FR', 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office', 'L\'accès à votre compte {config key=\"store_name\"} a changé', NULL, NULL),
     (5, 'fr_FR', 'Mail envoyé au client lorsque son compte est créé depuis le back-office par un administrateur', 'Un compte {config key=\"store_name\"} vient d\'être créé pour vous.', NULL, NULL),
     (6, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', NULL, NULL, NULL),
-    (7, 'fr_FR', 'Mail de confirmation d\'inscription à la newsletter', 'Vous avez souscrit à la newsletter du site %store', NULL, NULL)
+    (7, 'fr_FR', 'Mail de confirmation d\'inscription à la newsletter', 'Vous avez souscrit à la newsletter du site %store', NULL, NULL),
+    (8, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
