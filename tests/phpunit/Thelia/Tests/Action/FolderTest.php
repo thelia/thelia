@@ -26,7 +26,7 @@ use Thelia\Model\Folder as FolderModel;
 
 /**
  * Class FolderTest
- * @package Thelia\Tests\Action\ImageTest
+ * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderTest extends TestCaseWithURLToolSetup

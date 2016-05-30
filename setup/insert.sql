@@ -766,7 +766,16 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1412, 'states.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1413, 'state.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1414, 'state.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1416, 'configuration.order-path.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1417, 'configuration.order-path.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1418, 'order-status.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1419, 'order-status.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1420, 'order-status.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1421, 'order-status.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -1865,13 +1874,13 @@ VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
 
-INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', NOW(), NOW()),
-(2, 'paid', NOW(), NOW()),
-(3, 'processing', NOW(), NOW()),
-(4, 'sent', NOW(), NOW()),
-(5, 'canceled', NOW(), NOW()),
-(6, 'refunded', NOW(), NOW());
+INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', '#f0ad4e', 1, 1, NOW(), NOW()),
+(2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
+(3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
+(4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
+(5, 'canceled', '#d9534f', 5, 1, NOW(), NOW()),
+(6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
@@ -1925,7 +1934,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (46, 'admin.profile', NOW(), NOW()),
 (47, 'admin.search', NOW(), NOW()),
 (48, 'admin.configuration.api', NOW(), NOW()),
-(49, 'admin.customer.title', NOW(), NOW())
+(49, 'admin.customer.title', NOW(), NOW()),
+(50, 'admin.configuration.order-status', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3639,6 +3649,15 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1413, 'de_DE', NULL, '',  ''),
     (1414, 'de_DE', NULL, '', ''),
     (1415, 'de_DE', NULL, '', ''),
+    (1416,  'de_DE', NULL, NULL, NULL),
+    (1417,  'de_DE', NULL, NULL, NULL),
+    (1418,  'de_DE', NULL, NULL, NULL),
+    (1419,  'de_DE', NULL, NULL, NULL),
+    (1420,  'de_DE', NULL, NULL, NULL),
+    (1421,  'de_DE', NULL, NULL, NULL),
+    (1422,  'de_DE', NULL, NULL, NULL),
+    (1423,  'de_DE', NULL, NULL, NULL),
+    (1424, 'de_DE', NULL, NULL, NULL),
     (1000, 'en_US', 'Category - content', NULL, NULL),
     (1001, 'en_US', 'Content - content', NULL, NULL),
     (1002, 'en_US', 'Folder - content', NULL, NULL),
@@ -4055,6 +4074,15 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1413, 'en_US', 'state - creation form', '',  ''),
     (1414, 'en_US', 'state - delete form', '', ''),
     (1415, 'en_US', 'states - JavaScript', '', ''),
+    (1416,  'en_US', 'Configuration - Order path - top', NULL, NULL),
+    (1417,  'en_US', 'Configuration - Order path - bottom', NULL, NULL),
+    (1418,  'en_US', 'Order status - top', NULL, NULL),
+    (1419,  'en_US', 'Order status - bottom', NULL, NULL),
+    (1420,  'en_US', 'Order status - table header', NULL, NULL),
+    (1421,  'en_US', 'Order status - table row', NULL, NULL),
+    (1422,  'en_US', 'Order status - form creation', NULL, NULL),
+    (1423,  'en_US', 'Order status - form modification', NULL, NULL),
+    (1424, 'en_US', 'Order status - JavaScript', NULL, NULL),
     (1000, 'es_ES', 'Categoría - contenido', NULL, NULL),
     (1001, 'es_ES', 'Contenido - contenido', NULL, NULL),
     (1002, 'es_ES', 'Carpeta - contenido', NULL, NULL),
@@ -4471,6 +4499,15 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1413, 'es_ES', 'estado - formulario de creación', '',  ''),
     (1414, 'es_ES', 'estado - formulario de borrado', '', ''),
     (1415, 'es_ES', 'estados - JavaScript', '', ''),
+    (1416,  'es_ES', NULL, NULL, NULL),
+    (1417,  'es_ES', NULL, NULL, NULL),
+    (1418,  'es_ES', NULL, NULL, NULL),
+    (1419,  'es_ES', NULL, NULL, NULL),
+    (1420,  'es_ES', NULL, NULL, NULL),
+    (1421,  'es_ES', NULL, NULL, NULL),
+    (1422,  'es_ES', NULL, NULL, NULL),
+    (1423,  'es_ES', NULL, NULL, NULL),
+    (1424, 'es_ES', NULL, NULL, NULL),
     (1000, 'fr_FR', 'Catégorie - contenu', NULL, NULL),
     (1001, 'fr_FR', 'Contenu - contenu', NULL, NULL),
     (1002, 'fr_FR', 'Dossier - contenu', NULL, NULL),
@@ -4886,7 +4923,16 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1412, 'fr_FR', 'états - bas', '', ''),
     (1413, 'fr_FR', 'état - formulaire de création', '',  ''),
     (1414, 'fr_FR', 'état - formulaire de suppression', '', ''),
-    (1415, 'fr_FR', 'états - JavaScript', '', '')
+    (1415, 'fr_FR', 'états - JavaScript', '', ''),
+    (1416,  'fr_FR', NULL, NULL, NULL),
+    (1417,  'fr_FR', NULL, NULL, NULL),
+    (1418,  'fr_FR', NULL, NULL, NULL),
+    (1419,  'fr_FR', NULL, NULL, NULL),
+    (1420,  'fr_FR', NULL, NULL, NULL),
+    (1421,  'fr_FR', NULL, NULL, NULL),
+    (1422,  'fr_FR', NULL, NULL, NULL),
+    (1423,  'fr_FR', NULL, NULL, NULL),
+    (1424, 'fr_FR', NULL, NULL, NULL)
 ;
 
 -- Insert I18n pdf hooks
@@ -7545,6 +7591,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'de_DE', 'Back-Office Suchfunktion', NULL, NULL, NULL),
     (48, 'de_DE', 'API-Konfiguration', NULL, NULL, NULL),
     (49, 'de_DE', 'Kunde-Andere', NULL, NULL, NULL),
+    (50, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -7594,6 +7641,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'en_US', 'Back-office search function', NULL, NULL, NULL),
     (48, 'en_US', 'API Configuration', NULL, NULL, NULL),
     (49, 'en_US', 'Customer title', NULL, NULL, NULL),
+    (50, 'en_US', 'Configuration order status', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -7643,6 +7691,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'es_ES', 'Función de búsqueda de back office', NULL, NULL, NULL),
     (48, 'es_ES', 'Configuración de API', NULL, NULL, NULL),
     (49, 'es_ES', 'Estado civil cliente', NULL, NULL, NULL),
+    (50, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -7691,7 +7740,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (46, 'fr_FR', 'Gestion des profils d\'administration', NULL, NULL, NULL),
     (47, 'fr_FR', 'Fonction de recherche dans l\'administration', NULL, NULL, NULL),
     (48, 'fr_FR', 'Configuration de l\'API', NULL, NULL, NULL),
-    (49, 'fr_FR', 'civilité client', NULL, NULL, NULL)
+    (49, 'fr_FR', 'civilité client', NULL, NULL, NULL),
+    (50, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
 
 
