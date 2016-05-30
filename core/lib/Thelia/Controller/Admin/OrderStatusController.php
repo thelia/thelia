@@ -29,7 +29,7 @@ use Thelia\Model\OrderStatus;
  * Class OrderStatusController
  * @package Thelia\Controller\Admin
  * @author  Gilles Bourgeat <gbourgeat@openstudio.com>
- * @since 2.3
+ * @since 2.4
  */
 class OrderStatusController extends AbstractCrudController
 {

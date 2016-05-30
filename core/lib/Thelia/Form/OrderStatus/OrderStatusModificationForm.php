@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
  * Class OrderStatusModificationForm
  * @package Thelia\Form\OrderStatus
  * @author  Gilles Bourgeat <gbourgeat@openstudio.fr>
- * @since 2.3
+ * @since 2.4
  */
 class OrderStatusModificationForm extends OrderStatusCreationForm
 {
