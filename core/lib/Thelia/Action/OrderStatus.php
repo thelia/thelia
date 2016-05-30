@@ -30,7 +30,7 @@ use Thelia\Model\OrderStatusQuery;
  * Class OrderStatus
  * @package Thelia\Action
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
- * @since 2.3
+ * @since 2.4
  */
 class OrderStatus extends BaseAction implements EventSubscriberInterface
 {
