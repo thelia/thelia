@@ -121,8 +121,9 @@ class MailerFactory
      *
      * @param string $messageCode
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailToShopManagers($messageCode, $messageParameters = [])
+    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = [])
     {
         $storeName = ConfigQuery::getStoreName();
 
@@ -139,7 +140,9 @@ class MailerFactory
             $messageCode,
             [ConfigQuery::getStoreEmail() => $storeName],
             $to,
-            $messageParameters
+            $messageParameters,
+            null,[],[],
+            $replyTo
         );
     }
 
@@ -153,14 +156,15 @@ class MailerFactory
      * @param string $locale            If null, the default store locale is used.
      * @param array  $cc                Cc addresses. An array of (email-address => name) [optional]
      * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
+    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
     {
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
             if (! empty($to)) {
-                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc);
+                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 
                 $sentCount = $this->send($instance, $failedRecipients);
 
@@ -196,10 +200,11 @@ class MailerFactory
      * @param  string $locale            If null, the default store locale is used.
      * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
      * @param  array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param  array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      *
      * @return \Swift_Message the generated and built message.
      */
-    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
+    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
     {
         if (null !== $message = MessageQuery::getFromName($messageCode)) {
             if ($locale === null) {
@@ -235,6 +240,11 @@ class MailerFactory
             // Add bcc addresses
             foreach ($bcc as $address => $name) {
                 $instance->addBcc($address, $name);
+            }
+
+            // Add reply to addresses
+            foreach ($replyTo as $address => $name) {
+                $instance->addReplyTo($address, $name);
             }
             
             $message->buildMessage($this->parser, $instance);
