@@ -194,8 +194,8 @@ class MailerFactory
      * Create a SwiftMessage instance from a given message code.
      *
      * @param  string $messageCode
-     * @param  array  $from              From addresses. An array of (name => email-address)
-     * @param  array  $to                To addresses. An array of (name => email-address)
+     * @param  array  $from              From addresses. An array of (email-address => name)
+     * @param  array  $to                To addresses. An array of (email-address => name)
      * @param  array  $messageParameters an array of (name => value) parameters that will be available in the message.
      * @param  string $locale            If null, the default store locale is used.
      * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
