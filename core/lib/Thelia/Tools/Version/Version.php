@@ -103,8 +103,9 @@ class Version
      */
     public static function parse($version = null)
     {
-        if (is_null($version))
+        if (is_null($version)) {
             $version = \Thelia\Core\Thelia::THELIA_VERSION;
+        }
 
         $pattern = "`^(?<version>
             (?<major>[0-9]+)\.
@@ -112,6 +113,7 @@ class Version
             (?<release>[0-9]+)
             -?(?<extra>[a-zA-Z0-9]*) # extra_version will also match empty string
         )$`x";
+
         if (!preg_match($pattern, $version, $match)) {
             throw new \InvalidArgumentException(
                 sprintf(

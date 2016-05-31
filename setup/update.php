@@ -89,8 +89,7 @@ $files   = $update->getLatestVersion();
 $web     = $update->getWebVersion();
 
 while (1) {
-
-    if ($files != $web) {
+    if ($web !== null && $files != $web) {
         cliOutput(sprintf(
             "Thelia server is reporting the current stable release version is %s ",
             $web
@@ -103,8 +102,7 @@ while (1) {
         $files
     ), 'info');
 
-    if ($files < $web) {
-
+    if ($web !== null && $files < $web) {
         cliOutput(sprintf(
             "Your files belongs to version %s, which is not the latest stable release.",
             $web
