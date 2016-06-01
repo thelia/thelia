@@ -1,5 +1,6 @@
 # 2.2.4
 
+- (related to #2168) Router redirect to last rewriting_url
 - (related to #2160) Added missing home.block 'class' parameter
 
 # 2.2.3
