@@ -91,6 +91,9 @@
 
         <!-- Thelia logger class -->
         <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
+
+        <!-- Thelia Cache Config -->
+        <parameter key="thelia.cache.namespace">thelia_cache</parameter>
     </parameters>
 
 
@@ -353,7 +356,6 @@
             <argument>%admin.resources%</argument>
         </service>
 
-
         <!-- Handlers -->
         <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
             <argument type="service" id="event_dispatcher" />
@@ -365,6 +367,13 @@
             <argument type="service" id="thelia.serializer.manager" />
             <argument type="service" id="thelia.archiver.manager" />
             <argument type="service" id="service_container" />
+        </service>
+
+        <!-- Cache -->
+        <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
+            <argument>%thelia.cache.namespace%</argument>
+            <argument>600</argument>
+            <argument>%kernel.cache_dir%</argument>
         </service>
     </services>
 </config>
