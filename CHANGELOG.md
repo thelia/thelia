@@ -1,5 +1,6 @@
 # 2.3.2
 
+- (related to #2168) Fix router redirect to last rewriting_url
 - (related to #2166) Fixed the update process when thelia.net is out of order
 - (related to #2160) Added missing home.block 'class' parameter
 - (related to #2157) Prevent an infinite loop in new product dialog
@@ -223,6 +224,13 @@
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
 
+# 2.2.4
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+- (related to #2168) Router redirect to last rewriting_url
+- (related to #2160) Added missing home.block 'class' parameter
+
 # 2.2.3
 
 - (related to #2147) Fixed help text display if show_label is false
@@ -265,13 +273,6 @@
 - (related to #1799) Fixed the redirection to rewritten URL
 - (related to #1797) Fix order manual and manual_reverse in AttributeCombination loop
 - #1901 Update Colissimo export, add link to order and to customer, add package weight
-
-# 2.2.4
-
-- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
-- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
-- (related to #2168) Router redirect to last rewriting_url
-- (related to #2160) Added missing home.block 'class' parameter
 
 # 2.2.2
 
