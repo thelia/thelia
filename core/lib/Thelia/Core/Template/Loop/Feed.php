@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -41,27 +42,25 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
-        $cachedir = THELIA_ROOT . 'cache/feeds';
+        /** @var AdapterInterface $cacheAdapter */
+        $cacheAdapter = $this->container->get('thelia.cache');
 
-        if (! is_dir($cachedir)) {
-            if (! mkdir($cachedir)) {
-                throw new \Exception(sprintf("Failed to create cache directory '%s'", $cachedir));
-            }
+        $cacheItem = $cacheAdapter->getItem('feed_' . md5($this->getUrl()));
+
+        if (!$cacheItem->isHit()) {
+            $feed = new \SimplePie();
+            $feed->set_feed_url($this->getUrl());
+
+            $feed->init();
+
+            $feed->handle_content_type();
+
+            $cacheItem->expiresAfter($this->getTimeout() * 60);
+            $cacheItem->set($feed->get_items());
+            $cacheAdapter->save($cacheItem);
         }
 
-        $feed = new \SimplePie();
-        $feed->set_feed_url($this->getUrl());
-        $feed->set_cache_location(THELIA_ROOT . 'cache/feeds');
-
-        $feed->init();
-
-        $feed->handle_content_type();
-
-        $feed->set_timeout($this->getTimeout());
-
-        $items = $feed->get_items();
-
-        return $items;
+        return $cacheItem->get();
     }
 
     public function parseResults(LoopResult $loopResult)
