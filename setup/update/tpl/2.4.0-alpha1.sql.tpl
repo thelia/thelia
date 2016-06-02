@@ -14,7 +14,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id+1, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+2, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+3, 'delivery.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id+4, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW(),
+(@max_id+4, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+5, 'email-html.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+6, 'email-txt.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id+7, 'account-order.product-list', 1, 0, 0, 1, 1, 1, NOW(), NOW())
@@ -27,7 +27,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+3, '{$locale}', {intl l='Delivery - after product information' locale=$locale}, NULL, NULL),
     (@max_id+4, '{$locale}', {intl l='Invoice - after product information' locale=$locale}, NULL, NULL),
     (@max_id+5, '{$locale}', {intl l='Email html - order notification - after product information' locale=$locale}, NULL, NULL),
-    (@max_id+6, '{$locale}', {intl l='Email txt - order notification - after product information' locale=$locale}, NULL, NULL)
+    (@max_id+6, '{$locale}', {intl l='Email txt - order notification - after product information' locale=$locale}, NULL, NULL),
     (@max_id+7, '{$locale}', {intl l='Account order - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
@@ -112,7 +112,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id+6,  '{$locale}', {intl l='Order status - table row' locale=$locale}, NULL, NULL),
 (@max_id+7,  '{$locale}', {intl l='Order status - form creation' locale=$locale}, NULL, NULL),
 (@max_id+8,  '{$locale}', {intl l='Order status - form modification' locale=$locale}, NULL, NULL),
-(@max_id+0, '{$locale}', {intl l='Order status - JavaScript' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+(@max_id+9,  '{$locale}', {intl l='Order status - JavaScript' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
