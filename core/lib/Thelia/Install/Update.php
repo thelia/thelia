@@ -598,7 +598,9 @@ class Update
         $res = curl_exec($curl);
 
         try {
-            return Version::parse($res);
+            if (Version::parse($res)) {
+                return $res;
+            }
         } catch (\Exception $e) {
             return null;
         }
