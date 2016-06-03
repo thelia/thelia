@@ -39,6 +39,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
     public function cacheClear(CacheEvent $event)
     {
+        // clear cache on thelia.cache service
         $this->adapter->clear();
 
         $dir = $event->getDir();

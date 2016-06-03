@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Action\Cache;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -37,7 +38,8 @@ class CacheTest extends \PHPUnit_Framework_TestCase
     {
         $event = new CacheEvent($this->dir);
 
-        $action = new Cache();
+        $adapter = new ArrayAdapter();
+        $action = new Cache($adapter);
         $action->cacheClear($event);
 
         $fs = new Filesystem();
