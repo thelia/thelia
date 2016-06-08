@@ -126,18 +126,7 @@ class BaseFrontController extends BaseController
         // Add the template standard extension
         $templateName .= '.html';
 
-        $session = $this->getSession();
-
-        // Prepare common template variables
-        $args = array_merge($args, array(
-                'locale'               => $session->getLang()->getLocale(),
-                'lang_code'            => $session->getLang()->getCode(),
-                'lang_id'              => $session->getLang()->getId(),
-                'current_url'          => $this->getRequest()->getUri()
-            ));
-
         // Render the template.
-
         $data = $this->getParser($templateDir)->render($templateName, $args);
 
         return $data;
