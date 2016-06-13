@@ -7,7 +7,7 @@
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="parent" required="true" type="INTEGER" />
-    <column name="visible" required="true" type="TINYINT" />
+    <column defaultValue="0" name="visible" required="true" type="TINYINT" />
     <column name="position" required="true" type="INTEGER" />
     <column name="default_template_id" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -753,8 +753,8 @@
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />
-    <column name="was_new" required="true" type="TINYINT" />
-    <column name="was_in_promo" required="true" type="TINYINT" />
+    <column defaultValue="0" name="was_new" required="true" type="TINYINT" />
+    <column defaultValue="0" name="was_in_promo" required="true" type="TINYINT" />
     <column name="weight" size="45" type="VARCHAR" />
     <column name="ean_code" size="255" type="VARCHAR" />
     <column name="tax_rule_title" size="255" type="VARCHAR" />
@@ -811,7 +811,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="55" type="VARCHAR" />
     <column defaultValue="" name="version" required="true" size="25" type="VARCHAR" />
-    <column name="type" required="true" type="TINYINT" />
+    <column defaultValue="NULL" name="type" required="true" type="TINYINT" />
     <column defaultValue="classic" name="category" required="true" size="50" type="VARCHAR" />
     <column name="activate" type="TINYINT" />
     <column name="position" type="INTEGER" />
