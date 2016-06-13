@@ -1,5 +1,6 @@
 # 2.3.2
 
+- (related to #2181) Fix CSV export cached file size
 - (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
 - (related to #2168) Fix router redirect to last rewriting_url
 - (related to #2166) Fixed the update process when thelia.net is out of order
