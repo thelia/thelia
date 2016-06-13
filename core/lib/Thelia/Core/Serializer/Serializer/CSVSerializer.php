@@ -131,6 +131,8 @@ class CSVSerializer extends AbstractSerializer
 
         // Remove last line feed
         $fileObject->ftruncate($fileObject->getSize() - 1);
+
+        clearstatcache(true, $fileObject->getPathname());
     }
 
     public function unserialize(\SplFileObject $fileObject)
