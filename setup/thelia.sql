@@ -13,7 +13,7 @@ CREATE TABLE `category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `parent` INTEGER DEFAULT 0 NOT NULL,
-    `visible` TINYINT NOT NULL,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
     `default_template_id` INTEGER,
     `created_at` DATETIME,
@@ -860,8 +860,8 @@ CREATE TABLE `order_product`
     `quantity` FLOAT NOT NULL,
     `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
     `promo_price` DECIMAL(16,6) DEFAULT 0.000000,
-    `was_new` TINYINT NOT NULL,
-    `was_in_promo` TINYINT NOT NULL,
+    `was_new` TINYINT DEFAULT 0 NOT NULL,
+    `was_in_promo` TINYINT DEFAULT 0 NOT NULL,
     `weight` VARCHAR(45),
     `ean_code` VARCHAR(255),
     `tax_rule_title` VARCHAR(255),
@@ -3225,7 +3225,7 @@ CREATE TABLE `category_version`
 (
     `id` INTEGER NOT NULL,
     `parent` INTEGER DEFAULT 0 NOT NULL,
-    `visible` TINYINT NOT NULL,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
     `default_template_id` INTEGER,
     `created_at` DATETIME,
