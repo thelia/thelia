@@ -70,6 +70,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
 
     /**
      * The value for the visible field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $visible;
@@ -139,6 +140,7 @@ abstract class CategoryVersion implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->parent = 0;
+        $this->visible = 0;
         $this->version = 0;
     }
 
@@ -764,6 +766,10 @@ abstract class CategoryVersion implements ActiveRecordInterface
     public function hasOnlyDefaultValues()
     {
             if ($this->parent !== 0) {
+                return false;
+            }
+
+            if ($this->visible !== 0) {
                 return false;
             }
 

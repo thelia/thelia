@@ -182,7 +182,7 @@ class CategoryTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, 0);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, null);
+        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('DEFAULT_TEMPLATE_ID', 'DefaultTemplateId', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

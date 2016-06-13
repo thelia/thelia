@@ -137,12 +137,14 @@ abstract class OrderProduct implements ActiveRecordInterface
 
     /**
      * The value for the was_new field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $was_new;
 
     /**
      * The value for the was_in_promo field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $was_in_promo;
@@ -249,6 +251,8 @@ abstract class OrderProduct implements ActiveRecordInterface
     {
         $this->price = '0.000000';
         $this->promo_price = '0.000000';
+        $this->was_new = 0;
+        $this->was_in_promo = 0;
         $this->virtual = 0;
     }
 
@@ -1285,6 +1289,14 @@ abstract class OrderProduct implements ActiveRecordInterface
             }
 
             if ($this->promo_price !== '0.000000') {
+                return false;
+            }
+
+            if ($this->was_new !== 0) {
+                return false;
+            }
+
+            if ($this->was_in_promo !== 0) {
                 return false;
             }
 
