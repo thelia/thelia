@@ -242,6 +242,11 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+# 2.1.10
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+
 # 2.1.9
 
 - (related to #2144) Fix automatic configuration for the sql_mode
