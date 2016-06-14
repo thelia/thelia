@@ -188,7 +188,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $price = $product->getVirtualColumn('price');
 
-            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+            if (!$this->getBackendContext()
+                && $securityContext->hasCustomerUser()
+                && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
             }
 
@@ -202,7 +204,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
             $promoPrice = $product->getVirtualColumn('promo_price');
 
-            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+            if (!$this->getBackendContext()
+                && $securityContext->hasCustomerUser()
+                && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
             }
             try {
