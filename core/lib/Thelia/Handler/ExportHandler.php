@@ -175,13 +175,13 @@ class ExportHandler
             }
         }
 
-        if (!($rangeDate['start'] instanceof \DateTime)) {
+        if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
             $rangeDate['start'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $rangeDate['start']['year'] . '-' . $rangeDate['start']['month'] . '-1 00:00:00'
             );
         }
-        if (!($rangeDate['end'] instanceof \DateTime)) {
+        if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $rangeDate['end']['year'] . '-' . ($rangeDate['end']['month'] + 1) . '-0 23:59:59'

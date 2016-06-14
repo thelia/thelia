@@ -23,7 +23,7 @@ class CountryAreaQuery extends BaseCountryAreaQuery
         if (null !== $state) {
             $countryAreaList = self::create()
                 ->filterByCountryId($country->getId())
-                ->filterByStateId($country->getId())
+                ->filterByStateId($state->getId())
                 ->find();
 
             if (count($countryAreaList) > 0) {

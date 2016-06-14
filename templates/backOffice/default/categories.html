@@ -366,7 +366,7 @@
 
                                  loop_ref       = "product_list"
                                  max_page_count = 10
-                                 page_url       = "{url path="/admin/catalog" category_id=$category_id product_order=$product_order}"
+                                 page_url       = {url path="/admin/catalog" category_id=$category_id product_order=$product_order}
                                  }
 
                              </td>
@@ -417,7 +417,7 @@
             {loop type="lang" name="default-lang" default_only="1"}
                 <div class="input-group">
                     <input type="text" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                 </div>
 
                 {* Switch edition to the current locale *}
@@ -540,10 +540,14 @@
                     {* If current category has no template, get a parent's one *}
                     {if !$product_template}
                         {while $parent_category != 0 && !$product_template}
-                            {loop type="category" name="parent_category" visible="*" id=$parent_category}
-                                {assign var="parent_category" value=$PARENT}
-                                {assign var="product_template" value=$TEMPLATE}
+                            {loop type="category" name="parent_category" backend_context=1 visible="*" id=$parent_category}
+                                {$parent_category = $PARENT}
+                                {$product_template = $TEMPLATE}
                             {/loop}
+                            {* Be sure to prevent infinite loops *}
+                            {elseloop rel="parent_category"}
+                                {$parent_category = 0}
+                            {/elseloop}
                         {/while}
                     {/if}
 

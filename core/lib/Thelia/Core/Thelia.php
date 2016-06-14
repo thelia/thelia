@@ -50,7 +50,7 @@ use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.3.1';
+    const THELIA_VERSION = '2.3.2';
 
     public function __construct($environment, $debug)
     {
@@ -135,6 +135,15 @@ class Thelia extends Kernel
                         unset($sessionSqlMode[$key]);
                         $canUpdate = true;
                         Tlog::getInstance()->addWarning("Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.");
+                    }
+
+                    // remove STRICT_ALL_TABLES, the scheme has been fixed in version 2.4 of Thelia
+                    if (version_compare(Thelia::THELIA_VERSION, '2.4', '<')) {
+                        if (($key = array_search('STRICT_ALL_TABLES', $sessionSqlMode)) !== false) {
+                            unset($sessionSqlMode[$key]);
+                            $canUpdate = true;
+                            Tlog::getInstance()->addWarning("Remove sql_mode STRICT_ALL_TABLES. Please configure your MySQL server or update your Thelia on version 2.4 or higher.");
+                        }
                     }
                 }
             }

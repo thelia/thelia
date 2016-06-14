@@ -596,7 +596,13 @@ class Update
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($curl, CURLOPT_TIMEOUT, 5);
         $res = curl_exec($curl);
-        if (Version::parse($res))
-            return $res;
+
+        try {
+            if (Version::parse($res)) {
+                return $res;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

@@ -17,7 +17,7 @@
             {hook name="home.top" location="home_top" }
 
             <div class="row">
-                {hookblock name="home.block" fields="id,title,content"}
+                {hookblock name="home.block" fields="id,title,content,class"}
                 {forhook rel="home.block"}
                 <div class="{if $class}{$class}{else}col-md-4{/if}">
                     <div {if $id}id="{$id}"{/if} class="general-block-decorator">
