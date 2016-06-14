@@ -1,3 +1,7 @@
+# 2.2.4
+
+- (related to #2160) Added missing home.block 'class' parameter
+
 # 2.2.3
 
 - (related to #2147) Fixed help text display if show_label is false
