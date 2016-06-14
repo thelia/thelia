@@ -1,3 +1,14 @@
+# 2.3.2
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2181) Fix CSV export cached file size
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+- (related to #2168) Fix router redirect to last rewriting_url
+- (related to #2166) Fixed the update process when thelia.net is out of order
+- (related to #2160) Added missing home.block 'class' parameter
+- (related to #2157) Prevent an infinite loop in new product dialog
+- (related to #2154) Add Test range dates exists before testing type
+
 # 2.3.1
 
 - (related to #2150) Fix form and validator translations
@@ -215,6 +226,13 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
+
+# 2.2.4
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+- (related to #2168) Router redirect to last rewriting_url
+- (related to #2160) Added missing home.block 'class' parameter
 
 # 2.2.3
 
@@ -460,6 +478,11 @@
 - Imagine package is updated to 0.6.2, which provides a better support for transparency.
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
+
+# 2.1.10
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
 
 # 2.1.9
 
