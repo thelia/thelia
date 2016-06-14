@@ -1,3 +1,10 @@
+# 2.2.4
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+- (related to #2168) Router redirect to last rewriting_url
+- (related to #2160) Added missing home.block 'class' parameter
+
 # 2.2.3
 
 - (related to #2147) Fixed help text display if show_label is false
@@ -241,6 +248,11 @@
 - Imagine package is updated to 0.6.2, which provides a better support for transparency.
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
+
+# 2.1.10
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
 
 # 2.1.9
 
