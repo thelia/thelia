@@ -1,5 +1,6 @@
 # 2.2.4
 
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
 - (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
 - (related to #2168) Router redirect to last rewriting_url
 - (related to #2160) Added missing home.block 'class' parameter
