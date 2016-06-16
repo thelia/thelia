@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -106,6 +107,39 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             }
         }
 
+        // We do not consider here Free Text values, so be sure that the features values we will get
+        // are not free text ones, e.g. are not defined as free-text feature values in the
+        // feature_product table.
+        // We are doig here something like
+        //    SELECT * FROM `feature_av`
+        //    WHERE feature_av.FEATURE_ID IN ('7')
+        //    AND feature_av.ID not in (
+        //        select feature_av_id from feature_product
+        //        where feature_id = `feature_av`.feature_id
+        //        and feature_av_id = `feature_av`.id
+        //        and free_text_value = 1
+        //    )
+        $freeTextValuesQuery = FeatureProductQuery::create()
+            ->filterByFreeTextValue(true)
+            ->groupByFeatureAvId()
+        ;
+
+        if (null !== $id) {
+            $freeTextValuesQuery->filterByFeatureAvId($id);
+        }
+
+        if (null !== $feature) {
+            $freeTextValuesQuery->filterByFeatureId($feature);
+        }
+
+        // Juste get the column we're interested in.
+        $freeTextValues = $freeTextValuesQuery
+            ->select([ FeatureProductTableMap::FEATURE_AV_ID ])
+            ->find()
+        ;
+
+        $search->filterById($freeTextValues, Criteria::NOT_IN);
+
         return $search;
     }
 
@@ -113,26 +147,19 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
     {
         /** @var FeatureAv $featureAv */
         foreach ($loopResult->getResultDataCollection() as $featureAv) {
-            $isFreeText = FeatureProductQuery::create()
-                ->filterByFeatureId($featureAv->getFeatureId())
-                ->filterByFeatureAvId($featureAv->getId())
-                ->findOneByFreeTextValue(true);
+            $loopResultRow = new LoopResultRow($featureAv);
+            $loopResultRow->set("ID", $featureAv->getId())
+                ->set("IS_TRANSLATED", $featureAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("FEATURE_ID", $featureAv->getFeatureId())
+                ->set("TITLE", $featureAv->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $featureAv->getPosition());
+            $this->addOutputFields($loopResultRow, $featureAv);
 
-            if ($isFreeText === null) {
-                $loopResultRow = new LoopResultRow($featureAv);
-                $loopResultRow->set("ID", $featureAv->getId())
-                    ->set("IS_TRANSLATED", $featureAv->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE", $this->locale)
-                    ->set("FEATURE_ID", $featureAv->getFeatureId())
-                    ->set("TITLE", $featureAv->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("POSITION", $featureAv->getPosition());
-                $this->addOutputFields($loopResultRow, $featureAv);
-
-                $loopResult->addRow($loopResultRow);
-            }
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
