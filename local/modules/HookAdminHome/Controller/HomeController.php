@@ -72,10 +72,6 @@ class HomeController extends BaseAdminController
         return $this->jsonResponse($cacheItem->get());
     }
     
-    /**
-     * Le bloc de stats mesurelles pour affichage distant
-     * @return \Thelia\Core\HttpFoundation\Response
-     */
     public function blockMonthSalesStatistics($month, $year)
     {
         $baseDate = sprintf("%04d-%02d", $year, $month);
