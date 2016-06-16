@@ -291,6 +291,22 @@ class Product extends BaseProduct implements FileModelParentInterface
     public function postDelete(ConnectionInterface $con = null)
     {
         $this->markRewrittenUrlObsolete();
+        
+        // Delete product's free_text feature AV (see issue #2061)
+        $featureAvs = FeatureAvQuery::create()
+            ->useFeatureProductQuery()
+                ->filterByFreeTextValue(true)
+                ->filterByProductId($this->getId())
+            ->endUse()
+            ->find($con)
+        ;
+    
+        foreach ($featureAvs as $featureAv) {
+            $featureAv
+                ->setDispatcher($this->dispatcher)
+                ->delete($con)
+            ;
+        }
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
