@@ -8,6 +8,12 @@
         <default key="_controller">HookAdminHome\Controller\HomeController::loadStatsAjaxAction</default>
     </route>
 
+    <route id="admin.home.month.sales.block" path="/admin/home/month-sales-block/{month}/{year}">
+        <default key="_controller">HookAdminHome\Controller\HomeController::blockMonthSalesStatistics</default>
+        <requirement key="month">\d+</requirement>
+        <requirement key="year">\d+</requirement>
+    </route>
+
     <route id="admin.news-feed" path="/admin/ajax/thelia_news_feed">
         <default key="_controller">HookAdminHome\Controller\HomeController::processTemplateAction</default>
         <default key="template">ajax/thelia_news_feed</default>

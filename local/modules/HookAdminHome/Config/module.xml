@@ -19,6 +19,12 @@
             <name>Gilles Bourgeat</name>
             <email>gilles@thelia.net</email>
         </author>
+        <author>
+            <name>Franck Allimant</name>
+            <company>CQFDev</company>
+            <email>franck@cqfdev.fr</email>
+            <website>www.cqfdev.fr</website>
+        </author>
     </authors>
     <type>classic</type>
     <thelia>2.2.0</thelia>

@@ -1,5 +1,11 @@
 # 2.3.4
 
+- (related to #2189) Performance improvement in feature-availability loop
+- (related to #2188) A more effective way to solve issue free text feature problem (see #2061)
+- (related to #2174) New PSR-6 implementation + thelia.cache service and smarty cache block
+- (related to #2167) Add global variable `app` to Smarty to be consistent with Twig
+- (related to #2165) Add replyTo parameter in mailer factory
+- (related to #2081) Order Status improvements
 - (related to #2164) New confirmation email option after customer creation 
 - (related to #2153) Lighten placeholders color to be more different than filled inputs
 - (related to #2149) Fixed status_id parameter access
