@@ -13,11 +13,17 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <authors>
         <author>
             <name>Gilles Bourgeat</name>
             <email>gilles@thelia.net</email>
+        </author>
+        <author>
+            <name>Franck Allimant</name>
+            <company>CQFDev</company>
+            <email>franck@cqfdev.fr</email>
+            <website>www.cqfdev.fr</website>
         </author>
     </authors>
     <type>classic</type>

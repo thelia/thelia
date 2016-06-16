@@ -2,6 +2,7 @@
 
 return array(
     'Aborted orders' => 'Aborted orders',
+    'An error occurred while reading from JSON file' => 'An error occurred while reading from JSON file',
     'Average cart' => 'Average cart',
     'Categories' => 'Categories',
     'Click here' => 'Click here',
@@ -10,7 +11,6 @@ return array(
     'Dashboard' => 'Dashboard',
     'First orders' => 'First orders',
     'Latest version available' => 'Latest version available',
-    'Lire la suite' => 'Read more',
     'Loading Thelia lastest news...' => 'Loading Thelia lastest news...',
     'Loading...' => 'Loading...',
     'New customers' => 'New customers',
@@ -22,11 +22,12 @@ return array(
     'Previous month sales' => 'Previous month sales',
     'Previous year sales' => 'Previous year sales',
     'Products' => 'Products',
+    'Read more' => 'Read more',
     'Sales' => 'Sales',
     'Sales excluding shipping' => 'Sales excluding shipping',
     'This month' => 'This month',
     'This year' => 'This year',
     'Today' => 'Today',
+    'YYYY-MM' => 'YYYY-MM',
     'Yesterday sales' => 'Yesterday sales',
-    'Read more' => 'Read more',
 );

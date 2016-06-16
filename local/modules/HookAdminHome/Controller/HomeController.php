@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
 
@@ -70,6 +71,28 @@ class HomeController extends BaseAdminController
 
         return $this->jsonResponse($cacheItem->get());
     }
+    
+    /**
+     * Le bloc de stats mesurelles pour affichage distant
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    public function blockMonthSalesStatistics($month, $year)
+    {
+        $baseDate = sprintf("%04d-%02d", $year, $month);
+
+        $startDate = "$baseDate-01";
+        $endDate = date("Y-m-t", strtotime($startDate));
+        
+        $prevMonthStartDate = date('Y-m-01', strtotime("$baseDate -1 month"));
+        $prevMonthEndDate = date("Y-m-t", strtotime($prevMonthStartDate));
+        
+        return $this->render('block-month-sales-statistics', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'prevMonthStartDate' => $prevMonthStartDate,
+            'prevMonthEndDate' => $prevMonthEndDate,
+        ]);
+    }
 
     /**
      * @param int $month
@@ -92,26 +115,31 @@ class HomeController extends BaseAdminController
         $data->series[] = $saleSeries = new \stdClass();
         $saleSeries->color = self::testHexColor('sales_color', '#adadad');
         $saleSeries->data = OrderQuery::getMonthlySaleStats($month, $year);
+        $saleSeries->valueFormat = "%1.2f " . Currency::getDefaultCurrency()->getSymbol();
 
         /* new customers */
         $data->series[] = $newCustomerSeries = new \stdClass();
         $newCustomerSeries->color = self::testHexColor('customers_color', '#f39922');
         $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats($month, $year);
+        $newCustomerSeries->valueFormat = "%d";
 
         /* orders */
         $data->series[] = $orderSeries = new \stdClass();
         $orderSeries->color = self::testHexColor('orders_color', '#5cb85c');
         $orderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year);
+        $orderSeries->valueFormat = "%d";
 
         /* first order */
         $data->series[] = $firstOrderSeries = new \stdClass();
         $firstOrderSeries->color = self::testHexColor('first_orders_color', '#5bc0de');
         $firstOrderSeries->data = OrderQuery::getFirstOrdersStats($month, $year);
+        $firstOrderSeries->valueFormat = "%d";
 
         /* cancelled orders */
         $data->series[] = $cancelledOrderSeries = new \stdClass();
         $cancelledOrderSeries->color = self::testHexColor('cancelled_orders_color', '#d9534f');
         $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year, array(5));
+        $cancelledOrderSeries->valueFormat = "%d";
 
         return $data;
     }
