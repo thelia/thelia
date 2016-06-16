@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Map\FeatureAvTableMap;
 use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -119,26 +120,11 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         //        and feature_av_id = `feature_av`.id
         //        and free_text_value = 1
         //    )
-        $freeTextValuesQuery = FeatureProductQuery::create()
-            ->filterByFreeTextValue(true)
-            ->groupByFeatureAvId()
-        ;
-
-        if (null !== $id) {
-            $freeTextValuesQuery->filterByFeatureAvId($id);
-        }
-
-        if (null !== $feature) {
-            $freeTextValuesQuery->filterByFeatureId($feature);
-        }
-
-        // Juste get the column we're interested in.
-        $freeTextValues = $freeTextValuesQuery
-            ->select([ FeatureProductTableMap::FEATURE_AV_ID ])
-            ->find()
-        ;
-
-        $search->filterById($freeTextValues, Criteria::NOT_IN);
+        $search->where(FeatureAvTableMap::ID . ' NOT IN (
+             SELECT '.  FeatureProductTableMap::FEATURE_AV_ID . ' 
+             FROM ' .FeatureProductTableMap::TABLE_NAME. '
+             WHERE ' . FeatureProductTableMap::FREE_TEXT_VALUE . ' = 1
+        )');
 
         return $search;
     }
