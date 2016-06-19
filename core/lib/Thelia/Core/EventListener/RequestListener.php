@@ -15,6 +15,7 @@ namespace Thelia\Core\EventListener;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -48,19 +49,23 @@ class RequestListener implements EventSubscriberInterface
 {
     use RememberMeTrait;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @var \Thelia\Core\Translation\Translator
      */
     private $translator;
 
     /**
-     *
+     * RequestListener constructor.
      * @param Translator $translator
-     *
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(Translator $translator)
+    public function __construct(Translator $translator, EventDispatcherInterface $eventDispatcher)
     {
         $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function registerValidatorTranslator(GetResponseEvent $event)
