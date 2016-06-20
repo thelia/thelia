@@ -368,23 +368,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['list'] = ProductDocumentQuery::create()
                     ->findByProductId($event->getProductId());
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
-                // Delete free_text_feature AV (see issue #2061)
-                $featureAvs = FeatureAvQuery::create()
-                    ->useFeatureProductQuery()
-                    ->filterByFreeTextValue(true)
-                    ->filterByProductId($event->getProductId())
-                    ->endUse()
-                    ->find($con)
-                ;
-
-                foreach ($featureAvs as $featureAv) {
-                    $featureAv
-                        ->setDispatcher($this->eventDispatcher)
-                        ->delete($con)
-                    ;
-                }
-
+                
                 // Delete product
                 $product
                     ->setDispatcher($event->getDispatcher())
