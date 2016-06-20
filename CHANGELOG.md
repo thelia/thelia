@@ -1,3 +1,8 @@
+# 2.2.5
+
+- (related to #2188) A more effective way to solve issue #2061
+- #2194 Fix change currency on 2.2.x
+
 # 2.2.4
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
