@@ -333,7 +333,7 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is REFUNDED
      *
-     * @return bool true if this order is CANCELED, false otherwise.
+     * @return bool true if this order is REFUNDED, false otherwise.
      */
     public function isRefunded()
     {
