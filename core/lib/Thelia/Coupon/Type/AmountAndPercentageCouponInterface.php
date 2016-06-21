@@ -25,7 +25,7 @@ interface AmountAndPercentageCouponInterface
 {
     /**
      * Set the value of specific coupon fields.
-     * @param Array $effects the Coupon effects params
+     * @param array $effects the Coupon effects params
      */
     public function setFieldsValue($effects);
 
@@ -54,7 +54,13 @@ interface AmountAndPercentageCouponInterface
     public function getBaseFieldList($otherFields);
 
     /**
+     * Check the value of a coupon configuration field
      *
+     * @param string $fieldName
+     * @param string $fieldValue
+     * @return string the field value
+     *
+     * @throws \InvalidArgumentException is field value is not valid.
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue);
 }
