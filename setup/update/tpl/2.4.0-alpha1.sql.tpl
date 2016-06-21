@@ -117,8 +117,20 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
--- Additional usage_canceled column in order_coupon table
 
+-- Additional usage_canceled column in order_coupon table
 ALTER TABLE `order_coupon` ADD `usage_canceled` TINYINT(1) DEFAULT '0' AFTER `per_customer_usage_count`;
+
+-- add new config variables number_default_results_per_page
+SELECT @max := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max+1, 'number_default_results_per_page.coupon_list', '20', '0', '0', NOW(), NOW());
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+{foreach $locales as $locale}
+    (@max+1, '{$locale}', {intl l='Default number of coupons per page on coupon list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
+{/foreach}
+;
 
 SET FOREIGN_KEY_CHECKS = 1;
