@@ -159,8 +159,17 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id+9,  'fr_FR', NULL, NULL, NULL)
 ;
 
--- Additional usage_canceled column in order_coupon table
 
+-- Additional usage_canceled column in order_coupon table
 ALTER TABLE `order_coupon` ADD `usage_canceled` TINYINT(1) DEFAULT '0' AFTER `per_customer_usage_count`;
+
+-- add new config variables number_default_results_per_page
+SELECT @max := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max+1, 'number_default_results_per_page.coupon_list', '20', '0', '0', NOW(), NOW());
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', NULL, NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', NULL, NUll, NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;

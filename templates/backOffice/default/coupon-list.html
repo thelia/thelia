@@ -10,7 +10,9 @@
 {block name="page-title"}{intl l='Coupons'}{/block}
 
 {block name="main-content"}
-<div class="coupons">
+    {$coupon_page = {$smarty.get.page|default:1}}
+
+    <div class="coupons">
 
     <div id="wrapper" class="container">
 
@@ -120,7 +122,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {loop type="coupon" name="list_coupon" order={$coupon_order|default:'code'} backend_context="true"}
+                                {loop type="coupon" name="list_coupon" page={$coupon_page} limit={config key="number_default_results_per_page.coupon_list" default=20} order={$coupon_order|default:'code'} backend_context="true"}
                                     <tr>
                                         <td>
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
@@ -190,7 +192,7 @@
                                 {/loop}
                                 {elseloop rel="list_coupon"}
                                     <tr>
-                                        <td colspan="7">
+                                        <td colspan="100">
                                             <div class="alert alert-info text-center">
                                                 <p>{intl l="No coupon is currently defined. Please use the (+) button above to create your first coupon."}</p>
                                             </div>
@@ -198,6 +200,22 @@
                                     </tr>
                                 {/elseloop}
                             </tbody>
+                            {ifloop rel="list_coupon"}
+                                <tfoot>
+                                <tr>
+                                    <td colspan="100">
+                                        {include
+                                        file = "includes/pagination.html"
+
+                                        loop_ref       = "list_coupon"
+                                        max_page_count = 10
+                                        page_url       = "{url path="/admin/coupon" orders_order=$coupon_order}"
+                                        }
+
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            {/ifloop}
                         </table>
                     </div>
                 </div>
