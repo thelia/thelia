@@ -11,7 +11,7 @@
 {block name='no-return-functions' append}
     {if $folder_id}
         {loop name="folder.seo.title" type="folder" id=$folder_id limit="1"}
-        {$page_title = {$META_TITLE}}
+        {$page_title = $META_TITLE}
         {/loop}
     {/if}
 {/block}
