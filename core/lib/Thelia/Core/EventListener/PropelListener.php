@@ -14,6 +14,7 @@ namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\PropelInitService;
 
 /**
  * Actions related to Propel.
@@ -21,16 +22,24 @@ use Thelia\Core\Event\TheliaEvents;
 class PropelListener implements EventSubscriberInterface
 {
     /**
+     * Propel initialization service.
+     * @var PropelInitService
+     */
+    protected $propelInitService;
+
+    /**
      * Table map classes to be built.
      * @var string[]
      */
     protected $tableMapClasses = [];
 
     /**
+     * @param PropelInitService $propelInitService Propel initialization service.
      * @param string[] $tableMapClasses Table map classes to be built.
      */
-    public function __construct(array $tableMapClasses = [])
+    public function __construct(PropelInitService $propelInitService, array $tableMapClasses = [])
     {
+        $this->propelInitService = $propelInitService;
         $this->tableMapClasses = $tableMapClasses;
     }
 
@@ -38,6 +47,7 @@ class PropelListener implements EventSubscriberInterface
     {
         return [
             TheliaEvents::BOOT => 'buildTableMaps',
+            TheliaEvents::CACHE_CLEAR => ['rebuildCache', 127],
         ];
     }
 
@@ -49,5 +59,13 @@ class PropelListener implements EventSubscriberInterface
         foreach ($this->tableMapClasses as $tableMapClass) {
             call_user_func([$tableMapClass, 'buildTableMap']);
         }
+    }
+
+    /**
+     * Rebuild the cache.
+     */
+    public function rebuildCache()
+    {
+        $this->propelInitService->init();
     }
 }

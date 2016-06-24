@@ -260,6 +260,7 @@
         </service>
 
         <service id="propel.listener" class="Thelia\Core\EventListener\PropelListener">
+            <argument type="service" id="thelia.propel.init"/>
             <argument>%thelia.propel.table_map_classes%</argument>
             <tag name="kernel.event_subscriber"/>
         </service>
