@@ -14,11 +14,11 @@ namespace Thelia\Command;
 
 use Propel\Generator\Command\SqlBuildCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\PropelInitService;
 
 /**
  * generate sql for a specific module
@@ -57,15 +57,16 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
             throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
         }
 
-        $sqlBuild = new SqlBuildCommand();
-        $sqlBuild->setApplication($this->getApplication());
+        /** @var PropelInitService $propelInitService */
+        $propelInitService = $this->getContainer()->get('thelia.propel.init');
 
-        $sqlBuild->run(
-            new ArrayInput(array(
-                "command" => $sqlBuild->getName(),
-                "--output-dir" => $this->moduleDirectory . DS ."Config",
-                "--input-dir" => $this->moduleDirectory . DS ."Config"
-            )),
+        $propelInitService->runCommand(
+            new SqlBuildCommand(),
+            [
+                "--output-dir" => "{$this->moduleDirectory}/Config",
+                "--schema-dir" => "{$this->moduleDirectory}/Config",
+                "--config-dir" => $propelInitService->getPropelConfigDir(),
+            ],
             $output
         );
 
