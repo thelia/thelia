@@ -20,8 +20,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use Thelia\Config\DatabaseConfiguration;
-use Thelia\Config\DefinePropel;
+use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
@@ -86,30 +85,24 @@ class Update
         $dbConfig = null;
 
         try {
-            $dbConfig = $this->getDatabaseConfig();
+            $this->connection = $this->getDatabasePDO();
         } catch (ParseException $ex) {
             throw new UpdateException("database.yml is not a valid file : " . $ex->getMessage());
-        }
-
-        try {
-            $this->connection = new \PDO(
-                $dbConfig['dsn'],
-                $dbConfig['user'],
-                $dbConfig['password'],
-                [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"]
-            );
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
+
         $this->version = $this->getVersionList();
     }
 
     /**
-     * retrieve the database configuration
+     * retrieve the database connection
      *
-     * @return array containing the database
+     * @return \PDO
+     * @throws ParseException
+     * @throws \PDOException
      */
-    protected function getDatabaseConfig()
+    protected function getDatabasePDO()
     {
         $configPath = THELIA_CONF_DIR . "database.yml";
 
@@ -117,13 +110,12 @@ class Update
             throw new UpdateException("Thelia is not installed yet");
         }
 
-        $definePropel = new DefinePropel(
-            new DatabaseConfiguration(),
+        $definePropel = new DatabaseConfigurationSource(
             Yaml::parse(file_get_contents($configPath)),
             $this->getEnvParameters()
         );
 
-        return $definePropel->getConfig();
+        return $definePropel->getTheliaConnectionPDO();
     }
 
     /**
