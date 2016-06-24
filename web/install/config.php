@@ -40,11 +40,11 @@ try {
 
             $database->insertSql($_SESSION['install']['database']);
 
-            if (!file_exists(THELIA_ROOT . "/local/config/database.yml")) {
+            if (!file_exists(THELIA_CONF_DIR . "/database.yml")) {
                 $fs = new \Symfony\Component\Filesystem\Filesystem();
 
-                $sampleConfigFile = THELIA_ROOT . "/local/config/database.yml.sample";
-                $configFile = THELIA_ROOT . "/local/config/database.yml";
+                $sampleConfigFile = THELIA_CONF_DIR . "/database.yml.sample";
+                $configFile = THELIA_CONF_DIR . "/database.yml";
 
                 $fs->copy($sampleConfigFile, $configFile, true);
 
