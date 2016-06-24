@@ -80,8 +80,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
             ->with($productQuery->getTaxRule(), $countryQuery)
             ->will($this->returnValue('foo'));
 
-        $rewritingUrlQuery = $this->getProperty('taxRuleQuery');
-        $rewritingUrlQuery->setValue($calculator, $taxRuleQuery);
+        $taxRuleQueryReflectedProperty = $this->getProperty('taxRuleQuery');
+        $taxRuleQueryReflectedProperty->setValue($calculator, $taxRuleQuery);
 
         $calculator->load($productQuery, $countryQuery);
 
@@ -124,8 +124,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
@@ -144,8 +144,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
@@ -166,8 +166,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
@@ -211,8 +211,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
@@ -260,18 +260,18 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 
-        $aProduct = ProductQuery::create()->findOne();
-        if (null === $aProduct) {
+        $product = ProductQuery::create()->findOne();
+        if (null === $product) {
             return;
         }
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
-        $product = $this->getProperty('product');
-        $product->setValue($calculator, $aProduct);
+        $productReflectedProperty = $this->getProperty('product');
+        $productReflectedProperty->setValue($calculator, $product);
 
         $taxAmount = $calculator->getTaxAmountFromTaxedPrice(600.95);
         $untaxedPrice = $calculator->getUntaxedPrice(600.95);
