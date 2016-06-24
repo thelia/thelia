@@ -386,15 +386,33 @@ class ModuleValidator
         return $dependantModules;
     }
 
-    public function getCurrentModuleDependencies()
+    /**
+     * Get the dependencies of this module.
+     * @param bool $recursive Whether to also get the dependencies of dependencies, their dependencies, and so on...
+     * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
+     */
+    public function getCurrentModuleDependencies($recursive = false)
     {
+        if (empty($this->moduleDescriptor->required)) {
+            return [];
+        }
+
         $dependencies = [];
-        if (0 !== count($this->moduleDescriptor->required)) {
-            foreach ($this->moduleDescriptor->required->module as $dependency) {
-                $dependencies[] = [
-                   "code" => (string)$dependency,
-                   "version" => (string)$dependency['version'],
-                ];
+        foreach ($this->moduleDescriptor->required->module as $dependency) {
+            $dependencyArray = [
+                "code" => (string)$dependency,
+                "version" => (string)$dependency['version'],
+            ];
+            if (!in_array($dependencyArray, $dependencies)) {
+                $dependencies[] = $dependencyArray;
+            }
+
+            if ($recursive) {
+                $recursiveModuleValidator = new ModuleValidator(THELIA_MODULE_DIR . '/' . (string)$dependency);
+                array_merge(
+                    $dependencies,
+                    $recursiveModuleValidator->getCurrentModuleDependencies(true)
+                );
             }
         }
 
