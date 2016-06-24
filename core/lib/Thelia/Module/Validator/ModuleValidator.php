@@ -34,7 +34,7 @@ class ModuleValidator
 {
     protected $modulePath;
 
-    /** @var ModuleDescriptorValidator */
+    /** @var \SimpleXMLElement */
     protected $moduleDescriptor;
 
     /** @var ModuleDefinition */
