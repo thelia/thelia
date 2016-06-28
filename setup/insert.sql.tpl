@@ -1,5 +1,5 @@
 INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format`,`datetime_format`,`decimal_separator`,`thousands_separator`,`decimals`,`active`,`visible`,`by_default`,`created_at`,`updated_at`)VALUES
-(1, 'Français', 'fr', 'fr_FR', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '1', '1', '0', NOW(), NOW()),
+(1, 'Français', 'fr', 'fr_FR', '', 'd/m/Y', 'H:i:s', 'd/m/Y H:i:s', ',', ' ', '2', '1', '1', '0', NOW(), NOW()),
 (2, 'English', 'en', 'en_US', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', '.', ' ', '2', '1', '1', '1', NOW(), NOW()),
 (3, 'Castellano', 'es', 'es_ES', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', ',', '.', '2', '1', '1', '0', NOW(), NOW()),
 (4, 'Italiano', 'it', 'it_IT', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '1', '1', '0', NOW(), NOW()),
@@ -71,7 +71,12 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (61, 'customer_confirm_email', '1', 0, 0, NOW(), NOW()),
 (62, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
 (63, 'minimum_admin_password_length', '4', 0, 0, NOW(), NOW()),
-(64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW())
+(64, 'enable_lost_admin_password_recovery', '1', 0, 0, NOW(), NOW()),
+(65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
+(66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
+(67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
+(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -94,7 +99,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', NOW(), NOW()),
 (18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', NOW(), NOW()),
 (19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
-(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW())
+(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW()),
+(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', NOW(), NOW())
 ;
 
 -- Insert front hooks
@@ -321,7 +327,26 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (220, 'account-order.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
 (222, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(223, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(223, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(224, 'sale.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(225, 'sale.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(226, 'sale.main-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(227, 'sale.main-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(228, 'sale.content-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(229, 'sale.content-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(230, 'sale.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(231, 'sale.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(232, 'sale.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(233, 'account-order.invoice-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(234, 'account-order.delivery-address-bottom', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(235, 'newsletter-unsubscribe.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(236, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(237, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(240, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(242, 'account-order.product-list', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -741,7 +766,16 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1412, 'states.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1413, 'state.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1414, 'state.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1416, 'configuration.order-path.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1417, 'configuration.order-path.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1418, 'order-status.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1419, 'order-status.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1420, 'order-status.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1421, 'order-status.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -780,7 +814,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2037, 'delivery.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2038, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert email hooks
@@ -811,7 +847,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (3023, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3024, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3025, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3027, 'email-html.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3028, 'email-txt.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -1836,13 +1874,13 @@ VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
 
-INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', NOW(), NOW()),
-(2, 'paid', NOW(), NOW()),
-(3, 'processing', NOW(), NOW()),
-(4, 'sent', NOW(), NOW()),
-(5, 'canceled', NOW(), NOW()),
-(6, 'refunded', NOW(), NOW());
+INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', '#f0ad4e', 1, 1, NOW(), NOW()),
+(2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
+(3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
+(4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
+(5, 'canceled', '#d9534f', 5, 1, NOW(), NOW()),
+(6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
@@ -1896,7 +1934,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (46, 'admin.profile', NOW(), NOW()),
 (47, 'admin.search', NOW(), NOW()),
 (48, 'admin.configuration.api', NOW(), NOW()),
-(49, 'admin.customer.title', NOW(), NOW())
+(49, 'admin.customer.title', NOW(), NOW()),
+(50, 'admin.configuration.order-status', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -1905,7 +1944,9 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW()),
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
 (5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
-(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW())
+(6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
+(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
+(8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW())
 ;
 
 /**
@@ -1963,7 +2004,13 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (61, '{$locale}', {intl l='Ask the customers to confirm their email, 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
     (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL),
     (63, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL),
-    (64, '{$locale}', {intl l='Allow an administrator to recreate a lost password' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (64, '{$locale}', {intl l='Allow an administrator to recreate a lost password (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
+    (65, '{$locale}', {intl l='Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
+    (66, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
+    (67, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
+    (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL),
+    (69, '{$locale}', {intl l='Enable (1) or disable (0) customer email confirmation' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -2218,7 +2265,26 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (220, '{$locale}', {intl l='Order details - javascript initialization' locale=$locale}, NULL, NULL),
     (221, '{$locale}', {intl l='Customer account - additional information' locale=$locale}, NULL, NULL),
     (222, '{$locale}', {intl l='Order details - after product' locale=$locale}, NULL, NULL),
-    (223, '{$locale}', {intl l='Mini cart' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (223, '{$locale}', {intl l='Mini cart' locale=$locale}, NULL, NULL),
+    (224, '{$locale}', {intl l='Sale - at the top' locale=$locale}, NULL, NULL),
+    (225, '{$locale}', {intl l='Sale - at the bottom' locale=$locale}, NULL, NULL),
+    (226, '{$locale}', {intl l='Sale - at the top of the main area' locale=$locale}, NULL, NULL),
+    (227, '{$locale}', {intl l='Sale - at the bottom of the main area' locale=$locale}, NULL, NULL),
+    (228, '{$locale}', {intl l='Sale - before the main content area' locale=$locale}, NULL, NULL),
+    (229, '{$locale}', {intl l='Sale - after the main content area' locale=$locale}, NULL, NULL),
+    (230, '{$locale}', {intl l='Sale - CSS stylesheet' locale=$locale}, NULL, NULL),
+    (231, '{$locale}', {intl l='Sale - after javascript include' locale=$locale}, NULL, NULL),
+    (232, '{$locale}', {intl l='Sale - javascript initialization' locale=$locale}, NULL, NULL),
+    (233, '{$locale}', {intl l='Order details - after invoice address' locale=$locale}, NULL, NULL),
+    (234, '{$locale}', {intl l='Order details - after delivery address' locale=$locale}, NULL, NULL),
+    (235, '{$locale}', {intl l='Newsletter unsubscribe page - at the top' locale=$locale}, NULL, NULL),
+    (236, '{$locale}', {intl l='Newsletter unsubscribe page - at the bottom' locale=$locale}, NULL, NULL),
+    (237, '{$locale}', {intl l='Newsletter unsubscribe page - CSS stylesheet' locale=$locale}, NULL, NULL),
+    (238, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript include' locale=$locale}, NULL, NULL),
+    (239, '{$locale}', {intl l='Newsletter unsubscribe page - after javascript initialisation' locale=$locale}, NULL, NULL),
+    (240, '{$locale}', {intl l='Order invoice page - bottom of coupon form' locale=$locale}, NULL, NULL),
+    (241, '{$locale}', {intl l='Order invoice page - bottom of payment form' locale=$locale}, NULL, NULL),
+    (242, '{$locale}', {intl l='Account order - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -2641,7 +2707,16 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1412, '{$locale}', {intl l='states - bottom' locale=$locale}, '', ''),
     (1413, '{$locale}', {intl l='state - creation form' locale=$locale}, '',  ''),
     (1414, '{$locale}', {intl l='state - delete form' locale=$locale}, '', ''),
-    (1415, '{$locale}', {intl l='states - JavaScript' locale=$locale}, '', ''){if ! $locale@last},{/if}
+    (1415, '{$locale}', {intl l='states - JavaScript' locale=$locale}, '', ''),
+    (1416,  '{$locale}', {intl l='Configuration - Order path - top' locale=$locale}, NULL, NULL),
+    (1417,  '{$locale}', {intl l='Configuration - Order path - bottom' locale=$locale}, NULL, NULL),
+    (1418,  '{$locale}', {intl l='Order status - top' locale=$locale}, NULL, NULL),
+    (1419,  '{$locale}', {intl l='Order status - bottom' locale=$locale}, NULL, NULL),
+    (1420,  '{$locale}', {intl l='Order status - table header' locale=$locale}, NULL, NULL),
+    (1421,  '{$locale}', {intl l='Order status - table row' locale=$locale}, NULL, NULL),
+    (1422,  '{$locale}', {intl l='Order status - form creation' locale=$locale}, NULL, NULL),
+    (1423,  '{$locale}', {intl l='Order status - form modification' locale=$locale}, NULL, NULL),
+    (1424, '{$locale}', {intl l='Order status - JavaScript' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -2684,8 +2759,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, '{$locale}', {intl l='Invoice - After delivery module' locale=$locale}, NULL, NULL),
     (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL),
     (2035, '{$locale}', {intl l='Invoice - additional product information' locale=$locale}, NULL, NULL),
-    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL),
+    (2037, '{$locale}', {intl l='Delivery - after product information' locale=$locale}, NULL, NULL),
+    (2038, '{$locale}', {intl l='Invoice - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -2718,8 +2794,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3023, '{$locale}', {intl l='Email txt - order notification - after address' locale=$locale}, NULL, NULL),
     (3024, '{$locale}', {intl l='Email txt - order notification - order product' locale=$locale}, NULL, NULL),
     (3025, '{$locale}', {intl l='Email txt - order notification - before products' locale=$locale}, NULL, NULL),
-    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (3026, '{$locale}', {intl l='Email txt - order notification - after products' locale=$locale}, NULL, NULL),
+    (3027, '{$locale}', {intl l='Email html - order notification - after product information' locale=$locale}, NULL, NULL),
+    (3028, '{$locale}', {intl l='Email txt - order notification - after product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
@@ -3395,7 +3472,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (46, '{$locale}', {intl l='Administration profiles management' locale=$locale}, NULL, NULL, NULL),
     (47, '{$locale}', {intl l='Back-office search function' locale=$locale}, NULL, NULL, NULL),
     (48, '{$locale}', {intl l='API Configuration' locale=$locale}, NULL, NULL, NULL),
-    (49, '{$locale}', {intl l='Customer title' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (49, '{$locale}', {intl l='Customer title' locale=$locale}, NULL, NULL, NULL),
+    (50, '{$locale}', {intl l='Configuration order status' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -3408,7 +3486,9 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (3, '{$locale}', {intl l='Message sent to the shop owner when a new order is placed' locale=$locale}, {intl l='New order {$order_ref} placed on {config key="store_name"}' locale=$locale}, NULL, NULL),
     (4, '{$locale}', {intl l='Mail sent to the customer when its password or email is changed in the back-office' locale=$locale}, {intl l='Your account information on {config key="store_name"} has been changed.' locale=$locale}, NULL, NULL),
     (5, '{$locale}', {intl l='Mail sent to the customer when its account is created by an administrator in the back-office' locale=$locale}, {intl l='A {config key="store_name"} account has been created for you' locale=$locale}, NULL, NULL),
-    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on {config key="store_name"}' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (6, '{$locale}', {intl l='Mail sent to an administrator who requested a new password' locale=$locale}, {intl l='New password request on %store' store={config key="store_name"} locale=$locale}, NULL, NULL),
+    (7, '{$locale}', {intl l='Newsletter subscription confirmation mail' locale=$locale}, {intl l='Your subscription to %store newsletter' store={config key="store_name"} locale=$locale}, NULL, NULL),
+    (8, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your %store account' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

@@ -13,6 +13,7 @@
 namespace Thelia\Type;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 
 /**
  *
@@ -22,15 +23,27 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 abstract class BaseType implements TypeInterface
 {
     abstract public function getType();
+
     abstract public function isValid($value);
+
     abstract public function getFormattedValue($value);
+
     abstract public function getFormType();
+
     abstract public function getFormOptions();
 
     public function verifyForm($value, ExecutionContextInterface $context)
     {
         if (!$this->isValid($value)) {
-            $context->addViolation(sprintf("received value `%s` does not match `%s` type", $value, $this->getType()));
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    "received value `%value` does not match `%type` type",
+                    [
+                        '%value' => $value,
+                        '%type' => $this->getType()
+                    ]
+                )
+            );
         }
     }
 }

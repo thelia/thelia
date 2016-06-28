@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template\Assets;
 
+use Assetic\Filter\FilterInterface;
+
 interface AssetManagerInterface
 {
     /**
@@ -62,6 +64,8 @@ interface AssetManagerInterface
 
     /**
      * Register an asset filter
+     * @param string $filterIdentifier
+     * @param FilterInterface $filter
      */
     public function registerAssetFilter($filterIdentifier, $filter);
 }

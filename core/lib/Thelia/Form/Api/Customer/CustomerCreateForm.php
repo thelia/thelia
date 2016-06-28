@@ -30,7 +30,7 @@ class CustomerCreateForm extends BaseCustomerCreateForm
             ->remove('email_confirm')
             ->remove('password_confirm')
             ->remove('agreed')
-            ->add('lang', 'integer', [
+            ->add('lang_id', 'integer', [
                 'constraints' => [
                     new NotBlank(),
                 ]

@@ -159,18 +159,15 @@ class Colissimo extends AbstractDeliveryModule
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
     {
         $uploadDir = __DIR__ . '/Config/prices.json';
+
         $database = new Database($con);
 
-        $table_exists = $database->execute(
-            "SELECT COUNT(*)
-             FROM information_schema.tables
-             WHERE table_schema = 'thelia'
-             AND table_name = 'colissimo_freeshipping'"
-        )->fetch()["COUNT(*)"] ? true : false;
+        $tableExists = $database->execute("SHOW TABLES LIKE 'colissimo_freeshipping'")->rowCount();
 
-        if (Colissimo::getConfigValue(ColissimoConfigValue::FREE_SHIPPING, null) == null && $table_exists) {
+        if (Colissimo::getConfigValue(ColissimoConfigValue::FREE_SHIPPING, null) == null && $tableExists) {
             $result = $database->execute('SELECT active FROM colissimo_freeshipping WHERE id=1')->fetch()["active"];
             Colissimo::setConfigValue(ColissimoConfigValue::FREE_SHIPPING, $result);
+            $database->execute("DROP TABLE `colissimo_freeshipping`");
         }
 
         if (is_readable($uploadDir) && Colissimo::getConfigValue(ColissimoConfigValue::PRICES, null) == null) {

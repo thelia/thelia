@@ -1,0 +1,34 @@
+{loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
+  <div class="general-block-decorator dashboard">
+
+    <div class="title title-without-tabs clearfix">
+      {intl l='Dashboard' d='hookadminhome.bo.default'}
+      <div class="col-sm-2 input-group pull-right">
+        <span id="span-calendar" class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+        <input type="text" class="form-control" id="date-picker">
+        <span class="input-group-btn">
+            <button type="button" class="form-control btn btn-default js-stats-refresh" data-month-offset="0"><span class="glyphicon glyphicon-refresh"></span></button>
+        </span>
+      </div>
+    </div>
+
+    <div class="text-center clearfix">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default active" data-toggle="jqplot" data-target="sales"><span class="glyphicon glyphicon-euro"></span> {intl l="Sales" d='hookadminhome.bo.default'}</button>
+        <button type="button" class="btn btn-primary" data-toggle="jqplot" data-target="registration"><span class="glyphicon glyphicon-user"></span> {intl l="New customers" d='hookadminhome.bo.default'}</button>
+        <button type="button" class="btn btn-success" data-toggle="jqplot" data-target="orders"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Orders" d='hookadminhome.bo.default'}</button>
+        <button type="button" class="btn btn-info" data-toggle="jqplot" data-target="first-orders"><span class="glyphicon glyphicon-thumbs-up"></span> {intl l="First orders" d='hookadminhome.bo.default'}</button>
+        <button type="button" class="btn btn-danger" data-toggle="jqplot" data-target="aborted-orders"><span class="glyphicon glyphicon-thumbs-down"></span> {intl l="Aborted orders" d='hookadminhome.bo.default'}</button>
+      </div>
+    </div>
+
+    <hr/>
+
+    <div class="jqplot-content">
+      <div id="jqplot"></div>
+    </div>
+
+  </div>
+{/loop}

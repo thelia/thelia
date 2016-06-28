@@ -21,7 +21,7 @@
     <label for="coupon-products-id">{intl l="Applies to products :"}</label>
 
     <select required multiple size="10" class="form-control" id="coupon-products-id" name="{$products_field_name}[]">
-        {loop type="product" category=$category_id_value|default:0 name="list-of-products" backend_context="1"}
+        {loop type="product" category=$category_id_value|default:0 name="list-of-products" backend_context="1" return_url=false}
             <option value="{$ID}" {if in_array($ID, $products_values)}selected="selected"{/if}>{$TITLE}</option>
         {/loop}
     </select>

@@ -1,0 +1,9 @@
+{default_translation_domain domain='email.default'}
+{intl l="Welcome to %store," store={config key="store_name"}}
+
+{intl l="Confirm your email to complete your account"}
+
+{intl l="just click the button below : "}
+
+{url path='/customer/confirm/%token' token=$customer->getConfirmationToken()}
+

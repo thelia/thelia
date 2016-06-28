@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '*If you choose this option, the exported orders would not be available on this page anymore' => '* Bu seçeneği seçerseniz, ihracat siparişleri artık bu sayfadaki müsait olmaz',
     'Actions' => 'Eylemler',
     'An error occured' => 'Bir hata meydana geldi',
@@ -31,4 +31,4 @@ return array(
     'There is currently not orders to export' => 'Şu anda hiçbir emir vermek için',
     'Total taxed amount' => 'Toplam Kdvtutarı',
     'Weight up to ... (kg)' => 'Fazla kilo... (kg)',
-);
+];

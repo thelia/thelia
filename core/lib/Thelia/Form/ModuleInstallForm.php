@@ -16,10 +16,10 @@ use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Thelia\Core\Archiver\Archiver\ZipArchiver;
 use Thelia\Core\Translation\Translator;
 use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Module\Validator\ModuleValidator;
-use ZipArchive;
 
 /**
  * Class ProductCreationForm
@@ -129,18 +129,20 @@ class ModuleInstallForm extends BaseForm
     protected function unzipModule(UploadedFile $file)
     {
         $extractPath = false;
-        $zip = new ZipArchive();
-        if ($zip->open($file->getRealPath()) === true) {
-            $extractPath = $this->tempdir();
-
-            if ($extractPath !== false) {
-                if ($zip->extractTo($extractPath) === false) {
-                    $extractPath = false;
-                }
-            }
-
-            $zip->close();
+        $zip = new ZipArchiver();
+        if (!$zip->open($file->getRealPath())) {
+          throw new \Exception("unable to open zipfile");
         }
+
+        $extractPath = $this->tempdir();
+
+        if ($extractPath !== false) {
+            if ($zip->extract($extractPath) === false) {
+                $extractPath = false;
+            }
+        }
+
+        $zip->close();
 
         return $extractPath;
     }

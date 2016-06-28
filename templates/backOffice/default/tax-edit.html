@@ -102,12 +102,12 @@
                             {if $formType == 'choice'}
                                 <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if}>
                                     {foreach $choices as $choice}
-                                        <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
+                                        <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS[$label_attr.type] == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
                                     {/foreach}
                                 </select>
                             {/if}
                             {if $formType == 'text'}
-                                <input type="text" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label}{/if}">
+                                <input type="text" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS[$label_attr.type]}{/if}">
                             {/if}
                         </div>
                     {/form_tagged_fields}

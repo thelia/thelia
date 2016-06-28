@@ -142,6 +142,24 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * @since 2.3.0-alpha2
+     * @return bool
+     */
+    public static function getNotifyNewsletterSubscription()
+    {
+        return self::read('notify_newsletter_subscription', 0) != 0;
+    }
+
+    /**
+     * @since 2.4
+     * @return bool
+     */
+    public static function isCustomerEmailConfirmationEnable()
+    {
+        return (bool) self::read('customer_email_confirmation', false);
+    }
+
+    /**
      * @return array a list of email addresses to send the shop's notifications
      */
     public static function getNotificationEmailsList()

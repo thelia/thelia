@@ -238,6 +238,7 @@
         <tr>
             <td style="border:solid 1px #dddddd;">
                 <p>{$REF}</p>
+                {if $REF != $PRODUCT_SALE_ELEMENTS_REF}<p>{$PRODUCT_SALE_ELEMENTS_REF}</p>{/if}
             </td>
             <td style="border:solid 1px #dddddd;">
                 <p>{$TITLE}</p>
@@ -246,6 +247,7 @@
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                     {/loop}
                     {/ifloop}
+                    {hook name="delivery.product-list" order_product=$ID order=$order_id}
             </td>
             <td style="border:solid 1px #dddddd; text-align:center;">
                 <p>{$QUANTITY}</p>

@@ -12,6 +12,7 @@
 
 namespace Thelia\Model\Tools;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\PropelQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
@@ -19,7 +20,7 @@ use Propel\Runtime\Propel;
 trait PositionManagementTrait
 {
     /**
-     * Create an instancer of this object query
+     * Create an instance of this object query
      */
     private function createQuery()
     {
@@ -27,20 +28,12 @@ trait PositionManagementTrait
     }
 
     /**
-     * Return the database name from this object's table map.
-     */
-    private function getDatabaseNameFromMap()
-    {
-        $class = new \ReflectionClass(self::TABLE_MAP);
-
-        return $class->getConstant('DATABASE_NAME');
-    }
-
-    /**
      * Implementors may add some search criteria (e.g., parent id) to the queries
      * used to change/get position by overloading this method.
+     *
+     * @param $query ModelCriteria
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery(ModelCriteria $query)
     {
         // Add required criteria here...
     }
@@ -80,12 +73,12 @@ trait PositionManagementTrait
     /**
      * Move up or down a object
      *
-     * @param the exchange mode: go up (POSITION_UP) or go down (POSITION_DOWN)
+     * @param bool $up the exchange mode: go up (POSITION_UP) or go down (POSITION_DOWN)
      */
     protected function movePositionUpOrDown($up = true)
     {
         // The current position of the object
-        $my_position = $this->getPosition();
+        $myPosition = $this->getPosition();
 
         // Find object to exchange position with
         $search = $this->createQuery();
@@ -95,10 +88,10 @@ trait PositionManagementTrait
         // Up or down ?
         if ($up === true) {
             // Find the object immediately before me
-            $search->filterByPosition(array('max' => $my_position-1))->orderByPosition(Criteria::DESC);
+            $search->filterByPosition(array('max' => $myPosition-1))->orderByPosition(Criteria::DESC);
         } else {
             // Find the object immediately after me
-            $search->filterByPosition(array('min' => $my_position+1))->orderByPosition(Criteria::ASC);
+            $search->filterByPosition(array('min' => $myPosition+1))->orderByPosition(Criteria::ASC);
         }
 
         $result = $search->findOne();
@@ -115,7 +108,12 @@ trait PositionManagementTrait
                     ->save($cnx)
                 ;
 
-                $result->setDispatcher($this->getDispatcher())->setPosition($my_position)->save($cnx);
+                // For BC
+                if (method_exists($result, 'setDispatcher') && method_exists($this, 'getDispatcher')) {
+                    $result->setDispatcher($this->getDispatcher());
+                }
+
+                $result->setPosition($myPosition)->save($cnx);
 
                 $cnx->commit();
             } catch (\Exception $e) {
@@ -173,7 +171,12 @@ trait PositionManagementTrait
                 foreach ($results as $result) {
                     $objNewPosition = $result->getPosition() + $delta;
 
-                    $result->setDispatcher($this->getDispatcher())->setPosition($objNewPosition)->save($cnx);
+                    // For BC
+                    if (method_exists($result, 'setDispatcher') && method_exists($this, 'getDispatcher')) {
+                        $result->setDispatcher($this->getDispatcher());
+                    }
+
+                    $result->setPosition($objNewPosition)->save($cnx);
                 }
 
                 $this

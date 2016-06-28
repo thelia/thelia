@@ -26,7 +26,7 @@ class CustomerUpdateForm extends BaseCustomerUpdateForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add('lang', 'lang_id')
+            ->add('lang_id', 'lang_id')
             ->add('id', 'customer_id')
         ;
     }

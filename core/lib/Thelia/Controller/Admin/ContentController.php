@@ -381,7 +381,7 @@ class ContentController extends AbstractSeoCrudController
             // Redirect to parent category list
             return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                ['parent' => $content->getDefaultFolderId()]
+                ['parent' => $event->getReferrerId()]
             );
         } else {
             return null;
@@ -398,7 +398,8 @@ class ContentController extends AbstractSeoCrudController
         return new UpdatePositionEvent(
             $this->getRequest()->get('content_id', null),
             $positionChangeMode,
-            $positionValue
+            $positionValue,
+            $this->getRequest()->get('folder_id', null)
         );
     }
 

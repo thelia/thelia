@@ -1,0 +1,100 @@
+{loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
+    <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a href="#statjour" id="statjour_label"
+                              data-toggle="tab">{intl l="Today"  d='hookadminhome.bo.default'}</a></li>
+        <li><a href="#statmois" id="statmois_label"
+               data-toggle="tab">{intl l="This month"  d='hookadminhome.bo.default'}</a></li>
+        <li><a href="#statannee" id="statannee_label"
+               data-toggle="tab">{intl l="This year"  d='hookadminhome.bo.default'}</a></li>
+    </ul>
+{loop type="currency" name="default-currency" default_only="1"}
+{$defaultCurrency = $SYMBOL}
+{/loop}
+    <div class="tab-content">
+        <div class="tab-pane fade active in" id="statjour">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th>{intl l="Overall sales"  d='hookadminhome.bo.default'}</th>
+                        <td>{format_money number={stats key="sales" startDate="today" endDate="today"} symbol=$defaultCurrency}</td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Sales excluding shipping" d='hookadminhome.bo.default'}</th>
+                        <td>
+                            {$salesNoShipping = {stats key="sales" startDate="today" endDate="today" includeShipping="false"}}
+                            {format_money number=$salesNoShipping symbol=$defaultCurrency}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Yesterday sales" d='hookadminhome.bo.default'}</th>
+                        <td>{format_money number={stats key="sales" startDate="yesterday" endDate="yesterday"} symbol=$defaultCurrency}</td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Orders" d='hookadminhome.bo.default'}</th>
+                        <td>
+                            {$orderCount =  {stats key="orders" startDate="today" endDate="today"}}
+                            {$orderCount}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Average cart" d='hookadminhome.bo.default'}</th>
+                        <td>
+                            {if $orderCount == 0}
+                                {format_money number=0 symbol=$defaultCurrency}
+                            {else}
+                                {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency}
+                            {/if}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="statmois">
+            {include file="block-month-sales-statistics.html"}
+        </div>
+
+        <div class="tab-pane fade" id="statannee">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th>{intl l="Overall sales" d='hookadminhome.bo.default'}</th>
+                        <td>{format_money number={stats key="sales" startDate="this_year" endDate="this_year"} symbol=$defaultCurrency}</td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Sales excluding shipping" d='hookadminhome.bo.default'}</th>
+                        <td>
+                            {$salesNoShipping = {stats key="sales" startDate="this_year" endDate="this_year" includeShipping="false"}}
+                            {format_money number=$salesNoShipping symbol=$defaultCurrency}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Previous year sales" d='hookadminhome.bo.default'}</th>
+                        <td>{format_money number={stats key="sales" startDate="last_year" endDate="last_year"} symbol=$defaultCurrency}</td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Orders" d='hookadminhome.bo.default'}</th>
+                        <td>
+                            {$orderCount =  {stats key="orders" startDate="this_year" endDate="this_year"}}
+                            {$orderCount}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{intl l="Average cart" d='hookadminhome.bo.default'}</th>
+                        <td>
+                            {if $orderCount == 0}
+                                {format_money number=0 symbol=$defaultCurrency}
+                            {else}
+                                {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency}
+                            {/if}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{/loop}

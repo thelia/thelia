@@ -20,9 +20,27 @@ Parameters:
     {/if}
 {/form}
 
+
+{*
+Prevent multiple form submissions
+you can deactivate this behavior in setting data-submitting='0' on the form tag
+*}
+$('#{$dialog_id} form').on("submit", function(e) {
+    var submitting = $(this).data('submitting');
+    if (submitting == '1') {
+        e.preventDefault();
+        return false;
+    }
+    if (submitting != '0') {
+        $(this).data('submitting', '1');
+    }
+});
+
 {* Always reset create dialog on close *}
 
 $('#{$dialog_id}').on('hidden.bs.modal', function() {
+
+    var submitting = false;
 
     // Hide error message
     $('#{$dialog_id}_error').remove();

@@ -39,7 +39,11 @@ class PricePercentTaxType extends BaseTaxType
     public function getRequirementsDefinition()
     {
         return array(
-            new TaxTypeRequirementDefinition('percent', new FloatType())
+            new TaxTypeRequirementDefinition(
+                'percent',
+                new FloatType(),
+                Translator::getInstance()->trans("Percent")
+            )
         );
     }
 

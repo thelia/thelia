@@ -1,7 +1,5 @@
 <?php
 
-return array(
-    'File manager' => '',
+return [
     'None' => 'Keine Angabe',
-    'Responsive' => '',
-);
+];

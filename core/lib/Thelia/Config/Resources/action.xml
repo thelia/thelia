@@ -28,6 +28,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.order_status" class="Thelia\Action\OrderStatus">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.coupon" class="Thelia\Action\Coupon">
             <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.coupon.factory"/>
@@ -171,6 +175,7 @@
         </service>
 
         <service id="thelia.action.cache" class="Thelia\Action\Cache">
+            <argument type="service" id="thelia.cache"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -183,6 +188,8 @@
         </service>
 
         <service id="thelia.action.newsletter" class="Thelia\Action\Newsletter">
+            <argument type="service" id="mailer"/>
+            <argument type="service" id="event_dispatcher" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -220,6 +227,14 @@
 
         <service id="thelia.action.translation" class="Thelia\Action\Translation">
             <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.module.delivery" class="Thelia\Action\Delivery">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.module.payment" class="Thelia\Action\Payment">
             <tag name="kernel.event_subscriber"/>
         </service>
 

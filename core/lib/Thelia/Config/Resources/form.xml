@@ -15,6 +15,7 @@
         <form name="thelia.front.address.update" class="Thelia\Form\AddressUpdateForm"/>
         <form name="thelia.front.contact" class="Thelia\Form\ContactForm"/>
         <form name="thelia.front.newsletter" class="Thelia\Form\NewsletterForm"/>
+        <form name="thelia.front.newsletter.unsubscribe" class="Thelia\Form\NewsletterUnsubscribeForm"/>
 
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
         <form name="thelia.admin.lostpassword" class="Thelia\Form\AdminLostPassword"/>
@@ -160,6 +161,9 @@
 
         <form name="thelia_api_create" class="Thelia\Form\Api\ApiCreateForm"/>
         <form name="thelia_api_update" class="Thelia\Form\Api\ApiUpdateForm"/>
+
+        <form name="thelia.admin.order-status.creation" class="Thelia\Form\OrderStatus\OrderStatusCreationForm"/>
+        <form name="thelia.admin.order-status.modification" class="Thelia\Form\OrderStatus\OrderStatusModificationForm"/>
 
     </forms>
 

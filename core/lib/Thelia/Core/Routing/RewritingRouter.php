@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Routing;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -26,7 +27,9 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
@@ -190,7 +193,15 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
             /* is the URL redirected ? */
             if (null !== $rewrittenUrlData->redirectedToUrl) {
-                $this->redirect($urlTool->absoluteUrl($rewrittenUrlData->redirectedToUrl), 301);
+                $redirect = RewritingUrlQuery::create()
+                    ->filterByView($rewrittenUrlData->view)
+                    ->filterByViewId($rewrittenUrlData->viewId)
+                    ->filterByViewLocale($rewrittenUrlData->locale)
+                    ->filterByRedirected(null, Criteria::ISNULL)
+                    ->findOne()
+                ;
+
+                $this->redirect($urlTool->absoluteUrl($redirect->getUrl()), 301);
             }
 
             /* define GET arguments in request */

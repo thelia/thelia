@@ -14,6 +14,9 @@ namespace TheliaSmarty\Template\Plugins;
 
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -30,8 +33,16 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     protected $loopDefinition = array();
 
+    /**
+     * @var Request
+     * @deprecated since 2.3, please use requestStack
+     */
     protected $request;
+
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
+
+    /** @var SecurityContext */
     protected $securityContext;
 
     /** @var Translator */
@@ -51,8 +62,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-
-        $this->request = $container->get('request');
+        $this->request = $container->get('request_stack')->getCurrentRequest();
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
         $this->translator = $container->get("thelia.translator");
@@ -288,7 +298,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             if ($totalPageCount > $displayedPageCount) {
                 $startPage = $currentPage - round($displayedPageCount / 2);
 
-                if ($startPage < 0) {
+                if ($startPage <= 0) {
                     $startPage = 1;
                 }
             }

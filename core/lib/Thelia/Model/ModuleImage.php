@@ -13,10 +13,12 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\ModuleImageModification;
 use Thelia\Model\Base\ModuleImage as BaseModuleImage;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class ModuleImage extends BaseModuleImage implements FileModelInterface
 {
     use ModelEventDispatcherTrait;
+    use PositionManagementTrait;
 
     /**
      * Get the form instance used to change this object information

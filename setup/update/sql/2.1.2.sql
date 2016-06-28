@@ -15,7 +15,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
 (@maxHookId + 1, 'de_DE', 'Gutschein-Seite - Löschungsformular', '', ''),
 (@maxHookId + 1, 'en_US', 'Coupon page - in deletion form', '', ''),
-(@maxHookId + 1, 'es_ES', NULL, '', ''),
+(@maxHookId + 1, 'es_ES', 'Página de cupón - en formulario de eliminación', '', ''),
 (@maxHookId + 1, 'fr_FR', 'Page coupon - formulaire de suppression', '', '')
 ;
 

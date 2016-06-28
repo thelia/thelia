@@ -31,6 +31,7 @@ final class FrontForm
     const CUSTOMER_PROFILE_UPDATE = 'thelia.front.customer.profile.update';
     const CUSTOMER_PASSWORD_UPDATE = 'thelia.front.customer.password.update';
     const NEWSLETTER = 'thelia.front.newsletter';
+    const NEWSLETTER_UNSUBSCRIBE = 'thelia.front.newsletter.unsubscribe';
     const ORDER_DELIVER = 'thelia.order.delivery';
     const ORDER_PAYMENT = 'thelia.order.payment';
 }

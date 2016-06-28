@@ -79,6 +79,7 @@ CREATE TABLE `product_category`
     `product_id` INTEGER NOT NULL,
     `category_id` INTEGER NOT NULL,
     `default_category` TINYINT(1),
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_id`,`category_id`),
@@ -350,6 +351,7 @@ CREATE TABLE `attribute_combination`
     `attribute_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER NOT NULL,
     `product_sale_elements_id` INTEGER NOT NULL,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`attribute_id`,`attribute_av_id`,`product_sale_elements_id`),
@@ -460,19 +462,21 @@ DROP TABLE IF EXISTS `customer`;
 CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(50),
     `title_id` INTEGER NOT NULL,
+    `lang_id` INTEGER,
+    `ref` VARCHAR(50),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),
     `reseller` TINYINT,
-    `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
+    `enable` TINYINT DEFAULT 0,
+    `confirmation_token` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -481,11 +485,18 @@ CREATE TABLE `customer`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_customer_customer_title_id` (`title_id`),
+    INDEX `idx_customer_lang_id` (`lang_id`),
+    INDEX `idx_email` (`email`),
     CONSTRAINT `fk_customer_customer_title_id`
         FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_customer_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -879,6 +890,9 @@ CREATE TABLE `order_status`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
+    `color` CHAR(7),
+    `position` INTEGER,
+    `protected_status` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1230,6 +1244,7 @@ CREATE TABLE `content_folder`
     `content_id` INTEGER NOT NULL,
     `folder_id` INTEGER NOT NULL,
     `default_folder` TINYINT(1),
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`content_id`,`folder_id`),
@@ -1692,11 +1707,12 @@ CREATE TABLE `newsletter`
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
     `locale` VARCHAR(5),
-    `unsubscribed` TINYINT(1) DEFAULT 0,
+    `unsubscribed` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `email_UNIQUE` (`email`)
+    UNIQUE INDEX `email_UNIQUE` (`email`),
+    INDEX `idx_unsubscribed` (`unsubscribed`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -3261,19 +3277,21 @@ DROP TABLE IF EXISTS `customer_version`;
 CREATE TABLE `customer_version`
 (
     `id` INTEGER NOT NULL,
-    `ref` VARCHAR(50),
     `title_id` INTEGER NOT NULL,
+    `lang_id` INTEGER,
+    `ref` VARCHAR(50),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),
     `reseller` TINYINT,
-    `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
+    `enable` TINYINT DEFAULT 0,
+    `confirmation_token` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

@@ -60,6 +60,7 @@ $eventDispatcher = $container->get('event_dispatcher');
 $container->get('thelia.translator');
 $container->get('thelia.url.manager');
 $container->set('request', $request);
+$container->get('request_stack')->push($request);
 $event = new \Thelia\Core\Event\SessionEvent(THELIA_CACHE_DIR.$env, false, $env);
 
 $eventDispatcher->dispatch(\Thelia\Core\TheliaKernelEvents::SESSION, $event);

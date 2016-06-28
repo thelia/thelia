@@ -39,7 +39,11 @@ class FixAmountTaxType extends BaseTaxType
     public function getRequirementsDefinition()
     {
         return array(
-            new TaxTypeRequirementDefinition('amount', new FloatType())
+            new TaxTypeRequirementDefinition(
+                'amount',
+                new FloatType(),
+                Translator::getInstance()->trans("Amount")
+            )
         );
     }
 

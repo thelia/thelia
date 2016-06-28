@@ -813,9 +813,26 @@ final class TheliaEvents
     const MODULE_DELETE  = 'thelia.module.delete';
     const MODULE_INSTALL = 'thelia.module.install';
 
-    /* Invoke payment module */
+    /**
+     * Generate the event name for a specific module
+     *
+     * @param string $eventName the event name
+     * @param string $moduleCode the module code
+     *
+     * @return string the event name for the module
+     */
+    public static function getModuleEvent($eventName, $moduleCode)
+    {
+        return sprintf("%s.%s", $eventName, strtolower($moduleCode));
+    }
 
+    /* Payment module */
     const MODULE_PAY = 'thelia.module.pay';
+    const MODULE_PAYMENT_IS_VALID = 'thelia.module.payment.is_valid';
+    const MODULE_PAYMENT_MANAGE_STOCK = 'thelia.module.payment.manage_stock';
+
+    /* Delivery module */
+    const MODULE_DELIVERY_GET_POSTAGE = 'thelia.module.delivery.postage';
 
     /**
      * Hook
@@ -849,6 +866,7 @@ final class TheliaEvents
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
     const NEWSLETTER_UPDATE = 'thelia.newsletter.update';
     const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
+    const NEWSLETTER_CONFIRM_SUBSCRIPTION = 'thelia.newsletter.confirmSubscription';
 
     /************ LANG MANAGEMENT ****************************/
 
@@ -962,4 +980,20 @@ final class TheliaEvents
 
     const TRANSLATION_GET_STRINGS = 'action.translation.get_strings';
     const TRANSLATION_WRITE_FILE = 'action.translation.write_file';
+
+    // -- ORDER STATUS EVENTS -----------------------------------------------
+    const BEFORE_CREATE_ORDER_STATUS    = "action.before_createOrderStatus";
+    const ORDER_STATUS_CREATE           = "action.createOrderStatus";
+    const AFTER_CREATE_ORDER_STATUS     = "action.after_createOrderStatus";
+
+    const BEFORE_UPDATE_ORDER_STATUS    = "action.before_updateOrderStatus";
+    const ORDER_STATUS_UPDATE           = "action.updateOrderStatus";
+    const AFTER_UPDATE_ORDER_STATUS     = "action.after_updateOrderStatus";
+
+    const BEFORE_DELETE_ORDER_STATUS    = "action.before_deleteOrderStatus";
+    const ORDER_STATUS_DELETE           = "action.deleteOrderStatus";
+    const AFTER_DELETE_ORDER_STATUS     = "action.after_deleteOrderStatus";
+
+    const ORDER_STATUS_UPDATE_POSITION  = "action.updateOrderStatusPosition";
+    // -- END ORDER STATUS EVENTS -----------------------------------------------
 }

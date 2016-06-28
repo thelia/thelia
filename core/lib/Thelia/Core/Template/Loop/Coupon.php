@@ -98,7 +98,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($inUse !== null) {
             // Get the code of coupons currently in use
-            $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
+            $consumedCoupons = $this->getCurrentRequest()->getSession()->getConsumedCoupons();
 
             // Get only matching coupons.
             $criteria = $inUse ? Criteria::IN : Criteria::NOT_IN;

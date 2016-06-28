@@ -72,6 +72,25 @@ abstract class OrderStatus implements ActiveRecordInterface
     protected $code;
 
     /**
+     * The value for the color field.
+     * @var        string
+     */
+    protected $color;
+
+    /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
+     * The value for the protected_status field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $protected_status;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -130,10 +149,23 @@ abstract class OrderStatus implements ActiveRecordInterface
     protected $orderStatusI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->protected_status = false;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\OrderStatus object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -410,6 +442,39 @@ abstract class OrderStatus implements ActiveRecordInterface
     }
 
     /**
+     * Get the [color] column value.
+     *
+     * @return   string
+     */
+    public function getColor()
+    {
+
+        return $this->color;
+    }
+
+    /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
+     * Get the [protected_status] column value.
+     *
+     * @return   boolean
+     */
+    public function getProtectedStatus()
+    {
+
+        return $this->protected_status;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -492,6 +557,77 @@ abstract class OrderStatus implements ActiveRecordInterface
     } // setCode()
 
     /**
+     * Set the value of [color] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderStatus The current object (for fluent API support)
+     */
+    public function setColor($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->color !== $v) {
+            $this->color = $v;
+            $this->modifiedColumns[OrderStatusTableMap::COLOR] = true;
+        }
+
+
+        return $this;
+    } // setColor()
+
+    /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderStatus The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[OrderStatusTableMap::POSITION] = true;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
+     * Sets the value of the [protected_status] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\OrderStatus The current object (for fluent API support)
+     */
+    public function setProtectedStatus($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->protected_status !== $v) {
+            $this->protected_status = $v;
+            $this->modifiedColumns[OrderStatusTableMap::PROTECTED_STATUS] = true;
+        }
+
+
+        return $this;
+    } // setProtectedStatus()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -543,6 +679,10 @@ abstract class OrderStatus implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->protected_status !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -576,13 +716,22 @@ abstract class OrderStatus implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OrderStatusTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
             $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderStatusTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderStatusTableMap::translateFieldName('Color', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->color = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderStatusTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderStatusTableMap::translateFieldName('ProtectedStatus', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->protected_status = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderStatusTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderStatusTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderStatusTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -595,7 +744,7 @@ abstract class OrderStatus implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = OrderStatusTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = OrderStatusTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderStatus object", 0, $e);
@@ -859,6 +1008,15 @@ abstract class OrderStatus implements ActiveRecordInterface
         if ($this->isColumnModified(OrderStatusTableMap::CODE)) {
             $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
+        if ($this->isColumnModified(OrderStatusTableMap::COLOR)) {
+            $modifiedColumns[':p' . $index++]  = '`COLOR`';
+        }
+        if ($this->isColumnModified(OrderStatusTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+        }
+        if ($this->isColumnModified(OrderStatusTableMap::PROTECTED_STATUS)) {
+            $modifiedColumns[':p' . $index++]  = '`PROTECTED_STATUS`';
+        }
         if ($this->isColumnModified(OrderStatusTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -881,6 +1039,15 @@ abstract class OrderStatus implements ActiveRecordInterface
                         break;
                     case '`CODE`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
+                        break;
+                    case '`COLOR`':
+                        $stmt->bindValue($identifier, $this->color, PDO::PARAM_STR);
+                        break;
+                    case '`POSITION`':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
+                        break;
+                    case '`PROTECTED_STATUS`':
+                        $stmt->bindValue($identifier, (int) $this->protected_status, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -957,9 +1124,18 @@ abstract class OrderStatus implements ActiveRecordInterface
                 return $this->getCode();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getColor();
                 break;
             case 3:
+                return $this->getPosition();
+                break;
+            case 4:
+                return $this->getProtectedStatus();
+                break;
+            case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -993,8 +1169,11 @@ abstract class OrderStatus implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getColor(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getProtectedStatus(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1049,9 +1228,18 @@ abstract class OrderStatus implements ActiveRecordInterface
                 $this->setCode($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setColor($value);
                 break;
             case 3:
+                $this->setPosition($value);
+                break;
+            case 4:
+                $this->setProtectedStatus($value);
+                break;
+            case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1080,8 +1268,11 @@ abstract class OrderStatus implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setColor($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setProtectedStatus($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1095,6 +1286,9 @@ abstract class OrderStatus implements ActiveRecordInterface
 
         if ($this->isColumnModified(OrderStatusTableMap::ID)) $criteria->add(OrderStatusTableMap::ID, $this->id);
         if ($this->isColumnModified(OrderStatusTableMap::CODE)) $criteria->add(OrderStatusTableMap::CODE, $this->code);
+        if ($this->isColumnModified(OrderStatusTableMap::COLOR)) $criteria->add(OrderStatusTableMap::COLOR, $this->color);
+        if ($this->isColumnModified(OrderStatusTableMap::POSITION)) $criteria->add(OrderStatusTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(OrderStatusTableMap::PROTECTED_STATUS)) $criteria->add(OrderStatusTableMap::PROTECTED_STATUS, $this->protected_status);
         if ($this->isColumnModified(OrderStatusTableMap::CREATED_AT)) $criteria->add(OrderStatusTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderStatusTableMap::UPDATED_AT)) $criteria->add(OrderStatusTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1161,6 +1355,9 @@ abstract class OrderStatus implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
+        $copyObj->setColor($this->getColor());
+        $copyObj->setPosition($this->getPosition());
+        $copyObj->setProtectedStatus($this->getProtectedStatus());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1855,10 +2052,14 @@ abstract class OrderStatus implements ActiveRecordInterface
     {
         $this->id = null;
         $this->code = null;
+        $this->color = null;
+        $this->position = null;
+        $this->protected_status = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

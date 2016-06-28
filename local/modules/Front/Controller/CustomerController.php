@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Front\Front;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
@@ -31,6 +32,7 @@ use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Form\CustomerLogin;
@@ -39,6 +41,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
@@ -180,6 +183,10 @@ class CustomerController extends BaseFrontController
                     } else {
                         $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
                     }
+                }
+
+                if (ConfigQuery::isCustomerEmailConfirmationEnable() && ! $newCustomer->getEnable()) {
+                    return $this->generateRedirectFromRoute('customer.login.view');
                 }
 
                 $this->processLogin($customerCreateEvent->getCustomer());
@@ -410,7 +417,7 @@ class CustomerController extends BaseFrontController
      */
     public function loginAction()
     {
-        if (! $this->getSecurityContext()->hasCustomerUser()) {
+        if (!$this->getSecurityContext()->hasCustomerUser()) {
             $request = $this->getRequest();
             $customerLoginForm = new CustomerLogin($request);
 
@@ -418,12 +425,10 @@ class CustomerController extends BaseFrontController
                 $form = $this->validateForm($customerLoginForm, "post");
 
                 // If User is a new customer
-                if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
+                if ($form->get('account')->getData() == 0 && $form->get("email")->getErrors()->count() == 0) {
                     return $this->generateRedirectFromRoute(
                         "customer.create.process",
-                        array(
-                            "email" => $form->get("email")->getData()
-                        )
+                        ["email" => $form->get("email")->getData()]
                     );
                 } else {
                     try {
@@ -455,6 +460,15 @@ class CustomerController extends BaseFrontController
                     } catch (WrongPasswordException $e) {
                         $message = $this->getTranslator()->trans(
                             "Wrong email or password. Please try again",
+                            [],
+                            Front::MESSAGE_DOMAIN
+                        );
+                    } catch (CustomerNotConfirmedException $e) {
+                        if ($e->getUser() !== null) {
+                            $this->getMailer()->sendEmailToCustomer('customer_confirmation', $e->getUser(), ['customer' => $e->getUser()]);
+                        }
+                        $message = $this->getTranslator()->trans(
+                            "Your account is not yet confirmed, please check out your mailbox",
                             [],
                             Front::MESSAGE_DOMAIN
                         );
@@ -512,6 +526,27 @@ class CustomerController extends BaseFrontController
 
         // Redirect to home page
         return $this->generateRedirect(URL::getInstance()->getIndexPage());
+    }
+
+    /**
+     * @param $token
+     * @return \Thelia\Core\HttpFoundation\Response
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function confirmCustomerAction($token)
+    {
+        /** @var Customer $customer */
+        if (null === $customer = CustomerQuery::create()->findOneByConfirmationToken($token)) {
+            throw new NotFoundHttpException();
+        }
+
+        $customer
+            ->setEnable(true)
+            ->save()
+        ;
+
+        return $this->generateRedirectFromRoute('customer.login.view');
     }
 
     /**

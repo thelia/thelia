@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' country ' => ' le pays',
     ' migrated to ' => 'migré vers',
     ' state ' => ' état ',
@@ -23,9 +23,9 @@ return array(
     'New country' => 'Nouveau pays',
     'Now, countries has been splited in countries and states.' => 'Les pays ont été séparé en pays et états.',
     'Old country' => 'Ancien pays',
-    'State' => 'Etat',
+    'State' => 'État/région',
     'The migration proccess is tricky and couldn\'t be automated.' => 'Le processus de migration est compliqué et ne peux pas être automatisé',
     'The migration will change the address, tax rules and shipping zones to match with the new system.' => 'La migration changera les adresses, les règles de taxe et les zones de livraisons pour fonctionner avec le nouveau système.',
     'The update proccess has created new countries (even if it exists) and associated states.' => 'Le processus de mise à jour a créé de nouveaux pays (même si il existait) et associé des états.',
     'We added a \'default\' state with a blank name as a fallback. Customer will have the possibility to change it later.' => 'Nous avons ajouté un état par \'défaut\' avec un nom vide.  Par la suite, le client pourra le changer.',
-);
+];

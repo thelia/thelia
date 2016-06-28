@@ -32,15 +32,21 @@ class TaxTypeRequirementDefinition
     protected $type;
 
     /**
+     * @var string The translated requirement title
+     */
+    protected $title;
+
+    /**
      * Create a new Tax type requirement
      *
      * @param string        $name the name of the requirement
      * @param TypeInterface $type the type of the data
      */
-    public function __construct($name, TypeInterface $type)
+    public function __construct($name, TypeInterface $type, $title = null)
     {
         $this->name = $name;
         $this->type = $type;
+        $this->title = $title ?: $name;
     }
 
     public function getName()
@@ -51,6 +57,11 @@ class TaxTypeRequirementDefinition
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     public function isValueValid($value)

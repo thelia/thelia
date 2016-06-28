@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Coupon code can\'t be empty' => 'Gutschein-Code darf nicht leer sein',
     'Delivery address does not belong to the current customer' => 'Lieferadresse gehört nicht zum aktuellen Kunden',
     'Delivery module cannot be use with selected delivery address' => 'Lieferung-Modul kann nicht mit ausgewählten Lieferadresse verwendet werden',
@@ -19,4 +19,4 @@ return array(
     'To enable the virtual product feature, the VirtualProductDelivery module should be activated' => 'Um das virtuelle Produkt-Feature zu aktivieren, sollte das VirtualProductDelivery-Modul aktiviert werden',
     'Wrong email or password. Please try again' => 'E-Mail oder Passwort falsch. Bitte erneut versuchen',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'Sie sind derzeit angemeldet. Bitte melden Sie sich ab, bevor Sie ein neues Passwort anfordern.',
-);
+];

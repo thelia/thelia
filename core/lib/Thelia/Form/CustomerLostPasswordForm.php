@@ -80,6 +80,6 @@ class CustomerLostPasswordForm extends FirewallForm
      */
     public function getName()
     {
-        return "thelia_customer_creation";
+        return "thelia_customer_lost_password";
     }
 }

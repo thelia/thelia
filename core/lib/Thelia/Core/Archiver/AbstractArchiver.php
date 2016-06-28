@@ -28,6 +28,21 @@ abstract class AbstractArchiver implements ArchiverInterface
      */
     protected $archivePath;
 
+    public function __construct()
+    {
+      if (!$this->isAvailable()) {
+        throw new Exception(
+          Translator::getInstance()->trans(
+            "The archiver :name is not available. Please install the php extension :extension first.",
+            [
+              ':name'      => $this->getName(),
+              ':extension' => $this->getExtension(),
+            ]
+          )
+        );
+      }
+    }
+
     public function getArchivePath()
     {
         return $this->archivePath;

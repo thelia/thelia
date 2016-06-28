@@ -8,7 +8,7 @@
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
         <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
-        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.inline.class">Thelia\Core\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
 
         <!--
         The list of Model classes which suppoorts image or document management.
@@ -63,6 +63,7 @@
                 <parameter key="HOOK">admin.hook</parameter>
                 <parameter key="MODULE_HOOK">admin.module-hook</parameter>
                 <parameter key="ORDER">admin.order</parameter>
+                <parameter key="ORDER_STATUS">admin.configuration.order-status</parameter>
                 <parameter key="PRODUCT">admin.product</parameter>
                 <parameter key="PROFILE">admin.configuration.profile</parameter>
                 <parameter key="SHIPPING_ZONE">admin.configuration.shipping-zone</parameter>
@@ -90,6 +91,9 @@
 
         <!-- Thelia logger class -->
         <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
+
+        <!-- Thelia Cache Config -->
+        <parameter key="thelia.cache.namespace">thelia_cache</parameter>
     </parameters>
 
 
@@ -137,11 +141,6 @@
             <tag name="thelia.asset.filter" key="less" />
             <tag name="kernel.event_subscriber"/>
             <argument>%kernel.environment%</argument>
-        </service>
-
-        <service id="less_legacy.assetic.filter" class="Assetic\Filter\LessphpFilter">
-            <argument key="identifier">less_legacy</argument>
-            <tag name="thelia.asset.filter" key="less_legacy" />
         </service>
 
         <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
@@ -357,16 +356,24 @@
             <argument>%admin.resources%</argument>
         </service>
 
-
         <!-- Handlers -->
         <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
             <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="thelia.serializer.manager" />
             <argument type="service" id="thelia.archiver.manager" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <!-- Cache -->
+        <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
+            <argument>%thelia.cache.namespace%</argument>
+            <argument>600</argument>
+            <argument>%kernel.cache_dir%</argument>
         </service>
     </services>
 </config>

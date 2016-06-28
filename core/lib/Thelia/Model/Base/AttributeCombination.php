@@ -79,6 +79,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $product_sale_elements_id;
 
     /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -405,6 +411,17 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -520,6 +537,27 @@ abstract class AttributeCombination implements ActiveRecordInterface
     } // setProductSaleElementsId()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[AttributeCombinationTableMap::POSITION] = true;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -607,13 +645,16 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeCombinationTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AttributeCombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AttributeCombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -626,7 +667,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = AttributeCombinationTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = AttributeCombinationTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\AttributeCombination object", 0, $e);
@@ -889,6 +930,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
             $modifiedColumns[':p' . $index++]  = '`PRODUCT_SALE_ELEMENTS_ID`';
         }
+        if ($this->isColumnModified(AttributeCombinationTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+        }
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -914,6 +958,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
                         break;
                     case '`PRODUCT_SALE_ELEMENTS_ID`':
                         $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
+                        break;
+                    case '`POSITION`':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -986,9 +1033,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 return $this->getProductSaleElementsId();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1023,8 +1073,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $keys[0] => $this->getAttributeId(),
             $keys[1] => $this->getAttributeAvId(),
             $keys[2] => $this->getProductSaleElementsId(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1085,9 +1136,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->setProductSaleElementsId($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1117,8 +1171,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setAttributeId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setAttributeAvId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setProductSaleElementsId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1133,6 +1188,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_ID, $this->attribute_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_AV_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
+        if ($this->isColumnModified(AttributeCombinationTableMap::POSITION)) $criteria->add(AttributeCombinationTableMap::POSITION, $this->position);
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) $criteria->add(AttributeCombinationTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeCombinationTableMap::UPDATED_AT)) $criteria->add(AttributeCombinationTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1211,6 +1267,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $copyObj->setAttributeId($this->getAttributeId());
         $copyObj->setAttributeAvId($this->getAttributeAvId());
         $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1401,6 +1458,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $this->attribute_id = null;
         $this->attribute_av_id = null;
         $this->product_sale_elements_id = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

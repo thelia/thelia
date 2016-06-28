@@ -15,13 +15,23 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Routing\RequestContext;
 use Thelia\Core\Application;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
+use Thelia\Tools\URL;
 
 /**
  * Command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
@@ -68,5 +78,55 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
         }
 
         return $container->get('event_dispatcher');
+    }
+
+    /**
+     * For init an Request, if your command has need an Request
+     * @param Lang|null $lang
+     * @since 2.3
+     */
+    protected function initRequest(Lang $lang = null)
+    {
+        $container = $this->getContainer();
+
+        $request = Request::create($this->getBaseUrl($lang));
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $container->set("request_stack", new RequestStack());
+        $container->get('request_stack')->push($request);
+
+        $requestContext = new RequestContext();
+        $requestContext->fromRequest($request);
+        $url = new URL($container);
+        $url->setRequestContext($requestContext);
+    }
+
+    /**
+     * @param Lang|null $lang
+     * @return string
+     * @since 2.3
+     */
+    protected function getBaseUrl(Lang $lang = null)
+    {
+        $baseUrl = '';
+
+        if ((int) ConfigQuery::read('one_domain_foreach_lang') === 1) {
+            if ($lang === null) {
+                $lang = LangQuery::create()->findOneByByDefault(true);
+            }
+
+            $baseUrl = $lang->getUrl();
+        }
+
+        $baseUrl = trim($baseUrl);
+
+        if (empty($baseUrl)) {
+            $baseUrl = ConfigQuery::read('url_site');
+        }
+
+        if (empty($baseUrl)) {
+            $baseUrl = 'http://localhost';
+        }
+
+        return $baseUrl;
     }
 }

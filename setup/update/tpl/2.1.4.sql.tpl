@@ -17,6 +17,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
 {foreach $locales as $locale}
     (@max_id+1, '{$locale}', {intl l="Export modal or page - top" locale=$locale}, '', ''),
     (@max_id+2, '{$locale}', {intl l="Export modal or page - bottom" locale=$locale}, '', ''){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 

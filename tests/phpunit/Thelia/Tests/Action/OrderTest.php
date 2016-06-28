@@ -515,7 +515,7 @@ class OrderTest extends BaseAction
         $this->orderEvent->setStatus($newStatus);
         $this->orderEvent->setOrder($order);
 
-        $this->orderAction->updateStatus($this->orderEvent);
+        $this->orderAction->updateStatus($this->orderEvent, null, $this->getMockEventDispatcher());
 
         $this->assertEquals(
             $newStatus,

@@ -19,6 +19,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
@@ -32,6 +33,7 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -80,6 +82,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     protected $timestampable = true;
     protected $versionable = true;
 
+    use StandardI18nFieldsSearchTrait;
+    
     /**
      * @return ArgumentCollection
      */
@@ -171,10 +175,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function getSearchIn()
     {
-        return [
-            "ref",
-            "title",
-        ];
+        return array_merge(
+            [ 'ref' ],
+            $this->getStandardI18nSearchFields()
+        );
     }
 
     /**
@@ -186,6 +190,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
+
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
                 $search->_or();
@@ -194,18 +199,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 case "ref":
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
-                case "title":
-                    $search->where(
-                        "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-                        THEN `requested_locale_i18n`.`TITLE`
-                        ELSE `default_locale_i18n`.`TITLE`
-                        END ".$searchCriteria." ?",
-                        $searchTerm,
-                        \PDO::PARAM_STR
-                    );
-                    break;
             }
         }
+
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -231,7 +228,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $price = $product->getVirtualColumn('price');
 
-            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+            if (!$this->getBackendContext()
+                && $securityContext->hasCustomerUser()
+                && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
             }
 
@@ -245,7 +244,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
             $promoPrice = $product->getVirtualColumn('promo_price');
 
-            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+            if (!$this->getBackendContext()
+                && $securityContext->hasCustomerUser()
+                && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
             }
             try {
@@ -353,7 +354,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("META_TITLE", $product->getVirtualColumn('i18n_META_TITLE'))
             ->set("META_DESCRIPTION", $product->getVirtualColumn('i18n_META_DESCRIPTION'))
             ->set("META_KEYWORDS", $product->getVirtualColumn('i18n_META_KEYWORDS'))
-            ->set("POSITION", $product->getPosition())
+            ->set("POSITION", $product->getVirtualColumn('position_delegate'))
             ->set("VIRTUAL", $product->getVirtual() ? "1" : "0")
             ->set("VISIBLE", $product->getVisible() ? "1" : "0")
             ->set("TEMPLATE", $product->getTemplateId())
@@ -362,44 +363,63 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("BRAND_ID", $product->getBrandId() ?: 0)
             ->set("SHOW_ORIGINAL_PRICE", $display_initial_price);
 
-        if ($this->getWithPrevNextInfo()) {
-            $visible = $this->getWithPrevNextVisible();
-
-            // Find previous and next category
-            $previousSearch = ProductQuery::create()
-                ->joinProductCategory()
-                ->where('ProductCategory.category_id = ?', $default_category_id)
-                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
-                ->orderByPosition(Criteria::DESC);
-
-            if ($visible !== Type\BooleanOrBothType::ANY) {
-                $previousSearch->filterByVisible($visible ? 1 : 0);
-            }
-
-            $previous = $previousSearch->findOne();
-
-            $nextSearch = ProductQuery::create()
-                ->joinProductCategory()
-                ->where('ProductCategory.category_id = ?', $default_category_id)
-                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
-                ->orderByPosition(Criteria::ASC);
-
-            if ($visible !== Type\BooleanOrBothType::ANY) {
-                $nextSearch->filterByVisible($visible ? 1 : 0);
-            }
-
-            $next = $nextSearch->findOne();
-
-            $loopResultRow
-                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                ->set("HAS_NEXT", $next != null ? 1 : 0)
-                ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                ->set("NEXT", $next != null ? $next->getId() : -1);
-        }
+        $this->findNextPrev($loopResultRow, $product, $default_category_id);
 
         return $loopResultRow;
     }
 
+    /**
+     * @param LoopResultRow $loopResultRow
+     * @param ProductModel $product
+     * @param int $defaultFolderId
+     */
+    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultFolderId)
+    {
+        if ($this->getWithPrevNextInfo()) {
+            $currentPosition = ProductCategoryQuery::create()
+                ->filterByCategoryId($defaultFolderId)
+                ->filterByProductId($product->getId())
+                ->findOne()->getPosition();
+
+            // Find previous and next product
+            $previousQuery = ProductCategoryQuery::create()
+                ->filterByCategoryId($defaultFolderId)
+                ->filterByPosition($currentPosition, Criteria::LESS_THAN);
+
+            $nextQuery = ProductCategoryQuery::create()
+                ->filterByCategoryId($defaultFolderId)
+                ->filterByPosition($currentPosition, Criteria::GREATER_THAN);
+
+            if (!$this->getBackendContext()) {
+                $previousQuery->useProductQuery()
+                    ->filterByVisible(true)
+                    ->endUse();
+
+                $previousQuery->useProductQuery()
+                    ->filterByVisible(true)
+                    ->endUse();
+            }
+
+            $previous = $previousQuery
+                ->orderByPosition(Criteria::DESC)
+                ->findOne();
+
+            $next = $nextQuery
+                ->orderByPosition(Criteria::ASC)
+                ->findOne();
+
+            $loopResultRow
+                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                ->set("HAS_NEXT", $next != null ? 1 : 0)
+                ->set("PREVIOUS", $previous != null ? $previous->getProductId() : -1)
+                ->set("NEXT", $next != null ? $next->getProductId() : -1);
+        }
+    }
+
+    /**
+     * @param ProductQuery $search
+     * @param string[] $feature_availability
+     */
     protected function manageFeatureAv(&$search, $feature_availability)
     {
         if (null !== $feature_availability) {
@@ -431,6 +451,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
     }
 
+    /**
+     * @param ProductQuery $search
+     * @param string[] $feature_values
+     */
     protected function manageFeatureValue(&$search, $feature_values)
     {
         if (null !== $feature_values) {
@@ -473,7 +497,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
         } else {
-            $currency = $this->request->getSession()->getCurrency();
+            $currency = $this->getCurrentRequest()->getSession()->getCurrency();
         }
 
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
@@ -547,7 +571,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $manualOrderAllowed = false;
@@ -555,7 +579,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null !== $categoryDefault = $this->getCategoryDefault()) {
             // Select the products which have $categoryDefault as the default category.
             $search
-                ->useProductCategoryQuery('DefaultCategorySelect')
+                ->useProductCategoryQuery('CategorySelect')
                     ->filterByDefaultCategory(true)
                     ->filterByCategoryId($categoryDefault, Criteria::IN)
                 ->endUse()
@@ -563,9 +587,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             // We can only sort by position if we have a single category ID
             $manualOrderAllowed = (1 == count($categoryDefault));
-        }
-
-        if (null !== $categoryIdList = $this->getCategory()) {
+        } elseif (null !== $categoryIdList = $this->getCategory()) {
             // Select all products which have one of the required categories as the default one, or an associated one
             $depth = $this->getDepth();
 
@@ -579,14 +601,22 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             // We can only sort by position if we have a single category ID, with a depth of 1
             $manualOrderAllowed = (1 == $depth && 1 == count($categoryIdList));
+        } else {
+            $search
+                ->useProductCategoryQuery('CategorySelect')
+                ->filterByDefaultCategory(true)
+                ->endUse()
+            ;
         }
+
+        $search->withColumn('`CategorySelect`.POSITION', 'position_delegate');
 
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("product_id"), Criteria::EQUAL);
+            $search->filterById($this->getCurrentRequest()->get("product_id"), Criteria::EQUAL);
         } elseif ($current === false) {
-            $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get("product_id"), Criteria::NOT_IN);
         }
 
         $brand_id = $this->getBrand();
@@ -619,7 +649,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if ($current_category === true) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->request->get("product_id")),
+                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get("product_id")),
                     Criteria::IN
                 )->find(),
                 Criteria::IN
@@ -627,7 +657,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         } elseif ($current_category === false) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->request->get("product_id")),
+                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get("product_id")),
                     Criteria::IN
                 )->find(),
                 Criteria::NOT_IN
@@ -988,7 +1018,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case "min_price":
                     if ($complex) {
-                        $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
+                        $search->addAscendingOrderByColumn('real_lowest_price');
                     } else {
                         $search->addAscendingOrderByColumn('real_price');
                     }
@@ -1004,13 +1034,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     if (! $manualOrderAllowed) {
                         throw new \InvalidArgumentException('Manual order require a *single* category ID or category_default ID, and a depth <= 1');
                     }
-                    $search->orderByPosition(Criteria::ASC);
+                    $search->addAscendingOrderByColumn('position_delegate');
                     break;
                 case "manual_reverse":
                     if (! $manualOrderAllowed) {
                         throw new \InvalidArgumentException('Manual reverse order require a *single* category ID or category_default ID, and a depth <= 1');
                     }
-                    $search->orderByPosition(Criteria::DESC);
+                    $search->addDescendingOrderByColumn('position_delegate');
                     break;
                 case "ref":
                     $search->orderByRef(Criteria::ASC);

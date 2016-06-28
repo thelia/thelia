@@ -159,7 +159,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $con->commit();
         } catch (\Exception $e) {
-            $con->rollback();
+            $con->rollBack();
             throw $e;
         }
     }
@@ -341,7 +341,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 }
 
                 // Update default category (if required)
-                $product->updateDefaultCategory($event->getDefaultCategory());
+                $product->setDefaultCategory($event->getDefaultCategory());
 
                 $event->setProduct($product);
                 $con->commit();
@@ -386,7 +386,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['list'] = ProductDocumentQuery::create()
                     ->findByProductId($event->getProductId());
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-
+                
                 // Delete product
                 $product
                     ->setDispatcher($this->eventDispatcher)
@@ -405,7 +405,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 $con->commit();
             } catch (\Exception $e) {
-                $con->rollback();
+                $con->rollBack();
                 throw $e;
             }
         }
@@ -438,7 +438,13 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ProductQuery::create(), $event, $dispatcher);
+        $this->genericUpdateDelegatePosition(
+            ProductCategoryQuery::create()
+                ->filterByProductId($event->getObjectId())
+                ->filterByCategoryId($event->getReferrerId()),
+            $event,
+            $dispatcher
+        );
     }
 
     public function addContent(ProductAddContentEvent $event)
@@ -478,14 +484,14 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByProduct($event->getProduct())
             ->filterByCategoryId($event->getCategoryId())
             ->count() <= 0) {
-            $productCategory = new ProductCategory();
-
-            $productCategory
+            $productCategory = (new ProductCategory())
                 ->setProduct($event->getProduct())
                 ->setCategoryId($event->getCategoryId())
-                ->setDefaultCategory(false)
-                ->save()
-            ;
+                ->setDefaultCategory(false);
+
+            $productCategory
+                ->setPosition($productCategory->getNextPosition())
+                ->save();
         }
     }
 
@@ -591,7 +597,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Store all the stuff !
             $con->commit();
         } catch (\Exception $ex) {
-            $con->rollback();
+            $con->rollBack();
 
             throw $ex;
         }

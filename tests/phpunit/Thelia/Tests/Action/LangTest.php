@@ -86,12 +86,12 @@ class LangTest extends ContainerAwareTestCase
         $this->assertEquals('te_TE', $createdLang->getLocale());
         $this->assertEquals('test', $createdLang->getTitle());
         $this->assertEquals('TES', $createdLang->getCode());
+        $this->assertEquals('Y-m-d H:i:s', $createdLang->getDatetimeFormat());
         $this->assertEquals('Y-m-d', $createdLang->getDateFormat());
         $this->assertEquals('H:i:s', $createdLang->getTimeFormat());
         $this->assertEquals('.', $createdLang->getDecimalSeparator());
         $this->assertEquals(' ', $createdLang->getThousandsSeparator());
         $this->assertEquals('2', $createdLang->getDecimals());
-        $this->assertEquals('Y-m-d H:i:s', $createdLang->getDatetimeFormat());
 
         return $createdLang;
     }
@@ -117,6 +117,7 @@ class LangTest extends ContainerAwareTestCase
         ;
 
         $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+
         $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
@@ -132,6 +133,16 @@ class LangTest extends ContainerAwareTestCase
         $this->assertEquals('.', $updatedLang->getThousandsSeparator());
         $this->assertEquals('1', $updatedLang->getDecimals());
         $this->assertEquals('d-m-Y H-i-s', $updatedLang->getDatetimeFormat());
+
+        // set a specific date/time format
+        $event->setDateTimeFormat('d/m/Y H:i:s');
+
+        $action->update($event, null, $this->getMockEventDispatcher());
+
+        $updatedLang = $event->getLang();
+
+        $this->assertInstanceOf('Thelia\Model\Lang', $updatedLang);
+        $this->assertEquals('d/m/Y H:i:s', $updatedLang->getDatetimeFormat());
 
         return $updatedLang;
     }

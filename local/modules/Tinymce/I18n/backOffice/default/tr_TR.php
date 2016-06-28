@@ -1,7 +1,7 @@
 <?php
 
-return array(
+return [
     'File manager' => 'Dosya Yöneticisi',
     'None' => 'Yok',
     'Responsive' => 'Duyarlı',
-);
+];

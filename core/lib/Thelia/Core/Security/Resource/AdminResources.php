@@ -97,6 +97,8 @@ class AdminResources
 
     const ORDER = "admin.order";
 
+    const ORDER_STATUS = "admin.configuration.order-status";
+
     const PRODUCT = "admin.product";
 
     const PROFILE = "admin.configuration.profile";

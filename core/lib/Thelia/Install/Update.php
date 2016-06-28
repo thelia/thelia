@@ -95,7 +95,8 @@ class Update
             $this->connection = new \PDO(
                 $dbConfig['dsn'],
                 $dbConfig['user'],
-                $dbConfig['password']
+                $dbConfig['password'],
+                [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"]
             );
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
@@ -595,7 +596,13 @@ class Update
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($curl, CURLOPT_TIMEOUT, 5);
         $res = curl_exec($curl);
-        if (Version::parse($res))
-            return $res;
+
+        try {
+            if (Version::parse($res)) {
+                return $res;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

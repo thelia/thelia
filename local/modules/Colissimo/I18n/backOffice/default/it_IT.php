@@ -1,34 +1,13 @@
 <?php
 
-return array(
-    '*If you choose this option, the exported orders would not be available on this page anymore' => '',
+return [
     'Actions' => 'Azioni',
-    'An error occured' => '',
-    'Area : ' => '',
     'Cancel' => 'Annulla',
-    'Change orders status after export' => '',
-    'Colissimo Module allows to send your products all around the world with La Poste.' => '',
     'Create' => 'Creare',
-    'Create a new price slice' => '',
-    'Create a price slice' => '',
     'Date' => 'Data',
     'Delete' => 'Cancellare',
-    'Delete a price slice' => '',
-    'Delete this price slice' => '',
-    'Do not change' => '',
-    'Do you really want to delete this slice ?' => '',
     'Edit' => 'Modifica',
-    'Edit a price slice' => '',
-    'Edit this price slice' => '',
     'Export' => 'Esporta',
-    'Export expeditor inet file' => '',
-    'Please change the access rights' => '',
-    'Price (€)' => '',
-    'Price slices' => '',
-    'Processing' => '',
-    'REF' => '',
-    'Sent' => '',
-    'There is currently not orders to export' => '',
-    'Total taxed amount' => '',
-    'Weight up to ... (kg)' => '',
-);
+    'Number of packages' => 'Numero di pacchetti',
+    'Packages weight' => 'Peso pacchi',
+];

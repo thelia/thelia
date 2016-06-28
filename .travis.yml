@@ -1,4 +1,7 @@
 language: php
+cache:
+  directories:
+    - $HOME/.composer/cache
 php:
 - 5.4
 - 5.5
@@ -8,6 +11,7 @@ php:
 matrix:
   allow_failures:
   - php: nightly
+  - php: 5.4
 env:
 - DB_USER=root DB_HOST=127.0.0.1
 before_script:
@@ -16,7 +20,7 @@ before_script:
 - phpenv config-add travis.php.ini
 - phpenv config-rm xdebug.ini
 - composer self-update
-- composer install --prefer-dist --dev
+- composer install --no-interaction --prefer-dist
 - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS
   thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
 - php Thelia thelia:install --db_host=$DB_HOST --db_username=$DB_USER --db_name=thelia

@@ -1,5 +1,9 @@
 {capture name="module_include"}
-    {hook name="$hook" location="$location" id="$id" view="$view" countvar="module_count"}
+    {if $location}
+        {hook name="$hook" location="$location" id="$id" view="$view" countvar="module_count"}
+    {else}
+        {hook name="$hook" id="$id" view="$view" countvar="module_count"}
+    {/if}
 {/capture}
 
 {if trim($smarty.capture.module_include) == ''}

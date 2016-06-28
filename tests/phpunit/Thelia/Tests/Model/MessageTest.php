@@ -29,7 +29,7 @@ use TheliaSmarty\Template\SmartyParser;
 
 /**
  * Class CustomerTest
- * @package Thelia\Tests\Action
+ * @package Thelia\Tests\Model
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class MessageTest extends \PHPUnit_Framework_TestCase

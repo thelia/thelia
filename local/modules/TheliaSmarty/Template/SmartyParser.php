@@ -16,6 +16,7 @@ use \Smarty;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
@@ -25,6 +26,7 @@ use Imagine\Exception\InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 
 /**
  *
@@ -58,6 +60,12 @@ class SmartyParser extends Smarty implements ParserInterface
     /** @var int */
     protected $status = 200;
 
+    /** @var string */
+    protected $env;
+
+    /** @var bool */
+    protected $debug;
+
     /**
      * @param RequestStack             $requestStack
      * @param EventDispatcherInterface $dispatcher
@@ -80,15 +88,17 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->dispatcher = $dispatcher;
         $this->parserContext = $parserContext;
         $this->templateHelper = $templateHelper;
+        $this->env = $env;
+        $this->debug = $debug;
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'compile';
+        $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'compile';
         if (! is_dir($compile_dir)) {
             @mkdir($compile_dir, 0777, true);
         }
 
-        $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'cache';
+        $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'cache';
         if (! is_dir($cache_dir)) {
             @mkdir($cache_dir, 0777, true);
         }
@@ -391,6 +401,25 @@ class SmartyParser extends Smarty implements ParserInterface
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
+
+        // Prepare common template variables
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        $lang = $session ? $session->getLang() : Lang::getDefaultLanguage();
+
+        $parameters = array_merge($parameters, [
+            'locale' => $lang->getLocale(),
+            'lang_code' => $lang->getCode(),
+            'lang_id' => $lang->getId(),
+            'current_url' => $this->getRequest()->getUri(),
+            'app' => (object) [
+                'environment' => $this->env,
+                'request' => $this->getRequest(),
+                'session' => $session,
+                'debug' => $this->debug
+            ]
+        ]);
 
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }

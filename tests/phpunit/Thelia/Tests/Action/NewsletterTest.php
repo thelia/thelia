@@ -9,6 +9,7 @@
 /*      For the full copyright and license information, please view the LICENSE.txt  */
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Newsletter;
@@ -23,6 +24,19 @@ use Thelia\Model\NewsletterQuery;
  */
 class NewsletterTest extends BaseAction
 {
+    protected $mailerFactory;
+    protected $dispatcher;
+
+    public function setUp()
+    {
+        $this->mailerFactory = $this->getMockBuilder("Thelia\\Mailer\\MailerFactory")
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $this->dispatcher = $this->getMockEventDispatcher();
+    }
+
     public static function setUpBeforeClass()
     {
         NewsletterQuery::create()
@@ -38,7 +52,7 @@ class NewsletterTest extends BaseAction
             ->setLastname("bar")
         ;
 
-        $action = new Newsletter();
+        $action = new Newsletter($this->mailerFactory, $this->dispatcher);
         $action->subscribe($event);
 
         $subscribedNewsletter = $event->getNewsletter();
@@ -68,7 +82,7 @@ class NewsletterTest extends BaseAction
             ->setLastname("bar update")
         ;
 
-        $action = new Newsletter();
+        $action = new Newsletter($this->mailerFactory, $this->dispatcher);
         $action->update($event);
 
         $updatedNewsletter = $event->getNewsletter();
@@ -93,7 +107,7 @@ class NewsletterTest extends BaseAction
         $event = new NewsletterEvent('test@foo.com', 'en_US');
         $event->setId($newsletter->getId());
 
-        $action = new Newsletter();
+        $action = new Newsletter($this->mailerFactory, $this->dispatcher);
         $action->unsubscribe($event);
 
         $deletedNewsletter = $event->getNewsletter();

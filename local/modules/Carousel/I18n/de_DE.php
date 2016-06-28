@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'A descriptive title' => 'Beschreibungstitel',
     'A short description, used when a summary or an introduction is required' => 'Eine kurze beschreibung, benutzt wenn eine Zusammenfassung order eine Einleitung ist nötig',
     'A short text, used when an additional or supplemental information is required.' => 'Ein kurzer Text, der verwendet wird, wenn eine zusätzliche oder ergänzende Information erforderlich ist.',
@@ -17,4 +17,4 @@ return array(
     'Summary' => 'Zusammenfassung',
     'The detailed description.' => 'Die detaillierte Beschreibung.',
     'Title' => 'Titel',
-);
+];

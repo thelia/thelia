@@ -79,7 +79,7 @@ class CheckPermission extends BaseInstall
         $this->translator = $translator;
 
         $this->validationMessages['php_version'] =  array(
-            'text' => $this->getI18nPhpVersionText('5.4', phpversion(), true),
+            'text' => $this->getI18nPhpVersionText('5.5', phpversion(), true),
             'hint' =>  $this->getI18nPhpVersionHint(),
             'status' => true
         );
@@ -117,8 +117,8 @@ class CheckPermission extends BaseInstall
      */
     public function exec()
     {
-        if (version_compare(phpversion(), '5.4', '<')) {
-            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText('5.4', phpversion(), false);
+        if (version_compare(phpversion(), '5.5', '<')) {
+            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText('5.5', phpversion(), false);
             $this->validationMessages['php_version']['status'] = false;
             $this->validationMessages['php_version']['hint'] = $this->getI18nPhpVersionHint();
         }

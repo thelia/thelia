@@ -7,7 +7,7 @@
 {block name="page-title"}{intl l='Edit a customer'}{/block}
 
 {block name="check-resource"}admin.customer{/block}
-{block name="check-access"}update{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     <div class="customers edit-customer">
@@ -319,7 +319,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page_order} limit=10}
+                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page_order} limit={config key="number_default_results_per_page.order_list" default=20}}
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}

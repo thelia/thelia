@@ -25,6 +25,7 @@ namespace Front\Controller;
 use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Front\BaseFrontController;
@@ -46,6 +47,7 @@ use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\Exception\DeliveryException;
 
 /**
  * Class OrderController
@@ -65,15 +67,9 @@ class OrderController extends BaseFrontController
         // check if the cart contains only virtual products
         $cart = $this->getSession()->getSessionCart($this->getDispatcher());
 
+        $deliveryAddress = $this->getCustomerAddress();
+
         if ($cart->isVirtual()) {
-            // get the virtual product module
-            $customer = $this->getSecurityContext()->getCustomerUser();
-
-            $deliveryAddress = AddressQuery::create()
-                ->filterByCustomerId($customer->getId())
-                ->orderByIsDefault(Criteria::DESC)
-                ->findOne();
-
             if (null !== $deliveryAddress) {
                 $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery($this->container);
 
@@ -91,7 +87,12 @@ class OrderController extends BaseFrontController
             }
         }
 
-        return $this->render('order-delivery');
+        return $this->render(
+            'order-delivery',
+            [
+                'delivery_address_id' => (null !== $deliveryAddress) ? $deliveryAddress->getId() : null
+            ]
+        );
     }
 
     /**
@@ -103,9 +104,15 @@ class OrderController extends BaseFrontController
     {
         /* get postage amount */
         $deliveryModule = $moduleInstance->getModuleModel();
-        $postage = OrderPostage::loadFromPostage(
-            $moduleInstance->getPostage($deliveryAddress->getCountry())
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+        $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress);
+
+        $this->getDispatcher()->dispatch(
+            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+            $deliveryPostageEvent
         );
+
+        $postage = $deliveryPostageEvent->getPostage();
 
         $orderEvent = $this->getOrderEvent();
         $orderEvent->setDeliveryAddress($deliveryAddress->getId());
@@ -170,9 +177,21 @@ class OrderController extends BaseFrontController
             /* get postage amount */
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-            $postage = OrderPostage::loadFromPostage(
-                $moduleInstance->getPostage($deliveryAddress->getCountry())
+            $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+            $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress);
+
+            $this->getDispatcher()->dispatch(
+                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                $deliveryPostageEvent
             );
+
+            if (!$deliveryPostageEvent->isValidModule() || null === $deliveryPostageEvent->getPostage()) {
+                throw new DeliveryException(
+                    $this->getTranslator()->trans('The delivery module is not valid.', [], Front::MESSAGE_DOMAIN)
+                );
+            }
+
+            $postage = $deliveryPostageEvent->getPostage();
 
             $orderEvent = $this->getOrderEvent();
             $orderEvent->setDeliveryAddress($deliveryAddressId);
@@ -180,7 +199,6 @@ class OrderController extends BaseFrontController
             $orderEvent->setPostage($postage->getAmount());
             $orderEvent->setPostageTax($postage->getAmountTax());
             $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
-
 
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
@@ -376,31 +394,33 @@ class OrderController extends BaseFrontController
 
     public function orderFailed($order_id, $message)
     {
-        /* check if the placed order matched the customer */
-        $failedOrder = OrderQuery::create()->findPk(
-            $this->getRequest()->attributes->get('order_id')
-        );
-
-        if (null === $failedOrder) {
-            throw new TheliaProcessException("No failed order", TheliaProcessException::NO_PLACED_ORDER, $failedOrder);
+        if (empty($order_id)) {
+            // Fallback to request parameter if the method parameter is empty.
+            $order_id = $this->getRequest()->get('order_id');
         }
 
-        $customer = $this->getSecurityContext()->getCustomerUser();
+        $failedOrder = OrderQuery::create()->findPk($order_id);
 
-        if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
-            throw new TheliaProcessException(
-                $this->getTranslator()->trans(
-                    "Received failed order id does not belong to the current customer",
-                    [],
-                    Front::MESSAGE_DOMAIN
-                ),
-                TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
-                $failedOrder
-            );
+        if (null !== $failedOrder) {
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
+                throw new TheliaProcessException(
+                    $this->getTranslator()->trans(
+                        "Received failed order id does not belong to the current customer",
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    ),
+                    TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
+                    $failedOrder
+                );
+            }
+        } else {
+            Tlog::getInstance()->warning("Failed order ID '$order_id' not found.");
         }
 
         $this->getParserContext()
-            ->set("failed_order_id", $failedOrder->getId())
+            ->set("failed_order_id", $order_id)
             ->set("failed_order_message", $message)
         ;
     }
@@ -506,6 +526,7 @@ class OrderController extends BaseFrontController
         $this->checkXmlHttpRequest();
 
         // Change the delivery address if customer has changed it
+        $address = null;
         $session = $this->getSession();
         $addressId = $this->getRequest()->get('address_id', null);
         if (null !== $addressId && $addressId !== $session->getOrder()->getChoosenDeliveryAddress()) {
@@ -515,17 +536,10 @@ class OrderController extends BaseFrontController
             }
         }
 
-        // seems to be not necessary anymore since we have the new adress selected.
-        // keep for compatibility with old template
-        // TODO remove in version 2.3
-        $countryId = $this->getRequest()->get(
-            'country_id',
-            $this->container->get('thelia.taxEngine')->getDeliveryCountry()->getId()
-        );
+        $address = AddressQuery::create()->findPk($session->getOrder()->getChoosenDeliveryAddress());
 
-        $state = $this->container->get('thelia.taxEngine')->getDeliveryState();
-        $stateId = ($state !== null) ? $state->getId() : null;
-        $stateId = $this->getRequest()->get('state_id', $stateId);
+        $countryId = $address->getCountryId();
+        $stateId = $address->getStateId();
 
         $args = array(
             'country' => $countryId,
@@ -552,5 +566,34 @@ class OrderController extends BaseFrontController
         } else {
             return null;
         }
+    }
+
+    /**
+     * Retrieve the chosen delivery address for a cart or the default customer address if not exists
+     *
+     * @return null|Address
+     */
+    protected function getCustomerAddress()
+    {
+        $deliveryAddress = null;
+        $addressId = $this->getSession()->getOrder()->getChoosenDeliveryAddress();
+        if (null === $addressId) {
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            $deliveryAddress = AddressQuery::create()
+                ->filterByCustomerId($customer->getId())
+                ->orderByIsDefault(Criteria::DESC)
+                ->findOne();
+
+            if (null !== $deliveryAddress) {
+                $this->getSession()->getOrder()->setChoosenDeliveryAddress(
+                    $deliveryAddress->getId()
+                );
+            }
+        } else {
+            $deliveryAddress = AddressQuery::create()->findPk($addressId);
+        }
+
+        return $deliveryAddress;
     }
 }
