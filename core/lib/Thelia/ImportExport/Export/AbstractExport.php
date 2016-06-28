@@ -220,6 +220,15 @@ abstract class AbstractExport implements \Iterator
         return $this;
     }
 
+    /**
+     * Check if export is empty
+     * @return bool true if export is empty, else false.
+     */
+    public function isEmpty()
+    {
+        return empty($this->data);
+    }
+
 
     /**
      * Whether images has to be exported as data
