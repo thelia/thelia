@@ -104,7 +104,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
+            Argument::createIntTypeArgument('core'),
+            Argument::createIntTypeArgument('visible',0),
+            Argument::createIntTypeArgument('secure')
         );
     }
 
@@ -114,6 +117,16 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         /* manage translations */
         $this->configureI18nProcessing($search);
+
+
+        $search->filterByCore($this->getVisible());
+
+        if(null!==$this->getCore()){
+            $search->filterByCore($this->getCore());
+        }
+        if(null!==$this->getSecure()){
+            $search->filterBySecure($this->getSecure());
+        }
 
         $id = $this->getId();
 
@@ -245,6 +258,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("VERSION", $module->getVersion())
                     ->set("CLASS", $module->getFullNamespace())
                     ->set("POSITION", $module->getPosition())
+                    ->set("CORE", $module->getCore())
+                    ->set("VISIBLE", $module->getVisible())
+                    ->set("SECURE", $module->getSecure())
                     ->set("EXISTS", $exists);
 
                 $hasConfigurationInterface = false;

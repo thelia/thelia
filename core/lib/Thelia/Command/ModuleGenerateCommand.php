@@ -43,6 +43,24 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 InputOption::VALUE_NONE,
                 'If defined, it will update the module with missing directories and files (no overrides).'
             )
+            ->addOption(
+                'core',
+                null,
+                InputOption::VALUE_NONE,
+                'if defined, the module will be a core module'
+            )
+            ->addOption(
+                'visible',
+                null,
+                InputOption::VALUE_NONE,
+                'if defined, the module will be invisible'
+            )
+            ->addOption(
+                'secure',
+                null,
+                InputOption::VALUE_NONE,
+                'if defined, the module will be secured'
+            )
         ;
     }
 
@@ -62,7 +80,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
 
         $this->createDirectories();
-        $this->createFiles();
+        $this->createFiles($input);
         if (method_exists($output, "renderBlock")) {
             // impossible to change output class in CommandTester...
             $output->renderBlock(array(
@@ -106,7 +124,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
-    private function createFiles()
+    private function createFiles(InputInterface $input)
     {
         $fs = new Filesystem();
 
@@ -156,6 +174,24 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);
                 $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
+
+                if($input->getOption('core')){
+                    $moduleContent = str_replace("%%CORE%%", "\t<core>1</core>", $moduleContent);
+                } else{
+                    $moduleContent = str_replace("%%CORE%%".PHP_EOL, "", $moduleContent);
+                }
+
+                if($input->getOption('visible')){
+                    $moduleContent = str_replace("%%VISIBLE%%", "\t<visible>1</visible>", $moduleContent);
+                } else{
+                    $moduleContent = str_replace("%%VISIBLE%%".PHP_EOL, "", $moduleContent);
+                }
+
+                if($input->getOption('secure')){
+                    $moduleContent = str_replace("%%SECURE%%", "\t<secure>1</secure>", $moduleContent);
+                } else{
+                    $moduleContent = str_replace("%%SECURE%%".PHP_EOL, "", $moduleContent);
+                }
 
                 file_put_contents($filename, $moduleContent);
             }

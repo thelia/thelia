@@ -247,6 +247,13 @@ class ModuleController extends AbstractCrudController
         }
         $message = null;
         try {
+
+            $secure = ModuleQuery::create()->findPk($module_id)->getSecure();
+
+            if($secure === 1) {
+                throw new \Exception("Can't deactivate a secure module");
+            }
+
             $event = new ModuleToggleActivationEvent($module_id);
             $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
 
@@ -293,6 +300,11 @@ class ModuleController extends AbstractCrudController
 
             $deleteEvent = new ModuleDeleteEvent($module_id);
 
+            $core = ModuleQuery::create()->findPk($module_id)->getCore();
+
+            if($core === 1) {
+                throw new \Exception("Can't remove a core module");
+            }
             $deleteEvent->setDeleteData('1' == $this->getRequest()->get('delete-module-data', '0'));
 
             $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
@@ -302,6 +314,7 @@ class ModuleController extends AbstractCrudController
                     $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module'))
                 );
             }
+
         } catch (\Exception $e) {
             $message = $e->getMessage();
 

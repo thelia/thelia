@@ -1,4 +1,4 @@
-<div class="col-md-8 install-module-col">
+<div class="col-md-6 install-module-col">
     <div class="general-block-decorator">
 
         <div class="title title-without-tabs">
@@ -40,19 +40,41 @@
     </div>
 </div>
 
-<div class="col-md-4 install-module-col">
+<div class="col-md-6 install-module-col">
     <div class="general-block-decorator">
+
         <div class="title title-without-tabs">
             {intl l="Search a module"}
         </div>
-        <p>{intl l="Discover all our modules on <a href='http://thelia.net/modules' target='_blank'>Thelia Modules</a> !"}</p>
-        <form action="http://thelia.net/modules/search" method="get" target="_blank">
-            <div class="input-group">
-                <input type="text" class="form-control" id="q" name="q" placeholder="{intl l='Search on Thelia Modules'}">
-                <span class="input-group-btn">
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
-                </span>
+
+
+        <div class="row">
+            <div class="col-md-7">
+                <p>{intl l="Discover all our modules on <a href='http://thelia.net/modules' target='_blank'>Thelia Modules</a> !"}</p>
+                <form action="http://thelia.net/modules/search" method="get" target="_blank">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="q" name="q" placeholder="{intl l='Search on Thelia Modules'}">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
+                        </span>
+                    </div>
+                </form>
             </div>
-        </form>
+            <div class="col-md-5">
+                <p>{intl l="Display protected modules ?"}</p>
+                <form action="{url path="admin/modules"}" method="post">
+                    {$visible = $smarty.post.visible|default:'0'}
+                    <div class="input-group">
+                        <select name="visible" class="form-control">
+                            <option value="0">{intl l='No'}</option>
+                            <option value="1" {if $visible} selected {/if}>{intl l='Yes'}</option>
+                        </select>
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span></button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>

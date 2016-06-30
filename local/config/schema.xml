@@ -820,6 +820,9 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="full_namespace" size="255" type="VARCHAR" />
+    <column name="core" type="TINYINT" />
+    <column name="visible" type="TINYINT" />
+    <column name="secure" type="TINYINT" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>

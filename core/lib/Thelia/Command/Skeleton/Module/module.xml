@@ -38,4 +38,7 @@
     -->
     <thelia>2.2.0</thelia>
     <stability>other</stability>
+%%CORE%%
+%%VISIBLE%%
+%%SECURE%%
 </module>
