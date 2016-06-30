@@ -114,7 +114,7 @@ class CSVSerializer extends AbstractSerializer
         if ($this->headers !== null) {
             // Create tmp file with header
             $fd = fopen('php://temp', 'w+b');
-            fputcsv($fd, $this->headers);
+            fputcsv($fd, $this->headers, $this->delimiter, $this->enclosure);
 
             // Copy file content into tmp file
             $fileObject->rewind();
