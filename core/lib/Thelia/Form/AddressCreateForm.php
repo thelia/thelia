@@ -186,7 +186,6 @@ class AddressCreateForm extends FirewallForm
         ;
     }
 
-
     /**
      * @return string the name of you form. This name must be unique
      */

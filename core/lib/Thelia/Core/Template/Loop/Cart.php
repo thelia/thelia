@@ -89,7 +89,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $product = $cartItem->getProduct(null, $locale);
             $productSaleElement = $cartItem->getProductSaleElements();
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($cartItem);
 
             $loopResultRow->set("ITEM_ID", $cartItem->getId());
             $loopResultRow->set("TITLE", $product->getTitle());
