@@ -74,7 +74,7 @@
             <tbody>
 
             {$visible = $smarty.post.visible|default:'0'}
-
+            
             {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1 visible=$visible }
                 {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
                 <tr id="module-{$ID}" {if ! $EXISTS}class="warning"{/if}>
@@ -89,6 +89,7 @@
 
                     {if $EXISTS}
                         <td class="text-center">
+
                             {if $SECURE ne 1}
                             <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                                 <input type="checkbox" {if $ACTIVE}checked{/if}>
@@ -103,6 +104,7 @@
                             {else}
                             <i class="glyphicon glyphicon-ban-circle text-danger" aria-hidden="true"></i>
                             {/if}
+
                         </td>
 
                         <td class="text-center">

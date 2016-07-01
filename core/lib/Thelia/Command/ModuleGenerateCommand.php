@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Module\BaseModule;
 
 /**
  * generate a new Module
@@ -50,7 +51,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 'if defined, the module will be a core module'
             )
             ->addOption(
-                'visible',
+                'not-visible',
                 null,
                 InputOption::VALUE_NONE,
                 'if defined, the module will be invisible'
@@ -176,19 +177,19 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
 
                 if($input->getOption('core')){
-                    $moduleContent = str_replace("%%CORE%%", "\t<core>1</core>", $moduleContent);
+                    $moduleContent = str_replace("%%CORE%%", "\t<core>".BaseModule::IS_CORE."</core>", $moduleContent);
                 } else{
                     $moduleContent = str_replace("%%CORE%%".PHP_EOL, "", $moduleContent);
                 }
 
-                if($input->getOption('visible')){
-                    $moduleContent = str_replace("%%VISIBLE%%", "\t<visible>1</visible>", $moduleContent);
+                if($input->getOption('not-visible')){
+                    $moduleContent = str_replace("%%VISIBLE%%", "\t<visible>".BaseModule::IS_NOT_VISIBLE."</visible>", $moduleContent);
                 } else{
                     $moduleContent = str_replace("%%VISIBLE%%".PHP_EOL, "", $moduleContent);
                 }
 
                 if($input->getOption('secure')){
-                    $moduleContent = str_replace("%%SECURE%%", "\t<secure>1</secure>", $moduleContent);
+                    $moduleContent = str_replace("%%SECURE%%", "\t<secure>".BaseModule::IS_SECURE."</secure>", $moduleContent);
                 } else{
                     $moduleContent = str_replace("%%SECURE%%".PHP_EOL, "", $moduleContent);
                 }

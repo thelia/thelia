@@ -117,4 +117,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
+ALTER TABLE `module` ADD `core` TINYINT NOT NULL AFTER `full_namespace`, ADD `visible` TINYINT NOT NULL AFTER `core`, ADD `secure` TINYINT NOT NULL AFTER `visible`;
+UPDATE `module` SET `core` = 0, `visible` = 0, `secure` = 0;
+UPDATE `module` SET `visible` = 1 WHERE `code` = 'Front' OR `code` = 'TheliaSmarty';
 SET FOREIGN_KEY_CHECKS = 1;

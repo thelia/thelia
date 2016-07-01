@@ -55,6 +55,15 @@ class BaseModule implements BaseModuleInterface
     const IS_ACTIVATED     = 1;
     const IS_NOT_ACTIVATED = 0;
 
+    const IS_CORE       = 1;
+    const IS_NOT_CORE   = 0;
+
+    const IS_SECURE     = 1;
+    const IS_NOT_SECURE = 0;
+
+    const IS_VISIBLE        = 0;
+    const IS_NOT_VISIBLE    = 1;
+
     protected $reflected;
 
     protected $dispatcher = null;

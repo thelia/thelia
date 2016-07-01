@@ -31,6 +31,7 @@ use Thelia\Form\ModuleInstallForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 
 /**
@@ -248,10 +249,13 @@ class ModuleController extends AbstractCrudController
         $message = null;
         try {
 
-            $secure = ModuleQuery::create()->findPk($module_id)->getSecure();
+            $module = ModuleQuery::create()->findPk($module_id);
+            $secure = $module->getSecure();
 
-            if($secure === 1) {
-                throw new \Exception("Can't deactivate a secure module");
+            if($secure === BaseModule::IS_SECURE && $module->getActivate() === BaseModule::IS_ACTIVATED) {
+                throw new \Exception(
+                    $this->getTranslator()->trans('Can\'t deactivate a secure module')
+                );
             }
 
             $event = new ModuleToggleActivationEvent($module_id);
@@ -301,10 +305,12 @@ class ModuleController extends AbstractCrudController
             $deleteEvent = new ModuleDeleteEvent($module_id);
 
             $core = ModuleQuery::create()->findPk($module_id)->getCore();
-
-            if($core === 1) {
-                throw new \Exception("Can't remove a core module");
+            if($core === BaseModule::IS_CORE) {
+                throw new \Exception(
+                    $this->getTranslator()->trans('Can\'t remove a core module')
+                );
             }
+
             $deleteEvent->setDeleteData('1' == $this->getRequest()->get('delete-module-data', '0'));
 
             $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);

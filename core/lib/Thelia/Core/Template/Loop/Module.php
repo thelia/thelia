@@ -106,7 +106,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
             Argument::createIntTypeArgument('core'),
-            Argument::createIntTypeArgument('visible',0),
+            Argument::createIntTypeArgument('visible'),
             Argument::createIntTypeArgument('secure')
         );
     }
@@ -118,9 +118,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         /* manage translations */
         $this->configureI18nProcessing($search);
 
-
-        $search->filterByCore($this->getVisible());
-
+        if(null!==$this->getVisible()) {
+            $search->filterByVisible($this->getVisible());
+        }
         if(null!==$this->getCore()){
             $search->filterByCore($this->getCore());
         }
