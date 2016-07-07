@@ -219,9 +219,7 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-
             try {
-
                 if ($coupon->isMatching()) {
                     $couponsKept[] = $coupon;
                 }
@@ -319,10 +317,8 @@ class CouponManager
     public function decrementQuantity(Coupon $coupon, $customerId = null)
     {
         if ($coupon->isUsageUnlimited()) {
-            $ret = true;
+            return true;
         } else {
-            $ret = false;
-
             try {
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -355,15 +351,13 @@ class CouponManager
                             ->save()
                         ;
 
-                        $ret = $usageLeft - $newCount;
+                        return $usageLeft - $newCount;
                     } else {
-                        $usageLeft--;
-
-                        $coupon->setMaxUsage($usageLeft);
+                        $coupon->setMaxUsage(--$usageLeft);
 
                         $coupon->save();
 
-                        $ret = $usageLeft;
+                        return $usageLeft;
                     }
                 }
             } catch (\Exception $ex) {
@@ -372,6 +366,58 @@ class CouponManager
             }
         }
 
-        return $ret;
+        return false;
+    }
+
+    /**
+     * Add a coupon usage, for the case the related order is canceled.
+     *
+     * @param Coupon $coupon
+     * @param int $customerId
+     */
+    public function incrementQuantity(Coupon $coupon, $customerId = null)
+    {
+        if ($coupon->isUsageUnlimited()) {
+            return true;
+        } else {
+            try {
+                $usageLeft = $coupon->getUsagesLeft($customerId);
+
+                // If the coupon usage is per user, remove an entry from coupon customer usage count table
+                if ($coupon->getPerCustomerUsageCount()) {
+                    if (null == $customerId) {
+                        throw new \LogicException("Customer should not be null at this time.");
+                    }
+
+                    $ccc = CouponCustomerCountQuery::create()
+                        ->filterByCouponId($coupon->getId())
+                        ->filterByCustomerId($customerId)
+                        ->findOne()
+                    ;
+
+                    if ($ccc !== null && $ccc->getCount() > 0) {
+                        $newCount = $ccc->getCount() - 1;
+
+                        $ccc
+                            ->setCount($newCount)
+                            ->save();
+
+                        return $usageLeft - $newCount;
+                    }
+                } else {
+                    // Ad one usage to coupon
+                    $coupon->setMaxUsage(++$usageLeft);
+
+                    $coupon->save();
+
+                    return $usageLeft;
+                }
+            } catch (\Exception $ex) {
+                // Just log the problem.
+                Tlog::getInstance()->addError(sprintf("Failed to increment coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
+            }
+        }
+
+        return false;
     }
 }

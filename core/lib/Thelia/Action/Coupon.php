@@ -38,6 +38,8 @@ use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponCountry;
 use Thelia\Model\OrderCouponModule;
+use Thelia\Model\OrderCouponQuery;
+use Thelia\Model\OrderStatusQuery;
 
 /**
  * Process Coupon Events
@@ -379,6 +381,59 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Cancels order coupons usage when order is canceled or refunded,
+     * or use canceled coupons again if the order is no longer canceled or refunded
+     *
+     * @param OrderEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function orderStatusChange(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        // The order has been canceled or refunded ?
+        if ($event->getOrder()->isCancelled() || $event->getOrder()->isRefunded()) {
+            // Cancel usage of all coupons for this order
+            $usedCoupons = OrderCouponQuery::create()
+                ->filterByUsageCanceled(false)
+                ->findByOrderId($event->getOrder()->getId());
+
+            $customerId = $event->getOrder()->getCustomerId();
+
+            /** @var OrderCoupon $usedCoupon */
+            foreach ($usedCoupons as $usedCoupon) {
+                if (null !== $couponModel = CouponQuery::create()->findOneByCode($usedCoupon->getCode())) {
+                    // If the coupon still exists, restore one usage to the usage count.
+                    $this->couponManager->incrementQuantity($couponModel, $customerId);
+                }
+
+                // Mark coupon usage as canceled in the OrderCoupon table
+                $usedCoupon->setUsageCanceled(true)->save();
+            }
+        } else {
+            // Mark canceled coupons for this order as used again
+            $usedCoupons = OrderCouponQuery::create()
+                ->filterByUsageCanceled(true)
+                ->findByOrderId($event->getOrder()->getId());
+
+            $customerId = $event->getOrder()->getCustomerId();
+
+            /** @var OrderCoupon $usedCoupon */
+            foreach ($usedCoupons as $usedCoupon) {
+                if (null !== $couponModel = CouponQuery::create()->findOneByCode($usedCoupon->getCode())) {
+                    // If the coupon still exists, mark the coupon as used
+                    $this->couponManager->decrementQuantity($couponModel, $customerId);
+                }
+
+                // The coupon is no longer canceled
+                $usedCoupon->setUsageCanceled(false)->save();
+            }
+        }
+
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -392,6 +447,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
             TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 132),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),
+            TheliaEvents::ORDER_UPDATE_STATUS => array("orderStatusChange", 10),
             TheliaEvents::CART_ADDITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_DELETEITEM => array("updateOrderDiscount", 10),

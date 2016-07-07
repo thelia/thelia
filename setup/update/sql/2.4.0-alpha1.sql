@@ -159,4 +159,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id+9,  'fr_FR', NULL, NULL, NULL)
 ;
 
+-- Additional usage_canceled column in order_coupon table
+
+ALTER TABLE `order_coupon` ADD `usage_canceled` TINYINT(1) DEFAULT '0' AFTER `per_customer_usage_count`;
+
 SET FOREIGN_KEY_CHECKS = 1;
