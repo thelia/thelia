@@ -117,4 +117,20 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
+-- Update country
+-- 'Biélorussie' not correct. It's 'Belarus'
+-- isoalpha2 'PW' corresponds to the country 'Republic of Palau'
+
+SELECT @country_id :=id FROM `country` WHERE `isoalpha2` = 'PW';
+UPDATE `country_i18n` SET `title` = 'Republik Palau' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'de_DE';
+UPDATE `country_i18n` SET `title` = 'Republic of Palau' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'en_US';
+UPDATE `country_i18n` SET `title` = 'República de Palaos' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'es_ES';
+UPDATE `country_i18n` SET `title` = 'République des Palaos' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'fr_FR';
+
+SELECT @country_id :=id FROM `country` WHERE `isoalpha2` = 'BY';
+UPDATE `country_i18n` SET `title` = 'Weißrussland' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'de_DE';
+UPDATE `country_i18n` SET `title` = 'Belarus' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'en_US';
+UPDATE `country_i18n` SET `title` = 'Belarús' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'es_ES';
+UPDATE `country_i18n` SET `title` = 'Belarus' WHERE `country_i18n`.`id` = @country_id AND `country_i18n`.`locale` = 'fr_FR';
+
 SET FOREIGN_KEY_CHECKS = 1;
