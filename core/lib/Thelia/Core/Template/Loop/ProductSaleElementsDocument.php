@@ -29,7 +29,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
  * {@inheritdoc}
  * @method int[] getId()
  * @method int[] getProductSaleElementsId()
- * @method int{] getProductDocumentId()
+ * @method int[] getProductDocumentId()
  * @method string[] getOrder()
  */
 class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopInterface
@@ -43,7 +43,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
     {
         /** @var \Thelia\Model\ProductSaleElementsProductDocument $productSaleElementDocument */
         foreach ($loopResult->getResultDataCollection() as $productSaleElementDocument) {
-            $row = new LoopResultRow();
+            $row = new LoopResultRow($productSaleElementDocument);
 
             $row
                 ->set("ID", $productSaleElementDocument->getId())

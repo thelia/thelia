@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
@@ -390,51 +391,41 @@
     </behavior>
   </table>
   <table name="customer" namespace="Thelia\Model">
-    <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
-
-    <column name="title_id" type="INTEGER" required="true" />
-    <column name="lang_id" type="INTEGER" required="false" />
-
-    <column name="ref" type="VARCHAR" size="50" />
-    <column name="firstname" type="VARCHAR" size="255" required="true" />
-    <column name="lastname" type="VARCHAR" size="255" required="true" />
-    <column name="email" type="VARCHAR" size="255" />
-    <column name="password" type="VARCHAR" size="255" />
-    <column name="algo" type="VARCHAR" size="128" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="title_id" required="true" type="INTEGER" />
+    <column name="lang_id" type="INTEGER" />
+    <column name="ref" size="50" type="VARCHAR" />
+    <column name="firstname" required="true" size="255" type="VARCHAR" />
+    <column name="lastname" required="true" size="255" type="VARCHAR" />
+    <column name="email" size="255" type="VARCHAR" />
+    <column name="password" size="255" type="VARCHAR" />
+    <column name="algo" size="128" type="VARCHAR" />
     <column name="reseller" type="TINYINT" />
-    <column name="sponsor" type="VARCHAR" size="50" />
-    <column name="discount" type="DECIMAL" scale="6" size="16" defaultValue="0.000000" />
-    <column name="remember_me_token" type="VARCHAR" size="255" />
-    <column name="remember_me_serial" type="VARCHAR" size="255" />
+    <column name="sponsor" size="50" type="VARCHAR" />
+    <column defaultValue="0.000000" name="discount" scale="6" size="16" type="DECIMAL" />
+    <column name="remember_me_token" size="255" type="VARCHAR" />
+    <column name="remember_me_serial" size="255" type="VARCHAR" />
     <column defaultValue="0" name="enable" type="TINYINT" />
     <column name="confirmation_token" size="255" type="VARCHAR" />
-
-    <unique name="ref_UNIQUE">
-      <unique-column name="ref" />
-    </unique>
-
-    <index name="idx_customer_customer_title_id">
-      <index-column name="title_id" />
-    </index>
-
-    <index name="idx_customer_lang_id">
-      <index-column name="lang_id" />
-    </index>
-
-    <index name="idx_email">
-      <index-column name="email" />
-    </index>
-
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
-
-    <foreign-key foreignTable="lang" phpName="LangModel" name="fk_customer_lang_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <foreign-key foreignTable="lang" name="fk_customer_lang_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="LangModel">
       <reference foreign="id" local="lang_id" />
     </foreign-key>
-
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
+    <index name="idx_customer_customer_title_id">
+      <index-column name="title_id" />
+    </index>
+    <index name="idx_customer_lang_id">
+      <index-column name="lang_id" />
+    </index>
+    <index name="idx_email">
+      <index-column name="email" />
+    </index>
     <behavior name="timestampable" />
-
     <behavior name="versionable">
       <parameter name="log_created_at" value="true" />
       <parameter name="log_created_by" value="true" />
@@ -773,9 +764,9 @@
   <table name="order_status" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
-    <column name="color" type="CHAR" size="7" />
+    <column name="color" size="7" type="CHAR" />
     <column name="position" type="INTEGER" />
-    <column name="protected_status" type="BOOLEAN" defaultValue="0" />
+    <column defaultValue="0" name="protected_status" type="BOOLEAN" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -820,9 +811,6 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="full_namespace" size="255" type="VARCHAR" />
-    <column name="core" type="TINYINT" />
-    <column name="visible" type="TINYINT" />
-    <column name="secure" type="TINYINT" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
@@ -1008,7 +996,7 @@
     <column name="is_enabled" required="true" type="BOOLEAN" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
-    <column name="start_date" defaultValue="NULL" type="TIMESTAMP" />
+    <column defaultValue="NULL" name="start_date" type="TIMESTAMP" />
     <column name="expiration_date" type="TIMESTAMP" />
     <column name="max_usage" required="true" type="INTEGER" />
     <column name="is_cumulative" required="true" type="BOOLEAN" />
@@ -1029,9 +1017,6 @@
     <index name="idx_type">
       <index-column name="type" />
     </index>
-    <index name="idx_start_date">
-      <index-column name="start_date" />
-    </index>
     <index name="idx_expiration_date">
       <index-column name="expiration_date" />
     </index>
@@ -1046,6 +1031,9 @@
     </index>
     <index name="idx_is_available_on_special_offers">
       <index-column name="is_available_on_special_offers" />
+    </index>
+    <index name="idx_start_date">
+      <index-column name="start_date" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
@@ -1438,22 +1426,18 @@
     <behavior name="timestampable" />
   </table>
   <table name="newsletter" namespace="Thelia\Model">
-    <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
-
-    <column name="email" type="VARCHAR" size="255" required="true" />
-    <column name="firstname" type="VARCHAR" size="255" />
-    <column name="lastname" type="VARCHAR" size="255" />
-    <column name="locale" type="VARCHAR" size="5" />
-    <column name="unsubscribed" type="BOOLEAN" required="true" defaultValue="false"/>
-
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="email" required="true" size="255" type="VARCHAR" />
+    <column name="firstname" size="255" type="VARCHAR" />
+    <column name="lastname" size="255" type="VARCHAR" />
+    <column name="locale" size="5" type="VARCHAR" />
+    <column defaultValue="0" name="unsubscribed" required="true" type="BOOLEAN" />
     <unique name="email_UNIQUE">
       <unique-column name="email" />
     </unique>
-
     <index name="idx_unsubscribed">
       <index-column name="unsubscribed" />
     </index>
-
     <behavior name="timestampable" />
   </table>
   <table name="order_coupon" namespace="Thelia\Model">
@@ -1465,13 +1449,14 @@
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
-    <column name="start_date" defaultValue="NULL" type="TIMESTAMP" />
+    <column defaultValue="NULL" name="start_date" type="TIMESTAMP" />
     <column name="expiration_date" required="true" type="TIMESTAMP" />
     <column name="is_cumulative" required="true" type="BOOLEAN" />
     <column name="is_removing_postage" required="true" type="BOOLEAN" />
     <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
     <column name="serialized_conditions" required="true" type="LONGVARCHAR" />
     <column name="per_customer_usage_count" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="usage_canceled" type="BOOLEAN" />
     <foreign-key foreignTable="order" name="fk_order_coupon_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
@@ -1949,3 +1934,4 @@
     </behavior>
   </table>
 </database>
+>>>>>>> master
