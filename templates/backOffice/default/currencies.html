@@ -293,6 +293,16 @@
             </div>
         {/form_field}
 
+        {form_field field='format'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                <input type="text" size="10" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder}" class="form-control">
+                <span class="help-block">
+                    {$label_attr.help}
+                </span>
+            </div>
+        {/form_field}
+
         {hook name="currency.create-form" location="currency_create_form" }
 
     {/capture}

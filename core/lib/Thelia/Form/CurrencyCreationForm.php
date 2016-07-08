@@ -68,6 +68,9 @@ class CurrencyCreationForm extends BaseForm
                 "label_attr"  => [
                     "for" => "format",
                     "help" => $this->translator->trans("%n for number, %c for the currency code, %s for the currency symbol")
+                ],
+                "attr" => [
+                    "placeholder" => "%n"
                 ]
             ])
             ->add("rate", "text", [
