@@ -159,9 +159,9 @@
                         <xs:documentation>URL to test if a new version of the module exists. Will be called with two get parameters : module name, current version</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="core" minOccurs="0" maxOccurs="1">
+                <xs:element name="protect" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Flag for distribution module</xs:documentation>
+                        <xs:documentation>Flag for protected module</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -170,20 +170,9 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="visible" minOccurs="0" maxOccurs="1">
+                <xs:element name="hidden" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Flag for visible module</xs:documentation>
-                    </xs:annotation>
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="0"/>
-                            <xs:enumeration value="1"/>
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:element>
-                <xs:element name="secure" minOccurs="0" maxOccurs="1">
-                    <xs:annotation>
-                        <xs:documentation>Flag for secure module</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">

@@ -30,9 +30,8 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method     ChildModuleQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildModuleQuery orderByFullNamespace($order = Criteria::ASC) Order by the full_namespace column
- * @method     ChildModuleQuery orderByCore($order = Criteria::ASC) Order by the core column
- * @method     ChildModuleQuery orderByVisible($order = Criteria::ASC) Order by the visible column
- * @method     ChildModuleQuery orderBySecure($order = Criteria::ASC) Order by the secure column
+ * @method     ChildModuleQuery orderByProtect($order = Criteria::ASC) Order by the protect column
+ * @method     ChildModuleQuery orderByHidden($order = Criteria::ASC) Order by the hidden column
  * @method     ChildModuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildModuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -44,9 +43,8 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery groupByActivate() Group by the activate column
  * @method     ChildModuleQuery groupByPosition() Group by the position column
  * @method     ChildModuleQuery groupByFullNamespace() Group by the full_namespace column
- * @method     ChildModuleQuery groupByCore() Group by the core column
- * @method     ChildModuleQuery groupByVisible() Group by the visible column
- * @method     ChildModuleQuery groupBySecure() Group by the secure column
+ * @method     ChildModuleQuery groupByProtect() Group by the protect column
+ * @method     ChildModuleQuery groupByHidden() Group by the hidden column
  * @method     ChildModuleQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildModuleQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -109,9 +107,8 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModule findOneByActivate(int $activate) Return the first ChildModule filtered by the activate column
  * @method     ChildModule findOneByPosition(int $position) Return the first ChildModule filtered by the position column
  * @method     ChildModule findOneByFullNamespace(string $full_namespace) Return the first ChildModule filtered by the full_namespace column
- * @method     ChildModule findOneByCore(int $core) Return the first ChildModule filtered by the core column
- * @method     ChildModule findOneByVisible(int $visible) Return the first ChildModule filtered by the visible column
- * @method     ChildModule findOneBySecure(int $secure) Return the first ChildModule filtered by the secure column
+ * @method     ChildModule findOneByProtect(int $protect) Return the first ChildModule filtered by the protect column
+ * @method     ChildModule findOneByHidden(int $hidden) Return the first ChildModule filtered by the hidden column
  * @method     ChildModule findOneByCreatedAt(string $created_at) Return the first ChildModule filtered by the created_at column
  * @method     ChildModule findOneByUpdatedAt(string $updated_at) Return the first ChildModule filtered by the updated_at column
  *
@@ -123,9 +120,8 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     array findByActivate(int $activate) Return ChildModule objects filtered by the activate column
  * @method     array findByPosition(int $position) Return ChildModule objects filtered by the position column
  * @method     array findByFullNamespace(string $full_namespace) Return ChildModule objects filtered by the full_namespace column
- * @method     array findByCore(int $core) Return ChildModule objects filtered by the core column
- * @method     array findByVisible(int $visible) Return ChildModule objects filtered by the visible column
- * @method     array findBySecure(int $secure) Return ChildModule objects filtered by the secure column
+ * @method     array findByProtect(int $protect) Return ChildModule objects filtered by the protect column
+ * @method     array findByHidden(int $hidden) Return ChildModule objects filtered by the hidden column
  * @method     array findByCreatedAt(string $created_at) Return ChildModule objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildModule objects filtered by the updated_at column
  *
@@ -216,7 +212,7 @@ abstract class ModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `CORE`, `VISIBLE`, `SECURE`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `PROTECT`, `HIDDEN`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -586,16 +582,16 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the core column
+     * Filter the query on the protect column
      *
      * Example usage:
      * <code>
-     * $query->filterByCore(1234); // WHERE core = 1234
-     * $query->filterByCore(array(12, 34)); // WHERE core IN (12, 34)
-     * $query->filterByCore(array('min' => 12)); // WHERE core > 12
+     * $query->filterByProtect(1234); // WHERE protect = 1234
+     * $query->filterByProtect(array(12, 34)); // WHERE protect IN (12, 34)
+     * $query->filterByProtect(array('min' => 12)); // WHERE protect > 12
      * </code>
      *
-     * @param     mixed $core The value to use as filter.
+     * @param     mixed $protect The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -603,16 +599,16 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
-    public function filterByCore($core = null, $comparison = null)
+    public function filterByProtect($protect = null, $comparison = null)
     {
-        if (is_array($core)) {
+        if (is_array($protect)) {
             $useMinMax = false;
-            if (isset($core['min'])) {
-                $this->addUsingAlias(ModuleTableMap::CORE, $core['min'], Criteria::GREATER_EQUAL);
+            if (isset($protect['min'])) {
+                $this->addUsingAlias(ModuleTableMap::PROTECT, $protect['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($core['max'])) {
-                $this->addUsingAlias(ModuleTableMap::CORE, $core['max'], Criteria::LESS_EQUAL);
+            if (isset($protect['max'])) {
+                $this->addUsingAlias(ModuleTableMap::PROTECT, $protect['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -623,20 +619,20 @@ abstract class ModuleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ModuleTableMap::CORE, $core, $comparison);
+        return $this->addUsingAlias(ModuleTableMap::PROTECT, $protect, $comparison);
     }
 
     /**
-     * Filter the query on the visible column
+     * Filter the query on the hidden column
      *
      * Example usage:
      * <code>
-     * $query->filterByVisible(1234); // WHERE visible = 1234
-     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
-     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * $query->filterByHidden(1234); // WHERE hidden = 1234
+     * $query->filterByHidden(array(12, 34)); // WHERE hidden IN (12, 34)
+     * $query->filterByHidden(array('min' => 12)); // WHERE hidden > 12
      * </code>
      *
-     * @param     mixed $visible The value to use as filter.
+     * @param     mixed $hidden The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -644,16 +640,16 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
-    public function filterByVisible($visible = null, $comparison = null)
+    public function filterByHidden($hidden = null, $comparison = null)
     {
-        if (is_array($visible)) {
+        if (is_array($hidden)) {
             $useMinMax = false;
-            if (isset($visible['min'])) {
-                $this->addUsingAlias(ModuleTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+            if (isset($hidden['min'])) {
+                $this->addUsingAlias(ModuleTableMap::HIDDEN, $hidden['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($visible['max'])) {
-                $this->addUsingAlias(ModuleTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+            if (isset($hidden['max'])) {
+                $this->addUsingAlias(ModuleTableMap::HIDDEN, $hidden['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -664,48 +660,7 @@ abstract class ModuleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ModuleTableMap::VISIBLE, $visible, $comparison);
-    }
-
-    /**
-     * Filter the query on the secure column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterBySecure(1234); // WHERE secure = 1234
-     * $query->filterBySecure(array(12, 34)); // WHERE secure IN (12, 34)
-     * $query->filterBySecure(array('min' => 12)); // WHERE secure > 12
-     * </code>
-     *
-     * @param     mixed $secure The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildModuleQuery The current query, for fluid interface
-     */
-    public function filterBySecure($secure = null, $comparison = null)
-    {
-        if (is_array($secure)) {
-            $useMinMax = false;
-            if (isset($secure['min'])) {
-                $this->addUsingAlias(ModuleTableMap::SECURE, $secure['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($secure['max'])) {
-                $this->addUsingAlias(ModuleTableMap::SECURE, $secure['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ModuleTableMap::SECURE, $secure, $comparison);
+        return $this->addUsingAlias(ModuleTableMap::HIDDEN, $hidden, $comparison);
     }
 
     /**

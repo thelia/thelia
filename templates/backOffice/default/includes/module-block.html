@@ -73,9 +73,9 @@
 
             <tbody>
 
-            {$visible = $smarty.post.visible|default:'0'}
+            {$hidden = $smarty.post.hidden|default:'0'}
             
-            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1 visible=$visible }
+            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1 hidden=$hidden }
                 {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
                 <tr id="module-{$ID}" {if ! $EXISTS}class="warning"{/if}>
                     <td>{$ID}</td>
@@ -90,7 +90,7 @@
                     {if $EXISTS}
                         <td class="text-center">
 
-                            {if $SECURE ne 1}
+                            {if $PROTECT ne 1}
                             <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                                 <input type="checkbox" {if $ACTIVE}checked{/if}>
                             </div>
@@ -174,7 +174,7 @@
                                 {/loop}
                             {/if}
 
-                            {if $CORE ne 1}
+                            {if $PROTECT ne 1}
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
                                 <a class="module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}

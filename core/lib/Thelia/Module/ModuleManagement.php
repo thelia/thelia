@@ -88,9 +88,8 @@ class ModuleManagement
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code      = basename(dirname($reflected->getFileName()));
         $version   = (string)$content->version;
-        $core = $content->core;
-        $visible = $content->visible;
-        $secure = $content->secure;
+        $protect = $content->protect;
+        $hidden = $content->hidden;
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
 
@@ -106,14 +105,12 @@ class ModuleManagement
             $action = 'none';
         }
 
-        if(null === $core){
-            $core = 0;
+        if (null === $protect) {
+            $protect = 0;
         }
-        if(null === $visible){
-            $visible = 0;
-        }
-        if(null === $secure){
-            $secure = 0;
+
+        if (null === $hidden) {
+            $hidden = 0;
         }
 
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
@@ -126,9 +123,8 @@ class ModuleManagement
                 ->setFullNamespace((string)$content->fullnamespace)
                 ->setType($this->getModuleType($reflected))
                 ->setCategory((string)$content->type)
-                ->setCore($core)
-                ->setVisible($visible)
-                ->setSecure($secure)
+                ->setProtect($protect)
+                ->setHidden($hidden)
                 ->save($con);
 
             // Update the module images, title and description when the module is installed, but not after

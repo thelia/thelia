@@ -117,9 +117,9 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
-ALTER TABLE `module` ADD `core` TINYINT NOT NULL AFTER `full_namespace`, ADD `visible` TINYINT NOT NULL AFTER `core`, ADD `secure` TINYINT NOT NULL AFTER `visible`;
-UPDATE `module` SET `core` = 0, `visible` = 0, `secure` = 0;
-UPDATE `module` SET `visible` = 1 WHERE `code` = 'Front' OR `code` = 'TheliaSmarty';
+ALTER TABLE `module` ADD `protect` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `protect`;
+UPDATE `module` SET `protect` = 0, `hidden` = 0;
+UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front' OR `code` = 'TheliaSmarty';
 
 -- Additional usage_canceled column in order_coupon table
 

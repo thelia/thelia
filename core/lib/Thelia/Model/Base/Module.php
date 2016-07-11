@@ -132,22 +132,18 @@ abstract class Module implements ActiveRecordInterface
     protected $full_namespace;
 
     /**
-     * The value for the core field.
+     * The value for the protect field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $core;
+    protected $protect;
 
     /**
-     * The value for the visible field.
+     * The value for the hidden field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $visible;
-
-    /**
-     * The value for the secure field.
-     * @var        int
-     */
-    protected $secure;
+    protected $hidden;
 
     /**
      * The value for the created_at field.
@@ -358,6 +354,8 @@ abstract class Module implements ActiveRecordInterface
     {
         $this->version = '';
         $this->category = 'classic';
+        $this->protect = 0;
+        $this->hidden = 0;
     }
 
     /**
@@ -709,36 +707,25 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
-     * Get the [core] column value.
+     * Get the [protect] column value.
      * 
      * @return   int
      */
-    public function getCore()
+    public function getProtect()
     {
 
-        return $this->core;
+        return $this->protect;
     }
 
     /**
-     * Get the [visible] column value.
+     * Get the [hidden] column value.
      * 
      * @return   int
      */
-    public function getVisible()
+    public function getHidden()
     {
 
-        return $this->visible;
-    }
-
-    /**
-     * Get the [secure] column value.
-     * 
-     * @return   int
-     */
-    public function getSecure()
-    {
-
-        return $this->secure;
+        return $this->hidden;
     }
 
     /**
@@ -950,67 +937,46 @@ abstract class Module implements ActiveRecordInterface
     } // setFullNamespace()
 
     /**
-     * Set the value of [core] column.
+     * Set the value of [protect] column.
      * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
-    public function setCore($v)
+    public function setProtect($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->core !== $v) {
-            $this->core = $v;
-            $this->modifiedColumns[ModuleTableMap::CORE] = true;
+        if ($this->protect !== $v) {
+            $this->protect = $v;
+            $this->modifiedColumns[ModuleTableMap::PROTECT] = true;
         }
 
 
         return $this;
-    } // setCore()
+    } // setProtect()
 
     /**
-     * Set the value of [visible] column.
+     * Set the value of [hidden] column.
      * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
-    public function setVisible($v)
+    public function setHidden($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->visible !== $v) {
-            $this->visible = $v;
-            $this->modifiedColumns[ModuleTableMap::VISIBLE] = true;
+        if ($this->hidden !== $v) {
+            $this->hidden = $v;
+            $this->modifiedColumns[ModuleTableMap::HIDDEN] = true;
         }
 
 
         return $this;
-    } // setVisible()
-
-    /**
-     * Set the value of [secure] column.
-     * 
-     * @param      int $v new value
-     * @return   \Thelia\Model\Module The current object (for fluent API support)
-     */
-    public function setSecure($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->secure !== $v) {
-            $this->secure = $v;
-            $this->modifiedColumns[ModuleTableMap::SECURE] = true;
-        }
-
-
-        return $this;
-    } // setSecure()
+    } // setHidden()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1072,6 +1038,14 @@ abstract class Module implements ActiveRecordInterface
                 return false;
             }
 
+            if ($this->protect !== 0) {
+                return false;
+            }
+
+            if ($this->hidden !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -1123,22 +1097,19 @@ abstract class Module implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_namespace = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('Core', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->core = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('Protect', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->protect = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->visible = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('Hidden', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->hidden = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ModuleTableMap::translateFieldName('Secure', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->secure = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1151,7 +1122,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 13; // 13 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Module object", 0, $e);
@@ -1688,14 +1659,11 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) {
             $modifiedColumns[':p' . $index++]  = '`FULL_NAMESPACE`';
         }
-        if ($this->isColumnModified(ModuleTableMap::CORE)) {
-            $modifiedColumns[':p' . $index++]  = '`CORE`';
+        if ($this->isColumnModified(ModuleTableMap::PROTECT)) {
+            $modifiedColumns[':p' . $index++]  = '`PROTECT`';
         }
-        if ($this->isColumnModified(ModuleTableMap::VISIBLE)) {
-            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
-        }
-        if ($this->isColumnModified(ModuleTableMap::SECURE)) {
-            $modifiedColumns[':p' . $index++]  = '`SECURE`';
+        if ($this->isColumnModified(ModuleTableMap::HIDDEN)) {
+            $modifiedColumns[':p' . $index++]  = '`HIDDEN`';
         }
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
@@ -1738,14 +1706,11 @@ abstract class Module implements ActiveRecordInterface
                     case '`FULL_NAMESPACE`':                        
                         $stmt->bindValue($identifier, $this->full_namespace, PDO::PARAM_STR);
                         break;
-                    case '`CORE`':                        
-                        $stmt->bindValue($identifier, $this->core, PDO::PARAM_INT);
+                    case '`PROTECT`':                        
+                        $stmt->bindValue($identifier, $this->protect, PDO::PARAM_INT);
                         break;
-                    case '`VISIBLE`':                        
-                        $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
-                        break;
-                    case '`SECURE`':                        
-                        $stmt->bindValue($identifier, $this->secure, PDO::PARAM_INT);
+                    case '`HIDDEN`':                        
+                        $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':                        
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1840,18 +1805,15 @@ abstract class Module implements ActiveRecordInterface
                 return $this->getFullNamespace();
                 break;
             case 8:
-                return $this->getCore();
+                return $this->getProtect();
                 break;
             case 9:
-                return $this->getVisible();
+                return $this->getHidden();
                 break;
             case 10:
-                return $this->getSecure();
-                break;
-            case 11:
                 return $this->getCreatedAt();
                 break;
-            case 12:
+            case 11:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1891,11 +1853,10 @@ abstract class Module implements ActiveRecordInterface
             $keys[5] => $this->getActivate(),
             $keys[6] => $this->getPosition(),
             $keys[7] => $this->getFullNamespace(),
-            $keys[8] => $this->getCore(),
-            $keys[9] => $this->getVisible(),
-            $keys[10] => $this->getSecure(),
-            $keys[11] => $this->getCreatedAt(),
-            $keys[12] => $this->getUpdatedAt(),
+            $keys[8] => $this->getProtect(),
+            $keys[9] => $this->getHidden(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1995,18 +1956,15 @@ abstract class Module implements ActiveRecordInterface
                 $this->setFullNamespace($value);
                 break;
             case 8:
-                $this->setCore($value);
+                $this->setProtect($value);
                 break;
             case 9:
-                $this->setVisible($value);
+                $this->setHidden($value);
                 break;
             case 10:
-                $this->setSecure($value);
-                break;
-            case 11:
                 $this->setCreatedAt($value);
                 break;
-            case 12:
+            case 11:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -2041,11 +1999,10 @@ abstract class Module implements ActiveRecordInterface
         if (array_key_exists($keys[5], $arr)) $this->setActivate($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setFullNamespace($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setCore($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setVisible($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setSecure($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[8], $arr)) $this->setProtect($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setHidden($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
     }
 
     /**
@@ -2065,9 +2022,8 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) $criteria->add(ModuleTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModuleTableMap::POSITION)) $criteria->add(ModuleTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
-        if ($this->isColumnModified(ModuleTableMap::CORE)) $criteria->add(ModuleTableMap::CORE, $this->core);
-        if ($this->isColumnModified(ModuleTableMap::VISIBLE)) $criteria->add(ModuleTableMap::VISIBLE, $this->visible);
-        if ($this->isColumnModified(ModuleTableMap::SECURE)) $criteria->add(ModuleTableMap::SECURE, $this->secure);
+        if ($this->isColumnModified(ModuleTableMap::PROTECT)) $criteria->add(ModuleTableMap::PROTECT, $this->protect);
+        if ($this->isColumnModified(ModuleTableMap::HIDDEN)) $criteria->add(ModuleTableMap::HIDDEN, $this->hidden);
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) $criteria->add(ModuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ModuleTableMap::UPDATED_AT)) $criteria->add(ModuleTableMap::UPDATED_AT, $this->updated_at);
 
@@ -2140,9 +2096,8 @@ abstract class Module implements ActiveRecordInterface
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setFullNamespace($this->getFullNamespace());
-        $copyObj->setCore($this->getCore());
-        $copyObj->setVisible($this->getVisible());
-        $copyObj->setSecure($this->getSecure());
+        $copyObj->setProtect($this->getProtect());
+        $copyObj->setHidden($this->getHidden());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -5722,9 +5677,8 @@ abstract class Module implements ActiveRecordInterface
         $this->activate = null;
         $this->position = null;
         $this->full_namespace = null;
-        $this->core = null;
-        $this->visible = null;
-        $this->secure = null;
+        $this->protect = null;
+        $this->hidden = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

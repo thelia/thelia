@@ -36,8 +36,8 @@
 
             <div class="col-md-12">
 
-            {$visible = $smarty.post.visible|default:'0'}
-            {if $visible}
+            {$hidden = $smarty.post.hidden|default:'0'}
+            {if $hidden}
                 <div class="alert alert-danger">{intl l='Beware, you access the protected modules'}. <a href="{url path="/admin/modules"}">{intl l='Back to the modules list'}</a></div>
             {/if}
 

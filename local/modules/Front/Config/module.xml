@@ -25,5 +25,5 @@
     <type>classic</type>
     <thelia>2.2.0</thelia>
     <stability>alpha</stability>
-    <visible>1</visible>
+    <hidden>1</hidden>
 </module>

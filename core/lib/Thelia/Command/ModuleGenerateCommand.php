@@ -45,22 +45,16 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 'If defined, it will update the module with missing directories and files (no overrides).'
             )
             ->addOption(
-                'core',
+                'protect',
                 null,
                 InputOption::VALUE_NONE,
-                'if defined, the module will be a core module'
+                'if defined, the module will be a protected module'
             )
             ->addOption(
-                'not-visible',
+                'hidden',
                 null,
                 InputOption::VALUE_NONE,
                 'if defined, the module will be invisible'
-            )
-            ->addOption(
-                'secure',
-                null,
-                InputOption::VALUE_NONE,
-                'if defined, the module will be secured'
             )
         ;
     }
@@ -176,22 +170,16 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);
                 $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
 
-                if($input->getOption('core')){
-                    $moduleContent = str_replace("%%CORE%%", "\t<core>".BaseModule::IS_CORE."</core>", $moduleContent);
+                if ($input->getOption('protect')) {
+                    $moduleContent = str_replace("%%PROTECT%%", "\t<protect>".BaseModule::IS_PROTECTED."</protect>", $moduleContent);
                 } else{
-                    $moduleContent = str_replace("%%CORE%%".PHP_EOL, "", $moduleContent);
+                    $moduleContent = str_replace("%%PROTECT%%".PHP_EOL, "", $moduleContent);
                 }
 
-                if($input->getOption('not-visible')){
-                    $moduleContent = str_replace("%%VISIBLE%%", "\t<visible>".BaseModule::IS_NOT_VISIBLE."</visible>", $moduleContent);
+                if ($input->getOption('hidden')) {
+                    $moduleContent = str_replace("%%HIDDEN%%", "\t<hidden>".BaseModule::IS_HIDDEN."</hidden>", $moduleContent);
                 } else{
-                    $moduleContent = str_replace("%%VISIBLE%%".PHP_EOL, "", $moduleContent);
-                }
-
-                if($input->getOption('secure')){
-                    $moduleContent = str_replace("%%SECURE%%", "\t<secure>".BaseModule::IS_SECURE."</secure>", $moduleContent);
-                } else{
-                    $moduleContent = str_replace("%%SECURE%%".PHP_EOL, "", $moduleContent);
+                    $moduleContent = str_replace("%%HIDDEN%%".PHP_EOL, "", $moduleContent);
                 }
 
                 file_put_contents($filename, $moduleContent);

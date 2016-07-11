@@ -87,27 +87,26 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 'order',
                 new TypeCollection(
                     new Type\EnumListType([
-                            'id',
-                            'id_reverse',
-                            'code',
-                            'code_reverse',
-                            'title',
-                            'title_reverse',
-                            'type',
-                            'type_reverse',
-                            'manual',
-                            'manual_reverse',
-                            'enabled',
-                            'enabled_reverse'
+                        'id',
+                        'id_reverse',
+                        'code',
+                        'code_reverse',
+                        'title',
+                        'title_reverse',
+                        'type',
+                        'type_reverse',
+                        'manual',
+                        'manual_reverse',
+                        'enabled',
+                        'enabled_reverse'
                     ])
                 ),
                 'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
-            Argument::createIntTypeArgument('core'),
-            Argument::createIntTypeArgument('visible'),
-            Argument::createIntTypeArgument('secure')
+            Argument::createBooleanTypeArgument('hidden'),
+            Argument::createBooleanTypeArgument('protect')
         );
     }
 
@@ -118,14 +117,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         /* manage translations */
         $this->configureI18nProcessing($search);
 
-        if(null!==$this->getVisible()) {
-            $search->filterByVisible($this->getVisible());
+        if (null !== $this->getHidden()) {
+            $search->filterByHidden($this->getHidden());
         }
-        if(null!==$this->getCore()){
-            $search->filterByCore($this->getCore());
-        }
-        if(null!==$this->getSecure()){
-            $search->filterBySecure($this->getSecure());
+
+        if (null !== $this->getProtect()) {
+            $search->filterByProtect($this->getProtect());
         }
 
         $id = $this->getId();
@@ -258,9 +255,8 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("VERSION", $module->getVersion())
                     ->set("CLASS", $module->getFullNamespace())
                     ->set("POSITION", $module->getPosition())
-                    ->set("CORE", $module->getCore())
-                    ->set("VISIBLE", $module->getVisible())
-                    ->set("SECURE", $module->getSecure())
+                    ->set("PROTECT", $module->getProtect())
+                    ->set("HIDDEN", $module->getHidden())
                     ->set("EXISTS", $exists);
 
                 $hasConfigurationInterface = false;
