@@ -44,18 +44,6 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 InputOption::VALUE_NONE,
                 'If defined, it will update the module with missing directories and files (no overrides).'
             )
-            ->addOption(
-                'protect',
-                null,
-                InputOption::VALUE_NONE,
-                'if defined, the module will be a protected module'
-            )
-            ->addOption(
-                'hidden',
-                null,
-                InputOption::VALUE_NONE,
-                'if defined, the module will be invisible'
-            )
         ;
     }
 
@@ -75,7 +63,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
 
         $this->createDirectories();
-        $this->createFiles($input);
+        $this->createFiles();
         if (method_exists($output, "renderBlock")) {
             // impossible to change output class in CommandTester...
             $output->renderBlock(array(
@@ -119,7 +107,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
-    private function createFiles(InputInterface $input)
+    private function createFiles()
     {
         $fs = new Filesystem();
 
@@ -169,18 +157,6 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);
                 $moduleContent = str_replace("%%NAMESPACE%%", $this->module, $moduleContent);
-
-                if ($input->getOption('protect')) {
-                    $moduleContent = str_replace("%%PROTECT%%", "\t<protect>".BaseModule::IS_PROTECTED."</protect>", $moduleContent);
-                } else{
-                    $moduleContent = str_replace("%%PROTECT%%".PHP_EOL, "", $moduleContent);
-                }
-
-                if ($input->getOption('hidden')) {
-                    $moduleContent = str_replace("%%HIDDEN%%", "\t<hidden>".BaseModule::IS_HIDDEN."</hidden>", $moduleContent);
-                } else{
-                    $moduleContent = str_replace("%%HIDDEN%%".PHP_EOL, "", $moduleContent);
-                }
 
                 file_put_contents($filename, $moduleContent);
             }

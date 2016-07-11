@@ -132,11 +132,11 @@ abstract class Module implements ActiveRecordInterface
     protected $full_namespace;
 
     /**
-     * The value for the protect field.
+     * The value for the mandatory field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $protect;
+    protected $mandatory;
 
     /**
      * The value for the hidden field.
@@ -354,7 +354,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $this->version = '';
         $this->category = 'classic';
-        $this->protect = 0;
+        $this->mandatory = 0;
         $this->hidden = 0;
     }
 
@@ -707,14 +707,14 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
-     * Get the [protect] column value.
+     * Get the [mandatory] column value.
      * 
      * @return   int
      */
-    public function getProtect()
+    public function getMandatory()
     {
 
-        return $this->protect;
+        return $this->mandatory;
     }
 
     /**
@@ -937,25 +937,25 @@ abstract class Module implements ActiveRecordInterface
     } // setFullNamespace()
 
     /**
-     * Set the value of [protect] column.
+     * Set the value of [mandatory] column.
      * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
-    public function setProtect($v)
+    public function setMandatory($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->protect !== $v) {
-            $this->protect = $v;
-            $this->modifiedColumns[ModuleTableMap::PROTECT] = true;
+        if ($this->mandatory !== $v) {
+            $this->mandatory = $v;
+            $this->modifiedColumns[ModuleTableMap::MANDATORY] = true;
         }
 
 
         return $this;
-    } // setProtect()
+    } // setMandatory()
 
     /**
      * Set the value of [hidden] column.
@@ -1038,7 +1038,7 @@ abstract class Module implements ActiveRecordInterface
                 return false;
             }
 
-            if ($this->protect !== 0) {
+            if ($this->mandatory !== 0) {
                 return false;
             }
 
@@ -1097,8 +1097,8 @@ abstract class Module implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_namespace = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('Protect', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->protect = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('Mandatory', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->mandatory = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('Hidden', TableMap::TYPE_PHPNAME, $indexType)];
             $this->hidden = (null !== $col) ? (int) $col : null;
@@ -1659,8 +1659,8 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) {
             $modifiedColumns[':p' . $index++]  = '`FULL_NAMESPACE`';
         }
-        if ($this->isColumnModified(ModuleTableMap::PROTECT)) {
-            $modifiedColumns[':p' . $index++]  = '`PROTECT`';
+        if ($this->isColumnModified(ModuleTableMap::MANDATORY)) {
+            $modifiedColumns[':p' . $index++]  = '`MANDATORY`';
         }
         if ($this->isColumnModified(ModuleTableMap::HIDDEN)) {
             $modifiedColumns[':p' . $index++]  = '`HIDDEN`';
@@ -1706,8 +1706,8 @@ abstract class Module implements ActiveRecordInterface
                     case '`FULL_NAMESPACE`':                        
                         $stmt->bindValue($identifier, $this->full_namespace, PDO::PARAM_STR);
                         break;
-                    case '`PROTECT`':                        
-                        $stmt->bindValue($identifier, $this->protect, PDO::PARAM_INT);
+                    case '`MANDATORY`':                        
+                        $stmt->bindValue($identifier, $this->mandatory, PDO::PARAM_INT);
                         break;
                     case '`HIDDEN`':                        
                         $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
@@ -1805,7 +1805,7 @@ abstract class Module implements ActiveRecordInterface
                 return $this->getFullNamespace();
                 break;
             case 8:
-                return $this->getProtect();
+                return $this->getMandatory();
                 break;
             case 9:
                 return $this->getHidden();
@@ -1853,7 +1853,7 @@ abstract class Module implements ActiveRecordInterface
             $keys[5] => $this->getActivate(),
             $keys[6] => $this->getPosition(),
             $keys[7] => $this->getFullNamespace(),
-            $keys[8] => $this->getProtect(),
+            $keys[8] => $this->getMandatory(),
             $keys[9] => $this->getHidden(),
             $keys[10] => $this->getCreatedAt(),
             $keys[11] => $this->getUpdatedAt(),
@@ -1956,7 +1956,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->setFullNamespace($value);
                 break;
             case 8:
-                $this->setProtect($value);
+                $this->setMandatory($value);
                 break;
             case 9:
                 $this->setHidden($value);
@@ -1999,7 +1999,7 @@ abstract class Module implements ActiveRecordInterface
         if (array_key_exists($keys[5], $arr)) $this->setActivate($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setFullNamespace($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setProtect($arr[$keys[8]]);
+        if (array_key_exists($keys[8], $arr)) $this->setMandatory($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setHidden($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
@@ -2022,7 +2022,7 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) $criteria->add(ModuleTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModuleTableMap::POSITION)) $criteria->add(ModuleTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
-        if ($this->isColumnModified(ModuleTableMap::PROTECT)) $criteria->add(ModuleTableMap::PROTECT, $this->protect);
+        if ($this->isColumnModified(ModuleTableMap::MANDATORY)) $criteria->add(ModuleTableMap::MANDATORY, $this->mandatory);
         if ($this->isColumnModified(ModuleTableMap::HIDDEN)) $criteria->add(ModuleTableMap::HIDDEN, $this->hidden);
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) $criteria->add(ModuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ModuleTableMap::UPDATED_AT)) $criteria->add(ModuleTableMap::UPDATED_AT, $this->updated_at);
@@ -2096,7 +2096,7 @@ abstract class Module implements ActiveRecordInterface
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setFullNamespace($this->getFullNamespace());
-        $copyObj->setProtect($this->getProtect());
+        $copyObj->setMandatory($this->getMandatory());
         $copyObj->setHidden($this->getHidden());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -5677,7 +5677,7 @@ abstract class Module implements ActiveRecordInterface
         $this->activate = null;
         $this->position = null;
         $this->full_namespace = null;
-        $this->protect = null;
+        $this->mandatory = null;
         $this->hidden = null;
         $this->created_at = null;
         $this->updated_at = null;

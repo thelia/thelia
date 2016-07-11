@@ -105,8 +105,8 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
-            Argument::createBooleanTypeArgument('hidden'),
-            Argument::createBooleanTypeArgument('protect')
+            Argument::createBooleanTypeArgument('hidden', Type\BooleanOrBothType::ANY),
+            Argument::createBooleanTypeArgument('mandatory', Type\BooleanOrBothType::ANY)
         );
     }
 
@@ -117,18 +117,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         /* manage translations */
         $this->configureI18nProcessing($search);
 
-        if (null !== $this->getHidden()) {
-            $search->filterByHidden($this->getHidden());
-        }
-
-        if (null !== $this->getProtect()) {
-            $search->filterByProtect($this->getProtect());
-        }
-
         $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        if (null !== $this->getHidden()) {
+            $search->filterByHidden($this->getHidden());
+        }
+
+        if (null !== $this->getMandatory()) {
+            $search->filterByMandatory($this->getMandatory());
         }
 
         $profile = $this->getProfile();
@@ -255,7 +255,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("VERSION", $module->getVersion())
                     ->set("CLASS", $module->getFullNamespace())
                     ->set("POSITION", $module->getPosition())
-                    ->set("PROTECT", $module->getProtect())
+                    ->set("MANDATORY", $module->getMandatory())
                     ->set("HIDDEN", $module->getHidden())
                     ->set("EXISTS", $exists);
 

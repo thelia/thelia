@@ -248,7 +248,7 @@ class ModuleController extends AbstractCrudController
         }
         $message = null;
         try {
-            $event = new ModuleToggleActivationEvent($module_id);
+            $event = new ModuleToggleActivationEvent($module_id,$this->getRequest()->get('assume'));
             $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
 
             if (null === $event->getModule()) {

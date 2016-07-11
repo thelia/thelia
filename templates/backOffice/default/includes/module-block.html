@@ -90,8 +90,8 @@
                     {if $EXISTS}
                         <td class="text-center">
 
-                            {if $PROTECT ne 1}
-                            <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+
+                            <div class="make-switch switch-small module-activation" data-mandatory="{$MANDATORY}" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                                 <input type="checkbox" {if $ACTIVE}checked{/if}>
                             </div>
                             <noscript>
@@ -101,6 +101,7 @@
                                     <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
                                 {/if}
                             </noscript>
+                            {if $MANDATORY ne 1}
                             {else}
                             <i class="glyphicon glyphicon-ban-circle text-danger" aria-hidden="true"></i>
                             {/if}
@@ -174,7 +175,7 @@
                                 {/loop}
                             {/if}
 
-                            {if $PROTECT ne 1}
+                            {if $MANDATORY ne 1}
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
                                 <a class="module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}

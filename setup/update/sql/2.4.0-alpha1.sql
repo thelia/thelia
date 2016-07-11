@@ -159,8 +159,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id+9,  'fr_FR', NULL, NULL, NULL)
 ;
 
-ALTER TABLE `module` ADD `protect` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `protect`;
-UPDATE `module` SET `protect` = 0, `hidden` = 0;
+ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
+UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
 UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front' OR `code` = 'TheliaSmarty';
 
 -- Additional usage_canceled column in order_coupon table

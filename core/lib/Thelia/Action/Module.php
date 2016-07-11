@@ -85,7 +85,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             try {
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
 
-                    if ($module->getProtect() == BaseModule::IS_PROTECTED) {
+                    if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDeactivate() === false) {
                         throw new \Exception(
                             Translator::getInstance()->trans('Can\'t deactivate a secure module')
                         );
@@ -240,7 +240,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 }
 
                 try {
-                    if ($module->getProtect() == BaseModule::IS_PROTECTED) {
+                    if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDelete() === false) {
                         throw new \Exception(
                             Translator::getInstance()->trans('Can\'t remove a core module')
                         );

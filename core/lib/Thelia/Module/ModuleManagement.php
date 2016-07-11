@@ -88,7 +88,7 @@ class ModuleManagement
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code      = basename(dirname($reflected->getFileName()));
         $version   = (string)$content->version;
-        $protect = $content->protect;
+        $mandatory = $content->mandatory;
         $hidden = $content->hidden;
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
@@ -105,7 +105,7 @@ class ModuleManagement
             $action = 'none';
         }
 
-        if (null === $protect) {
+        if (null === $mandatory) {
             $protect = 0;
         }
 
@@ -123,7 +123,7 @@ class ModuleManagement
                 ->setFullNamespace((string)$content->fullnamespace)
                 ->setType($this->getModuleType($reflected))
                 ->setCategory((string)$content->type)
-                ->setProtect($protect)
+                ->setMandatory($mandatory)
                 ->setHidden($hidden)
                 ->save($con);
 

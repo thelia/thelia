@@ -811,7 +811,7 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="full_namespace" size="255" type="VARCHAR" />
-    <column name="protect" type="TINYINT" defaultValue="0" />
+    <column name="mandatory" type="TINYINT" defaultValue="0" />
     <column name="hidden" type="TINYINT" defaultValue="0" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />

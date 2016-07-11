@@ -30,7 +30,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method     ChildModuleQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildModuleQuery orderByFullNamespace($order = Criteria::ASC) Order by the full_namespace column
- * @method     ChildModuleQuery orderByProtect($order = Criteria::ASC) Order by the protect column
+ * @method     ChildModuleQuery orderByMandatory($order = Criteria::ASC) Order by the mandatory column
  * @method     ChildModuleQuery orderByHidden($order = Criteria::ASC) Order by the hidden column
  * @method     ChildModuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildModuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -43,7 +43,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery groupByActivate() Group by the activate column
  * @method     ChildModuleQuery groupByPosition() Group by the position column
  * @method     ChildModuleQuery groupByFullNamespace() Group by the full_namespace column
- * @method     ChildModuleQuery groupByProtect() Group by the protect column
+ * @method     ChildModuleQuery groupByMandatory() Group by the mandatory column
  * @method     ChildModuleQuery groupByHidden() Group by the hidden column
  * @method     ChildModuleQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildModuleQuery groupByUpdatedAt() Group by the updated_at column
@@ -107,7 +107,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModule findOneByActivate(int $activate) Return the first ChildModule filtered by the activate column
  * @method     ChildModule findOneByPosition(int $position) Return the first ChildModule filtered by the position column
  * @method     ChildModule findOneByFullNamespace(string $full_namespace) Return the first ChildModule filtered by the full_namespace column
- * @method     ChildModule findOneByProtect(int $protect) Return the first ChildModule filtered by the protect column
+ * @method     ChildModule findOneByMandatory(int $mandatory) Return the first ChildModule filtered by the mandatory column
  * @method     ChildModule findOneByHidden(int $hidden) Return the first ChildModule filtered by the hidden column
  * @method     ChildModule findOneByCreatedAt(string $created_at) Return the first ChildModule filtered by the created_at column
  * @method     ChildModule findOneByUpdatedAt(string $updated_at) Return the first ChildModule filtered by the updated_at column
@@ -120,7 +120,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     array findByActivate(int $activate) Return ChildModule objects filtered by the activate column
  * @method     array findByPosition(int $position) Return ChildModule objects filtered by the position column
  * @method     array findByFullNamespace(string $full_namespace) Return ChildModule objects filtered by the full_namespace column
- * @method     array findByProtect(int $protect) Return ChildModule objects filtered by the protect column
+ * @method     array findByMandatory(int $mandatory) Return ChildModule objects filtered by the mandatory column
  * @method     array findByHidden(int $hidden) Return ChildModule objects filtered by the hidden column
  * @method     array findByCreatedAt(string $created_at) Return ChildModule objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildModule objects filtered by the updated_at column
@@ -212,7 +212,7 @@ abstract class ModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `PROTECT`, `HIDDEN`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `MANDATORY`, `HIDDEN`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -582,16 +582,16 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the protect column
+     * Filter the query on the mandatory column
      *
      * Example usage:
      * <code>
-     * $query->filterByProtect(1234); // WHERE protect = 1234
-     * $query->filterByProtect(array(12, 34)); // WHERE protect IN (12, 34)
-     * $query->filterByProtect(array('min' => 12)); // WHERE protect > 12
+     * $query->filterByMandatory(1234); // WHERE mandatory = 1234
+     * $query->filterByMandatory(array(12, 34)); // WHERE mandatory IN (12, 34)
+     * $query->filterByMandatory(array('min' => 12)); // WHERE mandatory > 12
      * </code>
      *
-     * @param     mixed $protect The value to use as filter.
+     * @param     mixed $mandatory The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -599,16 +599,16 @@ abstract class ModuleQuery extends ModelCriteria
      *
      * @return ChildModuleQuery The current query, for fluid interface
      */
-    public function filterByProtect($protect = null, $comparison = null)
+    public function filterByMandatory($mandatory = null, $comparison = null)
     {
-        if (is_array($protect)) {
+        if (is_array($mandatory)) {
             $useMinMax = false;
-            if (isset($protect['min'])) {
-                $this->addUsingAlias(ModuleTableMap::PROTECT, $protect['min'], Criteria::GREATER_EQUAL);
+            if (isset($mandatory['min'])) {
+                $this->addUsingAlias(ModuleTableMap::MANDATORY, $mandatory['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($protect['max'])) {
-                $this->addUsingAlias(ModuleTableMap::PROTECT, $protect['max'], Criteria::LESS_EQUAL);
+            if (isset($mandatory['max'])) {
+                $this->addUsingAlias(ModuleTableMap::MANDATORY, $mandatory['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -619,7 +619,7 @@ abstract class ModuleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ModuleTableMap::PROTECT, $protect, $comparison);
+        return $this->addUsingAlias(ModuleTableMap::MANDATORY, $mandatory, $comparison);
     }
 
     /**

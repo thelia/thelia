@@ -159,7 +159,7 @@
                         <xs:documentation>URL to test if a new version of the module exists. Will be called with two get parameters : module name, current version</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="protect" minOccurs="0" maxOccurs="1">
+                <xs:element name="mandatory" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Flag for protected module</xs:documentation>
                     </xs:annotation>
