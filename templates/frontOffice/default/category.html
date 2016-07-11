@@ -12,7 +12,7 @@
 {block name='no-return-functions' append}
 {if $category_id}
     {loop name="category.seo.title" type="category" id=$category_id limit="1"}
-        {$page_title = {$META_TITLE}}
+        {$page_title = $META_TITLE}
     {/loop}
 {/if}
 {/block}
