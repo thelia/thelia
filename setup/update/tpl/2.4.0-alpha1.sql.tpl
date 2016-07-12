@@ -119,7 +119,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 
 ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
 UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
-UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front' OR `code` = 'TheliaSmarty';
+UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front';
+UPDATE `module` SET `mandatory` = 1, `hidden` = 1 WHERE `code` = 'TheliaSmarty';
 
 -- Additional usage_canceled column in order_coupon table
 

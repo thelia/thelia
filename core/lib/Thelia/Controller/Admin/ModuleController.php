@@ -31,7 +31,6 @@ use Thelia\Form\ModuleInstallForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
 
 /**

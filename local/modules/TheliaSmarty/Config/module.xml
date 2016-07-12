@@ -23,5 +23,6 @@
     <type>classic</type>
     <thelia>2.2.0</thelia>
     <stability>alpha</stability>
+    <mandatory>1</mandatory>
     <hidden>1</hidden>
 </module>

@@ -30,7 +30,7 @@ class ModuleDeleteEvent extends ModuleEvent
      */
     protected $assume_delete;
 
-    public function __construct($module_id,$assume_delete = false)
+    public function __construct($module_id, $assume_delete = false)
     {
         $this->module_id = $module_id;
         $this->assume_delete = $assume_delete;

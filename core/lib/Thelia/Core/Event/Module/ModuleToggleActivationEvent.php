@@ -43,7 +43,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
     /**
      * @param int $module_id
      */
-    public function __construct($module_id,$assume_deactivate = false)
+    public function __construct($module_id, $assume_deactivate = false)
     {
         $this->module_id = $module_id;
         $this->assume_deactivate = $assume_deactivate;
