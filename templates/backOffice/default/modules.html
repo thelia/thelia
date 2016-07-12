@@ -35,14 +35,8 @@
             {/loop}
 
             <div class="col-md-12">
-
-            {$hidden = $smarty.post.hidden|default:'0'}
-            {if $hidden}
-                <div class="alert alert-danger">{intl l='Beware, you access the protected modules'}. <a href="{url path="/admin/modules"}">{intl l='Back to the modules list'}</a></div>
-            {/if}
-
             {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
-                
+
             {include file="includes/module-block.html" module_type="2" caption_title={intl l='Delivery modules'}}
             {include file="includes/module-block.html" module_type="3" caption_title={intl l='Payment modules'}}
             {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
@@ -92,23 +86,6 @@
 
     form_action         = {token_url path='/admin/module/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
-}
-
-{* Deactivation mandatory module confirmation dialog *}
-
-{capture "deactivate_module_dialog"}
-    <input type="hidden" name="assume" value="1" />
-{/capture}
-
-{include
-    file = "includes/generic-confirm-dialog.html"
-
-    dialog_id       = "deactivate_module_dialog"
-    dialog_title    = {intl l="Deactivate a mandatory module"}
-    dialog_message  = {intl l="Do you really want to deactivate this module ?"}
-
-    form_action         = {url path='/admin/module/toggle-activation'}
-    form_content        = {$smarty.capture.deactivate_module_dialog nofilter}
 }
 
 <div class="modal fade" id="module-failed" tabindex="-1" role="dialog" aria-hidden="true">
@@ -170,16 +147,6 @@
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
 
-               console.log($(this).data('mandatory'));
-
-               if($(this).data('mandatory') == '1'){
-                   var url = url_management+$(this).data('id');
-                   $('#deactivate_module_dialog form').attr('action',url);
-                    $('#deactivate_module_dialog').modal('show');
-               }
-
-               //switchChange($(this), e, data);
-               /*
                var checkbox = $(this);
         	   var module_id = checkbox.data('id');
         	   var is_checked = data.value;
@@ -205,36 +172,8 @@
                     $('#module-failed-body').html(jqXHR.responseJSON.error);
                     $("#module-failed").modal("show");
                });
-                */
+
            });
-
-           function switchChange(elm, e, data){
-               var checkbox = elm;
-        	   var module_id = checkbox.data('id');
-        	   var is_checked = data.value;
-
-               $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
-               $.ajax({
-                    url: url_management+module_id
-               }).always(function(){
-                   $("#loading-event").remove();
-               }).done(function() {
-            	   if (is_checked) {
-                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
-                           .removeClass('disabled')
-                           .removeClass('no-follow-link');
-                   } else {
-                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
-                           .addClass('disabled')
-                           .addClass('no-follow-link');
-                   }
-
-               }).fail(function(jqXHR, textStatus, errorThrown){
-                    checkbox.bootstrapSwitch('toggleState', true);
-                    $('#module-failed-body').html(jqXHR.responseJSON.error);
-                    $("#module-failed").modal("show");
-               });
-           }
 
            $(".module-delete-action").click(function(){
                 $("#delete_module_id").val($(this).data("id"));
