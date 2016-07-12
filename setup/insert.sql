@@ -76,7 +76,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
 (67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
 (68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
-(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW())
+(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW()),
+(70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -2009,6 +2010,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (67, 'de_DE', NULL, NUll, NULL, NULL),
     (68, 'de_DE', NULL, NUll, NULL, NULL),
     (69, 'de_DE', NULL, NULL, NULL, NULL),
+    (70, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2060,10 +2062,11 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (64, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
     (65, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),
-    (66, 'en_US', 'Number by default of results per page for product list', NUll, NULL, NULL),
-    (67, 'en_US', 'Number by default of results per page for order list', NUll, NULL, NULL),
-    (68, 'en_US', 'Number by default of results per page for customer list', NUll, NULL, NULL),
+    (66, 'en_US', 'Default number of products on product list', NUll, NULL, NULL),
+    (67, 'en_US', 'Default number of orders on order list', NUll, NULL, NULL),
+    (68, 'en_US', 'Default number of customers on customer list', NUll, NULL, NULL),
     (69, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
+    (70, 'en_US', NULL, NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2119,6 +2122,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (67, 'es_ES', 'Número predeterminado de resultados por página para la lista de pedidos', NUll, NULL, NULL),
     (68, 'es_ES', 'Número predeterminado de resultados por página para la lista de clientes', NUll, NULL, NULL),
     (69, 'es_ES', NULL, NULL, NULL, NULL),
+    (70, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2173,7 +2177,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
-    (69, 'fr_FR', NULL, NULL, NULL, NULL)
+    (69, 'fr_FR', NULL, NULL, NULL, NULL),
+    (70, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
