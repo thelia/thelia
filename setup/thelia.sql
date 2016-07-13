@@ -944,6 +944,8 @@ CREATE TABLE `module`
     `activate` TINYINT,
     `position` INTEGER,
     `full_namespace` VARCHAR(255),
+    `mandatory` TINYINT DEFAULT 0,
+    `hidden` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
