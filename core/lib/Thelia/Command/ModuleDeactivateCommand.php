@@ -12,10 +12,13 @@
 
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Thelia\Action\Module;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
@@ -47,6 +50,12 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
                 InputArgument::REQUIRED,
                 "module to deactivate"
             )
+            ->addOption(
+                "assume-yes",
+                'y',
+                InputOption::VALUE_NONE,
+                'Assume to deactivate a mandatory module'
+            )
         ;
     }
 
@@ -67,6 +76,15 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
 
         try {
             $event = new ModuleToggleActivationEvent($module->getId());
+
+            $module = ModuleQuery::create()->findPk($module->getId());
+            if ($module->getMandatory() == BaseModule::IS_MANDATORY) {
+                if (!$this->askConfirmation($input, $output)) {
+                    return;
+                }
+                $event->setAssumeDeactivate(true);
+            }
+
             if ($input->getOption("with-dependencies")) {
                 $event->setRecursive(true);
             }
@@ -83,5 +101,35 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
                 ''
             ), "bg=green;fg=black");
         }
+    }
+
+    private function askConfirmation(InputInterface $input, OutputInterface $output)
+    {
+        $assumeYes = $input->getOption("assume-yes");
+        $moduleCode = $input->getArgument("module");
+
+        if (!$assumeYes) {
+            /** @var QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+            $questionText = "Module ";
+            $questionText .= (empty($moduleCode))
+                ? ""
+                : $moduleCode;
+            $questionText .= " is mandatory.\n";
+            $questionText .= "Would you like to deactivate the module ";
+            $questionText .= (empty($moduleCode))
+                ? ""
+                : $moduleCode;
+            $questionText .= " ? (yes, or no) ";
+
+            $question = new ConfirmationQuestion($questionText, false);
+
+            if (!$helper->ask($input, $output, $question)) {
+                return false;
+            }
+
+        }
+
+        return true;
     }
 }
