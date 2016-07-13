@@ -86,6 +86,8 @@ return array(
     'Cannot find the shop country. Please select a shop country.' => 'Cannot find the shop country. Please select a shop country.',
     'Cannot hide the default language' => 'Cannot hide the default language',
     'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?' => 'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?',
+    'Can\'t remove a core module' => 'Can\'t remove a core module',
+    'Can\'t deactivate a secure module' => 'Can\'t deactivate a secure module',
     'Cart' => 'Cart',
     'Cart contains at least a product %op% <strong>%products_list%</strong>' => 'Cart contains at least a product %op% <strong>%products_list%</strong>',
     'Cart contains categories condition' => 'Cart contains categories condition',
