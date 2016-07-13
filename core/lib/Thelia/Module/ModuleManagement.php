@@ -105,14 +105,6 @@ class ModuleManagement
             $action = 'none';
         }
 
-        if (null === $mandatory) {
-            $protect = 0;
-        }
-
-        if (null === $hidden) {
-            $hidden = 0;
-        }
-
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
