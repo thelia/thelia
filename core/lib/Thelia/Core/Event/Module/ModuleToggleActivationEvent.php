@@ -34,13 +34,19 @@ class ModuleToggleActivationEvent extends ModuleEvent
      */
     protected $recursive;
 
+    /**
+     * @var bool
+     */
+    protected $assume_deactivate;
+
 
     /**
      * @param int $module_id
      */
-    public function __construct($module_id)
+    public function __construct($module_id, $assume_deactivate = false)
     {
         $this->module_id = $module_id;
+        $this->assume_deactivate = $assume_deactivate;
     }
 
     /**
@@ -97,6 +103,24 @@ class ModuleToggleActivationEvent extends ModuleEvent
     public function setRecursive($recursive)
     {
         $this->recursive = $recursive;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getAssumeDeactivate()
+    {
+        return $this->assume_deactivate;
+    }
+
+    /**
+     * @param boolean $recursive
+     * @return $this;
+     */
+    public function setAssumeDeactivate($assume_deactivate)
+    {
+        $this->assume_deactivate = $assume_deactivate;
         return $this;
     }
 }
