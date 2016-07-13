@@ -13,7 +13,7 @@
 {* Page Title *}
 {block name='no-return-functions' append}
     {loop name="product.seo.title" type="product" id=$product_id limit="1" with_prev_next_info="1"}
-    {$page_title = {$META_TITLE}}
+    {$page_title = $META_TITLE}
     {/loop}
 {/block}
 
