@@ -1,5 +1,8 @@
 # 2.3.4
 
+- (related to #2197) Pagination of coupon list
+- (related to #2198) Cancel coupon usage on order cancel
+- (related to #2190) Admin Home page statistics improvements
 - (related to #2189) Performance improvement in feature-availability loop
 - (related to #2188) A more effective way to solve issue free text feature problem (see #2061)
 - (related to #2174) New PSR-6 implementation + thelia.cache service and smarty cache block
