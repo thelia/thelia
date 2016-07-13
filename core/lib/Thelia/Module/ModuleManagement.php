@@ -88,6 +88,8 @@ class ModuleManagement
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code      = basename(dirname($reflected->getFileName()));
         $version   = (string)$content->version;
+        $mandatory = intval($content->mandatory);
+        $hidden    = intval($content->hidden);
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
 
@@ -113,6 +115,8 @@ class ModuleManagement
                 ->setFullNamespace((string)$content->fullnamespace)
                 ->setType($this->getModuleType($reflected))
                 ->setCategory((string)$content->type)
+                ->setMandatory($mandatory)
+                ->setHidden($hidden)
                 ->save($con);
 
             // Update the module images, title and description when the module is installed, but not after
