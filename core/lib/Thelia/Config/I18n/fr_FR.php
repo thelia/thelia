@@ -85,6 +85,8 @@ return [
     'Cannot find the shop country. Please select a shop country.' => 'Impossible de trouver le pays du magasin. Veuillez en sélectionner un.',
     'Cannot hide the default language' => 'Impossible de masquer la langue par défaut',
     'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?' => 'Ne peut instancier le module "%name%": le namespace est null. Peut-être que le modèle n\'est pas chargé ?',
+    'Can\'t remove a core module' => 'Impossible de supprimer un module de base',
+    'Can\'t deactivate a secure module' => 'Impossible de désactiver un module sécurisé',
     'Cart' => 'Panier',
     'Cart contains at least a product %op% <strong>%products_list%</strong>' => 'Le panier contient au moins un produit %op% <strong>%products_list%</strong> ',
     'Cart contains categories condition' => 'Valable si le panier contient/ne contient pas des produits appartenant à certaines catégories',

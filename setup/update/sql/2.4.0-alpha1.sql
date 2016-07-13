@@ -172,4 +172,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', NULL, NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', NULL, NUll, NULL, NULL);
 
+ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
+UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
+UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front';
+UPDATE `module` SET `mandatory` = 1, `hidden` = 1 WHERE `code` = 'TheliaSmarty';
+
 SET FOREIGN_KEY_CHECKS = 1;

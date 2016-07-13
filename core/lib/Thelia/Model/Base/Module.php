@@ -47,7 +47,7 @@ use Thelia\Model\ProfileModule as ChildProfileModule;
 use Thelia\Model\ProfileModuleQuery as ChildProfileModuleQuery;
 use Thelia\Model\Map\ModuleTableMap;
 
-abstract class Module implements ActiveRecordInterface
+abstract class Module implements ActiveRecordInterface 
 {
     /**
      * TableMap class name
@@ -130,6 +130,20 @@ abstract class Module implements ActiveRecordInterface
      * @var        string
      */
     protected $full_namespace;
+
+    /**
+     * The value for the mandatory field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $mandatory;
+
+    /**
+     * The value for the hidden field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $hidden;
 
     /**
      * The value for the created_at field.
@@ -233,13 +247,13 @@ abstract class Module implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     // i18n behavior
-
+    
     /**
      * Current locale
      * @var        string
      */
     protected $currentLocale = 'en_US';
-
+    
     /**
      * Current translation objects
      * @var        array[ChildModuleI18n]
@@ -340,6 +354,8 @@ abstract class Module implements ActiveRecordInterface
     {
         $this->version = '';
         $this->category = 'classic';
+        $this->mandatory = 0;
+        $this->hidden = 0;
     }
 
     /**
@@ -604,7 +620,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [id] column value.
-     *
+     * 
      * @return   int
      */
     public function getId()
@@ -615,7 +631,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [code] column value.
-     *
+     * 
      * @return   string
      */
     public function getCode()
@@ -626,7 +642,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [version] column value.
-     *
+     * 
      * @return   string
      */
     public function getVersion()
@@ -637,7 +653,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [type] column value.
-     *
+     * 
      * @return   int
      */
     public function getType()
@@ -648,7 +664,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [category] column value.
-     *
+     * 
      * @return   string
      */
     public function getCategory()
@@ -659,7 +675,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [activate] column value.
-     *
+     * 
      * @return   int
      */
     public function getActivate()
@@ -670,7 +686,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [position] column value.
-     *
+     * 
      * @return   int
      */
     public function getPosition()
@@ -681,7 +697,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [full_namespace] column value.
-     *
+     * 
      * @return   string
      */
     public function getFullNamespace()
@@ -691,8 +707,30 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Get the [mandatory] column value.
+     * 
+     * @return   int
+     */
+    public function getMandatory()
+    {
+
+        return $this->mandatory;
+    }
+
+    /**
+     * Get the [hidden] column value.
+     * 
+     * @return   int
+     */
+    public function getHidden()
+    {
+
+        return $this->hidden;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
-     *
+     * 
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
@@ -712,7 +750,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [optionally formatted] temporal [updated_at] column value.
-     *
+     * 
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
@@ -732,7 +770,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [id] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -753,7 +791,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [code] column.
-     *
+     * 
      * @param      string $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -774,7 +812,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [version] column.
-     *
+     * 
      * @param      string $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -795,7 +833,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [type] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -816,7 +854,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [category] column.
-     *
+     * 
      * @param      string $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -837,7 +875,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [activate] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -858,7 +896,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [position] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -879,7 +917,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [full_namespace] column.
-     *
+     * 
      * @param      string $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -899,8 +937,50 @@ abstract class Module implements ActiveRecordInterface
     } // setFullNamespace()
 
     /**
+     * Set the value of [mandatory] column.
+     * 
+     * @param      int $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setMandatory($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->mandatory !== $v) {
+            $this->mandatory = $v;
+            $this->modifiedColumns[ModuleTableMap::MANDATORY] = true;
+        }
+
+
+        return $this;
+    } // setMandatory()
+
+    /**
+     * Set the value of [hidden] column.
+     * 
+     * @param      int $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setHidden($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->hidden !== $v) {
+            $this->hidden = $v;
+            $this->modifiedColumns[ModuleTableMap::HIDDEN] = true;
+        }
+
+
+        return $this;
+    } // setHidden()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-     *
+     * 
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\Module The current object (for fluent API support)
@@ -921,7 +1001,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
+     * 
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\Module The current object (for fluent API support)
@@ -955,6 +1035,14 @@ abstract class Module implements ActiveRecordInterface
             }
 
             if ($this->category !== 'classic') {
+                return false;
+            }
+
+            if ($this->mandatory !== 0) {
+                return false;
+            }
+
+            if ($this->hidden !== 0) {
                 return false;
             }
 
@@ -1009,13 +1097,19 @@ abstract class Module implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_namespace = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('Mandatory', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->mandatory = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('Hidden', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->hidden = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1028,7 +1122,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Module object", 0, $e);
@@ -1565,6 +1659,12 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) {
             $modifiedColumns[':p' . $index++]  = '`FULL_NAMESPACE`';
         }
+        if ($this->isColumnModified(ModuleTableMap::MANDATORY)) {
+            $modifiedColumns[':p' . $index++]  = '`MANDATORY`';
+        }
+        if ($this->isColumnModified(ModuleTableMap::HIDDEN)) {
+            $modifiedColumns[':p' . $index++]  = '`HIDDEN`';
+        }
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1582,34 +1682,40 @@ abstract class Module implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`ID`':                        
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`CODE`':                        
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`VERSION`':
+                    case '`VERSION`':                        
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_STR);
                         break;
-                    case '`TYPE`':
+                    case '`TYPE`':                        
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_INT);
                         break;
-                    case '`CATEGORY`':
+                    case '`CATEGORY`':                        
                         $stmt->bindValue($identifier, $this->category, PDO::PARAM_STR);
                         break;
-                    case '`ACTIVATE`':
+                    case '`ACTIVATE`':                        
                         $stmt->bindValue($identifier, $this->activate, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case '`POSITION`':                        
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`FULL_NAMESPACE`':
+                    case '`FULL_NAMESPACE`':                        
                         $stmt->bindValue($identifier, $this->full_namespace, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`MANDATORY`':                        
+                        $stmt->bindValue($identifier, $this->mandatory, PDO::PARAM_INT);
+                        break;
+                    case '`HIDDEN`':                        
+                        $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
+                        break;
+                    case '`CREATED_AT`':                        
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`UPDATED_AT`':                        
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -1699,9 +1805,15 @@ abstract class Module implements ActiveRecordInterface
                 return $this->getFullNamespace();
                 break;
             case 8:
-                return $this->getCreatedAt();
+                return $this->getMandatory();
                 break;
             case 9:
+                return $this->getHidden();
+                break;
+            case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1741,14 +1853,16 @@ abstract class Module implements ActiveRecordInterface
             $keys[5] => $this->getActivate(),
             $keys[6] => $this->getPosition(),
             $keys[7] => $this->getFullNamespace(),
-            $keys[8] => $this->getCreatedAt(),
-            $keys[9] => $this->getUpdatedAt(),
+            $keys[8] => $this->getMandatory(),
+            $keys[9] => $this->getHidden(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
-
+        
         if ($includeForeignObjects) {
             if (null !== $this->collOrdersRelatedByPaymentModuleId) {
                 $result['OrdersRelatedByPaymentModuleId'] = $this->collOrdersRelatedByPaymentModuleId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1842,9 +1956,15 @@ abstract class Module implements ActiveRecordInterface
                 $this->setFullNamespace($value);
                 break;
             case 8:
-                $this->setCreatedAt($value);
+                $this->setMandatory($value);
                 break;
             case 9:
+                $this->setHidden($value);
+                break;
+            case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1879,8 +1999,10 @@ abstract class Module implements ActiveRecordInterface
         if (array_key_exists($keys[5], $arr)) $this->setActivate($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setFullNamespace($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[8], $arr)) $this->setMandatory($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setHidden($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
     }
 
     /**
@@ -1900,6 +2022,8 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) $criteria->add(ModuleTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModuleTableMap::POSITION)) $criteria->add(ModuleTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
+        if ($this->isColumnModified(ModuleTableMap::MANDATORY)) $criteria->add(ModuleTableMap::MANDATORY, $this->mandatory);
+        if ($this->isColumnModified(ModuleTableMap::HIDDEN)) $criteria->add(ModuleTableMap::HIDDEN, $this->hidden);
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) $criteria->add(ModuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ModuleTableMap::UPDATED_AT)) $criteria->add(ModuleTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1972,6 +2096,8 @@ abstract class Module implements ActiveRecordInterface
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setFullNamespace($this->getFullNamespace());
+        $copyObj->setMandatory($this->getMandatory());
+        $copyObj->setHidden($this->getHidden());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2239,7 +2365,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $ordersRelatedByPaymentModuleIdToDelete = $this->getOrdersRelatedByPaymentModuleId(new Criteria(), $con)->diff($ordersRelatedByPaymentModuleId);
 
-
+        
         $this->ordersRelatedByPaymentModuleIdScheduledForDeletion = $ordersRelatedByPaymentModuleIdToDelete;
 
         foreach ($ordersRelatedByPaymentModuleIdToDelete as $orderRelatedByPaymentModuleIdRemoved) {
@@ -2607,7 +2733,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $ordersRelatedByDeliveryModuleIdToDelete = $this->getOrdersRelatedByDeliveryModuleId(new Criteria(), $con)->diff($ordersRelatedByDeliveryModuleId);
 
-
+        
         $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion = $ordersRelatedByDeliveryModuleIdToDelete;
 
         foreach ($ordersRelatedByDeliveryModuleIdToDelete as $orderRelatedByDeliveryModuleIdRemoved) {
@@ -2975,7 +3101,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $areaDeliveryModulesToDelete = $this->getAreaDeliveryModules(new Criteria(), $con)->diff($areaDeliveryModules);
 
-
+        
         $this->areaDeliveryModulesScheduledForDeletion = $areaDeliveryModulesToDelete;
 
         foreach ($areaDeliveryModulesToDelete as $areaDeliveryModuleRemoved) {
@@ -3218,7 +3344,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $profileModulesToDelete = $this->getProfileModules(new Criteria(), $con)->diff($profileModules);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -3464,7 +3590,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $moduleImagesToDelete = $this->getModuleImages(new Criteria(), $con)->diff($moduleImages);
 
-
+        
         $this->moduleImagesScheduledForDeletion = $moduleImagesToDelete;
 
         foreach ($moduleImagesToDelete as $moduleImageRemoved) {
@@ -3682,7 +3808,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $couponModulesToDelete = $this->getCouponModules(new Criteria(), $con)->diff($couponModules);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -3928,7 +4054,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $orderCouponModulesToDelete = $this->getOrderCouponModules(new Criteria(), $con)->diff($orderCouponModules);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -4174,7 +4300,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $moduleHooksToDelete = $this->getModuleHooks(new Criteria(), $con)->diff($moduleHooks);
 
-
+        
         $this->moduleHooksScheduledForDeletion = $moduleHooksToDelete;
 
         foreach ($moduleHooksToDelete as $moduleHookRemoved) {
@@ -4417,7 +4543,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $moduleConfigsToDelete = $this->getModuleConfigs(new Criteria(), $con)->diff($moduleConfigs);
 
-
+        
         $this->moduleConfigsScheduledForDeletion = $moduleConfigsToDelete;
 
         foreach ($moduleConfigsToDelete as $moduleConfigRemoved) {
@@ -4635,7 +4761,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $ignoredModuleHooksToDelete = $this->getIgnoredModuleHooks(new Criteria(), $con)->diff($ignoredModuleHooks);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -4881,7 +5007,7 @@ abstract class Module implements ActiveRecordInterface
     {
         $moduleI18nsToDelete = $this->getModuleI18ns(new Criteria(), $con)->diff($moduleI18ns);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -5551,6 +5677,8 @@ abstract class Module implements ActiveRecordInterface
         $this->activate = null;
         $this->position = null;
         $this->full_namespace = null;
+        $this->mandatory = null;
+        $this->hidden = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -5676,7 +5804,7 @@ abstract class Module implements ActiveRecordInterface
     }
 
     // timestampable behavior
-
+    
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
@@ -5685,12 +5813,12 @@ abstract class Module implements ActiveRecordInterface
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[ModuleTableMap::UPDATED_AT] = true;
-
+    
         return $this;
     }
 
     // i18n behavior
-
+    
     /**
      * Sets the locale for translations
      *
@@ -5701,10 +5829,10 @@ abstract class Module implements ActiveRecordInterface
     public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
-
+    
         return $this;
     }
-
+    
     /**
      * Gets the locale for translations
      *
@@ -5714,7 +5842,7 @@ abstract class Module implements ActiveRecordInterface
     {
         return $this->currentLocale;
     }
-
+    
     /**
      * Returns the current translation for a given locale
      *
@@ -5729,7 +5857,7 @@ abstract class Module implements ActiveRecordInterface
                 foreach ($this->collModuleI18ns as $translation) {
                     if ($translation->getLocale() == $locale) {
                         $this->currentTranslations[$locale] = $translation;
-
+    
                         return $translation;
                     }
                 }
@@ -5745,10 +5873,10 @@ abstract class Module implements ActiveRecordInterface
             }
             $this->addModuleI18n($translation);
         }
-
+    
         return $this->currentTranslations[$locale];
     }
-
+    
     /**
      * Remove the translation for a given locale
      *
@@ -5773,10 +5901,10 @@ abstract class Module implements ActiveRecordInterface
                 break;
             }
         }
-
+    
         return $this;
     }
-
+    
     /**
      * Returns the current translation
      *
@@ -5787,100 +5915,100 @@ abstract class Module implements ActiveRecordInterface
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
-
-
+    
+    
         /**
          * Get the [title] column value.
-         *
+         * 
          * @return   string
          */
         public function getTitle()
         {
         return $this->getCurrentTranslation()->getTitle();
     }
-
-
+    
+    
         /**
          * Set the value of [title] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ModuleI18n The current object (for fluent API support)
          */
         public function setTitle($v)
         {    $this->getCurrentTranslation()->setTitle($v);
-
+    
         return $this;
     }
-
-
+    
+    
         /**
          * Get the [description] column value.
-         *
+         * 
          * @return   string
          */
         public function getDescription()
         {
         return $this->getCurrentTranslation()->getDescription();
     }
-
-
+    
+    
         /**
          * Set the value of [description] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ModuleI18n The current object (for fluent API support)
          */
         public function setDescription($v)
         {    $this->getCurrentTranslation()->setDescription($v);
-
+    
         return $this;
     }
-
-
+    
+    
         /**
          * Get the [chapo] column value.
-         *
+         * 
          * @return   string
          */
         public function getChapo()
         {
         return $this->getCurrentTranslation()->getChapo();
     }
-
-
+    
+    
         /**
          * Set the value of [chapo] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ModuleI18n The current object (for fluent API support)
          */
         public function setChapo($v)
         {    $this->getCurrentTranslation()->setChapo($v);
-
+    
         return $this;
     }
-
-
+    
+    
         /**
          * Get the [postscriptum] column value.
-         *
+         * 
          * @return   string
          */
         public function getPostscriptum()
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
-
-
+    
+    
         /**
          * Set the value of [postscriptum] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ModuleI18n The current object (for fluent API support)
          */
         public function setPostscriptum($v)
         {    $this->getCurrentTranslation()->setPostscriptum($v);
-
+    
         return $this;
     }
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module>
+<module xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
     <fullnamespace>Front\Front</fullnamespace>
     <descriptive locale="en_US">
         <title>Front integration</title>
@@ -9,12 +11,19 @@
         <title>Front office module</title>
         <description></description>
     </descriptive>
+    <languages>
+        <language>en_US</language>
+        <language>fr_FR</language>
+    </languages>
     <version>2.3.0</version>
-    <author>
-        <name>Thelia team</name>
-        <email>info@thelia.net</email>
-    </author>
+    <authors>
+        <author>
+            <name>Thelia team</name>
+            <email>info@thelia.net</email>
+        </author>
+    </authors>
     <type>classic</type>
     <thelia>2.2.0</thelia>
     <stability>alpha</stability>
+    <hidden>1</hidden>
 </module>
