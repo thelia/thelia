@@ -25,9 +25,15 @@ class ModuleDeleteEvent extends ModuleEvent
     protected $module_id;
     protected $delete_data;
 
-    public function __construct($module_id)
+    /**
+     * @var bool
+     */
+    protected $assume_delete;
+
+    public function __construct($module_id, $assume_delete = false)
     {
         $this->module_id = $module_id;
+        $this->assume_delete = $assume_delete;
     }
 
     /**
@@ -55,6 +61,24 @@ class ModuleDeleteEvent extends ModuleEvent
     {
         $this->delete_data = $delete_data;
 
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getAssumeDelete()
+    {
+        return $this->assume_delete;
+    }
+
+    /**
+     * @param boolean $recursive
+     * @return $this;
+     */
+    public function setAssumeDelete($assume_delete)
+    {
+        $this->assume_delete = $assume_delete;
         return $this;
     }
 }

@@ -1,5 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<database defaultIdMethod="native" name="thelia">  <vendor type="mysql">    <parameter name="Engine" value="InnoDB"/>    <parameter name="Charset" value="utf8"/>  </vendor>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<database defaultIdMethod="native" name="thelia">
+  <vendor type="mysql">
+    <parameter name="Engine" value="InnoDB"/>
+    <parameter name="Charset" value="utf8"/>
+  </vendor>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="parent" required="true" type="INTEGER" />
@@ -806,6 +811,8 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
     <column name="full_namespace" size="255" type="VARCHAR" />
+    <column name="mandatory" type="TINYINT" defaultValue="0" />
+    <column name="hidden" type="TINYINT" defaultValue="0" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
