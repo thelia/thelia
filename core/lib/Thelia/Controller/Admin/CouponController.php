@@ -815,7 +815,7 @@ class CouponController extends BaseAdminController
 
     protected function getDefaultDateFormat()
     {
-        return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+        return LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
     }
 
     /**

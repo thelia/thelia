@@ -295,7 +295,7 @@ class CouponCreationForm extends BaseForm
      */
     public function checkLocalizedDate($value, ExecutionContextInterface $context)
     {
-        $format = LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+        $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
         if (false === \DateTime::createFromFormat($format, $value)) {
             $context->addViolation(
@@ -320,7 +320,7 @@ class CouponCreationForm extends BaseForm
             return;
         }
 
-        $format = LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+        $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
         $startDate = \DateTime::createFromFormat($format, $startDate);
         $expirationDate = \DateTime::createFromFormat($format, $value);
