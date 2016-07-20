@@ -1423,7 +1423,7 @@ return array(
     'Your new password' => 'Your new password',
     'Your new password for {config key="store_name"}' => 'Your new password for {config key="store_name"}',
     'Your order {$order_ref} at {config key="store_name"}' => 'Your order {$order_ref} at {config key="store_name"}',
-    'Your subscription to %store newsletter' => 'Your subscription to %store newsletter',
+    'Your subscription to %store newsletter' => 'Your subscription to {config key="store_name"} newsletter',
     'Yuan' => 'Yuan',
     'Yucatán' => 'Yucatán',
     'Yukon' => 'Yukon',
