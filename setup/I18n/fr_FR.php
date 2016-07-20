@@ -1403,7 +1403,7 @@ return [
     'Your new password' => 'Votre nouveau mot de passe',
     'Your new password for {config key="store_name"}' => 'Votre nouveau mot de passe {config key="store_name"}',
     'Your order {$order_ref} at {config key="store_name"}' => 'Votre commande {$order_ref} chez {config key="store_name"}',
-    'Your subscription to %store newsletter' => 'Vous avez souscrit à la newsletter du site %store',
+    'Your subscription to %store newsletter' => 'Vous avez souscrit à la newsletter du site {config key="store_name"}',
     'Your subscription to {config key="store_name"} newsletter' => 'Votre abonnement à {config key="store_name"} newsletter',
     'Yuan' => 'Yuan',
     'Yucatán' => 'Yucatán',
