@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array(
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les utilisateurs d\'administration',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les clients',
     '"Remember me" cookie name for administration users' => 'Nom du cookie "Remember me" pour les utilisateurs d\'administration',
@@ -283,6 +283,7 @@ return [
     'Configuration / Tax' => 'Configuration / Taxe',
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration variables' => 'Variables de configuration',
+    'Confirm your {config key="store_name"} account' => 'Confirmez la création de votre compte {config key="store_name"}',
     'Congo' => 'Congo',
     'Connecticut' => 'Connecticut',
     'Contact block' => 'Bloc contact',
@@ -774,6 +775,7 @@ return [
     'Madagascar' => 'Madagascar',
     'Mail sent after a subscription to newsletter' => 'Email envoyé après l\'inscription à la newsletter',
     'Mail sent to an administrator who requested a new password' => 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe',
+    'Mail sent to the customer to confirm its account' => 'E-mail de confirmation de création de compte client',
     'Mail sent to the customer when its account is created by an administrator in the back-office' => 'Mail envoyé au client lorsque son compte est créé depuis le back-office par un administrateur',
     'Mail sent to the customer when its password or email is changed in the back-office' => 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office',
     'Mailing system - JavaScript' => 'Envoi des e-mails - JavaScript',
@@ -889,7 +891,7 @@ return [
     'New York' => 'New York',
     'New Zealand' => 'Nouvelle-Zélande',
     'New order {$order_ref} placed on {config key="store_name"}' => 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}',
-    'New password request on {config key="store_name"}' => 'Nouvelle demande de mot de passe sur {config key="store_name"}',
+    'New password request on {config key="store_name"}' => 'Votre demande de mot de passe {config key="store_name"}',
     'Newfoundland and Labrador' => 'Terre Neuve et Labrador',
     'Newsletter block' => 'Bloc newsletter',
     'Newsletter page - CSS stylesheet' => 'Page newsletter - feuille de style CSS',
@@ -1403,7 +1405,6 @@ return [
     'Your new password' => 'Votre nouveau mot de passe',
     'Your new password for {config key="store_name"}' => 'Votre nouveau mot de passe {config key="store_name"}',
     'Your order {$order_ref} at {config key="store_name"}' => 'Votre commande {$order_ref} chez {config key="store_name"}',
-    'Your subscription to %store newsletter' => 'Vous avez souscrit à la newsletter du site {config key="store_name"}',
     'Your subscription to {config key="store_name"} newsletter' => 'Votre abonnement à {config key="store_name"} newsletter',
     'Yuan' => 'Yuan',
     'Yucatán' => 'Yucatán',
@@ -1447,4 +1448,4 @@ return [
     'tinymce wysiwyg editor' => 'Editeur TinyMCE',
     'Đồng' => 'Đồng',
     'Гривна' => 'Hryvnia Ukrainien',
-];
+);

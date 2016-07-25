@@ -74,9 +74,9 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max_id+1, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max_id+1, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your %store account', NULL, NULL),
+    (@max_id+1, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your {config key=\"store_name\"} account', NULL, NULL),
     (@max_id+1, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max_id+1, 'fr_FR', NULL, NULL, NULL, NULL)
+    (@max_id+1, 'fr_FR', 'E-mail de confirmation de création de compte client', 'Confirmez la création de votre compte {config key=\"store_name\"}', NULL, NULL)
 ;
 
 -- Order status improvement
@@ -170,7 +170,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (@max+1, 'number_default_results_per_page.coupon_list', '20', '0', '0', NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', NULL, NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', NULL, NUll, NULL, NULL);
+    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', 'Default number of coupons per page on coupon list', NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', NULL, NUll, NULL, NULL);
 
 ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
 UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
