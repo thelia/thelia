@@ -23,9 +23,9 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on %store', NULL, NULL),
-    (@max, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', NULL, NULL, NULL),
-    (@max, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', NULL, NULL, NULL)
+    (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
+    (@max, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', 'Nueva contraseña solicitada en {config key=\"store_name\"}', NULL, NULL),
+    (@max, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', 'Votre demande de mot de passe {config key=\"store_name\"}', NULL, NULL)
 ;
 
 -- Insert a fake email address for administrators, to trigger the admin update dialog
@@ -176,7 +176,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max, 'en_US', 'Mail sent after a subscription to newsletter', NULL, NULL, NULL),
+    (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),
     (@max, 'es_ES', 'Correo enviado después de la suscripción al boletín de noticias', 'Tu subscripción al boletín de {config key=\"store_name\"}', NULL, NULL),
     (@max, 'fr_FR', 'Email envoyé après l\'inscription à la newsletter', 'Votre abonnement à {config key=\"store_name\"} newsletter', NULL, NULL)
 ;
