@@ -46,16 +46,16 @@ class ContactController extends BaseFrontController
         try {
             $form = $this->validateForm($contactForm);
             
-            $message = $this->getMailer()->getMessageInstance()
-                ->setSubject($form->get('subject')->getData())
-                ->addFrom(ConfigQuery::getStoreEmail(), $form->get('name')->getData())
-                ->addReplyTo($form->get('email')->getData(), $form->get('name')->getData())
-                ->addTo(ConfigQuery::getStoreEmail(), ConfigQuery::getStoreName())
-            ;
-            
-            $message->setBody($form->get('message')->getData());
-            
-            $this->getMailer()->send($message);
+            $this->getMailer()->sendSimpleEmailMessage(
+                [ ConfigQuery::getStoreEmail() => $form->get('name')->getData() ],
+                [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+                $form->get('subject')->getData(),
+                '',
+                $form->get('message')->getData(),
+                [],
+                [],
+                [ $form->get('email')->getData() => $form->get('name')->getData() ]
+            );
             
             if ($contactForm->hasSuccessUrl()) {
                 return $this->generateSuccessRedirect($contactForm);
