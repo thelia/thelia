@@ -1,5 +1,7 @@
 # 2.3.4
 
+- (related to #2224) Added simple messages (no Message object required) processing to the MailerFactory, throug the sendSimpleEmailMessage() and createSimpleEmailMessage() methods. A new getMessageInstance() method has been added, to prevent direct usage of \Swift_Message::newInstance()
+- (related to #2217) New feature: Protected and hidden modules
 - (related to #2197) Pagination of coupon list
 - (related to #2198) Cancel coupon usage on order cancel
 - (related to #2190) Admin Home page statistics improvements
