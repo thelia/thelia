@@ -52,37 +52,20 @@ class SendMail implements EventSubscriberInterface
             $contact_email = ConfigQuery::getStoreEmail();
             
             if ($contact_email) {
-                
-                $message = MessageQuery::create()
-                    ->filterByName('mail_colissimo')
-                    ->findOne();
-                
-                if (false === $message) {
-                    throw new \Exception("Failed to load message 'order_confirmation'.");
-                }
-                
                 $order = $event->getOrder();
                 $customer = $order->getCustomer();
                 
-                $this->parser->assign('customer_id', $customer->getId());
-                $this->parser->assign('order_ref', $order->getRef());
-                $this->parser->assign('order_date', $order->getCreatedAt());
-                $this->parser->assign('update_date', $order->getUpdatedAt());
-                $this->parser->assign('package', $order->getDeliveryRef());
-                
-                
-                $message
-                    ->setLocale($order->getLang()->getLocale());
-                
-                $instance = $this->mailer->getMessageInstance()
-                    ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                    ->addFrom($contact_email, ConfigQuery::getStoreName())
-                ;
-                
-                // Build subject and body
-                $message->buildMessage($this->parser, $instance);
-                
-                $this->mailer->send($instance);
+                $this->mailer->sendEmailToCustomer(
+                    'mail_colissimo',
+                    $customer,
+                    [
+                        'customer_id' => $customer->getId(),
+                        'order_ref' => $order->getRef(),
+                        'order_date' => $order->getCreatedAt(),
+                        'update_date' => $order->getUpdatedAt(),
+                        'package' => $order->getDeliveryRef()
+                    ]
+                );
                 
                 Tlog::getInstance()->debug("Colissimo shipping message sent to customer ".$customer->getEmail());
             } else {
