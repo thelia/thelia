@@ -24,7 +24,6 @@
 namespace Front\Controller;
 
 use Thelia\Controller\Front\BaseFrontController;
-use Thelia\Form\ContactForm;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -47,12 +46,14 @@ class ContactController extends BaseFrontController
         try {
             $form = $this->validateForm($contactForm);
 
-            $message = \Swift_Message::newInstance($form->get('subject')->getData())
+            $message = $this->getMailer()->getMessageInstance()
+                ->setSubject($form->get('subject')->getData())
                 ->addFrom(ConfigQuery::getStoreEmail(), $form->get('name')->getData())
                 ->addReplyTo($form->get('email')->getData(), $form->get('name')->getData())
                 ->addTo(ConfigQuery::getStoreEmail(), ConfigQuery::getStoreName())
-                ->setBody($form->get('message')->getData())
             ;
+    
+            $message->setBody($form->get('message')->getData());
 
             $this->getMailer()->send($message);
 

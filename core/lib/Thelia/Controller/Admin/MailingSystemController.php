@@ -130,7 +130,7 @@ class MailingSystemController extends BaseAdminController
 
             $htmlMessage = "<p>$message</p>";
 
-            $instance = \Swift_Message::newInstance()
+            $instance = $this->getMailer()->getMessageInstance()
                 ->addTo($emailTest, $storeName)
                 ->addFrom($contactEmail, $storeName)
                 ->setSubject($message)

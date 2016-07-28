@@ -74,22 +74,20 @@ class SendMail implements EventSubscriberInterface
                 $message
                     ->setLocale($order->getLang()->getLocale());
 
-                $instance = \Swift_Message::newInstance()
+                $instance = $this->mailer->getMessageInstance()
                     ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
                     ->addFrom($contact_email, ConfigQuery::getStoreName())
                 ;
 
                 // Build subject and body
-
                 $message->buildMessage($this->parser, $instance);
 
                 $this->mailer->send($instance);
                 
                 Tlog::getInstance()->debug("Colissimo shipping message sent to customer ".$customer->getEmail());
-            }
-            else {
-              $customer = $order->getCustomer();
-              Tlog::getInstance()->debug("Colissimo shipping message no contact email customer_id", $customer->getId());
+            } else {
+                $customer = $order->getCustomer();
+                Tlog::getInstance()->debug("Colissimo shipping message no contact email customer_id", $customer->getId());
             }
         }
     }
