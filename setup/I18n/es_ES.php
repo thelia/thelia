@@ -1028,7 +1028,6 @@ return [
     'Your new password for {config key="store_name"}' => 'Su nueva contraseña para {tecla config = "store_name"}',
     'Your order {$order_ref} at {config key="store_name"}' => 'Su orden {$order_ref} en {tecla config = "store_name"}',
     'Your subscription to %store newsletter' => 'Tu suscripción al boletín de {config key="store_name"}',
-    'Your subscription to %store newsletter' => 'Tu subscripción al boletín de {config key="store_name"}',
     'Zaire' => 'Zaire',
     'Zambia' => 'Zambia',
     'Zimbabwe' => 'Zimbabue',
