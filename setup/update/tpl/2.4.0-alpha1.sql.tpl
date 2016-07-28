@@ -56,7 +56,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
-    (@max_id+1, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your {config key="store_name"} account' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (@max_id+1, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your %store account' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
