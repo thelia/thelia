@@ -32,68 +32,66 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class SendMail implements EventSubscriberInterface
 {
-
+    
     protected $parser;
-
+    
     protected $mailer;
-
+    
     public function __construct(ParserInterface $parser, MailerFactory $mailer)
     {
         $this->parser = $parser;
         $this->mailer = $mailer;
     }
-
+    
     public function updateStatus(OrderEvent $event)
     {
         $order = $event->getOrder();
         $colissimo = new Colissimo();
-
+        
         if ($order->isSent() && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
             $contact_email = ConfigQuery::getStoreEmail();
-
+            
             if ($contact_email) {
-
+                
                 $message = MessageQuery::create()
                     ->filterByName('mail_colissimo')
                     ->findOne();
-
+                
                 if (false === $message) {
                     throw new \Exception("Failed to load message 'order_confirmation'.");
                 }
-
+                
                 $order = $event->getOrder();
                 $customer = $order->getCustomer();
-
+                
                 $this->parser->assign('customer_id', $customer->getId());
                 $this->parser->assign('order_ref', $order->getRef());
                 $this->parser->assign('order_date', $order->getCreatedAt());
                 $this->parser->assign('update_date', $order->getUpdatedAt());
                 $this->parser->assign('package', $order->getDeliveryRef());
-
-
+                
+                
                 $message
                     ->setLocale($order->getLang()->getLocale());
-
-                $instance = \Swift_Message::newInstance()
+                
+                $instance = $this->mailer->getMessageInstance()
                     ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
                     ->addFrom($contact_email, ConfigQuery::getStoreName())
                 ;
-
+                
                 // Build subject and body
-
                 $message->buildMessage($this->parser, $instance);
-
+                
                 $this->mailer->send($instance);
                 
                 Tlog::getInstance()->debug("Colissimo shipping message sent to customer ".$customer->getEmail());
-            }
-            else {
-              $customer = $order->getCustomer();
-              Tlog::getInstance()->debug("Colissimo shipping message no contact email customer_id", $customer->getId());
+            } else {
+                $customer = $order->getCustomer();
+                Tlog::getInstance()->debug("Colissimo shipping message no contact email customer_id", $customer->getId());
             }
         }
     }
-
+    
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
