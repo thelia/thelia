@@ -61,11 +61,11 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
     }
 
-    protected function logAlertMessage($message)
+    protected function logAlertMessage($message, $failSafe = false)
     {
         Tlog::getInstance()->addAlert($message);
 
-        if ($this->debugEnabled) {
+        if (!$failSafe && $this->debugEnabled) {
             throw new \InvalidArgumentException($message);
         }
     }
@@ -346,9 +346,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
 
         if (! $hook->getActivate()) {
-            $this->logAlertMessage(sprintf("Hook %s is not activated.", $hookName));
-
-            return null;
+            $this->logAlertMessage(sprintf("Hook %s is not activated.", $hookName), true);
         }
 
         return $hook;
