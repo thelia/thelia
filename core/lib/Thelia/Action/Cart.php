@@ -98,11 +98,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
-
+    
         // Search for an identical item in the cart
-        $dispatcher->dispatch(TheliaEvents::CART_FINDITEM, clone $event);
-
-        $cartItem = $event->getCartItem();
+        $findItemEvent = clone $event;
+    
+        $dispatcher->dispatch(TheliaEvents::CART_FINDITEM, $findItemEvent);
+    
+        $cartItem = $findItemEvent->getCartItem();
 
         if ($cartItem === null || $newness) {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
