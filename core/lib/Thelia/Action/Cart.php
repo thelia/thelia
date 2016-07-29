@@ -301,7 +301,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function findCartItem(CartEvent $event)
     {
-        if (null !== $foundItem = CartItemQuery::create()
+        // Do not try to find a cartItem if one exists in the event, as previous event handlers
+        // mays have put it in th event.
+        if (null === $event->getCartItem() && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProduct())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
