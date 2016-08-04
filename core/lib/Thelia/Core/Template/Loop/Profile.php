@@ -78,6 +78,7 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("DESCRIPTION", $profile->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
+	    $this->addOutputFields($loopResultRow, $profile);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -76,6 +76,7 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
                 ->set("COUNTRY", $orderAddress->getCountryId())
                 ->set("PHONE", $orderAddress->getPhone())
             ;
+	    $this->addOutputFields($loopResultRow, $orderAddress);
 
             $loopResult->addRow($loopResultRow);
         }

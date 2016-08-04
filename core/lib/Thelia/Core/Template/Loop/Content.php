@@ -265,6 +265,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 ->set("VISIBLE"                 , $content->getVisible())
             ;
+	    $this->addOutputFields($loopResultRow, $content);
 
             $loopResult->addRow($this->findNextPrev($loopResultRow, $content, $defaultFolderId));
         }

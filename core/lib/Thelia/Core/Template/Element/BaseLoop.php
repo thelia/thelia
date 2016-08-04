@@ -536,4 +536,13 @@ abstract class BaseLoop
      */
     abstract protected function getArgDefinitions();
 
+
+    /**
+     * Use this method in order to add fields in sub-classes
+     * @param LoopResultRow $loopResultRow
+     * @param object|array $item
+     *
+     */    
+    protected function addOutputFields(LoopResultRow $loopResultRow, $item) { }
+
 }

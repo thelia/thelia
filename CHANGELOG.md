@@ -56,6 +56,7 @@
 - Updating stock when changing order : canceled status
 - order table is versionnable now.
 - product_sale_elements_id is added to order_product table.
+- Loop : new method addOutputFields is called in parseResults method
 
 #2.0.3
 
