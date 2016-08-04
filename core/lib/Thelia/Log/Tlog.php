@@ -687,7 +687,7 @@ class Tlog Implements LoggerInterface
 
             $prefix = str_replace(
                 array("#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"),
-                array(1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")),
+                array(1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("H:i:s")),
                 $this->prefix
             );
 
