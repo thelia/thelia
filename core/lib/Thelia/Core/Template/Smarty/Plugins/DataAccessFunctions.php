@@ -430,6 +430,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 }
 
                 $getter = sprintf("get%s", $this->underscoreToCamelcase($attribute));
+                if (!method_exists($data, $getter)) {
+                    $getter = sprintf("is%s", $this->underscoreToCamelcase($attribute));
+                }
                 if (method_exists($data, $getter)) {
                     $return =  $data->$getter();
 
