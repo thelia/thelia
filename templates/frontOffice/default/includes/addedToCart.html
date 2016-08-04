@@ -15,12 +15,12 @@
             </td>
             <td class="col-md-4">
                 <h2>{$TITLE}</h2>
-                {loop type="attribute_combination" name="product_options" product_sale_elements="{$smarty.get.pse_id}"}
+                {loop type="attribute_combination" name="product_options" product_sale_elements="{$smarty.get.pse_id|default:0}"}
                     <p>{$ATTRIBUTE_TITLE} : {$ATTRIBUTE_AVAILABILITY_TITLE}</p>
                 {/loop}
             </td>
             <td class="col-md-4">
-                {loop type="product_sale_elements" name="product_price" id="{$smarty.get.pse_id}"}
+                {loop type="product_sale_elements" name="product_price" id="{$smarty.get.pse_id|default:0}"}
                     {if $IS_PROMO == 1}
                         {assign "real_price" $TAXED_PROMO_PRICE}
                         <div class="special-price"><span class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></div>
