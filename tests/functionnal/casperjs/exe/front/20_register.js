@@ -53,7 +53,7 @@ casper.test.begin('Register', 15, function suite(test) {
         test.assertExists('.group-password_confirm.has-error', 'password confirm can not be empty');
 
         this.fill('form#form-register', {
-            'thelia_customer_create[title]': 1,
+            'thelia_customer_create[title]': '1',
             'thelia_customer_create[firstname]': 'thelia',
             'thelia_customer_create[lastname]': 'thelia',
             'thelia_customer_create[email]': 'test@thelia.net',
@@ -65,7 +65,7 @@ casper.test.begin('Register', 15, function suite(test) {
             'thelia_customer_create[address2]': '',
             'thelia_customer_create[zipcode]': '63000',
             'thelia_customer_create[city]': 'Clermont-Ferrand',
-            'thelia_customer_create[country]': 64,
+            'thelia_customer_create[country]': '64',
             'thelia_customer_create[password]': 'thelia',
             'thelia_customer_create[password_confirm]': 'thelia',
             'thelia_customer_create[newsletter]': ''
