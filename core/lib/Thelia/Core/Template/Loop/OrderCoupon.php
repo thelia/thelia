@@ -93,6 +93,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
                 $loopResultRow->set("ID", $orderCoupon->getId())
                     ->set("CODE", $orderCoupon->getCode())
+                    ->set("DISCOUNT_AMOUNT", $orderCoupon->getAmount())
                     ->set("TITLE", $orderCoupon->getTitle())
                     ->set("SHORT_DESCRIPTION", $orderCoupon->getShortDescription())
                     ->set("DESCRIPTION", $orderCoupon->getDescription())
