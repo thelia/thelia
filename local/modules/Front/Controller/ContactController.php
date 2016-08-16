@@ -42,10 +42,10 @@ class ContactController extends BaseFrontController
     public function sendAction()
     {
         $contactForm = $this->createForm(FrontForm::CONTACT);
-        
+
         try {
             $form = $this->validateForm($contactForm);
-            
+
             $this->getMailer()->sendSimpleEmailMessage(
                 [ ConfigQuery::getStoreEmail() => $form->get('name')->getData() ],
                 [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
@@ -56,26 +56,26 @@ class ContactController extends BaseFrontController
                 [],
                 [ $form->get('email')->getData() => $form->get('name')->getData() ]
             );
-            
+
             if ($contactForm->hasSuccessUrl()) {
                 return $this->generateSuccessRedirect($contactForm);
             }
-            
+
             return $this->generateRedirectFromRoute('contact.success');
-            
+
         } catch (FormValidationException $e) {
             $error_message = $e->getMessage();
         }
-        
+
         Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
-        
+
         $contactForm->setErrorMessage($error_message);
-        
+
         $this->getParserContext()
             ->addForm($contactForm)
             ->setGeneralError($error_message)
         ;
-        
+
         // Redirect to error URL if defined
         if ($contactForm->hasErrorUrl()) {
             return $this->generateErrorRedirect($contactForm);
