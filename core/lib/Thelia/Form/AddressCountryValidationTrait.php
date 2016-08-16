@@ -30,7 +30,8 @@ trait AddressCountryValidationTrait
     {
         $data = $context->getRoot()->getData();
 
-        if (null !== $country = CountryQuery::create()->findPk($data['country'])) {
+        $country = isset($data['country']) ? CountryQuery::create()->findPk($data['country']) : null;
+        if (null !== $country) {
             if ($country->getNeedZipCode()) {
                 $zipCodeRegExp = $country->getZipCodeRE();
                 if (null !== $zipCodeRegExp) {
@@ -51,7 +52,8 @@ trait AddressCountryValidationTrait
     {
         $data = $context->getRoot()->getData();
 
-        if (null !== $country = CountryQuery::create()->findPk($data['country'])) {
+        $country = isset($data['country']) ? CountryQuery::create()->findPk($data['country']) : null;
+        if (null !== $country) {
             if ($country->getHasStates()) {
                 if (null !== $state = StateQuery::create()->findPk($data['state'])) {
                     if ($state->getCountryId() !== $country->getId()) {
