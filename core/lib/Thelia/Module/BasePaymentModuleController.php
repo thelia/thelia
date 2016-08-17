@@ -118,6 +118,53 @@ abstract class BasePaymentModuleController extends BaseFrontController
     }
 
     /**
+     * Save the transaction/payment ref in the order
+     *
+     * @param int $orderId the order ID
+     * @param int $transactionRef the transaction reference
+     *
+     * @throws \Exception
+     */
+    public function saveTransactionRef($orderId, $transactionRef)
+    {
+        try {
+            $orderId = intval($orderId);
+
+            if (null !== $order = $this->getOrder($orderId)) {
+
+                $event = new OrderEvent($order);
+
+                $event->setTransactionRef($transactionRef);
+
+                $this->dispatch(TheliaEvents::ORDER_UPDATE_TRANSACTION_REF, $event);
+
+                $this->getLog()->addInfo(
+                    $this->getTranslator()->trans(
+                        "Payment transaction %transaction_ref for order ref. %ref, ID %id has been successfully saved.",
+                        [
+                            '%transaction_ref' => $transactionRef,
+                            '%ref' => $order->getRef(),
+                            '%id' => $order->getId()
+                        ]
+                    )
+                );
+            }
+        } catch (\Exception $ex) {
+            $this->getLog()->addError(
+                $this->getTranslator()->trans(
+                    "Error occurred while saving payment transaction %transaction_ref for order ID %id.",
+                    [
+                        '%transaction_ref' => $transactionRef,
+                        '%id' => $orderId
+                    ]
+                )
+            );
+
+            throw $ex;
+        }
+    }
+
+    /**
      * Process the cancellation of a payment on the payment gateway. The order will go back to the
      * "not paid" status.
      *
