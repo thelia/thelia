@@ -1,5 +1,9 @@
 # 2.3.4
 
+- (related to #2232) Moved to container-based infrastructure for Travis CI
+- (related to #2235) Add `DISCOUNT_AMOUNT` variable to `order_coupon` loop
+- (related to #2227) Fix for two problems with CART_FINDITEM event processing: 1) The CartEvent dispatched with CART_FINDITEM was the one received by Thelia\Action\Cart::addItem(), thus stopping event propagation will stop the whole cart add process. 2) Thelia\Action\Cart::findCartItem() was not aware of a cart item set in the event by event listeners with a higher priority, thus this cart item is always overwritten.
+- (related to #2221) Completed default email template FR and EN translations
 - (related to #2224) Added simple messages (no Message object required) processing to the MailerFactory, throug the sendSimpleEmailMessage() and createSimpleEmailMessage() methods. A new getMessageInstance() method has been added, to prevent direct usage of \Swift_Message::newInstance()
 - (related to #2217) New feature: Protected and hidden modules
 - (related to #2197) Pagination of coupon list
