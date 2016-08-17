@@ -627,6 +627,29 @@ class OrderTest extends BaseAction
      *
      * @param OrderModel $order
      */
+    public function testUpdateTransactionRef(OrderModel $order)
+    {
+        $transactionRef = uniqid('TRANSREF');
+        $this->orderEvent->setTransactionRef($transactionRef);
+        $this->orderEvent->setOrder($order);
+
+        $this->orderAction->updateTransactionRef($this->orderEvent);
+
+        $this->assertEquals(
+            $transactionRef,
+            $this->orderEvent->getOrder()->getTransactionRef()
+        );
+        $this->assertEquals(
+            $transactionRef,
+            OrderQuery::create()->findPk($order->getId())->getTransactionRef()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
     public function testUpdateDeliveryRef(OrderModel $order)
     {
         $deliveryRef = uniqid('DELREF');
