@@ -229,6 +229,10 @@ class RequestListener implements EventSubscriberInterface
         if (!$request->isXmlHttpRequest() && $event->getResponse()->isSuccessful()) {
             $referrer = $request->attributes->get('_previous_url', null);
 
+            $catalogViews = ['category', 'product'];
+
+            $view = $request->attributes->get('_view', null);
+
             if (null !== $referrer) {
                 // A previous URL (or the keyword 'dont-save') has been specified.
                 if ('dont-save' == $referrer) {
@@ -252,10 +256,18 @@ class RequestListener implements EventSubscriberInterface
 
                     if (null !== $lang) {
                         $session->setReturnToUrl($referrer);
+
+                        if (in_array($view, $catalogViews)) {
+                            $session->setReturnToCatalogLastUrl($referrer);
+                        }
                     }
                 } else {
                     if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
                         $session->setReturnToUrl($referrer);
+
+                        if (in_array($view, $catalogViews)) {
+                            $session->setReturnToCatalogLastUrl($referrer);
+                        }
                     }
                 }
             }
