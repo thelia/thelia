@@ -7,6 +7,7 @@ return [
     'Discount' => 'خصم',
     'INVOICE' => 'الفاتورة',
     'Invoice REF' => 'مرجع الفاتورة',
+    'Order number' => 'رقم طلب الشراء',
     'Postage' => 'الارسالية',
     'Quantity' => 'الكمية',
     'Ref' => 'المرجع',

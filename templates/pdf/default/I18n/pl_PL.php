@@ -8,6 +8,7 @@ return [
     'INVOICE' => 'FAKTURA',
     'Invoice REF' => 'Numer faktury',
     'Invoice address' => 'Adres rozliczeniowy (do faktury)',
+    'Order number' => 'Numer zamówienia',
     'Phone: ' => 'Telefon: ',
     'Total with tax' => 'Suma brutto',
     'Total without tax' => 'Suma netto',

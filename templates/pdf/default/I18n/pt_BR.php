@@ -8,6 +8,7 @@ return [
     'INVOICE' => 'Fatura',
     'Invoice REF' => 'Ref de fatura',
     'Invoice address' => 'Endereço de fatura',
+    'Order number' => 'Número do pedido',
     'Phone: ' => 'Telefone',
     'Quantity' => 'Quantidade',
     'Ref' => 'Ref',

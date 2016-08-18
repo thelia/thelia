@@ -11,6 +11,7 @@ return [
     'Invoice REF' => 'REF de factura ',
     'Invoice address' => 'Dirección de facturación',
     'Invoice date' => 'Fecha factura',
+    'Order number' => 'Número de pedido',
     'Payment module' => 'Módulo de pago',
     'Phone: ' => 'Teléfono: ',
     'Postage' => 'Gastos de envío',

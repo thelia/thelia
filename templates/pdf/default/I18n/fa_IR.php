@@ -11,6 +11,7 @@ return [
     'Invoice REF' => 'شماره صورت حساب',
     'Invoice address' => 'آدرس صورتحساب',
     'Invoice date' => 'تاریخ فاکتور',
+    'Order number' => 'شماره سفارش',
     'Payment module' => 'ماژول پرداخت',
     'Phone: ' => 'شماره تماس: ',
     'Postage' => 'هزینه پست',

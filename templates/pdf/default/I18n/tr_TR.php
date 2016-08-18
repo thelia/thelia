@@ -11,6 +11,7 @@ return [
     'Invoice REF' => 'Fatura ürün kodu',
     'Invoice address' => 'Fatura Adresi',
     'Invoice date' => 'Fatura tarihi',
+    'Order number' => 'Sipariş No',
     'Payment module' => 'Ödeme modülü',
     'Phone: ' => 'Telefon: ',
     'Postage' => 'Posta',

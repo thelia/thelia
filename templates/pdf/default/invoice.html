@@ -182,7 +182,10 @@
             <td><h3>{intl l="Invoice date"} : <span>{format_date date=$INVOICE_DATE output="date"}</span></h3></td>
         </tr>
         <tr>
-            <td><h3>{intl l="Invoice REF"} : <span>{$REF}</span></h3></td>
+            <td><h3>{intl l="Invoice REF"} : <span>{$INVOICE_REF}</span></h3></td>
+        </tr>
+        <tr>
+            <td><h3>{intl l="Order number"} : <span>{$REF}</span></h3></td>
         </tr>
         <tr>
             <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>

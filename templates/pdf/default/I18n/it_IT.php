@@ -5,6 +5,7 @@ return [
     'Delivery module' => 'Modulo di consegna',
     'Discount' => 'Sconto',
     'Invoice date' => 'Data della fattura',
+    'Order number' => 'Numero d\'ordine',
     'Payment module' => 'Modulo di pagamento',
     'Postage' => 'Spese di spedizione',
     'Product' => 'Prodotto',

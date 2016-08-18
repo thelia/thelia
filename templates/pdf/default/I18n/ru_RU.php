@@ -12,6 +12,7 @@ return array(
     'Invoice address' => 'Адрес плательщика',
     'Invoice date' => 'Дата счет-фактуры',
     'Payment module' => 'Модуль оплаты',
+    'Order number' => 'Номер заказа',
     'Phone: ' => 'Телефон: ',
     'Postage' => 'Почтовые расходы',
     'Product' => 'Товар',

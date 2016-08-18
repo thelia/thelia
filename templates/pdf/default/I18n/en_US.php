@@ -12,6 +12,7 @@ return array(
     'Invoice REF' => 'Invoice REF',
     'Invoice address' => 'Invoice address',
     'Invoice date' => 'Invoice date',
+    'Order number' => 'Order number',
     'Payment module' => 'Payment module',
     'Phone: ' => 'Phone: ',
     'Postage' => 'Postage',

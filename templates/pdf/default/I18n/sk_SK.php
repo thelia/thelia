@@ -8,6 +8,7 @@ return [
     'INVOICE' => 'FAKTÚRA',
     'Invoice REF' => 'Číslo Faktúry',
     'Invoice address' => 'Fakturačná adresa',
+    'Order number' => 'Číslo objednávky',
     'Phone: ' => 'Telefón: ',
     'Quantity' => 'Množstvo',
     'Ref' => 'Kód',

@@ -6,6 +6,7 @@ return [
     'Delivery module' => 'Szállítási modul',
     'Discount' => 'Kedvezmény',
     'Invoice date' => 'Számla kelte',
+    'Order number' => 'Megrendelés azonosító',
     'Payment module' => 'Fizetési modul',
     'Postage' => 'Szállítási költség',
     'Product' => 'Termék',

@@ -6,6 +6,7 @@ return [
     'INVOICE' => 'ΤΙΜΟΛΟΓΙΟ',
     'Invoice REF' => 'Αναφ Τιμολογίου',
     'Quantity' => 'Ποσότητα',
+    'Order number' => 'Αριθμός παραγγελίας',
     'Ref' => 'Αναφ',
     'Total' => 'Σύνολο',
     'Total with tax' => 'Σύνολο με ΦΠΑ',
