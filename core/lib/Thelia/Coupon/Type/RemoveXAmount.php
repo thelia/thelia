@@ -61,7 +61,16 @@ class RemoveXAmount extends AbstractRemove
      */
     public function exec()
     {
-        return $this->amount;
+        $discount = 0;
+        $cartItems = $this->facade->getCart()->getCartItems();
+        /** @var CartItem $cartItem */
+        foreach ($cartItems as $cartItem) {
+			if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
+				$discount = $this->amount;
+            }
+        }
+
+        return $discount;
     }
 
     /**
