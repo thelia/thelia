@@ -81,7 +81,7 @@ class SaleController extends AbstractCrudController
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
             $categories[] = $saleProduct->getProduct()->getDefaultCategoryId();
-            $products[] = $saleProduct->getProduct()->getId();
+            $products[$saleProduct->getProduct()->getId()] = $saleProduct->getProduct()->getId();
         }
 
         $dateFormat = SaleModificationForm::PHP_DATE_FORMAT;

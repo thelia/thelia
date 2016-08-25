@@ -1,3 +1,7 @@
+# 2.1.11
+
+- (related to #2205) Fixed sale edit form
+
 # 2.1.10
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
