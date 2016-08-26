@@ -1,6 +1,7 @@
 # 2.2.6
 
-- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fix cancelPayment method in BasePaymentModuleController class
 - (related to #2231) Fix #2215 : loop pagination cache
 - (related to #2219) Fix coupons issues
 - (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
