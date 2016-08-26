@@ -1,5 +1,6 @@
 # 2.2.6
 
+- (related to #2208) Fix missing model on LoopResultRow
 - (related to #2205) Fixed sale edit form
 
 # 2.2.5
