@@ -152,6 +152,7 @@ abstract class AbstractExport implements \Iterator
             if (is_array($data)) {
                 $this->data = $data;
                 $this->dataIsArray = true;
+                reset($this->getData());
 
                 return;
             }

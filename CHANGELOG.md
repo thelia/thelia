@@ -1,5 +1,6 @@
 # 2.3.3
 
+- (related to #2206) Add reset array pointer if $data is an array.
 - (related to #2205) Fixed sale edit form
 - (related to #2204) Add isEmpty(), to check if $data is empty.
 - (related to #2203) Check if $error exist, specific for submit type
