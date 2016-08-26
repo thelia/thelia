@@ -1,5 +1,6 @@
 # 2.3.3
 
+- (related to #2202) Fix currency creation modal (The currency field is missing in the html template)
 - (related to #2191) Update BO typo
 
 # 2.3.2
