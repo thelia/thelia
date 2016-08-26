@@ -118,6 +118,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (true === $withArea) {
             $search
+                ->distinct()
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
                 ->where('`with_area`.country_id ' . Criteria::ISNOTNULL);
         } elseif (false === $withArea) {
