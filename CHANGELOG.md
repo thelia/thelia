@@ -1,3 +1,7 @@
+# 2.2.6
+
+- (related to #2205) Fixed sale edit form
+
 # 2.2.5
 
 - (related to #2188) A more effective way to solve issue #2061
@@ -321,7 +325,7 @@
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
 - check specific role in security module instead of checking if a user is logged in
-- add a customer page parameter for the order loop on the customer page 
+- add a customer page parameter for the order loop on the customer page
 - keep break line in ACE editor
 
 # 2.1.4
