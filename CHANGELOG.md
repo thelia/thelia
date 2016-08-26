@@ -1,5 +1,6 @@
 # 2.3.3
 
+- (related to #2243) Fixed and optimized content and product loops
 - (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
 - (related to #2239) Fix #2233 : customer profile update
 - (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class

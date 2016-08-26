@@ -140,8 +140,8 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // Select the contents which have $folderDefault as the default folder.
             $search
                 ->useContentFolderQuery('FolderSelect')
-                ->filterByDefaultFolder(true)
-                ->filterByFolderId($folderDefault, Criteria::IN)
+                    ->filterByDefaultFolder(true)
+                    ->filterByFolderId($folderDefault, Criteria::IN)
                 ->endUse()
             ;
 
@@ -155,7 +155,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $search
                 ->useContentFolderQuery('FolderSelect')
-                ->filterByFolderId($allFolderIDs, Criteria::IN)
+                    ->filterByFolderId($allFolderIDs, Criteria::IN)
                 ->endUse()
             ;
 
@@ -163,11 +163,17 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $manualOrderAllowed = (1 == $depth && 1 == count($folderIdList));
         } else {
             $search
-                ->useContentFolderQuery('FolderSelect')
-                ->filterByDefaultFolder(true)
-                ->endUse()
+                ->leftJoinContentFolder('FolderSelect')
+                ->addJoinCondition('FolderSelect', '`FolderSelect`.DEFAULT_FOLDER = 1')
             ;
         }
+
+        $search->withColumn(
+            'CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `FolderSelect`.POSITION END',
+            'position_delegate'
+        );
+        $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
+        $search->withColumn('`FolderSelect`.DEFAULT_FOLDER', 'is_default_folder');
 
         $current = $this->getCurrent();
 
@@ -201,7 +207,20 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
         }
 
-        $search->withColumn('`FolderSelect`.POSITION', 'position_delegate');
+        $exclude = $this->getExclude();
+
+        if (!is_null($exclude)) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $exclude_folder = $this->getExcludeFolder();
+
+        if (!is_null($exclude_folder)) {
+            $search->filterByFolder(
+                FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
+                Criteria::NOT_IN
+            );
+        }
 
         $orders  = $this->getOrder();
 
@@ -260,30 +279,29 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
         }
 
-        $exclude = $this->getExclude();
-
-        if (!is_null($exclude)) {
-            $search->filterById($exclude, Criteria::NOT_IN);
-        }
-
-        $exclude_folder = $this->getExcludeFolder();
-
-        if (!is_null($exclude_folder)) {
-            $search->filterByFolder(
-                FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
-                Criteria::NOT_IN
-            );
-        }
+        $search->groupById();
 
         return $search;
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        echo(
+            \Propel\Runtime\Propel::getWriteConnection(
+                \Thelia\Model\Map\OrderTableMap::DATABASE_NAME
+            )->getLastExecutedQuery()
+        );
+
         /** @var ContentModel $content */
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
-            $defaultFolderId = $content->getDefaultFolderId();
+
+            if ((bool) $content->getVirtualColumn('is_default_folder')) {
+                $defaultFolderId = $content->getVirtualColumn('default_folder_id');
+            } else {
+                $defaultFolderId = $content->getDefaultFolderId();
+            }
+
             $loopResultRow->set("ID", $content->getId())
                 ->set("IS_TRANSLATED", $content->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)
