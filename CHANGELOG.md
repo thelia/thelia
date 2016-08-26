@@ -1,3 +1,7 @@
+# 2.3.3
+
+- (related to #2191) Update BO typo
+
 # 2.3.2
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
@@ -547,7 +551,7 @@
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
 - check specific role in security module instead of checking if a user is logged in
-- add a customer page parameter for the order loop on the customer page 
+- add a customer page parameter for the order loop on the customer page
 - keep break line in ACE editor
 
 # 2.1.4
