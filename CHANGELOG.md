@@ -1,5 +1,6 @@
 # 2.3.3
 
+- (related to #2230) Hook fixes
 - (related to #2222) Fix duplicates in country loop when used with "with_area" argument
 - (related to #2219) Fix coupons issues
 - (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working

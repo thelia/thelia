@@ -15,8 +15,8 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Propel\Runtime\Propel;
 use ReflectionException;
 use ReflectionMethod;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Hook\HookDefinition;
@@ -26,8 +26,8 @@ use Thelia\Model\Base\IgnoredModuleHookQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
-use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleHook;
+use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 
 /**
@@ -61,11 +61,11 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
     }
 
-    protected function logAlertMessage($message)
+    protected function logAlertMessage($message, $failSafe = false)
     {
         Tlog::getInstance()->addAlert($message);
 
-        if ($this->debugEnabled) {
+        if (!$failSafe && $this->debugEnabled) {
             throw new \InvalidArgumentException($message);
         }
     }
@@ -226,6 +226,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         $hookId = 0;
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
+
             // check if class and method exists
             if (!$container->hasDefinition($moduleHook->getClassname())) {
                 continue;
@@ -236,7 +237,8 @@ class RegisterHookListenersPass implements CompilerPassInterface
             if (!$this->isValidHookMethod(
                 $container->getDefinition($moduleHook->getClassname())->getClass(),
                 $moduleHook->getMethod(),
-                $hook->getBlock()
+                $hook->getBlock(),
+                true
             )
             ) {
                 $moduleHook->delete();
@@ -346,9 +348,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
 
         if (! $hook->getActivate()) {
-            $this->logAlertMessage(sprintf("Hook %s is not activated.", $hookName));
-
-            return null;
+            $this->logAlertMessage(sprintf("Hook %s is not activated.", $hookName), true);
         }
 
         return $hook;
@@ -360,10 +360,11 @@ class RegisterHookListenersPass implements CompilerPassInterface
      * @param string $className  the namespace of the class
      * @param string $methodName the method name
      * @param bool   $block      tell if the hook is a block or a function
+     * @param bool   $failSafe
      *
      * @return bool
      */
-    protected function isValidHookMethod($className, $methodName, $block)
+    protected function isValidHookMethod($className, $methodName, $block, $failSafe = false)
     {
         try {
             $method = new ReflectionMethod($className, $methodName);
@@ -380,7 +381,10 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 return false;
             }
         } catch (ReflectionException $ex) {
-            $this->logAlertMessage(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
+            $this->logAlertMessage(
+                sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex),
+                $failSafe
+            );
 
             return false;
         }
