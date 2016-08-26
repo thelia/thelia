@@ -1,5 +1,6 @@
 # 2.3.3
 
+- (related to #2239) Fix #2233 : customer profile update
 - (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
 - (related to #2231) Fix #2215 : loop pagination cache
 - (related to #2230) Hook fixes

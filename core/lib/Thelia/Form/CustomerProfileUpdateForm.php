@@ -41,6 +41,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             ->remove("city")
             ->remove("zipcode")
             ->remove("country")
+            ->remove("state")
             // Remove Login Information
             ->remove("password")
             ->remove("password_confirm")
