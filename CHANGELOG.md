@@ -1,5 +1,6 @@
 # 2.3.3
 
+- (related to #2205) Fixed sale edit form
 - (related to #2204) Add isEmpty(), to check if $data is empty.
 - (related to #2203) Check if $error exist, specific for submit type
 - (related to #2202) Fix currency creation modal (The currency field is missing in the html template)

@@ -252,12 +252,20 @@
 <script>
     (function($) {
 
-        {* data-date-format is a moment.js date format *}
+        var loadingProduct = true;
 
+        {* data-date-format is a moment.js date format *}
         {$langcode = {lang attr="code"}|substr:0:2}
 
         $('.datetime-picker').datetimepicker({
             locale: "{$langcode}"
+        });
+
+        // prevent form submission during products load
+        $(document.body).on('submit', '#sale-update-form', function(ev) {
+            if (loadingProduct) {
+                return false;
+            }
         });
 
         $(document.body).on('change', '.invert-selection', function(ev) {
@@ -426,6 +434,7 @@
                 });
             }
 
+            loadingProduct = true;
             $('#sale-products-list').empty();
 
             $.ajax('{url path="/admin/sale/update-product-list/%id" id=$sale_id}', {
@@ -443,6 +452,8 @@
                 $.each(selected_attributes, function(productId, attrAvIdsStr) {
                     setProductAttributeIds(productId, attrAvIdsStr);
                 });
+
+                loadingProduct = false;
             });
         }
 
