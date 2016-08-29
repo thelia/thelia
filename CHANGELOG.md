@@ -246,6 +246,22 @@
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
 
+
+# 2.2.6
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fix cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2219) Fix coupons issues
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2208) Fix missing model on LoopResultRow
+- (related to #2205) Fixed sale edit form
+
+# 2.2.5
+
+- (related to #2188) A more effective way to solve issue #2061
+- #2194 Fix change currency on 2.2.x
+
 # 2.2.4
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
@@ -498,6 +514,14 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+
+# 2.1.11
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2205) Fixed sale edit form
 
 # 2.1.10
 
