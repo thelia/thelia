@@ -6,6 +6,7 @@ Readme
 
 Thelia
 ------
+
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=2.3)](https://travis-ci.org/thelia/thelia) [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
 [Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
@@ -63,6 +64,7 @@ Thelia's archive builder's needs external libraries.
 For zip archives, you need PECL zip. See [PHP Doc](http://php.net/manual/en/zip.installation.php)
 
 For tar archives, you need PECL phar. Moreover, you need to deactivate php.ini option "phar.readonly":
+
 ```ini
 phar.readonly = Off
 ```
@@ -76,18 +78,20 @@ For tar.gz archives, you need tar's dependencies and the extension "zlib". See [
 You can get the sources from git and then let composer install dependencies, or use composer to install the whole thelia project into a specific directory
 
 ### Using git for download and composer for dependencies
+
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.3.2 (2.2.4 or 2.1.10)
+$ git checkout 2.3.3 (2.2.6 or 2.1.11)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
 
 ### Using composer for both download and dependencies
+
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.3.2 (2.2.4 or 2.1.10)
+$ php composer.phar create-project thelia/thelia path/ 2.3.3 (2.2.6 or 2.1.11)
 ```
 
 ## Install it

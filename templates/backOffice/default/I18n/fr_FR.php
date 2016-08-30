@@ -1049,7 +1049,7 @@ return [
     'Tax rule created on %date_create. Last modification: %date_change' => 'Règle de taxe créée le %date_create. Dernière modification le %date_change',
     'Tax rules' => 'Règles de taxes',
     'Tax rules are combination of different taxes.' => 'Les règles de taxe sont une combinaison de différentes taxes.',
-    'Taxed total' => 'Montant total des taxes',
+    'Taxed total' => 'Prix TTC',
     'Taxes' => 'Taxes',
     'Taxes configuration' => 'Configuration des taxes',
     'Taxes define the amount of money which is added to a bought product.' => 'Les taxes correspondent au montant ajouté au prix HT d\'un produit acheté',

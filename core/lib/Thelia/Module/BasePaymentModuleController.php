@@ -19,7 +19,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Log\Tlog;
 use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
 /**
@@ -138,7 +137,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
             $event = new OrderEvent($order);
 
-            $event->setStatus(OrderStatus::CODE_NOT_PAID);
+            $event->setStatus(OrderStatusQuery::getNotPaidStatus()->getId());
 
             $this->getLog()->addInfo(
                 $this->getTranslator()->trans(

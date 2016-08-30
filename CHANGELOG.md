@@ -1,3 +1,23 @@
+# 2.3.3
+
+- (related to #2249) Fix identical queries in the productSaleElement loop and the Product loop
+- (related to #2243) Fixed and optimized content and product loops
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2239) Fix #2233 : customer profile update
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2230) Hook fixes
+- (related to #2222) Fix duplicates in country loop when used with "with_area" argument
+- (related to #2219) Fix coupons issues
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2207) Add delimiter and enclosure for header insertion
+- (related to #2206) Add reset array pointer if $data is an array.
+- (related to #2205) Fixed sale edit form
+- (related to #2204) Add isEmpty(), to check if $data is empty.
+- (related to #2203) Check if $error exist, specific for submit type
+- (related to #2202) Fix currency creation modal (The currency field is missing in the html template)
+- (related to #2191) Update BO typo
+
 # 2.3.2
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
@@ -226,6 +246,22 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
+
+
+# 2.2.6
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fix cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2219) Fix coupons issues
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2208) Fix missing model on LoopResultRow
+- (related to #2205) Fixed sale edit form
+
+# 2.2.5
+
+- (related to #2188) A more effective way to solve issue #2061
+- #2194 Fix change currency on 2.2.x
 
 # 2.2.4
 
@@ -480,6 +516,14 @@
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
 
+# 2.1.11
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2205) Fixed sale edit form
+
 # 2.1.10
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
@@ -547,7 +591,7 @@
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
 - check specific role in security module instead of checking if a user is logged in
-- add a customer page parameter for the order loop on the customer page 
+- add a customer page parameter for the order loop on the customer page
 - keep break line in ACE editor
 
 # 2.1.4

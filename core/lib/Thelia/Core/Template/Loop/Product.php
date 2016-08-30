@@ -26,6 +26,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
@@ -262,7 +263,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $taxedPromoPrice = null;
             }
 
-            $default_category_id = $product->getDefaultCategoryId();
+            $defaultCategoryId = $this->getDefaultCategoryId($product);
 
             $loopResultRow
                 ->set("WEIGHT", $product->getVirtualColumn('weight'))
@@ -283,7 +284,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'));
             $this->addOutputFields($loopResultRow, $product);
 
-            $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
+            $loopResult->addRow($this->associateValues($loopResultRow, $product, $defaultCategoryId));
         }
 
         return $loopResult;
@@ -315,8 +316,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $taxedPrice = null;
             }
 
-            // Find previous and next product, in the default category.
-            $default_category_id = $product->getDefaultCategoryId();
+            $defaultCategoryId = $this->getDefaultCategoryId($product);
 
             $loopResultRow
                 ->set("BEST_PRICE", $price)
@@ -325,7 +325,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
 
-            $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
+            $loopResult->addRow($this->associateValues($loopResultRow, $product, $defaultCategoryId));
         }
 
         return $loopResult;
@@ -334,10 +334,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @param  LoopResultRow         $loopResultRow the current result row
      * @param  \Thelia\Model\Product $product
-     * @param $default_category_id
+     * @param $defaultCategoryId
      * @return mixed
      */
-    private function associateValues($loopResultRow, $product, $default_category_id)
+    private function associateValues($loopResultRow, $product, $defaultCategoryId)
     {
         $display_initial_price = $product->getVirtualColumn('display_initial_price');
 
@@ -362,12 +362,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("VIRTUAL", $product->getVirtual() ? "1" : "0")
             ->set("VISIBLE", $product->getVisible() ? "1" : "0")
             ->set("TEMPLATE", $product->getTemplateId())
-            ->set("DEFAULT_CATEGORY", $default_category_id)
+            ->set("DEFAULT_CATEGORY", $defaultCategoryId)
             ->set("TAX_RULE_ID", $product->getTaxRuleId())
             ->set("BRAND_ID", $product->getBrandId() ?: 0)
             ->set("SHOW_ORIGINAL_PRICE", $display_initial_price);
 
-        $this->findNextPrev($loopResultRow, $product, $default_category_id);
+        $this->findNextPrev($loopResultRow, $product, $defaultCategoryId);
 
         return $loopResultRow;
     }
@@ -375,23 +375,23 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @param LoopResultRow $loopResultRow
      * @param ProductModel $product
-     * @param int $defaultFolderId
+     * @param int $defaultCategoryId
      */
-    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultFolderId)
+    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultCategoryId)
     {
         if ($this->getWithPrevNextInfo()) {
             $currentPosition = ProductCategoryQuery::create()
-                ->filterByCategoryId($defaultFolderId)
+                ->filterByCategoryId($defaultCategoryId)
                 ->filterByProductId($product->getId())
                 ->findOne()->getPosition();
 
             // Find previous and next product
             $previousQuery = ProductCategoryQuery::create()
-                ->filterByCategoryId($defaultFolderId)
+                ->filterByCategoryId($defaultCategoryId)
                 ->filterByPosition($currentPosition, Criteria::LESS_THAN);
 
             $nextQuery = ProductCategoryQuery::create()
-                ->filterByCategoryId($defaultFolderId)
+                ->filterByCategoryId($defaultCategoryId)
                 ->filterByPosition($currentPosition, Criteria::GREATER_THAN);
 
             if (!$this->getBackendContext()) {
@@ -504,7 +504,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
         }
 
-        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
         $priceToCompareAsSQL = '';
@@ -607,13 +607,17 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $manualOrderAllowed = (1 == $depth && 1 == count($categoryIdList));
         } else {
             $search
-                ->useProductCategoryQuery('CategorySelect')
-                ->filterByDefaultCategory(true)
-                ->endUse()
+                ->leftJoinProductCategory('CategorySelect')
+                ->addJoinCondition('CategorySelect', '`CategorySelect`.DEFAULT_CATEGORY = 1')
             ;
         }
 
-        $search->withColumn('`CategorySelect`.POSITION', 'position_delegate');
+        $search->withColumn(
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `CategorySelect`.POSITION END',
+            'position_delegate'
+        );
+        $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
+        $search->withColumn('`CategorySelect`.DEFAULT_CATEGORY', 'is_default_category');
 
         $current = $this->getCurrent();
 
@@ -1102,5 +1106,22 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         return $search;
+    }
+
+    /**
+     * Get the default category id for a product
+     *
+     * @param \Thelia\Model\Product $product
+     * @return null|int
+     */
+    protected function getDefaultCategoryId($product)
+    {
+        $defaultCategoryId = null;
+        if ((bool) $product->getVirtualColumn('is_default_category')) {
+            $defaultCategoryId = $product->getVirtualColumn('default_category_id');
+        } else {
+            $defaultCategoryId = $product->getDefaultCategoryId();
+        }
+        return $defaultCategoryId;
     }
 }

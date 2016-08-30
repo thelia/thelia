@@ -152,6 +152,7 @@ abstract class AbstractExport implements \Iterator
             if (is_array($data)) {
                 $this->data = $data;
                 $this->dataIsArray = true;
+                reset($this->getData());
 
                 return;
             }
@@ -218,6 +219,15 @@ abstract class AbstractExport implements \Iterator
         }
 
         return $this;
+    }
+
+    /**
+     * Check if export is empty
+     * @return bool true if export is empty, else false.
+     */
+    public function isEmpty()
+    {
+        return empty($this->data);
     }
 
 
