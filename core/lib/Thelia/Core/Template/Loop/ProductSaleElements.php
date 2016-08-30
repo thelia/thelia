@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Type;
@@ -184,7 +185,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
         }
 
-        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
