@@ -60,6 +60,7 @@ abstract class BaseLoop
     protected $translator = null;
 
     private static $cacheLoopResult = [];
+    private static $cacheLoopPagination = [];
     private static $cacheCount = [];
 
     /**
@@ -417,6 +418,10 @@ abstract class BaseLoop
         $hash = $this->args->getHash();
 
         if (($isCaching = $this->isCaching()) && isset(self::$cacheLoopResult[$hash])) {
+            if (isset(self::$cacheLoopPagination[$hash])) {
+                $pagination = self::$cacheLoopPagination[$hash];
+            }
+
             return self::$cacheLoopResult[$hash];
         }
 
@@ -455,6 +460,10 @@ abstract class BaseLoop
 
         if ($isCaching) {
             self::$cacheLoopResult[$hash] = $parsedResults;
+
+            if ($pagination instanceof PropelModelPager) {
+                self::$cacheLoopPagination[$hash] = clone $pagination;
+            }
         }
 
         return $parsedResults;
