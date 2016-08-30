@@ -37,7 +37,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
     {
         /** @var \Thelia\Model\ProductSaleElementsProductDocument $productSaleElementDocument */
         foreach ($loopResult->getResultDataCollection() as $productSaleElementDocument) {
-            $row = new LoopResultRow();
+            $row = new LoopResultRow($productSaleElementDocument);
 
             $row
                 ->set("ID", $productSaleElementDocument->getId())

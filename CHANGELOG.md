@@ -1,3 +1,13 @@
+# 2.2.6
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fix cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2219) Fix coupons issues
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2208) Fix missing model on LoopResultRow
+- (related to #2205) Fixed sale edit form
+
 # 2.2.5
 
 - (related to #2188) A more effective way to solve issue #2061
@@ -254,6 +264,14 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+# 2.1.11
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2205) Fixed sale edit form
+
 # 2.1.10
 
 - (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
@@ -321,7 +339,7 @@
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
 - check specific role in security module instead of checking if a user is logged in
-- add a customer page parameter for the order loop on the customer page 
+- add a customer page parameter for the order loop on the customer page
 - keep break line in ACE editor
 
 # 2.1.4

@@ -78,7 +78,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.2.5 (2.3.2 or 2.1.10)
+$ git checkout 2.2.6 (2.3.3 or 2.1.11)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -86,7 +86,7 @@ $ php composer.phar install
 ### Using composer for both download and dependencies
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.2.5 (2.3.2 or 2.1.10)
+$ php composer.phar create-project thelia/thelia path/ 2.2.6 (2.3.3 or 2.1.11)
 ```
 
 ## Install it
@@ -125,7 +125,7 @@ This repo contains all the configuration needed to run Thelia with docker and do
 
 It requires obviously [docker](https://docker.com/) and [docker-compose](http://docs.docker.com/compose/)
 
-How to start the configuration : 
+How to start the configuration :
 
 ```
 docker-compose up -d
@@ -133,7 +133,7 @@ docker-compose up -d
 
 tip : create an alias for docker-compose, it's boring to write it all the time
 
-All the script are launched through docker. For examples : 
+All the script are launched through docker. For examples :
 
 ```
 docker exec -it thelia_web_1 php Thelia cache:clear
@@ -142,7 +142,7 @@ docker exec -it thelia_web_1 unit-tests.sh
 docker exec -it thelia_web_1 php composer.phar install
 ```
 
-Database information : 
+Database information :
 
 * host : mariaDB
 * login : root
@@ -150,11 +150,11 @@ Database information :
 
 Once started, you can access it with your browser at this url : http://127.0.0.1:8080 and phpmyadmin : http://127.0.0.1:8081
 
-What is missing : 
+What is missing :
 
 * confguration for export compression (zip, gzip, etc)
 
-Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it : 
+Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it :
 
 ```
 docker-compose build --no-cache

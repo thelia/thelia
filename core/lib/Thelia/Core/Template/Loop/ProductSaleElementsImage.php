@@ -37,7 +37,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
     {
         /** @var \Thelia\Model\ProductSaleElementsProductImage $productSaleElementImage */
         foreach ($loopResult->getResultDataCollection() as $productSaleElementImage) {
-            $row = new LoopResultRow();
+            $row = new LoopResultRow($productSaleElementImage);
 
             $row
                 ->set("ID", $productSaleElementImage->getId())
