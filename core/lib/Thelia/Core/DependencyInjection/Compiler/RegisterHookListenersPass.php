@@ -236,7 +236,8 @@ class RegisterHookListenersPass implements CompilerPassInterface
             if (!$this->isValidHookMethod(
                 $container->getDefinition($moduleHook->getClassname())->getClass(),
                 $moduleHook->getMethod(),
-                $hook->getBlock()
+                $hook->getBlock(),
+                true
             )
             ) {
                 $moduleHook->delete();
@@ -361,7 +362,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      *
      * @return bool
      */
-    protected function isValidHookMethod($className, $methodName, $block)
+    protected function isValidHookMethod($className, $methodName, $block, $failSafe = false)
     {
         try {
             $method = new ReflectionMethod($className, $methodName);
@@ -378,7 +379,10 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 return false;
             }
         } catch (ReflectionException $ex) {
-            $this->logAlertMessage(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
+            $this->logAlertMessage(
+                sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex),
+                $failSafe
+            );
 
             return false;
         }
