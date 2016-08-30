@@ -27,6 +27,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
@@ -499,7 +500,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
         }
 
-        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
         $priceToCompareAsSQL = '';
