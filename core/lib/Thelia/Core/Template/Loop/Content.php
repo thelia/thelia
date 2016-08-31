@@ -286,12 +286,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function parseResults(LoopResult $loopResult)
     {
-        echo(
-            \Propel\Runtime\Propel::getWriteConnection(
-                \Thelia\Model\Map\OrderTableMap::DATABASE_NAME
-            )->getLastExecutedQuery()
-        );
-
         /** @var ContentModel $content */
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
