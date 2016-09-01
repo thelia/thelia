@@ -708,7 +708,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [mandatory] column value.
-     * 
+     *
      * @return   int
      */
     public function getMandatory()
@@ -719,7 +719,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Get the [hidden] column value.
-     * 
+     *
      * @return   int
      */
     public function getHidden()
@@ -938,7 +938,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [mandatory] column.
-     * 
+     *
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -959,7 +959,7 @@ abstract class Module implements ActiveRecordInterface
 
     /**
      * Set the value of [hidden] column.
-     * 
+     *
      * @param      int $v new value
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
@@ -1706,13 +1706,13 @@ abstract class Module implements ActiveRecordInterface
                     case '`FULL_NAMESPACE`':                        
                         $stmt->bindValue($identifier, $this->full_namespace, PDO::PARAM_STR);
                         break;
-                    case '`MANDATORY`':                        
+                    case '`MANDATORY`':
                         $stmt->bindValue($identifier, $this->mandatory, PDO::PARAM_INT);
                         break;
-                    case '`HIDDEN`':                        
+                    case '`HIDDEN`':
                         $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':                        
+                    case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                     case '`UPDATED_AT`':                        

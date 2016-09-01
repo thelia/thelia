@@ -62,7 +62,8 @@
         "ramsey/array_column": "~1.1",
         "propel/propel": "dev-thelia-2.3",
         "commerceguys/addressing": "0.8.*",
-        "symfony/cache": "~3.1.0"
+        "symfony/cache": "~3.1.0",
+        "friendsofsymfony/rest-bundle": "^2.0"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",

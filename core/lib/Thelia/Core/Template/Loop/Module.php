@@ -47,6 +47,8 @@ use Thelia\Type\TypeCollection;
  * @method int[] getExclude()
  * @method bool|string getActive()
  * @method string[] getOrder()
+ * @method bool|string getMandatory()
+ * @method bool|string getHidden()
  */
 class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -105,8 +107,8 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
-            Argument::createBooleanTypeArgument('hidden', Type\BooleanOrBothType::ANY),
-            Argument::createBooleanTypeArgument('mandatory', Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('hidden', Type\BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('mandatory', Type\BooleanOrBothType::ANY)
         );
     }
 
@@ -177,6 +179,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($active !== Type\BooleanOrBothType::ANY) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
+        }
+
+        $hidden = $this->getHidden();
+
+        if ($hidden !== Type\BooleanOrBothType::ANY) {
+            $search->filterByHidden($hidden ? 1 : 0, Criteria::EQUAL);
+        }
+
+        $mandatory = $this->getMandatory();
+
+        if ($mandatory !== Type\BooleanOrBothType::ANY) {
+            $search->filterByMandatory($mandatory ? 1 : 0, Criteria::EQUAL);
         }
 
         $orders = $this->getOrder();

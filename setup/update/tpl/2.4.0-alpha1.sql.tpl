@@ -56,7 +56,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
 {foreach $locales as $locale}
-    (@max_id+1, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your %store account' store={config key="store_name"} locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (@max_id+1, '{$locale}', {intl l='Mail sent to the customer to confirm its account' locale=$locale}, {intl l='Confirm your %store account' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -132,5 +132,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max+1, '{$locale}', {intl l='Default number of coupons per page on coupon list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
+
+ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
+UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
+UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front';
+UPDATE `module` SET `mandatory` = 1, `hidden` = 1 WHERE `code` = 'TheliaSmarty';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -647,7 +647,7 @@ class CouponController extends BaseAdminController
                 $this->pageNotFound();
             }
 
-            $response = new ResponseRest($couponManager->drawBackOfficeInputs());
+            $response = new ResponseRest($couponManager->drawBackOfficeInputs(), 'text');
         } else {
             // Return an empty response if the service ID is not defined
             // Typically, when the user chooses "Please select a coupon type"
@@ -815,7 +815,7 @@ class CouponController extends BaseAdminController
 
     protected function getDefaultDateFormat()
     {
-        return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+        return LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
     }
 
     /**
