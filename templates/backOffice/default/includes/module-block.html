@@ -125,7 +125,7 @@
                         </td>
                     {/if}
 
-                    {hook name="modules.table-row" location="modules_table_row" }
+                    {hook name="modules.table-row" location="modules_table_row" module_code={$CODE} }
 
                     <td class="actions">
                         {if $module_type == 2}
