@@ -77,9 +77,9 @@
                     <div class="carousel-inner">
                         <div class="item active">
                             <ul class="list-inline">
-                                {loop name="image.carousel" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" limit="5"}
+                                {loop name="image.carousel" type="image" product="{$ID}" width="560" height="445" resize_mode="borders" limit="5"}
                                 <li>
-                                    <a href="{$IMAGE_URL nofilter}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
+                                    <a href="{$IMAGE_URL nofilter}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}" data-thumb-id="{$ID}">
                                         {loop type="image" name="image.thumbs" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
                                             <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                         {/loop}
@@ -91,9 +91,9 @@
                         {ifloop rel="image.carouselsup"}
                         <div class="item">
                             <ul class="list-inline">
-                                {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" offset="5"}
+                                {loop name="image.carouselsup" type="image" product="{$ID}" width="560" height="445" resize_mode="borders" offset="5"}
                                     <li>
-                                        <a href="{$IMAGE_URL nofilter}" class="thumbnail">
+                                        <a href="{$IMAGE_URL nofilter}" class="thumbnail" data-thumb-id="{$ID}">
                                             {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
                                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                             {/loop}
@@ -336,6 +336,11 @@
         {$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
     {/loop}
     {$pse[$ID]["combinations"]=$pse_combination}
+    {$pse_images=[]}
+    {loop name="pse_images" type="product-sale-elements-image" product_sale_elements_id="$ID"}
+        {$pse_images[]=$PRODUCT_IMAGE_ID}
+    {/loop}
+    {$pse[$ID]["images"]=$pse_images}
 {/loop}
 
 <script type="text/javascript">
