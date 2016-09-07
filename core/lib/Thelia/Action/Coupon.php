@@ -324,7 +324,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     $orderCoupon->setOrder($event->getOrder())
                         ->setCode($couponModel->getCode())
                         ->setType($couponModel->getType())
-                        ->setAmount($couponModel->getAmount())
+                        ->setAmount($couponCode->exec())
 
                         ->setTitle($couponModel->getTitle())
                         ->setShortDescription($couponModel->getShortDescription())
