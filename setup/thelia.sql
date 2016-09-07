@@ -517,8 +517,8 @@ CREATE TABLE `address`
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `address1` VARCHAR(255) NOT NULL,
-    `address2` VARCHAR(255) NOT NULL,
-    `address3` VARCHAR(255) NOT NULL,
+    `address2` VARCHAR(255),
+    `address3` VARCHAR(255),
     `zipcode` VARCHAR(10) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `country_id` INTEGER NOT NULL,
@@ -600,7 +600,7 @@ DROP TABLE IF EXISTS `folder`;
 CREATE TABLE `folder`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `parent` INTEGER NOT NULL,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1626,7 +1626,7 @@ CREATE TABLE `module_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `module_id` INTEGER NOT NULL,
-    `file` VARCHAR(255) NOT NULL,
+    `file` VARCHAR(255),
     `visible` TINYINT DEFAULT 1 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -3184,7 +3184,7 @@ DROP TABLE IF EXISTS `folder_version`;
 CREATE TABLE `folder_version`
 (
     `id` INTEGER NOT NULL,
-    `parent` INTEGER NOT NULL,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
