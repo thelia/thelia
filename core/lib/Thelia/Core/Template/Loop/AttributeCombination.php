@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -20,8 +21,12 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
+use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\AttributeTableMap;
+use Thelia\Model\Map\AttributeTemplateTableMap;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -47,7 +52,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'alpha'
             )
@@ -80,6 +85,30 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
         $orders  = $this->getOrder();
 
+        if (in_array('manual', $orders) || in_array('manual_reverse', $orders)) {
+            $template_id = ProductQuery::create()
+                ->useProductSaleElementsQuery()
+                    ->filterById($productSaleElements)
+                ->endUse()
+                ->select(ProductTableMap::TEMPLATE_ID)
+                ->findOne()
+            ;
+
+            if (empty($template_id)) {
+                return null;
+            }
+
+            $attributeJoin = new Join(
+                AttributeCombinationTableMap::ATTRIBUTE_ID,
+                AttributeTemplateTableMap::ATTRIBUTE_ID,
+                Criteria::INNER_JOIN
+            );
+
+            $search->addJoinObject($attributeJoin)
+            ->where(AttributeTemplateTableMap::TEMPLATE_ID."=?", $template_id, \PDO::PARAM_INT)
+            ;
+        }
+
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
@@ -87,6 +116,12 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                     break;
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
+                    break;
+                case "manual":
+                    $search->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                    break;
+                case "manual_reverse":
+                    $search->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
                     break;
             }
         }
