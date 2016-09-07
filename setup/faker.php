@@ -383,9 +383,9 @@ try {
         $ft = new Thelia\Model\FeatureTemplate();
 
         $ft
-        ->setTemplate($template)
-        ->setFeatureId($featureId)
-        ->save();
+            ->setTemplate($template)
+            ->setFeatureId($featureId)
+            ->save();
     }
 
     echo "Creating folders and contents\n";
@@ -611,7 +611,7 @@ try {
     echo "Creating orders\n";
 
     $colissimo_id = ModuleQuery::create()->
-        filterByCode("Colissimo")
+    filterByCode("Colissimo")
         ->findOne()
         ->getId();
 
@@ -636,7 +636,7 @@ try {
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
             ->setCountryId(64)
-        ->save($con)
+            ->save($con)
         ;
 
         $invoiceOrderAddress = new OrderAddress();
@@ -652,7 +652,7 @@ try {
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
             ->setCountryId(64)
-        ->save($con)
+            ->save($con)
         ;
 
         /**
@@ -716,7 +716,7 @@ try {
                 ->setTaxRuleTitle(getRealText(20))
                 ->setTaxRuleDescription(getRealText(50))
                 ->setEanCode($pse->getEanCode())
-            ->save($con);
+                ->save($con);
         }
 
     }
@@ -743,7 +743,7 @@ try {
         ;
 
         setI18n($sale, [
-                'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
+            'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
         ]);
 
         $sale->save();
@@ -777,7 +777,7 @@ try {
                 ->setAttributeAvId(null)
                 ->save();
             ;
-         }
+        }
     }
 
     $con->commit();
@@ -884,9 +884,10 @@ function generate_image($image, $typeobj, $id)
 
     // Generate images
     $imagine = new Imagine\Gd\Imagine();
-    $image   = $imagine->create(new Imagine\Image\Box(320,240), new Imagine\Image\Color('#E9730F'));
+    $palette = new Imagine\Image\Palette\RGB();
+    $image = $imagine->create(new Imagine\Image\Box(320, 240), $palette->color('#E9730F'));
 
-    $white = new Imagine\Image\Color('#FFF');
+    $white = $palette->color('#FFF');
 
     $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 14, $white);
 
@@ -922,12 +923,12 @@ function generate_document($document, $typeobj, $id)
     global $faker;
 
     $document
-    ->setTitle(getRealText(20))
-    ->setDescription(getRealText(250))
-    ->setChapo(getRealText(40))
-    ->setPostscriptum(getRealText(40))
-    ->setFile(sprintf("sample-document-%s.txt", $id))
-    ->save()
+        ->setTitle(getRealText(20))
+        ->setDescription(getRealText(250))
+        ->setChapo(getRealText(40))
+        ->setPostscriptum(getRealText(40))
+        ->setFile(sprintf("sample-document-%s.txt", $id))
+        ->save()
     ;
 
     $document_file = sprintf("%smedia/documents/%s/sample-document-%s.txt", THELIA_LOCAL_DIR, $typeobj, $id);
@@ -944,7 +945,7 @@ function getRealText($length, $locale = 'en_US') {
 
     // Below 20 chars, generate a simple text, without ponctuation nor newlines.
     if ($length <= 20){
-      $text = ucfirst(mb_strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));      
+        $text = ucfirst(mb_strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
     }
 
     // echo "Generated $locale text ($length) : $locale:$text\n";
