@@ -607,9 +607,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->addJoinCondition('CategorySelect', '`CategorySelect`.DEFAULT_CATEGORY = 1')
             ;
         }
-
+    
         $search->withColumn(
-            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `CategorySelect`.POSITION END',
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN ' . PHP_INT_MAX . ' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
             'position_delegate'
         );
         $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
