@@ -19,7 +19,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
-use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\DeliveryModuleExInterface;
 
 /**
  * Class DeliveryPostageEvent
@@ -28,7 +28,7 @@ use Thelia\Module\DeliveryModuleInterface;
  */
 class DeliveryPostageEvent extends ActionEvent
 {
-    /** @var DeliveryModuleInterface */
+    /** @var DeliveryModuleExInterface */
     protected $module = null;
 
     /** @var Cart */
@@ -57,13 +57,13 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * DeliveryPostageEvent constructor.
-     * @param DeliveryModuleInterface $module
+     * @param DeliveryModuleExInterface $module
      * @param Country $country
      * @param Cart $cart
      * @param State $state
      */
     public function __construct(
-        DeliveryModuleInterface $module,
+        DeliveryModuleExInterface $module,
         Cart $cart,
         Address $address = null,
         Country $country = null,
@@ -128,7 +128,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return DeliveryModuleInterface
+     * @return DeliveryModuleExInterface
      */
     public function getModule()
     {
@@ -136,7 +136,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @param DeliveryModuleInterface $module
+     * @param DeliveryModuleExInterface $module
      */
     public function setModule($module)
     {

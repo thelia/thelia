@@ -24,7 +24,6 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\Exception\DeliveryException;
 
 /**
@@ -88,7 +87,6 @@ class Delivery extends BaseSpecificModule
                 continue;
             }
 
-            /** @var DeliveryModuleInterface $moduleInstance */
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
             if (true === $virtual

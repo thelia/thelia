@@ -752,7 +752,7 @@ return array(
     'decimal separator' => 'decimal separator',
     'delete form' => 'delete form',
     'delivery address' => 'delivery address',
-    'delivery module %s is not a Thelia\Module\DeliveryModuleInterface' => 'delivery module %s is not a Thelia\Module\DeliveryModuleInterface',
+    'delivery module %s is not a Thelia\Module\DeliveryModuleInterface' => 'delivery module %s is not a Thelia\Module\DeliveryModuleInterface or Thelia\Module\DeliveryModuleExInterface',
     'details pricing form' => 'details pricing form',
     'details promotion form' => 'details promotion form',
     'email' => 'email',

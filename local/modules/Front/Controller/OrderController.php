@@ -25,14 +25,14 @@ namespace Front\Controller;
 use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -43,10 +43,9 @@ use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
-use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\DeliveryModuleExInterface;
 use Thelia\Module\Exception\DeliveryException;
 
 /**
@@ -96,7 +95,7 @@ class OrderController extends BaseFrontController
     }
 
     /**
-     * @param AbstractDeliveryModule $moduleInstance
+     * @param DeliveryModuleExInterface $moduleInstance
      * @param Address $deliveryAddress
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -352,7 +351,10 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute('cart.view');
         }
     }
-
+    
+    /**
+     * @param int $order_id
+     */
     public function orderPlaced($order_id)
     {
         /* check if the placed order matched the customer */

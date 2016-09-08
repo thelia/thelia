@@ -16,28 +16,23 @@ use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Country;
 
-/**
- * Class AbstractDeliveryModule
- * @package Thelia\Module
- *
- * @deprecated use AbstractDeliveryExModule class instead
- */
-abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
+abstract class AbstractDeliveryExModule extends BaseModule implements DeliveryModuleExInterface
 {
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
-
+    
     /**
-     * @return bool
+     * @return bool true if the module manages virtual delivery, false otherwise.
      */
     public function handleVirtualProductDelivery()
     {
         return false;
     }
-
-
+    
+    
     /**
      * Return the first area that matches the given  country for the given module
+     *
      * @param Country $country
      * @param BaseModule $module
      * @return Area|null
@@ -45,14 +40,14 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
     public function getAreaForCountry(Country $country)
     {
         $area = null;
-
+        
         if (null !== $areaDeliveryModule = AreaDeliveryModuleQuery::create()->findByCountryAndModule(
             $country,
             $this->getModuleModel()
         )) {
             $area = $areaDeliveryModule->getArea();
         }
-
+        
         return $area;
     }
 }

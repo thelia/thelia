@@ -12,12 +12,12 @@
 
 namespace Thelia\Module;
 
+use Thelia\Model\Address;
 use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
 use Thelia\Module\Exception\DeliveryException;
 
-/** @deprecated Use DeliveryModuleExInterface instead */
-interface DeliveryModuleInterface extends BaseModuleInterface
+interface DeliveryModuleExInterface extends BaseModuleInterface
 {
     /**
      * This method is called by the Delivery  loop, to check if the current module has to be displayed to the customer.
@@ -27,20 +27,22 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      * If you return false, the delivery method will not be displayed
      *
      * @param Country $country the country to deliver to.
+     * @param Address|null $deliveryAddress the complete delivery address. Maybe null if none is defined
      *
      * @return boolean
      */
-    public function isValidDelivery(Country $country);
+    public function isValidDelivery(Country $country, Address $deliveryAddress = null);
 
     /**
      * Calculate and return delivery price in the shop's default currency
      *
      * @param Country $country the country to deliver to.
+     * @param Address|null $deliveryAddress the complete delivery address. Maybe null if none is defined
      *
      * @return OrderPostage|float             the delivery price
      * @throws DeliveryException if the postage price cannot be calculated.
      */
-    public function getPostage(Country $country);
+    public function getPostage(Country $country, Address $deliveryAddress = null);
 
     /**
      *

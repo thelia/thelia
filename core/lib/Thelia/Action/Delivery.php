@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Module\DeliveryModuleInterface;
 
 /**
  * Class Delivery
@@ -48,9 +49,17 @@ class Delivery implements EventSubscriberInterface
         }
 
         // call legacy module method
-        $event->setValidModule($module->isValidDelivery($event->getCountry()));
-        if ($event->isValidModule()) {
-            $event->setPostage($module->getPostage($event->getCountry()));
+        if ($module instanceof DeliveryModuleInterface) {
+            // Use legacy interface
+            $event->setValidModule($module->isValidDelivery($event->getCountry()));
+            if ($event->isValidModule()) {
+                $event->setPostage($module->getPostage($event->getCountry()));
+            }
+        } else {
+            $event->setValidModule($module->isValidDelivery($event->getCountry(), $event->getAddress()));
+            if ($event->isValidModule()) {
+                $event->setPostage($module->getPostage($event->getCountry(), $event->getAddress()));
+            }
         }
     }
 

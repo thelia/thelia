@@ -14,14 +14,15 @@ namespace VirtualProductDelivery;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Address;
 use Thelia\Model\Country;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
-use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\AbstractDeliveryExModule;
 use Thelia\Module\Exception\DeliveryException;
 
-class VirtualProductDelivery extends AbstractDeliveryModule
+class VirtualProductDelivery extends AbstractDeliveryExModule
 {
     const MESSAGE_DOMAIN = 'virtualproductdelivery';
 
@@ -35,14 +36,14 @@ class VirtualProductDelivery extends AbstractDeliveryModule
      *
      * @return bool true if there is only virtual products in cart elsewhere false
      */
-    public function isValidDelivery(Country $country)
+    public function isValidDelivery(Country $country, Address $address = null)
     {
         return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->isVirtual();
     }
 
-    public function getPostage(Country $country)
+    public function getPostage(Country $country, Address $address = null)
     {
-        if (!$this->isValidDelivery($country)) {
+        if (!$this->isValidDelivery($country, $address)) {
             throw new DeliveryException(
                 $this->trans("This module cannot be used on the current cart.")
             );
