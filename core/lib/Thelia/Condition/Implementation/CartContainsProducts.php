@@ -93,27 +93,18 @@ class CartContainsProducts extends ConditionAbstract
     {
         $cartItems = $this->facade->getCart()->getCartItems();
 
-        if ($this->operators[self::PRODUCTS_LIST] == Operators::IN) {
-            $comparisonOkReturn = true;
-        } elseif ($this->operators[self::PRODUCTS_LIST] == Operators::OUT) {
-            $comparisonOkReturn = false;
-        } else {
-            throw new \Exception('The operator must be : IN or OUT');
-        }
-
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            $comparison = $this->conditionValidator->variableOpComparison(
+            
+            if ($this->conditionValidator->variableOpComparison(
                 $cartItem->getProduct()->getId(),
                 $this->operators[self::PRODUCTS_LIST],
                 $this->values[self::PRODUCTS_LIST]
-            );
-            if ($comparison === $comparisonOkReturn) {
-                return $comparisonOkReturn;
+            )) {
+                return true;
             }
         }
-
-        return !$comparisonOkReturn;
+        return false;
     }
 
     /**
