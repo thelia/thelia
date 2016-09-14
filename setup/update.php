@@ -105,7 +105,7 @@ while (1) {
     if ($web !== null && $files < $web) {
         cliOutput(sprintf(
             "Your files belongs to version %s, which is not the latest stable release.",
-            $web
+            $files
         ), 'warning');
         cliOutput(sprintf(
             "It is recommended to upgrade your files first then run this script again." . PHP_EOL
