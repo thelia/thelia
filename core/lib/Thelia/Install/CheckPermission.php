@@ -57,6 +57,7 @@ class CheckPermission extends BaseInstall
         'intl',
         'mcrypt',
         'pdo_mysql',
+        'dom',
     );
 
     protected $validationMessages = array();
