@@ -6,7 +6,9 @@ Readme
 
 Thelia
 ------
-[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
+[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) 
+[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) 
+[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
 [Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
 
@@ -24,6 +26,7 @@ Requirements
         * intl
         * gd
         * curl
+        * dom
     * safe_mode off
     * memory_limit at least 128M, preferably 256.
     * post\_max\_size 20M
@@ -76,19 +79,24 @@ For tar.gz archives, you need tar's dependencies and the extension "zlib". See [
 You can get the sources from git and then let composer install dependencies, or use composer to install the whole thelia project into a specific directory
 
 ### Using git for download and composer for dependencies
+
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.3.2 (2.2.4 or 2.1.10)
+$ git checkout 2.3.3 (2.2.6 or 2.1.11)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
 
 ### Using composer for both download and dependencies
+
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.3.2 (2.2.4 or 2.1.10)
+$ php composer.phar create-project thelia/thelia path/ 2.3.3 (2.2.6 or 2.1.11)
 ```
+
+If something goes wrong during the install process, you can restart Thelia install wizard with 
+the following command : `php composer.phar run-script post-create-project-cmd` 
 
 ## Install it
 
@@ -116,6 +124,12 @@ http://thelia.net/install
 
 ``` bash
 $ php Thelia thelia:install
+```
+
+or if you use a Thelia project :
+
+``` bash
+$ php composer.phar run-script post-create-project-cmd
 ```
 
 You just have to follow all instructions.

@@ -1,3 +1,93 @@
+# 2.4.0-alpha1
+
+- (related to #2266) Fix #2226 : Bad parsing of web version in db update script
+- (related to #2265) Fix #2225 : Wrong version displayed in db update script
+- (related to #2264) Fix #2263 : check php extension "dom" is installed
+- (related to #2261) Cast position_delegate virtual column to number in product loop
+- (related to #2259) Coupon - fix cart contains products & cart contains categories conditions
+- (related to #2257) Coupon - fix order coupon amount
+- (related to #2256) Coupon - add available on special offers in remove x amount type
+- (related to #2255) Moved php shebang in the right file
+- (related to #2254) Add parameter "module_code" to "modules.table-row"
+- (related to #2251) Remove a forgotten debug instruction
+- (related to #2250) Fix hook register listener that throws unucessary exceptions
+- (related to #2249) Fix identical queries in the productSaleElement loop and the Product loop
+- (related to #2243) Fixed and optimized content and product loops
+- (related to #2240) Fixes #2229 : bad resource code in MailingSystemController class
+- (related to #2239) Fixes #2233 : customer profile update
+- (related to #2238) New method to save order transaction ref
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2235) Add amount in order coupon loop parse results
+- (related to #2232) Moved to container-based infrastructure for Travis CI
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2230) Hook fixes
+- (related to #2227) Fix for two problems with CART_FINDITEM event processing
+- (related to #2224) Added simple message processing to MailerFactory
+- (related to #2222) Fix duplicates in country loop when used with "with_area" argument
+- (related to #2221) Completed default email template FR and EN translations
+- (related to #2220) French translations
+- (related to #2219) Fix coupons issues
+- (related to #2217) Protected/hidden modules
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2208) Fix missing model on LoopResultRow
+- (related to #2207) Add delimiter and enclosure for header insertion
+- (related to #2206) Add reset array pointer if $data is an array.
+- (related to #2205) Fixed sale edit form
+- (related to #2204) Add isEmpty(), to check if $data is empty.
+- (related to #2203) Check if $error exist, specific for submit type
+- (related to #2202) Fix currency creation modal (The currency field is missing in the html template)
+- (related to #2201) Deprecated class NotFountHttpException because typo and removed deprecated classes 
+- (related to #2198) Cancel coupon usage on order cancel
+- (related to #2197) Pagination of coupon list
+- (related to #2191) Update BO typo
+- (related to #2190) Home stats improvements
+- (related to #2189) Huge performance improvement in feature-availability loop
+- (related to #2188) A more effective way to solve issue #2061
+- (related to #2187) Merge versions 2.1.10 2.2.4 2.3.2 in master branch 
+- (related to #2181) Fix CSV export cached file size
+- (related to #2178) Add a coupon type to offer a product
+- (related to #2174) PSR-6 + thelia.cache service and smarty cache block
+- (related to #2173) Fix customer discount apply on backoffice
+- (related to #2171) Fix sql syntax in setup/update/tpl/2.4.0-alpha1.sql.tpl 
+- (related to #2170) Fix #2166 : array to string conversion when php setup/update.php
+- (related to #2168) Router redirect to last rewriting_url
+- (related to #2167) Add global variable `app` to Smarty
+- (related to #2166) Fixed the update process when thelia.net is out of order
+- (related to #2165) Add replyTo parameter in mailer factory
+- (related to #2164) Add confirmation email option after customer creation
+- (related to #2163) Update fr_FR.php
+- (related to #2161) State Fixes
+- (related to #2160) Added missing home.block 'class' parameter
+- (related to #2157) Prevent an infinite loop in new product dialog
+- (related to #2155) Injects versions 2.1.9 2.2.3 2.3.1 in the master branch 
+- (related to #2154) Test range dates exists before testing type
+- (related to #2153) Lighten placeholders color
+- (related to #2150) Fix form and validator translations
+- (related to #2149) Fixed status_id parameter access 
+- (related to #2148) Added search by EAN code to product sale elements loop
+- (related to #2147) Fixed help text display if show_label is false
+- (related to #2146) Fix search in i18n fields when backend_context=1, and search improvements
+- (related to #2145) Fix for taxes & tax rules description display in Taxes rules page.
+- (related to #2144) Fix sql_mode
+- (related to #2143) Change order_adress in account-order
+- (related to #2142) Force utf8 on thelia update
+- (related to #2139) Start page correction
+- (related to #2135) Fix ressources check for translation view
+- (related to #2133) Add ORDER_UPDATE_TRANSACTION_REF event
+- (related to #2132) Fix change default category and default folder
+- (related to #2129) Fix order export date interval
+- (related to #2128) Fix checkout issues
+- (related to #2127) Fix for 2.3.0 BC break.
+- (related to #2125) fix construct in GenerateRewrittenUrlEvent
+- (related to #2123) Init Version 2.4.0-alpha1 
+- (related to #2109) Module routers priority improvement (issue #2108) 
+- (related to #2107) Add create function for AlphaNumStringType argument
+- (related to #2106) Added order-invoice form hooks
+- (related to #2093) Fix #1662 add of hooks in pdf email and account-order
+- (related to #2082) Fix issue #2003 : product and pse ref in invoice template
+- (related to #2081) Order Status
+
+
 # 2.3.3
 
 - (related to #2243) Fixed and optimized content and product loops
