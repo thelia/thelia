@@ -18,6 +18,7 @@ use Smarty;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
@@ -448,8 +449,6 @@ class SmartyParser extends Smarty implements ParserInterface
                 'debug' => $this->debug
             ]
         ]);
-
-        $this->parserContext->setCurrentTemplateInfo($realTemplateName, $parameters);
         
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }
