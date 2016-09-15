@@ -79,6 +79,6 @@ return array(
     'Your order confirmation Nº %ref' => 'Your order confirmation Nº %ref',
     'Your password for %store' => 'Your password for %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
-    'Your subscription to %store newsletter' => 'Your subscription to %store newsletter',
+    'Your subscriotion to %store newsletter' => 'Your subscriotion to %store newsletter',
     'just click the button below : ' => 'just click the button below : ',
 );

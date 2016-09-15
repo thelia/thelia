@@ -35,6 +35,7 @@ local/modules/*
 !local/modules/Cheque/
 !local/modules/Carousel/
 !local/modules/Front/
+!local/modules/FreeOrder/
 !local/modules/Tinymce/
 !local/modules/Colissimo/
 !local/modules/Hook*/
