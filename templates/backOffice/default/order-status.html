@@ -25,6 +25,11 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="general-block-decorator">
+
+                        {if ! empty($general_error) }
+                            <div class="alert alert-danger">{$general_error}</div>
+                        {/if}
+
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
@@ -102,7 +107,7 @@
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.order-status" access="UPDATE"}
                                                     <a title="{intl l='Edit this order status'}" href="{url path="/admin/configuration/order-status/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                 {if !$DELETABLE}
-                                                    <a class="order-status-cancel" title="{intl l='Cancel this order status'}" href="#cancel_order-status_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                    <a class="order-status-cancel" title="{intl l='Delete this order status'}" href="#cancel_order-status_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
                                                 {/if}
                                                 {/loop}
                                             </div>
@@ -191,7 +196,7 @@
 
     dialog_id       = "cancel_order-status_dialog"
     dialog_title    = {intl l="Delete an order status"}
-    dialog_message  = {intl l="Do you really want to cancel this order status ?"}
+    dialog_message  = {intl l="Do you really want to delete this order status ?"}
 
     form_action         = {token_url path='/admin/configuration/order-status/delete'}
     form_content        = {$smarty.capture.cancel_order_status_dialog nofilter}

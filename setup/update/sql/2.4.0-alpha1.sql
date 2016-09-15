@@ -83,7 +83,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 
 ALTER TABLE `order_status` ADD `color` CHAR(7) NOT NULL AFTER `code`;
 ALTER TABLE `order_status` ADD `position` INT(11) NOT NULL AFTER `color`;
-ALTER TABLE `order_status` ADD `protected_status` TINYINT(1) NOT NULL DEFAULT '1' AFTER `position`;
+ALTER TABLE `order_status` ADD `protected_status` TINYINT(1) NOT NULL DEFAULT '0' AFTER `position`;
 
 UPDATE `order_status` SET `position` = `id` WHERE 1;
 UPDATE `order_status` SET `color` = '#f0ad4e' WHERE `code` = 'not_paid';
