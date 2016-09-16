@@ -93,7 +93,7 @@ UPDATE `order_status` SET `color` = '#5bc0de' WHERE `code` = 'sent';
 UPDATE `order_status` SET `color` = '#d9534f' WHERE `code` = 'canceled';
 UPDATE `order_status` SET `color` = '#986dff' WHERE `code` = 'refunded';
 UPDATE `order_status` SET `color` = '#777777' WHERE `code` NOT IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
-UPDATE `order_status` SET `protected_status` = 1 WHERE `protected_status` IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
+UPDATE `order_status` SET `protected_status` = 1 WHERE `code` IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
 
 SELECT @max_id := MAX(`id`) FROM `resource`;
 
