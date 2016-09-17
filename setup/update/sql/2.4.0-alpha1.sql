@@ -55,6 +55,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 
 ALTER TABLE `customer` ADD `enable` TINYINT DEFAULT 0 AFTER `remember_me_serial`;
 ALTER TABLE `customer` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
+ALTER TABLE `customer_version` ADD `enable` TINYINT DEFAULT 0 AFTER `remember_me_serial`;
+ALTER TABLE `customer_version` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 
