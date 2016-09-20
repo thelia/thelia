@@ -8,7 +8,7 @@
 
     <select required class="form-control" id="coupon-category-id" name="{$category_id_field_name}">
         <option value="0">{intl l="Please select..."}</option>
-        {loop type="category-tree" category=0 name="list-of-category" backend_context="1"}
+        {loop type="category-tree" category=0 name="list-of-category" backend_context="1" visible="*"}
             <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if $ID == $category_id_value}selected="selected"{/if}>{$TITLE}</option>
         {/loop}
     </select>
