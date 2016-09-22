@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\TheliaFormValidatorInterface;
@@ -132,7 +134,27 @@ class ParserContext implements \IteratorAggregate
     public function addForm(BaseForm $form)
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
-
+    
+        // Get form field error details
+        $formFieldErrors = [];
+    
+        // Get form field error details
+        $formFieldErrors = [];
+    
+        /** @var Form $field */
+        foreach ($form->getForm()->getIterator() as $field) {
+            $errors = $field->getErrors();
+        
+            if (count($errors) > 0) {
+                $formFieldErrors[$field->getName()] = [];
+            
+                /** @var FormError $error */
+                foreach ($errors as $error) {
+                    $formFieldErrors[$field->getName()][] = $error;
+                }
+            }
+        }
+    
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
         // Set form error information
@@ -188,6 +210,19 @@ class ParserContext implements \IteratorAggregate
                         $this->formValidator->validateForm($form, $formInfo['method']);
                     } catch (\Exception $ex) {
                         // Ignore the exception.
+                    }
+    
+                    // Manually set the form fields error information, if validateForm() did not the job,
+                    // which is the case when the user has been redirected .
+                    foreach ($formInfo['field_errors'] as $fieldName => $errors) {
+                        /** @var Form $field */
+                        $field = $form->getForm()->get($fieldName);
+        
+                        if (null !==  $field && count($field->getErrors()) == 0) {
+                            foreach ($errors as $error) {
+                                $field->addError($error);
+                            }
+                        }
                     }
                 }
 
