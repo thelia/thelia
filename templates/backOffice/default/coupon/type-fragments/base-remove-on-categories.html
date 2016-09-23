@@ -7,7 +7,7 @@
     <label for="coupon-categories-id">{intl l="Applies to products in categories :"}</label>
 
     <select required multiple size="10" class="form-control" id="coupon-categories-id" name="{$categories_field_name}[]">
-        {loop type="category-tree" category=0 name="list-of-categories" backend_context="1"}
+        {loop type="category-tree" category=0 name="list-of-categories" backend_context="1" visible="*"}
             <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if in_array($ID, $categories_values)}selected="selected"{/if}>{$TITLE}</option>
         {/loop}
     </select>
