@@ -281,9 +281,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("IS_NEW", $product->getVirtualColumn('is_new'))
                 ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
                 ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'));
+    
+            $this->associateValues($loopResultRow, $product, $defaultCategoryId);
+    
             $this->addOutputFields($loopResultRow, $product);
-
-            $loopResult->addRow($this->associateValues($loopResultRow, $product, $defaultCategoryId));
+    
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
@@ -323,8 +326,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("BEST_TAXED_PRICE", $taxedPrice)
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
-
-            $loopResult->addRow($this->associateValues($loopResultRow, $product, $defaultCategoryId));
+    
+            $this->associateValues($loopResultRow, $product, $defaultCategoryId);
+    
+            $this->addOutputFields($loopResultRow, $product);
+    
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
