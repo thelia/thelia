@@ -172,11 +172,17 @@ class URL
         $anchor      = '';
 
         if (! is_null($parameters)) {
-            foreach ($parameters as $name => $value) {
+            foreach ($parameters as $name => $data) {
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('/([?&])'.$name.'=(?:[^&]*)(?:&|$)/', '$1', $base);
 
-                $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
+                if (is_array($data)) {
+                    foreach ($data as $idx => $value) {
+                        $queryString .= sprintf('%s[%s]=%s&', urlencode($name), $idx, urlencode($value));
+                    }
+                } else {
+                    $queryString .= sprintf('%s=%s&', urlencode($name), urlencode($data));
+                }
             }
         }
 
