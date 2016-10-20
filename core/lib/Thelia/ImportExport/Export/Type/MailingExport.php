@@ -26,7 +26,7 @@ class MailingExport extends AbstractExport
     protected $orderAndAliases = [
         'newsletter.ID' => 'Identifier',
         'newsletter.EMAIL' => 'Email',
-        'newsletter.FISTNAME' => 'FirstName',
+        'newsletter.FIRSTNAME' => 'FirstName',
         'newsletter.LASTNAME' => 'LastName'
     ];
 
