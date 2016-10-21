@@ -51,13 +51,13 @@ class NumberFormat
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals == null) {
+        if ($decimals === null) {
             $decimals = $lang->getDecimals();
         }
-        if ($decPoint == null) {
+        if ($decPoint === null) {
             $decPoint = $lang->getDecimalSeparator();
         }
-        if ($thousandsSep == null) {
+        if ($thousandsSep === null) {
             $thousandsSep = $lang->getThousandsSeparator();
         }
         return number_format($number, $decimals, $decPoint, $thousandsSep);
