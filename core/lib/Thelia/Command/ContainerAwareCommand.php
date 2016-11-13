@@ -98,6 +98,7 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
         $requestContext->fromRequest($request);
         $url = new URL($container);
         $url->setRequestContext($requestContext);
+        $this->getContainer()->get('router.admin')->setContext($requestContext);
     }
 
     /**
