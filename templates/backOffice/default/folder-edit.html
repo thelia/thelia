@@ -127,7 +127,7 @@
                                                               {/loop}
                                                               {$myparent=$PARENT}
 		                                                      {loop name="fold-parent" type="folder-tree" visible="*" folder="0" exclude={','|implode:$excludeFolders}}
-		                                                           <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $folder_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+		                                                           <option value="{$ID}" {if $myparent == $ID}selected="selected"{/if} {if $folder_id == $ID}disabled="disabled"{/if}>{option_offset l=$LEVEL+1 label=$TITLE}</option>
 		                                                      {/loop}
 		                                                </select>
 		                                             </div>
