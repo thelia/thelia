@@ -8,7 +8,7 @@
         <select required class="form-control" id="free-product-category-id" name="{$offered_category_field_name}">
             <option value="0">{intl l="Please select..."}</option>
             {loop type="category-tree" category=0 name="list-of-category" backend_context="1" visible="*"}
-                <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if $ID == $offered_category_value}selected="selected"{/if}>{$TITLE}</option>
+                <option value="{$ID}" {if $ID == $offered_category_value}selected="selected"{/if}>{option_offset l=$LEVEL label=$TITLE}</option>
             {/loop}
         </select>
     </div>
