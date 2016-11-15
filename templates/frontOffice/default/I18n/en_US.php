@@ -49,7 +49,7 @@ return array(
     'Choose your delivery method' => 'Choose your delivery method',
     'Choose your payment method' => 'Choose your payment method',
     'Code :' => 'Code :',
-    'Connecting to the secure payment server, please wait a few seconds...' => 'Connection au serveur depaiement sécurisé, merci de patienter.',
+    'Connecting to the secure payment server, please wait a few seconds...' => 'Connecting to the secure payment server, please wait a few seconds...',
     'Contact Us' => 'Contact Us',
     'Contact page' => 'Contact page',
     'Continue Shopping' => 'Continue Shopping',
