@@ -102,7 +102,7 @@
                     <li class="dropdown">
                         {loop type="lang" name="ui-lang" id={lang attr='id'} backend_context="1"}
                         <button class="dropdown-toggle" data-toggle="dropdown">
-                            <imconfiguration/administrators/viewg src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
+                            <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
                             <span class="caret"></span>
                         </button>
                         {/loop}
