@@ -331,7 +331,7 @@
                                                 <td>
                                                     <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
                                                 </td>
-                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id }
+                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id order_id=$ID}
                                             </tr>
                                         {/loop}
 
