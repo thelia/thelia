@@ -170,7 +170,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `FolderSelect`.POSITION END',
+            'CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `FolderSelect`.POSITION END AS SIGNED)',
             'position_delegate'
         );
         $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
