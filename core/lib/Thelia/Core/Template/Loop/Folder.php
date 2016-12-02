@@ -69,15 +69,13 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 new TypeCollection(
                     new Type\EnumListType(
                         [
-                            'alpha',
-                            'alpha_reverse',
-                            'manual',
-                            'manual_reverse',
+                            'id', 'id_reverse',
+                            'alpha', 'alpha_reverse',
+                            'manual', 'manual_reverse',
+                            'visible', 'visible_reverse',
                             'random',
-                            'created',
-                            'created_reverse',
-                            'updated',
-                            'updated_reverse'
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse'
                         ]
                     )
                 ),
@@ -127,10 +125,10 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $parent = $this->getParent();
 
-        if (!is_null($parent)) {
+        if (null !== $parent) {
             $search->filterByParent($parent);
         }
-
+    
         $current = $this->getCurrent();
 
         if ($current === true) {
@@ -171,6 +169,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
@@ -182,6 +186,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();

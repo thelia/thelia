@@ -80,18 +80,15 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
-                            'alpha',
-                            'alpha-reverse',
-                            'manual',
-                            'manual_reverse',
+                            'id', 'id_reverse',
+                            'alpha', 'alpha-reverse', 'alpha_reverse',
+                            'manual', 'manual_reverse',
+                            'visible', 'visible_reverse',
                             'random',
                             'given_id',
-                            'created',
-                            'created_reverse',
-                            'updated',
-                            'updated_reverse',
-                            'position',
-                            'position_reverse'
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
+                            'position', 'position_reverse'
                         )
                     )
                 ),
@@ -227,10 +224,17 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
@@ -254,6 +258,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         $search->withColumn(ContentTableMap::ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();
