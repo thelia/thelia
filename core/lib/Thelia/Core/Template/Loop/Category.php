@@ -89,7 +89,15 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
+                    new Type\EnumListType([
+                        'id', 'id_reverse',
+                        'alpha', 'alpha_reverse',
+                        'manual', 'manual_reverse',
+                        'visible', 'visible_reverse',
+                        'created','created_reverse',
+                        'updated', 'updated_reverse',
+                        'random'
+                    ])
                 ),
                 'manual'
             ),
@@ -133,10 +141,13 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $parent = $this->getParent();
 
-        if (!is_null($parent)) {
+        if (null !== $parent) {
             $search->filterByParent($parent, Criteria::IN);
+            $positionOrderAllowed = true;
+        } else {
+            $positionOrderAllowed = false;
         }
-
+    
         $excludeParent = $this->getExcludeParent();
 
         if (!is_null($excludeParent)) {
@@ -219,6 +230,18 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                     break;
                 case "visible_reverse":
                     $search->orderByVisible(Criteria::DESC);
+                    break;
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
                     break;
                 case "random":
                     $search->clearOrderByColumns();
