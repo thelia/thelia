@@ -717,10 +717,11 @@ abstract class BaseLoop
 
         $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_BUILD_ARRAY);
         if (null !== $eventName) {
-            $this->dispatcher->dispatch(
-                $eventName,
-                new LoopExtendsBuildArrayEvent($this, $search)
-            );
+            $event = new LoopExtendsBuildArrayEvent($this, $search);
+
+            $this->dispatcher->dispatch($eventName, $event);
+
+            $search = $event->getArray();
         }
 
         return $search;
