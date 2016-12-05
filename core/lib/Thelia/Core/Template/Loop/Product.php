@@ -128,6 +128,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'updated', 'updated_reverse',
                             'ref', 'ref_reverse',
                             'visible', 'visible_reverse',
+                            'position', 'position_reverse',
                             'promo',
                             'new',
                             'random',
@@ -1083,6 +1084,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case "updated_reverse":
                     $search->addDescendingOrderByColumn('updated_at');
+                    break;
+                case "position":
+                    $search->addAscendingOrderByColumn('position_delegate');
+                    break;
+                case "position_reverse":
+                    $search->addDescendingOrderByColumn('position_delegate');
                     break;
                 case "given_id":
                     if (null === $id) {
