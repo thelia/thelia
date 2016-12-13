@@ -451,6 +451,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_ADDITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),
             TheliaEvents::CART_DELETEITEM => array("updateOrderDiscount", 10),
+            TheliaEvents::CUSTOMER_LOGIN => array("updateOrderDiscount", 10)
         );
     }
 
