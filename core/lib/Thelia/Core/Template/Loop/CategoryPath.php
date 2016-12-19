@@ -49,32 +49,34 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
-            Argument::createIntTypeArgument('depth'),
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
             Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }
 
     public function buildArray()
     {
-        $id = $this->getCategory();
+        $originalId = $currentId = $this->getCategory();
         $visible = $this->getVisible();
-
-        $search = CategoryQuery::create();
-
-        $this->configureI18nProcessing($search, array('TITLE'));
-
-        $search->filterById($id);
-        if ($visible !== BooleanOrBothType::ANY) {
-            $search->filterByVisible($visible);
-        }
-
+        $depth = $this->getDepth();
+    
         $results = array();
-
+    
         $ids = array();
-
+    
         do {
+            $search = CategoryQuery::create();
+        
+            $this->configureI18nProcessing($search, array('TITLE'));
+        
+            $search->filterById($currentId);
+        
+            if ($visible !== BooleanOrBothType::ANY) {
+                $search->filterByVisible($visible);
+            }
+        
             $category = $search->findOne();
-
+        
             if ($category != null) {
                 $results[] = array(
                     "ID" => $category->getId(),
@@ -82,29 +84,26 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     "URL" => $category->getUrl($this->locale),
                     "LOCALE" => $this->locale,
                 );
-
-                $parent = $category->getParent();
-
-                if ($parent > 0) {
+            
+                $currentId = $category->getParent();
+            
+                if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (in_array($parent, $ids)) {
-                        throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
+                    if (in_array($currentId, $ids)) {
+                        throw new \LogicException(
+                            sprintf(
+                                "Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)",
+                                $originalId,
+                                $currentId
+                            )
+                        );
                     }
-
-                    $ids[] = $parent;
-
-                    $search = CategoryQuery::create();
-
-                    $this->configureI18nProcessing($search, array('TITLE'));
-
-                    $search->filterById($parent);
-                    if ($visible != BooleanOrBothType::ANY) {
-                        $search->filterByVisible($visible);
-                    }
+                
+                    $ids[] = $currentId;
                 }
             }
-        } while ($category != null && $parent > 0);
-
+        } while ($category != null && $currentId > 0 && --$depth > 0);
+    
         // Reverse list and build the final result
         return array_reverse($results);
     }
