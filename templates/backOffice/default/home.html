@@ -39,7 +39,7 @@
 jQuery(function($){
     // Get the latest Thelia version
     $.ajax({
-        url: "http://thelia.net/version.php",
+        url: "https://thelia.net/version.php",
         beforeSend: function (jqXHR) {
             jqXHR.setRequestHeader("Thelia-Version", "{$THELIA_VERSION}");
         },
