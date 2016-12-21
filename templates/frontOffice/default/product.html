@@ -77,7 +77,7 @@
                     <div class="carousel-inner">
                         <div class="item active">
                             <ul class="list-inline">
-                                {loop name="image.carousel" type="image" product={$ID}  width="560" height="445" resize_mode="borders" limit="5"}
+                                {loop name="image.carousel" type="image" product={$ID} width="560" height="445" resize_mode="borders" limit="5"}
                                 <li>
                                     <a href="{$IMAGE_URL nofilter}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
                                         {loop type="image" name="image.thumbs" id={$ID} product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
@@ -91,7 +91,7 @@
                         {ifloop rel="image.carouselsup"}
                         <div class="item">
                             <ul class="list-inline">
-                                {loop name="image.carouselsup" type="image" product={$ID}  width="560" height="445" resize_mode="borders" offset="5"}
+                                {loop name="image.carouselsup" type="image" product={$ID} width="560" height="445" resize_mode="borders" offset="5"}
                                     <li>
                                         <a href="{$IMAGE_URL nofilter}" class="thumbnail">
                                             {loop type="image" name="image.thumbssup" id={$ID} product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
@@ -179,6 +179,9 @@
                     <input type="hidden" name="product_id" value="{$ID}">
                     {form_field field="append"}
                         <input type="hidden" name="{$name}" value="1">
+                    {/form_field}
+                    {form_field form=$form field="success_url"}
+                        <input type="hidden" name="{$name}" value="{url path='/cart'}">
                     {/form_field}
 
                     {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
