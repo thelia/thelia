@@ -694,7 +694,7 @@
 		        </ul>
 		    </div>
 		</div>
-        {loop type="product_sale_elements" name="product_sale_elements_combination_form" product=$product_id default="yes"}
+        {loop type="product_sale_elements" name="product_sale_elements_combination_form" product=$product_id default="yes" limit=1 backend_context=1}
 		<div class="col-md-6">
          {form_field field='price'}
              <div class="form-group {if $error}has-error{/if}">
