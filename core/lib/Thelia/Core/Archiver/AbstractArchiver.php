@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Archiver;
 
+use Thelia\Core\Translation\Translator;
+
 /**
  * Class AbstractArchiver
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
@@ -31,7 +33,7 @@ abstract class AbstractArchiver implements ArchiverInterface
     public function __construct()
     {
       if (!$this->isAvailable()) {
-        throw new Exception(
+        throw new \Exception(
           Translator::getInstance()->trans(
             "The archiver :name is not available. Please install the php extension :extension first.",
             [
