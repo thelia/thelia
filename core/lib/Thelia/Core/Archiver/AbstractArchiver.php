@@ -14,6 +14,7 @@ namespace Thelia\Core\Archiver;
 
 use Thelia\Core\Translation\Translator;
 
+
 /**
  * Class AbstractArchiver
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
