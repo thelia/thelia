@@ -22,6 +22,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\TheliaKernelEvents;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -89,6 +90,25 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
+    public function logException(GetResponseForExceptionEvent $event)
+    {
+        // Log exception in the Thelia log
+        $exception = $event->getException();
+        
+        $logMessage = '';
+        
+        do {
+            $logMessage .=
+                ($logMessage ? PHP_EOL . 'Caused by' : 'Uncaught exception')
+                . $event->getException()->getMessage()
+                . PHP_EOL
+                . "Stack Trace: " . $event->getException()->getTraceAsString()
+            ;
+        } while (null !== $exception = $exception->getPrevious());
+        
+        Tlog::getInstance()->error($logMessage);
+    }
+
     public function authenticationException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
@@ -107,6 +127,7 @@ class ErrorListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::EXCEPTION => [
+                ["logException", 0],
                 ["handleException", 0],
                 ['authenticationException', 100]
             ],
