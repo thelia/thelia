@@ -17,7 +17,7 @@ return array(
     '<strong>Warning</strong>, some of your countries are not included in any shipping zone:' => '<strong>Предупреждение</strong>, некоторые из ваших стран не включены ни в одну зону доставки:',
     '<strong>Warning</strong>, some of your shipping zones are not attached to any delivery module:' => '<strong>Предупреждение</strong>, некоторые из ваших зон доставок не прикреплены ни к одному модулю доставки:',
     'A content could be attached to more than one folder. Select here the additional folders for this content.' => 'Вы можете присоединить более одной папки к содержимому. Выберите дополнительные папки для данного содержимого.',
-    'A product could be attached to more than one category. Select here the additional categories for this product.' => 'Товар может быть прикреплен к более чем одной категории. Выберите дополнительные категорие для этого товара.',
+    'A product could be attached to more than one category. Select here the additional categories for this product.' => 'Товар может быть прикреплен к более чем одной категории. Выберите дополнительные категории для этого товара.',
     'API configuration' => 'Конфигурация API',
     'API list access' => 'Список доступов к API ',
     'API users' => 'Пользователи API',
