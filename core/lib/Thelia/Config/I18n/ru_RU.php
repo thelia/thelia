@@ -242,7 +242,7 @@ return array(
     'Hook title' => 'Название хука',
     'Hooks' => 'Хуки',
     'Host' => 'Хост',
-    'I would like to receive the newsletter or the latest news.' => 'Я хотел бы получать информационный бюллетень или последние новости.',
+    'I would like to receive the newsletter or the latest news.' => 'Я хотел бы подписаться на рассылку новостей.',
     'ISO 4217 code' => 'Код ISO 4217',
     'ISO 639-1 Code' => 'Код ISO 639-1',
     'ISO Alpha-2 code' => 'ISO Alpha-2 код',

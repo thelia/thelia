@@ -114,7 +114,7 @@ return array(
     'Need help ?' => 'Нужна помощь?',
     'Newsletter' => 'Рассылка',
     'Newsletter Subscription' => 'Подписка на рассылку',
-    'Next' => 'Следующая',
+    'Next' => 'Далее',
     'Next Step' => 'Следующий шаг',
     'Next product' => 'Следующий товар',
     'No Contents in this folder.' => 'Содержимое в папке отсутствует.',
