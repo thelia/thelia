@@ -2,5 +2,5 @@
 
 return array(
     '+ View All' => '+ Смотреть все',
-    'Latest' => 'Последние',
+    'Latest' => 'Новые',
 );
