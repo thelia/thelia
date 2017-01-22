@@ -49,7 +49,7 @@ class FolderQuery extends BaseFolderQuery
             $currentPosition++;
 
             if ($depth == $currentPosition && $depth != 0) {
-                return;
+                return[];
             }
 
             $categories = self::create()
