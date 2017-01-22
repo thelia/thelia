@@ -33,7 +33,7 @@ class CategoryQuery extends BaseCategoryQuery
      *
      * find all category children for a given category. an array of \Thelia\Model\Category is return
      *
-     * @param $categoryId the category id or an array of id
+     * @param int|int[]                 $categoryId the category id or an array of id
      * @param  int                      $depth      max depth you want to search
      * @param  int                      $currentPos don't change this param, it is used for recursion
      * @return \Thelia\Model\Category[]
