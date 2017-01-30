@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array(
     ' content create form' => 'Formulaire de création de contenu',
     ' note: only non-visible documents can be associated.' => 'remarque : seuls ces modules. les documents non visibles peuvent être associés.',
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'Le paramètre "%param" ne peut être vide dans la boucle type: %type, nom: %name ',
@@ -80,13 +80,13 @@ return [
     'By Module' => 'Par module',
     'CSS' => 'CSS',
     'CSS stylesheet' => 'Feuille de style CSS',
+    'Can\'t deactivate a secure module' => 'Impossible de désactiver un module sécurisé',
+    'Can\'t remove a core module' => 'Impossible de supprimer un module de base',
     'Cannot disable the default language' => 'Impossible de désactiver la langue par défaut',
     'Cannot find a default country. Please define one.' => 'Impossible de trouver un pays par défaut. Veuillez en définir un.',
     'Cannot find the shop country. Please select a shop country.' => 'Impossible de trouver le pays du magasin. Veuillez en sélectionner un.',
     'Cannot hide the default language' => 'Impossible de masquer la langue par défaut',
     'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?' => 'Ne peut instancier le module "%name%": le namespace est null. Peut-être que le modèle n\'est pas chargé ?',
-    'Can\'t remove a core module' => 'Impossible de supprimer un module de base',
-    'Can\'t deactivate a secure module' => 'Impossible de désactiver un module sécurisé',
     'Cart' => 'Panier',
     'Cart contains at least a product %op% <strong>%products_list%</strong>' => 'Le panier contient au moins un produit %op% <strong>%products_list%</strong> ',
     'Cart contains categories condition' => 'Valable si le panier contient/ne contient pas des produits appartenant à certaines catégories',
@@ -421,6 +421,7 @@ return [
     'Range date Start' => 'Date de début',
     'Rate' => 'Taux',
     'Rate from %currencyCode' => 'Taux pour %currencyCode',
+    'Recipient e-mail address' => 'Adresse e-mail du destinataire',
     'Redirecting ...' => 'Redirection ...',
     'Redirecting to %url' => 'Redirection vers %url',
     'Reference' => 'Référence',
@@ -453,6 +454,7 @@ return [
     'Select the product brand, or supplier.' => 'Choisissez la marque ou le fournisseur  du produit.',
     'Select the products covered by this operation' => 'Produits inclus dans cette promotion',
     'Select the virtual document' => 'Sélectionnez le document virtuel',
+    'Send test e-mail to:' => 'Envoyer un email de test à: ',
     'Service ID' => 'ID du service',
     'Shipping configuration' => 'Configuration du transport',
     'Shipping zone name' => 'Nom de la zone de livraison',
@@ -822,4 +824,4 @@ return [
     'update form' => 'Formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
-];
+);

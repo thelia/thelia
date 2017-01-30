@@ -173,7 +173,7 @@
 
     <route id="admin.customer.update.process" path="/admin/customer/save">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::processUpdateAction</default>
-     </route>
+    </route>
 
     <route id="admin.customer.delete" path="/admin/customer/delete">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
@@ -1575,6 +1575,11 @@
 
     <route id="admin.email.preview_text" path="/admin/message/preview/text/{messageId}" methods="get">
         <default key="_controller">Thelia:Admin\Message:previewAsText</default>
+        <requirement key="messageId">\d+</requirement>
+    </route>
+
+    <route id="admin.email.test_send" path="/admin/message/send/{messageId}" methods="post">
+        <default key="_controller">Thelia:Admin\Message:sendSampleByEmail</default>
         <requirement key="messageId">\d+</requirement>
     </route>
 
