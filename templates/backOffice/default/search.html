@@ -675,7 +675,7 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
     form_action         = {token_url path='/admin/customer/delete'}
-    form_content        = {$smarty.capture.delete_customer_dialog nofilter}
+    form_content        = {$smarty.capture.customer_delete_dialog nofilter}
     form_id             = "customer_delete_dialog"
 }
 
@@ -695,22 +695,27 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     <script>
         $(function() {
 
-            // Set proper category ID in delete from
+            // Set proper customer ID in delete form
+            $('a.customer-delete').click(function(ev) {
+                $('#delete_customer_id').val($(this).data('id'));
+            });
+
+            // Set proper category ID in delete form
             $('a.category-delete').click(function(ev) {
                 $('#category_delete_id').val($(this).data('id'));
             });
 
-            // Set proper product ID in delete from
+            // Set proper product ID in delete form
             $('a.product-delete').click(function(ev) {
                 $('#product_delete_id').val($(this).data('id'));
             });
 
-            // Set proper folder ID in delete from
+            // Set proper folder ID in delete form
             $('a.folder-delete').click(function(ev) {
                 $('#folder_delete_id').val($(this).data('id'));
             });
 
-            // Set proper content ID in delete from
+            // Set proper content ID in delete form
             $('a.content-delete').click(function(ev) {
                 $('#content_delete_id').val($(this).data('id'));
             });
