@@ -538,7 +538,9 @@ abstract class BaseLoop
         }
 
         $parsedResults = $this->extendsParseResults($this->parseResults($loopResult));
-
+    
+        $loopResult->finalizeRows();
+    
         if ($isCaching) {
             self::$cacheLoopResult[$hash] = $parsedResults;
 
