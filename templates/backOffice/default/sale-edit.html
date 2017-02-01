@@ -124,7 +124,7 @@
                                         <select class="form-control" id="cat_source" name="cat_source" size="10" multiple>
                                         {loop type="category-tree" category=0 name="available-categories"  backend_context=1}
                                             {$selected = in_array($ID, $value)}
-                                            <option {if $selected}disabled class="disabled-select-option"{/if} value="{$ID}">{option_offset l=$LEVEL label=$TITLE}</option>
+                                            <option {if $selected}disabled class="disabled-select-option"{/if} value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
                                         {/loop}
                                         </select>
                                     </div>

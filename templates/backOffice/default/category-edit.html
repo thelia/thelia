@@ -193,7 +193,7 @@
                                                             <select name="folder_id" id="folder_id" class="form-control">
                                                                 <option value="">{intl l='Select a folder...'}</option>
                                                                 {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
-                                                                    <option value="{$ID}">{option_offset l=$LEVEL label=$TITLE}</option>
+                                                                    <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
                                                                 {/loop}
                                                             </select>
                                                         </div>

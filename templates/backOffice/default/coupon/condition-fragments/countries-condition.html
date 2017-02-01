@@ -8,7 +8,7 @@
     <label for="{$countries_field_name}-value">{intl l="The selected countries :"}</label>
     <select required multiple size="5" class="form-control" id="{$countries_field_name}-value" name="{$countries_field_name}[value][]">
         {loop type="country" name="list-of-countries" order="alpha" backend_context=1 visible="*"}
-            <option value="{$ID}" {if in_array($ID, $values)}selected="selected"{/if}>{option_offset l=$LEVEL label=$TITLE}</option>
+            <option value="{$ID}" {if in_array($ID, $values)}selected="selected"{/if}>{option_offset l=$LEVEL label={$TITLE}}</option>
         {/loop}
     </select>
     <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one country'}</span>
