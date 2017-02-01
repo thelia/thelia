@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'Sales statistics' => 'Sales statistics',
-    'Stats on %month/%year' => 'Stats on %month/%year',
-    'Thelia informations' => 'Thelia information',
+    'Sales statistics' => 'Статистика продаж',
+    'Stats on %month/%year' => 'Статистика за %month/%year',
+    'Thelia informations' => 'Информация о Thelia',
 ];

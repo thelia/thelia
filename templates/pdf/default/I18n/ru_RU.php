@@ -1,21 +1,29 @@
 <?php
 
-return [
+return array(
     'Customer Number' => 'Номер клиента',
     'DELIVERY' => 'ДОСТАВКА',
     'Delivery address' => 'Адрес доставки',
+    'Delivery module' => 'Модуль доставки',
+    'Discount' => 'Скидка',
     'Email: ' => 'Эл.почта: ',
     'INVOICE' => 'СЧЕТ-ФАКТУРА',
     'Invoice REF' => 'Счет-фактура номер',
     'Invoice address' => 'Адрес плательщика',
+    'Invoice date' => 'Дата счет-фактуры',
+    'Payment module' => 'Модуль оплаты',
     'Phone: ' => 'Телефон: ',
+    'Postage' => 'Почтовые расходы',
+    'Product' => 'Товар',
     'Quantity' => 'Количество',
     'Ref' => 'Номер',
+    'Tax' => 'Налог',
+    'Taxed total' => 'Цена с налогом',
     'Total' => 'Итого',
     'Total with tax' => 'Итого с налогом',
     'Total without tax' => 'Итого без налога',
-    'delivery.imprint' => 'delivery.imprint',
-    'invoice.imprint' => 'invoice.imprint',
+    'Unit taxed price' => 'Цена с налогом ед.',
+    'Unit. price' => 'Цена ед.',
     'page' => 'страница',
     'product' => 'товар',
-];
+);
