@@ -26,7 +26,7 @@
                                 <option value="">{intl l='Select a folder...'}</option>
                                 {loop name="folders" type="folder-tree" folder="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id" return_url=false}
                                     <option value="{$ID}" {if $DEFAULT_FOLDER==$ID}disabled="disabled"{/if}>
-                                        {option_offset l=$LEVEL label=$TITLE}{if $DEFAULT_FOLDER==$ID}{intl l=' (default)'}{/if}
+                                        {option_offset l=$LEVEL label={$TITLE}}{if $DEFAULT_FOLDER==$ID}{intl l=' (default)'}{/if}
                                     </option>
                                 {/loop}
                             </select>

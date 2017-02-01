@@ -32,7 +32,7 @@
 		                    <select name="folder_id" id="folder_id" class="form-control">
 		                        <option value="">{intl l='Select a folder...'}</option>
 		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
-		                            <option value="{$ID}">{option_offset l=$LEVEL label=$TITLE}</option>
+		                            <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
 		                        {/loop}
 		                    </select>
 
@@ -150,7 +150,7 @@
 		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
 		                        <option value="">{intl l='Select a category...'}</option>
 		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
-		                            <option value="{$ID}">{option_offset l=$LEVEL label=$TITLE}</option>
+		                            <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
 		                        {/loop}
 		                    </select>
 
@@ -283,7 +283,7 @@
 	                            <option value="">{intl l='Select a category...'}</option>
 	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id" return_url=false}
 	                                <option value="{$ID}" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
-										{option_offset l=$LEVEL label=$TITLE}{if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
+										{option_offset l=$LEVEL label={$TITLE}}{if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
 	                                </option>
 	                            {/loop}
 	                        </select>
