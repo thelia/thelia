@@ -98,6 +98,7 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
         $requestContext->fromRequest($request);
         $url = $container->get('thelia.url.manager');
         $url->setRequestContext($requestContext);
+        $this->getContainer()->get('router.admin')->setContext($requestContext);
     }
 
     /**
