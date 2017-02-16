@@ -85,6 +85,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createBooleanTypeArgument('need_count_child', false),
             Argument::createBooleanTypeArgument('need_product_count', false),
+            Argument::createBooleanTypeArgument('product_count_visible_only', false),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
@@ -288,7 +289,12 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             }
 
             if ($this->getNeedProductCount()) {
-                $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
+                if ($this->getProductCountVisibleOnly()) {
+                    $loopResultRow->set("PRODUCT_COUNT", $category->countAllProductsVisibleOnly());
+                }
+                else {
+                    $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
+                }
             }
 
             $isBackendContext = $this->getBackendContext();
