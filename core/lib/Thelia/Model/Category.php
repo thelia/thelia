@@ -61,6 +61,31 @@ class Category extends BaseCategory implements FileModelParentInterface
     }
 
     /**
+     *
+     * count visible products only for current category and sub categories
+     *
+     * /!\ the number of queries is exponential, use it with caution
+     *
+     * @return int
+     */
+    public function countAllProductsVisibleOnly()
+    {
+        $children = CategoryQuery::findAllChild($this->getId());
+        array_push($children, $this);
+
+        $countProduct = 0;
+
+        foreach ($children as $child) {
+            $countProduct += ProductQuery::create()
+                ->filterByCategory($child)
+                ->filterByVisible(true)
+                ->count();
+        }
+
+        return $countProduct;
+    }
+    
+    /**
      * Get the root category
      * @param  int   $categoryId
      * @return mixed
