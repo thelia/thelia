@@ -74,7 +74,7 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function countAllProductsVisibleOnly()
     {
-        return countAllProducts(true);
+        return $this->countAllProducts(true);
     }
     
     /**
