@@ -44,7 +44,7 @@ class Category extends BaseCategory implements FileModelParentInterface
      *
      * @return int
      */
-    public function countAllProducts()
+    public function countAllProducts($visibleOnly = false)
     {
         $children = CategoryQuery::findAllChild($this->getId());
         array_push($children, $this);
@@ -52,9 +52,13 @@ class Category extends BaseCategory implements FileModelParentInterface
         $countProduct = 0;
 
         foreach ($children as $child) {
-            $countProduct += ProductQuery::create()
-                ->filterByCategory($child)
-                ->count();
+            $req = ProductQuery::create();
+            $req->filterByCategory($child);
+            if($visibleOnly) {
+                $req->filterByVisible(true);
+            }
+
+            $countProduct += $req->count();
         }
 
         return $countProduct;
@@ -70,19 +74,7 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function countAllProductsVisibleOnly()
     {
-        $children = CategoryQuery::findAllChild($this->getId());
-        array_push($children, $this);
-
-        $countProduct = 0;
-
-        foreach ($children as $child) {
-            $countProduct += ProductQuery::create()
-                ->filterByCategory($child)
-                ->filterByVisible(true)
-                ->count();
-        }
-
-        return $countProduct;
+        return countAllProducts(true);
     }
     
     /**
