@@ -248,7 +248,10 @@ class CustomerController extends BaseFrontController
         $this->checkAuth();
 
         /** @var Customer $customer */
-        $customer = $this->getSecurityContext()->getCustomerUser();
+        $customerId = $this->getSecurityContext()->getCustomerUser()->getId();
+
+        $customer = CustomerQuery::create()->findOneById($customerId);
+
         $data = array(
             'id'           => $customer->getId(),
             'title'        => $customer->getTitleId(),
