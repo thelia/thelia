@@ -73,6 +73,10 @@ class CarouselLoop extends Image
     {
         /** @var \Carousel\Model\Carousel $carousel */
         foreach ($loopResult->getResultDataCollection() as $carousel) {
+            if (!file_exists($carousel->getUploadDir() . DS . $carousel->getFile())) {
+                continue;
+            }
+
             $loopResultRow = new LoopResultRow($carousel);
 
             $event = new ImageEvent();
