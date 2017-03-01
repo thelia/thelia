@@ -77,6 +77,7 @@ use Thelia\Type\TypeCollection;
  * @method int[] getFeatureAvailability()
  * @method string[] getFeatureValues()
  * @method string[] getAttributeNonStrictMatch()
+ * @method int[] getTemplateId()
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {

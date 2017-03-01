@@ -17,23 +17,36 @@ use Thelia\Model\Template;
 
 class TemplateEvent extends ActionEvent
 {
+    /**
+     * @var Template
+     */
     protected $template = null;
 
     public function __construct(Template $template = null)
     {
         $this->template = $template;
     }
-
+    
+    /**
+     * @return bool
+     */
     public function hasTemplate()
     {
         return ! is_null($this->template);
     }
-
+    
+    /**
+     * @return Template
+     */
     public function getTemplate()
     {
         return $this->template;
     }
-
+    
+    /**
+     * @param Template $template
+     * @return $this
+     */
     public function setTemplate($template)
     {
         $this->template = $template;
