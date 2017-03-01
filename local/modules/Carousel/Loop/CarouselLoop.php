@@ -24,6 +24,7 @@ use Thelia\Core\Template\Loop\Image;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
+use Thelia\Log\Tlog;
 
 /**
  * Class CarouselLoop
@@ -73,14 +74,16 @@ class CarouselLoop extends Image
     {
         /** @var \Carousel\Model\Carousel $carousel */
         foreach ($loopResult->getResultDataCollection() as $carousel) {
-            if (!file_exists($carousel->getUploadDir() . DS . $carousel->getFile())) {
+            $imgSourcePath = $carousel->getUploadDir() . DS . $carousel->getFile();
+            if (!file_exists($imgSourcePath)) {
+                Tlog::getInstance()->error( sprintf('Carousel source image file %s does not exists.', $imgSourcePath) );
                 continue;
             }
 
             $loopResultRow = new LoopResultRow($carousel);
 
             $event = new ImageEvent();
-            $event->setSourceFilepath($carousel->getUploadDir() . DS . $carousel->getFile())
+            $event->setSourceFilepath(imgSourcePath)
                 ->setCacheSubdirectory('carousel');
 
             switch ($this->getResizeMode()) {
