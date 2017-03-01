@@ -118,9 +118,9 @@
                                             {loop type="product" name="prod-using" backend_context=1 visible='*' template_id=$template_id limit=$max_products order='ref'}
                                             {$url = {url path="/admin/products/update" product_id=$ID}}
                                                 <tr>
-                                                    <td>{$ID}</td>
-                                                    <td>{$REF}</td>
-                                                    <td><a href="{$url}">{$TITLE}</a></td>
+                                                    <td><a href="{$url}">{$ID}</a></td>
+                                                    <td><a href="{$url}">{$REF}</a></td>
+                                                    <td>{$TITLE}</td>
                                                 </tr>
                                             {/loop}
                                         </table>
@@ -158,7 +158,7 @@
                                             {loop type="category" name="cat-using" backend_context=1 visible='*' template_id=$template_id limit=$loaded_categories order='alpha'}
                                             {$url = {url path="/admin/categories/update" category_id=$ID}}
                                                 <tr>
-                                                    <td>{$ID}</td>
+                                                    <td><a href="{$url}">{$ID}</a></td>
                                                     <td><a href="{$url}">{$TITLE}</a></td>
                                                 </tr>
                                             {/loop}
