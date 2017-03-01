@@ -49,7 +49,7 @@
         <tr>
             <td>{$ID}</td>
 
-            <td>{$TITLE}</td>
+            <td><a href="{url path="admin/configuration/attributes/update" attribute_id=$ID}">{$TITLE}</a></td>
 
             <td class="text-center">
             {admin_position_block
@@ -99,7 +99,7 @@
 
     dialog_id       = "delete_attribute_dialog"
     dialog_title    = {intl l="Remove attribute"}
-    dialog_message  = {intl l="Do you really want to remove this attribute from the template ?"}
+    dialog_message  = {intl l="Do you really want to remove this attribute from the template ? The attributes combinations that uses this attributes <strong>will be deleted</strong> for the products that uses this template."}
 
     form_action     = {token_url path='/admin/configuration/templates/attributes/delete'}
     form_content    = {$smarty.capture.delete_attribute_dialog nofilter}

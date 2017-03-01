@@ -755,6 +755,10 @@
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.templates.duplicate" path="/admin/configuration/templates/duplicate">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::duplicateAction</default>
+    </route>
+
     <route id="admin.configuration.templates.features.list" path="/admin/configuration/templates/features/list">
         <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxFeaturesAction</default>
     </route>
