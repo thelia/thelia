@@ -840,7 +840,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      * @param string $eventName
      * @param EventDispatcherInterface $dispatcher
      */
-    public function deteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Detete the removed attribute in all products which are using this template
         $pseToDelete = ProductSaleElementsQuery::create()
@@ -897,7 +897,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
             
-            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => array("deteTemplateAttribute", 128),
+            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => array("deleteTemplateAttribute", 128),
             TheliaEvents::TEMPLATE_DELETE_FEATURE           => array("deleteTemplateFeature", 128),
     
             // Those two have to be executed before
