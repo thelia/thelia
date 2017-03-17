@@ -140,30 +140,34 @@ This repo contains all the configuration needed to run Thelia with docker and do
 
 It requires obviously [docker](https://docker.com/) and [docker-compose](http://docs.docker.com/compose/)
 
-How to start the configuration : 
+To install Thelia within Docker, run :
 
 ```
 docker-compose up -d
+docker-compose exec web composer install
+docker-compose exec web php Thelia thelia:install
 ```
 
-tip : create an alias for docker-compose, it's boring to write it all the time
-
-All the script are launched through docker. For examples : 
-
-```
-docker exec -it thelia_web_1 php Thelia cache:clear
-docker exec -it thelia_web_1 php setup/faker.php
-docker exec -it thelia_web_1 unit-tests.sh
-docker exec -it thelia_web_1 php composer.phar install
-```
-
-Database information : 
+This will prompt you for database information. Enter the following :
 
 * host : mariaDB
+* port : 3306 (default)
+* name : thelia
 * login : root
 * password : toor
 
-Once started, you can access it with your browser at this url : http://127.0.0.1:8080 and phpmyadmin : http://127.0.0.1:8081
+tip : create an alias for docker-compose, it's boring to write it all the time
+
+All the scripts can be launched through docker (or the corresponding `docker-compose exec web ...` command. For example :
+
+```
+docker exec -it thelia_web_1 composer install
+docker exec -it thelia_web_1 php Thelia cache:clear
+docker exec -it thelia_web_1 php setup/faker.php
+docker exec -it thelia_web_1 unit-tests.sh
+```
+
+Once started, you can open your local Thelia website at [127.0.0.1:8080](http://127.0.0.1:8080) and your phpMyAdmin installation at [127.0.0.1:8081](http://127.0.0.1:8081).
 
 What is missing : 
 
