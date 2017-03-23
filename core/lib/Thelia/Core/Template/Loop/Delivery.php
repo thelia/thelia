@@ -21,7 +21,6 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CountryQuery;
-use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
