@@ -37,6 +37,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 
 ALTER TABLE `customer` ADD `enable` TINYINT DEFAULT 0 AFTER `remember_me_serial`;
 ALTER TABLE `customer` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
+ALTER TABLE `customer_version` ADD `enable` TINYINT DEFAULT 0 AFTER `remember_me_serial`;
+ALTER TABLE `customer_version` ADD `confirmation_token` VARCHAR(255) AFTER `enable`;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 
@@ -75,8 +77,7 @@ UPDATE `order_status` SET `color` = '#5bc0de' WHERE `code` = 'sent';
 UPDATE `order_status` SET `color` = '#d9534f' WHERE `code` = 'canceled';
 UPDATE `order_status` SET `color` = '#986dff' WHERE `code` = 'refunded';
 UPDATE `order_status` SET `color` = '#777777' WHERE `code` NOT IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
-UPDATE `order_status` SET `protected_status` = 1 WHERE `protected_status` IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
-
+UPDATE `order_status` SET `protected_status` = 1 WHERE `code` IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
 SELECT @max_id := MAX(`id`) FROM `resource`;
 
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES (@max_id+1, 'admin.configuration.order-status', NOW(), NOW());

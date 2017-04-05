@@ -53,11 +53,6 @@
 
                         {loop name="carousel.image" type="carousel" width="550" height="200" resize_mode="borders" backend_context="1" lang="$edit_language_id"}
 
-                        {* Not yet implemented *}
-                        {form_field field="position{$ID}"}
-                            <input type="hidden" name="{$name}" value={$POSITION}>
-                        {/form_field}
-
                         <div class="well well-sm">
                             <div class="row">
                                 <div class="col-md-6">
@@ -71,6 +66,17 @@
                                         <a class="btn btn-default btn-sm image-delete" href="#delete_carousel_dialog" data-toggle="modal" data-id="{$ID}">
                                             <i class="glyphicon glyphicon-trash"></i> {intl d='carousel.bo.default' l='Remove this image'}
                                         </a>
+                                    </div>
+
+                                    <div class="pull-right row" style="width:170px">
+                                        <div class="col-xs-5" style="padding-top:5px">
+                                            <label for="position{$ID}">{intl d='carousel.bo.default' l='Position'}:</label>
+                                        </div>
+                                        <div class="col-xs-7">
+                                            {form_field field="position{$ID}"}
+                                                <input id="position{$ID}" class="form-control" type="number" min="1" name="{$name}" value={$POSITION}>
+                                            {/form_field}
+                                        </div>
                                     </div>
                                 </div>
 

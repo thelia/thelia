@@ -1,5 +1,44 @@
 # 2.3.4
 
+- (related to #2365) en_US translation improvements
+- (related to #2364) On the contact page, the map is now fetched using https
+- (related to #2356) Parameter `product_count_visible_only` added to `category` loop
+- (related to #2283) Typo which prevents to save the custom-css.less file in TinyMCE module
+- (related to #2338) All exceptions are now logged in the Thelia log file
+- (related to #2348) fix customer delete in back-offcie search view
+- (related to #2339) Fix for #2337 to always get a correct LOOP_TOTAL 
+- (related to #2334) Fix "Class not found" in AbstractArchiver
+- (related to #2327) Add cart success_url, which is missing for mobile
+- (no related PR) Thelia version is now fetched using https insteade of http 
+- (related to #2326) Fix the "visible" argument of folder-path and category-path loops, which was not working after the first iteration. The code for the "depth" element was missing in these loops, and is now written.
+- (related to #2325) Cart discount is now updated after login
+- (related to #2323) Fix possible html break if the database contains a product that has multiple product sale element by default.
+- (related to #2277) Module information is now displaying properly module information of 2.2 module.xml files, and specially authors.
+- (related to #2309) Added missing hooks in back-office search results tables head and body
+- (related to #2320) Fix the sorting feature in categories and folders back-office views: some sorting criteria, such as visible or ID where not implemented in the loops.
+- (related to #2310) Fix for of array based loops extensions, to allow listeners to change array content.
+- (related to #2312) Added order ID to 'customer.orders-table-row' hook parameters
+- (related to #2313) The manual order is now working properly in the content loop.
+- (related to #2308) Use service in ContainerAwareCommand to get URL instance. It will prevent further calls to this service to override request context.
+- (related to #2291) Fix currency change to default where no currency in request. Change to default only if requested currency not exists.
+- (related to #2287) Fix for not working decimals=0 in {format_number} or {format_money} 
+- (related to #2306) fr_FR translation imrpovement
+- (related to #2303) en_US translation imrpovement
+- (related to #2300) Back-office HTML typo
+- (related to #2299) Back-office HTML tag typo for displaying current lang flag
+- (related to #2295) Fix method initRequest on the ContainerAwareCommand
+- (related to #2281) Fixed PECL extentions install script in docker setup
+- (related to #2271) Invisible (off-line) categories are now available in coupon conditions and types
+- (related to #2264) Check if php extension "dom" is installed (issue #2263)
+- (related to #2265) Fix #2225 wrong version displayed in db update script (issue #2225) 
+- (related to #2266) Bad parsing of web version in DB update script (issue #2226)
+- (related to #2259) Fixed "cart contains products" & "cart contains categories" coupon conditions
+- (related to #2261) The manual order is now working properly in the product loop.
+- (related to #2257) Fix for wrong order coupon amount  
+- (related to #2256) Check if a RemoveXAmount type coupon is valid for special offers 
+- (related to #2255) Moved php shebang in the right file
+- (related to #2254) add parameter "module_code" to "modules.table-row" hook
+- (related to #2238) New method BasePaymentModuleController::saveTransactionRef() to save order transaction reference
 - (related to #2232) Moved to container-based infrastructure for Travis CI
 - (related to #2235) Add `DISCOUNT_AMOUNT` variable to `order_coupon` loop
 - (related to #2227) Fix for two problems with CART_FINDITEM event processing: 1) The CartEvent dispatched with CART_FINDITEM was the one received by Thelia\Action\Cart::addItem(), thus stopping event propagation will stop the whole cart add process. 2) Thelia\Action\Cart::findCartItem() was not aware of a cart item set in the event by event listeners with a higher priority, thus this cart item is always overwritten.
