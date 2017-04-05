@@ -10,4 +10,5 @@ return [
     'Edit your carousel.' => 'Modifier votre carrousel',
     'Remove this image' => 'Supprimer cette image',
     'Your carousel contains no image. Please add one using the form above.' => 'Votre carrousel ne contient aucune image. Ajoutez votre première image avec le formulaire ci-dessus',
+    'Position' => 'Position',
 ];
