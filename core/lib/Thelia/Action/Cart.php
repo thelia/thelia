@@ -98,12 +98,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
-    
+
         // Search for an identical item in the cart
         $findItemEvent = clone $event;
-    
+
         $dispatcher->dispatch(TheliaEvents::CART_FINDITEM, $findItemEvent);
-    
+
         $cartItem = $findItemEvent->getCartItem();
 
         if ($cartItem === null || $newness) {
@@ -135,6 +135,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->filterByCartId($cart->getId())
                 ->filterById($cartItemId)
                 ->delete();
+
+            // Force an update of the Cart object to provide
+            // to other listeners an updated CartItem collection.
+            $cart->clearCartItems();
         }
     }
 
