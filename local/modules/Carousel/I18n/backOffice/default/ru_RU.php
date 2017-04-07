@@ -10,4 +10,5 @@ return array(
     'Edit your carousel.' => 'Редактировать вашу карусель.',
     'Remove this image' => 'Удалить это изображение',
     'Your carousel contains no image. Please add one using the form above.' => 'Ваша карусель не содержит изображений. Пожалуйста, добавьте одно используя форму ниже.',
+    'Position' => 'Позиция',
 );
