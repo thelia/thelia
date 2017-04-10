@@ -53,6 +53,17 @@ class AdminUtilities extends AbstractSmartyPlugin
 
         return $data;
     }
+    
+    public function optionOffsetGenerator($params, &$smarty)
+    {
+        $label = $this->getParam($params, 'label', null);
+        
+        if (null !== $level = $this->getParam($params, [ 'l', 'level'], null)) {
+            $label = str_repeat('&nbsp;', 4 * $level) . $label;
+        }
+        
+        return $label;
+    }
 
     public function generatePositionChangeBlock($params, &$smarty)
     {
@@ -155,6 +166,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         return array(
             new SmartyPluginDescriptor('function', 'admin_sortable_header', $this, 'generateSortableColumnHeader'),
             new SmartyPluginDescriptor('function', 'admin_position_block', $this, 'generatePositionChangeBlock'),
+            new SmartyPluginDescriptor('function', 'option_offset', $this, 'optionOffsetGenerator'),
         );
     }
 }
