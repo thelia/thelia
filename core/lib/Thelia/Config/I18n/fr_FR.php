@@ -357,6 +357,7 @@ return [
     'Password confirmation' => 'Confirmation du mot de passe.',
     'Payment failed' => 'Echec du paiement',
     'Payment gateway' => 'Passerelle de paiement',
+    'Payment module ID not found' => 'ID du module de paiement non trouvé',
     'Per customer' => 'Par client',
     'Percent' => 'Pourcent',
     'Percentage' => 'Pourcentage',
