@@ -251,6 +251,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
     protected function redirect($url, $status = 302)
     {
-        throw new RedirectException($url, $status);
+        throw new RedirectException('/'.$url, $status);
     }
 }
