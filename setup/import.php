@@ -479,6 +479,7 @@ function createFolders($faker, $con)
             $folder
                 ->setVisible(1)
                 ->setPosition($row-1)
+                ->setParent(0)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
                     ->setChapo($faker->text(20))
