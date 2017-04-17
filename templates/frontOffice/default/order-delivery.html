@@ -167,7 +167,7 @@
                             address_id: $(this).attr('value')
                         }
     {/literal}
-                    );
+                    ).filter(':checked').change();
                 }
             });
 
