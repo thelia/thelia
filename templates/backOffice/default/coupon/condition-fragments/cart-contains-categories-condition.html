@@ -8,7 +8,7 @@
     <label for="{$categories_field_name}-value">{intl l="The selected categories :"}</label>
     <select required multiple size="5" class="form-control" id="{$categories_field_name}-value" name="{$categories_field_name}[value][]">
         {loop type="category-tree" category=0 name="list-of-categories" backend_context=1 visible="*"}
-            <option style="padding-left: {$LEVEL * 20}px" value="{$ID}" {if in_array($ID, $values)}selected="selected"{/if}>{$TITLE}</option>
+            <option value="{$ID}" {if in_array($ID, $values)}selected="selected"{/if}>{option_offset l=$LEVEL label={$TITLE}}</option>
         {/loop}
     </select>
     <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one category'}</span>

@@ -10,4 +10,5 @@ return array(
     'Edit your carousel.' => 'Edit your carousel.',
     'Remove this image' => 'Remove this image',
     'Your carousel contains no image. Please add one using the form above.' => 'Your carousel contains no image. Please add one using the form above.',
+    'Position' => 'Position',
 );
