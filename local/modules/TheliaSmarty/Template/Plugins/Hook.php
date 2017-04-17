@@ -17,9 +17,9 @@ use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
-use TheliaSmarty\Template\Plugins\Module;
+use Thelia\Exception\HookException;
+use Thelia\Model\HookQuery;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\SmartyParser;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
@@ -107,8 +107,12 @@ class Hook extends AbstractSmartyPlugin
 
         $content = trim($event->dump());
 
+        if ($this->debug) {
+            $this->errorDetector(false, $type, $module, $hookName);
+        }
+
         if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-            $content = self::showHook($hookName, $params) . $content;
+            $content = self::showHook(false, $hookName, $params) . $content;
         }
 
         $this->hookResults[$hookName] = $content;
@@ -155,9 +159,54 @@ class Hook extends AbstractSmartyPlugin
         return $this->smartyPluginModule;
     }
 
-    protected function showHook($hookName, $params)
+    /**
+     * @param bool $hookBlock
+     * @param int $hookType
+     * @param int $module
+     * @param string $hookName
+     */
+    protected function errorDetector($hookBlock, $hookType, $module, $hookName)
     {
-        $content = '<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">' . $hookName;
+        if (null !== $hook = HookQuery::create()
+                ->filterByCode($hookName)
+                ->filterByType($hookType)
+                ->findOne())
+        {
+            if ((int) $hook->getBlock() !== (($hookBlock) ? 1 : 0)) {
+                throw new HookException(
+                    $hookType,
+                    $hookName,
+                    ((int) $hook->getBlock()) ? 'Hook is a block in database' : 'Hook is not a block in database'
+                );
+            }
+
+            if ((int) $hook->getByModule() !== (($module !== 0) ? 1 : 0)) {
+                throw new HookException(
+                    $hookType,
+                    $hookName,
+                    ((int) $hook->getByModule()) ? 'Hook is a by module in database' : 'Hook is not by module in database'
+                );
+            }
+        } else {
+            throw new HookException(
+                $hookType,
+                $hookName,
+                'Hook not found in database'
+            );
+        }
+    }
+
+    /**
+     * @param bool $hookBlock
+     * @param string $hookName
+     * @param array $params
+     * @return string
+     */
+    protected function showHook($hookBlock, $hookName, array $params)
+    {
+        $content = '<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">';
+
+        $content .= '<span style="background-color: #000088; color: #fff">' . (($hookBlock) ? 'hookblock' : 'hook') . '</span> ' . $hookName;
 
         foreach ($params as $name => $value) {
             if ($name !== 'location' && $name !== "name") {
@@ -223,14 +272,6 @@ class Hook extends AbstractSmartyPlugin
         );
         $fields = ('' !== $fields) ? explode(",", $fields) : [];
 
-        if (!$repeat) {
-            if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-                $content = self::showHook($hookName, $params) . $content;
-            }
-
-            return $content;
-        }
-
         $type = $smarty->getTemplateDefinition()->getType();
 
         $event = new HookRenderBlockEvent($hookName, $params, $fields);
@@ -242,6 +283,18 @@ class Hook extends AbstractSmartyPlugin
         // this is a hook specific to a module
         if (0 !== $module) {
             $eventName .= '.' . $module;
+        }
+
+        if (!$repeat) {
+            if ($this->debug) {
+                $this->errorDetector(true, $type, $module, $hookName);
+            }
+
+            if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
+                $content = self::showHook(true, $hookName, $params) . $content;
+            }
+
+            return $content;
         }
 
         $this->getDispatcher()->dispatch($eventName, $event);
