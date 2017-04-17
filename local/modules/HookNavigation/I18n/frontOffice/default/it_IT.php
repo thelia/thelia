@@ -1,6 +1,8 @@
 <?php
 
-return array(
-    'Latest articles' => '',
-    'No articles currently' => '',
-);
+return [
+    'Categories' => 'Categorie',
+    'Home' => 'Home',
+    'No articles currently' => 'Attualmente non sono presenti articoli',
+    'Toggle navigation' => 'Toggle navigation',
+];

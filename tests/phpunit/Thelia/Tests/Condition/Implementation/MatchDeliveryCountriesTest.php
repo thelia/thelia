@@ -17,6 +17,7 @@ use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Address;
+use Thelia\Model\Customer;
 
 /**
  * @package Coupon
@@ -49,6 +50,10 @@ class MatchDeliveryCountriesTest extends \PHPUnit_Framework_TestCase
 
         $address = new Address();
         $address->setCountryId(10);
+
+        $stubFacade->expects($this->any())
+            ->method('getCustomer')
+            ->will($this->returnValue(new Customer()));
 
         $stubFacade->expects($this->any())
             ->method('getDeliveryAddress')

@@ -95,6 +95,7 @@ class CartContainsProducts extends ConditionAbstract
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
+            
             if ($this->conditionValidator->variableOpComparison(
                 $cartItem->getProduct()->getId(),
                 $this->operators[self::PRODUCTS_LIST],
@@ -103,7 +104,6 @@ class CartContainsProducts extends ConditionAbstract
                 return true;
             }
         }
-
         return false;
     }
 
@@ -148,7 +148,7 @@ class CartContainsProducts extends ConditionAbstract
         if (null !== $prodList = ProductQuery::create()->findPks($prodIds)) {
             /** @var Product $prod */
             foreach ($prodList as $prod) {
-                $prodStrList .= $prod->getTitle() . ', ';
+                $prodStrList .= $prod->setLocale($this->getCurrentLocale())->getTitle() . ', ';
             }
 
             $prodStrList = rtrim($prodStrList, ', ');

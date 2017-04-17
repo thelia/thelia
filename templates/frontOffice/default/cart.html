@@ -154,7 +154,7 @@
                                     {/if}
                                     {if $delivery_id != 0 }
                                     <div>
-                                        {intl l="with:"} {loop type="delivery" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
+                                        {intl l="with:"} {loop type="module" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
                                     </div>
                                     {else}
                                     <div class="alert alert-danger">
@@ -175,10 +175,49 @@
                     <tfoot>
                     <tr>
                         <td colspan="3" class="empty">&nbsp;</td>
+                        <td colspan="2">
+                            {form name="thelia.order.coupon"}
+                            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype}>
+                                {form_hidden_fields}
+
+                                {form_field field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/cart"}" />
+                                {/form_field}
+
+                                {form_field field='error_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/cart"}" />
+                                {/form_field}
+
+                                {form_field field='coupon-code'}
+                                    <div class="{if $form_error}has-error{/if}">
+                                        <div class="input-group">
+                                            <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
+                                            <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-default">{intl l="Ok"}</button>
+                                            </span>
+                                        </div>
+                                        {if $form_error_message}<span class="help-block">{$form_error_message nofilter}</span>{/if}
+                                    </div>
+                                {/form_field}
+                            </form>
+                            {/form}
+                        </td>
+                    </tr>
+                    {$discount={order attr="discount"}}
+                    {if $discount}
+                        <tr>
+                            <td colspan="3" class="empty">&nbsp;</td>
+                            <th class="discount">{intl l="Discount"}</th>
+                            <td><span class="price">{format_money number=$discount}</span></td>
+                        </tr>
+                    {/if}
+                    <tr>
+                        <td colspan="3" class="empty">&nbsp;</td>
                         <th class="total">{intl l="Total incl. taxes"}</th>
                         <td class="total">
                             <div class="total-price">
-                                {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
+                                {assign var="totalAmount" value={cart attr='total_taxed_price'} + $postageAmount }
                                 <span class="price">{format_money number=$totalAmount}</span>
                             </div>
                         </td>

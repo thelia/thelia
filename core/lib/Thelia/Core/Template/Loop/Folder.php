@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\ContentQuery;
@@ -45,6 +46,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+
     protected $timestampable = true;
     protected $versionable = true;
 
@@ -66,15 +69,13 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 new TypeCollection(
                     new Type\EnumListType(
                         [
-                            'alpha',
-                            'alpha_reverse',
-                            'manual',
-                            'manual_reverse',
+                            'id', 'id_reverse',
+                            'alpha', 'alpha_reverse',
+                            'manual', 'manual_reverse',
+                            'visible', 'visible_reverse',
                             'random',
-                            'created',
-                            'created_reverse',
-                            'updated',
-                            'updated_reverse'
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse'
                         ]
                     )
                 ),
@@ -90,36 +91,20 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return $this->getStandardI18nSearchFields();
     }
 
     /**
      * @param FolderQuery $search
      * @param string $searchTerm
-     * @param string $searchIn
+     * @param array $searchIn
      * @param string $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-
-        $this->addTitleSearchWhereClause($search, $searchCriteria, $searchTerm);
-    }
-
-    /**
-     * @param FolderQuery $search
-     * @param string $criteria
-     * @param string $value
-     */
-    protected function addTitleSearchWhereClause($search, $criteria, $value)
-    {
-        $search->where(
-            "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$criteria." ?",
-            $value,
-            \PDO::PARAM_STR
-        );
+        
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()
@@ -140,16 +125,16 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $parent = $this->getParent();
 
-        if (!is_null($parent)) {
+        if (null !== $parent) {
             $search->filterByParent($parent);
         }
-
+    
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("folder_id"));
+            $search->filterById($this->getCurrentRequest()->get("folder_id"));
         } elseif ($current === false) {
-            $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get("folder_id"), Criteria::NOT_IN);
         }
 
         $exclude = $this->getExclude();
@@ -171,7 +156,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $this->addTitleSearchWhereClause($search, Criteria::LIKE, '%'.$title.'%');
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $visible = $this->getVisible();
@@ -184,6 +169,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
@@ -195,6 +186,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();

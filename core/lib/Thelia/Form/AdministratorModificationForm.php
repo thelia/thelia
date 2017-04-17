@@ -13,7 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
 
@@ -41,6 +41,9 @@ class AdministratorModificationForm extends AdministratorCreationForm
                 ),
             ))
         ;
+
+        $this->formBuilder->get('password')->setRequired(false);
+        $this->formBuilder->get('password_confirm')->setRequired(false);
     }
 
     /**
@@ -66,8 +69,20 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $data = $context->getRoot()->getData();
 
         $administrator = AdminQuery::create()->findOneByLogin($value);
-        if ($administrator !== null && $administrator->getId() != $data['id']) {
-            $context->addViolation(Translator::getInstance()->trans("This login already exists"));
+
+        if (null !== $administrator && $administrator->getId() != $data['id']) {
+            $context->addViolation($this->translator->trans("This administrator login already exists"));
+        }
+    }
+
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        $administrator = AdminQuery::create()->findOneByEmail($value);
+
+        if (null !== $administrator && $administrator->getId() != $data['id']) {
+            $context->addViolation($this->translator->trans("An administrator with this email address already exists"));
         }
     }
 
@@ -75,12 +90,14 @@ class AdministratorModificationForm extends AdministratorCreationForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
-        }
+        if (!empty($data["password"])) {
+            if ($data["password"] != $data["password_confirm"]) {
+                $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
+            }
 
-        if ($data["password"] !== '' && strlen($data["password"]) < 4) {
-            $context->addViolation(Translator::getInstance()->trans("password must be composed of at least 4 characters"));
+            if ($data["password"] !== '' && strlen($data["password"]) < 4) {
+                $context->addViolation(Translator::getInstance()->trans("password must be composed of at least 4 characters"));
+            }
         }
     }
 }

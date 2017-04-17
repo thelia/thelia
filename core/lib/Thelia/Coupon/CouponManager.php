@@ -15,6 +15,7 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CouponModule;
@@ -81,6 +82,15 @@ class CouponManager
         }
 
         return $discount;
+    }
+
+    /**
+     * @param $code
+     * @return mixed|void
+     */
+    public function pushCouponInSession($code)
+    {
+        $this->facade->pushCouponInSession($code);
     }
 
     /**
@@ -160,6 +170,14 @@ class CouponManager
     }
 
     /**
+     * @return array
+     */
+    public function getCouponsKept()
+    {
+        return $this->sortCoupons($this->facade->getCurrentCoupons());
+    }
+
+    /**
      * Sort Coupon to keep
      * Coupon not cumulative cancels previous
      *
@@ -201,8 +219,14 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            if ($coupon->isMatching($this->facade)) {
-                $couponsKept[] = $coupon;
+            try {
+                if ($coupon->isMatching()) {
+                    $couponsKept[] = $coupon;
+                }
+
+            } catch (UnmatchableConditionException $e) {
+                // ignore unmatchable coupon
+                continue;
             }
         }
 
@@ -293,10 +317,8 @@ class CouponManager
     public function decrementQuantity(Coupon $coupon, $customerId = null)
     {
         if ($coupon->isUsageUnlimited()) {
-            $ret = true;
+            return true;
         } else {
-            $ret = false;
-
             try {
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -329,15 +351,13 @@ class CouponManager
                             ->save()
                         ;
 
-                        $ret = $usageLeft - $newCount;
+                        return $usageLeft - $newCount;
                     } else {
-                        $usageLeft--;
-
-                        $coupon->setMaxUsage($usageLeft);
+                        $coupon->setMaxUsage(--$usageLeft);
 
                         $coupon->save();
 
-                        $ret = $usageLeft;
+                        return $usageLeft;
                     }
                 }
             } catch (\Exception $ex) {
@@ -346,6 +366,58 @@ class CouponManager
             }
         }
 
-        return $ret;
+        return false;
+    }
+
+    /**
+     * Add a coupon usage, for the case the related order is canceled.
+     *
+     * @param Coupon $coupon
+     * @param int $customerId
+     */
+    public function incrementQuantity(Coupon $coupon, $customerId = null)
+    {
+        if ($coupon->isUsageUnlimited()) {
+            return true;
+        } else {
+            try {
+                $usageLeft = $coupon->getUsagesLeft($customerId);
+
+                // If the coupon usage is per user, remove an entry from coupon customer usage count table
+                if ($coupon->getPerCustomerUsageCount()) {
+                    if (null == $customerId) {
+                        throw new \LogicException("Customer should not be null at this time.");
+                    }
+
+                    $ccc = CouponCustomerCountQuery::create()
+                        ->filterByCouponId($coupon->getId())
+                        ->filterByCustomerId($customerId)
+                        ->findOne()
+                    ;
+
+                    if ($ccc !== null && $ccc->getCount() > 0) {
+                        $newCount = $ccc->getCount() - 1;
+
+                        $ccc
+                            ->setCount($newCount)
+                            ->save();
+
+                        return $usageLeft - $newCount;
+                    }
+                } else {
+                    // Ad one usage to coupon
+                    $coupon->setMaxUsage(++$usageLeft);
+
+                    $coupon->save();
+
+                    return $usageLeft;
+                }
+            } catch (\Exception $ex) {
+                // Just log the problem.
+                Tlog::getInstance()->addError(sprintf("Failed to increment coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
+            }
+        }
+
+        return false;
     }
 }

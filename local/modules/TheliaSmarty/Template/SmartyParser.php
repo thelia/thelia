@@ -12,23 +12,21 @@
 
 namespace TheliaSmarty\Template;
 
+use \Smarty;
 use \Symfony\Component\HttpFoundation\Request;
 use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use \Smarty;
-
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\ParserInterface;
-
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateHelperInterface;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Core\Template\TemplateDefinition;
 use Imagine\Exception\InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 
 /**
  *
@@ -39,27 +37,37 @@ class SmartyParser extends Smarty implements ParserInterface
 {
     public $plugins = array();
 
-    protected $request;
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
+
+    /** @var ParserContext */
     protected $parserContext;
+
+    /** @var TemplateHelperInterface */
     protected $templateHelper;
+
+    /** @var RequestStack */
+    protected $requestStack;
 
     protected $backOfficeTemplateDirectories = array();
     protected $frontOfficeTemplateDirectories = array();
 
     protected $templateDirectories = array();
 
-    /**
-     * @var TemplateDefinition
-     */
-    protected $templateDefinition = "";
+    /** @var TemplateDefinition */
+    protected $templateDefinition;
 
+    /** @var int */
     protected $status = 200;
 
+    /** @var string */
+    protected $env;
 
+    /** @var bool */
+    protected $debug;
 
     /**
-     * @param Request                  $request
+     * @param RequestStack             $requestStack
      * @param EventDispatcherInterface $dispatcher
      * @param ParserContext            $parserContext
      * @param TemplateHelperInterface  $templateHelper
@@ -67,7 +75,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool                     $debug
      */
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
         TemplateHelperInterface $templateHelper,
@@ -76,19 +84,21 @@ class SmartyParser extends Smarty implements ParserInterface
     ) {
         parent::__construct();
 
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->dispatcher = $dispatcher;
         $this->parserContext = $parserContext;
         $this->templateHelper = $templateHelper;
+        $this->env = $env;
+        $this->debug = $debug;
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'compile';
+        $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'compile';
         if (! is_dir($compile_dir)) {
             @mkdir($compile_dir, 0777, true);
         }
 
-        $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'cache';
+        $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'cache';
         if (! is_dir($cache_dir)) {
             @mkdir($cache_dir, 0777, true);
         }
@@ -114,7 +124,7 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getRequest()
     {
-        return $this->request;
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -269,6 +279,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /**
      * @param TemplateDefinition $templateDefinition
+     * @param bool $useFallback
      */
     public function setTemplateDefinition(TemplateDefinition $templateDefinition, $useFallback = false)
     {
@@ -390,6 +401,25 @@ class SmartyParser extends Smarty implements ParserInterface
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
+
+        // Prepare common template variables
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        $lang = $session ? $session->getLang() : Lang::getDefaultLanguage();
+
+        $parameters = array_merge($parameters, [
+            'locale' => $lang->getLocale(),
+            'lang_code' => $lang->getCode(),
+            'lang_id' => $lang->getId(),
+            'current_url' => $this->getRequest()->getUri(),
+            'app' => (object) [
+                'environment' => $this->env,
+                'request' => $this->getRequest(),
+                'session' => $session,
+                'debug' => $this->debug
+            ]
+        ]);
 
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }

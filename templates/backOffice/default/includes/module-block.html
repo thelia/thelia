@@ -72,9 +72,12 @@
             </thead>
 
             <tbody>
-            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1}
+
+            {$hidden = $smarty.post.hidden|default:'0'}
+            
+            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1 hidden=$hidden }
                 {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
-                <tr id="module-{$ID}" {if ! $EXISTS}class="warning"{/if}>
+                <tr id="module-{$ID}" {if ! $EXISTS || $MANDATORY}class="warning"{/if}>
                     <td>{$ID}</td>
                     <td nowrap>
                         <a href="#" class="module-information text-info" data-id="{$ID}" title="{intl l='Get more information about this module'}"><span class="glyphicon glyphicon-question-sign"></span></a>
@@ -86,7 +89,9 @@
 
                     {if $EXISTS}
                         <td class="text-center">
-                            <div class="make-switch switch-small module-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+
+                            {if $MANDATORY ne 1 || $ACTIVE eq 0}
+                            <div class="make-switch switch-small module-activation" data-mandatory="{$MANDATORY}" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                                 <input type="checkbox" {if $ACTIVE}checked{/if}>
                             </div>
                             <noscript>
@@ -96,6 +101,10 @@
                                     <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
                                 {/if}
                             </noscript>
+                            {else}
+                            <i class="glyphicon glyphicon-ban-circle text-danger" aria-hidden="true"></i>
+                            {/if}
+
                         </td>
 
                         <td class="text-center">
@@ -116,7 +125,7 @@
                         </td>
                     {/if}
 
-                    {hook name="modules.table-row" location="modules_table_row" }
+                    {hook name="modules.table-row" location="modules_table_row" module_code={$CODE} }
 
                     <td class="actions">
                         {if $module_type == 2}
@@ -144,15 +153,15 @@
                         <div class="toolbar-options hidden">
                             {if $EXISTS}
 
-                                {if $CONFIGURABLE == 1 && $ACTIVE}
+                                {if $CONFIGURABLE == 1}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
+                                        <a class="config-btn-{$ID}{if ! $ACTIVE} disabled no-follow-link{/if}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
                                     {/loop}
                                 {/if}
 
-                                {if $HOOKABLE && $ACTIVE}
+                                {if $HOOKABLE}
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
-                                    <a id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-indent-left"></span></a>
+                                    <a class="hook-btn-{$ID}{if ! $ACTIVE} disabled no-follow-link{/if}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-indent-left"></span></a>
                                 {/loop}
                                 {/if}
 
@@ -165,9 +174,11 @@
                                 {/loop}
                             {/if}
 
+                            {if $MANDATORY ne 1}
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
                                 <a class="module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}
+                            {/if}
                         </div>
                     </td>
                 </tr>

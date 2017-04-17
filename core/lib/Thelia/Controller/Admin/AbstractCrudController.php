@@ -12,8 +12,12 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 
 /**
@@ -86,11 +90,13 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Return the creation form for this object
+     * @return BaseForm
      */
     abstract protected function getCreationForm();
 
     /**
      * Return the update form for this object
+     * @return BaseForm
      */
     abstract protected function getUpdateForm();
 
@@ -98,6 +104,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * Hydrate the update form for this object, before passing it to the update template
      *
      * @param mixed $object
+     * @return BaseForm
      */
     abstract protected function hydrateObjectForm($object);
 
@@ -119,6 +126,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Creates the delete event with the provided form data
+     * @return \Thelia\Core\Event\ActionEvent
      */
     abstract protected function getDeleteEvent();
 
@@ -144,14 +152,14 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param mixed $object
+     * @param string|null $object
      */
     abstract protected function getObjectLabel($object);
 
     /**
      * Returns the object ID from the object
      *
-     * @param mixed $object
+     * @param int|null $object
      */
     abstract protected function getObjectId($object);
 
@@ -159,11 +167,13 @@ abstract class AbstractCrudController extends BaseAdminController
      * Render the main list template
      *
      * @param mixed $currentOrder, if any, null otherwise.
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     abstract protected function renderListTemplate($currentOrder);
 
     /**
      * Render the edition template
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     abstract protected function renderEditionTemplate();
 
@@ -179,11 +189,19 @@ abstract class AbstractCrudController extends BaseAdminController
      */
     abstract protected function redirectToListTemplate();
 
+    /**
+     * @param $positionChangeMode
+     * @param $positionValue
+     * @return ActionEvent
+     */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         throw new \LogicException("Position Update is not supported for this object");
     }
 
+    /**
+     * @return ActionEvent
+     */
     protected function createToggleVisibilityEvent()
     {
         throw new \LogicException("Toggle Visibility is not supported for this object");
@@ -192,7 +210,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  unknown  $createEvent the create event
+     * @param  ActionEvent $createEvent the create event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
@@ -203,7 +221,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object update processing if required.
      *
-     * @param  unknown  $updateEvent the update event
+     * @param ActionEvent $updateEvent the update event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -214,7 +232,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param  unknown  $deleteEvent the delete event
+     * @param ActionEvent $deleteEvent the delete event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
@@ -225,8 +243,8 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object position change processing if required.
      *
-     * @param  unknown  $positionChangeEvent the delete event
-     * @return Response a response, or null to continue normal processing
+     * @param ActionEvent $positionChangeEvent the delete event
+     * @return Response|null a response, or null to continue normal processing
      */
     protected function performAdditionalUpdatePositionAction($positionChangeEvent)
     {
@@ -645,5 +663,14 @@ abstract class AbstractCrudController extends BaseAdminController
         ;
 
         return $this->defaultAction();
+    }
+
+    /**
+     * @return \Thelia\Core\HttpFoundation\Request
+     * @since 2.3
+     */
+    protected function getRequest()
+    {
+        return $this->container->get('request_stack')->getCurrentRequest();
     }
 }

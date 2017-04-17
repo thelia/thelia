@@ -12,7 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
 use Thelia\Core\Template\Smarty\Plugins\an;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -25,13 +25,16 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
  */
 class Esi extends AbstractSmartyPlugin
 {
+    /** @var EsiFragmentRenderer */
     protected $esiFragmentRender;
-    protected $request;
 
-    public function __construct(EsiFragmentRenderer $esiFragmentRenderer, Request $request)
+    /** @var RequestStack */
+    protected $requestStack;
+
+    public function __construct(EsiFragmentRenderer $esiFragmentRenderer, RequestStack $requestStack)
     {
         $this->esiFragmentRender = $esiFragmentRenderer;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     public function renderEsi($params, $template = null)
@@ -45,7 +48,7 @@ class Esi extends AbstractSmartyPlugin
             return;
         }
 
-        $response = $this->esiFragmentRender->render($path, $this->request, array(
+        $response = $this->esiFragmentRender->render($path, $this->requestStack->getCurrentRequest(), array(
             'alt' => $alt,
             'ignore_errors' => $ignore_errors,
             'comment' => $comment
@@ -59,7 +62,7 @@ class Esi extends AbstractSmartyPlugin
     }
 
     /**
-     * @return an array of SmartyPluginDescriptor
+     * @return array an array of SmartyPluginDescriptor
      */
     public function getPluginDescriptors()
     {

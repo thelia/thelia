@@ -12,509 +12,231 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ImportExport as ImportExportEvent;
+use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
-use Thelia\Core\FileFormat\Archive\ArchiveBuilderManager;
-use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
-use Thelia\Core\FileFormat\Formatting\FormatterManager;
-use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Loop\Import as ImportLoop;
-use Thelia\Exception\FileNotFoundException;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\ImportExport\Import\ImportHandler;
-use Thelia\Model\ImportCategoryQuery;
-use Thelia\Model\ImportQuery;
-use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
  * Class ImportController
- * @package Thelia\Controller\Admin
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ImportController extends BaseAdminController
 {
-    use FormatterManagerTrait;
-    use ArchiveBuilderManagerTrait;
-
-    public function indexAction()
+    /**
+     * Handle default action, that is, list available imports
+     *
+     * @param string $_view View to render
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    public function indexAction($_view = 'import')
     {
-        if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW])) {
-            return $response;
+        $authResponse  = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW]);
+        if ($authResponse !== null) {
+            return $authResponse;
         }
 
-        $this->setOrders();
+        $this->getParserContext()
+            ->set('category_order', $this->getRequest()->query->get('category_order', 'manual'))
+            ->set('import_order', $this->getRequest()->query->get('import_order', 'manual'))
+        ;
 
-        return $this->render('import');
+        return $this->render($_view);
     }
 
     /**
-     * @param  integer  $id
-     * @return Response
+     * Handle import position change action
      *
-     * This method is called when the route /admin/import/{id}
-     * is called with a POST request.
+     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function import($id)
+    public function changeImportPositionAction()
     {
-        if (null === $import = $this->getImport($id)) {
+        $authResponse  = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
+        if ($authResponse !== null) {
+            return $authResponse;
+        }
+
+        $query = $this->getRequest()->query;
+
+        $this->dispatch(
+            TheliaEvents::IMPORT_CHANGE_POSITION,
+            new UpdatePositionEvent(
+                $query->get('id'),
+                $this->matchPositionMode($query->get('mode')),
+                $query->get('value')
+            )
+        );
+
+        return $this->generateRedirectFromRoute('import.list');
+    }
+
+    /**
+     * Handle import category position change action
+     *
+     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function changeCategoryPositionAction()
+    {
+        $authResponse  = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
+        if ($authResponse !== null) {
+            return $authResponse;
+        }
+
+        $query = $this->getRequest()->query;
+
+        $this->dispatch(
+            TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION,
+            new UpdatePositionEvent(
+                $query->get('id'),
+                $this->matchPositionMode($query->get('mode')),
+                $query->get('value')
+            )
+        );
+
+        return $this->generateRedirectFromRoute('import.list');
+    }
+
+    /**
+     * Match position mode string against position mode constant value
+     *
+     * @param null|string $mode Position mode string
+     *
+     * @return integer Position mode constant value
+     */
+    protected function matchPositionMode($mode)
+    {
+        if ($mode === 'up') {
+            return UpdatePositionEvent::POSITION_UP;
+        }
+
+        if ($mode === 'down') {
+            return UpdatePositionEvent::POSITION_DOWN;
+        }
+
+        return UpdatePositionEvent::POSITION_ABSOLUTE;
+    }
+
+    /**
+     * Display import configuration view
+     *
+     * @param integer $id An import identifier
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    public function configureAction($id)
+    {
+        /** @var \Thelia\Handler\ImportHandler $importHandler */
+        $importHandler = $this->container->get('thelia.import.handler');
+
+        $import = $importHandler->getImport($id);
+        if ($import === null) {
             return $this->pageNotFound();
         }
 
-        $archiveBuilderManager = $this->getArchiveBuilderManager($this->container);
-        $formatterManager = $this->getFormatterManager($this->container);
-        $handler = $import->getHandleClassInstance($this->container);
+        $extensions = [];
+        $mimeTypes = [];
 
-        /**
-         * Get needed services
-         */
-        $form = $this->createForm(AdminForm::IMPORT);
-        $errorMessage = null;
-        $successMessage = null;
-
-        try {
-            $boundForm = $this->validateForm($form);
-
-            $lang = LangQuery::create()->findPk(
-                $boundForm->get("language")->getData()
-            );
-
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-            $file = $boundForm->get("file_upload")->getData();
-
-            /**
-             * We have to check the extension manually because of composed file formats as tar.gz or tar.bz2
-             */
-            $name = $file->getClientOriginalName();
-
-            $tools = $this->retrieveFormatTools(
-                $name,
-                $handler,
-                $formatterManager,
-                $archiveBuilderManager
-            );
-
-            /** @var AbstractArchiveBuilder $archiveBuilder */
-            $archiveBuilder = $tools["archive_builder"];
-
-            /** @var AbstractFormatter $formatter */
-            $formatter = $tools["formatter"];
-
-            if ($archiveBuilder !== null) {
-                /**
-                 * If the file is an archive, load it and try to find the file.
-                 */
-                $archiveBuilder = $archiveBuilder->loadArchive($file->getPathname());
-
-                $contentAndFormat = $this->getFileContentInArchive(
-                    $archiveBuilder,
-                    $formatterManager,
-                    $tools["types"]
-                );
-
-                $formatter = $contentAndFormat["formatter"];
-                $content = $contentAndFormat["content"];
-            } elseif ($formatter !== null) {
-                /**
-                 * If the file isn't an archive
-                 */
-                $content = file_get_contents($file->getPathname());
-            } else {
-                throw new \ErrorException(
-                    $this->getTranslator()->trans(
-                        "There's a problem, the extension \"%ext\" has been found, but has no formatters nor archive builder",
-                        [
-                            "%ext" => $tools["extension"],
-                        ]
-                    )
-                );
-            }
-
-            /**
-             * Process the import: dispatch events, format the file content and let the handler do it's job.
-             */
-            $successMessage = $this->processImport(
-                $content,
-                $handler,
-                $formatter,
-                $archiveBuilder,
-                $lang
-            );
-        } catch (FormValidationException $e) {
-            $errorMessage = $this->createStandardFormValidationErrorMessage($e);
-        } catch (\Exception $e) {
-            $errorMessage = $e->getMessage();
+        /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
+        foreach ($this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID)->getSerializers() as $serializer) {
+            $extensions[] = $serializer->getExtension();
+            $mimeTypes[] = $serializer->getMimeType();
         }
 
-        if ($successMessage !== null) {
-            $this->getParserContext()->set("success_message", $successMessage);
+        /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
+        foreach ($this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID)->getArchivers(true) as $archiver) {
+            $extensions[] = $archiver->getExtension();
+            $mimeTypes[] = $archiver->getMimeType();
         }
 
-        if ($errorMessage !== null) {
-            $form->setErrorMessage($errorMessage);
-
-            $this->getParserContext()
-                ->addForm($form)
-                ->setGeneralError($errorMessage)
-            ;
+        // Render standard view or ajax one
+        $templateName = 'import-page';
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $templateName = 'ajax/import-modal';
         }
 
-        return $this->importView($id);
-    }
-
-    public function getFileContentInArchive(
-        AbstractArchiveBuilder $archiveBuilder,
-        FormatterManager $formatterManager,
-        array $types
-    ) {
-        $content = null;
-
-        /**
-         * Check expected file names for each formatter
-         */
-
-        $fileNames = [];
-        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-        foreach ($formatterManager->getFormattersByTypes($types) as $formatter) {
-            $fileName = $formatter::FILENAME . "." . $formatter->getExtension();
-            $fileNames[] = $fileName;
-
-            if ($archiveBuilder->hasFile($fileName)) {
-                $content = $archiveBuilder->getFileContent($fileName);
-                break;
-            }
-        }
-
-        if ($content === null) {
-            throw new FileNotFoundException(
-                $this->getTranslator()->trans(
-                    "Your archive must contain one of these file and doesn't: %files",
-                    [
-                        "%files" => implode(", ", $fileNames),
-                    ]
-                )
-            );
-        }
-
-        return array(
-            "formatter" => $formatter,
-            "content" => $content,
-        );
-    }
-
-    public function retrieveFormatTools(
-        $fileName,
-        ImportHandler $handler,
-        FormatterManager $formatterManager,
-        ArchiveBuilderManager $archiveBuilderManager
-    ) {
-        $nameLength = strlen($fileName);
-
-        $types = $handler->getHandledTypes();
-
-        $formats =
-            $formatterManager->getExtensionsByTypes($types, true) +
-            $archiveBuilderManager->getExtensions(true)
-        ;
-
-        $uploadFormat = null;
-
-        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-        $formatter = null;
-
-        /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
-        $archiveBuilder = null;
-
-        foreach ($formats as $objectName => $format) {
-            $formatLength = strlen($format);
-            $formatExtension = substr($fileName, -$formatLength);
-
-            if ($nameLength >= $formatLength  && $formatExtension === $format) {
-                $uploadFormat = $format;
-
-
-                try {
-                    $formatter = $formatterManager->get($objectName);
-                } catch (\OutOfBoundsException $e) {
-                }
-
-                try {
-                    $archiveBuilder = $archiveBuilderManager->get($objectName);
-                } catch (\OutOfBoundsException $e) {
-                }
-
-                break;
-            }
-        }
-
-        $this->checkFileExtension($fileName, $uploadFormat);
-
-        return array(
-            "formatter" => $formatter,
-            "archive_builder" => $archiveBuilder,
-            "extension" => $uploadFormat,
-            "types" => $types,
-        );
-    }
-
-    public function checkFileExtension($fileName, $uploadFormat)
-    {
-        if ($uploadFormat === null) {
-            $splitName = explode(".", $fileName);
-            $ext = "";
-
-            if (1 < $limit = count($splitName)) {
-                $ext = "." . $splitName[$limit-1];
-            }
-
-            throw new FormValidationException(
-                $this->getTranslator()->trans(
-                    "The extension \"%ext\" is not allowed",
-                    [
-                        "%ext" => $ext
-                    ]
-                )
-            );
-        }
-    }
-
-    public function processImport(
-        $content,
-        ImportHandler $handler,
-        AbstractFormatter $formatter = null,
-        AbstractArchiveBuilder $archiveBuilder = null,
-        Lang $lang = null
-    ) {
-        $event = new ImportExportEvent($formatter, $handler, null, $archiveBuilder);
-        $event->setContent($content);
-
-        $this->dispatch(TheliaEvents::IMPORT_BEFORE_DECODE, $event);
-
-        $data = $formatter
-            ->decode($event->getContent())
-            ->setLang($lang)
-        ;
-
-        $event->setContent(null)->setData($data);
-        $this->dispatch(TheliaEvents::IMPORT_AFTER_DECODE, $event);
-
-        $errors = $handler->retrieveFromFormatterData($data);
-
-        if (!empty($errors)) {
-            throw new \Exception(
-                $this->getTranslator()->trans(
-                    "Errors occurred while importing the file: %errors",
-                    [
-                        "%errors" => implode(", ", $errors),
-                    ]
-                )
-            );
-        }
-
-        return $this->getTranslator()->trans(
-            "Import successfully done, %numb row(s) have been changed",
+        return $this->render(
+            $templateName,
             [
-                "%numb" => $handler->getImportedRows(),
+                'importId' => $id,
+                'ALLOWED_MIME_TYPES' => implode(', ', $mimeTypes),
+                'ALLOWED_EXTENSIONS' => implode(', ', $extensions),
             ]
         );
     }
 
     /**
-     * @param  integer  $id
-     * @return Response
+     * Handle import action
      *
-     * This method is called when the route /admin/import/{id}
-     * is called with a GET request.
+     * @param integer $id An import identifier
      *
-     * It returns a modal view if the request is an AJAX one,
-     * otherwise it generates a "normal" back-office page
+     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\Response
      */
-    public function importView($id)
+    public function importAction($id)
     {
-        if (null === $import = $this->getImport($id)) {
+        /** @var \Thelia\Handler\Importhandler $importHandler */
+        $importHandler = $this->container->get('thelia.import.handler');
+
+        $import = $importHandler->getImport($id);
+        if ($import === null) {
             return $this->pageNotFound();
         }
 
-        /**
-         * Use the loop to inject the same vars in the template engine
-         */
-        $loop = new ImportLoop($this->container);
+        $form = $this->createForm(AdminForm::IMPORT);
 
-        $loop->initializeArgs([
-            "id" => $id
-        ]);
+        try {
+            $validatedForm = $this->validateForm($form);
 
-        $query = $loop->buildModelCriteria();
-        $result= $query->find();
+            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            $file = $validatedForm->get('file_upload')->getData();
+            $file = $file->move(
+                THELIA_CACHE_DIR . 'import' . DS . (new\DateTime)->format('Ymd'),
+                uniqid() . '-' . $file->getClientOriginalName()
+            );
 
-        $results = $loop->parseResults(
-            new LoopResult($result)
-        );
+            $lang = (new LangQuery)->findPk($validatedForm->get('language')->getData());
 
-        $parserContext = $this->getParserContext();
+            $importEvent = $importHandler->import($import, $file, $lang);
 
-        /** @var \Thelia\Core\Template\Element\LoopResultRow $row */
-        foreach ($results as $row) {
-            foreach ($row->getVarVal() as $name => $value) {
-                $parserContext->set($name, $value);
+            if (count($importEvent->getErrors()) > 0) {
+                $this->getSession()->getFlashBag()->add(
+                    'thelia.import.error',
+                    $this->getTranslator()->trans(
+                        'Error(s) in import&nbsp;:<br />%errors',
+                        [
+                            '%errors' => implode('<br />', $importEvent->getErrors())
+                        ]
+                    )
+                );
             }
-        }
 
-        /**
-         * Get allowed formats
-         */
-        /** @var \Thelia\ImportExport\AbstractHandler $handler */
-        $handler = $import->getHandleClassInstance($this->container);
-        $types = $handler->getHandledTypes();
-
-        $formatterManager = $this->getFormatterManager($this->container);
-        $archiveBuilderManager = $this->getArchiveBuilderManager($this->container);
-
-        $formats =
-            $formatterManager->getExtensionsByTypes($types, true) +
-            $archiveBuilderManager->getExtensions(true)
-        ;
-
-        /**
-         * Get allowed mime types (used for the "Search a file" window
-         */
-        $mimeTypes =
-            $formatterManager->getMimeTypesByTypes($types) +
-            $archiveBuilderManager->getMimeTypes()
-        ;
-
-        /**
-         * Inject them in template engine
-         */
-        $parserContext
-            ->set("ALLOWED_MIME_TYPES", implode(",", $mimeTypes))
-            ->set("ALLOWED_EXTENSIONS", implode(", ", $formats))
-            ->set("CURRENT_LANG_ID", $this->getSession()->getLang()->getId())
-        ;
-
-        /** Then render the form */
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->render("ajax/import-modal");
-        } else {
-            return $this->render("import-page");
-        }
-    }
-
-    protected function setOrders($category = null, $import = null)
-    {
-        if ($category === null) {
-            $category = $this->getRequest()->query->get("category_order", "manual");
-        }
-
-        if ($import === null) {
-            $import = $this->getRequest()->query->get("import_order", "manual");
-        }
-
-        $this->getParserContext()
-            ->set("category_order", $category)
-        ;
-
-        $this->getParserContext()
-            ->set("import_order", $import)
-        ;
-    }
-
-    public function changePosition()
-    {
-        if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE])) {
-            return $response;
-        }
-
-        $query = $this->getRequest()->query;
-
-        $mode = $query->get("mode");
-        $id = $query->get("id");
-        $value = $query->get("value");
-
-        $this->getImport($id);
-
-        $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
-        $this->dispatch(TheliaEvents::IMPORT_CHANGE_POSITION, $event);
-
-        return $this->render('import');
-    }
-
-    public function changeCategoryPosition()
-    {
-        if (null !== $response = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE])) {
-            return $response;
-        }
-
-        $query = $this->getRequest()->query;
-
-        $mode = $query->get("mode");
-        $id = $query->get("id");
-        $value = $query->get("value");
-
-        $this->getCategory($id);
-
-        $event = new UpdatePositionEvent($id, $this->getMode($mode), $value);
-        $this->dispatch(TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION, $event);
-
-        $this->setOrders("manual");
-
-        return $this->render('import');
-    }
-
-    public function getMode($action)
-    {
-        if ($action === "up") {
-            $mode = UpdatePositionEvent::POSITION_UP;
-        } elseif ($action === "down") {
-            $mode = UpdatePositionEvent::POSITION_DOWN;
-        } else {
-            $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
-        }
-
-        return $mode;
-    }
-
-    protected function getImport($id)
-    {
-        $import = ImportQuery::create()->findPk($id);
-
-        if (null === $import) {
-            throw new \ErrorException(
+            $this->getSession()->getFlashBag()->add(
+                'thelia.import.success',
                 $this->getTranslator()->trans(
-                    "There is no id \"%id\" in the imports",
+                    'Import successfully done, %count row(s) have been changed',
                     [
-                        "%id" => $id
+                        '%count' => $importEvent->getImport()->getImportedRows()
                     ]
                 )
             );
+
+            return $this->generateRedirectFromRoute('import.view', [], ['id' => $id]);
+        } catch (FormValidationException $e) {
+            $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
+        } catch (\Exception $e) {
+            $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
-        return $import;
-    }
+        $this->getParserContext()
+            ->addForm($form)
+        ;
 
-    protected function getCategory($id)
-    {
-        $category = ImportCategoryQuery::create()->findPk($id);
-
-        if (null === $category) {
-            throw new \ErrorException(
-                $this->getTranslator()->trans(
-                    "There is no id \"%id\" in the import categories",
-                    [
-                        "%id" => $id
-                    ]
-                )
-            );
-        }
-
-        return $category;
+        return $this->configureAction($id);
     }
 }

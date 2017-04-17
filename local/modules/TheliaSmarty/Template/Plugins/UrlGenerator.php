@@ -13,7 +13,9 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpFoundation\Session\Session;
 use TheliaSmarty\Template\SmartyParser;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -23,20 +25,23 @@ use Thelia\Core\HttpFoundation\Request;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
+    /** @var TokenProvider */
     protected $tokenProvider;
+
     /** @var ContainerInterface */
     private $container;
 
     /**
-     * @param Request            $request
+     * @param RequestStack       $requestStack
      * @param TokenProvider      $tokenProvider
      * @param ContainerInterface $container         Needed to get all router.
      */
-    public function __construct(Request $request, TokenProvider $tokenProvider, ContainerInterface $container)
+    public function __construct(RequestStack $requestStack, TokenProvider $tokenProvider, ContainerInterface $container)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->tokenProvider = $tokenProvider;
         $this->container = $container;
     }
@@ -57,9 +62,9 @@ class UrlGenerator extends AbstractSmartyPlugin
         $file = $this->getParam($params, 'file', null);
         $routeId = $this->getParam($params, 'route_id', null);
         // select default router
-        if ($this->request->fromAdmin()) {
+        if ($this->getRequest()->fromAdmin()) {
             $defaultRouter = 'admin';
-        } elseif ($this->request->fromFront()) {
+        } elseif ($this->getRequest()->fromFront()) {
             $defaultRouter = 'front';
         } else {
             $defaultRouter = null;
@@ -67,12 +72,12 @@ class UrlGenerator extends AbstractSmartyPlugin
         $routerId = $this->getParam($params, 'router', $defaultRouter);
 
         if ($current) {
-            $path = $this->request->getPathInfo();
+            $path = $this->getRequest()->getPathInfo();
             unset($params["current"]); // Delete the current param, so it isn't included in the url
 
             // build the query variables
             $params = array_merge(
-                $this->request->query->all(),
+                $this->getRequest()->query->all(),
                 $params
             );
         }
@@ -273,9 +278,9 @@ class UrlGenerator extends AbstractSmartyPlugin
         $ignore_current = $this->getParam($params, 'ignore_current', false);
 
         if ($ignore_current !== false) {
-            $this->request->attributes->set('_previous_url', 'dont-save');
+            $this->getRequest()->attributes->set('_previous_url', 'dont-save');
         } else {
-            $this->request->attributes->set('_previous_url', $this->generateUrlFunction($params, $smarty));
+            $this->getRequest()->attributes->set('_previous_url', $this->generateUrlFunction($params, $smarty));
         }
     }
 
@@ -327,16 +332,32 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        return $this->request->getUri();
+        return $this->getRequest()->getUri();
     }
 
     protected function getPreviousUrl()
     {
-        return URL::getInstance()->absoluteUrl($this->request->getSession()->getReturnToUrl());
+        return URL::getInstance()->absoluteUrl($this->getSession()->getReturnToUrl());
     }
 
     protected function getIndexUrl()
     {
         return URL::getInstance()->getIndexPage();
+    }
+
+    /**
+     * @return Request
+     */
+    protected function getRequest()
+    {
+        return $this->requestStack->getCurrentRequest();
+    }
+
+    /**
+     * @return Session
+     */
+    protected function getSession()
+    {
+        return $this->getRequest()->getSession();
     }
 }

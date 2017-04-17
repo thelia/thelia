@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Facebook username' => 'Nom d\'utilisateur Facebook',
     'Follow us' => 'Suivez-nous',
     'Google + username' => 'Nom d\'utilisateur Google +',
@@ -9,4 +9,4 @@ return array(
     'RSS URL' => 'URL du flux RSS',
     'Twitter username' => 'Nom d\'utilisateur Twitter',
     'Youtube URL' => 'URL Youtube',
-);
+];

@@ -15,7 +15,7 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CustomerQuery;
 
@@ -80,6 +80,6 @@ class CustomerLostPasswordForm extends FirewallForm
      */
     public function getName()
     {
-        return "thelia_customer_creation";
+        return "thelia_customer_lost_password";
     }
 }

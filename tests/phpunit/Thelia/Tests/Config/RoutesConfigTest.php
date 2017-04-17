@@ -18,6 +18,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Router;
@@ -81,9 +82,6 @@ class RoutesConfigTest extends ContainerAwareTestCase
             = THELIA_VENDOR
             . DS . 'symfony'
             . DS . 'routing'
-            . DS . 'Symfony'
-            . DS . 'Component'
-            . DS . 'Routing'
             . DS . 'Loader'
             . DS . XmlFileLoader::SCHEME_PATH;
 
@@ -238,8 +236,8 @@ class RoutesConfigTest extends ContainerAwareTestCase
      */
     public function testTargetFrontViewsExists()
     {
-        /** @var Request $request */
-        $request = $this->getContainer()->get('request');
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->getContainer()->get('request_stack');
 
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->getContainer()->get('event_dispatcher');
@@ -254,7 +252,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
         $templateHelper = new TheliaTemplateHelper();
 
         $parser = new SmartyParser(
-            $request,
+            $requestStack,
             $eventDispatcher,
             $parserContext,
             $templateHelper

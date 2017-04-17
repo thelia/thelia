@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\State\StateCreateEvent;
 use Thelia\Core\Event\State\StateDeleteEvent;
@@ -28,16 +29,6 @@ use Thelia\Model\StateQuery;
  */
 class State extends BaseAction implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
-    {
-        return array(
-            TheliaEvents::STATE_CREATE => array('create', 128),
-            TheliaEvents::STATE_UPDATE => array('update', 128),
-            TheliaEvents::STATE_DELETE => array('delete', 128),
-            TheliaEvents::STATE_TOGGLE_VISIBILITY => array('toggleVisibility', 128)
-        );
-    }
-
     public function create(StateCreateEvent $event)
     {
         $state = new StateModel();
@@ -84,16 +75,29 @@ class State extends BaseAction implements EventSubscriberInterface
      *
      * @param StateToggleVisibilityEvent $event
      */
-    public function toggleVisibility(StateToggleVisibilityEvent $event)
+    public function toggleVisibility(StateToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $state = $event->getState();
 
         $state
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setVisible(!$state->getVisible())
             ->save()
         ;
 
         $event->setState($state);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            TheliaEvents::STATE_CREATE => array('create', 128),
+            TheliaEvents::STATE_UPDATE => array('update', 128),
+            TheliaEvents::STATE_DELETE => array('delete', 128),
+            TheliaEvents::STATE_TOGGLE_VISIBILITY => array('toggleVisibility', 128)
+        );
     }
 }

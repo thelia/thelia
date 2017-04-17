@@ -12,13 +12,13 @@
 
 namespace Colissimo\Form;
 
-
 use Colissimo\Colissimo;
-use Colissimo\Model\ColissimoFreeshippingQuery;
+use Colissimo\Model\Config\Base\ColissimoConfigValue;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
-class FreeShipping extends BaseForm {
+class FreeShipping extends BaseForm
+{
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -41,13 +41,15 @@ class FreeShipping extends BaseForm {
      */
     protected function buildForm()
     {
-        $freeshipping = ColissimoFreeshippingQuery::create()->getLast();
         $this->formBuilder
-            ->add("freeshipping", "checkbox", array(
-                'data'=>$freeshipping,
-                'label'=>Translator::getInstance()->trans("Activate free shipping: ", [], Colissimo::MESSAGE_DOMAIN)
-            ))
-        ;
+        ->add(
+            "freeshipping",
+            "checkbox",
+            array(
+                "label" => Translator::getInstance()->trans("Activate free shipping: ", [], Colissimo::DOMAIN_NAME),
+                "value" => Colissimo::getConfigValue(ColissimoConfigValue::FREE_SHIPPING, false),
+            )
+        );
     }
 
     /**
@@ -57,6 +59,4 @@ class FreeShipping extends BaseForm {
     {
         return "colissimofreeshipping";
     }
-
-
 }

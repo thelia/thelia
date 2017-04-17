@@ -17,6 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 
 class CustomerEvent extends ActionEvent
 {
+    /** @var null|Customer */
     public $customer = null;
 
     public function __construct(Customer $customer = null)
@@ -26,6 +27,7 @@ class CustomerEvent extends ActionEvent
 
     /**
      * @param Customer $customer
+     * @return $this
      */
     public function setCustomer(Customer $customer)
     {
@@ -35,7 +37,7 @@ class CustomerEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Model\Customer
+     * @return null|Customer
      */
     public function getCustomer()
     {

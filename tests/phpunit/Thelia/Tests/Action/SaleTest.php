@@ -12,9 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Sale;
-use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
@@ -26,6 +24,7 @@ use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\SaleQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
+use Thelia\Model\Sale as SaleModel;
 
 /**
  * Class SaleTest
@@ -34,24 +33,13 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class SaleTest extends TestCaseWithURLToolSetup
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public function getUpdateEvent(&$sale)
     {
-        if (!$sale instanceof \Thelia\Model\Sale) {
+        if (!$sale instanceof SaleModel) {
             $sale = $this->getRandomSale();
         }
 
         $event = new SaleUpdateEvent($sale->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setActive(1)
             ->setLocale($sale->getLocale())
@@ -64,10 +52,16 @@ class SaleTest extends TestCaseWithURLToolSetup
         return $event;
     }
 
+    /**
+     * @param SaleUpdateEvent $event
+     * @return SaleModel
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function processUpdateAction($event)
     {
-        $saleAction = new Sale($this->getContainer());
-        $saleAction->update($event);
+        $saleAction = new Sale();
+        $saleAction->update($event, null, $this->getMockEventDispatcher());
 
         return $event->getSale();
     }
@@ -75,14 +69,13 @@ class SaleTest extends TestCaseWithURLToolSetup
     public function testCreateSale()
     {
         $event = new SaleCreateEvent();
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setLocale('en_US')
             ->setTitle('test create sale')
             ->setSaleLabel('test create sale label')
         ;
 
-        $saleAction = new Sale($this->getContainer());
+        $saleAction = new Sale($this->getMockEventDispatcher());
         $saleAction->create($event);
 
         $createdSale = $event->getSale();
@@ -101,13 +94,12 @@ class SaleTest extends TestCaseWithURLToolSetup
         $product = ProductQuery::create()->findOne();
 
         $event = new SaleUpdateEvent($sale->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
             ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
             ->setActive(1)
             ->setDisplayInitialPrice(1)
-            ->setPriceOffsetType(\Thelia\Model\Sale::OFFSET_TYPE_AMOUNT)
+            ->setPriceOffsetType(SaleModel::OFFSET_TYPE_AMOUNT)
             ->setPriceOffsets([ CurrencyQuery::create()->findOne()->getId() => 10 ])
             ->setProducts([$product->getId()])
             ->setProductAttributes([])
@@ -119,8 +111,8 @@ class SaleTest extends TestCaseWithURLToolSetup
             ->setSaleLabel('test create sale label')
         ;
 
-        $saleAction = new Sale($this->getContainer());
-        $saleAction->update($event);
+        $saleAction = new Sale();
+        $saleAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedSale = $event->getSale();
 
@@ -143,13 +135,12 @@ class SaleTest extends TestCaseWithURLToolSetup
         $attrAv = AttributeAvQuery::create()->findOne();
 
         $event = new SaleUpdateEvent($sale->getId());
-        $event->setDispatcher($this->dispatcher);
         $event
             ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
             ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
             ->setActive(1)
             ->setDisplayInitialPrice(1)
-            ->setPriceOffsetType(\Thelia\Model\Sale::OFFSET_TYPE_AMOUNT)
+            ->setPriceOffsetType(SaleModel::OFFSET_TYPE_AMOUNT)
             ->setPriceOffsets([ CurrencyQuery::create()->findOne()->getId() => 10 ])
             ->setProducts([$product->getId()])
             ->setProductAttributes([$product->getId() => [ $attrAv->getId()] ])
@@ -161,8 +152,8 @@ class SaleTest extends TestCaseWithURLToolSetup
             ->setSaleLabel('test create sale label')
         ;
 
-        $saleAction = new Sale($this->getContainer());
-        $saleAction->update($event);
+        $saleAction = new Sale($this->getMockEventDispatcher());
+        $saleAction->update($event, null, $this->getMockEventDispatcher());
 
         $updatedSale = $event->getSale();
 
@@ -180,10 +171,9 @@ class SaleTest extends TestCaseWithURLToolSetup
         $sale = $this->getRandomSale();
 
         $event = new SaleDeleteEvent($sale->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $saleAction = new Sale($this->getContainer());
-        $saleAction->delete($event);
+        $saleAction = new Sale($this->getMockEventDispatcher());
+        $saleAction->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedSale = $event->getSale();
 
@@ -198,10 +188,9 @@ class SaleTest extends TestCaseWithURLToolSetup
         $visibility = $sale->getActive();
 
         $event = new SaleToggleActivityEvent($sale);
-        $event->setDispatcher($this->dispatcher);
 
-        $saleAction = new Sale($this->getContainer());
-        $saleAction->toggleActivity($event);
+        $saleAction = new Sale($this->getMockEventDispatcher());
+        $saleAction->toggleActivity($event, null, $this->getMockEventDispatcher());
 
         $updatedSale = $event->getSale();
 
@@ -215,9 +204,8 @@ class SaleTest extends TestCaseWithURLToolSetup
         $promoList = ProductSaleElementsQuery::create()->filterByPromo(true)->select('Id')->find()->toArray();
 
         $event = new SaleClearStatusEvent();
-        $event->setDispatcher($this->dispatcher);
 
-        $saleAction = new Sale($this->getContainer());
+        $saleAction = new Sale();
         $saleAction->clearStatus($event);
 
         // Restore promo status

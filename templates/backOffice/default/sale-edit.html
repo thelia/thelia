@@ -124,7 +124,7 @@
                                         <select class="form-control" id="cat_source" name="cat_source" size="10" multiple>
                                         {loop type="category-tree" category=0 name="available-categories"  backend_context=1}
                                             {$selected = in_array($ID, $value)}
-                                            <option {if $selected}disabled class="disabled-select-option"{/if}style="padding-left: {$LEVEL * 20}px" value="{$ID}">{$TITLE}</option>
+                                            <option {if $selected}disabled class="disabled-select-option"{/if} value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
                                         {/loop}
                                         </select>
                                     </div>
@@ -142,10 +142,10 @@
                                     {form_field field="categories"}
                                     <div class="form-group ">
                                         <label for="cat_source" class="control-label">{intl l='Selected categories'}</label>
-                                        <select {form_field_attributes field='categories'}'>
+                                        <select {form_field_attributes field='categories'}>
                                         {* protect ourselves against empty $value, which causes all categories to be displayed *}
                                         {if empty($value)}{$value = [ 0 ]}{/if}
-                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1}
+                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1 return_url=false}
                                             <option value="{$ID}">{$TITLE}</option>
                                         {/loop}
                                         </select>
@@ -252,12 +252,20 @@
 <script>
     (function($) {
 
-        {* data-date-format is a moment.js date format *}
+        var loadingProduct = true;
 
+        {* data-date-format is a moment.js date format *}
         {$langcode = {lang attr="code"}|substr:0:2}
 
         $('.datetime-picker').datetimepicker({
             locale: "{$langcode}"
+        });
+
+        // prevent form submission during products load
+        $(document.body).on('submit', '#sale-update-form', function(ev) {
+            if (loadingProduct) {
+                return false;
+            }
         });
 
         $(document.body).on('change', '.invert-selection', function(ev) {
@@ -426,6 +434,7 @@
                 });
             }
 
+            loadingProduct = true;
             $('#sale-products-list').empty();
 
             $.ajax('{url path="/admin/sale/update-product-list/%id" id=$sale_id}', {
@@ -443,6 +452,8 @@
                 $.each(selected_attributes, function(productId, attrAvIdsStr) {
                     setProductAttributeIds(productId, attrAvIdsStr);
                 });
+
+                loadingProduct = false;
             });
         }
 

@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\Attribute as AttributeModel;
@@ -31,17 +32,17 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      * Create a new attribute entry
      *
      * @param AttributeCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function create(AttributeCreateEvent $event)
+    public function create(AttributeCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $attribute = new AttributeModel();
 
         $attribute
-            ->setDispatcher($event->getDispatcher())
-
+            ->setDispatcher($dispatcher)
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-
             ->save()
         ;
 
@@ -57,12 +58,14 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      * Change a product attribute
      *
      * @param AttributeUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function update(AttributeUpdateEvent $event)
+    public function update(AttributeUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
             $attribute
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -80,12 +83,14 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      * Delete a product attribute entry
      *
      * @param AttributeDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function delete(AttributeDeleteEvent $event)
+    public function delete(AttributeDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
             $attribute
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 
@@ -96,11 +101,13 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(AttributeQuery::create(), $event);
+        $this->genericUpdatePosition(AttributeQuery::create(), $event, $dispatcher);
     }
 
     protected function doAddToAllTemplates(AttributeModel $attribute)
@@ -132,7 +139,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

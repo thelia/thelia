@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Command;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -94,20 +95,14 @@ class CacheClearTest extends ContainerAwareTestCase
         }
     }
 
-    public function getKernel()
-    {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
-
-        return $kernel;
-    }
-
     /**
      * Use this method to build the container with the services that you need.
+     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addSubscriber(new Cache());
+        $eventDispatcher->addSubscriber(new Cache(new ArrayAdapter()));
 
         $container->set("event_dispatcher", $eventDispatcher);
 

@@ -12,11 +12,12 @@
 
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\IgnoredModuleHookQuery;
@@ -90,17 +91,20 @@ class HookCleanCommand extends ContainerAwareCommand
     private function askConfirmation(InputInterface $input, OutputInterface $output)
     {
         $assumeYes = $input->getOption("assume-yes");
+        $moduleCode = $input->getArgument("module");
 
         if (!$assumeYes) {
-            /** @var DialogHelper $dialog */
-            $dialog = $this->getHelperSet()->get('dialog');
-            $question = "Would you like to delete all hooks ";
-            $question .= (empty($moduleCode))
+            /** @var QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+            $questionText = "Would you like to delete all hooks ";
+            $questionText .= (empty($moduleCode))
                 ? "of all modules"
                 : "of module " . $moduleCode;
-            $question .= " ? (yes, or no) ";
+            $questionText .= " ? (yes, or no) ";
 
-            if (!$dialog->askConfirmation($output, $question, false)) {
+            $question = new ConfirmationQuestion($questionText, false);
+
+            if (!$helper->ask($input, $output, $question)) {
                 $output->writeln("<info>No hooks deleted</info>");
                 return false;
             }
@@ -139,6 +143,7 @@ class HookCleanCommand extends ContainerAwareCommand
 
     /**
      * @param OutputInterface $output
+     * @throws \Exception
      */
     protected function clearCache(OutputInterface $output)
     {

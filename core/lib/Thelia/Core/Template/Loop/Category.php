@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CategoryQuery;
@@ -46,10 +47,11 @@ use Thelia\Model\Category as CategoryModel;
  *
  * {@inheritdoc}
  * @method int[] getId()
- * @method int getParent()
- * @method int getExcludeParent()
- * @method int getProduct()
- * @method int getExcludeProduct()
+ * @method int[] getParent()
+ * @method int[] getExcludeParent()
+ * @method int[] getProduct()
+ * @method int[] getExcludeProduct()
+ * @method int[] getContent()
  * @method bool getCurrent()
  * @method bool getNotEmpty()
  * @method bool getWithPrevNextInfo()
@@ -61,6 +63,8 @@ use Thelia\Model\Category as CategoryModel;
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+
     protected $timestampable = true;
     protected $versionable = true;
 
@@ -73,18 +77,28 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('parent'),
             Argument::createIntListTypeArgument('exclude_parent'),
-            Argument::createIntTypeArgument('product'),
-            Argument::createIntTypeArgument('exclude_product'),
+            Argument::createIntListTypeArgument('product'),
+            Argument::createIntListTypeArgument('exclude_product'),
+            Argument::createIntListTypeArgument('content'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createBooleanTypeArgument('need_count_child', false),
             Argument::createBooleanTypeArgument('need_product_count', false),
+            Argument::createBooleanTypeArgument('product_count_visible_only', false),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
+                    new Type\EnumListType([
+                        'id', 'id_reverse',
+                        'alpha', 'alpha_reverse',
+                        'manual', 'manual_reverse',
+                        'visible', 'visible_reverse',
+                        'created','created_reverse',
+                        'updated', 'updated_reverse',
+                        'random'
+                    ])
                 ),
                 'manual'
             ),
@@ -97,22 +111,20 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return $this->getStandardI18nSearchFields();
     }
 
     /**
      * @param CategoryQuery $search
      * @param string $searchTerm
-     * @param string $searchIn
+     * @param array $searchIn
      * @param string $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+    
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()
@@ -130,10 +142,13 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $parent = $this->getParent();
 
-        if (!is_null($parent)) {
+        if (null !== $parent) {
             $search->filterByParent($parent, Criteria::IN);
+            $positionOrderAllowed = true;
+        } else {
+            $positionOrderAllowed = false;
         }
-
+    
         $excludeParent = $this->getExcludeParent();
 
         if (!is_null($excludeParent)) {
@@ -143,9 +158,9 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("category_id"));
+            $search->filterById($this->getCurrentRequest()->get("category_id"));
         } elseif ($current === false) {
-            $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get("category_id"), Criteria::NOT_IN);
         }
 
         $exclude = $this->getExclude();
@@ -160,27 +175,36 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             $search->filterByVisible($visible ? 1 : 0);
         }
 
-        $product = $this->getProduct();
+        $products = $this->getProduct();
 
-        if ($product != null) {
-            $obj = ProductQuery::create()->findPk($product);
+        if ($products != null) {
+            $obj = ProductQuery::create()->findPks($products);
 
             if ($obj != null) {
                 $search->filterByProduct($obj, Criteria::IN);
             }
         }
 
-        $excludeProduct = $this->getExcludeProduct();
+        $excludeProducts = $this->getExcludeProduct();
 
-        if ($excludeProduct != null) {
-            $obj = ProductQuery::create()->findPk($excludeProduct);
+        if ($excludeProducts != null) {
+            $obj = ProductQuery::create()->findPks($excludeProducts);
 
             if ($obj != null) {
                 $search->filterByProduct($obj, Criteria::NOT_IN);
             }
         }
 
-        $orders  = $this->getOrder();
+        $contentId = $this->getContent();
+
+        if ($contentId != null) {
+            $search->useCategoryAssociatedContentQuery()
+                ->filterByContentId($contentId, Criteria::IN)
+                ->endUse()
+            ;
+        }
+
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -207,6 +231,18 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                     break;
                 case "visible_reverse":
                     $search->orderByVisible(Criteria::DESC);
+                    break;
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
                     break;
                 case "random":
                     $search->clearOrderByColumns();
@@ -253,7 +289,12 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             }
 
             if ($this->getNeedProductCount()) {
-                $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
+                if ($this->getProductCountVisibleOnly()) {
+                    $loopResultRow->set("PRODUCT_COUNT", $category->countAllProductsVisibleOnly());
+                }
+                else {
+                    $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
+                }
             }
 
             $isBackendContext = $this->getBackendContext();

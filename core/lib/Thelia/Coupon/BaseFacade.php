@@ -177,6 +177,18 @@ class BaseFacade implements FacadeInterface
         return count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
     }
 
+    public function getNbArticlesInCartIncludeQuantity()
+    {
+        $cartItems = $this->getCart()->getCartItems();
+        $quantity = 0;
+
+        foreach ($cartItems as $cartItem) {
+            $quantity += $cartItem->getQuantity();
+        }
+
+        return $quantity;
+    }
+
     /**
      * Return all Coupon given during the Checkout
      *
@@ -282,7 +294,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getRequest()
     {
-        return $this->container->get('request');
+        return $this->container->get('request_stack')->getCurrentRequest();
     }
 
     /**
@@ -315,5 +327,26 @@ class BaseFacade implements FacadeInterface
     public function getDispatcher()
     {
         return $this->container->get('event_dispatcher');
+    }
+
+    /**
+     * Add a coupon in session
+     * @param $couponCode
+     * @return mixed|void
+     */
+    public function pushCouponInSession($couponCode)
+    {
+        $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
+
+        if (!isset($consumedCoupons) || !$consumedCoupons) {
+            $consumedCoupons = array();
+        }
+
+        if (!isset($consumedCoupons[$couponCode])) {
+            // Prevent accumulation of the same Coupon on a Checkout
+            $consumedCoupons[$couponCode] = $couponCode;
+
+            $this->getRequest()->getSession()->setConsumedCoupons($consumedCoupons);
+        }
     }
 }

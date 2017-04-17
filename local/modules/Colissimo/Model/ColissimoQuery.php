@@ -29,13 +29,12 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
-
 /**
  * Class ColissimoQuery
  * @package Colissimo\Model
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class ColissimoQuery 
+class ColissimoQuery
 {
     /**
      * @return OrderQuery
@@ -51,10 +50,7 @@ class ColissimoQuery
                 Criteria::IN
             )
             ->find()
-            ->toArray("code")
-        ;
-
-
+            ->toArray("code");
 
         $query = OrderQuery::create()
             ->filterByDeliveryModuleId((new Colissimo())->getModuleModel()->getId())
@@ -67,4 +63,4 @@ class ColissimoQuery
 
         return $query;
     }
-} 
+}

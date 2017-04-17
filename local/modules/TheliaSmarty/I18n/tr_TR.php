@@ -1,7 +1,7 @@
 <?php
 
-return array(
-    '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop' => '\'%type\' döngü sınıfını genişleten Thelia\\Core\\Template\\Element\\BaseLoop',
+return [
+    '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop' => '\'%type\' döngü sınıfını genişleten Thelia\Core\Template\Element\BaseLoop',
     'A loop named \'%name\' already exists in the current scope.' => '\'%name\' adlı bir döngü geçerli etki alanında bulunmaktadır.',
     'Loop type \'%type\' is not defined.' => 'Döngü türü \'%type\' tanımlı değil.',
     'Missing \'name\' parameter in loop arguments' => 'Döngü değişkenlerde \'ad\' parametresi eksik',
@@ -18,4 +18,4 @@ return array(
     'Related loop name \'%name\'\' is not defined.' => 'İlgili kanca adı \'%name\' tanımlı değil.',
     'Template file %file cannot be found.' => 'Şablon dosyası %file bulunamadı.',
     'The loop name \'%name\' is already defined in %className class' => 'Döngü adı \'%name\' zaten %className sınıfında tanımlanmış',
-);
+];

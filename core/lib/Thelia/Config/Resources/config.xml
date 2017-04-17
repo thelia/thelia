@@ -8,7 +8,7 @@
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
         <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
-        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.inline.class">Thelia\Core\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
 
         <!--
         The list of Model classes which suppoorts image or document management.
@@ -36,6 +36,53 @@
             <parameter key="image.module">Thelia\Model\ModuleImage</parameter>
         </parameter>
 
+        <parameter key="admin.resources" type="collection">
+            <parameter key="thelia" type="collection">
+                <parameter key="SUPERADMINISTRATOR">SUPERADMINISTRATOR</parameter>
+                <parameter key="ADDRESS">admin.address</parameter>
+                <parameter key="ADMINISTRATOR">admin.configuration.administrator</parameter>
+                <parameter key="ADVANCED_CONFIGURATION">admin.configuration.advanced</parameter>
+                <parameter key="AREA">admin.configuration.area</parameter>
+                <parameter key="ATTRIBUTE">admin.configuration.attribute</parameter>
+                <parameter key="BRAND">admin.brand</parameter>
+                <parameter key="CATEGORY">admin.category</parameter>
+                <parameter key="CONFIG">admin.configuration"</parameter>
+                <parameter key="CONTENT">admin.content</parameter>
+                <parameter key="COUNTRY">admin.configuration.country</parameter>
+                <parameter key="STATE">admin.configuration.state</parameter>
+                <parameter key="COUPON">admin.coupon</parameter>
+                <parameter key="CURRENCY">admin.configuration.currency</parameter>
+                <parameter key="CUSTOMER">admin.customer</parameter>
+                <parameter key="FEATURE">admin.configuration.feature</parameter>
+                <parameter key="FOLDER">admin.folder</parameter>
+                <parameter key="HOME">admin.home</parameter>
+                <parameter key="LANGUAGE">admin.configuration.language</parameter>
+                <parameter key="MAILING_SYSTEM">admin.configuration.mailing-system</parameter>
+                <parameter key="MESSAGE">admin.configuration.message</parameter>
+                <parameter key="MODULE">admin.module</parameter>
+                <parameter key="HOOK">admin.hook</parameter>
+                <parameter key="MODULE_HOOK">admin.module-hook</parameter>
+                <parameter key="ORDER">admin.order</parameter>
+                <parameter key="ORDER_STATUS">admin.configuration.order-status</parameter>
+                <parameter key="PRODUCT">admin.product</parameter>
+                <parameter key="PROFILE">admin.configuration.profile</parameter>
+                <parameter key="SHIPPING_ZONE">admin.configuration.shipping-zone</parameter>
+                <parameter key="TAX">admin.configuration.tax</parameter>
+                <parameter key="TEMPLATE">admin.configuration.template</parameter>
+                <parameter key="SYSTEM_LOG">admin.configuration.system-logs</parameter>
+                <parameter key="ADMIN_LOG">admin.configuration.admin-logs</parameter>
+                <parameter key="STORE">admin.configuration.store</parameter>
+                <parameter key="TRANSLATIONS">admin.configuration.translations</parameter>
+                <parameter key="UPDATE">admin.configuration.update</parameter>
+                <parameter key="EXPORT">admin.export</parameter>
+                <parameter key="IMPORT">admin.import</parameter>
+                <parameter key="TOOLS">admin.tools</parameter>
+                <parameter key="SALES">admin.sales</parameter>
+                <parameter key="API">admin.configuration.api</parameter>
+                <parameter key="TITLE">admin.customer.title</parameter>
+            </parameter>
+        </parameter>
+
         <parameter key="import.base_url">/admin/import</parameter>
         <parameter key="export.base_url">/admin/export</parameter>
 
@@ -44,6 +91,9 @@
 
         <!-- Thelia logger class -->
         <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
+
+        <!-- Thelia Cache Config -->
+        <parameter key="thelia.cache.namespace">thelia_cache</parameter>
     </parameters>
 
 
@@ -77,9 +127,8 @@
         </service>
 
         <!-- Tax engine -->
-
-        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine">
+            <argument type="service" id="request_stack" />
         </service>
 
         <!--  The assets manager -->
@@ -92,11 +141,6 @@
             <tag name="thelia.asset.filter" key="less" />
             <tag name="kernel.event_subscriber"/>
             <argument>%kernel.environment%</argument>
-        </service>
-
-        <service id="less_legacy.assetic.filter" class="Assetic\Filter\LessphpFilter">
-            <argument key="identifier">less_legacy</argument>
-            <tag name="thelia.asset.filter" key="less_legacy" />
         </service>
 
         <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
@@ -142,12 +186,12 @@
 
 		<!-- Security context for front and back office -->
 
-		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">
-            <argument type="service" id="request" />
+		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext">
+            <argument type="service" id="request_stack" />
 		</service>
 
-        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext">
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.form_factory" />
             <argument type="service" id="thelia.form_validator" />
         </service>
@@ -163,6 +207,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="stack_factory" class="Stack\Builder" />
@@ -176,15 +221,15 @@
             <argument id="base_http_kernel" type="service"/>
         </service>
 
+        <service id="request" class="Thelia\Core\HttpFoundation\Request" />
 
-        <service id="request" scope="request" synthetic="true" />
+        <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />
 
         <service id="service_container" synthetic="true" />
 
         <service id="kernel" synthetic="true" />
 
-
-        <service id="mailer" class="Thelia\Mailer\MailerFactory" scope="request">
+        <service id="mailer" class="Thelia\Mailer\MailerFactory">
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser"/>
         </service>
@@ -197,64 +242,71 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener" scope="request">
+        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener">
             <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener" scope="request">
+        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener">
             <argument>%kernel.environment%</argument>
             <argument type="service" id="thelia.parser"/>
             <argument type="service" id="thelia.securityContext"/>
-
+            <argument type="service" id="event_dispatcher" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <!-- Archive builders -->
 
-        <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
-            <argument>%kernel.environment%</argument>
+        <!-- Serializers -->
+        <service id="thelia.serializer.manager" class="Thelia\Core\Serializer\SerializerManager" />
+
+        <!-- csv -->
+        <service id="thelia.serializer.csv" class="Thelia\Core\Serializer\Serializer\CSVSerializer">
+            <tag name="thelia.serializer" />
         </service>
 
+        <!-- xml -->
+        <service id="thelia.serializer.xml" class="Thelia\Core\Serializer\Serializer\XMLSerializer">
+            <tag name="thelia.serializer" />
+        </service>
+
+        <!-- json -->
+        <service id="thelia.serializer.json" class="Thelia\Core\Serializer\Serializer\JSONSerializer">
+            <tag name="thelia.serializer" />
+        </service>
+
+        <!-- yaml -->
+        <!--<service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">-->
+            <!--<tag name="thelia.serializer" />-->
+        <!--</service>-->
+
+
+        <!-- Archiver -->
+        <service id="thelia.archiver.manager" class="Thelia\Core\Archiver\ArchiverManager" />
+
         <!-- zip -->
-        <service id="thelia.archive_builder.zip" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.zip" class="Thelia\Core\Archiver\Archiver\ZipArchiver">
+            <tag name="thelia.archiver" />
         </service>
 
         <!-- tar -->
-        <service id="thelia.archive_builder.tar" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.tar" class="Thelia\Core\Archiver\Archiver\TarArchiver">
+            <tag name="thelia.archiver" />
         </service>
 
         <!-- tar.gz -->
-        <service id="thelia.archive_builder.tar_gz" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.tgz" class="Thelia\Core\Archiver\Archiver\TarGzArchiver">
+            <tag name="thelia.archiver" />
         </service>
 
         <!-- tar.bz2 -->
-        <service id="thelia.archive_builder.tar_bz2" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">
-            <tag name="thelia.archive_builder" />
+        <service id="thelia.archiver.bz2" class="Thelia\Core\Archiver\Archiver\TarBz2Archiver">
+            <tag name="thelia.archiver" />
         </service>
 
-        <!-- Formatters -->
-
-        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
-
-        <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
-            <tag name="thelia.formatter" />
-        </service>
-
-        <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
-            <tag name="thelia.formatter" />
-        </service>
-
-        <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
-            <tag name="thelia.formatter" />
-        </service>
 
         <!-- Thelia simple token provider -->
-        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider">
+            <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.translator" />
             <argument>%thelia.token_id%</argument>
         </service>
@@ -269,7 +321,7 @@
             </call>
         </service>
 
-        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" scope="request" />
+        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" />
 
         <service id="thelia.forms.extension.http_foundation_extension" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension">
             <tag name="thelia.forms.extension" />
@@ -279,8 +331,8 @@
             <tag name="thelia.forms.extension" />
         </service>
 
-        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory" scope="request">
-            <argument type="service" id="request" />
+        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory">
+            <argument type="service" id="request_stack" />
             <argument type="service" id="service_container" />
             <argument>%thelia.parser.forms%</argument>
         </service>
@@ -298,5 +350,30 @@
 
         <!-- Thelia logger -->
         <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
+
+        <!-- The AdminRessources manager -->
+        <service id="thelia.admin.resources" class="Thelia\Core\Security\Resource\AdminResources">
+            <argument>%admin.resources%</argument>
+        </service>
+
+        <!-- Handlers -->
+        <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="thelia.serializer.manager" />
+            <argument type="service" id="thelia.archiver.manager" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <!-- Cache -->
+        <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
+            <argument>%thelia.cache.namespace%</argument>
+            <argument>600</argument>
+            <argument>%kernel.cache_dir%</argument>
+        </service>
     </services>
 </config>

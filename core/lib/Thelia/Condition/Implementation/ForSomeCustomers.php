@@ -15,6 +15,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
+use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 
@@ -89,7 +90,9 @@ class ForSomeCustomers extends ConditionAbstract
      */
     public function isMatching()
     {
-        $customer = $this->facade->getCustomer();
+        if (null === $customer = $this->facade->getCustomer()) {
+            throw new UnmatchableConditionException();
+        }
 
         return $this->conditionValidator->variableOpComparison(
             $customer->getId(),

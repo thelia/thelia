@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '* Billing address' => '* Fatura adresi',
     '* Delivery address' => '* Teslimat adresi',
     '* Items ordered:' => '* Sipariş maddeler:',
@@ -65,4 +65,4 @@ return array(
     'Your order confirmation Nº %ref' => 'Sipariş onayı n º %ref',
     'Your password for %store' => '%store şifre',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Yeni parolanızı <span style="font-family: courier, fixed; font-size: 120%">%pass</span> olduğunu',
-);
+];

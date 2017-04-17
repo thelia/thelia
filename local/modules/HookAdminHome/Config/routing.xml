@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+
+    <route id="admin.home.stats" path="/admin/home/stats">
+        <default key="_controller">HookAdminHome\Controller\HomeController::loadStatsAjaxAction</default>
+    </route>
+
+    <route id="admin.home.month.sales.block" path="/admin/home/month-sales-block/{month}/{year}">
+        <default key="_controller">HookAdminHome\Controller\HomeController::blockMonthSalesStatistics</default>
+        <requirement key="month">\d+</requirement>
+        <requirement key="year">\d+</requirement>
+    </route>
+
+    <route id="admin.news-feed" path="/admin/ajax/thelia_news_feed">
+        <default key="_controller">HookAdminHome\Controller\HomeController::processTemplateAction</default>
+        <default key="template">ajax/thelia_news_feed</default>
+        <default key="not-logged">1</default>
+    </route>
+
+</routes>

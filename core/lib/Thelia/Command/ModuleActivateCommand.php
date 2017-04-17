@@ -72,8 +72,13 @@ class ModuleActivateCommand extends BaseModuleGenerate
 
             $this->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(),
-                $e->getMessage()));
+            throw new \RuntimeException(
+                sprintf(
+                    "Activation fail with Exception : [%d] %s",
+                    $e->getCode(),
+                    $e->getMessage()
+                )
+            );
         }
 
         //impossible to change output class in CommandTester...

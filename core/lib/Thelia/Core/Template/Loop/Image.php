@@ -265,7 +265,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     public function parseResults(LoopResult $loopResult)
     {
         // Create image processing event
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         // Prepare tranformations
         $width = $this->getWidth();

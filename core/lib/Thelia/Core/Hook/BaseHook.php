@@ -41,22 +41,15 @@ use Thelia\Module\BaseModule;
  */
 abstract class BaseHook
 {
-
     const INJECT_TEMPLATE_METHOD_NAME = "insertTemplate";
 
-    /**
-     * @var BaseModule
-     */
+    /** @var BaseModule */
     public $module = null;
 
-    /**
-     * @var array list of templates automatically injected
-     */
+    /** @var array list of templates automatically injected */
     protected $templates = [];
 
-    /**
-     * @var \Thelia\Core\Template\ParserInterface
-     */
+    /** @var \Thelia\Core\Template\ParserInterface */
     public $parser = null;
 
     /** @var TranslatorInterface $translator */
@@ -89,16 +82,14 @@ abstract class BaseHook
     /** @var Currency $currency */
     protected $currency = null;
 
-
     /**
      * This function is called when hook uses the automatic insert template.
      *
-     *@param HookRenderEvent $event
+     * @param HookRenderEvent $event
+     * @param string $code
      */
-    public function insertTemplate(HookRenderEvent $event)
+    public function insertTemplate(HookRenderEvent $event, $code)
     {
-        $code = $event->getName();
-
         if (array_key_exists($code, $this->templates)) {
             $templates = explode(';', $this->templates[$code]);
 
@@ -130,7 +121,6 @@ abstract class BaseHook
                 }
             }
         }
-
     }
 
     /**
@@ -448,6 +438,4 @@ abstract class BaseHook
 
         return [$type, $filepath];
     }
-
-
 }

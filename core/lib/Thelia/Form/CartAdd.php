@@ -13,7 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Form\Exception\StockNotFoundException;
 use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -123,7 +123,7 @@ class CartAdd extends BaseForm
         $data = $context->getRoot()->getData();
 
         if (null === $data["product_sale_elements_id"]) {
-            $context->addViolationAt("quantity", Translator::getInstance()->trans("Invalid product_sale_elements"));
+            $context->buildViolation(Translator::getInstance()->trans("Invalid product_sale_elements"));
         } else {
             $productSaleElements = ProductSaleElementsQuery::create()
                 ->filterById($data["product_sale_elements_id"])

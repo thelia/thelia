@@ -21,6 +21,9 @@ namespace Thelia\Form\Definition;
 final class AdminForm
 {
     const ADMIN_LOGIN = 'thelia.admin.login';
+    const ADMIN_LOST_PASSWORD = 'thelia.admin.lostpassword';
+    const ADMIN_CREATE_PASSWORD = 'thelia.admin.createpassword';
+
     const SEO = 'thelia.admin.seo';
 
     const CUSTOMER_CREATE = 'thelia.admin.customer.create';
@@ -67,6 +70,9 @@ final class AdminForm
     const ORDER_DELIVERY = 'thelia.order.delivery';
     const ORDER_PAYMENT = 'thelia.order.payment';
     const ORDER_UPDATE_ADDRESS = 'thelia.order.update.address';
+
+    const ORDER_STATUS_CREATION = 'thelia.admin.order-status.creation';
+    const ORDER_STATUS_MODIFICATION = 'thelia.admin.order-status.modification';
 
     const COUPON_CODE = 'thelia.order.coupon';
 

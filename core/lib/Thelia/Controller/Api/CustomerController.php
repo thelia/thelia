@@ -150,7 +150,7 @@ class CustomerController extends AbstractCrudApiController
             $data['country'],
             $data['email'],
             $data['password'],
-            $data['lang'],
+            $data['lang_id'],
             isset($data["reseller"]) ? $data["reseller"] : null,
             isset($data["sponsor"]) ? $data["sponsor"] : null,
             isset($data["discount"]) ? $data["discount"] : null,

@@ -19,12 +19,7 @@
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li>{intl l="Modules"}</li>
             </ul>
-{*            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
-                <a class="btn btn-primary pull-right" title="{intl l='Install a new module'}" href="#install_dialog" data-toggle="modal">
-                    <span class="glyphicon glyphicon-import"></span> {intl l="Install a new module"}
-                </a>
-            {/loop}
-*}
+
         </div>
 
         {hook name="modules.top" location="modules_top" }
@@ -35,11 +30,13 @@
             {include file="includes/module-errors.html"}
             {/if}
 
+            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
             {include file="includes/module-install.html"}
+            {/loop}
 
             <div class="col-md-12">
             {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
-                
+
             {include file="includes/module-block.html" module_type="2" caption_title={intl l='Delivery modules'}}
             {include file="includes/module-block.html" module_type="3" caption_title={intl l='Payment modules'}}
             {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
@@ -160,10 +157,15 @@
                }).always(function(){
                    $("#loading-event").remove();
                }).done(function() {
-            	   if (is_checked)
-            		   $('.config-btn-' + module_id).removeClass('disabled');
-            	   else
-                       $('.config-btn-' + module_id).addClass('disabled');
+            	   if (is_checked) {
+                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
+                           .removeClass('disabled')
+                           .removeClass('no-follow-link');
+                   } else {
+                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
+                           .addClass('disabled')
+                           .addClass('no-follow-link');
+                   }
 
                }).fail(function(jqXHR, textStatus, errorThrown){
                     checkbox.bootstrapSwitch('toggleState', true);

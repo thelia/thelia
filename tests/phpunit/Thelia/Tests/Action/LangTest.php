@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Lang;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
@@ -33,11 +34,9 @@ use Thelia\Tests\ContainerAwareTestCase;
  */
 class LangTest extends ContainerAwareTestCase
 {
-    protected $dispatcher;
-
     protected static $defaultId;
 
-    protected $request;
+    protected $requestStack;
 
     public static function setUpBeforeClass()
     {
@@ -51,12 +50,13 @@ class LangTest extends ContainerAwareTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $session = new Session(new MockArraySessionStorage());
 
-        $this->request = new Request();
-        $this->request->setSession($session);
+        $request = new Request();
+        $request->setSession($session);
+        $this->requestStack = new RequestStack();
+        $this->requestStack->push($request);
     }
 
     public function testCreate()
@@ -72,11 +72,10 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimalSeparator(".")
             ->setThousandsSeparator(" ")
             ->setDecimals("2")
-            ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
-        $action->create($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdLang = $event->getLang();
 
@@ -87,12 +86,12 @@ class LangTest extends ContainerAwareTestCase
         $this->assertEquals('te_TE', $createdLang->getLocale());
         $this->assertEquals('test', $createdLang->getTitle());
         $this->assertEquals('TES', $createdLang->getCode());
+        $this->assertEquals('Y-m-d H:i:s', $createdLang->getDatetimeFormat());
         $this->assertEquals('Y-m-d', $createdLang->getDateFormat());
         $this->assertEquals('H:i:s', $createdLang->getTimeFormat());
         $this->assertEquals('.', $createdLang->getDecimalSeparator());
         $this->assertEquals(' ', $createdLang->getThousandsSeparator());
         $this->assertEquals('2', $createdLang->getDecimals());
-        $this->assertEquals('Y-m-d H:i:s', $createdLang->getDatetimeFormat());
 
         return $createdLang;
     }
@@ -100,6 +99,7 @@ class LangTest extends ContainerAwareTestCase
     /**
      * @param LangModel $lang
      * @depends testCreate
+     * @return LangModel
      */
     public function testUpdate(LangModel $lang)
     {
@@ -114,11 +114,11 @@ class LangTest extends ContainerAwareTestCase
             ->setDecimalSeparator(",")
             ->setThousandsSeparator(".")
             ->setDecimals("1")
-            ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
-        $action->update($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
 
@@ -134,20 +134,30 @@ class LangTest extends ContainerAwareTestCase
         $this->assertEquals('1', $updatedLang->getDecimals());
         $this->assertEquals('d-m-Y H-i-s', $updatedLang->getDatetimeFormat());
 
+        // set a specific date/time format
+        $event->setDateTimeFormat('d/m/Y H:i:s');
+
+        $action->update($event, null, $this->getMockEventDispatcher());
+
+        $updatedLang = $event->getLang();
+
+        $this->assertInstanceOf('Thelia\Model\Lang', $updatedLang);
+        $this->assertEquals('d/m/Y H:i:s', $updatedLang->getDatetimeFormat());
+
         return $updatedLang;
     }
 
     /**
      * @param LangModel $lang
      * @depends testUpdate
+     * @return LangModel
      */
     public function testToggleDefault(LangModel $lang)
     {
         $event = new LangToggleDefaultEvent($lang->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
-        $action->toggleDefault($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action->toggleDefault($event, null, $this->getMockEventDispatcher());
 
         $updatedLang = $event->getLang();
 
@@ -172,10 +182,9 @@ class LangTest extends ContainerAwareTestCase
         self::tearDownAfterClass();
 
         $event = new LangDeleteEvent($lang->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
-        $action->delete($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedLang = $event->getLang();
 
@@ -193,10 +202,9 @@ class LangTest extends ContainerAwareTestCase
         $lang = LangQuery::create()->findOneByByDefault(1);
 
         $event = new LangDeleteEvent($lang->getId());
-        $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang(new TheliaTemplateHelper(), $this->request);
-        $action->delete($event);
+        $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+        $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
     public static function tearDownAfterClass()
@@ -213,6 +221,7 @@ class LangTest extends ContainerAwareTestCase
     }
 
     /**
+     * @param ContainerBuilder $container
      * Use this method to build the container with the services that you need.
      */
     protected function buildContainer(ContainerBuilder $container)

@@ -20,6 +20,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\FeatureAvModificationForm;
+use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
 
 /**
@@ -124,11 +125,19 @@ class FeatureAvController extends AbstractCrudController
         return $featureAv;
     }
 
+    /**
+     * @param FeatureAv $object
+     * @return string
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param FeatureAv $object
+     * @return int
+     */
     protected function getObjectId($object)
     {
         return $object->getId();

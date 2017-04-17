@@ -22,10 +22,10 @@ trait FolderBreadcrumbTrait
     public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $folderId)
     {
         $translator = Translator::getInstance();
-        $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
+        $foldersUrl = $router->generate('admin.folders.default', [], Router::ABSOLUTE_URL);
         $breadcrumb = [
             $translator->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
-            $translator->trans('Folder') => $catalogUrl,
+            $translator->trans('Folder') => $foldersUrl,
         ];
 
         $folderPath = new FolderPath($container);
@@ -38,7 +38,7 @@ trait FolderBreadcrumbTrait
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = sprintf(
-                "%s?folder_id=%d",
+                "%s?parent=%d",
                 $router->generate(
                     'admin.folders.default',
                     [],

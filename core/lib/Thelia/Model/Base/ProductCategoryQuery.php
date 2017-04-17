@@ -24,12 +24,14 @@ use Thelia\Model\Map\ProductCategoryTableMap;
  * @method     ChildProductCategoryQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildProductCategoryQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
  * @method     ChildProductCategoryQuery orderByDefaultCategory($order = Criteria::ASC) Order by the default_category column
+ * @method     ChildProductCategoryQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductCategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductCategoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildProductCategoryQuery groupByProductId() Group by the product_id column
  * @method     ChildProductCategoryQuery groupByCategoryId() Group by the category_id column
  * @method     ChildProductCategoryQuery groupByDefaultCategory() Group by the default_category column
+ * @method     ChildProductCategoryQuery groupByPosition() Group by the position column
  * @method     ChildProductCategoryQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductCategoryQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -51,12 +53,14 @@ use Thelia\Model\Map\ProductCategoryTableMap;
  * @method     ChildProductCategory findOneByProductId(int $product_id) Return the first ChildProductCategory filtered by the product_id column
  * @method     ChildProductCategory findOneByCategoryId(int $category_id) Return the first ChildProductCategory filtered by the category_id column
  * @method     ChildProductCategory findOneByDefaultCategory(boolean $default_category) Return the first ChildProductCategory filtered by the default_category column
+ * @method     ChildProductCategory findOneByPosition(int $position) Return the first ChildProductCategory filtered by the position column
  * @method     ChildProductCategory findOneByCreatedAt(string $created_at) Return the first ChildProductCategory filtered by the created_at column
  * @method     ChildProductCategory findOneByUpdatedAt(string $updated_at) Return the first ChildProductCategory filtered by the updated_at column
  *
  * @method     array findByProductId(int $product_id) Return ChildProductCategory objects filtered by the product_id column
  * @method     array findByCategoryId(int $category_id) Return ChildProductCategory objects filtered by the category_id column
  * @method     array findByDefaultCategory(boolean $default_category) Return ChildProductCategory objects filtered by the default_category column
+ * @method     array findByPosition(int $position) Return ChildProductCategory objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductCategory objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductCategory objects filtered by the updated_at column
  *
@@ -147,7 +151,7 @@ abstract class ProductCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `PRODUCT_ID`, `CATEGORY_ID`, `DEFAULT_CATEGORY`, `CREATED_AT`, `UPDATED_AT` FROM `product_category` WHERE `PRODUCT_ID` = :p0 AND `CATEGORY_ID` = :p1';
+        $sql = 'SELECT `PRODUCT_ID`, `CATEGORY_ID`, `DEFAULT_CATEGORY`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `product_category` WHERE `PRODUCT_ID` = :p0 AND `CATEGORY_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -359,6 +363,47 @@ abstract class ProductCategoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductCategoryTableMap::DEFAULT_CATEGORY, $defaultCategory, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductCategoryQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(ProductCategoryTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(ProductCategoryTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ProductCategoryTableMap::POSITION, $position, $comparison);
     }
 
     /**

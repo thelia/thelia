@@ -48,23 +48,24 @@ class Coupon extends BaseCoupon
     /**
      * Create or Update this Coupon
      *
-     * @param string    $code                       Coupon Code
-     * @param string    $title                      Coupon title
-     * @param array     $effects                    Ready to be serialized in JSON effect params
-     * @param string    $type                       Coupon type
-     * @param bool      $isRemovingPostage          Is removing Postage
-     * @param string    $shortDescription           Coupon short description
-     * @param string    $description                Coupon description
-     * @param boolean   $isEnabled                  Enable/Disable
-     * @param \DateTime $expirationDate             Coupon expiration date
-     * @param boolean   $isAvailableOnSpecialOffers Is available on special offers
-     * @param boolean   $isCumulative               Is cumulative
-     * @param int       $maxUsage                   Coupon quantity
-     * @param string    $defaultSerializedRule      Serialized default rule added if none found
-     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
-     * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
-     * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
-     * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
+     * @param string $code Coupon Code
+     * @param string $title Coupon title
+     * @param array $effects Ready to be serialized in JSON effect params
+     * @param string $type Coupon type
+     * @param bool $isRemovingPostage Is removing Postage
+     * @param string $shortDescription Coupon short description
+     * @param string $description Coupon description
+     * @param boolean $isEnabled Enable/Disable
+     * @param \DateTime $expirationDate Coupon expiration date
+     * @param boolean $isAvailableOnSpecialOffers Is available on special offers
+     * @param boolean $isCumulative Is cumulative
+     * @param int $maxUsage Coupon quantity
+     * @param string $defaultSerializedRule Serialized default rule added if none found
+     * @param string $locale Coupon Language code ISO (ex: fr_FR)
+     * @param array $freeShippingForCountries ID of Countries to which shipping is free
+     * @param array $freeShippingForMethods ID of Shipping modules for which shipping is free
+     * @param bool $perCustomerUsageCount True if usage coiunt is per customer
+     * @param $startDate
      *
      * @throws \Exception
      */
@@ -85,7 +86,8 @@ class Coupon extends BaseCoupon
         $locale,
         $freeShippingForCountries,
         $freeShippingForMethods,
-        $perCustomerUsageCount
+        $perCustomerUsageCount,
+        $startDate = null
     ) {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
@@ -98,6 +100,7 @@ class Coupon extends BaseCoupon
                 ->setEffects($effects)
                 ->setIsRemovingPostage($isRemovingPostage)
                 ->setIsEnabled($isEnabled)
+                ->setStartDate($startDate)
                 ->setExpirationDate($expirationDate)
                 ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
                 ->setIsCumulative($isCumulative)

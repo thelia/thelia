@@ -13,9 +13,10 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\ProfileQuery;
 
@@ -35,16 +36,36 @@ class AdministratorCreationForm extends BaseForm
                         ),
                     )),
                 ),
-                "label" => Translator::getInstance()->trans("Login"),
+                "label" => $this->translator->trans("Login name"),
                 "label_attr" => array(
                     "for" => "login",
+                    'help' => $this->translator->trans("This is the name used on the login screen")
                 ),
+            ))
+            ->add("email", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this, "verifyExistingEmail"),
+                        ),
+                    )),
+                ),
+                "label" => $this->translator->trans("Email address"),
+                "label_attr" => array(
+                    "for" => "email",
+                    'help' => $this->translator->trans("Please enter a valid email address")
+                ),
+                'attr'        => [
+                    'placeholder' => $this->translator->trans('Administrator email address'),
+                ]
             ))
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("First Name"),
+                "label" => $this->translator->trans("First Name"),
                 "label_attr" => array(
                     "for" => "firstname",
                 ),
@@ -53,14 +74,14 @@ class AdministratorCreationForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("Last Name"),
+                "label" => $this->translator->trans("Last Name"),
                 "label_attr" => array(
                     "for" => "lastname",
                 ),
             ))
             ->add("password", "password", array(
                 "constraints" => array(),
-                "label" => Translator::getInstance()->trans("Password"),
+                "label" => $this->translator->trans("Password"),
                 "label_attr" => array(
                     "for" => "password",
                 ),
@@ -71,7 +92,7 @@ class AdministratorCreationForm extends BaseForm
                         array($this, "verifyPasswordField"),
                     ))),
                 ),
-                "label" => Translator::getInstance()->trans('Password confirmation'),
+                "label" => $this->translator->trans('Password confirmation'),
                 "label_attr" => array(
                     "for" => "password_confirmation",
                 ),
@@ -84,7 +105,7 @@ class AdministratorCreationForm extends BaseForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans('Profile'),
+                    "label" => $this->translator->trans('Profile'),
                     "label_attr" => array(
                         "for" => "profile",
                     ),
@@ -98,7 +119,7 @@ class AdministratorCreationForm extends BaseForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
-                    "label" => Translator::getInstance()->trans('Preferred locale'),
+                    "label" => $this->translator->trans('Preferred locale'),
                     "label_attr" => array(
                         "for" => "locale",
                     ),
@@ -132,16 +153,24 @@ class AdministratorCreationForm extends BaseForm
             $context->addViolation("password confirmation is not the same as password field");
         }
 
-        if (strlen($data["password"]) < 4) {
-            $context->addViolation("password must be composed of at least 4 characters");
+        $minLength = ConfigQuery::getMinimuAdminPasswordLength();
+
+        if (strlen($data["password"]) < $minLength) {
+            $context->addViolation("password must be composed of at least $minLength characters");
         }
     }
 
     public function verifyExistingLogin($value, ExecutionContextInterface $context)
     {
-        $administrator = AdminQuery::create()->findOneByLogin($value);
-        if ($administrator !== null) {
-            $context->addViolation("This login already exists");
+        if (null !== $administrator = AdminQuery::create()->findOneByLogin($value)) {
+            $context->addViolation($this->translator->trans("This administrator login already exists"));
+        }
+    }
+
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        if (null !== $administrator = AdminQuery::create()->findOneByEmail($value)) {
+            $context->addViolation($this->translator->trans("An administrator with thie email address already exists"));
         }
     }
 

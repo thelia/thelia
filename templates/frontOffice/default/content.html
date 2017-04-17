@@ -11,7 +11,7 @@
 {block name='no-return-functions' append}
     {if {$content_id}}
         {loop name="content.seo.title" type="content" id={$content_id} limit="1"}
-            {$page_title = {$META_TITLE}}
+            {$page_title = $META_TITLE}
         {/loop}
     {/if}
 {/block}
@@ -30,7 +30,7 @@
     {if $content_id}
         {$breadcrumbs = []}
         {loop type="content" name="content-breadcrumb" id=$content_id limit="1"}
-            {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
+            {loop name="folder_path" type="folder-path" folder={$DEFAULT_FOLDER}}
                 {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
             {/loop}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
@@ -63,7 +63,7 @@
                 {ifloop rel="blog.document"}
                 <div class="documents">
                     <ul>
-                    {loop name="blog.document"  type="document" content="{$ID}"}
+                    {loop name="blog.document"  type="document" content={$ID}}
                     <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
                     {/loop}  
                     </ul>

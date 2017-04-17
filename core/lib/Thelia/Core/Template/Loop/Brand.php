@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\BrandQuery;
@@ -46,6 +47,8 @@ use Thelia\Type\TypeCollection;
  */
 class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+
     protected $timestampable = true;
 
     /**
@@ -90,28 +93,20 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return $this->getStandardI18nSearchFields();
     }
 
     /**
      * @param BrandQuery $search
      * @param string $searchTerm
-     * @param string $searchIn
+     * @param array $searchIn
      * @param string $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
 
-        $search->where(
-            "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-            THEN `requested_locale_i18n`.`TITLE`ELSE `default_locale_i18n`.`TITLE`
-            END ".$searchCriteria." ?",
-            $searchTerm,
-            \PDO::PARAM_STR
-        );
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()
@@ -153,22 +148,15 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where(
-                "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-                THEN `requested_locale_i18n`.`TITLE`
-                ELSE `default_locale_i18n`.`TITLE`
-                END ".Criteria::LIKE." ?",
-                "%".$title."%",
-                \PDO::PARAM_STR
-            );
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("brand_id"));
+            $search->filterById($this->getCurrentRequest()->get("brand_id"));
         } elseif ($current === false) {
-            $search->filterById($this->request->get("brand_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get("brand_id"), Criteria::NOT_IN);
         }
 
         $orders  = $this->getOrder();

@@ -16,8 +16,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\AdminQuery;
 use Thelia\Tools\Password;
 
@@ -32,6 +36,18 @@ use Thelia\Tools\Password;
  */
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
 {
+    protected function init()
+    {
+        $container = $this->getContainer();
+
+        $request = new Request();
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $requestStack->push($request);
+    }
+
     /**
      * Configures the current command.
      */
@@ -57,6 +73,8 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->init();
+
         $login = $input->getArgument('login');
 
         if (null === $admin = AdminQuery::create()->filterByLogin($login)->findOne()) {

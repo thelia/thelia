@@ -19,10 +19,21 @@ namespace Thelia\Core\Event\MetaData;
  */
 class MetaDataDeleteEvent extends MetaDataEvent
 {
+    /** @var string */
     protected $metaKey = null;
+
+    /** @var string */
     protected $elementKey = null;
+
+    /** @var int */
     protected $elementId = null;
 
+    /**
+     * MetaDataDeleteEvent constructor.
+     * @param string|null $metaKey
+     * @param string|null $elementKey
+     * @param int|null $elementId
+     */
     public function __construct($metaKey = null, $elementKey = null, $elementId = null)
     {
         parent::__construct();
@@ -45,7 +56,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getMetaKey()
     {
@@ -65,7 +76,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
     }
 
     /**
-     * @return null
+     * @return null|string
      */
     public function getElementKey()
     {
@@ -85,7 +96,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getElementId()
     {

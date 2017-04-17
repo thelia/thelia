@@ -14,8 +14,12 @@ namespace Thelia\Core\Event\Message;
 
 class MessageDeleteEvent extends MessageEvent
 {
+    /** @var int */
     protected $message_id;
 
+    /**
+     * @param int $message_id
+     */
     public function __construct($message_id)
     {
         $this->setMessageId($message_id);

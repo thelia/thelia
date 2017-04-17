@@ -10,85 +10,84 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-<div class="container" id="wrapper">
+    {loop type="import" name="import" id=$importId}
+        <div id="wrapper" class="container">
+            <nav>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="{url path='admin/home'}">{intl l='Home'}</a>
+                    </li>
+                    <li>
+                        <a href="{url path='admin/tools'}">{intl l='Tools'}</a>
+                    </li>
+                    <li>
+                        <a href="{url path='admin/import'}">{intl l="Imports"}</a>
+                    </li>
+                    <li>
+                        {intl l="Import"}&nbsp;: {$TITLE}
+                    </li>
+                </ul>
+            </nav>
 
-    <nav>
-        <ul class="breadcrumb">
-            <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-            <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
-            <li><a href="{url path='admin/import'}">{intl l="Imports"}</a></li>
-            <li>{intl l="Import"}: {$TITLE}</li>
-        </ul>
-    </nav>
-
-    {form name="thelia.import"}
-    {if $form_error}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="alert alert-danger">{$form_error_message}</div>
-            </div>
-        </div>
-    {/if}
-
-    {if $success_message}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="alert alert-success">{$success_message}</div>
-            </div>
-        </div>
-    {/if}
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="general-block-decorator">
-
-                <div class="title title-without-tabs">
-                    {intl l='Import'}: {$TITLE}
+            {if $general_error}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">{$general_error}</div>
+                    </div>
                 </div>
+            {/if}
 
-                {if $DESCRIPTION}
+            {flash type="thelia.import.error"}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class=" alert alert-danger">
+                            {$MESSAGE nofilter}
+                        </div>
+                    </div>
+                </div>
+            {/flash}
+
+            {flash type="thelia.import.success"}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class=" alert alert-success">
+                            {$MESSAGE nofilter}
+                        </div>
+                    </div>
+                </div>
+            {/flash}
+
+            {form name="thelia.import"}
+                <form action="{$URL nofilter}" method="post" {form_enctype}>
+                    {form_hidden_fields}
+
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="alert alert-info">
-                                {$DESCRIPTION nofilter}
+                            <div class="general-block-decorator">
+                                <div class="title title-without-tabs">
+                                    {intl l='Import'}: {$TITLE}
+                                </div>
+
+                                {if $form_error}
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="alert alert-danger">{$form_error_message}</div>
+                                        </div>
+                                    </div>
+                                {/if}
+
+                                {include 'includes/import-form-body.html'}
+
+                                <div>
+                                    <button class="btn btn-primary" type="submit" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                {/if}
-                <form action="{$URL nofilter}" method="post" {form_enctype}>
-                    {form_hidden_fields}
-                    <div class="row">
-                        <div class="col-md-12">
-                            {form_field field="language"}
-                                <label for="{$label_attr.for}">
-                                    {$label}
-                                </label>
-                                <select id="{$label_attr.for}" name="{$name}" required>
-                                    {loop name="import-lang" type="lang"}
-                                        <option value="{$ID}" {if $ID == $CURRENT_LANG_ID}selected{/if}>{$TITLE}</option>
-                                    {/loop}
-                                </select>
-                            {/form_field}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            {form_field field="file_upload"}
-                                <label form="{$label_attr.for}">
-                                    {$label}
-                                </label>
-
-                                <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
-                                <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
-                            {/form_field}
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
                 </form>
-            </div>
+            {/form}
         </div>
-    </div>
-    {/form}
+    {/loop}
 {/block}
 
 {block name="javascript-last-call"}

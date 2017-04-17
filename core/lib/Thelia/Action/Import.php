@@ -14,74 +14,66 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Handler\ImportHandler;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
 
 /**
  * Class Import
- * @package Thelia\Action
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class Import extends BaseAction implements EventSubscriberInterface
 {
-    protected $environment;
+    /**
+     * @var \Thelia\Handler\ImportHandler The import handler
+     */
+    protected $handler;
 
-    public function __construct($environment)
+    /**
+     * @param \Thelia\Handler\ImportHandler $importHandler The import handler
+     */
+    public function __construct(ImportHandler $importHandler)
     {
-        $this->environment = $environment;
+        $this->handler = $importHandler;
     }
 
-    public function changeCategoryPosition(UpdatePositionEvent $event)
+    public static function getSubscribedEvents()
     {
-        $this->genericUpdatePosition(new ImportCategoryQuery(), $event);
-
-        $this->cacheClear($event->getDispatcher());
-    }
-
-    public function changeImportPosition(UpdatePositionEvent $event)
-    {
-        $this->genericUpdatePosition(new ImportQuery(), $event);
-
-        $this->cacheClear($event->getDispatcher());
-    }
-
-    protected function cacheClear(EventDispatcherInterface $dispatcher)
-    {
-        $cacheEvent = new CacheEvent(
-            $this->environment
-        );
-
-        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        return [
+            TheliaEvents::IMPORT_CHANGE_POSITION => [
+                ['importChangePosition', 128]
+            ],
+            TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION => [
+                ['importCategoryChangePosition', 128]
+            ]
+        ];
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
+     * Handle import change position event
      *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * @param UpdatePositionEvent $updatePositionEvent
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public static function getSubscribedEvents()
+    public function importChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return array(
-            TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION => array("changeCategoryPosition", 128),
-            TheliaEvents::IMPORT_CHANGE_POSITION => array("changeImportPosition", 128),
-        );
+        $this->handler->getImport($updatePositionEvent->getObjectId(), true);
+        $this->genericUpdatePosition(new ImportQuery, $updatePositionEvent, $dispatcher);
+    }
+
+    /**
+     * Handle import category change position event
+     *
+     * @param UpdatePositionEvent $updatePositionEvent
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
+        $this->genericUpdatePosition(new ImportCategoryQuery, $updatePositionEvent, $dispatcher);
     }
 }

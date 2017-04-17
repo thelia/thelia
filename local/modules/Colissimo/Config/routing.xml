@@ -14,4 +14,8 @@
     <route id="colissimo.export" path="/admin/module/colissimo/export" methods="post">
         <default key="_controller">Colissimo\Controller\Export::exportAction</default>
     </route>
+
+    <route id="colissimo.configuration" path="/admin/module/colissimo/configuration/update" methods="post">
+        <default key="_controller">Colissimo\Controller\Configuration::editConfiguration</default>
+    </route>
 </routes>

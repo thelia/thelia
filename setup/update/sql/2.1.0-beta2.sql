@@ -20,9 +20,9 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 1, 'en_US', 'Customer account - additional information', '', ''),
 (@max_id + 2, 'en_US', 'Product page - On the top of the form', '', ''),
 (@max_id + 3, 'en_US', 'Product page - On the bottom of the form', '', ''),
-(@max_id + 1, 'es_ES', NULL, '', ''),
-(@max_id + 2, 'es_ES', NULL, '', ''),
-(@max_id + 3, 'es_ES', NULL, '', ''),
+(@max_id + 1, 'es_ES', 'Cuenta de cliente - información adicional', '', ''),
+(@max_id + 2, 'es_ES', 'Página de producto - en la parte superior del formulario', '', ''),
+(@max_id + 3, 'es_ES', 'Página del producto - en la parte inferior del formulario', '', ''),
 (@max_id + 1, 'fr_FR', 'Compte client - informations additionnelles', '', ''),
 (@max_id + 2, 'fr_FR', 'Page produit - En haut du formulaire', '', ''),
 (@max_id + 3, 'fr_FR', 'Page produit - En bas du formulaire', '', '')

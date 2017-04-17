@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use LogicException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
@@ -168,12 +169,18 @@ class Country extends BaseCountry
      */
     public static function getShopLocation()
     {
-        $dc = CountryQuery::create()->findOneByShopCountry(true);
+        $countryId = ConfigQuery::getStoreCountry();
 
-        if ($dc == null) {
+        // return the default country if no shop country defined
+        if (empty($countryId)) {
+            return self::getDefaultCountry();
+        }
+
+        $shopCountry = CountryQuery::create()->findPk($countryId);
+        if ($shopCountry === null) {
             throw new \LogicException(Translator::getInstance()->trans("Cannot find the shop country. Please select a shop country."));
         }
 
-        return $dc;
+        return $shopCountry;
     }
 }

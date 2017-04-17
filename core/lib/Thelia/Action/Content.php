@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
@@ -40,10 +41,10 @@ use Thelia\Model\Map\ContentTableMap;
  */
 class Content extends BaseAction implements EventSubscriberInterface
 {
-    public function create(ContentCreateEvent $event)
+    public function create(ContentCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $content = (new ContentModel)
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -57,14 +58,18 @@ class Content extends BaseAction implements EventSubscriberInterface
      * process update content
      *
      * @param ContentUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws PropelException
+     * @throws \Exception
      */
-    public function update(ContentUpdateEvent $event)
+    public function update(ContentUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
             $con->beginTransaction();
 
-            $content->setDispatcher($event->getDispatcher());
+            $content->setDispatcher($dispatcher);
             try {
                 $content
                     ->setVisible($event->getVisible())
@@ -76,7 +81,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                     ->save($con)
                 ;
 
-                $content->updateDefaultFolder($event->getDefaultFolder());
+                $content->setDefaultFolder($event->getDefaultFolder());
 
                 $event->setContent($content);
                 $con->commit();
@@ -90,39 +95,48 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * Change Content SEO
      *
-     * @param \Thelia\Core\Event\UpdateSeoEvent $event
-     *
-     * @return mixed
+     * @param UpdateSeoEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @return Object
      */
-    public function updateSeo(UpdateSeoEvent $event)
+    public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        return $this->genericUpdateSeo(ContentQuery::create(), $event);
+        return $this->genericUpdateSeo(ContentQuery::create(), $event, $dispatcher);
     }
 
-    public function updatePosition(UpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition(ContentQuery::create(), $event);
+        $this->genericUpdateDelegatePosition(
+            ContentFolderQuery::create()
+                ->filterByContentId($event->getObjectId())
+                ->filterByFolderId($event->getReferrerId()),
+            $event,
+            $dispatcher
+        );
     }
 
-    public function toggleVisibility(ContentToggleVisibilityEvent $event)
+    public function toggleVisibility(ContentToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $content = $event->getContent();
 
         $content
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setVisible(!$content->getVisible())
             ->save();
 
         $event->setContent($content);
     }
 
-    public function delete(ContentDeleteEvent $event)
+    public function delete(ContentDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
             $con->beginTransaction();
 
             try {
+                $fileList = ['images' => [], 'documentList' => []];
+
                 $defaultFolderId = $content->getDefaultFolderId();
 
                 // Get content's files to delete after content deletion
@@ -135,7 +149,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
 
                 // Delete content
-                $content->setDispatcher($event->getDispatcher())
+                $content->setDispatcher($dispatcher)
                     ->delete($con);
 
                 $event->setDefaultFolderId($defaultFolderId);
@@ -145,7 +159,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $dispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
                     }
                 }
 
@@ -170,12 +184,13 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->filterByFolderId($event->getFolderId())
             ->count() <= 0
         ) {
-            $contentFolder = new ContentFolder();
-
-            $contentFolder
+            $contentFolder = (new ContentFolder())
                 ->setFolderId($event->getFolderId())
                 ->setContent($event->getContent())
-                ->setDefaultFolder(false)
+                ->setDefaultFolder(false);
+
+            $contentFolder
+                ->setPosition($contentFolder->getNextPosition())
                 ->save();
         }
     }
@@ -193,24 +208,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

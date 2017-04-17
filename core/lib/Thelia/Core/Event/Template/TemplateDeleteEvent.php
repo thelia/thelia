@@ -14,9 +14,14 @@ namespace Thelia\Core\Event\Template;
 
 class TemplateDeleteEvent extends TemplateEvent
 {
+    /** @var int */
     protected $template_id;
+
     protected $product_count;
 
+    /**
+     * @param int $template_id
+     */
     public function __construct($template_id)
     {
         $this->setTemplateId($template_id);

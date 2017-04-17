@@ -18,8 +18,10 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\ContentQuery;
@@ -53,6 +55,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+
     protected $timestampable = true;
     protected $versionable = true;
 
@@ -76,18 +80,15 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
-                            'alpha',
-                            'alpha-reverse',
-                            'manual',
-                            'manual_reverse',
+                            'id', 'id_reverse',
+                            'alpha', 'alpha-reverse', 'alpha_reverse',
+                            'manual', 'manual_reverse',
+                            'visible', 'visible_reverse',
                             'random',
                             'given_id',
-                            'created',
-                            'created_reverse',
-                            'updated',
-                            'updated_reverse',
-                            'position',
-                            'position_reverse'
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
+                            'position', 'position_reverse'
                         )
                     )
                 ),
@@ -103,22 +104,20 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return $this->getStandardI18nSearchFields();
     }
 
     /**
      * @param ContentQuery $search
      * @param string $searchTerm
-     * @param string $searchIn
+     * @param array $searchIn
      * @param string $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
 
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()
@@ -134,51 +133,62 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterById($id, Criteria::IN);
         }
 
-        $folder = $this->getFolder();
-        $folderDefault = $this->getFolderDefault();
+        $manualOrderAllowed = false;
+        if (null !== $folderDefault = $this->getFolderDefault()) {
+            // Select the contents which have $folderDefault as the default folder.
+            $search
+                ->useContentFolderQuery('FolderSelect')
+                    ->filterByDefaultFolder(true)
+                    ->filterByFolderId($folderDefault, Criteria::IN)
+                ->endUse()
+            ;
 
-        if (!is_null($folder) || !is_null($folderDefault)) {
-            $foldersIds = array();
-            if (!is_array($folder)) {
-                $folder = array();
-            }
-            if (!is_array($folderDefault)) {
-                $folderDefault = array();
-            }
-
-            $foldersIds = array_merge($foldersIds, $folder, $folderDefault);
-            $folders = FolderQuery::create()->filterById($foldersIds, Criteria::IN)->find();
-
+            // We can only sort by position if we have a single folder ID
+            $manualOrderAllowed = (1 == count($folderDefault));
+        } elseif (null !== $folderIdList = $this->getFolder()) {
+            // Select all content which have one of the required folders as the default one, or an associated one
             $depth = $this->getDepth();
 
-            if (null !== $depth) {
-                foreach (FolderQuery::findAllChild($folder, $depth) as $subFolder) {
-                    $folders->prepend($subFolder);
-                }
-            }
+            $allFolderIDs = FolderQuery::getFolderTreeIds($folderIdList, $depth);
 
-            $search->filterByFolder(
-                $folders,
-                Criteria::IN
-            );
+            $search
+                ->useContentFolderQuery('FolderSelect')
+                    ->filterByFolderId($allFolderIDs, Criteria::IN)
+                ->endUse()
+            ;
+
+            // We can only sort by position if we have a single folder ID, with a depth of 1
+            $manualOrderAllowed = (1 == $depth && 1 == count($folderIdList));
+        } else {
+            $search
+                ->leftJoinContentFolder('FolderSelect')
+                ->addJoinCondition('FolderSelect', '`FolderSelect`.DEFAULT_FOLDER = 1')
+            ;
         }
+
+        $search->withColumn(
+            'CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `FolderSelect`.POSITION END AS SIGNED)',
+            'position_delegate'
+        );
+        $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
+        $search->withColumn('`FolderSelect`.DEFAULT_FOLDER', 'is_default_folder');
 
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("content_id"));
+            $search->filterById($this->getCurrentRequest()->get("content_id"));
         } elseif ($current === false) {
-            $search->filterById($this->request->get("content_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get("content_id"), Criteria::NOT_IN);
         }
 
         $current_folder = $this->getCurrentFolder();
 
         if ($current_folder === true) {
-            $current = ContentQuery::create()->findPk($this->request->get("content_id"));
+            $current = ContentQuery::create()->findPk($this->getCurrentRequest()->get("content_id"));
 
             $search->filterByFolder($current->getFolders(), Criteria::IN);
         } elseif ($current_folder === false) {
-            $current = ContentQuery::create()->findPk($this->request->get("content_id"));
+            $current = ContentQuery::create()->findPk($this->getCurrentRequest()->get("content_id"));
 
             $search->filterByFolder($current->getFolders(), Criteria::NOT_IN);
         }
@@ -192,30 +202,52 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
+        }
+
+        $exclude = $this->getExclude();
+
+        if (!is_null($exclude)) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $exclude_folder = $this->getExcludeFolder();
+
+        if (!is_null($exclude_folder)) {
+            $search->filterByFolder(
+                FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
+                Criteria::NOT_IN
+            );
         }
 
         $orders  = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if (null === $foldersIds || count($foldersIds) != 1) {
+                    if (! $manualOrderAllowed) {
                         throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
                     }
-                    $search->orderByPosition(Criteria::ASC);
+                    $search->addAscendingOrderByColumn('position_delegate');
                     break;
                 case "manual_reverse":
-                    if (null === $foldersIds || count($foldersIds) != 1) {
+                    if (! $manualOrderAllowed) {
                         throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
                     }
-                    $search->orderByPosition(Criteria::DESC);
+                    $search->addDescendingOrderByColumn('position_delegate');
                     break;
                 case "given_id":
                     if (null === $id) {
@@ -226,6 +258,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         $search->withColumn(ContentTableMap::ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();
@@ -244,28 +282,15 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
                 case "position":
-                    $search->orderByPosition(Criteria::ASC);
+                    $search->addAscendingOrderByColumn('position_delegate');
                     break;
                 case "position_reverse":
-                    $search->orderByPosition(Criteria::DESC);
+                    $search->addDescendingOrderByColumn('position_delegate');
                     break;
             }
         }
 
-        $exclude = $this->getExclude();
-
-        if (!is_null($exclude)) {
-            $search->filterById($exclude, Criteria::NOT_IN);
-        }
-
-        $exclude_folder = $this->getExcludeFolder();
-
-        if (!is_null($exclude_folder)) {
-            $search->filterByFolder(
-                FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
-                Criteria::NOT_IN
-            );
-        }
+        $search->groupById();
 
         return $search;
     }
@@ -275,7 +300,13 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         /** @var ContentModel $content */
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
-            $defaultFolderId = $content->getDefaultFolderId();
+
+            if ((bool) $content->getVirtualColumn('is_default_folder')) {
+                $defaultFolderId = $content->getVirtualColumn('default_folder_id');
+            } else {
+                $defaultFolderId = $content->getDefaultFolderId();
+            }
+
             $loopResultRow->set("ID", $content->getId())
                 ->set("IS_TRANSLATED", $content->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)
@@ -287,50 +318,54 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("META_TITLE", $content->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $content->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $content->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("POSITION", $content->getPosition())
+                ->set("POSITION", $content->getVirtualColumn('position_delegate'))
                 ->set("DEFAULT_FOLDER", $defaultFolderId)
                 ->set("VISIBLE", $content->getVisible());
             $this->addOutputFields($loopResultRow, $content);
 
-            $loopResult->addRow($this->findNextPrev($loopResultRow, $content, $defaultFolderId));
+            $this->findNextPrev($loopResultRow, $content, $defaultFolderId);
+
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
     }
 
     /**
-     * @param  LoopResultRow         $loopResultRow
-     * @param  \Thelia\Model\Content $content
-     * @param $defaultFolderId
-     * @return LoopResultRow
+     * @param LoopResultRow $loopResultRow
+     * @param ContentModel $content
+     * @param int $defaultFolderId
      */
     private function findNextPrev(LoopResultRow $loopResultRow, ContentModel $content, $defaultFolderId)
     {
-        $isBackendContext = $this->getBackendContext();
-
         if ($this->getWithPrevNextInfo()) {
-            // Find previous and next category
-            $previousQuery = ContentQuery::create()
-                ->joinContentFolder()
-                ->where('ContentFolder.folder_id = ?', $defaultFolderId)
-                ->filterByPosition($content->getPosition(), Criteria::LESS_THAN);
+            $currentPosition = ContentFolderQuery::create()
+                ->filterByFolderId($defaultFolderId)
+                ->filterByContentId($content->getId())
+                ->findOne()->getPosition();
 
-            if (! $isBackendContext) {
-                $previousQuery->filterByVisible(true);
+            // Find previous and next content
+            $previousQuery = ContentFolderQuery::create()
+                ->filterByFolderId($defaultFolderId)
+                ->filterByPosition($currentPosition, Criteria::LESS_THAN);
+
+            $nextQuery = ContentFolderQuery::create()
+                ->filterByFolderId($defaultFolderId)
+                ->filterByPosition($currentPosition, Criteria::GREATER_THAN);
+
+            if (!$this->getBackendContext()) {
+                $previousQuery->useContentQuery()
+                    ->filterByVisible(true)
+                    ->endUse();
+
+                $previousQuery->useContentQuery()
+                    ->filterByVisible(true)
+                    ->endUse();
             }
 
             $previous = $previousQuery
                 ->orderByPosition(Criteria::DESC)
                 ->findOne();
-
-            $nextQuery = ContentQuery::create()
-                ->joinContentFolder()
-                ->where('ContentFolder.folder_id = ?', $defaultFolderId)
-                ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN);
-
-            if (! $isBackendContext) {
-                $nextQuery->filterByVisible(true);
-            }
 
             $next = $nextQuery
                 ->orderByPosition(Criteria::ASC)
@@ -339,10 +374,8 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $loopResultRow
                 ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
                 ->set("HAS_NEXT", $next != null ? 1 : 0)
-                ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                ->set("NEXT", $next != null ? $next->getId() : -1);
+                ->set("PREVIOUS", $previous != null ? $previous->getContentId() : -1)
+                ->set("NEXT", $next != null ? $next->getContentId() : -1);
         }
-
-        return $loopResultRow;
     }
 }

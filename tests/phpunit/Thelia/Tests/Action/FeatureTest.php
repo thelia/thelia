@@ -23,25 +23,17 @@ use Thelia\Core\Event\Feature\FeatureCreateEvent;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class FeatureTest extends \PHPUnit_Framework_TestCase
+class FeatureTest extends BaseAction
 {
-    protected $dispatcher;
-
-    public function setUp()
-    {
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-    }
-
     public function testCreate()
     {
         $event = new FeatureCreateEvent();
         $event
             ->setLocale('en_US')
-            ->setTitle('test feature')
-            ->setDispatcher($this->dispatcher);
+            ->setTitle('test feature');
 
         $action = new Feature();
-        $action->create($event);
+        $action->create($event, null, $this->getMockEventDispatcher());
 
         $createdFeature = $event->getFeature();
 
@@ -58,6 +50,7 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
     /**
      * @param FeatureModel $feature
      * @depends testCreate
+     * @return FeatureModel
      */
     public function testUpdate(FeatureModel $feature)
     {
@@ -68,11 +61,10 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
             ->setTitle('test update')
             ->setChapo('test chapo')
             ->setDescription('test description')
-            ->setPostscriptum('test postscriptum')
-            ->setDispatcher($this->dispatcher);
+            ->setPostscriptum('test postscriptum');
 
         $action = new Feature();
-        $action->update($event);
+        $action->update($event, null, $this->getMockEventDispatcher());
 
         $updatedFeature = $event->getFeature();
 
@@ -94,10 +86,9 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
     public function testDelete(FeatureModel $feature)
     {
         $event = new FeatureDeleteEvent($feature->getId());
-        $event->setDispatcher($this->dispatcher);
 
         $action = new Feature();
-        $action->delete($event);
+        $action->delete($event, null, $this->getMockEventDispatcher());
 
         $deletedFeature = $event->getFeature();
 

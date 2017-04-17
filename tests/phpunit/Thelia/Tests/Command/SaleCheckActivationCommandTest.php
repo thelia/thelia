@@ -21,7 +21,6 @@ use Thelia\Command\SaleCheckActivationCommand;
 use Thelia\Core\Application;
 use Thelia\Model\SaleQuery;
 use Thelia\Tests\ContainerAwareTestCase;
-use Thelia\Model\Sale as SaleModel;
 
 /**
  * Class SaleCheckActivationCommandTest
@@ -39,6 +38,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
      */
     public static function setUpBeforeClass()
     {
+        /** @var \Thelia\Model\Sale $sale */
         $sale = SaleQuery::create()
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
@@ -57,6 +57,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
 
         self::$deactivated = $sale->getId();
 
+        /** @var \Thelia\Model\Sale $otherSale */
         $otherSale = SaleQuery::create()
             ->filterById($sale->getId(), Criteria::NOT_IN)
             ->addAscendingOrderByColumn('RAND()')
@@ -73,13 +74,6 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
 
 
         self::$activated = $otherSale->getId();
-    }
-
-    public function getKernel()
-    {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
-
-        return $kernel;
     }
 
     public function testCommand()
@@ -109,11 +103,12 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
 
     /**
      * Use this method to build the container with the services that you need.
+     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addSubscriber(new Sale());
+        $eventDispatcher->addSubscriber(new Sale($eventDispatcher));
 
         $container->set("event_dispatcher", $eventDispatcher);
     }

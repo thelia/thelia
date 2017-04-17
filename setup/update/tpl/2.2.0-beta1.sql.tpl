@@ -25,6 +25,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 1, '{$locale}', {intl l='Order - table header' locale=$locale}, '', ''),
     (@max_id + 2, '{$locale}', {intl l='Order - table row' locale=$locale}, '', ''),
     (@max_id + 3, '{$locale}', {intl l='Mini cart' locale=$locale}, '', ''){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 

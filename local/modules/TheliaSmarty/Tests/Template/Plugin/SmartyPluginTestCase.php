@@ -15,6 +15,7 @@ namespace TheliaSmarty\Tests\Template\Plugin;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\TheliaFormValidator;
@@ -37,15 +38,19 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
     protected $smarty;
 
     /**
+     * @param ContainerBuilder $container
      * Use this method to build the container with the services that you need.
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         /** @var Request $request */
-        $request = $container->get("request");
+        $request = $container->get("request_stack")->getCurrentRequest();
         if (null === $request->getSession()) {
             $request->setSession(new Session());
         }
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
 
         $container->set("thelia.parser.forms", [
             "thelia.empty" => "Thelia\\Form\\EmptyForm",
@@ -58,17 +63,17 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
 
         $container->set(
             "thelia.form_factory",
-            new TheliaFormFactory($request, $container, $container->get("thelia.parser.forms"))
+            new TheliaFormFactory($requestStack, $container, $container->get("thelia.parser.forms"))
         );
 
         $container->set("thelia.parser.context", new ParserContext(
-            $request,
+            $requestStack,
             $container->get("thelia.form_factory"),
             new TheliaFormValidator(new Translator($container), 'dev')
         ));
 
         $this->smarty = new SmartyParser(
-            $request,
+            $requestStack,
             $container->get("event_dispatcher"),
             $container->get("thelia.parser.context"),
             $templateHelper = new TheliaTemplateHelper()
@@ -82,14 +87,25 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
 
     protected function render($template, $data = [])
     {
+        return $this->internalRender('file', __DIR__.DS."fixtures".DS.$template, $data);
+    }
+
+    protected function renderString($template, $data = [])
+    {
+        return $this->internalRender('string', $template, $data);
+    }
+
+    protected function internalRender($resourceType, $resourceContent, array $data)
+    {
         foreach ($data as $key => $value) {
             $this->smarty->assign($key, $value);
         }
 
-        return $this->smarty->fetch(__DIR__.DS."fixtures".DS.$template);
+        return $this->smarty->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
     }
 
     /**
+     * @param ContainerBuilder $container
      * @return \TheliaSmarty\Template\AbstractSmartyPlugin
      */
     abstract protected function getPlugin(ContainerBuilder $container);

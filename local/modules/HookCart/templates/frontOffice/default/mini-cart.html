@@ -34,28 +34,28 @@
                                 {assign "real_price" $TAXED_PRICE}
                                 {assign "real_total_price" $TOTAL_TAXED_PRICE}
                             {/if}
-                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{format_money number=$real_price}</span></div>
-        {assign "total_price" $total_price + $real_total_price}
-        </td>
-        </tr>
-        {/loop}
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="2" class="empty">
-                <a href="{url path="/cart"}" role="button" class="btn btn-default btn-sm"><i class="fa fa-eye"></i> {intl l="View Cart" d="hookcart.fo.default"}</a>
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-primary btn-sm"><i class="fa fa-chevron-right"></i> {intl l="Checkout" d="hookcart.fo.default"}</a>
-                {*<button type="submit" name="checkout" class="btn btn-primary btn-sm">{intl l="Checkout" d="hookcart.fo.default"}</button>*}
-            </td>
-            <td class="total">
-                <div class="total-price">
-                    <span class="price">{format_money number=$total_price}</span>
-                </div>
-            </td>
-        </tr>
-        </tfoot>
-        </table>
-        </form>
+                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{format_money number=$real_price}</span>
+                            {assign "total_price" $total_price + $real_total_price}
+                        </td>
+                    </tr>
+                    {/loop}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2" class="empty">
+                            <a href="{url path="/cart"}" role="button" class="btn btn-default btn-sm"><i class="fa fa-eye"></i> {intl l="View Cart" d="hookcart.fo.default"}</a>
+                            <a href="{url path="/order/delivery"}" role="button" class="btn btn-primary btn-sm"><i class="fa fa-chevron-right"></i> {intl l="Checkout" d="hookcart.fo.default"}</a>
+                            {*<button type="submit" name="checkout" class="btn btn-primary btn-sm">{intl l="Checkout" d="hookcart.fo.default"}</button>*}
+                        </td>
+                        <td class="total">
+                            <div class="total-price">
+                                <span class="price">{format_money number=$total_price}</span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </form>
         </div>
     </li>
 {/ifloop}

@@ -99,18 +99,19 @@ class CartContainsCategories extends ConditionAbstract
 
             /** @var Category $category */
             foreach ($categories as $category) {
-                $catecoryInCart = $this->conditionValidator->variableOpComparison(
+
+                if (! $this->conditionValidator->variableOpComparison(
                     $category->getId(),
                     $this->operators[self::CATEGORIES_LIST],
                     $this->values[self::CATEGORIES_LIST]
-                );
-
-                if ($catecoryInCart) {
-                    return true;
+                )) {
+                    // cart item doesn't match go to next cart item
+                    continue 2;
                 }
             }
+            // cart item match
+            return true;
         }
-
         return false;
     }
 
@@ -155,7 +156,7 @@ class CartContainsCategories extends ConditionAbstract
         if (null !== $catList = CategoryQuery::create()->findPks($catIds)) {
             /** @var Category $cat */
             foreach ($catList as $cat) {
-                $catStrList .= $cat->getTitle() . ', ';
+                $catStrList .= $cat->setLocale($this->getCurrentLocale())->getTitle() . ', ';
             }
 
             $catStrList = rtrim($catStrList, ', ');

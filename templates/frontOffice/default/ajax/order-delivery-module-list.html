@@ -6,10 +6,10 @@
 {ifloop rel="deliveries"}
 <table class="table table-condensed table-delivery">
     <tbody>
-    {loop type="delivery" name="deliveries" force_return="true" country=$country state=$state}
+    {loop type="delivery" name="deliveries" force_return="true" address=$address}
 
         {assign var="isDeliveryMethodChecked" value="0"}
-        <tr>
+        <tr id="delivery-module-{$ID}">
             <td>
                 <div class="radio">
                     {form_field field='delivery-module'}
@@ -26,6 +26,12 @@
                                 <strong>{$TITLE}</strong>
                                 <br>
                                 <span class="help-block">{$DESCRIPTION nofilter}</span>
+                                {if $DELIVERY_DATE}
+                                    <br>
+                                    <span class="help-block">
+                                        {intl l="Expected delivery date: %delivery_date" delivery_date={format_date date=$DELIVERY_DATE output="date"}}
+                                    </span>
+                                {/if}
                             </p>
                         </label>
                     {/form_field}
@@ -38,13 +44,18 @@
             </td>
             <td>
                 <div class="price">
-                    {format_money number=$POSTAGE}
+                    {if $POSTAGE}
+                        {format_money number=$POSTAGE symbol={currency attr='symbol'}}
+                    {else}
+                        &nbsp;
+                    {/if}
                 </div>
             </td>
         </tr>
 
         {hook name="order-delivery.extra" module="$ID"}
         {hook name="order-delivery.javascript" module="$ID"}
+
     {/loop}
 {/ifloop}
 {elseloop rel="deliveries"}<div class="alert alert-warning">{intl l="<strong>Sorry!</strong> We are not able to give you a delivery method for your order."}</div>{/elseloop}

@@ -97,7 +97,7 @@
                                  </thead>
 
                                  <tbody>
-                                 {loop name="category_list" type="category" visible="*" parent=$category_id order=$category_order backend_context="1" lang=$lang_id}
+                                 {loop name="category_list" type="category" visible="*" parent=$category_id order=$category_order backend_context="1" lang=$lang_id return_url=false}
                                  <tr>
                                      <td>{$ID}</td>
 
@@ -292,7 +292,7 @@
                          </thead>
 
                          <tbody>
-                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products#}
+                         {loop name="product_list" type="product" visible="*" category=$category_id order=$product_order page=$page backend_context="on" limit={config key="number_default_results_per_page.category_list" default=20} return_url=false}
                          <tr>
                              <td>{$ID}</td>
 
@@ -333,7 +333,7 @@
                              {admin_position_block
                                  resource="admin.product"
                                  access="UPDATE"
-                                 path={url path='/admin/products/update-position' product_id=$ID}
+                                 path={url path='/admin/products/update-position' product_id=$ID category_id=$category_id}
                                  url_parameter="product_id"
                                  in_place_edit_class="productPositionChange"
                                  position=$POSITION
@@ -366,7 +366,7 @@
 
                                  loop_ref       = "product_list"
                                  max_page_count = 10
-                                 page_url       = "{url path="/admin/catalog" category_id=$category_id product_order=$product_order}"
+                                 page_url       = {url path="/admin/catalog" category_id=$category_id product_order=$product_order}
                                  }
 
                              </td>
@@ -417,7 +417,7 @@
             {loop type="lang" name="default-lang" default_only="1"}
                 <div class="input-group">
                     <input type="text" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                 </div>
 
                 {* Switch edition to the current locale *}
@@ -540,10 +540,14 @@
                     {* If current category has no template, get a parent's one *}
                     {if !$product_template}
                         {while $parent_category != 0 && !$product_template}
-                            {loop type="category" name="parent_category" visible="*" id=$parent_category}
-                                {assign var="parent_category" value=$PARENT}
-                                {assign var="product_template" value=$TEMPLATE}
+                            {loop type="category" name="parent_category" backend_context=1 visible="*" id=$parent_category}
+                                {$parent_category = $PARENT}
+                                {$product_template = $TEMPLATE}
                             {/loop}
+                            {* Be sure to prevent infinite loops *}
+                            {elseloop rel="parent_category"}
+                                {$parent_category = 0}
+                            {/elseloop}
                         {/while}
                     {/if}
 
@@ -811,7 +815,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url noamp='1' path='/admin/products/update-position' product_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/products/update-position' product_id='__ID__' position='__POS__' category_id=$category_id}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))

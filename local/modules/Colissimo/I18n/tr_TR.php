@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Activate free shipping: ' => 'Ücretsiz nakliye etkinleştirmek için: ',
     'Can\'t read Config directory' => 'Yapılandırma dizini okunamıyor',
     'Can\'t read file' => 'Dosyayı okuyamıyor',
@@ -11,4 +11,4 @@ return array(
     'Modify status export after export' => 'İhracat sonra sipariş durumunu değiştir',
     'colissimo expeditor export' => 'Colissimo Expeditor verme',
     'select a valid status' => 'Geçerli sipariş durumunu seçin',
-);
+];

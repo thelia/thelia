@@ -12,16 +12,16 @@
     </parameters>
 
     <services>
-        <service id="test.client" class="%test.client.class%" scope="prototype">
+        <service id="test.client" class="%test.client.class%">
             <argument type="service" id="kernel" />
             <argument>%test.client.parameters%</argument>
             <argument type="service" id="test.client.history" />
             <argument type="service" id="test.client.cookiejar" />
         </service>
 
-        <service id="test.client.history" class="%test.client.history.class%" scope="prototype" />
+        <service id="test.client.history" class="%test.client.history.class%" />
 
-        <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" scope="prototype" />
+        <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" />
 
     </services>
 

@@ -143,13 +143,12 @@ class Argument
     }
 
     /**
-     * This method is available from Thelia 2.2 version
-     *
      * @param $name
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty
      * @return Argument
+     * @since 2.2
      */
     public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
@@ -170,6 +169,48 @@ class Argument
             $name,
             new TypeCollection(
                 new Type\EnumListType($entries)
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
+    /**
+     * @param $name
+     * @param null $default
+     * @param bool $mandatory
+     * @param bool $empty
+     * @return Argument
+     * @since 2.4.0
+     */
+    public static function createAlphaNumStringTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\AlphaNumStringType()
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
+    /**
+     * @param $name
+     * @param null $default
+     * @param bool $mandatory
+     * @param bool $empty
+     * @return Argument
+     * @since 2.4.0
+     */
+    public static function createAlphaNumStringListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\AlphaNumStringListType()
             ),
             $default,
             $mandatory,

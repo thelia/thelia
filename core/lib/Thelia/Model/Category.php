@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
@@ -43,7 +44,7 @@ class Category extends BaseCategory implements FileModelParentInterface
      *
      * @return int
      */
-    public function countAllProducts()
+    public function countAllProducts($visibleOnly = false)
     {
         $children = CategoryQuery::findAllChild($this->getId());
         array_push($children, $this);
@@ -51,14 +52,31 @@ class Category extends BaseCategory implements FileModelParentInterface
         $countProduct = 0;
 
         foreach ($children as $child) {
-            $countProduct += ProductQuery::create()
-                ->filterByCategory($child)
-                ->count();
+            $req = ProductQuery::create();
+            $req->filterByCategory($child);
+            if($visibleOnly) {
+                $req->filterByVisible(true);
+            }
+
+            $countProduct += $req->count();
         }
 
         return $countProduct;
     }
 
+    /**
+     *
+     * count visible products only for current category and sub categories
+     *
+     * /!\ the number of queries is exponential, use it with caution
+     *
+     * @return int
+     */
+    public function countAllProductsVisibleOnly()
+    {
+        return $this->countAllProducts(true);
+    }
+    
     /**
      * Get the root category
      * @param  int   $categoryId
@@ -177,5 +195,22 @@ class Category extends BaseCategory implements FileModelParentInterface
         }
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
+    }
+
+    /**
+     * Overload for the position management
+     * @param Base\ProductCategory $productCategory
+     * @inheritdoc
+     */
+    protected function doAddProductCategory($productCategory)
+    {
+        parent::doAddProductCategory($productCategory);
+
+        $productCategoryPosition = ProductCategoryQuery::create()
+            ->filterByCategoryId($productCategory->getCategoryId())
+            ->orderByPosition(Criteria::DESC)
+            ->findOne();
+
+        $productCategory->setPosition($productCategoryPosition !== null ? $productCategoryPosition->getPosition() + 1 : 1);
     }
 }

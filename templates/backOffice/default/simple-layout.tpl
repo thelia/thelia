@@ -70,7 +70,13 @@
             </div>
         {/images}
 
-        <p class="text-center">{intl l="Welcome to Thelia administration !"}</p>
+        <p class="text-center">{block name="main-title"}{intl l="Welcome to Thelia administration !"}{/block}</p>
+
+        <p class="text-center">
+            {loop type="lang" name="ui-lang" backend_context="1"}
+                <a href="{url path="{navigate to="current"}" lang={$CODE}}" title="{intl l="View this page in %langname" langname=$TITLE}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></a>
+            {/loop}
+        </p>
 
         <div class="row">
             {block name="main-content"}Put here the content of the template{/block}

@@ -64,6 +64,10 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($cartTotalPrice));
 
         $stubFacade->expects($this->any())
+            ->method('getCartTotalTaxPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue($checkoutCurrency));
 

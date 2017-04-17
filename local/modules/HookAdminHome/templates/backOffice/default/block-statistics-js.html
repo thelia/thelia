@@ -1,0 +1,207 @@
+<script src="{javascript file='assets/js/jqplot/jquery.jqplot.min.js'}"></script>
+<script src="{javascript file='assets/js/jqplot/plugins/jqplot.highlighter.min.js'}"></script>
+<script src="{javascript file='assets/js/jqplot/plugins/jqplot.pointLabels.min.js'}"></script>
+<script src="{javascript file='assets/js/moment-with-locales.min.js'}"></script>
+<script src="{javascript file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}"></script>
+
+<script>
+    jQuery(function ($) {
+        {$langcode = {lang attr="code"}|substr:0:2}
+
+        var jQplotDate = moment();
+        var $datePicker = $('#date-picker');
+        var displayDateFormat = '{intl l='YYYY-MM' d='hookadminhome.bo.default'}';
+
+        $datePicker.val(moment().format(displayDateFormat));
+
+        $datePicker.datetimepicker({
+            locale: "{$langcode}",
+            viewMode: 'months',
+            format: displayDateFormat
+        }).on('dp.change', function (e) {
+            // Load month statistics block
+            $('#statmois_label').html(e.date.format(displayDateFormat)).click();
+            $('#statmois').load('{url path="/admin/home/month-sales-block/"}' + (e.date.month() + 1) + '/' + e.date.year());
+
+            // e.date is a moment.js date
+            jQplotDate = e.date;
+
+            statInputActive(true);
+
+            retrieveJQPlotJson(
+                jQplotDate,
+                function () {
+                    statInputActive(false);
+                },
+                0
+            );
+        });
+
+        $("#span-calendar").click(function (e) {
+            $('#date-picker').focus();
+        });
+
+        function statInputActive(type) {
+            $('#date-picker').attr('readonly', type);
+            $('.js-stats-refresh').attr('disabled', type)
+        }
+
+        var url = "{url path='/admin/home/stats'}";
+        var jQplotData; // json data
+        var jQPlotInstance; // global instance
+        var valueFormats; // sprintf format of tooltip text
+
+        var jQPlotsOptions = {
+            animate: false,
+            axesDefaults: {
+                tickOptions: {
+                    showMark: true,
+                    showGridline: true
+                }
+            },
+            axes: {
+                xaxis: {
+                    borderColor: '#ccc',
+                    ticks: [],
+                    tickOptions: {
+                        showGridline: false
+                    }
+                },
+                yaxis: {
+                    min: 0,
+                    tickOptions: {
+                        showGridline: true,
+                        showMark: false,
+                        showLabel: true,
+                        shadow: false
+                    }
+                }
+            },
+            seriesDefaults: {
+                lineWidth: 3,
+                shadow: false,
+                markerOptions: {
+                    shadow: false,
+                    style: 'filledCircle',
+                    size: 12
+                }
+            },
+            grid: {
+                background: '#FFF',
+                shadow: false,
+                borderColor: '#FFF'
+            },
+            highlighter: {
+                show: true,
+                sizeAdjust: 7,
+                tooltipLocation: 'n',
+                tooltipContentEditor: function (str, seriesIndex, pointIndex, plot) {
+                    return $.jqplot.sprintf(
+                        valueFormats[seriesIndex],
+                        plot.data[seriesIndex][pointIndex][1]
+                    );
+                }
+            }
+        };
+
+        // Get initial data Json
+        retrieveJQPlotJson(jQplotDate);
+
+        $('[data-toggle="jqplot"]').click(function () {
+            $(this).toggleClass('active');
+            jsonSuccessLoad();
+        });
+
+        $('.js-stats-refresh').click(function (e) {
+            statInputActive(true);
+
+            retrieveJQPlotJson(
+                jQplotDate,
+                function () {
+                    statInputActive(false);
+                },
+                1
+            );
+        });
+
+        function retrieveJQPlotJson(moment, callback, flush) {
+
+            if (typeof flush === "undefined") {
+                flush = 0;
+            }
+
+            // JS month range is [0..11], the url requires a PHP month range [1..12]
+            $.getJSON(url, {
+                month : moment.month() + 1,
+                year  : moment.year(),
+                flush  : flush
+            }).done(function (data) {
+                jQplotData = data;
+                jsonSuccessLoad();
+                if (callback) {
+                    callback();
+                }
+            }).fail(jsonFailLoad);
+        }
+
+        function initJqplotData(json) {
+            var series = [];
+            var seriesColors = [];
+
+            // Used globally !
+            valueFormats = [];
+
+            $('[data-toggle="jqplot"].active').each(function (i) {
+                var position = $(this).index();
+                var serie = json.series[position];
+
+                series.push(serie.data);
+                seriesColors.push(serie.color);
+                valueFormats.push(serie.valueFormat);
+            });
+
+            // Number of days to display ( = data.length in one serie)
+            var days = json.series[0].data.length;
+
+            // Add days to xaxis
+            var ticks = [];
+            for (var i = 1; i < (days + 1); i++) {
+                ticks.push([i - 1, i]);
+            }
+
+            jQPlotsOptions.axes.xaxis.ticks = ticks;
+
+            // Graph title
+            jQPlotsOptions.title = json.title;
+
+            // Graph series colors
+            jQPlotsOptions.seriesColors = seriesColors;
+
+            return series;
+        }
+
+        function jsonFailLoad(data) {
+            $('#jqplot').html(
+                '<div class="alert alert-danger">{intl l='An error occurred while reading from JSON file' js=1 d='hookadminhome.bo.default'}</div>'
+            );
+        }
+
+        function jsonSuccessLoad() {
+            // Init jQPlot
+            var series = initJqplotData(jQplotData);
+
+            // Start jQPlot
+            if (jQPlotInstance) {
+                jQPlotInstance.destroy();
+            }
+
+            jQPlotInstance = $.jqplot("jqplot", series, jQPlotsOptions);
+
+            $(window).bind('resize', function (event, ui) {
+                jQPlotInstance.replot({
+                    resetAxes: true
+                });
+            });
+        }
+    });
+</script>

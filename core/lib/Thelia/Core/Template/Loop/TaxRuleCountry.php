@@ -23,6 +23,7 @@ use Thelia\Model\Map\TaxTableMap;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
+use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
 
 /**
  *
@@ -109,6 +110,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
             return $loopResult;
         }
 
+        /** @var TaxRuleCountryModel $taxRuleCountry */
         foreach ($loopResult->getResultDataCollection() as $taxRuleCountry) {
             $loopResultRow = new LoopResultRow($taxRuleCountry);
             $loopResultRow

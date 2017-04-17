@@ -9,6 +9,7 @@
 /*      For the full copyright and license information, please view the LICENSE.txt  */
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Newsletter;
@@ -21,8 +22,21 @@ use Thelia\Model\NewsletterQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class NewsletterTest extends \PHPUnit_Framework_TestCase
+class NewsletterTest extends BaseAction
 {
+    protected $mailerFactory;
+    protected $dispatcher;
+
+    public function setUp()
+    {
+        $this->mailerFactory = $this->getMockBuilder("Thelia\\Mailer\\MailerFactory")
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $this->dispatcher = $this->getMockEventDispatcher();
+    }
+
     public static function setUpBeforeClass()
     {
         NewsletterQuery::create()
@@ -38,7 +52,7 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
             ->setLastname("bar")
         ;
 
-        $action = new Newsletter();
+        $action = new Newsletter($this->mailerFactory, $this->dispatcher);
         $action->subscribe($event);
 
         $subscribedNewsletter = $event->getNewsletter();
@@ -55,7 +69,9 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param NewsletterModel $newsletter
      * @depends testSubscribe
+     * @return NewsletterModel
      */
     public function testUpdate(NewsletterModel $newsletter)
     {
@@ -66,7 +82,7 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
             ->setLastname("bar update")
         ;
 
-        $action = new Newsletter();
+        $action = new Newsletter($this->mailerFactory, $this->dispatcher);
         $action->update($event);
 
         $updatedNewsletter = $event->getNewsletter();
@@ -82,19 +98,21 @@ class NewsletterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param NewsletterModel $newsletter
      * @depends testUpdate
+     * @param NewsletterModel $newsletter
      */
     public function testUnsubscribe(NewsletterModel $newsletter)
     {
         $event = new NewsletterEvent('test@foo.com', 'en_US');
         $event->setId($newsletter->getId());
 
-        $action = new Newsletter();
+        $action = new Newsletter($this->mailerFactory, $this->dispatcher);
         $action->unsubscribe($event);
 
         $deletedNewsletter = $event->getNewsletter();
 
         $this->assertInstanceOf('Thelia\Model\Newsletter', $deletedNewsletter);
-        $this->assertTrue($deletedNewsletter->isDeleted());
+        $this->assertEquals(1, NewsletterQuery::create()->filterByEmail('test@foo.com')->filterByUnsubscribed(true)->count());
     }
 }

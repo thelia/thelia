@@ -101,15 +101,12 @@ class CartController extends BaseFrontController
 
             if ($this->getRequest()->isXmlHttpRequest()) {
                 $this->changeViewForAjax();
-            } elseif (null !== $response = $this->generateSuccessRedirect()) {
-                return $response;
             }
+        } catch (\Exception $e) {
+            Tlog::getInstance()->error(sprintf("Failed to change cart item quantity: %s", $e->getMessage()));
 
-
-        } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
-
     }
 
     public function deleteItem()
@@ -125,11 +122,7 @@ class CartController extends BaseFrontController
             $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
 
             $this->afterModifyCart();
-
-            if (null !== $response = $this->generateSuccessRedirect()) {
-                return $response;
-            }
-        } catch (PropelException $e) {
+        } catch (\Exception $e) {
             Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());
         }

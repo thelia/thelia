@@ -15,7 +15,7 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\NewsletterQuery;
 
@@ -81,7 +81,7 @@ class NewsletterForm extends BaseForm
 
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
-        $customer = NewsletterQuery::create()->findOneByEmail($value);
+        $customer = NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value);
         if ($customer) {
             $context->addViolation(Translator::getInstance()->trans("You are already registered!"));
         }

@@ -23,13 +23,17 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
     (@max_id + 1, 'de_DE', 'Bestellung - Tabellenkopf', '', ''),
     (@max_id + 2, 'de_DE', 'Bestellung - Tabellenzeile', '', ''),
-    (@max_id + 3, 'de_DE', NULL, '', ''),    (@max_id + 1, 'en_US', 'Order - table header', '', ''),
+    (@max_id + 3, 'de_DE', 'Mini-Warenkorb', '', ''),
+    (@max_id + 1, 'en_US', 'Order - table header', '', ''),
     (@max_id + 2, 'en_US', 'Order - table row', '', ''),
-    (@max_id + 3, 'en_US', 'Mini cart', '', ''),    (@max_id + 1, 'es_ES', NULL, '', ''),
-    (@max_id + 2, 'es_ES', NULL, '', ''),
-    (@max_id + 3, 'es_ES', NULL, '', ''),    (@max_id + 1, 'fr_FR', 'Commande - colonne tableau', '', ''),
+    (@max_id + 3, 'en_US', 'Mini cart', '', ''),
+    (@max_id + 1, 'es_ES', 'Orden - encabezado de tabla', '', ''),
+    (@max_id + 2, 'es_ES', 'Orden - fila de la tabla', '', ''),
+    (@max_id + 3, 'es_ES', 'Mini tarjeta', '', ''),
+    (@max_id + 1, 'fr_FR', 'Commande - colonne tableau', '', ''),
     (@max_id + 2, 'fr_FR', 'Commande - ligne tableau', '', ''),
-    (@max_id + 3, 'fr_FR', 'Mini panier', '', '');
+    (@max_id + 3, 'fr_FR', 'Mini panier', '', '')
+;
 
 ALTER TABLE `rewriting_url` CHANGE `url` `url` VARBINARY( 255 ) NOT NULL;
 

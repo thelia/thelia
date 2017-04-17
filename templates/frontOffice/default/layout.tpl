@@ -89,7 +89,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
     {javascripts file="assets/dist/js/vendors/html5shiv.min.js"}
         <script>window.html5 || document.write('<script src="{$asset_url}"><\/script>');</script>
     {/javascripts}
@@ -140,7 +140,11 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <div class="header row">
                     <h1 class="logo container hidden-xs">
                         <a href="{navigate to="index"}" title="{$store_name}">
-                            <img src="{image file='assets/dist/img/logo.gif'}" alt="{$store_name}">
+                            {$image = {image file='assets/dist/img/logo.png' failsafe=true}}
+                            {if $image == null}
+                                {$image = {image file='assets/dist/img/logo.gif' failsafe=true}}
+                            {/if}
+                            <img src="{$image}" alt="{$store_name}">
                         </a>
                     </h1>
                     {hook name="main.navbar-primary"}
@@ -256,7 +260,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     <!-- Jquery -->
     <!--[if lt IE 9]><script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> <![endif]-->
-    <!--[if (gte IE 9)|!(IE)]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script><!--<![endif]-->
+    <!--[if (gte IE 9)|!(IE)]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script><!--<![endif]-->
     {javascripts file="assets/dist/js/vendors/jquery.min.js"}
         <script>window.jQuery || document.write('<script src="{$asset_url}"><\/script>');</script>
     {/javascripts}
@@ -267,7 +271,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{$lang_code}.js"></script>
     {/if}
 
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     {javascripts file="assets/dist/js/vendors/bootstrap.min.js"}
         <script>if(typeof($.fn.modal) === 'undefined') { document.write('<script src="{$asset_url}"><\/script>'); }</script>
     {/javascripts}

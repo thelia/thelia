@@ -29,6 +29,7 @@ use Thelia\Type\BooleanOrBothType;
  * {@inheritdoc}
  * @method int getFolder()
  * @method bool|string getVisible()
+ * @method int getDepth()
  * @method string[] getOrder()
  */
 class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
@@ -40,30 +41,32 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('folder', null, true),
-            Argument::createIntTypeArgument('depth'),
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
             Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }
 
     public function buildArray()
     {
-        $id = $this->getFolder();
+        $originalId = $currentId = $this->getFolder();
         $visible = $this->getVisible();
-
-        $search = FolderQuery::create();
-
-        $this->configureI18nProcessing($search, array('TITLE'));
-
-        $search->filterById($id);
-        if ($visible !== BooleanOrBothType::ANY) {
-            $search->filterByVisible($visible);
-        }
-
+        $depth = $this->getDepth();
+    
         $results = array();
 
         $ids = array();
 
         do {
+            $search = FolderQuery::create();
+    
+            $this->configureI18nProcessing($search, array('TITLE'));
+    
+            $search->filterById($currentId);
+            
+            if ($visible !== BooleanOrBothType::ANY) {
+                $search->filterByVisible($visible);
+            }
+    
             $folder = $search->findOne();
 
             if ($folder != null) {
@@ -73,28 +76,25 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     "URL" => $folder->getUrl($this->locale),
                     "LOCALE" => $this->locale,
                 );
+    
+                $currentId = $folder->getParent();
 
-                $parent = $folder->getParent();
-
-                if ($parent > 0) {
+                if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (in_array($parent, $ids)) {
-                        throw new \LogicException(sprintf("Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)", $id, $parent));
+                    if (in_array($currentId, $ids)) {
+                        throw new \LogicException(
+                            sprintf(
+                                "Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)",
+                                $originalId,
+                                $currentId
+                            )
+                        );
                     }
 
-                    $ids[] = $parent;
-
-                    $search = FolderQuery::create();
-
-                    $this->configureI18nProcessing($search, array('TITLE'));
-
-                    $search->filterById($parent);
-                    if ($visible != BooleanOrBothType::ANY) {
-                        $search->filterByVisible($visible);
-                    }
+                    $ids[] = $currentId;
                 }
             }
-        } while ($folder != null && $parent > 0);
+        } while ($folder != null && $currentId > 0 && --$depth > 0);
 
         // Reverse list and build the final result
         return array_reverse($results);
@@ -107,6 +107,8 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
             foreach ($result as $output => $outputValue) {
                 $loopResultRow->set($output, $outputValue);
             }
+
+            $this->addOutputFields($loopResultRow, $result);
             $loopResult->addRow($loopResultRow);
         }
 

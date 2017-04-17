@@ -11,29 +11,29 @@
 /*************************************************************************************/
 
 namespace HookContact\Hook;
-use Thelia\Core\Event\Hook\HookRenderBlockEvent;
-use Thelia\Core\Event\Hook\HookRenderEvent;
-use Thelia\Core\Hook\BaseHook;
 
+use Thelia\Core\Event\Hook\HookRenderBlockEvent;
+use Thelia\Core\Hook\BaseHook;
 
 /**
  * Class FrontHook
  * @package HookCurrency\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FrontHook extends BaseHook {
-
+class FrontHook extends BaseHook
+{
     public function onMainFooterBody(HookRenderBlockEvent $event)
     {
         $content = trim($this->render("main-footer-body.html"));
-        if ("" != $content){
-            $event->add(array(
-                "id" => "contact-footer-body",
-                "class" => "contact",
-                "title" => $this->trans("Contact", array(), "hookcontact"),
-                "content" => $content
-            ));
+        if ("" != $content) {
+            $event->add(
+                array(
+                    "id" => "contact-footer-body",
+                    "class" => "contact",
+                    "title" => $this->trans("Contact", array(), "hookcontact"),
+                    "content" => $content
+                )
+            );
         }
     }
-
-} 
+}

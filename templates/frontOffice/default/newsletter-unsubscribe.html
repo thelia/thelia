@@ -1,0 +1,57 @@
+{extends file="layout.tpl"}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [['title' => {intl l="Newsletter"}, 'url'=>{url path="/newsletter-unsubscribe"}]]}
+{/block}
+
+{block name="main-content"}
+    <div class="main">
+        <article class="col-main" role="main" aria-labelledby="main-label">
+            <h1 id="main-label" class="page-header">{intl l="Cancel Newsletter Subscription"}</h1>
+
+            {hook name="newsletter-unsubscribe.top"}
+
+            {form name="thelia.front.newsletter.unsubscribe"}
+                <form id="form-newsletter" action="{url path="/newsletter-unsubscribe"}" method="post">
+                    {form_hidden_fields}
+                    <p>{intl l="To cancel your subscription to our newsletter, please enter your email address below."}</p>
+                    <div class="col-sm-6">
+                        {form_field field="email"}
+                            <div class="form-group group-email {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
+                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <div class="control-input">
+                                    <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value|default:$smarty.get.email}" class="form-control" maxlength="255" {if $required} aria-required="true" required{/if} autofocus>
+                                    {if $error}
+                                        <span class="help-block">{$message}</span>
+                                    {elseif !$error && $value != ""}
+                                        <span class="help-block"><span class="fa fa-check"></span> {intl l="Your subscription to our newsletter has been canceled."}</span>
+                                    {/if}
+                                </div>
+                            </div>
+                        {/form_field}
+                        <div class="form-group group-btn">
+                            <div class="control-btn">
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Unsubscribe"}</button>
+                            </div>
+                        </div><!--/.form-group-->
+                    </div>
+                </form>
+            {/form}
+            {hook name="newsletter-unsubscribe.bottom"}
+        </article>
+    </div>
+{/block}
+
+
+{block name="stylesheet"}
+    {hook name="newsletter-unsubscribe.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+    {hook name="newsletter-unsubscribe.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+    {hook name="newsletter-unsubscribe.javascript-initialization"}
+{/block}

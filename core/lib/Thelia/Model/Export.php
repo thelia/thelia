@@ -3,11 +3,8 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\ImportExport\Export\DocumentsExportInterface;
-use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\ImportExport\Export\ImagesExportInterface;
+use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
@@ -17,19 +14,22 @@ class Export extends BaseExport
     use PositionManagementTrait;
     use ModelEventDispatcherTrait;
 
+    /**
+     * @var \Thelia\ImportExport\Export\AbstractExport
+     */
     protected static $cache;
 
     /**
-     * @param  ContainerInterface                        $container
-     * @return \Thelia\ImportExport\Export\ExportHandler
      * @throws \ErrorException
+     *
+     * @return \Thelia\ImportExport\Export\ExportHandler
      */
-    public function getHandleClassInstance(ContainerInterface $container)
+    public function getHandleClassInstance()
     {
         $class = $this->getHandleClass();
 
-        if ($class[0] !== "\\") {
-            $class = "\\" . $class;
+        if ($class[0] !== '\\') {
+            $class = '\\' . $class;
         }
 
         if (!class_exists($class)) {
@@ -37,49 +37,58 @@ class Export extends BaseExport
 
             throw new \ErrorException(
                 Translator::getInstance()->trans(
-                    "The class \"%class\" doesn't exist",
+                    'The class "%class" doesn\'t exist',
                     [
-                        "%class" => $class
+                        '%class' => $class
                     ]
                 )
             );
         }
 
-        $instance = new $class($container);
+        $instance = new $class();
 
-        if (!$instance instanceof ExportHandler) {
+        if (!$instance instanceof AbstractExport) {
             $this->delete();
 
             throw new \ErrorException(
                 Translator::getInstance()->trans(
-                    "The class \"%class\" must extend %baseClass",
+                    'The class "%class" must extend %baseClass',
                     [
-                        "%class" => $class,
-                        "%baseClass" => "Thelia\\ImportExport\\Export\\ExportHandler",
+                        '%class' => $class,
+                        '%baseClass' => 'Thelia\\ImportExport\\Export\\AbstractExport',
                     ]
                 )
             );
         }
 
-        return static::$cache = $instance;
+        return $instance;
     }
 
-    public function hasImages(ContainerInterface $container)
+    public function hasImages()
     {
         if (static::$cache === null) {
-            $this->getHandleClassInstance($container);
+            static::$cache = $this->getHandleClassInstance();
         }
 
-        return static::$cache instanceof ImagesExportInterface;
+        return static::$cache->hasImages();
     }
 
-    public function hasDocuments(ContainerInterface $container)
+    public function hasDocuments()
     {
         if (static::$cache === null) {
-            $this->getHandleClassInstance($container);
+            static::$cache = $this->getHandleClassInstance();
         }
 
-        return static::$cache instanceof DocumentsExportInterface;
+        return static::$cache->hasDocuments();
+    }
+
+    public function useRangeDate()
+    {
+        if (static::$cache === null) {
+            static::$cache = $this->getHandleClassInstance();
+        }
+
+        return static::$cache->useRangeDate();
     }
 
     /**

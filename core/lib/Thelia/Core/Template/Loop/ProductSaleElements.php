@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Type;
@@ -150,7 +151,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     $search->orderByQuantity(Criteria::DESC);
                     break;
                 case "min_price":
-                    $search->addAscendingOrderByColumn('price_FINAL_PRICE', Criteria::ASC);
+                    $search->addAscendingOrderByColumn('price_FINAL_PRICE');
                     break;
                 case "max_price":
                     $search->addDescendingOrderByColumn('price_FINAL_PRICE');
@@ -181,10 +182,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
         } else {
-            $currency = $this->request->getSession()->getCurrency();
+            $currency = $this->getCurrentRequest()->getSession()->getCurrency();
         }
 
-        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
@@ -275,11 +276,32 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     {
         return [
             "ref",
+            "ean_code"
         ];
     }
 
+    /**
+     * @param ProductSaleElementsQuery $search
+     * @param $searchTerm
+     * @param $searchIn
+     * @param $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
-        $search->filterByRef($searchTerm, $searchCriteria);
+        $search->_and();
+
+        foreach ($searchIn as $index => $searchInElement) {
+            if ($index > 0) {
+                $search->_or();
+            }
+            switch ($searchInElement) {
+                case "ref":
+                    $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case "ean_code":
+                    $search->filterByEanCode($searchTerm, $searchCriteria);
+                    break;
+            }
+        }
     }
 }

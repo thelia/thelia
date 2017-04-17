@@ -12,7 +12,7 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
@@ -41,6 +41,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             ->remove("city")
             ->remove("zipcode")
             ->remove("country")
+            ->remove("state")
             // Remove Login Information
             ->remove("password")
             ->remove("password_confirm")

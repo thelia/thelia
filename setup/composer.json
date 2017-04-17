@@ -2,7 +2,7 @@
     "name": "thelia/setup",
     "type": "thelia-local",
     "require": {
-        "thelia/installer": "1.1",
+        "thelia/installer": "~1.1",
         "fzaninotto/faker": "1.5.*"
     },
     "extra": {

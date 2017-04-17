@@ -25,6 +25,11 @@ var administrator = {
 // Default
 var thelia2_store_name = "Thelia V2";
 
+var screenshot_enabled = true;
+if (casper.cli.has('thelia2_screenshot_disabled')) {
+    screenshot_enabled = false;
+}
+
 // Screenshot Dir
 var screenshot_dir = 'tests/functionnal/casperjs/screenshot/';
 if (casper.cli.has('thelia2_screenshot_path')){

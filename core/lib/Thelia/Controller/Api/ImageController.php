@@ -13,23 +13,18 @@
 namespace Thelia\Controller\Api;
 
 use Propel\Runtime\Propel;
-use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Controller\Admin\FileController;
-use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
-use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Files\FileConfiguration;
-use Thelia\Model\ProductQuery;
 
 /**
  * Class ImageController
@@ -48,7 +43,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::VIEW);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::VIEW);
 
         $this->checkEntityExists($entity, $entityId);
 
@@ -80,7 +75,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::VIEW);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::VIEW);
 
         $this->checkEntityExists($entity, $entityId);
 
@@ -116,7 +111,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::UPDATE);
 
         $fileController = new FileController();
         $fileController->setContainer($this->getContainer());
@@ -145,7 +140,7 @@ class ImageController extends BaseApiController
         $request = $this->getRequest();
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::UPDATE);
 
         $this->checkEntityExists($entity, $entityId);
         $this->checkImage($entity, $imageId);
@@ -288,7 +283,7 @@ class ImageController extends BaseApiController
 
         $entity = $request->attributes->get('entity');
 
-        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($entity), [], AccessManager::UPDATE);
 
         $this->checkEntityExists($entity, $entityId);
 

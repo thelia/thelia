@@ -12,8 +12,8 @@
 
 namespace Thelia\Core\Form;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class TheliaFormFactory
@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class TheliaFormFactory implements TheliaFormFactoryInterface
 {
-    /** @var Request  */
-    protected $request;
+    /** @var RequestStack  */
+    protected $requestStack;
 
     /** @var ContainerInterface  */
     protected $container;
@@ -31,9 +31,9 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     /** @var array */
     protected $formDefinition;
 
-    public function __construct(Request $request, ContainerInterface $container, array $formDefinition)
+    public function __construct(RequestStack $requestStack, ContainerInterface $container, array $formDefinition)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->container = $container;
         $this->formDefinition = $formDefinition;
     }
@@ -53,6 +53,6 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
             );
         }
 
-        return new $this->formDefinition[$name]($this->request, $type, $data, $options, $this->container);
+        return new $this->formDefinition[$name]($this->requestStack->getCurrentRequest(), $type, $data, $options, $this->container);
     }
 }

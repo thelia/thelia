@@ -69,6 +69,9 @@ final class TheliaEvents
      * Sent once the administrator is successfully logged in.
      */
     const ADMIN_LOGIN  = "action.admin_login";
+
+    const ADMIN_PASSWORD_RENEW  = "action.admin_renew_password";
+
     // -- END ADMIN EVENTS --------------------------------------------------------
 
 
@@ -405,6 +408,12 @@ final class TheliaEvents
     const CART_DELETEITEM = "action.deleteArticle";
     const CART_CLEAR = "action.clear";
 
+    /** before inserting a cart item in database */
+    const CART_ITEM_CREATE_BEFORE = "action.cart.item.create.before";
+
+    /** before updating a cart item in database */
+    const CART_ITEM_UPDATE_BEFORE = "action.cart.item.update.before";
+
     /**
      * Order linked event
      */
@@ -428,6 +437,7 @@ final class TheliaEvents
     const ORDER_SEND_NOTIFICATION_EMAIL = "action.order.sendOrderNotificationEmail";
 
     const ORDER_UPDATE_DELIVERY_REF = "action.order.updateDeliveryRef";
+    const ORDER_UPDATE_TRANSACTION_REF = "action.order.updateTransactionRef";
     const ORDER_UPDATE_ADDRESS = "action.order.updateAddress";
 
     const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
@@ -659,7 +669,8 @@ final class TheliaEvents
     const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
     const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
-    const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
+    const ADMINISTRATOR_UPDATEPASSWORD            = 'action.generatePassword';
+    const ADMINISTRATOR_CREATEPASSWORD            = 'action.createPassword';
 
     // -- Api management ---------------------------------------------
 
@@ -803,9 +814,26 @@ final class TheliaEvents
     const MODULE_DELETE  = 'thelia.module.delete';
     const MODULE_INSTALL = 'thelia.module.install';
 
-    /* Invoke payment module */
+    /**
+     * Generate the event name for a specific module
+     *
+     * @param string $eventName the event name
+     * @param string $moduleCode the module code
+     *
+     * @return string the event name for the module
+     */
+    public static function getModuleEvent($eventName, $moduleCode)
+    {
+        return sprintf("%s.%s", $eventName, strtolower($moduleCode));
+    }
 
+    /* Payment module */
     const MODULE_PAY = 'thelia.module.pay';
+    const MODULE_PAYMENT_IS_VALID = 'thelia.module.payment.is_valid';
+    const MODULE_PAYMENT_MANAGE_STOCK = 'thelia.module.payment.manage_stock';
+
+    /* Delivery module */
+    const MODULE_DELIVERY_GET_POSTAGE = 'thelia.module.delivery.postage';
 
     /**
      * Hook
@@ -839,6 +867,7 @@ final class TheliaEvents
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
     const NEWSLETTER_UPDATE = 'thelia.newsletter.update';
     const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
+    const NEWSLETTER_CONFIRM_SUBSCRIPTION = 'thelia.newsletter.confirmSubscription';
 
     /************ LANG MANAGEMENT ****************************/
 
@@ -884,19 +913,23 @@ final class TheliaEvents
     const BEFORE_UPDATEBRAND = "action.before_updateBrand";
     const AFTER_UPDATEBRAND  = "action.after_updateBrand";
 
+    // -- Import ----------------------------------------------
+
+    const IMPORT_CHANGE_POSITION = 'import.change.position';
+    const IMPORT_CATEGORY_CHANGE_POSITION = 'import.category.change.position';
+
+    const IMPORT_BEGIN = 'import.begin';
+    const IMPORT_FINISHED = 'import.finished';
+    const IMPORT_SUCCESS = 'import.success';
+
     // -- Export ----------------------------------------------
 
-    const EXPORT_BEFORE_ENCODE = "Thelia.export.encode.before";
-    const EXPORT_AFTER_ENCODE = "Thelia.export.encode.after";
+    const EXPORT_CHANGE_POSITION = 'export.change.position';
+    const EXPORT_CATEGORY_CHANGE_POSITION = 'export.category.change.position';
 
-    const EXPORT_CATEGORY_CHANGE_POSITION = "Thelia.export.change_category_position";
-    const EXPORT_CHANGE_POSITION = "Thelia.export.change_position";
-
-    const IMPORT_BEFORE_DECODE = "Thelia.import.decode.before";
-    const IMPORT_AFTER_DECODE = "Thelia.import.decode.after";
-
-    const IMPORT_CATEGORY_CHANGE_POSITION = "Thelia.import.change_category_position";
-    const IMPORT_CHANGE_POSITION = "Thelia.import.change_position";
+    const EXPORT_BEGIN = 'export.begin';
+    const EXPORT_FINISHED = 'export.finished';
+    const EXPORT_SUCCESS = 'export.success';
 
     // -- Sales management -----------------------------------------------
 
@@ -948,4 +981,20 @@ final class TheliaEvents
 
     const TRANSLATION_GET_STRINGS = 'action.translation.get_strings';
     const TRANSLATION_WRITE_FILE = 'action.translation.write_file';
+
+    // -- ORDER STATUS EVENTS -----------------------------------------------
+    const BEFORE_CREATE_ORDER_STATUS    = "action.before_createOrderStatus";
+    const ORDER_STATUS_CREATE           = "action.createOrderStatus";
+    const AFTER_CREATE_ORDER_STATUS     = "action.after_createOrderStatus";
+
+    const BEFORE_UPDATE_ORDER_STATUS    = "action.before_updateOrderStatus";
+    const ORDER_STATUS_UPDATE           = "action.updateOrderStatus";
+    const AFTER_UPDATE_ORDER_STATUS     = "action.after_updateOrderStatus";
+
+    const BEFORE_DELETE_ORDER_STATUS    = "action.before_deleteOrderStatus";
+    const ORDER_STATUS_DELETE           = "action.deleteOrderStatus";
+    const AFTER_DELETE_ORDER_STATUS     = "action.after_deleteOrderStatus";
+
+    const ORDER_STATUS_UPDATE_POSITION  = "action.updateOrderStatusPosition";
+    // -- END ORDER STATUS EVENTS -----------------------------------------------
 }

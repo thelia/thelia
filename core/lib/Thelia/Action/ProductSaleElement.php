@@ -12,10 +12,13 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
+use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
+use Thelia\Core\Template\Loop\ProductSaleElementsImage;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductDocumentQuery;
@@ -40,6 +43,14 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 {
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * Create a new product sale element, with or without combination
      *
@@ -325,7 +336,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->orderByIsDefault(Criteria::DESC)
             ->findByProductId($event->getOriginalProduct()->getId());
 
-        // Handle PSEs
+        /**
+         * Handle PSEs
+         *
+         * @var int  $key
+         * @var ProductSaleElements $originalProductPSE
+         */
         foreach ($originalProductPSEs as $key => $originalProductPSE) {
             $currencyId = ProductPriceQuery::create()
                 ->filterByProductSaleElementsId($originalProductPSE->getId())
@@ -355,7 +371,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function createClonePSE(ProductCloneEvent $event, $originalProductPSE, $currencyId)
+    public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId)
     {
         $attributeCombinationList = AttributeCombinationQuery::create()
             ->filterByProductSaleElementsId($originalProductPSE->getId())
@@ -363,12 +379,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->find();
 
         $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($event->getClonedProduct(), $attributeCombinationList, $currencyId);
-        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $clonedProductCreatePSEEvent);
+        $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $clonedProductCreatePSEEvent);
 
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
 
-    public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, $originalProductPSE, $key)
+    public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, ProductSaleElements $originalProductPSE, $key)
     {
         $originalProductPSEPrice = ProductPriceQuery::create()
             ->findOneByProductSaleElementsId($originalProductPSE->getId());
@@ -390,12 +406,15 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setSalePrice($originalProductPSEPrice->getPromoPrice())
             ->setCurrencyId($originalProductPSEPrice->getCurrencyId());
 
-        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
+        $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
     }
 
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type)
     {
+        /** @var ProductSaleElementsDocument|ProductSaleElementsImage $originalProductPSEFile */
         foreach ($originalProductPSEFiles as $originalProductPSEFile) {
+            $originalProductFilePositionQuery = [];
+            $originalProductPSEFileId = null;
 
             // Get file's original position
             switch ($type) {
@@ -421,6 +440,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $clonedProductFileIdToLinkToPSEQuery = ProductDocumentQuery::create();
                     break;
             }
+
             $clonedProductFileIdToLinkToPSE = $clonedProductFileIdToLinkToPSEQuery
                 ->filterByProductId($clonedProductId)
                 ->filterByPosition($originalProductFilePosition)

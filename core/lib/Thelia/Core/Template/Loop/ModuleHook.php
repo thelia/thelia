@@ -165,6 +165,7 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("TEMPLATES", $moduleHook->getTemplates())
                 ;
 
+                $this->addOutputFields($loopResultRow, $moduleHook);
                 $loopResult->addRow($loopResultRow);
             }
         }

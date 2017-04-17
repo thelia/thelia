@@ -21,6 +21,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Import as ImportModel;
 use Thelia\Tools\URL;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
@@ -48,6 +49,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
      */
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var ImportModel $type */
         foreach ($loopResult->getResultDataCollection() as $type) {
             $loopResultRow = new LoopResultRow($type);
 
@@ -69,6 +71,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
             } catch (\ErrorException $e) {
             }
 
+            $this->addOutputFields($loopResultRow, $type);
             $loopResult->addRow($loopResultRow);
         }
 

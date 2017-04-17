@@ -1,0 +1,241 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'order-status'}
+{/block}
+
+{block name="page-title"}{intl l='Order status'}{/block}
+
+{block name="check-resource"}admin.order-status{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="orders">
+
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li><a href="#">{intl l="Order status"}</a></li>
+            </ul>
+
+            {hook name="order-status.top"}
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="general-block-decorator">
+
+                        {if ! empty($general_error) }
+                            <div class="alert alert-danger">{$general_error}</div>
+                        {/if}
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed table-left-aligned">
+                                <caption class="clearfix">
+                                    {intl l='Orders status'}
+                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new order status'}" href="#creation_dialog" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-plus-sign"></span>
+                                    </a>
+                                </caption>
+
+                                <thead>
+                                <tr>
+                                    <th class="object-title">
+                                        {intl l='ID'}
+                                    </th>
+
+                                    <th class="object-title">
+                                        {intl l='Code'}
+                                    </th>
+
+                                    <th class="object-title">
+                                        {intl l='Title'}
+                                    </th>
+
+                                    <th class="object-title">
+                                        {intl l='Orders'}
+                                    </th>
+
+                                    <th class="object-title">
+                                        {intl l='Position'}
+                                    </th>
+
+                                    {hook name="order-status.table-header"}
+
+                                    <th class="actions">{intl l="Actions"}</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+
+                                {loop type="order-status" name="order-status-list" backend_context="1"}
+
+                                    <tr>
+                                        <td>
+                                            <a href="{url path="/admin/configuration/order-status/update/%id" id=$ID}">{$ID}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{url path="/admin/configuration/order-status/update/%id" id=$ID}">{$CODE}</a>
+                                        </td>
+                                        <td>
+                                            <a class="label" style="background-color: {$COLOR};" href="{url path="/admin/configuration/order-status/update/%id" id=$ID}">{$TITLE}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{url path="/admin/orders" status=$ID}">
+                                                {count type="order" name="order" customer="*" backend_context="1" status=$ID}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {admin_position_block
+                                            resource="admin.order-status"
+                                            access="UPDATE"
+                                            path={url path='admin/configuration/order-status/update-position' order_status_id=$ID}
+                                            url_parameter="order_status_id"
+                                            in_place_edit_class="orderStatusPositionChange"
+                                            position=$POSITION
+                                            id=$ID
+                                            }
+                                        </td>
+                                        {hook name="order-status.table-row" order_status_id={$ID} }
+
+                                        <td class="actions">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order-status" access="UPDATE"}
+                                                    <a title="{intl l='Edit this order status'}" href="{url path="/admin/configuration/order-status/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {if !$DELETABLE}
+                                                    <a class="order-status-cancel" title="{intl l='Delete this order status'}" href="#cancel_order-status_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                {/if}
+                                                {/loop}
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                {/loop}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {hook name="order-status.bottom"}
+        </div>
+    </div>
+
+    {form name="thelia.admin.order-status.creation"}
+
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "creation_dialog"}
+        {form_hidden_fields exclude="locale"}
+
+        {render_form_field field="success_url" value={url path='/admin/configuration/order-status/update/_ID_'}}
+
+        {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+                {render_form_field field="locale" value=$LOCALE}
+
+                <div class="input-group">
+                    <input type="text" class="form-control" {form_field_attributes field="title"}>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                </div>
+            {/loop}
+        {/custom_render_form_field}
+
+        <div class="row">
+            <div class="col-md-6">
+            {custom_render_form_field field="code"}
+                <div class="input-group">
+                    <input type="text" class="form-control" {form_field_attributes field="code"}>
+                </div>
+            {/custom_render_form_field}
+            </div>
+            <div class="col-md-6">
+            {custom_render_form_field field="color"}
+                <div class="input-group">
+                    <input type="color" class="form-control" style="width: 100px;" {form_field_attributes field="color"}>
+                </div>
+            {/custom_render_form_field}
+            </div>
+        </div>
+
+        {hook name='brand.create-form' location='brand_create_form'}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "creation_dialog"
+        dialog_title = {intl l="Create a new order status"}
+        dialog_body  = {$smarty.capture.creation_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Create this order status"}
+
+        form_action        = {url path="/admin/configuration/order-status/create"}
+        form_enctype       = {form_enctype}
+        form_error_message = $form_error_message
+    }
+    {/form}
+
+    {* Cancel order confirmation dialog *}
+
+    {capture "cancel_order_status_dialog"}
+        <input type="hidden" name="order_status_id" id="cancel_order-status_id" />
+    {/capture}
+
+    {include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "cancel_order-status_dialog"
+    dialog_title    = {intl l="Delete an order status"}
+    dialog_message  = {intl l="Do you really want to delete this order status ?"}
+
+    form_action         = {token_url path='/admin/configuration/order-status/delete'}
+    form_content        = {$smarty.capture.cancel_order_status_dialog nofilter}
+    form_id             = "cancel-order-status-form"
+    }
+
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script type="text/javascript">
+        $(".order-status-cancel").click(function(){
+            $("#cancel_order-status_id").val($(this).attr("data-id"));
+        });
+
+        $('.orderStatusPositionChange').editable({
+            type        : 'text',
+            title       : '{intl l="Enter new order status position"}',
+            mode        : 'popup',
+            inputclass  : 'input-mini',
+            placement   : 'left',
+            success     : function(response, newValue) {
+                // The URL template
+                var url = "{url noamp='1' path='/admin/configuration/order-status/update-position' order_status_id='__ID__' position='__POS__'}";
+
+                // Perform subtitutions
+                url = url.replace('__ID__', $(this).data('id'))
+                        .replace('__POS__', newValue);
+
+                // Reload the page
+                location.href = url;
+            }
+        });
+    </script>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="order-status.js"}
+{/block}

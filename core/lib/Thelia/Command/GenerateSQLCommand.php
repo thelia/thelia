@@ -18,11 +18,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Tools\URL;
+use Thelia\Tools\Version\Version;
 use TheliaSmarty\Template\SmartyParser;
 
 /**
@@ -63,7 +63,8 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         // Main insert.sql file
         $content = file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql.tpl');
-        $content = $this->parser->renderString($content, [], false);
+        $version = Version::parse();
+        $content = $this->parser->renderString($content, $version, false);
 
         if (false === file_put_contents(THELIA_SETUP_DIRECTORY . 'insert.sql', $content)) {
             $output->writeln("Can't write file " . THELIA_SETUP_DIRECTORY . 'insert.sql');
@@ -94,11 +95,9 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
     protected function init(InputInterface $input)
     {
-        $container = $this->getContainer();
+        $this->initRequest();
 
-        $container->set("request", new Request());
-        $container->get("request")->setSession(new Session(new MockArraySessionStorage()));
-        $container->enterScope("request");
+        $container = $this->getContainer();
 
         $this->translator = $container->get('thelia.translator');
         $this->parser = $container->get('thelia.parser');

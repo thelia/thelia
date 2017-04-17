@@ -5,6 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
+use Thelia\Model\Tools\UrlRewritingTrait;
 use Thelia\TaxEngine\Calculator;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
@@ -12,14 +13,16 @@ use Thelia\Core\Event\Product\ProductEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
 
 class Product extends BaseProduct implements FileModelParentInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use PositionManagementTrait;
 
-    use \Thelia\Model\Tools\UrlRewritingTrait;
+    use UrlRewritingTrait;
 
     /**
      * {@inheritDoc}
@@ -66,6 +69,9 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     /**
      * Return PSE count fir this product.
+     *
+     * @param ConnectionInterface $con an optional connection object
+     * @return int
      */
     public function countSaleElements($con = null)
     {
@@ -73,7 +79,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * @return the current default category ID for this product
+     * @return int the current default category ID for this product
      */
     public function getDefaultCategoryId()
     {
@@ -89,59 +95,58 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Set default category for this product
      *
-     * @param integer $categoryId the new default category id
+     * @param int $defaultCategoryId the new default category id
+     * @return $this
      */
-    public function setDefaultCategory($categoryId)
-    {
-        // Unset previous category
-        ProductCategoryQuery::create()
-            ->filterByProductId($this->getId())
-            ->filterByDefaultCategory(true)
-            ->find()
-            ->setByDefault(false)
-            ->save();
-
-        // Set new default category
-        ProductCategoryQuery::create()
-            ->filterByProductId($this->getId())
-            ->filterByCategoryId($categoryId)
-            ->find()
-            ->setByDefault(true)
-            ->save();
-
-        return $this;
-    }
-
-    public function updateDefaultCategory($defaultCategoryId)
+    public function setDefaultCategory($defaultCategoryId)
     {
         // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultCategoryId <= 0) {
             $defaultCategoryId = null;
         }
 
-        // Update the default category
+        /** @var ProductCategory $productCategory */
         $productCategory = ProductCategoryQuery::create()
             ->filterByProductId($this->getId())
             ->filterByDefaultCategory(true)
             ->findOne()
         ;
 
-        if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
-            // Delete the old default category
-            if ($productCategory !== null) {
-                $productCategory->delete();
-            }
+        if ($productCategory !== null && (int) $productCategory->getCategoryId() === (int) $defaultCategoryId) {
+            return $this;
+        }
 
-            // Add the new default category
-            $productCategory = new ProductCategory();
+        if ($productCategory !== null) {
+            $productCategory->delete();
+        }
 
-            $productCategory
+        // checks if the product is already associated with the category and but not default
+        if (null !== $productCategory = ProductCategoryQuery::create()->filterByProduct($this)->filterByCategoryId($defaultCategoryId)->findOne()) {
+            $productCategory->setDefaultCategory(true)->save();
+        } else {
+            $position = (new ProductCategory())->setCategoryId($defaultCategoryId)->getNextPosition();
+
+            (new ProductCategory())
                 ->setProduct($this)
                 ->setCategoryId($defaultCategoryId)
                 ->setDefaultCategory(true)
-                ->save()
-            ;
+                ->setPosition($position)
+                ->save();
+
+            $this->setPosition($position);
         }
+
+        return $this;
+    }
+
+    /**
+     * @deprecated since 2.3, and will be removed in 2.4, please use Product::setDefaultCategory
+     * @param int $defaultCategoryId
+     * @return $this
+     */
+    public function updateDefaultCategory($defaultCategoryId)
+    {
+        return $this->setDefaultCategory($defaultCategoryId);
     }
 
     /**
@@ -155,7 +160,6 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param  int        $baseQuantity     the product quantity (default: 0)
      * @throws \Exception
      */
-
     public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0)
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
@@ -168,10 +172,7 @@ class Product extends BaseProduct implements FileModelParentInterface
             $this->save($con);
 
             // Add the default category
-            $this->updateDefaultCategory($defaultCategoryId);
-
-            // Set the position
-            $this->setPosition($this->getNextPosition())->save($con);
+            $this->setDefaultCategory($defaultCategoryId)->save($con);
 
             $this->setTaxRuleId($taxRuleId);
 
@@ -191,6 +192,21 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     /**
      * Create a basic product sale element attached to this product.
+     *
+     * @param ConnectionInterface $con
+     * @param float $weight
+     * @param float $basePrice
+     * @param float $salePrice
+     * @param int $currencyId
+     * @param int $isDefault
+     * @param bool $isPromo
+     * @param bool $isNew
+     * @param int $quantity
+     * @param string $eanCode
+     * @param bool $ref
+     * @return ProductSaleElements
+     * @throws PropelException
+     * @throws \Exception
      */
     public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false)
     {
@@ -226,19 +242,21 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our default category
+     *
+     * @param ProductQuery $query
+     * @deprecated since 2.3, and will be removed in 2.4
      */
     protected function addCriteriaToPositionQuery($query)
     {
         // Find products in the same category
-        $produits = ProductCategoryQuery::create()
+        $products = ProductCategoryQuery::create()
             ->filterByCategoryId($this->getDefaultCategoryId())
             ->filterByDefaultCategory(true)
             ->select('product_id')
             ->find();
 
-        // Filtrer la requete sur ces produits
-        if ($produits != null) {
-            $query->filterById($produits, Criteria::IN);
+        if ($products != null) {
+            $query->filterById($products, Criteria::IN);
         }
     }
 
@@ -262,6 +280,24 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        // Delete free_text feature AV for this product (see issue #2061). We have to do this before
+        // deleting the product, as the delete is cascaded to the feature_product table.
+        $featureAvs = FeatureAvQuery::create()
+            ->useFeatureProductQuery()
+            ->filterByFreeTextValue(true)
+            ->filterByProductId($this->getId())
+            ->endUse()
+            ->find($con)
+        ;
+
+        /** @var FeatureAv $featureAv */
+        foreach ($featureAvs as $featureAv) {
+            $featureAv
+                ->setDispatcher($this->dispatcher)
+                ->delete($con)
+            ;
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEPRODUCT, new ProductEvent($this));
 
         return true;
@@ -275,5 +311,56 @@ class Product extends BaseProduct implements FileModelParentInterface
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::setPosition
+     */
+    public function setPosition($v)
+    {
+        return parent::setPosition($v);
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::getPosition
+     */
+    public function getPosition()
+    {
+        return parent::getPosition();
+    }
+
+    public function postSave(ConnectionInterface $con = null)
+    {
+        // For BC, will be removed in 2.4
+        if (!$this->isNew()) {
+            if (isset($this->modifiedColumns[ProductTableMap::POSITION]) && $this->modifiedColumns[ProductTableMap::POSITION]) {
+                if (null !== $productCategory = ProductCategoryQuery::create()
+                        ->filterByProduct($this)
+                        ->filterByDefaultCategory(true)
+                        ->findOne()
+                ) {
+                    $productCategory->changeAbsolutePosition($this->getPosition());
+                }
+            }
+        }
+    }
+
+    /**
+     * Overload for the position management
+     * @param ProductCategory $productCategory
+     * @inheritdoc
+     */
+    protected function doAddProductCategory($productCategory)
+    {
+        parent::doAddProductCategory($productCategory);
+
+        $productCategoryPosition = ProductCategoryQuery::create()
+            ->filterByCategoryId($productCategory->getCategoryId())
+            ->orderByPosition(Criteria::DESC)
+            ->findOne();
+
+        $productCategory->setPosition($productCategoryPosition !== null ? $productCategoryPosition->getPosition() + 1 : 1);
     }
 }

@@ -109,6 +109,13 @@ interface FacadeInterface
     public function getNbArticlesInCart();
 
     /**
+     * Return the number of Products include quantity in the Cart
+     *
+     * @return int
+     */
+    public function getNbArticlesInCartIncludeQuantity();
+
+    /**
      * Return all Coupon given during the Checkout
      *
      * @return array Array of CouponInterface
@@ -179,4 +186,12 @@ interface FacadeInterface
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     public function getDispatcher();
+
+    /**
+     * Add a coupon in session
+     *
+     * @param $couponCode
+     * @return mixed|void
+     */
+    public function pushCouponInSession($couponCode);
 }

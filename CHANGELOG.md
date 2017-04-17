@@ -1,5 +1,246 @@
+# 2.4.0-alpha1
+
+- (related to #2266) Fix #2226 : Bad parsing of web version in db update script
+- (related to #2265) Fix #2225 : Wrong version displayed in db update script
+- (related to #2264) Fix #2263 : check php extension "dom" is installed
+- (related to #2261) Cast position_delegate virtual column to number in product loop
+- (related to #2259) Coupon - fix cart contains products & cart contains categories conditions
+- (related to #2257) Coupon - fix order coupon amount
+- (related to #2256) Coupon - add available on special offers in remove x amount type
+- (related to #2255) Moved php shebang in the right file
+- (related to #2254) Add parameter "module_code" to "modules.table-row"
+- (related to #2251) Remove a forgotten debug instruction
+- (related to #2250) Fix hook register listener that throws unucessary exceptions
+- (related to #2249) Fix identical queries in the productSaleElement loop and the Product loop
+- (related to #2243) Fixed and optimized content and product loops
+- (related to #2240) Fixes #2229 : bad resource code in MailingSystemController class
+- (related to #2239) Fixes #2233 : customer profile update
+- (related to #2238) New method to save order transaction ref
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2235) Add amount in order coupon loop parse results
+- (related to #2232) Moved to container-based infrastructure for Travis CI
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2230) Hook fixes
+- (related to #2227) Fix for two problems with CART_FINDITEM event processing
+- (related to #2224) Added simple message processing to MailerFactory
+- (related to #2222) Fix duplicates in country loop when used with "with_area" argument
+- (related to #2221) Completed default email template FR and EN translations
+- (related to #2220) French translations
+- (related to #2219) Fix coupons issues
+- (related to #2217) Protected/hidden modules
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2208) Fix missing model on LoopResultRow
+- (related to #2207) Add delimiter and enclosure for header insertion
+- (related to #2206) Add reset array pointer if $data is an array.
+- (related to #2205) Fixed sale edit form
+- (related to #2204) Add isEmpty(), to check if $data is empty.
+- (related to #2203) Check if $error exist, specific for submit type
+- (related to #2202) Fix currency creation modal (The currency field is missing in the html template)
+- (related to #2201) Deprecated class NotFountHttpException because typo and removed deprecated classes 
+- (related to #2198) Cancel coupon usage on order cancel
+- (related to #2197) Pagination of coupon list
+- (related to #2191) Update BO typo
+- (related to #2190) Home stats improvements
+- (related to #2189) Huge performance improvement in feature-availability loop
+- (related to #2188) A more effective way to solve issue #2061
+- (related to #2187) Merge versions 2.1.10 2.2.4 2.3.2 in master branch 
+- (related to #2181) Fix CSV export cached file size
+- (related to #2178) Add a coupon type to offer a product
+- (related to #2174) PSR-6 + thelia.cache service and smarty cache block
+- (related to #2173) Fix customer discount apply on backoffice
+- (related to #2171) Fix sql syntax in setup/update/tpl/2.4.0-alpha1.sql.tpl 
+- (related to #2170) Fix #2166 : array to string conversion when php setup/update.php
+- (related to #2168) Router redirect to last rewriting_url
+- (related to #2167) Add global variable `app` to Smarty
+- (related to #2166) Fixed the update process when thelia.net is out of order
+- (related to #2165) Add replyTo parameter in mailer factory
+- (related to #2164) Add confirmation email option after customer creation
+- (related to #2163) Update fr_FR.php
+- (related to #2161) State Fixes
+- (related to #2160) Added missing home.block 'class' parameter
+- (related to #2157) Prevent an infinite loop in new product dialog
+- (related to #2155) Injects versions 2.1.9 2.2.3 2.3.1 in the master branch 
+- (related to #2154) Test range dates exists before testing type
+- (related to #2153) Lighten placeholders color
+- (related to #2150) Fix form and validator translations
+- (related to #2149) Fixed status_id parameter access 
+- (related to #2148) Added search by EAN code to product sale elements loop
+- (related to #2147) Fixed help text display if show_label is false
+- (related to #2146) Fix search in i18n fields when backend_context=1, and search improvements
+- (related to #2145) Fix for taxes & tax rules description display in Taxes rules page.
+- (related to #2144) Fix sql_mode
+- (related to #2143) Change order_adress in account-order
+- (related to #2142) Force utf8 on thelia update
+- (related to #2139) Start page correction
+- (related to #2135) Fix ressources check for translation view
+- (related to #2133) Add ORDER_UPDATE_TRANSACTION_REF event
+- (related to #2132) Fix change default category and default folder
+- (related to #2129) Fix order export date interval
+- (related to #2128) Fix checkout issues
+- (related to #2127) Fix for 2.3.0 BC break.
+- (related to #2125) fix construct in GenerateRewrittenUrlEvent
+- (related to #2123) Init Version 2.4.0-alpha1 
+- (related to #2109) Module routers priority improvement (issue #2108) 
+- (related to #2107) Add create function for AlphaNumStringType argument
+- (related to #2106) Added order-invoice form hooks
+- (related to #2093) Fix #1662 add of hooks in pdf email and account-order
+- (related to #2082) Fix issue #2003 : product and pse ref in invoice template
+- (related to #2081) Order Status
+
+
+# 2.3.3
+
+- (related to #2243) Fixed and optimized content and product loops
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2239) Fix #2233 : customer profile update
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2230) Hook fixes
+- (related to #2222) Fix duplicates in country loop when used with "with_area" argument
+- (related to #2219) Fix coupons issues
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2207) Add delimiter and enclosure for header insertion
+- (related to #2206) Add reset array pointer if $data is an array.
+- (related to #2205) Fixed sale edit form
+- (related to #2204) Add isEmpty(), to check if $data is empty.
+- (related to #2203) Check if $error exist, specific for submit type
+- (related to #2202) Fix currency creation modal (The currency field is missing in the html template)
+- (related to #2191) Update BO typo
+
+# 2.3.2
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2181) Fix CSV export cached file size
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+- (related to #2168) Fix router redirect to last rewriting_url
+- (related to #2166) Fixed the update process when thelia.net is out of order
+- (related to #2160) Added missing home.block 'class' parameter
+- (related to #2157) Prevent an infinite loop in new product dialog
+- (related to #2154) Add Test range dates exists before testing type
+
+# 2.3.1
+
+- (related to #2150) Fix form and validator translations
+- (related to #2147) Fixed help text display if show_label is false
+- (related to #2145) Fix for taxes & tax rules description display in Taxes rules page
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2142) Force utf8 on thelia update
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2132) Fix change default category and default folder. Since the pull request #2066, it's no longer possible to change the default category of a product or the default folder of a content.
+- (related to #2129) Fix order export date interval
+- (related to #2128) Fix address state check in delivery cost estimation and fix login error due to symfony update
+- (related to #2127) Fix 2.3.0 major BC break in Thelia\Core\Event\Order\OrderPaymentEvent
+- (related to #2125) Fix construct in GenerateRewrittenUrlEvent
+
+# 2.3.0
+
+- #2121 Fix possible Compile Error in delivery loop
+- #2117 Fix Admin update, the password is no longer required for update of an admin
+- #2118 Module TinyMCE, fix the path for the Java uploader
+- #2120 Fix {count} in search context, {count} doesn't work when searching (since 2.3.0 alpha-1)
+- #2116 Updated translations from Crowdin
+- #2110 Added a way to set specific date/time format for lang, fixed date/time format for fr_FR
+
+# 2.3.0-beta2
+
+- #2030 Fix ziparchive not found, add a message to prevent that the zip extension was not found on the server
+- #2104 Fixed update function issue in Colissimo module
+- #2096 #2103 Fix currency change, an exception was thrown if the currency does not exist
+- #2097 Fixed and improved cancel order processing
+- #2095 Updated translations from Crowdin
+- #2092 Fix Module TheliaSmarty, replace the request service by requestStack service
+- #2091 Fixed NO_ENGINE_SUBSTITUTION setting for MariaDB
+- #2090 Fix GenerateRewrittenUrlEvent, add getters and setters
+- #2084 Check if customer exist in coupon builder
+
+# 2.3.0-beta1
+
+- #2062 Remove composer dependency leafo/lessphp
+- #2060 Fix BC, TaxRule action introduces a compatibility break
+- #2080 Fix missing function `addoutputfields` in the loops
+- #2078 Fixed checkbox and radio automatic rendrering. The "checked" status of checkboxes and radios was not correctly managed by form-field-attributes-renderer.html
+- #2079 BackOffice : UX improvements on tablets, the right menu was too broad
+- #2067 Fix esi render. The sub-request was not a Thelia request
+- #2066 Fix the problem of position if a product or content in several sections and folders
+- #2073 Use template default fallback in View Listener. Module views was not properly processed when the active front template is not "default"
+- #2068 Fix customer edit view ACL, replace `update` by `view` for edit a customer
+- #2063 Fix, when deleting a product with a free text feature value, the free text feature value was not removed
+- #2058 Fix bug when sending the attribute combination builder form if the user had not selected attribute
+- #2056 Fix UX bug on product list in the frontOffice, the grid icon or the list icon do not lock
+- #2040 Fix bug when change image position on the module config page. The trait `PositionManagementTrait` was missing in `ModuleImage`
+- #2054 Fix the update process for the Collissimo module
+
+# 2.3.0-alpha2
+
+- #1985 Add delivery and payment events `MODULE_PAYMENT_IS_VALID`, `MODULE_PAYMENT_MANAGE_STOCK`, `MODULE_DELIVERY_GET_POSTAGE`
+- #2045 Moves the backOffice statistics in the new module HookAdminHome
+- #2044 Add possibility to change number by default of results per page for the product list, the order list and the customer list in the backOffice
+- #2042 Avoid having too many results in the backOffice search page
+- #2021 Fixes hooks `mini-cart`, `sale.top`, `sale.bottom`, `sale.main-top`, `sale.main-bottom`, `sale.content-top`, `sale.content-bottom`, `sale.stylesheet`, `sale.after-javascript-include`, `sale.javascript-initialization`, `account-order.invoice-address-bottom`, `account-order.delivery-address-bottom`
+- #2041 Fix possible circular reference for category tree and folder tree
+- #2039 Disable the output of the url by the loops on the BackOffice
+- #2034 Add column position in attribute combination table
+- #2028 Fixed translation regexp prefix for templates
+- #2027 Confirmation email when subscribing to newsletter, and subscription cancel page
+- #2017 Add constraint of unicity in create and update hook form
+- #2012 Checking MySQL version to set sql_mode automatically, this fixed the compatibility with MySQL > 5.6 for modes `STRICT_TRANS_TABLES`, `NO_ENGINE_SUBSTITUTION`
+- #2009 Display PSE ref in backOffice order edit for the product list
+- #2001 Check PHP version before trying to do anything in install process
+- #1999 Fix Folder breadcrumb, the parent url was not good if you edit a picture in a folder or a content
+- #1998 Add not blank constraint on zipcode in address create form
+- #1988 Fix hide module-install if auth are not right in the BackOffice
+- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New minimum_admin_password_length and enable_lost_admin_password_recovery configuration variable.
+- #1962 Fix exception when cloning a product if the i18n in specific locale does not exist
+- #1933 #2006 #2016 #2033 Upgrade Symfony 2.3 to Symfony 2.8
+- #1995 Added order search options, improved search page in the backOffice
+- #1994 Allow coupon in first cart step
+- #1993 Fix the default language isocode link in backOffice languages page
+- #1992 Add method to find category path `Thelia/Model/CategoryQuery::getPathToCategory`
+- #1977 Fixed translation domain in NewsletterController
+- #1980 Update database schema to increase module version field to 25 chars.
+- #1971 #1973 Adds an address email to the administrator profile and adds the password lost functionality for administrators
+- #1970 Add `CartDuplicationEvent` which provide both original and duplicated cart to listeners
+- #1967 Module Colissimo : Replace country title by isoalpha2 in export for expeditor
+- #1964 Fixed cart not deleted after an order placed
+- #1960 Add events `CART_ITEM_CREATE_BEFORE` and `CART_ITEM_UPDATE_BEFORE`
+- #1959 Add the ability to format an address by country
+- #1907 Administrator email management and features
+    - adds an address email to the administrator profile
+    - This address email can now be used to login just like the login name
+    - An administrator could now recover a lost password, just like a regular customer
+- #1958 Fix missing success_url on Brand SEO update
+- #1956 Fix UX right class in brand products pagination in the frontOffice
+- #1948 Allow to define custom delimiter and enclosure char for CSV serializer
+- #1947 Added a way to get category/product from related content ID
+- #1946 Fix l'inclusion automatique of the TaxType class only if extension == php
+- #1939 Add `visible` and `visible_reverse` values in Product Loop order argument
+- #1936 Fixed the module name vefication for command `module:position`
+- #1931 Add a optional parameters CC and BCC in method `\Thelia\Mailer\MailerFactory::sendEmailMessage`
+- #1929 Mod: BaseController useFallbackTemplate set to true by default
+- #1928 Hook DI alert messages thrown as exceptions in dev. mode
+- #1926 Fix redirection after coupon consume
+- #1923 Re enabled functional tests for back office
+- #1922 Colissimo Move the prices from a json to a config
+- #1921 Modules 'configuration' and 'hook' buttons behavior fix
+- #1920 Fixed coupons conditions label translation
+- #1917 Fixed translations bug in user mode with view only missing translations activated
+- #1916 Fix upload document. The document title is missing after upload
+- #1914 The module list in the translation page is now ordered by module code instead of module title
+- #1913 Conservation the emails after unsubscribe on newsletter
+- #1911 Add 'admin_current_location' arg for 'main.in-top-menu-items' Hook
+- #1908 A fix for "terms & conditions" bootbox height
+- #1906 Fix coupon create form data
+- #1904 Update tinyMCE
+- #1903 Added missing generateErrorRedirect()
+- #1895 Add a link to the contact page in the front footer and update bootstrap
+- #1881 Display only the zones affected to Colissimo in the backOffice
+- #1853 Coupon, add condition match for cart item include quantity
+- #1815 #1963 #1984 #1989 #1997 #2013 #2019 Import/export complete rework
+
 # 2.3.0-alpha1
 
+- #1907 Administrators should now have an email address. They may use login name or email to log in the back-office. They could now create a new a password if they forgot it. New ```minimum_admin_password_length``` and ```enable_lost_admin_password_recovery``` configuration variable.
 - #1902 Update Colissimo export, add link to order and to customer, add package weight
 - #1801 Fixed cart duplication conditions at user login/logout
 - #1892 Add a name verification when creating a module with a command
@@ -94,6 +335,72 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
+
+
+# 2.2.6
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fix cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2219) Fix coupons issues
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2208) Fix missing model on LoopResultRow
+- (related to #2205) Fixed sale edit form
+
+# 2.2.5
+
+- (related to #2188) A more effective way to solve issue #2061
+- #2194 Fix change currency on 2.2.x
+
+# 2.2.4
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+- (related to #2168) Router redirect to last rewriting_url
+- (related to #2160) Added missing home.block 'class' parameter
+
+# 2.2.3
+
+- (related to #2147) Fixed help text display if show_label is false
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2142) Force utf8 on thelia update
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2125) Fix construct in GenerateRewrittenUrlEvent
+- (related to #2118) Module TinyMCE, fix the path for the Java uploader
+- (related to #2096) Fix currency change, an exception was thrown if the currency does not exist
+- (related to #2090) Fix GenerateRewrittenUrlEvent, add getters and setters
+- (related to #2084) Check if customer exist in coupon builder
+- (related to #2080) Fix missing function `addoutputfields` in the loops
+- (related to #2078) Fixed checkbox and radio automatic rendrering. The "checked" status of checkboxes and radios was not correctly managed by form-field-attributes-renderer.html
+- (related to #2068) Use template default fallback in View Listener. Module views was not properly processed when the active front template is not "default"
+- (related to #2068) Fix customer edit view ACL, replace `update` by `view` for edit a customer
+- (related to #2058) Fix bug when sending the attribute combination builder form if the user had not selected attribute
+- (related to #2052) Fix #2040 Missing trait PositionManagementTrait in ModuleImage
+- (related to #2041) Fix possible circular reference for category tree and folder tree
+- (related to #2017) Add constraint of unicity in create and update hook form
+- (related to #2012) Checking MySQL version to set sql_mode automatically, this fixed the compatibility with MySQL > 5.6 for modes `STRICT_TRANS_TABLES`, `NO_ENGINE_SUBSTITUTION`
+- (related to #2010) Improve product price edition tab
+- (related to #2005) Use a wider version requirement on thelia/installer for setup/
+- (related to #1999) Fix Folder breadcrumb, the parent url was not good if you edit a picture in a folder or a content
+- (related to #1980) Update database schema to increase module version field to 25 chars.
+- (related to #1967) Module Colissimo : Replace country title by isoalpha2 in export for expeditor
+- (related to #1962) Fix exception when cloning a product if the i18n in specific locale does not exist
+- (related to #1958) Fix missing success_url on Brand SEO update
+- (related to #1956) Fix UX right class in brand products pagination in the frontOffice
+- (related to #1946) Fix the automatic inclusion of the TaxType class only if extension == php
+- (related to #1939) Add `visible` and `visible_reverse` values in Product Loop order argument
+- (related to #1936) Fixed the module name verification for command `module:position`
+- (related to #1928) Hook DI alert messages thrown as exceptions in dev. mode
+- (related to #1921) Modules 'configuration' and 'hook' buttons behavior fix
+- (related to #1920) Fixed coupons conditions label translation
+- (related to #1917) Fixed translations bug in user mode with view only missing translations activated
+- (related to #1914) The module list in the translation page is now ordered by module code instead of module title
+- (related to #1908) A fix for "terms & conditions" bootbox height
+- (related to #1906) Fix coupon create form data
+- (related to #1799) Fixed the redirection to rewritten URL
+- (related to #1797) Fix order manual and manual_reverse in AttributeCombination loop
+- #1901 Update Colissimo export, add link to order and to customer, add package weight
 
 # 2.2.2
 
@@ -297,6 +604,38 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+
+# 2.1.11
+
+- (related to #2240) Fix #2229 : bad resource code in MailingSystemController class
+- (related to #2237) Fixed cancelPayment method in BasePaymentModuleController class
+- (related to #2231) Fix #2215 : loop pagination cache
+- (related to #2214) Fix for #2213 : Nesting loops with the same argument set is now working
+- (related to #2205) Fixed sale edit form
+
+# 2.1.10
+
+- (related to #2182) Fix compatibility with sql_mode STRICT_ALL_TABLES
+- (related to #2173) Fix customer discount apply on backoffice. The custome permanentr discount is also applied on the back office if the user is logged in front office
+
+# 2.1.9
+
+- (related to #2144) Fix automatic configuration for the sql_mode
+- (related to #2139) Start page correction for the loops
+- (related to #2135) Fix ressources check for translation view
+- (related to #2125) fix construct in GenerateRewrittenUrlEvent
+- (related to #1920) Fixed coupons conditions label translation
+- (related to #1946) Fix TaxType class only if extension == php
+- (related to #1958) Missing success_url on Brand SEO update
+- (related to #1967) Replace country title by isoalpha2 in export for expeditor
+- (related to #1999) Update FolderBreadcrumbTrait.php
+- (related to #2005) Use a wider version requirement on thelia/installer for setup
+- (related to #2091) Checking MySQL version to set sql_mode automatically
+- (related to #2041) Fix possible circular reference for category tree and folder tree
+- (related to #2058) Fix Bug on submit combination builder empty form
+- (related to #2068) Fix customer edit access
+- (related to #2073) Use template default fallback in View Listener
+
 # 2.1.8
 
 - Fix Colissimo module external-schema (related to #1838)
@@ -341,7 +680,7 @@
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
 - check specific role in security module instead of checking if a user is logged in
-- add a customer page parameter for the order loop on the customer page 
+- add a customer page parameter for the order loop on the customer page
 - keep break line in ACE editor
 
 # 2.1.4

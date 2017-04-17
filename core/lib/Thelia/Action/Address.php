@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
@@ -28,18 +29,18 @@ use Thelia\Model\Map\AddressTableMap;
  */
 class Address extends BaseAction implements EventSubscriberInterface
 {
-    public function create(AddressCreateOrUpdateEvent $event)
+    public function create(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $address = new AddressModel();
         $address->setCustomer($event->getCustomer());
-        $this->createOrUpdate($address, $event);
+        $this->createOrUpdate($address, $event, $dispatcher);
     }
 
-    public function update(AddressCreateOrUpdateEvent $event)
+    public function update(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $addressModel = $event->getAddress();
 
-        $this->createOrUpdate($addressModel, $event);
+        $this->createOrUpdate($addressModel, $event, $dispatcher);
     }
 
     public function delete(AddressEvent $event)
@@ -56,9 +57,9 @@ class Address extends BaseAction implements EventSubscriberInterface
         $address->makeItDefault();
     }
 
-    protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
+    protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event, $dispatcher)
     {
-        $addressModel->setDispatcher($event->getDispatcher());
+        $addressModel->setDispatcher($dispatcher);
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();
         try {
@@ -93,24 +94,7 @@ class Address extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

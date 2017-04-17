@@ -58,9 +58,9 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        $args['coupon_order'] = $this->getListOrderFromSession('coupon', 'coupon_order', 'code');
-
-        return $this->render('coupon-list', $args);
+        return $this->render('coupon-list', [
+            'coupon_order' => $this->getListOrderFromSession('coupon', 'coupon_order', 'code')
+        ]);
     }
 
     /**
@@ -90,6 +90,7 @@ class CouponController extends BaseAdminController
         } else {
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
+            $args['nowDate'] = $defaultDate->format($this->getDefaultDateFormat());
             $args['defaultDate'] = $defaultDate->modify('+2 month')->format($this->getDefaultDateFormat());
         }
 
@@ -101,6 +102,9 @@ class CouponController extends BaseAdminController
             Router::ABSOLUTE_URL
         );
         $args['formAction'] = 'admin/coupon/create';
+
+        // Setup empty data if form is already in parser context
+        $this->getParserContext()->addForm($this->createForm(AdminForm::COUPON_CREATION));
 
         return $this->render(
             'coupon-create',
@@ -184,6 +188,7 @@ class CouponController extends BaseAdminController
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => $coupon->getIsEnabled(),
+                'startDate' => $coupon->getStartDate($this->getDefaultDateFormat()),
                 'expirationDate' => $coupon->getExpirationDate($this->getDefaultDateFormat()),
                 'isAvailableOnSpecialOffers' => $coupon->getIsAvailableOnSpecialOffers(),
                 'isCumulative' => $coupon->getIsCumulative(),
@@ -642,7 +647,7 @@ class CouponController extends BaseAdminController
                 $this->pageNotFound();
             }
 
-            $response = new ResponseRest($couponManager->drawBackOfficeInputs());
+            $response = new ResponseRest($couponManager->drawBackOfficeInputs(), 'text');
         } else {
             // Return an empty response if the service ID is not defined
             // Typically, when the user chooses "Please select a coupon type"
@@ -721,7 +726,8 @@ class CouponController extends BaseAdminController
             $data['locale'],
             $data['freeShippingForCountries'],
             $data['freeShippingForModules'],
-            $data['perCustomerUsageCount']
+            $data['perCustomerUsageCount'],
+            empty($data['startDate']) ? null : \DateTime::createFromFormat($this->getDefaultDateFormat(), $data['startDate'])
         );
 
         // If Update mode
@@ -782,7 +788,8 @@ class CouponController extends BaseAdminController
             $coupon->getLocale(),
             $coupon->getFreeShippingForCountries(),
             $coupon->getFreeShippingForModules(),
-            $coupon->getPerCustomerUsageCount()
+            $coupon->getPerCustomerUsageCount(),
+            $coupon->getStartDate()
         );
         $couponEvent->setCouponModel($coupon);
         $couponEvent->setConditions($conditions);
@@ -808,20 +815,25 @@ class CouponController extends BaseAdminController
 
     protected function getDefaultDateFormat()
     {
-        return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+        return LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
     }
 
+    /**
+     * @param string $action
+     * @param Coupon|null $coupon
+     * @return \Thelia\Form\BaseForm
+     */
     protected function getForm($action, $coupon)
     {
-        $options["validation_groups"] = ["Default", $action];
-
         $data = array();
 
         if (null !== $coupon) {
             $data["code"] = $coupon->getCode();
         }
 
-        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, $options);
+        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, [
+            'validation_groups' => ["Default", $action]
+        ]);
     }
 
     public function deleteAction()

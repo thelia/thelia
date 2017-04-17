@@ -13,7 +13,6 @@
 namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -48,7 +47,8 @@ class ModuleManagement
 
         $finder
             ->name('module.xml')
-            ->in($this->baseModuleDir . '*'.DS.'Config');
+            ->in($this->baseModuleDir . '*' . DS . 'Config')
+        ;
 
         $errors = [];
 
@@ -84,10 +84,12 @@ class ModuleManagement
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
-        $content   = $descriptorValidator->getDescriptor($file->getRealPath());
+        $content = $descriptorValidator->getDescriptor($file->getRealPath());
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
-        $code      = basename(dirname($reflected->getFileName()));
-        $version   = (string)$content->version;
+        $code = basename(dirname($reflected->getFileName()));
+        $version = (string)$content->version;
+        $mandatory = intval($content->mandatory);
+        $hidden = intval($content->hidden);
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
 
@@ -113,7 +115,10 @@ class ModuleManagement
                 ->setFullNamespace((string)$content->fullnamespace)
                 ->setType($this->getModuleType($reflected))
                 ->setCategory((string)$content->type)
-                ->save($con);
+                ->setMandatory($mandatory)
+                ->setHidden($hidden)
+                ->save($con)
+            ;
 
             // Update the module images, title and description when the module is installed, but not after
             // as these data may have been modified byt the administrator
@@ -123,7 +128,7 @@ class ModuleManagement
                 if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
                     /** @var \Thelia\Module\BaseModule $moduleInstance */
                     $moduleInstance = $reflected->newInstance();
-                    $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string) $content->{"images-folder"};
+                    $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string)$content->{"images-folder"};
                     $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
                 }
             }
@@ -139,9 +144,13 @@ class ModuleManagement
                 $instance->update($currentVersion, $version, $con);
             }
 
+            if ($action !== 'none') {
+                $instance->registerHooks();
+            }
+
             $con->commit();
         } catch (\Exception $ex) {
-            Tlog::getInstance()->addError("Failed to update module ".$module->getCode(), $ex);
+            Tlog::getInstance()->addError("Failed to update module " . $module->getCode(), $ex);
 
             $con->rollBack();
             throw $ex;
@@ -184,7 +193,8 @@ class ModuleManagement
                 ->setDescription(isset($description->description) ? $description->description : null)
                 ->setPostscriptum(isset($description->postscriptum) ? $description->postscriptum : null)
                 ->setChapo(isset($description->subtitle) ? $description->subtitle : null)
-                ->save($con);
+                ->save($con)
+            ;
         }
     }
 }

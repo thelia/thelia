@@ -14,12 +14,16 @@ namespace Thelia\Core\Event\Attribute;
 
 class AttributeUpdateEvent extends AttributeCreateEvent
 {
+    /** @var int */
     protected $attribute_id;
 
     protected $description;
     protected $chapo;
     protected $postscriptum;
 
+    /**
+     * @param int $attribute_id
+     */
     public function __construct($attribute_id)
     {
         $this->setAttributeId($attribute_id);

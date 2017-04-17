@@ -12,11 +12,12 @@
 
 namespace Thelia\TaxEngine;
 
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
-use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\Customer;
 use Thelia\Model\State;
 
 /**
@@ -33,15 +34,12 @@ class TaxEngine
 
     protected $taxTypesDirectories = array();
 
-    /**
-     * @var Session $session
-     */
-    protected $session = null;
+    /** @var RequestStack */
+    protected $requestStack;
 
-
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->session = $request->getSession();
+        $this->requestStack = $requestStack;
 
         // Intialize the defaults Tax Types
         $this->taxTypesDirectories['Thelia\\TaxEngine\\TaxType'] = __DIR__ . DS . "TaxType";
@@ -81,8 +79,10 @@ class TaxEngine
 
                     foreach ($directoryIterator as $fileinfo) {
                         if ($fileinfo->isFile()) {
-                            $fileName  = $fileinfo->getFilename();
-                            $className = substr($fileName, 0, (1+strlen($fileinfo->getExtension())) * -1);
+                            $extension = $fileinfo->getExtension();
+                            if (strtolower($extension) !== 'php')
+                                continue;
+                            $className  = $fileinfo->getBaseName('.php');
 
                             try {
                                 $fullyQualifiedClassName = "$namespace\\$className";
@@ -118,10 +118,11 @@ class TaxEngine
     {
         if (null === $this->taxCountry) {
             /* is there a logged in customer ? */
-            if (null !== $customer = $this->session->getCustomerUser()) {
-                if (null !== $this->session->getOrder()
-                        && null !== $this->session->getOrder()->getChoosenDeliveryAddress()
-                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->session->getOrder()->getChoosenDeliveryAddress())) {
+            /** @var Customer $customer */
+            if (null !== $customer = $this->getSession()->getCustomerUser()) {
+                if (null !== $this->getSession()->getOrder()
+                        && null !== $this->getSession()->getOrder()->getChoosenDeliveryAddress()
+                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()->getOrder()->getChoosenDeliveryAddress())) {
                     $this->taxCountry = $currentDeliveryAddress->getCountry();
                     $this->taxState = $currentDeliveryAddress->getState();
                 } else {
@@ -158,5 +159,13 @@ class TaxEngine
         }
 
         return $this->taxState;
+    }
+
+    /**
+     * @return Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

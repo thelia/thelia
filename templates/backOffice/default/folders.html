@@ -98,7 +98,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="folder_list" type="folder" visible="*" parent=$parent order=$folder_order backend_context="1" lang=$lang_id}
+                            {loop name="folder_list" type="folder" visible="*" parent=$parent order=$folder_order backend_context="1" lang=$lang_id return_url=false}
                                 <tr>
                                     <td>{$ID}</td>
 
@@ -220,6 +220,7 @@
                                     current_order=$content_order
                                     order='id'
                                     reverse_order='id_reverse'
+                                    request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='ID'}"
                                     }
@@ -231,6 +232,7 @@
                                     current_order=$content_order
                                     order='alpha'
                                     reverse_order='alpha_reverse'
+                                    request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='Content title'}"
                                     }
@@ -242,6 +244,7 @@
                                     current_order=$content_order
                                     order='visible'
                                     reverse_order='visible_reverse'
+                                    request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='Online'}"
                                     }
@@ -252,6 +255,7 @@
                                     current_order=$content_order
                                     order='manual'
                                     reverse_order='manual_reverse'
+                                    request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='Position'}"
                                     }
@@ -262,7 +266,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="content_list" type="content" visible="*" folder_default=$parent order=$content_order}
+                            {loop name="content_list" type="content" visible="*" folder=$parent order=$content_order return_url=false}
                                 <tr>
                                     <td>{$ID}</td>
 
@@ -295,7 +299,7 @@
                                         {admin_position_block
                                             resource="admin.content"
                                             access="UPDATE"
-                                            path={url path='/admin/content/update-position' content_id=$ID}
+                                            path={url path='/admin/content/update-position' content_id=$ID folder_id=$parent}
                                             url_parameter="content_id"
                                             in_place_edit_class="contentPositionChange"
                                             position=$POSITION
@@ -445,7 +449,7 @@
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                             </div>
 
-                            <div class="help-block">{intl l='Enter here the content name in the default language (%title)' title="{$TITLE}"}</div>
+                            <div class="help-block">{intl l='Enter here the content name in the default language (%title)' title={$TITLE}}</div>
 
                             {* Switch edition to the current locale *}
                             <input type="hidden" name="edit_language_id" value="{$ID}" />
@@ -617,7 +621,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url noamp=1 path='/admin/content/update-position' content_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp=1 path='/admin/content/update-position' content_id='__ID__' position='__POS__' folder_id=$parent}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))

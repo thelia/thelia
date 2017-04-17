@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Application;
@@ -26,7 +27,10 @@ use Thelia\Command\ModuleGenerateCommand;
  */
 class ModuleGenerateCommandTest extends BaseCommandTest
 {
+    /** @var Command */
     protected $command;
+
+    /** @var CommandTester */
     protected $commandTester;
 
     public static function clearTest()

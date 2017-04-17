@@ -1,0 +1,59 @@
+{* Do not display shop information block if user none of the required authorizations *}
+
+{capture name="shop_information_block_content"}
+    {loop type="auth" name="can_view" role="ADMIN" resource="admin.customer" access="VIEW"}
+        <div class="stats col-md-2 col-xs-4">
+            <a href="{url path='/admin/customers'}">
+                <h2>{count type="customer" current="false" backend_context="1"}</h2>
+                <p>{intl l="Customers" d='hookadminhome.bo.default'}</p>
+            </a>
+        </div>
+    {/loop}
+
+    {loop type="auth" name="can_view" role="ADMIN" resource="admin.category" access="VIEW"}
+        <div class="stats col-md-2 col-xs-4">
+            <a href="{url path='/admin/catalog'}">
+                <h2>{count type="category" visible="*" backend_context="1"}</h2>
+                <p>{intl l="Categories" d='hookadminhome.bo.default'}</p>
+            </a>
+        </div>
+    {/loop}
+
+    {loop type="auth" name="can_view" role="ADMIN" resource="admin.product" access="VIEW"}
+        <div class="stats col-md-2 col-xs-4">
+            <a href="{url path='/admin/catalog'}">
+                <h2>{count type="product" visible="*" backend_context="1"}</h2>
+                <p>{intl l="Products" d='hookadminhome.bo.default'}</p>
+            </a>
+        </div>
+        <div class="stats col-md-2 col-xs-4">
+            <a href="{url path='/admin/catalog'}">
+                <h2>{count type="product" visible="true" backend_context="1"}</h2>
+                <p>{intl l="Online products" d='hookadminhome.bo.default'}</p>
+            </a>
+        </div>
+        <div class="stats col-md-2 col-xs-4">
+            <a href="{url path='/admin/catalog'}">
+                <h2>{count type="product" visible="false" backend_context="1"}</h2>
+                <p>{intl l="Offline products" d='hookadminhome.bo.default'}</p>
+            </a>
+        </div>
+    {/loop}
+
+    {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
+        <div class="stats col-md-2 col-xs-4">
+            <a href="{url path='/admin/orders'}">
+                <h2>{count type="order" status="*" customer="*" backend_context="1"}</h2>
+                <p>{intl l="Orders" d='hookadminhome.bo.default'}</p>
+            </a>
+        </div>
+    {/loop}
+{/capture}
+
+{if trim($smarty.capture.shop_information_block_content) ne ""}
+    <div class="general-block-decorator" id="block-information">
+        <div class="row">
+            {$smarty.capture.shop_information_block_content nofilter}
+        </div>
+    </div>
+{/if}

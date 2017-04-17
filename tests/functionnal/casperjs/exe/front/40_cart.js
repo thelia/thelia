@@ -21,7 +21,9 @@ casper.test.begin('Cart', 5, function suite(test) {
         "#pse-submit",
         function(){
             test.assertExists("#pse-submit", "Add to cart button exists");
-            this.capture(screenshot_dir + 'front/40_product.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/40_product.png');
+            }
             this.echo("Submit add to cart");
 
             var isDisabled = this.evaluate(function() {
@@ -44,7 +46,9 @@ casper.test.begin('Cart', 5, function suite(test) {
         function() {
             //this.echo(this.getHTML());
             test.assertSelectorHasText('.bootbox h3.text-center', 'The product has been added to your cart');
-            this.captureSelector(screenshot_dir + 'front/40_added-to-cart.png', '.bootbox');
+            if (screenshot_enabled) {
+                this.captureSelector(screenshot_dir + 'front/40_added-to-cart.png', '.bootbox');
+            }
         },
         function(){
             this.die("'The product has been added to your cart' pop-in not found");
@@ -56,9 +60,13 @@ casper.test.begin('Cart', 5, function suite(test) {
         this.echo(this.getTitle());
         test.assertExists("#cart .table-cart", "Cart table exists");
         test.assertElementCount("#cart .table-cart tbody tr h3.name a", 1, "Cart contains 1 product")
+
         var link = this.getElementInfo('#cart .table-cart tbody tr h3.name a');
         test.assertTruthy( link.attributes.href == productUrl, "This is the right product in cart");
-        this.capture(screenshot_dir + 'front/40_cart.png');
+
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/40_cart.png');
+        }
     });
 
     casper.run(function() {

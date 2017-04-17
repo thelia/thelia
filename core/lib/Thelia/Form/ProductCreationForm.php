@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProductQuery;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProductCreationForm extends BaseForm
 {

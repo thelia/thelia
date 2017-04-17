@@ -14,6 +14,7 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -28,7 +29,7 @@ use Thelia\Core\Translation\Translator;
  */
 class Customer extends BaseCustomer implements UserInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
     /**
      * @param  int                                       $titleId          customer title id (from customer_title table)
@@ -91,7 +92,7 @@ class Customer extends BaseCustomer implements UserInterface
         ;
 
         if (!is_null($lang)) {
-            $this->setLang($lang);
+            $this->setLangId($lang);
         }
 
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
@@ -119,6 +120,10 @@ class Customer extends BaseCustomer implements UserInterface
                     ;
 
                 $this->addAddress($address);
+                
+                if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
+                    $this->setConfirmationToken(bin2hex(random_bytes(32)));
+                }
             } else {
                 $address = $this->getDefaultAddress();
 
@@ -143,7 +148,7 @@ class Customer extends BaseCustomer implements UserInterface
 
             $con->commit();
         } catch (PropelException $e) {
-            $con->rollback();
+            $con->rollBack();
             throw $e;
         }
     }
@@ -151,20 +156,52 @@ class Customer extends BaseCustomer implements UserInterface
     /**
      * Return the customer lang, or the default one if none is defined.
      *
-     * @return Lang the customer lang
+     * @return \Thelia\Model\Lang Lang model
      */
     public function getCustomerLang()
     {
-        if ($this->getLang() !== null) {
-            $lang = LangQuery::create()
-                ->findPk($this->getLang());
-        } else {
-            $lang = LangQuery::create()
+        $lang = $this->getLangModel();
+
+        if ($lang === null) {
+            $lang = (new LangQuery)
                 ->filterByByDefault(1)
-                ->findOne();
+                ->findOne()
+            ;
         }
 
         return $lang;
+    }
+
+    /**
+     * Get lang identifier
+     *
+     * @return integer Lang id
+     *
+     * @deprecated 2.3.0 It's not the good way to get lang identifier
+     *
+     * @see \Thelia\Model\Customer::getLangId()
+     * @see \Thelia\Model\Customer::getLangModel()
+     */
+    public function getLang()
+    {
+        return $this->getLangId();
+    }
+
+    /**
+     * Set lang identifier
+     *
+     * @param integer $langId Lang identifier
+     *
+     * @return $this Return $this, allow chaining
+     *
+     * @deprecated 2.3.0 It's not the good way to set lang identifier
+     *
+     * @see \Thelia\Model\Customer::setLangId()
+     * @see \Thelia\Model\Customer::setLangModel()
+     */
+    public function setLang($langId)
+    {
+        return $this->setLangId($langId);
     }
 
     protected function generateRef()
@@ -250,7 +287,7 @@ class Customer extends BaseCustomer implements UserInterface
         return parent::setEmail($email);
     }
 
-   /**
+    /**
      * {@inheritDoc}
      */
     public function getUsername()

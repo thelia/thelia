@@ -26,7 +26,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
     /**
      * Set the value of specific coupon fields.
      *
-     * @param Array $effects the Coupon effects params
+     * @param array $effects the Coupon effects params
      */
     abstract public function setFieldsValue($effects);
 
@@ -79,35 +79,6 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         $this->setFieldsValue($effects);
 
         return $this;
-    }
-    /**
-     * @inheritdoc
-     */
-    public function exec()
-    {
-        // This coupon subtracts the specified amount from the order total
-        // for each product of the selected categories.
-        $discount = 0;
-
-        $cartItems = $this->facade->getCart()->getCartItems();
-
-        /** @var CartItem $cartItem */
-        foreach ($cartItems as $cartItem) {
-            if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
-                $categories = $cartItem->getProduct()->getCategories();
-
-                /** @var Category $category */
-                foreach ($categories as $category) {
-                    if (in_array($category->getId(), $this->category_list)) {
-                        $discount += $this->getCartItemDiscount($cartItem);
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $discount;
     }
 
     /**

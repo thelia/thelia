@@ -16,22 +16,48 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.stats" path="/admin/home/stats">
-        <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
-    </route>
-
-    <route id="admin.news-feed" path="/admin/ajax/thelia_news_feed">
-        <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
-        <default key="template">ajax/thelia_news_feed</default>
-        <default key="not-logged">1</default>
-    </route>
-
     <!-- end home -->
 
     <!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
         <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>
         <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.lost-password" path="/admin/lost-password">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::showLostPasswordAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-create" path="/admin/password-create-request">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-create-success" path="/admin/password-create-request-success">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestSuccessAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+
+    <route id="admin.password-create-form" path="/admin/password-create/{token}">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::displayCreateFormAction</default>
+        <requirement key="token">.*</requirement>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-renewed" path="/admin/password-created">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreatedAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.password-renewed-success" path="/admin/password-create-success">
+        <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreatedSuccessAction</default>
+        <default key="not-logged">1</default>
+    </route>
+
+    <route id="admin.set-email-address" path="/admin/set-email-address">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::setEmailAction</default>
     </route>
 
     <!-- Route to the administration logout page -->
@@ -225,6 +251,36 @@
     </route>
 
     <!-- end order management -->
+
+    <!-- order status management -->
+
+    <route id="admin.order-status.default" path="/admin/configuration/order-status">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::defaultAction</default>
+    </route>
+
+    <route id="admin.order-status.create" path="/admin/configuration/order-status/create">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::createAction</default>
+    </route>
+
+    <route id="admin.order-status.update" path="/admin/configuration/order-status/update/{order_status_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::updateAction</default>
+        <requirement key="order_status_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order-status.save" path="/admin/configuration/order-status/save/{order_status_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::processUpdateAction</default>
+        <requirement key="order_status_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order-status.delete" path="/admin/configuration/order-status/delete">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::deleteAction</default>
+    </route>
+
+    <route id="admin.order-status.update-position" path="/admin/configuration/order-status/update-position">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::updatePositionAction</default>
+    </route>
+
+    <!-- end order status management -->
 
     <!-- Categories management -->
 
@@ -965,6 +1021,10 @@
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::defaultAction</default>
     </route>
 
+    <route id="admin.configuration.administrators.view-profile" path="/admin/configuration/administrators/view">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::viewAction</default>
+    </route>
+
     <route id="admin.configuration.administrators.add" path="/admin/configuration/administrators/add">
         <default key="_controller">Thelia\Controller\Admin\AdministratorController::createAction</default>
     </route>
@@ -1405,49 +1465,53 @@
 
     <!-- export management -->
 
-    <route id="export.list" path="/admin/export">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
+    <route id="export.list" path="/admin/export" methods="get">
+        <default key="_controller">Thelia:Admin\Export:index</default>
     </route>
 
-    <route id="export.position" path="/admin/export/position">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::changePosition</default>
+    <route id="export.position" path="/admin/export/position" methods="get">
+        <default key="_controller">Thelia:Admin\Export:changeExportPosition</default>
     </route>
 
-    <route id="export.category.position" path="/admin/export/position/category">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
-    </route>
-
-    <route id="export.mode" path="/admin/export/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
-        <requirement key="id">\d+</requirement>
+    <route id="export.category.position" path="/admin/export/position/category" methods="get">
+        <default key="_controller">Thelia:Admin\Export:changeCategoryPosition</default>
     </route>
 
     <route id="export.view" path="/admin/export/{id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::exportView</default>
+        <default key="_controller">Thelia:Admin\Export:configure</default>
+
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="export.process" path="/admin/export/{id}" methods="post">
+        <default key="_controller">Thelia:Admin\Export:export</default>
+
         <requirement key="id">\d+</requirement>
     </route>
 
     <!-- import management -->
 
     <route id="import.list" path="/admin/import">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
+        <default key="_controller">Thelia:Admin\Import:index</default>
     </route>
 
-    <route id="import.position" path="/admin/import/position">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::changePosition</default>
+    <route id="import.position" path="/admin/import/position" methods="get">
+        <default key="_controller">Thelia:Admin\Import:changeImportPosition</default>
     </route>
 
-    <route id="import.category.position" path="/admin/import/position/category">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPosition</default>
-    </route>
-
-    <route id="import.mode" path="/admin/import/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
-        <requirement key="id">\d+</requirement>
+    <route id="import.category.position" path="/admin/import/position/category" methods="get">
+        <default key="_controller">Thelia:Admin\Import:changeCategoryPosition</default>
     </route>
 
     <route id="import.view" path="/admin/import/{id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
+        <default key="_controller">Thelia:Admin\Import:configure</default>
+
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="import.process" path="/admin/import/{id}" methods="post">
+        <default key="_controller">Thelia:Admin\Import:import</default>
+
         <requirement key="id">\d+</requirement>
     </route>
 

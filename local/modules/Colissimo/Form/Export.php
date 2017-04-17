@@ -14,16 +14,11 @@ namespace Colissimo\Form;
 
 use Colissimo\Colissimo;
 use Colissimo\Model\ColissimoQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
-use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderStatus;
-use Thelia\Model\OrderStatusQuery;
-
 
 /**
  * Class Export
@@ -59,21 +54,26 @@ class Export extends BaseForm
             ->find();
 
         $this->formBuilder
-            ->add('status_id', 'text',[
-                'constraints' => [
-                    new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(
-                            array($this,
-                                "verifyValue")
+            ->add(
+                'status_id',
+                'text',
+                [
+                    'constraints' => [
+                        new NotBlank(),
+                        new Callback(
+                            array("methods" => array(array($this, "verifyValue")))
                         )
-                    ))
-                ],
-                'label' => Translator::getInstance()->trans('Modify status export after export', [], Colissimo::MESSAGE_DOMAIN),
-                'label_attr' => [
-                    'for' => 'status_id'
+                    ],
+                    'label' => Translator::getInstance()->trans(
+                        'Modify status export after export',
+                        [],
+                        Colissimo::DOMAIN_NAME
+                    ),
+                    'label_attr' => [
+                        'for' => 'status_id'
+                    ]
                 ]
-            ]);
+            );
 
         /** @var \Thelia\Model\Order $order */
         foreach ($orders as $order) {
@@ -101,8 +101,14 @@ class Export extends BaseForm
 
     public function verifyValue($value, ExecutionContextInterface $context)
     {
-        if (!preg_match("#^nochange|processing|sent$#",$value)) {
-            $context->addViolation(Translator::getInstance()->trans('select a valid status', [], Colissimo::MESSAGE_DOMAIN));
+        if (!preg_match("#^nochange|processing|sent$#", $value)) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'select a valid status',
+                    [],
+                    Colissimo::DOMAIN_NAME
+                )
+            );
         }
     }
 

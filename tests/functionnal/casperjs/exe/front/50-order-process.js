@@ -9,7 +9,9 @@ casper.test.begin('Order process', 4, function suite(test) {
             function then() {
                 casper.test.comment('== Page loaded : ' + this.getCurrentUrl());
                 test.assertTitle("Billing and delivery - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
-                this.capture(screenshot_dir + 'front/50_delivery_list.png');
+                if (screenshot_enabled) {
+                    this.capture(screenshot_dir + 'front/50_delivery_list.png');
+                }
 
                 test.assertEval(function () {
                     return __utils__.findAll("#form-cart-delivery table.table-address tr").length >= 1;
@@ -36,7 +38,9 @@ casper.test.begin('Order process', 4, function suite(test) {
             test.assertTitle("My order - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
 
             test.assertElementCount("table.table-cart tbody tr", 1, "cart contain 1 product");
-            this.capture(screenshot_dir + 'front/50_delivery_order.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/50_delivery_order.png');
+            }
         },
         function(){
             this.die("The 'title' tag didn't change");

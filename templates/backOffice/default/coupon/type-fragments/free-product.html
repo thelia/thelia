@@ -7,8 +7,8 @@
 
         <select required class="form-control" id="free-product-category-id" name="{$offered_category_field_name}">
             <option value="0">{intl l="Please select..."}</option>
-            {loop type="category-tree" category=0 name="list-of-category" backend_context="1"}
-                <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if $ID == $offered_category_value}selected="selected"{/if}>{$TITLE}</option>
+            {loop type="category-tree" category=0 name="list-of-category" backend_context="1" visible="*"}
+                <option value="{$ID}" {if $ID == $offered_category_value}selected="selected"{/if}>{option_offset l=$LEVEL label={$TITLE}}</option>
             {/loop}
         </select>
     </div>
@@ -20,7 +20,7 @@
         <label for="free-products-id">{intl l="Select offered product :"}</label>
 
         <select required class="form-control" id="free-products-id" name="{$offered_product_field_name}">
-            {loop type="product" category=$offered_category_value|default:0 name="list-of-products" backend_context="1"}
+            {loop type="product" category=$offered_category_value|default:0 name="list-of-products" backend_context="1" return_url=false}
                 <option value="{$ID}" {if $ID == $offered_product_value}selected="selected"{/if}>{$TITLE}</option>
             {/loop}
         </select>

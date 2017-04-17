@@ -10,6 +10,7 @@ A generic modal creation dialog template. Parameters
     dialog_cancel_label = The cancel button label. Default create
 
     form_action        = The form action URL. Form is submitted when OK button is clicked
+    form_attributes    = additional form attibutes
     form_enctype       = The form encoding
     form_error_message = The form error message (optional)
 
@@ -25,7 +26,7 @@ A generic modal creation dialog template. Parameters
                 <h3>{$dialog_title nofilter}</h3>
             </div>
 
-            <form method="POST" action="{$form_action nofilter}" {$form_enctype nofilter}>
+            <form method="POST" action="{$form_action nofilter}" {$form_enctype nofilter} {$form_attributes nofilter}>
 
                 <div class="modal-body">
                     {if ! empty($form_error_message)}<div class="alert alert-danger" id="{$dialog_id}_error">{$form_error_message nofilter}</div>{/if}

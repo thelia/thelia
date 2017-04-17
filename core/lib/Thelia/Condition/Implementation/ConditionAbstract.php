@@ -338,4 +338,14 @@ abstract class ConditionAbstract implements ConditionInterface
             ]
         );
     }
+
+    /**
+     * A helper to het the current locale.
+     *
+     * @return string the current locale.
+     */
+    protected function getCurrentLocale()
+    {
+        return $this->facade->getRequest()->getSession()->getLang()->getLocale();
+    }
 }

@@ -38,4 +38,6 @@
     -->
     <thelia>2.2.0</thelia>
     <stability>other</stability>
+    <mandatory>0</mandatory>
+    <hidden>0</hidden>
 </module>

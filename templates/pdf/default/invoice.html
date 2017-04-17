@@ -209,30 +209,12 @@
                     {hook name="invoice.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                 {/ifhook}
                 {elsehook rel="invoice.delivery-address"}                
-				<p>
-                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
-                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop} {$FIRSTNAME} {$LASTNAME}<br />
-                    {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                    {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" visible="*" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-                    {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}
-                    {/loop}
-                </p>
+				    {format_address order_address=$DELIVERY_ADDRESS locale=$locale}
                	{/elsehook}
             </td>
             <td style="border-left: solid 1mm #f6993c;">
                 <h3>{intl l="Invoice address"}</h3>
-                <p>
-                    {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
-                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
-                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
-                    {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
-                    {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" visible="*" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
-                    {if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}
-                    {/loop}
-                </p>
+                {format_address order_address=$INVOICE_ADDRESS locale=$locale}
             </td>
         </tr>
     </table>
@@ -273,11 +255,16 @@
             <tr class="table-2">
                 <td>
                     <p>{$TITLE}</p>
+                    <p>
+                        {intl l="Product ref : "}{$REF}<br>
+                        {intl l="Combination ref : "}{$PRODUCT_SALE_ELEMENTS_REF}
+                    </p>
                     {ifloop rel="combinations"}
                     {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                     {/loop}
                     {/ifloop}
+                    {hook name="invoice.product-list" order_product=$ID order=$order_id}
                 </td>
                 <td><p class="align-right">{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
                 <td><p class="align-right">{format_money number=$realTax currency_id=$CURRENCY}</p></td>

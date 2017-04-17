@@ -7,7 +7,9 @@ casper.test.begin('Register', 15, function suite(test) {
     casper.start(thelia2_base_url + "register", function() {
         test.assertTitle("Register - " + thelia2_store_name, "title is the one expected");
         test.assertExists('form#form-register', "register form is found");
-        this.capture(screenshot_dir + 'front/20_register.png');
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/20_register.png');
+        }
 
         casper.test.comment('== Register blank account');
 
@@ -36,7 +38,9 @@ casper.test.begin('Register', 15, function suite(test) {
 
         casper.test.comment('== Register thelia account');
 
-        this.capture(screenshot_dir + 'front/20_register-ko.png');
+        if (screenshot_enabled) {
+            this.capture(screenshot_dir + 'front/20_register-ko.png');
+        }
 
         test.assertExists('.group-title.has-error', 'title can not be empty');
         test.assertExists('.group-firstname.has-error', 'firstname can not be empty');
@@ -49,7 +53,7 @@ casper.test.begin('Register', 15, function suite(test) {
         test.assertExists('.group-password_confirm.has-error', 'password confirm can not be empty');
 
         this.fill('form#form-register', {
-            'thelia_customer_create[title]': 1,
+            'thelia_customer_create[title]': '1',
             'thelia_customer_create[firstname]': 'thelia',
             'thelia_customer_create[lastname]': 'thelia',
             'thelia_customer_create[email]': 'test@thelia.net',
@@ -61,7 +65,7 @@ casper.test.begin('Register', 15, function suite(test) {
             'thelia_customer_create[address2]': '',
             'thelia_customer_create[zipcode]': '63000',
             'thelia_customer_create[city]': 'Clermont-Ferrand',
-            'thelia_customer_create[country]': 64,
+            'thelia_customer_create[country]': '64',
             'thelia_customer_create[password]': 'thelia',
             'thelia_customer_create[password_confirm]': 'thelia',
             'thelia_customer_create[newsletter]': ''
@@ -100,7 +104,9 @@ casper.test.begin('Register', 15, function suite(test) {
     casper.waitForSelector(
         '.navbar-customer a.account',
         function() {
-            this.capture(screenshot_dir + 'front/20_register-ok.png');
+            if (screenshot_enabled) {
+                this.capture(screenshot_dir + 'front/20_register-ok.png');
+            }
             test.assertSelectorHasText('.navbar-customer a.account', 'My Account');
             test.assertExists('a.logout', 'Logout button exists');
 

@@ -94,5 +94,31 @@ class CategoryQuery extends BaseCategoryQuery
 
         return $result;
     }
+
+    /**
+     * Get categories from root to child
+     *
+     * @param integer $categoryId Category ID
+     *
+     * @since 2.3.0
+     *
+     * @return array An array of \Thelia\Model\Category from root to wanted category
+     *               or an empty array if Category ID doesn't exists
+     */
+    public static function getPathToCategory($categoryId)
+    {
+        $path = [];
+
+        $category = (new CategoryQuery)->findPk($categoryId);
+        if ($category !== null) {
+            $path[] = $category;
+
+            if ($category->getParent() !== 0) {
+                $path = array_merge(self::getPathToCategory($category->getParent()), $path);
+            }
+        }
+
+        return $path;
+    }
 }
 // CategoryQuery

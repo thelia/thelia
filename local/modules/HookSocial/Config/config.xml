@@ -9,7 +9,7 @@
     </forms>
 
     <hooks>
-        <hook id="hooksocial.hook.front" class="HookSocial\Hook\FrontHook" scope="request">
+        <hook id="hooksocial.hook.front" class="HookSocial\Hook\FrontHook">
             <tag name="hook.event_listener" event="main.footer-body" />
         </hook>
         <hook id="hooksocial.hook.back">

@@ -153,7 +153,7 @@ class CustomerControllerTest extends ApiTestCase
             'country'   => 64,
             'email'     => sprintf("%s@thelia.fr", uniqid()),
             'password'  => 'azerty',
-            'lang'      => 1
+            'lang_id'   => 1
         ];
 
         $requestContent = json_encode($user);
@@ -191,7 +191,7 @@ class CustomerControllerTest extends ApiTestCase
             'country'   => 64,
             'email'     => $customer->getEmail(),
             'password'  => 'azerty',
-            'lang'      => 1
+            'lang_id'   => 1
         ];
 
         $requestContent = json_encode($user);
@@ -255,7 +255,7 @@ class CustomerControllerTest extends ApiTestCase
             'zipcode'   => 63100,
             'country'   => 64,
             'email'     => sprintf("%s@thelia.fr", uniqid()),
-            'lang'      => 1
+            'lang_id'   => 1
         ];
 
         $requestContent = json_encode($user);
@@ -287,7 +287,7 @@ class CustomerControllerTest extends ApiTestCase
             'zipcode'   => 63100,
             'country'   => 64,
             'email'     => sprintf("%s@thelia.fr", uniqid()),
-            'lang'      => 1
+            'lang_id'   => 1
         ];
 
         $requestContent = json_encode($user);

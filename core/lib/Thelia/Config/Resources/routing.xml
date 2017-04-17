@@ -21,7 +21,7 @@
 
         <service id="controller.default" class="Thelia\Controller\DefaultController"/>
 
-        <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController" scope="request">
+        <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController">
        		<argument type="service" id="thelia.parser"/>
         </service>
 

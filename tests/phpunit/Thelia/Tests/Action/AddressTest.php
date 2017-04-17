@@ -26,7 +26,7 @@ use Thelia\Model\CustomerQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class AddressTest extends \PHPUnit_Framework_TestCase
+class AddressTest extends BaseAction
 {
     public function testCreatedAddress()
     {
@@ -48,10 +48,9 @@ class AddressTest extends \PHPUnit_Framework_TestCase
             ""
         );
         $AddressCreateOrUpdateEvent->setCustomer($customer);
-        $AddressCreateOrUpdateEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $actionAddress = new Address();
-        $actionAddress->create($AddressCreateOrUpdateEvent);
+        $actionAddress->create($AddressCreateOrUpdateEvent, null, $this->getMockEventDispatcher());
 
         $createdAddress = $AddressCreateOrUpdateEvent->getAddress();
 
@@ -95,10 +94,9 @@ class AddressTest extends \PHPUnit_Framework_TestCase
             ""
         );
         $addressEvent->setAddress($address);
-        $addressEvent->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $actionAddress = new Address();
-        $actionAddress->update($addressEvent);
+        $actionAddress->update($addressEvent, null, $this->getMockEventDispatcher());
 
         $updatedAddress = $addressEvent->getAddress();
         $this->assertInstanceOf("Thelia\Model\Address", $updatedAddress);
@@ -160,15 +158,12 @@ class AddressTest extends \PHPUnit_Framework_TestCase
         );
 
         $addressEvent->setAddress($defaultAddress);
-        $addressEvent->setDispatcher(
-            $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface")
-        );
 
         /**
          * Do the update
          */
         $actionAddress = new Address();
-        $actionAddress->update($addressEvent);
+        $actionAddress->update($addressEvent, null, $this->getMockEventDispatcher());
 
         $updatedAddress = AddressQuery::create()
             ->findPk($addressId);

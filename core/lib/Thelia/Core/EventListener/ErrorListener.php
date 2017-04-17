@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -20,8 +21,8 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\TheliaKernelEvents;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -31,28 +32,31 @@ use Thelia\Model\ConfigQuery;
  */
 class ErrorListener implements EventSubscriberInterface
 {
-    /**
-     * @var ParserInterface
-     */
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    /** @var ParserInterface */
     protected $parser;
 
-    /**
-     * @var SecurityContext
-     */
+    /** @var SecurityContext */
     protected $securityContext;
 
+    /** @var string */
     protected $env;
 
     public function __construct(
         $env,
         ParserInterface $parser,
-        SecurityContext $securityContext
+        SecurityContext $securityContext,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->env = $env;
 
         $this->parser = $parser;
 
         $this->securityContext = $securityContext;
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function defaultErrorFallback(GetResponseForExceptionEvent $event)
@@ -77,13 +81,32 @@ class ErrorListener implements EventSubscriberInterface
     public function handleException(GetResponseForExceptionEvent $event)
     {
         if ("prod" === $this->env && ConfigQuery::isShowingErrorMessage()) {
-            $event->getDispatcher()
+            $this->eventDispatcher
                 ->dispatch(
                     TheliaKernelEvents::THELIA_HANDLE_ERROR,
                     $event
                 )
             ;
         }
+    }
+
+    public function logException(GetResponseForExceptionEvent $event)
+    {
+        // Log exception in the Thelia log
+        $exception = $event->getException();
+        
+        $logMessage = '';
+        
+        do {
+            $logMessage .=
+                ($logMessage ? PHP_EOL . 'Caused by' : 'Uncaught exception')
+                . $event->getException()->getMessage()
+                . PHP_EOL
+                . "Stack Trace: " . $event->getException()->getTraceAsString()
+            ;
+        } while (null !== $exception = $exception->getPrevious());
+        
+        Tlog::getInstance()->error($logMessage);
     }
 
     public function authenticationException(GetResponseForExceptionEvent $event)
@@ -97,29 +120,14 @@ class ErrorListener implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
+     * api
      */
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::EXCEPTION => [
+                ["logException", 0],
                 ["handleException", 0],
                 ['authenticationException', 100]
             ],

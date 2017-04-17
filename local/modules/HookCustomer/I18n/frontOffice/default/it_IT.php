@@ -1,13 +1,13 @@
 <?php
 
-return array(
+return [
     'Email address' => 'Indirizzo email',
     'Forgot your Password?' => 'Hai dimenticato la password?',
-    'Log In!' => '',
-    'Log out!' => '',
+    'Log In!' => 'Accedi!',
+    'Log out!' => 'Esci!',
     'My Account' => 'Mio account',
     'Password' => 'Password',
     'Register' => 'Registrati',
-    'Register!' => '',
-    'Sign In' => '',
-);
+    'Register!' => 'Registrati!',
+    'Sign In' => 'Accedi',
+];

@@ -64,6 +64,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                         'code', 'code-reverse',
                         'title', 'title-reverse',
                         'enabled', 'enabled-reverse',
+                        'start-date', 'start-date-reverse',
                         'expiration-date', 'expiration-date-reverse',
                         'days-left', 'days-left-reverse',
                         'usages-left', 'usages-left-reverse'
@@ -97,7 +98,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($inUse !== null) {
             // Get the code of coupons currently in use
-            $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
+            $consumedCoupons = $this->getCurrentRequest()->getSession()->getConsumedCoupons();
 
             // Get only matching coupons.
             $criteria = $inUse ? Criteria::IN : Criteria::NOT_IN;
@@ -137,6 +138,13 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
                 case 'enabled-reverse':
                     $search->orderByIsEnabled(Criteria::DESC);
+                    break;
+
+                case 'start-date':
+                    $search->orderByStartDate(Criteria::ASC);
+                    break;
+                case 'start-date-reverse':
+                    $search->orderByStartDate(Criteria::DESC);
                     break;
 
                 case 'expiration-date':
@@ -233,6 +241,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("TITLE", $coupon->getVirtualColumn('i18n_TITLE'))
                 ->set("SHORT_DESCRIPTION", $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))
                 ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("START_DATE", $coupon->getStartDate())
                 ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
                 ->set("USAGE_LEFT", $coupon->getMaxUsage())
                 ->set("PER_CUSTOMER_USAGE_COUNT", $coupon->getPerCustomerUsageCount())

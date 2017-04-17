@@ -13,12 +13,15 @@
 namespace Thelia\Command;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ModuleQuery;
+use Symfony\Component\Console\Helper\QuestionHelper;
 
 /**
  * Class ModulePositionCommand
@@ -69,7 +72,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         $argsList = $input->getArgument('modules');
         array_walk($argsList, [$this, 'checkModuleArgument']);
 
-        if (!$this->checkPositions($output, $isAbsolute)) {
+        if (!$this->checkPositions($input, $output, $isAbsolute)) {
             return;
         }
 
@@ -108,14 +111,10 @@ class ModulePositionCommand extends ContainerAwareCommand
             $this->getDispatcher()->dispatch(TheliaEvents::MODULE_UPDATE_POSITION, $event);
         }
 
-        $output->renderBlock(
-            [
-                '',
-                'Module position(s) updated',
-                ''
-            ],
-            'bg=green;fg=black'
-        );
+        /** @var FormatterHelper $formatter */
+        $formatter = $this->getHelper('formatter');
+        $formattedBlock = $formatter->formatBlock('Module position(s) updated', 'bg=green;fg=black', true);
+        $output->writeln($formattedBlock);
     }
 
     /**
@@ -128,7 +127,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      */
     protected function checkModuleArgument($paramValue)
     {
-        if (!preg_match('#^([a-z]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
+        if (!preg_match('#^([a-z0-9]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
             throw new \InvalidArgumentException(
                 'Arguments must be in format moduleName:[+|-]position where position is an integer or up or down.'
             );
@@ -174,6 +173,7 @@ class ModulePositionCommand extends ContainerAwareCommand
     /**
      * Check positions consistency
      *
+     * @param InputInterface $input     An InputInterface instance
      * @param OutputInterface $output     An OutputInterface instance
      * @param bool            $isAbsolute Set to true or false according to position values
      *
@@ -181,7 +181,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      *
      * @return bool Continue or stop command
      */
-    protected function checkPositions(OutputInterface $output, &$isAbsolute = false)
+    protected function checkPositions(InputInterface $input, OutputInterface $output, &$isAbsolute = false)
     {
         $isRelative = false;
         foreach (array_count_values($this->positionsList) as $value => $count) {
@@ -197,24 +197,21 @@ class ModulePositionCommand extends ContainerAwareCommand
         }
 
         if ($isAbsolute && $isRelative) {
-            $output->renderBlock(
-                [
-                    '',
-                    'Mix absolute and relative positions may produce unexpected results !',
-                    ''
-                ],
-                'bg=yellow;fg=black'
+            /** @var FormatterHelper $formatter */
+            $formatter = $this->getHelper('formatter');
+            $formattedBlock = $formatter->formatBlock(
+                'Mix absolute and relative positions may produce unexpected results !',
+                'bg=yellow;fg=black',
+                true
             );
+            $output->writeln($formattedBlock);
 
-            /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
-            $dialog = $this->getHelper('dialog');
-            if (!$dialog->askConfirmation(
-                $output,
-                '<question>Do you want to continue ? y/[n]<question>',
-                false
-            )) {
-                return false;
-            }
+            /** @var QuestionHelper $helper */
+            $helper = $this->getHelper('question');
+
+            $question = new ConfirmationQuestion('<question>Do you want to continue ? y/[n]<question>', false);
+
+            return $helper->ask($input, $output, $question);
         }
 
         return true;

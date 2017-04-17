@@ -29,7 +29,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
  * {@inheritdoc}
  * @method int[] getId()
  * @method int[] getProductSaleElementsId()
- * @method int{] getProductImageId()
+ * @method int[] getProductImageId()
  * @method string[] getOrder()
  */
 class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInterface
@@ -43,7 +43,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
     {
         /** @var \Thelia\Model\ProductSaleElementsProductImage $productSaleElementImage */
         foreach ($loopResult->getResultDataCollection() as $productSaleElementImage) {
-            $row = new LoopResultRow();
+            $row = new LoopResultRow($productSaleElementImage);
 
             $row
                 ->set("ID", $productSaleElementImage->getId())
@@ -51,6 +51,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
                 ->set("PRODUCT_IMAGE_ID", $productSaleElementImage->getProductImageId())
             ;
 
+            $this->addOutputFields($row, $productSaleElementImage);
             $loopResult->addRow($row);
         }
 

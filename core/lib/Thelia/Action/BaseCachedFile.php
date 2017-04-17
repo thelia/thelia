@@ -12,6 +12,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CachedFileEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
@@ -192,7 +193,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @param FileCreateOrUpdateEvent $event Image event
      *
-     * @throws \Thelia\Exception\FileException
+     * @throws \Thelia\Exception\FileException|\Exception
      *
      */
     public function saveFile(FileCreateOrUpdateEvent $event)
@@ -263,13 +264,13 @@ abstract class BaseCachedFile extends BaseAction
         $this->fileManager->deleteFile($event->getFileToDelete());
     }
 
-    public function updatePosition(UpdateFilePositionEvent $event)
+    public function updatePosition(UpdateFilePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericUpdatePosition($event->getQuery(), $event);
+        $this->genericUpdatePosition($event->getQuery(), $event, $dispatcher);
     }
 
-    public function toggleVisibility(FileToggleVisibilityEvent $event)
+    public function toggleVisibility(FileToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->genericToggleVisibility($event->getQuery(), $event);
+        $this->genericToggleVisibility($event->getQuery(), $event, $dispatcher);
     }
 }

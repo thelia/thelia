@@ -122,7 +122,7 @@
                                     </thead>
 
                                     <tbody>
-                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit=#max_displayed_customers# search_term=$search search_in="ref,firstname,lastname,email"}
+                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit={config key="number_default_results_per_page.customer_list" default=20} search_term=$search search_in="ref,firstname,lastname,email"}
                                         {$lastOrderDate = ''}
                                         {$lastOrderAmount = ''}
                                         {$lastOrderCurrency = ''}

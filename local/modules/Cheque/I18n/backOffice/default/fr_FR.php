@@ -1,5 +1,5 @@
 <?php
 
-return array(
+return [
     'Cheque instructions configuration' => 'Instructions de paiement par chèque',
-);
+];

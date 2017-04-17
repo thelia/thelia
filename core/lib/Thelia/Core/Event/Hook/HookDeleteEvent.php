@@ -19,8 +19,12 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookDeleteEvent extends HookEvent
 {
+    /** @var int */
     protected $hook_id;
 
+    /**
+     * @param int $hook_id
+     */
     public function __construct($hook_id)
     {
         $this->hook_id = $hook_id;
@@ -28,6 +32,7 @@ class HookDeleteEvent extends HookEvent
 
     /**
      * @param mixed $hook_id
+     * @return $this
      */
     public function setHookId($hook_id)
     {
@@ -37,7 +42,7 @@ class HookDeleteEvent extends HookEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getHookId()
     {

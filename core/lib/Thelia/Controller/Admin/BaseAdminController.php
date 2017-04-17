@@ -239,7 +239,7 @@ class BaseAdminController extends BaseController
     protected function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->container->get('request')->duplicate($query, null, $path);
+        $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
@@ -366,8 +366,6 @@ class BaseAdminController extends BaseController
         // Add the template standard extension
         $templateName .= '.html';
 
-        $session = $this->getSession();
-
         // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLang();
 
@@ -376,16 +374,9 @@ class BaseAdminController extends BaseController
 
         // Prepare common template variables
         $args = array_merge($args, array(
-            'locale'               => $session->getLang()->getLocale(),
-            'lang_code'            => $session->getLang()->getCode(),
-            'lang_id'              => $session->getLang()->getId(),
-
             'edit_language_id'     => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
-
             'edit_currency_id'     => $edition_currency->getId(),
-
-            'current_url'          => $this->getRequest()->getUri()
         ));
 
         // Update the current edition language & currency in session

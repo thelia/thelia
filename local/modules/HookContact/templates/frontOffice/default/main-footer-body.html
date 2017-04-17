@@ -18,10 +18,8 @@
             <a href="tel:{config key="store_phone"}" class="tel" itemprop="telephone">{config key="store_phone"}</a>
         </li>
         {/if}
-        {if {config key="store_email"} }
-        <li class="contact-email">
-            {mailto address={config key="store_email"} encode="hex" extra='class="email" itemprop="email"'}
+        <li class="contact-contact">
+            <a href="{url path='/contact'}">{intl l="Find us, Contact us" d="hookcontact.fo.default"}</a>
         </li>
-        {/if}
     </ul>
 </div>

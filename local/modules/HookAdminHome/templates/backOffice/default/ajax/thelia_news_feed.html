@@ -1,0 +1,29 @@
+{* this template is loaded via Ajax in the login page, to prevent login page slowdown *}
+
+{* Set the default translation domain, that will be used by intl when the 'd' parameter is not set *}
+{default_translation_domain domain='hookadminhome.bo.default'}
+
+<div class="panel-group" id="accordion">
+	{loop type="feed" name="thelia_feeds" url="http://thelia.net/feeds/?lang={$lang_code}" limit="3"}
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse-{$LOOP_COUNT}">
+						{$TITLE|strip_tags nofilter} - {format_date timestamp=$DATE output='date'}
+					</a>
+				</h3>
+			</div>
+			<div id="collapse-{$LOOP_COUNT}" class="panel-collapse collapse {if $LOOP_COUNT == 1}in{/if}">
+				<div class="panel-body">
+					{* we use unescape:"htmlall" to unescape var before truncate, to prevent a cut in the middel of an HTML entity, eg &ea... *}
+         			<p>{$DESCRIPTION|strip_tags|unescape:"htmlall"|truncate:250:"...":true nofilter}</p>
+				</div>
+				<div class="panel-footer">
+					<a href="{$URL nofilter}" target="_blank" class="btn btn-defaut btn-primary"><span class="glyphicon glyphicon-book"></span> {intl l='Read more'}</a>
+				</div>
+			</div>
+		</div>
+
+	{/loop}
+</div>

@@ -12,7 +12,8 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Element\FlashMessage as FlashMessageBag;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -38,8 +39,8 @@ use Thelia\Core\Translation\Translator;
  */
 class FlashMessage extends AbstractSmartyPlugin
 {
-    /** @var Request Request service */
-    protected $request;
+    /** @var RequestStack Request service */
+    protected $requestStack;
 
     /** @var FlashMessageBag $results */
     protected $results;
@@ -47,14 +48,9 @@ class FlashMessage extends AbstractSmartyPlugin
     /** @var Translator */
     protected $translator;
 
-    /**
-     * Constructor
-     *
-     * @param Request $request Request service
-     */
-    public function __construct(Request $request, Translator $translator)
+    public function __construct(RequestStack $requestStack, Translator $translator)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
     }
 
@@ -81,7 +77,7 @@ class FlashMessage extends AbstractSmartyPlugin
             );
         }
 
-        return $this->request->getSession()->getFlashBag()->has($type);
+        return $this->getSession()->getFlashBag()->has($type);
     }
 
     /**
@@ -104,11 +100,11 @@ class FlashMessage extends AbstractSmartyPlugin
             $this->results = new FlashMessageBag();
 
             if (false === $type) {
-                $this->results->addAll($this->request->getSession()->getFlashBag()->all());
+                $this->results->addAll($this->getSession()->getFlashBag()->all());
             } else {
                 $this->results->add(
                     $type,
-                    $this->request->getSession()->getFlashBag()->get($type, [])
+                    $this->getSession()->getFlashBag()->get($type, [])
                 );
             }
 
@@ -147,5 +143,13 @@ class FlashMessage extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "hasflash", $this, "hasFlashMessage"),
             new SmartyPluginDescriptor("block", "flash", $this, "getFlashMessage")
         ];
+    }
+
+    /**
+     * @return Session
+     */
+    protected function getSession()
+    {
+        return $this->requestStack->getCurrentRequest()->getSession();
     }
 }

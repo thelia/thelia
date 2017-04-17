@@ -67,9 +67,58 @@ class Version extends \PHPUnit_Framework_TestCase
             ['2.2', '<2.2', false],
             ['2.2', '~2.2', true],
             ['2.2.0-alpha1', '>=2.2', true],
-            ['2.2.0-alpha1', '>2.1', false],
+            ['2.2.0-alpha1', '>2.1', true],
+            ['2.2.0-alpha1', '<2.1', false],
             ['2.2.0-alpha1', '=2.2', true],
             ['2.2.0-alpha1', '~2.2', true],
+            ['2.2.0-alpha2', '>=2.2', true],
+            ['2.2.0-alpha2', '>2.1', true],
+            ['2.2.0-alpha2', '<2.1', false],
+            ['2.2.0-alpha2', '=2.2', true],
+            ['2.2.0-alpha2', '~2.2', true],
+        ];
+    }
+
+    public function parseProvider()
+    {
+        return [
+            [ '2.1.0', [
+                'version'         => '2.1.0',
+                'major'           => '2',
+                'minus'           => '1',
+                'release'         => '0',
+                'extra'           => '',
+            ] ],
+            [ '2.5.0', [
+                'version' => '2.5.0',
+                'major'   => '2',
+                'minus'   => '5',
+                'release' => '0',
+                'extra'   => '',
+            ], ],
+            [ '2.3.0-alpha2', [
+                'version' => '2.3.0-alpha2',
+                'major'   => '2',
+                'minus'   => '3',
+                'release' => '0',
+                'extra'   => 'alpha2',
+            ], ],
+        ];
+    }
+
+    public function exceptionParseProvider()
+    {
+        return [
+            ['x.3.1',         ],
+            ['2.x.1',         ],
+            ['2.3.x',         ],
+            ['2.3.1-alpha.2', ],
+            ['2.1',           ],
+            ['a.4',           ],
+            ['2.1.2.4',       ],
+            ['2.1.2.4.5',     ],
+            ['1.alpha.8',     ],
+            ['.1.2',          ],
         ];
     }
 
@@ -88,5 +137,27 @@ class Version extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertSame($result, Tester::test($version, $expression, $strict), $message);
+    }
+
+    /**
+     * @dataProvider ParseProvider
+     */
+    public function testParse($version, $expected)
+    {
+        $message = sprintf(
+            "=====\n\tVersion: %s\n\t expected: %s\n======\n",
+            var_export($version, true),
+            var_export($expected, true)
+        );
+        $this->assertEquals($expected, Tester::parse($version), $message);
+    }
+
+    /**
+     * @dataProvider exceptionParseProvider
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionParse($version)
+    {
+        Tester::parse($version);
     }
 }

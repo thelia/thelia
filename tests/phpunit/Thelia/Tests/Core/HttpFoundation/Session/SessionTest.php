@@ -12,6 +12,8 @@
 
 namespace Thelia\Tests\Core\HttpFoundation\Session;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -19,6 +21,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Tools\TokenProvider;
 
@@ -34,9 +37,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     /** @var  Session */
     protected $session;
 
-    /** @var  Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
+    /** @var EventDispatcher */
     protected $dispatcher;
 
     protected $dispatcherNull;
@@ -47,19 +51,32 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->request = new Request();
+        $this->requestStack = new RequestStack();
+
+        $request = new Request();
+
+        $this->requestStack->push($request);
 
         $this->session = new Session(new MockArraySessionStorage());
 
-        $this->session->setSessionCart(null);
+        $request->setSession($this->session);
 
-        $this->request->setSession($this->session);
+        $this->dispatcher = new EventDispatcher();
 
         $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
 
+        $token = new TokenProvider($this->requestStack, $translator, 'test');
+
+        $this->dispatcher->addSubscriber(new \Thelia\Action\Cart($this->requestStack, $token));
+
+        $this->session->setSessionCart(null);
+
+        $request->setSession($this->session);
+
+        /** @var \Thelia\Action\Cart  cartAction */
         $this->cartAction = new \Thelia\Action\Cart(
-            $this->request,
-            new TokenProvider($this->request, $translator, 'baba au rhum')
+            $this->requestStack,
+            new TokenProvider($this->requestStack, $translator, 'baba au rhum')
         );
 
         $this->dispatcherNull = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -81,12 +98,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($type, $event) {
-                    $event->setDispatcher($this->dispatcher);
-
                         if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
-                            $this->cartAction->restoreCurrentCart($event);
+                            $this->cartAction->restoreCurrentCart($event, null, $this->dispatcher);
                         } elseif ($type == TheliaEvents::CART_CREATE_NEW) {
-                            $this->cartAction->createEmptyCart($event);
+                            $this->cartAction->createEmptyCart($event, null, $this->dispatcher);
                         }
                     }
                 )
@@ -110,7 +125,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $session = $this->session;
 
-        @$session->getCart();
+        @$session->getSessionCart();
     }
 
     /**
@@ -170,7 +185,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $testCart->setToken(uniqid("testSessionGetCart2", true));
         $testCart->save();
 
-        $this->request->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
+        $this->requestStack->getCurrentRequest()->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
 
         $cart = $session->getSessionCart($this->dispatcher);
 
@@ -197,11 +212,46 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $testCart->setCustomerId($customer->getId());
         $testCart->save();
 
-        $this->request->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
+        $this->requestStack->getCurrentRequest()->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
 
         $cart = $session->getSessionCart($this->dispatcher);
 
         $this->assertNotNull($cart);
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
+    }
+
+    public function testSetCurrency()
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        $currentCurrency = (new Currency())->setId(99);
+        $session->setCurrency($currentCurrency);
+        $this->assertEquals($currentCurrency->getId(), $session->getCurrency()->getId());
+    }
+
+    public function testGetCurrencyWithParameterForceDefault()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $this->assertNull($session->getCurrency(false));
+    }
+
+    public function testGetCurrency()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $this->assertInstanceOf('Thelia\Model\Currency', $session->getCurrency());
+    }
+
+    public function testGetAdminEditionCurrencyWithCurrencyInSession()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $currentCurrency = (new Currency())->setId(99);
+        $session->setAdminEditionCurrency($currentCurrency);
+        $this->assertEquals($currentCurrency->getId(), $session->getAdminEditionCurrency()->getId());
+    }
+
+    public function testGetAdminEditionCurrencyWithNoCurrencyInSession()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $this->assertInstanceOf('Thelia\Model\Currency', $session->getAdminEditionCurrency());
     }
 }

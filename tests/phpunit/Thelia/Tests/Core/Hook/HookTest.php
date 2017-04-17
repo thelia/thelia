@@ -57,7 +57,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testConfigTag($content)
@@ -70,7 +70,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testHookFunction($content)
@@ -82,7 +82,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testHookIfElse($content)
@@ -103,7 +103,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testHookBlock($content)
@@ -114,14 +114,14 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookGlobal($content)
     {
         $this->assertStringContains($content, ":: main.content-top ::");
         $this->assertStringContains($content, ":: request : GET / HTTP/1.1");
-        $this->assertRegExp('/:: session : [a-f0-9]{40} ::/', $content);
+        $this->assertRegExp('/:: session : [a-f0-9]{40,} ::/', $content);
         $this->assertStringContains($content, ":: cart : not null ::");
         $this->assertStringContains($content, ":: order : not null ::");
         $this->assertStringContains($content, ":: currency : 1 ::");
@@ -130,7 +130,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookRender($content)
@@ -139,7 +139,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookDump($content)
@@ -148,7 +148,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookAddCSS($content)
@@ -158,7 +158,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookAddJS($content)
@@ -167,7 +167,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookTrans($content)
@@ -179,7 +179,7 @@ class HookTest extends WebTestCase
     }
 
     /**
-     * @params string $content
+     * @param string $content
      * @depends testHome
      */
     public function testBaseHookAssetsOverride($content)

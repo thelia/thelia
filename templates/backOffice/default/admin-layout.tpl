@@ -95,7 +95,7 @@
                             <span class="caret"></span>
                         </button>                        
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
+                            <li><a class="profile" href="{url path='admin/configuration/administrators/view'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
                             <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
                         </ul>
                     </li>

@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
@@ -73,10 +74,10 @@ class Area extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updatePostage(AreaUpdatePostageEvent $event)
+    public function updatePostage(AreaUpdatePostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->setDispatcher($event->getDispatcher());
+            $area->setDispatcher($dispatcher);
             $area
                 ->setPostage($event->getPostage())
                 ->save();
@@ -85,33 +86,33 @@ class Area extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(AreaDeleteEvent $event)
+    public function delete(AreaDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->setDispatcher($event->getDispatcher());
+            $area->setDispatcher($dispatcher);
             $area->delete();
 
             $event->setArea($area);
         }
     }
 
-    public function create(AreaCreateEvent $event)
+    public function create(AreaCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $area = new AreaModel();
 
         $area
-            ->setDispatcher($event->getDispatcher())
+            ->setDispatcher($dispatcher)
             ->setName($event->getAreaName())
             ->save();
 
         $event->setArea($area);
     }
 
-    public function update(AreaUpdateEvent $event)
+    public function update(AreaUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
             $area
-                ->setDispatcher($event->getDispatcher())
+                ->setDispatcher($dispatcher)
                 ->setName($event->getAreaName())
                 ->save();
 
@@ -120,24 +121,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
