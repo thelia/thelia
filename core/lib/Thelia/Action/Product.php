@@ -80,6 +80,12 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function create(ProductCreateEvent $event)
     {
+        $defaultTaxRuleId = null;
+        $defaultTaxRule = TaxRuleQuery::create()->findOneByIsDefault(true);
+        if ($defaultTaxRule) {
+            $defaultTaxRuleId = $defaultTaxRule->getId();
+        }
+
         $product = new ProductModel();
 
         $product
@@ -97,7 +103,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $event->getBasePrice(),
                 $event->getCurrencyId(),
                 // Set the default tax rule if not defined
-                $event->getTaxRuleId() ?: TaxRuleQuery::create()->findOneByIsDefault(true),
+                $event->getTaxRuleId() ?: $defaultTaxRuleId,
                 $event->getBaseWeight(),
                 $event->getBaseQuantity()
             )
