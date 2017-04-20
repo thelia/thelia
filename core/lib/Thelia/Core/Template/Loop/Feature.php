@@ -123,11 +123,13 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 /** @var ProductModel $product */
                 foreach ($products as $product) {
-                    $search
-                        ->useFeatureProductQuery()
-                            ->filterByProduct($product)
-                        ->endUse()
-                    ;
+                    if (!$this->getBackendContext()) {
+                        $search
+                            ->useFeatureProductQuery()
+                                ->filterByProduct($product)
+                            ->endUse()
+                        ;
+                    }
                     $tplId = $product->getTemplateId();
 
                     if (! is_null($tplId)) {
