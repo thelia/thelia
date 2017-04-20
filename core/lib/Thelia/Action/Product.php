@@ -81,8 +81,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function create(ProductCreateEvent $event)
     {
         $defaultTaxRuleId = null;
-        $defaultTaxRule = TaxRuleQuery::create()->findOneByIsDefault(true);
-        if ($defaultTaxRule) {
+        if (null !== $defaultTaxRule = TaxRuleQuery::create()->findOneByIsDefault(true)) {
             $defaultTaxRuleId = $defaultTaxRule->getId();
         }
 
