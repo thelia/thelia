@@ -80,6 +80,11 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function create(ProductCreateEvent $event)
     {
+        $defaultTaxRuleId = null;
+        if (null !== $defaultTaxRule = TaxRuleQuery::create()->findOneByIsDefault(true)) {
+            $defaultTaxRuleId = $defaultTaxRule->getId();
+        }
+
         $product = new ProductModel();
 
         $product
@@ -90,17 +95,14 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setVisible($event->getVisible() ? 1 : 0)
             ->setVirtual($event->getVirtual() ? 1 : 0)
-
-            // Set the default tax rule to this product
-            ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
-
             ->setTemplateId($event->getTemplateId())
 
             ->create(
                 $event->getDefaultCategory(),
                 $event->getBasePrice(),
                 $event->getCurrencyId(),
-                $event->getTaxRuleId(),
+                // Set the default tax rule if not defined
+                $event->getTaxRuleId() ?: $defaultTaxRuleId,
                 $event->getBaseWeight(),
                 $event->getBaseQuantity()
             )
@@ -386,7 +388,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['list'] = ProductDocumentQuery::create()
                     ->findByProductId($event->getProductId());
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
-                
+
                 // Delete product
                 $product
                     ->setDispatcher($this->eventDispatcher)
