@@ -106,8 +106,11 @@
                                     {else}
                                         <dd>{intl l="Out of Stock"}</dd>
                                     {/if}
-                                    <dt>{intl l="No."}</dt>
-                                    <dd>{$REF}</dd>
+                                    {loop type="product_sale_elements" name="ref" id=$PRODUCT_SALE_ELEMENTS_ID}
+                                        <dt>{intl l="No."}</dt>
+                                        <dd>{$REF}</dd>
+                                    {/loop}
+                                    
                                     {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
                                         <dt>{$ATTRIBUTE_TITLE}</dt>
                                         <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
