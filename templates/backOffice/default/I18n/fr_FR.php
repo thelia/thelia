@@ -169,6 +169,7 @@ return [
     'Change this template' => 'Modifier ce gabarit',
     'Change this variable' => 'Modifier cette variable',
     'Chapo' => 'Chapeau',
+    'Check if it is the same server, same Thelia as the default language' => 'Cochez si c\'est le même serveur, même Thelia que la langue par défaut',
     'Check sale activation' => 'Contrôler l\'activation',
     'Check the support of hooks.' => 'Vérifier le support des points d\'accroche',
     'Check this box if you want to add this attributes to all product templates' => 'Cochez cette case si vous voulez ajouter cette déclinaison à tous les gabarits de produits',

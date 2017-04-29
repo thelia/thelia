@@ -22,14 +22,25 @@ use Thelia\Core\Event\ActionEvent;
 class LangUrlEvent extends ActionEvent
 {
     protected $url = array();
+    protected $same_server = array();
 
     public function addUrl($id, $url)
     {
         $this->url[$id] = $url;
     }
 
+    public function addSameServer($id, $value)
+    {
+        $this->same_server[$id] = $value;
+    }
+
     public function getUrl()
     {
         return $this->url;
+    }
+
+    public function getSameServer()
+    {
+        return $this->same_server;
     }
 }

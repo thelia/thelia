@@ -188,6 +188,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 ->filterById($id)
                 ->update(array('Url' => $url));
         }
+
+        foreach ($event->getSameServer() as $id => $same_server) {
+            LangQuery::create()
+                ->filterById($id)
+                ->update(array('SameServer' => $same_server));
+        }
     }
 
     public function fixMissingFlag(LangEvent $event)

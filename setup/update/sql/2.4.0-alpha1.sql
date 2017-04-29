@@ -179,4 +179,8 @@ UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
 UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front';
 UPDATE `module` SET `mandatory` = 1, `hidden` = 1 WHERE `code` = 'TheliaSmarty';
 
+
+-- Add same_server column in url table
+ALTER TABLE `lang` ADD `same_server` TINYINT(1) NULL DEFAULT '0' AFTER `url`;
+
 SET FOREIGN_KEY_CHECKS = 1;

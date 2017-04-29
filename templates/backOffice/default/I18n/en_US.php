@@ -168,6 +168,7 @@ return array(
     'Change this template' => 'Change this template',
     'Change this variable' => 'Change this variable',
     'Chapo' => 'Chapo',
+    'Check if it is the same server, same Thelia as the default language' => ' Check if it is the same server, same Thelia as the default language',
     'Check sale activation' => 'Check sale activation',
     'Check the support of hooks.' => 'Check the support of hooks.',
     'Check this box if you want to add this attributes to all product templates' => 'Check this box if you want to add this attributes to all product templates',
