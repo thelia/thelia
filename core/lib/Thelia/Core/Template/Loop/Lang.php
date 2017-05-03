@@ -44,6 +44,7 @@ use TheliaSmarty\Template\Plugins\TheliaLoop;
  * @method bool getDefaultOnly()
  * @method bool getExcludeDefault()
  * @method string[] getOrder()
+ * @method bool|string getSameServer()
  */
 class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -63,6 +64,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
             Argument::createBooleanOrBothTypeArgument('visible', true),
             Argument::createBooleanTypeArgument('default_only', false),
             Argument::createBooleanTypeArgument('exclude_default', false),
+            Argument::createBooleanOrBothTypeArgument('same_server', Type\BooleanOrBothType::ANY),
             Argument::createEnumListTypeArgument(
                 'order',
                 [
@@ -109,6 +111,10 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $exclude = $this->getExclude()) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+        
+        if (Type\BooleanOrBothType::ANY !== $same_server = $this->getSameServer()) {
+            $search->filterBySameServer($same_server ? 1 : 0);
         }
 
         $orders  = $this->getOrder();
@@ -160,6 +166,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set("THOUSANDS_SEPARATOR", $result->getThousandsSeparator())
                 ->set("DECIMAL_COUNT", $result->getDecimals())
                 ->set("POSITION", $result->getPosition())
+                ->set("SAME_SERVER", $result->getSameServer())
             ;
 
             $this->addOutputFields($loopResultRow, $result);
