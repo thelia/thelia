@@ -73,6 +73,8 @@ class SessionMiddleware implements HttpKernelInterface
                 self::$session = $session = $event->getSession();
             }
 
+            setlocale(LC_ALL, $session->getLang()->getLocale() . '.UTF-8');
+
             $session->start();
             $request->setSession($session);
         }
