@@ -134,7 +134,7 @@ class ParamInitMiddleware implements HttpKernelInterface
                 $domainUrl = $lang->getUrl();
                 $sameServer = $lang->getSameServer();
 
-                if(null === $sameServer) {
+                if(null === $sameServer || null === $request->server->get('REDIRECT_URL')) {
                     if (!empty($domainUrl)) {
                         // if lang domain is different from current domain, redirect to the proper one
                         if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
