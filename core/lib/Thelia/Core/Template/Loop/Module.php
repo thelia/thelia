@@ -125,6 +125,14 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($id, Criteria::IN);
         }
 
+        if (null !== $this->getHidden()) {
+            $search->filterByHidden($this->getHidden());
+        }
+
+        if (null !== $this->getMandatory()) {
+            $search->filterByMandatory($this->getMandatory());
+        }
+
         $profile = $this->getProfile();
 
         if (null !== $profile) {

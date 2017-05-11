@@ -136,7 +136,7 @@ class ModuleTableMap extends TableMap
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     // i18n behavior
-
+    
     /**
      * The default locale to use for translations.
      *
@@ -298,7 +298,7 @@ class ModuleTableMap extends TableMap
                             : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
                         ];
     }
-
+    
     /**
      * The class that the tableMap will make instances of.
      *
@@ -358,7 +358,7 @@ class ModuleTableMap extends TableMap
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
         $results = array();
-
+    
         // set the class once to avoid overhead in the loop
         $cls = static::getOMClass(false);
         // populate the object(s)

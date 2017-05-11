@@ -20,7 +20,7 @@ use Thelia\Model\Map\ModuleTableMap;
 /**
  * Base class that represents a query for the 'module' table.
  *
- *
+ * 
  *
  * @method     ChildModuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildModuleQuery orderByCode($order = Criteria::ASC) Order by the code column
@@ -128,7 +128,7 @@ use Thelia\Model\Map\ModuleTableMap;
  */
 abstract class ModuleQuery extends ModelCriteria
 {
-
+    
     /**
      * Initializes internal state of \Thelia\Model\Base\ModuleQuery object.
      *
@@ -214,7 +214,7 @@ abstract class ModuleQuery extends ModelCriteria
     {
         $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `MANDATORY`, `HIDDEN`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
         try {
-            $stmt = $con->prepare($sql);
+            $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
@@ -1679,10 +1679,10 @@ abstract class ModuleQuery extends ModelCriteria
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-
+            
 
         ModuleTableMap::removeInstanceFromPool($criteria);
-
+        
             $affectedRows += ModelCriteria::delete($con);
             ModuleTableMap::clearRelatedInstancePool();
             $con->commit();
@@ -1695,7 +1695,7 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     // timestampable behavior
-
+    
     /**
      * Filter by the latest updated
      *
@@ -1707,7 +1707,7 @@ abstract class ModuleQuery extends ModelCriteria
     {
         return $this->addUsingAlias(ModuleTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
-
+    
     /**
      * Filter by the latest created
      *
@@ -1719,7 +1719,7 @@ abstract class ModuleQuery extends ModelCriteria
     {
         return $this->addUsingAlias(ModuleTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
-
+    
     /**
      * Order by update date desc
      *
@@ -1729,7 +1729,7 @@ abstract class ModuleQuery extends ModelCriteria
     {
         return $this->addDescendingOrderByColumn(ModuleTableMap::UPDATED_AT);
     }
-
+    
     /**
      * Order by update date asc
      *
@@ -1739,7 +1739,7 @@ abstract class ModuleQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ModuleTableMap::UPDATED_AT);
     }
-
+    
     /**
      * Order by create date desc
      *
@@ -1749,7 +1749,7 @@ abstract class ModuleQuery extends ModelCriteria
     {
         return $this->addDescendingOrderByColumn(ModuleTableMap::CREATED_AT);
     }
-
+    
     /**
      * Order by create date asc
      *
@@ -1761,7 +1761,7 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     // i18n behavior
-
+    
     /**
      * Adds a JOIN clause to the query using the i18n relation
      *
@@ -1774,12 +1774,12 @@ abstract class ModuleQuery extends ModelCriteria
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'ModuleI18n';
-
+    
         return $this
             ->joinModuleI18n($relationAlias, $joinType)
             ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
     }
-
+    
     /**
      * Adds a JOIN clause to the query and hydrates the related I18n object.
      * Shortcut for $c->joinI18n($locale)->with()
@@ -1795,10 +1795,10 @@ abstract class ModuleQuery extends ModelCriteria
             ->joinI18n($locale, null, $joinType)
             ->with('ModuleI18n');
         $this->with['ModuleI18n']->setIsWithOneToMany(false);
-
+    
         return $this;
     }
-
+    
     /**
      * Use the I18n relation query object
      *

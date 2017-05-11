@@ -86,10 +86,17 @@ class ModuleManagement
 
         $content = $descriptorValidator->getDescriptor($file->getRealPath());
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
+<<<<<<< HEAD
+        $code      = basename(dirname($reflected->getFileName()));
+        $version   = (string)$content->version;
+        $mandatory = intval($content->mandatory);
+        $hidden    = intval($content->hidden);
+=======
         $code = basename(dirname($reflected->getFileName()));
         $version = (string)$content->version;
         $mandatory = intval($content->mandatory);
         $hidden = intval($content->hidden);
+>>>>>>> 7ef5c996cb55d3e1047e9dbd578f2f188ab8ff84
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
 
@@ -117,8 +124,12 @@ class ModuleManagement
                 ->setCategory((string)$content->type)
                 ->setMandatory($mandatory)
                 ->setHidden($hidden)
+<<<<<<< HEAD
+                ->save($con);
+=======
                 ->save($con)
             ;
+>>>>>>> 7ef5c996cb55d3e1047e9dbd578f2f188ab8ff84
 
             // Update the module images, title and description when the module is installed, but not after
             // as these data may have been modified byt the administrator
