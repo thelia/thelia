@@ -435,7 +435,7 @@ class BaseModule implements BaseModuleInterface
         /** @var Country $country */
         $country = $taxEngine->getDeliveryCountry();
 
-        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
+        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount, $country);
 
         if ($with_postage) {
             if ($with_tax) {

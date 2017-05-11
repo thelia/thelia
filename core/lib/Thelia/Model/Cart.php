@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
+use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
 {
@@ -110,8 +111,9 @@ class Cart extends BaseCart
      *
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
-     * @param  Country   $country
-     * @param  bool      $discount
+     * @param  Country      $country
+     * @param  bool         $discount
+     * @param  State|null   $state
      * @return float|int
      */
     public function getTaxedAmount(Country $country, $discount = true, State $state = null)
@@ -135,10 +137,12 @@ class Cart extends BaseCart
     /**
      *
      * @see getTaxedAmount same as this method but the amount is without taxes
-     * @param  bool      $discount
+     * @param  bool         $discount
+     * @param  Country      $country
+     * @param  State|null   $state
      * @return float|int
      */
-    public function getTotalAmount($discount = true)
+    public function getTotalAmount($discount = true, Country $country = null, State $state = null)
     {
         $total = 0;
 
@@ -149,8 +153,16 @@ class Cart extends BaseCart
             $total += $subtotal;
         }
 
-        if ($discount) {
-            $total -= $this->getDiscount();
+        if ($discount && $this->countCartItems() > 0) {
+            $taxCalculator = new Calculator();
+
+            $untaxedDiscount = $taxCalculator->load($cartItem->getProduct(), $country, $state)->getUntaxedPrice($this->getDiscount());
+
+            $total -= $untaxedDiscount;
+
+            if ($total < 0) {
+                $total = 0;
+            }
         }
 
         return $total;
@@ -162,7 +174,7 @@ class Cart extends BaseCart
      */
     public function getTotalVAT($taxCountry, $taxState = null)
     {
-        return ($this->getTaxedAmount($taxCountry) - $this->getTotalAmount());
+        return ($this->getTaxedAmount($taxCountry) - $this->getTotalAmount(true, $taxCountry, $taxState));
     }
 
     /**
