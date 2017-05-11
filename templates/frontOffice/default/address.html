@@ -149,7 +149,7 @@
                             <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if} </label>
 
                             <div class="control-input col-sm-5">
-                                <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder address2"}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{$label_attr.placeholder}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                                 {if $error }
                                     <span class="help-block">{$message}</span>
                                     {assign var="error_focus" value="true"}

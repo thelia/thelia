@@ -98,12 +98,14 @@ class AddressCreateForm extends FirewallForm
                     "label" => Translator::getInstance()->trans("Street Address"),
                     "label_attr" => array(
                         "for" => "address1",
+                        "placeholder" => Translator::getInstance()->trans("Street address information")
                     ),
                 ))
             ->add("address2", "text", array(
                     "label" => Translator::getInstance()->trans("Address Line 2"),
                     "label_attr" => array(
                         "for" => "address2",
+                        "placeholder" => Translator::getInstance()->trans("Address line 2 information")
                     ),
                     "required" => false,
                 ))
@@ -111,6 +113,7 @@ class AddressCreateForm extends FirewallForm
                     "label" => Translator::getInstance()->trans("Address Line 3"),
                     "label_attr" => array(
                         "for" => "address3",
+                        "placeholder" => Translator::getInstance()->trans("Address line 3 information")
                     ),
                     "required" => false,
                 ))
