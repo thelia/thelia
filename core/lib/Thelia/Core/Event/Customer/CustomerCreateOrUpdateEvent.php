@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Event\Customer;
 
+use Thelia\Model\Customer;
+
 /**
  * Class CustomerCreateOrUpdateEvent
  * @package Thelia\Core\Event
@@ -107,6 +109,53 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $this->company = $company;
         $this->ref = $ref;
     }
+
+    /**
+     * @return CustomerCreateOrUpdateEvent
+     */
+    public static function create(array $data, Customer $customer = null)
+    {
+        $address = null;
+        $password = isset($data['password']) ? trim($data['password']) : null;
+        if ($customer !== null) {
+            $address = $customer->getDefaultAddress();
+        } elseif (empty($password)) {
+            $password = Password::generateRandom(8);
+        }
+
+        $self = self::__construct(
+            $customer ? $customer->getTitleId() : CustomerTitleQuery::create()->findOneByByDefault(true)->getId(),
+            $customer ? $customer->getFirstname() : null,
+            $customer ? $customer->getLastname() : null,
+            $address ? $address->getAddress1() : null,
+            $address ? $address->getAddress2() : null,
+            $address ? $address->getAddress3() : null,
+            $address ? $address->getPhone() : null,
+            $address ? $address->getCellphone() : null,
+            $address ? $address->getZipcode() : null,
+            $address ? $address->getCity() : null,
+            $address ? $address->getCountryId() : Country::getDefaultCountry()->getId(),
+            $customer ? $customer->getEmail() : null,
+            $password,
+            $customer ? $customer->getLangId() : Lang::getDefaultLanguage()->getId(),
+            $customer ? $customer->getReseller() : null,
+            $customer ? $customer->getSponsor() : null,
+            $customer ? $customer->getDiscount() : null,
+            $address ? $address->getCompany() : null,
+            $customer ? $customer->getRef() : null,
+            $address ? $address->getStateId() : null
+        );
+
+        unset($data['password'], $data['customer']); //for prevent overwriting below
+        foreach ($data as $key=>$value) {
+            $self->{$key} = $value;
+        }
+        if ($customer !== null) {
+            $self->setCustomer($customer);
+        }
+        return $self;
+    }
+
 
     /**
      * @return mixed
