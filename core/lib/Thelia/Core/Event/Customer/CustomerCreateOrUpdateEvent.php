@@ -12,8 +12,11 @@
 
 namespace Thelia\Core\Event\Customer;
 
-use Thelia\Model\Customer;
 use Thelia\Tools\Password;
+use Thelia\Model\CustomerTitleQuery;
+use Thelia\Model\Customer;
+use Thelia\Model\Country;
+use Thelia\Model\Lang;
 
 /**
  * Class CustomerCreateOrUpdateEvent
