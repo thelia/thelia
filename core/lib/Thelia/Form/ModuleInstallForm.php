@@ -129,7 +129,7 @@ class ModuleInstallForm extends BaseForm
     protected function unzipModule(UploadedFile $file)
     {
         $extractPath = false;
-        $zip = new ZipArchiver();
+        $zip = new ZipArchiver(true);
         if (!$zip->open($file->getRealPath())) {
           throw new \Exception("unable to open zipfile");
         }
