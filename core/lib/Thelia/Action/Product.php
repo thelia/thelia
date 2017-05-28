@@ -263,7 +263,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $clonedProductCreateFeatureEvent->setLocale($originalProductFeatureAvI18n->getLocale());
 
                 // If it's a free text value, pass the FeatureAvI18n's title as featureValue to the event
-                if ($originalProductFeature->getFreeTextValue() !== null) {
+                if ($originalProductFeature->isFreeText() || $originalProductFeature->getFreeTextValue() !== null) {
                     $clonedProductCreateFeatureEvent->setFeatureValue($originalProductFeatureAvI18n->getTitle());
                     $clonedProductCreateFeatureEvent->setIsTextValue(true);
                 }
@@ -667,6 +667,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             // If it's a free text value, create a FeatureAv to handle i18n
             if ($event->getIsTextValue() === true) {
                 $featureProduct->setFreeTextValue(true);
+                $featureProduct->setIsFreeText(true);
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
                 $createFeatureAvEvent
