@@ -209,17 +209,9 @@
 
 								                    {elseloop rel="product-features-av"}
 								                        {* Get the free text value *}
-                                                        {$feature_value=''}
-
-								                        {loop name="free-text-value" type="feature_value" product=$product_id feature=$ID backend_context="1" lang="$edit_language_id"}
-                                                            {if $IS_FREE_TEXT && $FREE_TEXT_VALUE != 1}
-                                                                {$feature_value=$FREE_TEXT_VALUE}
-                                                            {else}
-								                                {$feature_value=$TITLE}
-                                                            {/if}
+								                        {loop name="free-text-value" type="feature_value" product=$product_id feature=$ID backend_context="1" lang="$edit_language_id" limit="1"}
+                                            <input type="text" id="feature_text_value_{$ID}" name="feature_text_value[{$ID}]" title="{intl l='Enter here the feature value as free text'}" placeholder="{intl l='Feature value'}" class="form-control" value="{$TITLE}">
 								                        {/loop}
-
-								                        <input type="text" id="feature_text_value_{$ID}" name="feature_text_value[{$ID}]" title="{intl l='Enter here the feature value as free text'}" placeholder="{intl l='Feature value'}" class="form-control" value="{$feature_value|default:''}">
 								                    {/elseloop}
 							                    </td>
 

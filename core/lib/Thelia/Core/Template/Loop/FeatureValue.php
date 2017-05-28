@@ -100,7 +100,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (null !== $freeText = $this->getFreeText()) {
-            $search->filterByFreeTextValue($featureAvailability, Criteria::IN);
+            $search->filterByFreeTextValue($freeText);
         }
 
         if (true === $excludeFeatureAvailability = $this->getExcludeFeatureAvailability()) {

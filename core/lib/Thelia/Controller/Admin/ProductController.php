@@ -840,7 +840,7 @@ class ProductController extends AbstractSeoCrudController
                     // Check if a FeatureProduct exists for this product and this feature (for another lang)
                     $freeTextFeatureProduct = FeatureProductQuery::create()
                         ->filterByProductId($productId)
-                        ->filterByFreeTextValue(true)
+                        ->filterByIsFreeText(true)
                         ->findOneByFeatureId($featureId);
 
                     // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing
