@@ -91,6 +91,13 @@ abstract class FeatureProduct implements ActiveRecordInterface
     protected $free_text_value;
 
     /**
+     * The value for the is_free_text field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $is_free_text;
+
+    /**
      * The value for the position field.
      * @var        int
      */
@@ -132,10 +139,23 @@ abstract class FeatureProduct implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->is_free_text = false;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\FeatureProduct object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -725,6 +745,10 @@ abstract class FeatureProduct implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->is_free_text !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -770,16 +794,16 @@ abstract class FeatureProduct implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FeatureProductTableMap::translateFieldName('IsFreeText', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_free_text = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FeatureProductTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FeatureProductTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FeatureProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FeatureProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FeatureProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : FeatureProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -792,7 +816,7 @@ abstract class FeatureProduct implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = FeatureProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = FeatureProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\FeatureProduct object", 0, $e);
@@ -1051,32 +1075,35 @@ abstract class FeatureProduct implements ActiveRecordInterface
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(FeatureProductTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
         if ($this->isColumnModified(FeatureProductTableMap::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
         if ($this->isColumnModified(FeatureProductTableMap::FEATURE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`FEATURE_ID`';
+            $modifiedColumns[':p' . $index++]  = 'FEATURE_ID';
         }
         if ($this->isColumnModified(FeatureProductTableMap::FEATURE_AV_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`FEATURE_AV_ID`';
+            $modifiedColumns[':p' . $index++]  = 'FEATURE_AV_ID';
         }
         if ($this->isColumnModified(FeatureProductTableMap::FREE_TEXT_VALUE)) {
-            $modifiedColumns[':p' . $index++]  = '`FREE_TEXT_VALUE`';
+            $modifiedColumns[':p' . $index++]  = 'FREE_TEXT_VALUE';
+        }
+        if ($this->isColumnModified(FeatureProductTableMap::IS_FREE_TEXT)) {
+            $modifiedColumns[':p' . $index++]  = 'IS_FREE_TEXT';
         }
         if ($this->isColumnModified(FeatureProductTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
         if ($this->isColumnModified(FeatureProductTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
         if ($this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO `feature_product` (%s) VALUES (%s)',
+            'INSERT INTO feature_product (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1085,28 +1112,31 @@ abstract class FeatureProduct implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`PRODUCT_ID`':
+                    case 'PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case '`FEATURE_ID`':
+                    case 'FEATURE_ID':
                         $stmt->bindValue($identifier, $this->feature_id, PDO::PARAM_INT);
                         break;
-                    case '`FEATURE_AV_ID`':
+                    case 'FEATURE_AV_ID':
                         $stmt->bindValue($identifier, $this->feature_av_id, PDO::PARAM_INT);
                         break;
-                    case '`FREE_TEXT_VALUE`':
+                    case 'FREE_TEXT_VALUE':
                         $stmt->bindValue($identifier, $this->free_text_value, PDO::PARAM_STR);
                         break;
-                    case '`POSITION`':
+                    case 'IS_FREE_TEXT':
+                        $stmt->bindValue($identifier, (int) $this->is_free_text, PDO::PARAM_INT);
+                        break;
+                    case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -1362,6 +1392,7 @@ abstract class FeatureProduct implements ActiveRecordInterface
         if ($this->isColumnModified(FeatureProductTableMap::FEATURE_ID)) $criteria->add(FeatureProductTableMap::FEATURE_ID, $this->feature_id);
         if ($this->isColumnModified(FeatureProductTableMap::FEATURE_AV_ID)) $criteria->add(FeatureProductTableMap::FEATURE_AV_ID, $this->feature_av_id);
         if ($this->isColumnModified(FeatureProductTableMap::FREE_TEXT_VALUE)) $criteria->add(FeatureProductTableMap::FREE_TEXT_VALUE, $this->free_text_value);
+        if ($this->isColumnModified(FeatureProductTableMap::IS_FREE_TEXT)) $criteria->add(FeatureProductTableMap::IS_FREE_TEXT, $this->is_free_text);
         if ($this->isColumnModified(FeatureProductTableMap::POSITION)) $criteria->add(FeatureProductTableMap::POSITION, $this->position);
         if ($this->isColumnModified(FeatureProductTableMap::CREATED_AT)) $criteria->add(FeatureProductTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) $criteria->add(FeatureProductTableMap::UPDATED_AT, $this->updated_at);
@@ -1627,11 +1658,13 @@ abstract class FeatureProduct implements ActiveRecordInterface
         $this->feature_id = null;
         $this->feature_av_id = null;
         $this->free_text_value = null;
+        $this->is_free_text = null;
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

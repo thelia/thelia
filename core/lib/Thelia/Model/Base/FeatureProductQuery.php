@@ -36,7 +36,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProductQuery groupByFeatureId() Group by the feature_id column
  * @method     ChildFeatureProductQuery groupByFeatureAvId() Group by the feature_av_id column
  * @method     ChildFeatureProductQuery groupByFreeTextValue() Group by the free_text_value column
- * @method     ChildFeatureProductQuery groupByIsFreeText($order = Criteria::ASC) Order by the is_free_text column
+ * @method     ChildFeatureProductQuery groupByIsFreeText() Group by the is_free_text column
  * @method     ChildFeatureProductQuery groupByPosition() Group by the position column
  * @method     ChildFeatureProductQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildFeatureProductQuery groupByUpdatedAt() Group by the updated_at column
@@ -167,7 +167,7 @@ abstract class FeatureProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FEATURE_ID`, `FEATURE_AV_ID`, `FREE_TEXT_VALUE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature_product` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, FREE_TEXT_VALUE, IS_FREE_TEXT, POSITION, CREATED_AT, UPDATED_AT FROM feature_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -454,7 +454,6 @@ abstract class FeatureProductQuery extends ModelCriteria
 
         return $this->addUsingAlias(FeatureProductTableMap::FREE_TEXT_VALUE, $freeTextValue, $comparison);
     }
-
 
     /**
      * Filter the query on the is_free_text column
