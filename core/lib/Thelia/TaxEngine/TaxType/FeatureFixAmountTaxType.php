@@ -20,6 +20,7 @@ use Thelia\Type\ModelValidIdType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\BaseTaxType;
 use Thelia\TaxEngine\TaxTypeRequirementDefinition;
+use Thelia\Model\Lang;
 
 /**
  *
@@ -46,7 +47,9 @@ class FeatureFixAmountTaxType extends BaseTaxType
             ->findOne();
 
         if (null !== $query) {
-            $taxAmount = $query->getFreeTextValue();
+            if ( (1 == $taxAmount = $query->getFreeTextValue()) && !is_null($query->getFeatureAvId()) ) {
+                $taxAmount = $query->getFeatureAv()->setLocale( Lang::getDefaultLanguage()->getLocale() )->getTitle();
+            }
 
             $testInt = new FloatType();
             if (!$testInt->isValid($taxAmount)) {
