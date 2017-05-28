@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
+use Thelia\Log\Tlog;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_product' table.
@@ -16,5 +17,14 @@ use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
  */
 class FeatureProductQuery extends BaseFeatureProductQuery
 {
+    /**
+     * @deprecated
+     */
+    public function filterByFreeTextValue($freeTextValue = null, $comparison = null)
+    {
+        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+        return parent::filterByFreeTextValue($freeTextValue, $comparison)
+    }
 }
 // FeatureProductQuery
