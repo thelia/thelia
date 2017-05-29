@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
+use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
 {
@@ -150,7 +151,22 @@ class Cart extends BaseCart
         }
 
         if ($discount) {
-            $total -= $this->getDiscount();
+            // get default tax rule
+            $taxRuleQuery = new TaxRuleQuery();
+            $taxRule = $taxRuleQuery->findOneByIsDefault(true);
+            // get default country
+            $countryQuery = new CountryQuery();
+            $country = $countryQuery->findOneByByDefault(true);
+            // get calculator for this tax / country
+            $calculator = new Calculator();
+            $calculator->loadTaxRuleWithoutProduct($taxRule, $country);
+            // return untaxed price
+            $untaxedDiscount =  round($calculator->getUntaxedPrice($this->getDiscount()), 2);
+
+            $total -= $untaxedDiscount;
+            if ($total < 0) {
+                $total = 0;
+            }
         }
 
         return $total;
