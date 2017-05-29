@@ -67,7 +67,9 @@ class FeatureProduct extends BaseFeatureProduct
     }
 
     /**
-     * @deprecated
+     * @inheritdoc
+     * @deprecated since version 2.4.0, to be removed in 3.0.
+     *                      Please use  getIsFreeText() instead
      */
      public function getFreeTextValue()
      {
@@ -77,7 +79,9 @@ class FeatureProduct extends BaseFeatureProduct
      }
 
      /**
-      * @deprecated
+      * @inheritdoc
+      * @deprecated since version 2.4.0, to be removed in 3.0.
+      *                      Please use  setIsFreeText() instead
       */
      public function setFreeTextValue($v)
      {

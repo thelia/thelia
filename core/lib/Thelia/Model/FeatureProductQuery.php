@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Log\Tlog;
 
 /**
@@ -18,13 +19,39 @@ use Thelia\Log\Tlog;
 class FeatureProductQuery extends BaseFeatureProductQuery
 {
     /**
-     * @deprecated
+     * @inheritdoc
+     * @deprecated since version 2.4.0, to be removed in 3.0.
+     *                      Please use  filterByIsFreeText() instead
      */
     public function filterByFreeTextValue($freeTextValue = null, $comparison = null)
     {
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
         return parent::filterByFreeTextValue($freeTextValue, $comparison);
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since version 2.4.0, to be removed in 3.0.
+     *                      Please use  orderByIsFreeText() instead
+     */
+    public function orderByFreeTextValue($order = Criteria::ASC)
+    {
+        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+        return parent::orderByFreeTextValue($order);
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since version 2.4.0, to be removed in 3.0.
+     *                      Please use  groupByIsFreeText() instead
+     */
+    public function groupByFreeTextValue()
+    {
+        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+        return parent::groupByFreeTextValue();
     }
 }
 // FeatureProductQuery
