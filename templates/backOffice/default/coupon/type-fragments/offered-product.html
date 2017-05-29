@@ -1,0 +1,58 @@
+{default_translation_domain domain='bo.default'}
+
+  <div class="form-group input-offered-product-category-id">
+
+    <label for="offered-product-category-id">{intl l="Select offrered product category :"}</label>
+
+    <select required class="form-control" id="offered-product-category-id" name="{$offered_category_field_name}">
+      <option value="0">{intl l="Please select..."}</option>
+      {loop type="category-tree" category=0 name="list-of-category" backend_context="1"}
+        <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if $ID == $offered_category_value}selected="selected"{/if}>{$TITLE}</option>
+      {/loop}
+    </select>
+  </div>
+
+  <div class="loading" id="input-offered-products-id-loading" style="display: none"></div>
+
+  <div class="form-group" id="input-offered-products-id" {if $offered_category_value == 0}style="display: none"{/if}>
+
+    <label for="offered-products-id">{intl l="Select offered product :"}</label>
+
+    <select required class="form-control" id="offered-products-id" name="{$offered_product_field_name}">
+      {loop type="product" category=$offered_category_value|default:0 name="list-of-products" backend_context="1" return_url=false}
+        <option value="{$ID}" {if $ID == $offered_product_value}selected="selected"{/if}>{$TITLE}</option>
+      {/loop}
+    </select>
+  </div>
+
+<script>
+    var $offeredCatSelect = $('#offered-product-category-id');
+
+    $offeredCatSelect.change(function() {
+
+        var $category_id = $(this).val();
+
+        $('#input-offered-products-id').hide();
+        $('#offered-products-id').html('');
+
+        if ($category_id != 0) {
+
+            $('#input-offered-products-id-loading').show();
+
+            $.ajax({
+                url: "{url path='/admin/coupon/type-fragments/ajax-products-list'}",
+                type: 'POST',
+                data: {
+                    category_id: $category_id
+                },
+                success: function(options) {
+                    $('#offered-products-id').html(options);
+                    $('#input-offered-products-id').show();
+                },
+                complete: function() {
+                    $('#input-offered-products-id-loading').hide();
+                }
+            });
+        }
+    });
+</script>
