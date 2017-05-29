@@ -53,5 +53,25 @@ class FeatureProductQuery extends BaseFeatureProductQuery
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
         return parent::groupByFreeTextValue();
     }
+
+    /**
+     * @inheritdoc
+     * @deprecated since version 2.4.0, to be removed in 3.0.
+     *                      Please use  findByIsFreeText() instead
+     */
+    public function findByFreeTextValue($free_text_value)
+    {
+        return parent::findByFreeTextValue($free_text_value);
+    }
+
+    /**
+     * @inheritdoc
+     * @deprecated since version 2.4.0, to be removed in 3.0.
+     *                      Please use  findOneByIsFreeText() instead
+     */
+    public function findOneByFreeTextValue($free_text_value)
+    {
+        return parent::findByFreeTextValue($free_text_value);
+    }
 }
 // FeatureProductQuery
