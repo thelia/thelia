@@ -369,7 +369,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         if (! isset($this->loopstack[$loopName])) {
             throw new \InvalidArgumentException(
-                $this->translator->trans("Related loop name '%name'' is not defined.", ['%name' => $loopName])
+                $this->translator->trans("Related loop name '%name' is not defined.", ['%name' => $loopName])
             );
         }
 
