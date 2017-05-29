@@ -75,4 +75,14 @@ class FeatureProduct extends BaseFeatureProduct
          Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
          return parent::getFreeTextValue();
      }
+
+     /**
+      * @deprecated
+      */
+     public function setFreeTextValue($v)
+     {
+         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+         return parent::setFreeTextValue($v);
+     }
 }
