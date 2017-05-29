@@ -71,7 +71,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      */
     public function findOneByFreeTextValue($free_text_value)
     {
-        return parent::findByFreeTextValue($free_text_value);
+        return parent::findOneByFreeTextValue($free_text_value);
     }
 }
 // FeatureProductQuery
