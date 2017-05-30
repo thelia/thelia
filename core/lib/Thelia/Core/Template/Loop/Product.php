@@ -199,7 +199,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
             switch ($searchInElement) {
                 case "ref":
-                    $search->filterByRef($searchTerm, $searchCriteria);
+                    $searchCriteriaRef = $searchCriteria;
+                    
+                    if($searchCriteria == ' REGEXP ') {
+                      $searchCriteriaRef = criteria::IN;
+                    }
+                    
+                    $search->filterByRef($searchTerm, $searchCriteriaRef);
                     break;
             }
         }
