@@ -54,7 +54,8 @@ class LangController extends BaseAdminController
     {
         $data = array();
         foreach (LangQuery::create()->find() as $lang) {
-            $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
+            $data[LangUrlForm::LANG_PREFIX.'url_'.$lang->getId()] = $lang->getUrl();
+            $data[LangUrlForm::LANG_PREFIX.'sameServer_'.$lang->getId()] = $lang->getSameServer();
         }
         $langUrlForm = $this->createForm(AdminForm::LANG_URL, 'form', $data);
         $this->getParserContext()->addForm($langUrlForm);
@@ -344,7 +345,12 @@ class LangController extends BaseAdminController
             $event = new LangUrlEvent();
             foreach ($data as $key => $value) {
                 if (false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
-                    $event->addUrl(substr($key, strlen(LangUrlForm::LANG_PREFIX)), $value);
+                    if (false !== strpos($key, 'url_')) {
+                        $event->addUrl(substr($key, strlen(LangUrlForm::LANG_PREFIX.'url_')), $value);
+                    }
+                    if (false !== strpos($key, 'sameServer_')) {
+                        $event->addSameServer(substr($key, strlen(LangUrlForm::LANG_PREFIX.'sameServer_')), $value);
+                    }
                 }
             }
 

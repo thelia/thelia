@@ -132,21 +132,25 @@ class ParamInitMiddleware implements HttpKernelInterface
             // if each lang has its own domain, we redirect the user to the proper one.
             if (ConfigQuery::isMultiDomainActivated()) {
                 $domainUrl = $lang->getUrl();
+                $sameServer = $lang->getSameServer();
 
-                if (! empty($domainUrl)) {
-                    // if lang domain is different from current domain, redirect to the proper one
-                    if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
-                        // TODO : search if http status 302 is the good one.
-                        return new RedirectResponse($domainUrl, 302);
-                    } else {
-                        //the user is currently on the proper domain, nothing to change
-                        return null;
+                if(null === $sameServer || null === $request->server->get('REDIRECT_URL')) {
+                    if (!empty($domainUrl)) {
+                        // if lang domain is different from current domain, redirect to the proper one
+                        if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
+                            // TODO : search if http status 302 is the good one.
+                            return new RedirectResponse($domainUrl, 302);
+                        } else {
+                            //the user is currently on the proper domain, nothing to change
+                            return null;
+                        }
                     }
+
+                    Tlog::getInstance()->warning("The domain URL for language " . $lang->getTitle() . " (id " . $lang->getId() . ") is not defined.");
+
+                    return Lang::getDefaultLanguage();
                 }
-
-                Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
-
-                return Lang::getDefaultLanguage();
+                return null;
 
             } else {
                 // one domain for all languages, the lang has to be set into session

@@ -90,6 +90,13 @@ abstract class Lang implements ActiveRecordInterface
     protected $url;
 
     /**
+     * The value for the same_server field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $same_server;
+
+    /**
      * The value for the date_format field.
      * @var        string
      */
@@ -523,6 +530,17 @@ abstract class Lang implements ActiveRecordInterface
     }
 
     /**
+     * Get the [same_server] column value.
+     *
+     * @return   boolean
+     */
+    public function getSameServer()
+    {
+
+        return $this->same_server;
+    }
+
+    /**
      * Get the [date_format] column value.
      *
      * @return   string
@@ -776,6 +794,36 @@ abstract class Lang implements ActiveRecordInterface
 
         return $this;
     } // setUrl()
+
+    /**
+     * Sets the value of the [same_server] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Lang The current object (for fluent API support)
+     */
+    public function setSameServer($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->active !== $v) {
+            $this->active = $v;
+            $this->modifiedColumns[LangTableMap::SAME_SERVER] = true;
+        }
+
+
+        return $this;
+    } // setActive()
+
 
     /**
      * Set the value of [date_format] column.
@@ -1047,6 +1095,10 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->same_server !== false) {
+                return false;
+            }
+
             if ($this->active !== false) {
                 return false;
             }
@@ -1097,43 +1149,46 @@ abstract class Lang implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : LangTableMap::translateFieldName('Url', TableMap::TYPE_PHPNAME, $indexType)];
             $this->url = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : LangTableMap::translateFieldName('DateFormat', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : LangTableMap::translateFieldName('SameServer', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->same_server = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : LangTableMap::translateFieldName('DateFormat', TableMap::TYPE_PHPNAME, $indexType)];
             $this->date_format = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : LangTableMap::translateFieldName('TimeFormat', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : LangTableMap::translateFieldName('TimeFormat', TableMap::TYPE_PHPNAME, $indexType)];
             $this->time_format = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : LangTableMap::translateFieldName('DatetimeFormat', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : LangTableMap::translateFieldName('DatetimeFormat', TableMap::TYPE_PHPNAME, $indexType)];
             $this->datetime_format = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : LangTableMap::translateFieldName('DecimalSeparator', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : LangTableMap::translateFieldName('DecimalSeparator', TableMap::TYPE_PHPNAME, $indexType)];
             $this->decimal_separator = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : LangTableMap::translateFieldName('ThousandsSeparator', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : LangTableMap::translateFieldName('ThousandsSeparator', TableMap::TYPE_PHPNAME, $indexType)];
             $this->thousands_separator = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : LangTableMap::translateFieldName('Active', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : LangTableMap::translateFieldName('Active', TableMap::TYPE_PHPNAME, $indexType)];
             $this->active = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : LangTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : LangTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
             $this->visible = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : LangTableMap::translateFieldName('Decimals', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : LangTableMap::translateFieldName('Decimals', TableMap::TYPE_PHPNAME, $indexType)];
             $this->decimals = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : LangTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : LangTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->by_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : LangTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : LangTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : LangTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : LangTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : LangTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : LangTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1420,6 +1475,9 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->isColumnModified(LangTableMap::URL)) {
             $modifiedColumns[':p' . $index++]  = '`URL`';
         }
+        if ($this->isColumnModified(LangTableMap::SAME_SERVER)) {
+            $modifiedColumns[':p' . $index++]  = '`SAME_SERVER`';
+        }
         if ($this->isColumnModified(LangTableMap::DATE_FORMAT)) {
             $modifiedColumns[':p' . $index++]  = '`DATE_FORMAT`';
         }
@@ -1481,6 +1539,9 @@ abstract class Lang implements ActiveRecordInterface
                         break;
                     case '`URL`':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
+                        break;
+                    case '`SAME_SERVER`':
+                        $stmt->bindValue($identifier, (int) $this->same_server, PDO::PARAM_INT);
                         break;
                     case '`DATE_FORMAT`':
                         $stmt->bindValue($identifier, $this->date_format, PDO::PARAM_STR);
@@ -1596,39 +1657,42 @@ abstract class Lang implements ActiveRecordInterface
                 return $this->getUrl();
                 break;
             case 5:
-                return $this->getDateFormat();
+                return $this->getSameServer();
                 break;
             case 6:
-                return $this->getTimeFormat();
+                return $this->getDateFormat();
                 break;
             case 7:
-                return $this->getDatetimeFormat();
+                return $this->getTimeFormat();
                 break;
             case 8:
-                return $this->getDecimalSeparator();
+                return $this->getDatetimeFormat();
                 break;
             case 9:
-                return $this->getThousandsSeparator();
+                return $this->getDecimalSeparator();
                 break;
             case 10:
-                return $this->getActive();
+                return $this->getThousandsSeparator();
                 break;
             case 11:
-                return $this->getVisible();
+                return $this->getActive();
                 break;
             case 12:
-                return $this->getDecimals();
+                return $this->getVisible();
                 break;
             case 13:
-                return $this->getByDefault();
+                return $this->getDecimals();
                 break;
             case 14:
-                return $this->getPosition();
+                return $this->getByDefault();
                 break;
             case 15:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 16:
+                return $this->getCreatedAt();
+                break;
+            case 17:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1665,18 +1729,19 @@ abstract class Lang implements ActiveRecordInterface
             $keys[2] => $this->getCode(),
             $keys[3] => $this->getLocale(),
             $keys[4] => $this->getUrl(),
-            $keys[5] => $this->getDateFormat(),
-            $keys[6] => $this->getTimeFormat(),
-            $keys[7] => $this->getDatetimeFormat(),
-            $keys[8] => $this->getDecimalSeparator(),
-            $keys[9] => $this->getThousandsSeparator(),
-            $keys[10] => $this->getActive(),
-            $keys[11] => $this->getVisible(),
-            $keys[12] => $this->getDecimals(),
-            $keys[13] => $this->getByDefault(),
-            $keys[14] => $this->getPosition(),
-            $keys[15] => $this->getCreatedAt(),
-            $keys[16] => $this->getUpdatedAt(),
+            $keys[5] => $this->getSameServer(),
+            $keys[6] => $this->getDateFormat(),
+            $keys[7] => $this->getTimeFormat(),
+            $keys[8] => $this->getDatetimeFormat(),
+            $keys[9] => $this->getDecimalSeparator(),
+            $keys[10] => $this->getThousandsSeparator(),
+            $keys[11] => $this->getActive(),
+            $keys[12] => $this->getVisible(),
+            $keys[13] => $this->getDecimals(),
+            $keys[14] => $this->getByDefault(),
+            $keys[15] => $this->getPosition(),
+            $keys[16] => $this->getCreatedAt(),
+            $keys[17] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1740,39 +1805,42 @@ abstract class Lang implements ActiveRecordInterface
                 $this->setUrl($value);
                 break;
             case 5:
-                $this->setDateFormat($value);
+                $this->setSameServer($value);
                 break;
             case 6:
-                $this->setTimeFormat($value);
+                $this->setDateFormat($value);
                 break;
             case 7:
-                $this->setDatetimeFormat($value);
+                $this->setTimeFormat($value);
                 break;
             case 8:
-                $this->setDecimalSeparator($value);
+                $this->setDatetimeFormat($value);
                 break;
             case 9:
-                $this->setThousandsSeparator($value);
+                $this->setDecimalSeparator($value);
                 break;
             case 10:
-                $this->setActive($value);
+                $this->setThousandsSeparator($value);
                 break;
             case 11:
-                $this->setVisible($value);
+                $this->setActive($value);
                 break;
             case 12:
-                $this->setDecimals($value);
+                $this->setVisible($value);
                 break;
             case 13:
-                $this->setByDefault($value);
+                $this->setDecimals($value);
                 break;
             case 14:
-                $this->setPosition($value);
+                $this->setByDefault($value);
                 break;
             case 15:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 16:
+                $this->setCreatedAt($value);
+                break;
+            case 17:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1804,18 +1872,19 @@ abstract class Lang implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setCode($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setLocale($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUrl($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setDateFormat($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setTimeFormat($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setDatetimeFormat($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setDecimalSeparator($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setThousandsSeparator($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setActive($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setVisible($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setDecimals($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setByDefault($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setPosition($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setUpdatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[5], $arr)) $this->setSameServer($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setDateFormat($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setTimeFormat($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setDatetimeFormat($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setDecimalSeparator($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setThousandsSeparator($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setActive($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setVisible($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setDecimals($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setByDefault($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setPosition($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
     }
 
     /**
@@ -1832,6 +1901,7 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->isColumnModified(LangTableMap::CODE)) $criteria->add(LangTableMap::CODE, $this->code);
         if ($this->isColumnModified(LangTableMap::LOCALE)) $criteria->add(LangTableMap::LOCALE, $this->locale);
         if ($this->isColumnModified(LangTableMap::URL)) $criteria->add(LangTableMap::URL, $this->url);
+        if ($this->isColumnModified(LangTableMap::SAME_SERVER)) $criteria->add(LangTableMap::SAME_SERVER, $this->same_server);
         if ($this->isColumnModified(LangTableMap::DATE_FORMAT)) $criteria->add(LangTableMap::DATE_FORMAT, $this->date_format);
         if ($this->isColumnModified(LangTableMap::TIME_FORMAT)) $criteria->add(LangTableMap::TIME_FORMAT, $this->time_format);
         if ($this->isColumnModified(LangTableMap::DATETIME_FORMAT)) $criteria->add(LangTableMap::DATETIME_FORMAT, $this->datetime_format);
@@ -1911,6 +1981,7 @@ abstract class Lang implements ActiveRecordInterface
         $copyObj->setCode($this->getCode());
         $copyObj->setLocale($this->getLocale());
         $copyObj->setUrl($this->getUrl());
+        $copyObj->setSameServer($this->getSameServer());
         $copyObj->setDateFormat($this->getDateFormat());
         $copyObj->setTimeFormat($this->getTimeFormat());
         $copyObj->setDatetimeFormat($this->getDatetimeFormat());
@@ -2636,6 +2707,7 @@ abstract class Lang implements ActiveRecordInterface
         $this->code = null;
         $this->locale = null;
         $this->url = null;
+        $this->same_server = null;
         $this->date_format = null;
         $this->time_format = null;
         $this->datetime_format = null;

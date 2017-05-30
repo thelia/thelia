@@ -26,6 +26,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildLangQuery orderByLocale($order = Criteria::ASC) Order by the locale column
  * @method     ChildLangQuery orderByUrl($order = Criteria::ASC) Order by the url column
+ * @method     ChildLangQuery orderBySameServer($order = Criteria::ASC) Order by the same_server column
  * @method     ChildLangQuery orderByDateFormat($order = Criteria::ASC) Order by the date_format column
  * @method     ChildLangQuery orderByTimeFormat($order = Criteria::ASC) Order by the time_format column
  * @method     ChildLangQuery orderByDatetimeFormat($order = Criteria::ASC) Order by the datetime_format column
@@ -44,6 +45,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery groupByCode() Group by the code column
  * @method     ChildLangQuery groupByLocale() Group by the locale column
  * @method     ChildLangQuery groupByUrl() Group by the url column
+ * @method     ChildLangQuery groupBySameServer() Group by the same_server column
  * @method     ChildLangQuery groupByDateFormat() Group by the date_format column
  * @method     ChildLangQuery groupByTimeFormat() Group by the time_format column
  * @method     ChildLangQuery groupByDatetimeFormat() Group by the datetime_format column
@@ -77,6 +79,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLang findOneByCode(string $code) Return the first ChildLang filtered by the code column
  * @method     ChildLang findOneByLocale(string $locale) Return the first ChildLang filtered by the locale column
  * @method     ChildLang findOneByUrl(string $url) Return the first ChildLang filtered by the url column
+ * @method     ChildLang findOneBySameServer(boolean $active) Return the first ChildLang filtered by the same_server column
  * @method     ChildLang findOneByDateFormat(string $date_format) Return the first ChildLang filtered by the date_format column
  * @method     ChildLang findOneByTimeFormat(string $time_format) Return the first ChildLang filtered by the time_format column
  * @method     ChildLang findOneByDatetimeFormat(string $datetime_format) Return the first ChildLang filtered by the datetime_format column
@@ -95,6 +98,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     array findByCode(string $code) Return ChildLang objects filtered by the code column
  * @method     array findByLocale(string $locale) Return ChildLang objects filtered by the locale column
  * @method     array findByUrl(string $url) Return ChildLang objects filtered by the url column
+ * @method     array findBySameServer(boolean $active) Return ChildLang objects filtered by the same_server column
  * @method     array findByDateFormat(string $date_format) Return ChildLang objects filtered by the date_format column
  * @method     array findByTimeFormat(string $time_format) Return ChildLang objects filtered by the time_format column
  * @method     array findByDatetimeFormat(string $datetime_format) Return ChildLang objects filtered by the datetime_format column
@@ -195,7 +199,7 @@ abstract class LangQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `LOCALE`, `URL`, `DATE_FORMAT`, `TIME_FORMAT`, `DATETIME_FORMAT`, `DECIMAL_SEPARATOR`, `THOUSANDS_SEPARATOR`, `ACTIVE`, `VISIBLE`, `DECIMALS`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `LOCALE`, `URL`, `SAME_SERVER`, `DATE_FORMAT`, `TIME_FORMAT`, `DATETIME_FORMAT`, `DECIMAL_SEPARATOR`, `THOUSANDS_SEPARATOR`, `ACTIVE`, `VISIBLE`, `DECIMALS`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -439,6 +443,33 @@ abstract class LangQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(LangTableMap::URL, $url, $comparison);
+    }
+
+    /**
+     * Filter the query on the same_server column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySameServer(true); // WHERE active = true
+     * $query->filterBySameServer('yes'); // WHERE active = true
+     * </code>
+     *
+     * @param     boolean|string $sameServer The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterBySameServer($sameServer = null, $comparison = null)
+    {
+        if (is_string($sameServer)) {
+            $sameServer = in_array(strtolower($sameServer), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(LangTableMap::SAME_SERVER, $sameServer, $comparison);
     }
 
     /**

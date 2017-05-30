@@ -13,6 +13,8 @@
 namespace Thelia\Form\Lang;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
 
@@ -23,7 +25,7 @@ use Thelia\Model\LangQuery;
  */
 class LangUrlForm extends BaseForm
 {
-    const LANG_PREFIX = 'url_';
+    const LANG_PREFIX = 'lang_';
 
     /**
      *
@@ -48,21 +50,33 @@ class LangUrlForm extends BaseForm
     protected function buildForm()
     {
         foreach (LangQuery::create()->find() as $lang) {
-            $this->formBuilder->add(
-                self::LANG_PREFIX.$lang->getId(),
-                'text',
-                array(
-                    'constraints' => array(
-                        new NotBlank(),
-                    ),
-                    "attr" => array(
-                        "tag" => "url",
-                        "url_id" => $lang->getId(),
-                        "url_title" => $lang->getTitle(),
-                    ),
+            $this->formBuilder
+                ->add(
+                    self::LANG_PREFIX.'url_'.$lang->getId(),
+                    'text',
+                    array(
+                        'constraints' => array(
+                            new NotBlank(),
+                        ),
+                        "attr" => array(
+                            "tag" => "url",
+                            "url_id" => $lang->getId(),
+                            "url_title" => $lang->getTitle(),
+                            "url_same_server" => $lang->getSameServer(),
+                        ),
 
+                    )
                 )
-            );
+                ->add(
+                    self::LANG_PREFIX.'sameServer_'.$lang->getId(),
+                    'checkbox',
+                    [
+                        'constraints' => [ new Type([ 'type' => 'bool']) ],
+                        'required'    => false,
+                        'attr' => [
+                          ]
+                    ]
+                );
         }
     }
 

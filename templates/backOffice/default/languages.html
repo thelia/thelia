@@ -157,6 +157,10 @@
                                     <td>
                                         <div class="form-group {if $error}has-error{/if}">
                                         <input type="text" class="form-control" name="{$name}" value="{$value}" placeholder="http://www.domain.com" {if $one_domain_per_lang == 0}readonly{/if}>
+                                        {$check_same_server = $attr_list.url_same_server}
+                                        {form_field field="lang_sameServer_{$attr_list.url_id}"}
+                                        <input type="checkbox" name="{$name}" {if $check_same_server}checked{/if}> {intl l='Check if it is the same server, same Thelia as the default language'}
+                                        {/form_field}
                                         </div>
                                     </td>
                                 </tr>
