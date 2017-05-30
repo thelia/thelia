@@ -145,7 +145,7 @@ class UrlGenerator extends AbstractSmartyPlugin
                     
                     $domainUrl = $lang->getUrl();
                     $path = '';
-                    if (null != $urlRewrite){
+                    if (null != $urlRewrite) {
                         $path = "/".$urlRewrite->getUrl();
                     }
                     $baseUrl = $request->getBaseUrl();
