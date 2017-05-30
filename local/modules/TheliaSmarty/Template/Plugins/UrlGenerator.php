@@ -134,17 +134,18 @@ class UrlGenerator extends AbstractSmartyPlugin
                 } else {
                     $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
                 }
-                $urlRewrite = RewritingUrlQuery::create()
-                    ->filterByView($view)
-                    ->filterByViewId($viewId)
-                    ->filterByViewLocale($lang->getLocale())
-                    ->findOneByRedirected(null)
-                ;
 
                 if (ConfigQuery::isMultiDomainActivated()) {
+                    $urlRewrite = RewritingUrlQuery::create()
+                        ->filterByView($view)
+                        ->filterByViewId($viewId)
+                        ->filterByViewLocale($lang->getLocale())
+                        ->findOneByRedirected(null)
+                    ;
+                    
                     $domainUrl = $lang->getUrl();
                     $path = '';
-                    if(null != $urlRewrite){
+                    if (null != $urlRewrite){
                         $path = "/".$urlRewrite->getUrl();
                     }
                     $baseUrl = $request->getBaseUrl();
