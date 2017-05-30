@@ -143,13 +143,11 @@ class UrlGenerator extends AbstractSmartyPlugin
                         ->findOneByRedirected(null)
                     ;
                     
-                    $domainUrl = $lang->getUrl();
                     $path = '';
                     if (null != $urlRewrite) {
                         $path = "/".$urlRewrite->getUrl();
                     }
-                    $baseUrl = $request->getBaseUrl();
-                    $url = rtrim($domainUrl, "/").$baseUrl.$path;
+                    $url = rtrim($lang->getUrl(), "/").$request->getBaseUrl().$path;
                 }
 
             }
