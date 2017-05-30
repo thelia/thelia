@@ -2804,9 +2804,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
 
 INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 {foreach $locales as $locale}
-    (1, '{$locale}', {intl l='Mr.' locale=$locale}, {intl l='Mister' locale=$locale}),
-    (2, '{$locale}', {intl l='Mrs' locale=$locale}, {intl l='Misses' locale=$locale}),
-    (3, '{$locale}', {intl l='Miss_short' locale=$locale}, {intl l='Miss' locale=$locale}){if ! $locale@last},{/if}
+    (1, '{$locale}', {intl l='Mr.' locale=$locale use_default="1"}, {intl l='Mister' locale=$locale use_default="1"}),
+    (2, '{$locale}', {intl l='Mrs' locale=$locale use_default="1"}, {intl l='Misses' locale=$locale use_default="1"}),
+    (3, '{$locale}', {intl l='Miss_short' locale=$locale use_default="1"}, {intl l='Miss' locale=$locale use_default="1"}){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -3414,12 +3414,12 @@ INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`) VALUES
 
 INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 {foreach $locales as $locale}
-    (1, '{$locale}', {intl l='Not paid' locale=$locale}, '', '', ''),
-    (2, '{$locale}', {intl l='Paid' locale=$locale}, '', '', ''),
-    (3, '{$locale}', {intl l='Processing' locale=$locale}, '', '', ''),
-    (4, '{$locale}', {intl l='Sent' locale=$locale}, '', '', ''),
-    (5, '{$locale}', {intl l='Canceled' locale=$locale}, '', '', ''),
-    (6, '{$locale}', {intl l='Refunded' locale=$locale}, '', '', ''){if ! $locale@last},{/if}
+    (1, '{$locale}', {intl l='Not paid' locale=$locale use_default="1"}, '', '', ''),
+    (2, '{$locale}', {intl l='Paid' locale=$locale use_default="1"}, '', '', ''),
+    (3, '{$locale}', {intl l='Processing' locale=$locale use_default="1"}, '', '', ''),
+    (4, '{$locale}', {intl l='Sent' locale=$locale use_default="1"}, '', '', ''),
+    (5, '{$locale}', {intl l='Canceled' locale=$locale use_default="1"}, '', '', ''),
+    (6, '{$locale}', {intl l='Refunded' locale=$locale use_default="1"}, '', '', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;
