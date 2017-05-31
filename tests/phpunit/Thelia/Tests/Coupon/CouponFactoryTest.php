@@ -176,8 +176,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testBuildCouponFromCode()
     {
-        $this->markTestSkipped('It\'s necessary to mock the facade');
-
         /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
@@ -244,8 +242,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testBuildCouponFromCodeUsageLimitCoupon()
     {
-        $this->markTestSkipped('It\'s necessary to mock the facade');
-
         /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
@@ -302,9 +298,14 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->with('request_stack')
+            ->will($this->returnValue(false));
 
         $dummy = new Translator($stubContainer);
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
         $factory->buildCouponFromCode('XMAS');
@@ -347,8 +348,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testBuildCouponFromCodeExpiredCoupon()
     {
-        $this->markTestSkipped('It\'s necessary to mock the facade');
-
         /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
@@ -402,9 +401,14 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->with('request_stack')
+            ->will($this->returnValue(false));
 
         $dummy = new Translator($stubContainer);
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
 
         $factory = new CouponFactory($stubContainer);
         $factory->buildCouponFromCode('XMAS');
@@ -416,8 +420,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testBuildCouponFromCodeNoConditionCoupon()
     {
-        $this->markTestSkipped('It\'s necessary to mock the facade');
-
         /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
@@ -478,8 +480,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testBuildCouponFromModel()
     {
-        $this->markTestSkipped('It\'s necessary to mock the facade');
-
         /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
@@ -545,17 +545,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     protected function getMockContainer()
     {
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
-
-        $stubContainer->expects($this->any())
-            ->method('has')
-            ->with('request_stack')
-            ->will($this->returnValue(false));
-
-        $stubContainer->expects($this->any())
-            ->method('has')
-            ->with('request')
-            ->will($this->returnValue(false));
+        $stubContainer = $this->getMock(ContainerInterface::class);
 
         return $stubContainer;
     }
