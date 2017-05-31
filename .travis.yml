@@ -17,7 +17,6 @@ php:
 matrix:
   allow_failures:
   - php: nightly
-  - php: 7.1
 env:
 - DB_USER=root DB_HOST=127.0.0.1
 before_script:
