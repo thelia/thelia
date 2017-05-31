@@ -87,6 +87,15 @@ class FeatureProduct extends BaseFeatureProduct
      {
          $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
          Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+         $this->setIsFreeText($v ? true : false);
          return parent::setFreeTextValue($v);
+     }
+
+     /**
+      * {@inheritDoc}
+      */
+     public function setIsFreeText($v) {
+         parent::setFreeTextValue($v ? 1 : null); //for preventing log deprecation
+         return parent::setIsFreeText($v);
      }
 }

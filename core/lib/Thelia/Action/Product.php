@@ -666,7 +666,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // If it's a free text value, create a FeatureAv to handle i18n
             if ($event->getIsTextValue() === true) {
-                $featureProduct->setFreeTextValue(true);
                 $featureProduct->setIsFreeText(true);
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
