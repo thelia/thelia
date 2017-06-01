@@ -306,14 +306,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
-        /** @var State $taxState */
-        if (array_key_exists('currentState', self::$dataAccessCache)) {
-            $taxState = self::$dataAccessCache['currentState'];
-        } else {
-            $taxState = $this->taxEngine->getDeliveryState();
-            self::$dataAccessCache['currentState'] = $taxState;
-        }
-
         /** @var Cart $cart */
         $cart = $this->getSession()->getSessionCart($this->dispatcher);
 
@@ -333,17 +325,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 break;
             case "total_price":
             case "total_price_with_discount":
-                $result = $cart->getTotalAmount(true, $taxCountry, $taxState);
+                $result = $cart->getTotalAmount();
                 break;
             case "total_price_without_discount":
-                $result = $cart->getTotalAmount(false, $taxCountry, $taxState);
+                $result = $cart->getTotalAmount(false);
                 break;
             case "total_taxed_price":
             case "total_taxed_price_with_discount":
-                $result = $cart->getTaxedAmount($taxCountry, true, $taxState);
+                $result = $cart->getTaxedAmount($taxCountry);
                 break;
             case "total_taxed_price_without_discount":
-                $result = $cart->getTaxedAmount($taxCountry, false, $taxState);
+                $result = $cart->getTaxedAmount($taxCountry, false);
                 break;
             case "is_virtual":
             case "contains_virtual_product":
