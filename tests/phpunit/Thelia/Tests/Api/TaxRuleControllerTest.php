@@ -120,8 +120,6 @@ class TaxRuleControllerTest extends ApiTestCase
 
     public function testCreateTaxRule()
     {
-        $this->markTestSkipped('Must be revisited. Tax Rules do not work like this.');
-
         $taxes = TaxQuery::create()
             ->limit(2)
             ->select(TaxTableMap::ID)
@@ -184,8 +182,6 @@ class TaxRuleControllerTest extends ApiTestCase
      */
     public function testUpdateTaxRule($taxRuleId)
     {
-        $this->markTestSkipped('Must be revisited. Tax Rules do not work like this.');
-
         $data = [
             "id" => $taxRuleId,
             "default" => true,
@@ -230,12 +226,10 @@ class TaxRuleControllerTest extends ApiTestCase
 
     /**
      * @param $taxRuleId
-     * @depends testCreateTaxRule
+     * @depends testUpdateTaxRule
      */
     public function testDeleteTaxRule($taxRuleId)
     {
-        $this->markTestSkipped('Must be revisited. Tax Rules do not work like this.');
-
         $client = static::createClient();
         $servers = $this->getServerParameters();
 
@@ -254,8 +248,6 @@ class TaxRuleControllerTest extends ApiTestCase
 
     public function testCreateTaxRuleWithInvalidData()
     {
-        $this->markTestSkipped('Must be revisited. Tax Rules do not work like this.');
-
         $countries = CountryQuery::create()
             ->limit(2)
             ->select(CountryTableMap::ID)
