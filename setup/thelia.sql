@@ -274,6 +274,16 @@ CREATE TABLE `feature_product`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
+DROP TRIGGER IF EXISTS `remove_free_text_feature_av`;
+
+DELIMITER $$
+CREATE TRIGGER `remove_free_text_feature_av` AFTER DELETE ON `feature_product`
+ FOR EACH ROW IF OLD.`is_free_text` = 1 THEN
+  DELETE FROM `feature_av` WHERE `id` = OLD.`feature_av_id`;
+END IF
+$$
+DELIMITER ;
+
 -- ---------------------------------------------------------------------
 -- feature_template
 -- ---------------------------------------------------------------------
