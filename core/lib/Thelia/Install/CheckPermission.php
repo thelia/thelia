@@ -55,7 +55,7 @@ class CheckPermission extends BaseInstall
         'fileinfo',
         'gd',
         'intl',
-        'mcrypt',
+        'openssl',
         'pdo_mysql',
         'dom',
     );

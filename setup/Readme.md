@@ -23,7 +23,7 @@ Requirements
 * php 5.5
     * Required extensions :
         * PDO_Mysql
-        * mcrypt
+        * openssl
         * intl
         * gd
         * curl
