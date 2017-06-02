@@ -714,19 +714,19 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                     $deleteFeatureAvEvent = new FeatureAvDeleteEvent($freeTextFeatureAv->getId());
                     $this->eventDispatcher->dispatch(TheliaEvents::FEATURE_AV_DELETE, $deleteFeatureAvEvent);
-
-                    return;
                 }
+                return;
             } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
             elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
+
                 $freeTextFeatureAvI18n->setTitle($featureAvId);
                 $freeTextFeatureAvI18n->save();
 
                 $featureAvId = $freeTextFeatureAvI18n->getId();
+            } //To prevent Integrity constraint violation
+            elseif (empty($featureAvId)) {
+                return;
             }
-        } // Else the FeatureProduct exists and is not a free text value
-        else {
-            $featureAvId = $event->getFeatureValue();
         }
 
         $featureProduct->setFeatureAvId($featureAvId);
