@@ -12,7 +12,6 @@
 
 namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Exception\TaxEngineException;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Product;
 use Thelia\Type\FloatType;
@@ -20,7 +19,8 @@ use Thelia\Type\ModelValidIdType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\BaseTaxType;
 use Thelia\TaxEngine\TaxTypeRequirementDefinition;
-use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
+use Thelia\Log\Tlog;
 
 /**
  *
@@ -47,16 +47,19 @@ class FeatureFixAmountTaxType extends BaseTaxType
             ->findOne();
 
         if (null !== $query) {
-            if ( (1 == $taxAmount = $query->getFreeTextValue()) && !is_null($query->getFeatureAvId()) ) {
-                $taxAmount = $query->getFeatureAv()->setLocale( Lang::getDefaultLanguage()->getLocale() )->getTitle();
+
+            if (is_null($query->getFeatureAvId())) {
+                $taxAmount = $query->getFreeTextValue(); //BC for old behavior
+            } else {
+                $locale = LangQuery::create()->findPk( $this->getRequirement('lang') )->getLocale();
+                $taxAmount = $query->getFeatureAv()->setLocale($locale)->getTitle();
             }
 
-            $testInt = new FloatType();
-            if (!$testInt->isValid($taxAmount)) {
-                throw new TaxEngineException(
-                    Translator::getInstance()->trans('Feature value does not match FLOAT format'),
-                    TaxEngineException::FEATURE_BAD_EXPECTED_VALUE
-                );
+            $testFloat = new FloatType();
+            if (!$testFloat->isValid($taxAmount)) {
+                //We cannot modify "bad" (consider uninitialized) feature value in backOffice if we throw exception
+                Tlog::getInstance()->error( Translator::getInstance()->trans('Feature value does not match FLOAT format') );
+                return 0;
             }
         }
 
@@ -70,7 +73,12 @@ class FeatureFixAmountTaxType extends BaseTaxType
                 'feature',
                 new ModelValidIdType('Feature'),
                 Translator::getInstance()->trans("Feature")
-            )
+            ),
+            new TaxTypeRequirementDefinition(
+                'lang',
+                new ModelValidIdType('Lang'),
+                Translator::getInstance()->trans('Language')
+            ),
         );
     }
 
