@@ -76,7 +76,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     {
         return $this->countAllProducts(true);
     }
-    
+
     /**
      * Get the root category
      * @param  int   $categoryId
@@ -116,7 +116,10 @@ class Category extends BaseCategory implements FileModelParentInterface
             foreach ($productsCategories as $productCategory) {
                 $product = $productCategory->getProduct();
                 if ($product) {
-                    $product->delete($con);
+                    $product
+                        ->setDispatcher($this->dispatcher)
+                        ->delete($con)
+                    ;
                 }
             }
         }

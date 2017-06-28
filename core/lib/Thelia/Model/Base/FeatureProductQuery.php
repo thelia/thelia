@@ -26,6 +26,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProductQuery orderByFeatureId($order = Criteria::ASC) Order by the feature_id column
  * @method     ChildFeatureProductQuery orderByFeatureAvId($order = Criteria::ASC) Order by the feature_av_id column
  * @method     ChildFeatureProductQuery orderByFreeTextValue($order = Criteria::ASC) Order by the free_text_value column
+ * @method     ChildFeatureProductQuery orderByIsFreeText($order = Criteria::ASC) Order by the is_free_text column
  * @method     ChildFeatureProductQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildFeatureProductQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildFeatureProductQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -35,6 +36,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProductQuery groupByFeatureId() Group by the feature_id column
  * @method     ChildFeatureProductQuery groupByFeatureAvId() Group by the feature_av_id column
  * @method     ChildFeatureProductQuery groupByFreeTextValue() Group by the free_text_value column
+ * @method     ChildFeatureProductQuery groupByIsFreeText() Group by the is_free_text column
  * @method     ChildFeatureProductQuery groupByPosition() Group by the position column
  * @method     ChildFeatureProductQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildFeatureProductQuery groupByUpdatedAt() Group by the updated_at column
@@ -63,6 +65,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProduct findOneByFeatureId(int $feature_id) Return the first ChildFeatureProduct filtered by the feature_id column
  * @method     ChildFeatureProduct findOneByFeatureAvId(int $feature_av_id) Return the first ChildFeatureProduct filtered by the feature_av_id column
  * @method     ChildFeatureProduct findOneByFreeTextValue(string $free_text_value) Return the first ChildFeatureProduct filtered by the free_text_value column
+ * @method     ChildFeatureProduct findOneByIsFreeText(boolean $is_free_text) Return the first ChildFeatureProduct filtered by the is_free_text column
  * @method     ChildFeatureProduct findOneByPosition(int $position) Return the first ChildFeatureProduct filtered by the position column
  * @method     ChildFeatureProduct findOneByCreatedAt(string $created_at) Return the first ChildFeatureProduct filtered by the created_at column
  * @method     ChildFeatureProduct findOneByUpdatedAt(string $updated_at) Return the first ChildFeatureProduct filtered by the updated_at column
@@ -72,6 +75,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     array findByFeatureId(int $feature_id) Return ChildFeatureProduct objects filtered by the feature_id column
  * @method     array findByFeatureAvId(int $feature_av_id) Return ChildFeatureProduct objects filtered by the feature_av_id column
  * @method     array findByFreeTextValue(string $free_text_value) Return ChildFeatureProduct objects filtered by the free_text_value column
+ * @method     array findByIsFreeText(boolean $is_free_text) Return ChildFeatureProduct objects filtered by the is_free_text column
  * @method     array findByPosition(int $position) Return ChildFeatureProduct objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildFeatureProduct objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildFeatureProduct objects filtered by the updated_at column
@@ -163,7 +167,7 @@ abstract class FeatureProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FEATURE_ID`, `FEATURE_AV_ID`, `FREE_TEXT_VALUE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature_product` WHERE `ID` = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, FREE_TEXT_VALUE, IS_FREE_TEXT, POSITION, CREATED_AT, UPDATED_AT FROM feature_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -449,6 +453,33 @@ abstract class FeatureProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FeatureProductTableMap::FREE_TEXT_VALUE, $freeTextValue, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_free_text column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsFreeText(true); // WHERE is_free_text = true
+     * $query->filterByIsFreeText('yes'); // WHERE is_free_text = true
+     * </code>
+     *
+     * @param     boolean|string $isFreeText The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFeatureProductQuery The current query, for fluid interface
+     */
+    public function filterByIsFreeText($isFreeText = null, $comparison = null)
+    {
+        if (is_string($isFreeText)) {
+            $is_free_text = in_array(strtolower($isFreeText), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(FeatureProductTableMap::IS_FREE_TEXT, $isFreeText, $comparison);
     }
 
     /**

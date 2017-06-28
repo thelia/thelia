@@ -601,7 +601,7 @@ try {
                 $featureAv->save();
 
                 $featureProduct->setFeatureAvId($featureAv->getId());
-                $featureProduct->setFreeTextValue(true);
+                $featureProduct->setIsFreeText(true);
                 $freeTextCreated = true;
             } elseif (count($featureAvId) > 0) { //got some av
                 $featureProduct->setFeatureAvId(

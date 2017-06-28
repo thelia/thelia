@@ -250,7 +250,7 @@
                                     <strong>{$TITLE}</strong> :
                                     {loop name="feature_value_info" type="feature_value" feature={$ID} product=$product_id}
                                         {if $LOOP_COUNT > 1}, {else} {/if}
-                                        <span>{if $IS_FREE_TEXT == 1}{$FREE_TEXT_VALUE}{else}{$TITLE}{/if}</span>
+                                        <span>{$TITLE}</span>
                                     {/loop}
                                 </li>
                             {/ifloop}
