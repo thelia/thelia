@@ -12,45 +12,39 @@
 
 namespace Thelia\Core\Event\Template;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\Template;
-
-class TemplateEvent extends ActionEvent
+class TemplateDuplicateEvent extends TemplateEvent
 {
+    /** @var  int */
+    protected $sourceTemplateId;
+    
+    /** @var  string */
+    protected $locale;
+    
     /**
-     * @var Template
+     * TemplateCreateEvent constructor.
+     * @param int $sourceTemplateId
      */
-    protected $template = null;
-
-    public function __construct(Template $template = null)
+    public function __construct($sourceTemplateId, $locale)
     {
-        $this->template = $template;
+        parent::__construct();
+        
+        $this->sourceTemplateId = $sourceTemplateId;
+        $this->locale = $locale;
     }
     
     /**
-     * @return bool
+     * @return int
      */
-    public function hasTemplate()
+    public function getSourceTemplateId()
     {
-        return ! is_null($this->template);
+        return $this->sourceTemplateId;
     }
     
     /**
-     * @return Template
+     * @return string
      */
-    public function getTemplate()
+    public function getLocale()
     {
-        return $this->template;
-    }
-    
-    /**
-     * @param Template $template
-     * @return $this
-     */
-    public function setTemplate($template)
-    {
-        $this->template = $template;
-
-        return $this;
+        return $this->locale;
     }
 }

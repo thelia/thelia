@@ -77,6 +77,7 @@ use Thelia\Type\TypeCollection;
  * @method int[] getFeatureAvailability()
  * @method string[] getFeatureValues()
  * @method string[] getAttributeNonStrictMatch()
+ * @method int[] getTemplateId()
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -115,6 +116,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntTypeArgument('currency'),
             Argument::createAnyTypeArgument('title'),
+            Argument::createIntListTypeArgument('template_id'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -574,7 +576,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (!is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
-
+        
+        $templateIdList = $this->getTemplateId();
+    
+        if (!is_null($templateIdList)) {
+            $search->filterByTemplateId($templateIdList, Criteria::IN);
+        }
+        
         $manualOrderAllowed = false;
 
         if (null !== $categoryDefault = $this->getCategoryDefault()) {
