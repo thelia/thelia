@@ -17,12 +17,23 @@ use Thelia\Model\Product;
 
 class ProductCloneEvent extends ActionEvent
 {
+    /** @var  string */
     protected $ref;
+    /** @var  string */
     protected $lang;
-    protected $originalProduct = array();
-    protected $clonedProduct = array();
+    /** @var  Product */
+    protected $originalProduct;
+    /** @var  Product */
+    protected $clonedProduct;
+    /** @var array */
     protected $types = array('images', 'documents');
 
+    /**
+     * ProductCloneEvent constructor.
+     * @param string $ref
+     * @param string $lang the locale (such as fr_FR)
+     * @param $originalProduct
+     */
     public function __construct(
         $ref,
         $lang,
@@ -34,7 +45,7 @@ class ProductCloneEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getRef()
     {
@@ -42,7 +53,7 @@ class ProductCloneEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $ref
+     * @param string $ref
      */
     public function setRef($ref)
     {
@@ -50,7 +61,7 @@ class ProductCloneEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return string the locale (such as fr_FR)
      */
     public function getLang()
     {
@@ -58,7 +69,7 @@ class ProductCloneEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $lang
+     * @param string $lang the locale (such as fr_FR)
      */
     public function setLang($lang)
     {
