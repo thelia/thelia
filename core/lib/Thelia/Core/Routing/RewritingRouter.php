@@ -28,6 +28,7 @@ use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Rewriting\RewritingResolver;
@@ -180,6 +181,11 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             if (null ==! $requestedLocale = $request->get('lang')) {
                 if (null !== $requestedLang = LangQuery::create()->findOneByLocale($requestedLocale)) {
                     if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
+                        // Save one redirection if requested locale is disabled.
+                        if (! $requestedLang->getActive()) {
+                            $requestedLang = Lang::getDefaultLanguage();
+                        }
+
                         $localizedUrl = $urlTool->retrieve(
                             $rewrittenUrlData->view,
                             $rewrittenUrlData->viewId,
@@ -189,6 +195,22 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                         $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
                     }
                 }
+            }
+
+            // If the rewritten URL locale is disabled, redirect to the URL in the default language
+            if (null === $lang = LangQuery::create()
+                    ->filterByActive(true)
+                    ->filterByLocale($rewrittenUrlData->locale)
+                    ->findOne()) {
+                $lang = Lang::getDefaultLanguage();
+
+                $localizedUrl = $urlTool->retrieve(
+                    $rewrittenUrlData->view,
+                    $rewrittenUrlData->viewId,
+                    $lang->getLocale()
+                )->toString();
+
+                $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
             }
 
             /* is the URL redirected ? */
