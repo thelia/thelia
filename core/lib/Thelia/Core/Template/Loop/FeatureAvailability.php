@@ -108,12 +108,17 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             }
         }
 
+        // Search only non-freetext feature values.
         $search
             ->useFeatureProductQuery()
                 ->filterByIsFreeText(false)
                 ->_or()
                 ->filterByIsFreeText(null) //does not belong to any product
-            ->endUse();
+            ->endUse()
+        ;
+
+        // Joining with FeatureProduct may result in multiple occurences of the same FeatureAv. Juste get one.
+        $search->distinct();
 
         return $search;
     }
