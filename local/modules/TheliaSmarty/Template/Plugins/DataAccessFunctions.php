@@ -20,6 +20,8 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Coupon\CouponManager;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\BrandQuery;
 use Thelia\Model\Cart;
@@ -33,6 +35,7 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -64,6 +67,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     /** @var TaxEngine */
     protected $taxEngine;
 
+    /** @var  CouponManager */
+    protected $couponManager;
+
     private static $dataAccessCache = array();
 
     public function __construct(
@@ -71,13 +77,15 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         SecurityContext $securityContext,
         TaxEngine $taxEngine,
         ParserContext $parserContext,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        CouponManager $couponManager
     ) {
         $this->securityContext = $securityContext;
         $this->parserContext = $parserContext;
         $this->requestStack = $requestStack;
         $this->dispatcher = $dispatcher;
         $this->taxEngine = $taxEngine;
+        $this->couponManager = $couponManager;
     }
 
     /**
@@ -361,6 +369,31 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return $result;
     }
 
+    public function couponDataAccess($params, &$smarty)
+    {
+        /** @var Order $order */
+        $order = $this->getSession()->getOrder();
+        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+
+        switch ($attribute) {
+            case 'has_coupons':
+                return count($this->couponManager->getCouponsKept()) > 0;
+            case 'coupon_count':
+                return count($this->couponManager->getCouponsKept());
+            case 'coupon_list':
+                $orderCoupons = [];
+                /** @var CouponInterface $coupon */
+                foreach($this->couponManager->getCouponsKept() as $coupon) {
+                    $orderCoupons[] = $coupon->getCode();
+                }
+                return $orderCoupons;
+            case 'is_delivery_free':
+                return $this->couponManager->isCouponRemovingPostage($order);
+        }
+
+        throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
+    }
+
     /**
      * Provides access to an attribute of the current order
      *
@@ -370,6 +403,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function orderDataAccess($params, &$smarty)
     {
+        /** @var Order $order */
         $order = $this->getSession()->getOrder();
         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
         switch ($attribute) {
@@ -773,6 +807,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'stats', $this, 'statsAccess'),
             new SmartyPluginDescriptor('function', 'meta', $this, 'metaAccess'),
             new SmartyPluginDescriptor('function', 'module_config', $this, 'moduleConfigDataAccess'),
+            new SmartyPluginDescriptor('function', 'coupon', $this, 'couponDataAccess'),
         );
     }
 
