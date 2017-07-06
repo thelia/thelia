@@ -60,10 +60,14 @@
                         {loop type="cart" name="cartloop"}
                         <tr>
                             <td class="image">
+                                {assign var="product_image_id" value=null}
+                                {loop name="pse-image" type="product-sale-elements-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                    {assign var="product_image_id" value=$PRODUCT_IMAGE_ID}
+                                {/loop}
                                 {ifloop rel='product-image'}
                                 <a href="{$PRODUCT_URL nofilter}" class="thumbnail">
-                                    {assign "cart_count" $LOOP_COUNT}
-                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    {assign var="cart_count" value=$LOOP_COUNT}
+                                    {loop type="image" name="product-image" id=$product_image_id product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
                                         <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
                                     {/loop}
                                 </a>
@@ -73,14 +77,14 @@
                                 <h3 class="name"><a href="{$PRODUCT_URL nofilter}">{$TITLE}</a></h3>
                                 <div class="product-options">
                                     <dl class="dl-horizontal">
-                                        <dt>{intl l="Available"} :</dt>
+                                        <dt class="stockView">{intl l="Available"} :</dt>
                                         {if $STOCK > 0}
                                             <dd>{intl l="In Stock"}</dd>
                                         {else}
                                             {$errorStock="TRUE"}
                                             <dd>{intl l="Out of Stock"}</dd>
                                         {/if}
-                                        <dt>{intl l="No."}</dt>
+                                        <dt class="refView">{intl l="No."}</dt>
                                         <dd>{$REF}</dd>
                                         {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID" order="manual"}
                                             <dt>{$ATTRIBUTE_TITLE}</dt>
