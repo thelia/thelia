@@ -97,7 +97,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
             $url = $router->generate(
                 $routeId,
-                $this->getArgsFromParam($params, ['route_id', 'router']),
+                $this->getArgsFromParam($params, ['route_id', 'router', 'noamp']),
                 Router::ABSOLUTE_URL
             );
         } else {
