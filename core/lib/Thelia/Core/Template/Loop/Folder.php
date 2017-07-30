@@ -43,6 +43,8 @@ use Thelia\Type\BooleanOrBothType;
  * @method string getTitle()
  * @method string[] getOrder()
  * @method bool getWithPrevNextInfo()
+ *  @method bool getNeedCountChild()
+ * @method bool getNeedContentCount()
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -64,6 +66,8 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
+            Argument::createBooleanTypeArgument('need_count_child', true),
+            Argument::createBooleanTypeArgument('need_content_count', true),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -236,10 +240,17 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("META_TITLE", $folder->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $folder->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("CHILD_COUNT", $folder->countChild())
-                ->set("CONTENT_COUNT", $folder->countAllContents())
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition());
+    
+
+            if ($this->getNeedCountChild()) {
+                $loopResultRow->set("CHILD_COUNT", $folder->countChild());
+            }
+    
+            if ($this->getNeedContentCount()) {
+                $loopResultRow->set("PRODUCT_COUNT", $folder->countAllContents());
+            }
 
             $isBackendContext = $this->getBackendContext();
 

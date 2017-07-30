@@ -13,6 +13,9 @@
 namespace Thelia\Tests\Model;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Action\Product;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProductQuery;
@@ -24,6 +27,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class FeatureProductTest extends \PHPUnit_Framework_TestCase
 {
+    public function getContainer()
+    {
+        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+
+        return $container;
+    }
+
+    public function getEventDispatcher()
+    {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addSubscriber(new Product($eventDispatcher));
+
+        return $eventDispatcher;
+    }
+
     public function testProductDeleteFreeTextFeatureAv()
     {
         $con = Propel::getConnection();
@@ -33,8 +52,9 @@ class FeatureProductTest extends \PHPUnit_Framework_TestCase
         $featureAvId = $featureProduct->getFeatureAvId();
         $this->assertNotNull($featureAvId, '`feature_av_id` in `feature_product` table cannot be null');
 
-        $featureProduct->getProduct()
-            ->setDispatcher( $this->getMock(EventDispatcherInterface::class) )
+        $featureProduct
+            ->getProduct()
+            ->setDispatcher($this->getEventDispatcher())
             ->delete($con);
 
         $featureAv = FeatureAvQuery::create($con)->findPk($featureAvId);
@@ -52,8 +72,9 @@ class FeatureProductTest extends \PHPUnit_Framework_TestCase
         $featureAvId = $featureProduct->getFeatureAvId();
         $this->assertNotNull($featureAvId, '`feature_av_id` in `feature_product` table cannot be null');
 
-        CategoryQuery::create()->findPk( $featureProduct->getProduct()->getDefaultCategoryId() )
-            ->setDispatcher( $this->getMock(EventDispatcherInterface::class) )
+        CategoryQuery::create()
+            ->findPk($featureProduct->getProduct()->getDefaultCategoryId())
+            ->setDispatcher($this->getEventDispatcher())
             ->delete($con);
 
         $featureAv = FeatureAvQuery::create($con)->findPk($featureAvId);
