@@ -85,7 +85,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     protected $versionable = true;
 
     use StandardI18nFieldsSearchTrait;
-    
+
     /**
      * @return ArgumentCollection
      */
@@ -281,11 +281,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("IS_NEW", $product->getVirtualColumn('is_new'))
                 ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
                 ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'));
-    
+
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
-    
+
             $this->addOutputFields($loopResultRow, $product);
-    
+
             $loopResult->addRow($loopResultRow);
         }
 
@@ -326,11 +326,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("BEST_TAXED_PRICE", $taxedPrice)
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
-    
+
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
-    
+
             $this->addOutputFields($loopResultRow, $product);
-    
+
             $loopResult->addRow($loopResultRow);
         }
 
@@ -583,13 +583,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (!is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
-        
+
         $templateIdList = $this->getTemplateId();
-    
+
         if (!is_null($templateIdList)) {
             $search->filterByTemplateId($templateIdList, Criteria::IN);
         }
-        
+
         $manualOrderAllowed = false;
 
         if (null !== $categoryDefault = $this->getCategoryDefault()) {
@@ -623,7 +623,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->addJoinCondition('CategorySelect', '`CategorySelect`.DEFAULT_CATEGORY = 1')
             ;
         }
-    
+
         $search->withColumn(
             'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN ' . PHP_INT_MAX . ' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
             'position_delegate'
