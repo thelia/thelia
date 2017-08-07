@@ -78,6 +78,7 @@ UPDATE `order_status` SET `color` = '#d9534f' WHERE `code` = 'canceled';
 UPDATE `order_status` SET `color` = '#986dff' WHERE `code` = 'refunded';
 UPDATE `order_status` SET `color` = '#777777' WHERE `code` NOT IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
 UPDATE `order_status` SET `protected_status` = 1 WHERE `code` IN ('not_paid', 'paid', 'processing', 'sent', 'canceled', 'refunded');
+
 SELECT @max_id := MAX(`id`) FROM `resource`;
 
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES (@max_id+1, 'admin.configuration.order-status', NOW(), NOW());
@@ -114,6 +115,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+7,  '{$locale}', {intl l='Order status - form creation' locale=$locale}, NULL, NULL),
     (@max_id+8,  '{$locale}', {intl l='Order status - form modification' locale=$locale}, NULL, NULL),
     (@max_id+9,  '{$locale}', {intl l='Order status - JavaScript' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
 {/foreach}
 ;
 
@@ -131,5 +133,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max+1, '{$locale}', {intl l='Default number of coupons per page on coupon list' locale=$locale}, NUll, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
+
+ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
+UPDATE `module` SET `mandatory` = 0, `hidden` = 0;
+UPDATE `module` SET `hidden` = 1 WHERE `code` = 'Front';
+UPDATE `module` SET `mandatory` = 1, `hidden` = 1 WHERE `code` = 'TheliaSmarty';
 
 SET FOREIGN_KEY_CHECKS = 1;
