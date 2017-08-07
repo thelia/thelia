@@ -9,7 +9,7 @@ Thelia
 ------
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
-[Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
+[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
 
 This is the new major version of Thelia.
 
@@ -20,13 +20,16 @@ A repository containing all thelia modules is available at this address : https:
 Requirements
 ------------
 
-* php 5.4
+* php 5.5
     * Required extensions :
         * PDO_Mysql
         * mcrypt
         * intl
         * gd
         * curl
+        * calendar
+        * dom
+        * fileinfo
     * safe_mode off
     * memory_limit at least 128M, preferably 256.
     * post_max_size 20M

@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
+        "php": ">=5.5",
         "ircmaxell/password-compat": "1.0.*",
         "psr/log": "1.0",
         "symfony/config": "2.8.*",

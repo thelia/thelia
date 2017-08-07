@@ -20,13 +20,16 @@ A repository containing all thelia modules is available at this address : https:
 Requirements
 ------------
 
-* php 5.4
+* php 5.5
     * Required extensions :
         * PDO_Mysql
         * mcrypt
         * intl
         * gd
         * curl
+        * calendar
+        * dom
+        * fileinfo
     * safe_mode off
     * memory_limit at least 128M, preferably 256.
     * post_max_size 20M

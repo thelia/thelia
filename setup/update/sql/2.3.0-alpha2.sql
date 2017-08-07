@@ -177,7 +177,7 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
     (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),
-    (@max, 'es_ES', 'Correo enviado después de la suscripción al boletín de noticias', 'Tu subscripción al boletín de {config key=\"store_name\"}', NULL, NULL),
+    (@max, 'es_ES', 'Correo enviado después de la suscripción al boletín de noticias', 'Tu suscripción al boletín de {config key=\"store_name\"}', NULL, NULL),
     (@max, 'fr_FR', 'Email envoyé après l\'inscription à la newsletter', 'Votre abonnement à {config key=\"store_name\"} newsletter', NULL, NULL)
 ;
 

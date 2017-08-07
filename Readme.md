@@ -9,7 +9,7 @@ Thelia
 
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=2.3)](https://travis-ci.org/thelia/thelia) [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
-[Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
+[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
 
 This is the new major version of Thelia.
 
@@ -18,13 +18,16 @@ A repository containing all thelia modules is available at this address : https:
 Requirements
 ------------
 
-* PHP 5.4
+* PHP 5.5
     * Required extensions :
         * PDO_Mysql
         * mcrypt
         * intl
         * gd
         * curl
+        * calendar
+        * dom
+        * fileinfo
     * safe_mode off
     * memory_limit at least 128M, preferably 256.
     * post\_max\_size 20M
@@ -82,7 +85,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.3.3 (2.2.6 or 2.1.11)
+$ git checkout 2.3.4 (2.2.6 or 2.1.11)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -91,7 +94,7 @@ $ php composer.phar install
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.3.3 (2.2.6 or 2.1.11)
+$ php composer.phar create-project thelia/thelia path/ 2.3.4 (2.2.6 or 2.1.11)
 ```
 
 ## Install it
@@ -110,10 +113,10 @@ The install wizard in accessible with your favorite browser :
 http://yourdomain.tld/[/subdomain_if_needed]/install
 ```
 
-For example, I have thelia downloaded at http://thelia.net and my vhost is correctly configured, I have to reach this address :
+For example, I have thelia downloaded at https://thelia.net and my vhost is correctly configured, I have to reach this address :
 
 ``` bash
-http://thelia.net/install
+https://thelia.net/install
 ```
 
 ### Using cli tools
@@ -178,7 +181,7 @@ Thelia documentation is available at http://doc.thelia.net
 Roadmap
 -------
 
-The Roadmap is available at http://thelia.net/community/roadmap
+The Roadmap is available at https://thelia.net/community/roadmap
 
 
 Contribute
