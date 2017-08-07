@@ -1,5 +1,27 @@
 # 2.3.4
 
+- (related to #2272) Form fields error information are now saved in the global form error context, and remain available after a redirection.
+- (related to #2276) Product loop fix: addOutputFields() method may now to manipulate fields that were set in associateValues()
+- (related to #2293) performance improvement for calculating order total. This calculation uses now only one request instead of (1 + number of products).
+- (related to #2345) fix and improvement of counting sub categories and sub folders. The number of request is reduced, and the visibility status of products or contents is now considered. Category and subcategory products are now deleted by dispatching a TheliaEvents::PRODUCT_DELETE instead of calling Product::delete()
+- (related to #2349) New feature: It is now possible to send a test email message from the Preview tab of mailing template modification page
+- (related to #2380) Fix for wrong product reference on cart and order-invoice pages
+- (related to #2402) "Coupon" substitutions are now available in the templates
+- (related to #2400) Back-office HTML typo
+- (related to #2394) The customer state is now used to calculate cart taxes
+- (related to #2357) When the resize mode is "none", and required image is bigger than original image in both dimensions, the image is now zoomed if allow_zoom is true.
+- (related to #2403) Fix for wrong or missing types in ProductCloneEvent
+- (related to #2363) Improved products templates features. 1) When a product's template is modified, only the obsolete attribute combinations are deleted, this is much better than deleting all attribute combinations. 2) When an attribute is removed from a template, all related products are also updated, and obsolete attribute combinations are removed. 3) When a feature is removed from a template, the related products are updated, and the feature is removed from the product. 4) The template management page now displays the related products and categories, making finding which products or categories uses the template easier. 5) It is now possible to duplicate a product template. 6) Product and Category loops have now a template_id parameter, to filter results on one ore more template IDs. 
+- (related to #2369) PHP7 related fix: $return was declared as string, and used as array
+- (related to #2372) When an URL for a disabled language is invoked, the page in the disabled locale was displayed. The user is now redirected to the default language URL.
+- (related to #2396) Fix for domain-based language selection
+- (related to #2395) In RemoveXPercent coupon type, the discount is no longer rounded to 2 decimals.
+- (related to #2389) `Thelia export --list-archiver` will not return an error if one of the supported archiver extensions is not installed
+- (related to #2379) When creating a product, the default tax rule is used if none is defined in the ProductCreateEvent event. 
+- (related to #2378) When used in the back-office context (backend_context=1), the feature loop will return all features
+- (related to #2296) &lt;option&gt; label margin using CSS is not working in IE and Safari, making category tree selection hard to use. &amp;nbsp; is now used, via the `{option_offset l=n label='some label'}` Smarty custon function  
+- (related to #2375) Force an update of Cart model after deleting an item, so that the listeners will not notice the change
+- (related to #2374) Image position field is now available in Carousel module configuration
 - (related to #2365) en_US translation improvements
 - (related to #2364) On the contact page, the map is now fetched using https
 - (related to #2356) Parameter `product_count_visible_only` added to `category` loop
