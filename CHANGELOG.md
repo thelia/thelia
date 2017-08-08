@@ -1,6 +1,8 @@
 # 2.3.4
 
 - Minimum PHP version is now 5.5
+- (related to #2408) Code style fixes and translations improvements
+- (related to #2408) <br> cound now be used in text email templates to force a line break
 - (related to #2272) Form fields error information are now saved in the global form error context, and remain available after a redirection.
 - (related to #2276) Product loop fix: addOutputFields() method may now to manipulate fields that were set in associateValues()
 - (related to #2293) performance improvement for calculating order total. This calculation uses now only one request instead of (1 + number of products).
