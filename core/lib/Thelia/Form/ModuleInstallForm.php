@@ -131,7 +131,7 @@ class ModuleInstallForm extends BaseForm
         $extractPath = false;
         $zip = new ZipArchiver(true);
         if (!$zip->open($file->getRealPath())) {
-          throw new \Exception("unable to open zipfile");
+            throw new \Exception("unable to open zipfile");
         }
 
         $extractPath = $this->tempdir();

@@ -79,5 +79,4 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
 
         return $toolTip;
     }
-
 }

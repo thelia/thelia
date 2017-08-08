@@ -14,7 +14,6 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
-
 class CountryModificationForm extends CountryCreationForm
 {
     use StandardDescriptionFieldsTrait;

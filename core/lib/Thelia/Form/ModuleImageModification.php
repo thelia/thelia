@@ -14,7 +14,6 @@ namespace Thelia\Form;
 
 use Thelia\Form\Image\ImageModification;
 
-
 class ModuleImageModification extends ImageModification
 {
     /**

@@ -26,6 +26,7 @@ use Front\Front;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
@@ -186,20 +187,19 @@ class CustomerController extends BaseFrontController
                 }
 
                 if (ConfigQuery::isCustomerEmailConfirmationEnable() && ! $newCustomer->getEnable()) {
-                    return $this->generateRedirectFromRoute('customer.login.view');
-                }
-
-                $this->processLogin($customerCreateEvent->getCustomer());
-
-                $cart = $this->getSession()->getSessionCart($this->getDispatcher());
-                if ($cart->getCartItems()->count() > 0) {
-                    $response = $this->generateRedirectFromRoute('cart.view');
+                    $response = $this->generateRedirectFromRoute('customer.login.view');
                 } else {
-                    $response = $this->generateSuccessRedirect($customerCreation);
+                    $this->processLogin($customerCreateEvent->getCustomer());
+
+                    $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+                    if ($cart->getCartItems()->count() > 0) {
+                        $response = $this->generateRedirectFromRoute('cart.view');
+                    } else {
+                        $response = $this->generateSuccessRedirect($customerCreation);
+                    }
                 }
 
                 return $response;
-
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
                     "Please check your input: %s",
@@ -465,10 +465,14 @@ class CustomerController extends BaseFrontController
                         );
                     } catch (CustomerNotConfirmedException $e) {
                         if ($e->getUser() !== null) {
-                            $this->getMailer()->sendEmailToCustomer('customer_confirmation', $e->getUser(), ['customer' => $e->getUser()]);
+                            // Send the confirmation email again
+                            $this->getDispatcher()->dispatch(
+                                TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
+                                new CustomerEvent($e->getUser())
+                            );
                         }
                         $message = $this->getTranslator()->trans(
-                            "Your account is not yet confirmed, please check out your mailbox",
+                            "Your account is not yet confirmed. A confirmation email has been sent to your email address, please check your mailbox",
                             [],
                             Front::MESSAGE_DOMAIN
                         );
@@ -530,7 +534,7 @@ class CustomerController extends BaseFrontController
 
     /**
      * @param $token
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -546,7 +550,9 @@ class CustomerController extends BaseFrontController
             ->save()
         ;
 
-        return $this->generateRedirectFromRoute('customer.login.view');
+        // Clear form error context
+
+        return $this->generateRedirectFromRoute('customer.login.view', [ 'validation_done' => 1 ]);
     }
 
     /**

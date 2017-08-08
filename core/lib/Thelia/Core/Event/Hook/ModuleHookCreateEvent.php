@@ -128,6 +128,4 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 
         return $this;
     }
-
-
 }

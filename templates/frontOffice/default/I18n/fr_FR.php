@@ -1,9 +1,10 @@
 <?php
 
-return [
+return array(
     '%nb Item' => '%nb élément',
     '%nb Items' => '%nb éléments',
     '+' => '+',
+    '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Désolé !</strong>Nous ne pouvons pas trouver de mode de livraison pour votre commande.',
     'A new password has been sent to your e-mail address. Please check your mailbox.' => 'Un nouveau mot de passe vient d\'être envoyé à votre adresse e-mail. Merci de vérifier votre boite de réception.',
     'A problem occured' => 'Un problème est survenu',
@@ -250,6 +251,7 @@ return [
     'You want to subscribe to the newsletter? Please enter your email address below.' => 'Vous voulez vous inscrire à la newsletter ? Veuillez saisir votre adresse e-mail ci-dessous.',
     'You will receive a link to reset your password.' => 'Vous recevrez un lien pour réinitialiser votre mot de passe.',
     'Your Cart' => 'Votre panier',
+    'Your customer account was successfully activated, you can now login.' => 'Votre compte client a bien été activé, vous pouvez maintenant vous connecter.',
     'Your order payment' => 'Votre paiement',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Votre commande sera confirmée à réception de votre paiement.',
     'Your subscription to our newsletter has been canceled.' => 'Votre inscription à notre newsletter a été annulée.',
@@ -259,5 +261,4 @@ return [
     'per page' => 'par page',
     'update' => 'mettre à jour',
     'with:' => 'avec :',
-    '404' => '404',
-];
+);

@@ -147,7 +147,6 @@ class ParamInitMiddleware implements HttpKernelInterface
                 Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
 
                 return Lang::getDefaultLanguage();
-
             } else {
                 // one domain for all languages, the lang has to be set into session
                 return $lang;

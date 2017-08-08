@@ -30,7 +30,7 @@ class CartDuplicationEvent extends CartEvent
      */
     public function getDuplicatedCart()
     {
-        return parent::getCart();
+        return $this->getCart();
     }
 
     /**
