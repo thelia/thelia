@@ -80,28 +80,28 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW())
 ;
 
-INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', NOW(), NOW()),
-(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
-(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
-(4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
-(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', NOW(), NOW()),
-(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', NOW(), NOW()),
-(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', NOW(), NOW()),
-(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', NOW(), NOW()),
-(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', NOW(), NOW()),
-(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', NOW(), NOW()),
-(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', NOW(), NOW()),
-(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', NOW(), NOW()),
-(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', NOW(), NOW()),
-(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', NOW(), NOW()),
-(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', NOW(), NOW()),
-(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', NOW(), NOW()),
-(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', NOW(), NOW()),
-(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', NOW(), NOW()),
-(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
-(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW()),
-(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', NOW(), NOW())
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
+(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
+(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', 0, 0, NOW(), NOW()),
+(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
+(4, 'Front', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
+(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),
+(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', 0, 0, NOW(), NOW()),
+(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', 0, 0, NOW(), NOW()),
+(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', 0, 0, NOW(), NOW()),
+(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', 0, 0, NOW(), NOW()),
+(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', 0, 0, NOW(), NOW()),
+(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', 0, 0, NOW(), NOW()),
+(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', 0, 0, NOW(), NOW()),
+(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', 0, 0, NOW(), NOW()),
+(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', 0, 0, NOW(), NOW()),
+(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', 0, 0, NOW(), NOW()),
+(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', 0, 0, NOW(), NOW()),
+(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', 0, 0, NOW(), NOW()),
+(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', 0, 0, NOW(), NOW()),
+(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', 0, 0, NOW(), NOW()),
+(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', 0, 0, NOW(), NOW()),
+(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', 0, 0, NOW(), NOW())
 ;
 
 -- Insert front hooks
@@ -2001,7 +2001,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'de_DE', 'Fehlermeldung zeigen anstatt einer weißen Seite im Falle eines eines Serverfehlers', NULL, NULL, NULL),
     (59, 'de_DE', 'Dateiname der Fehlerseite', NULL, NULL, NULL),
     (60, 'de_DE', 'Den Kunden erlauben ihre E-Mail-Adresse zu ändern. 1 für Ja, 0 für Nein', NULL, NULL, NULL),
-    (61, 'de_DE', 'Den Kunden fragen, ihre E-Mail-Adresse zu bestätigen. 1 für Jan, 0 für Nein', NULL, NULL, NULL),
+    (61, 'de_DE', NULL, NULL, NULL, NULL),
     (62, 'de_DE', 'Geheimer Schlüssel für Formular CSRF-token', NULL, NULL, NULL),
     (63, 'de_DE', NULL, NULL, NULL, NULL),
     (64, 'de_DE', NULL, NULL, NULL, NULL),
@@ -2057,7 +2057,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
     (59, 'en_US', 'Filename of the error page', NULL, NULL, NULL),
     (60, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
-    (61, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
+    (61, 'en_US', 'Ask the customers to confirm their email in customer creation form (1: yes, 0: no)', NULL, NULL, NULL),
     (62, 'en_US', 'Secret key for form CSRF token', NULL, NULL, NULL),
     (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (64, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
@@ -2065,7 +2065,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'en_US', 'Default number of products on product list', NUll, NULL, NULL),
     (67, 'en_US', 'Default number of orders on order list', NUll, NULL, NULL),
     (68, 'en_US', 'Default number of customers on customer list', NUll, NULL, NULL),
-    (69, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
+    (69, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (70, 'en_US', 'Default number of coupons per page on coupon list', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
@@ -2113,7 +2113,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'es_ES', 'Mostrar mensaje de error en lugar de una página en blanco cuando ocurre un error de servidor', NULL, NULL, NULL),
     (59, 'es_ES', 'Nombre de archivo de la página de error', NULL, NULL, NULL),
     (60, 'es_ES', 'Permitir a los clientes cambiar su correo electrónico. 1 para sí, 0 para no', NULL, NULL, NULL),
-    (61, 'es_ES', 'Preguntar al cliente para confirmar su correo electrónico, 1 para sí, 0 no', NULL, NULL, NULL),
+    (61, 'es_ES', NULL, NULL, NULL, NULL),
     (62, 'es_ES', 'Clave secreta para el token CSRF del formulario', NULL, NULL, NULL),
     (63, 'es_ES', 'La longitud mínima de la contraseña de administrador', NULL, NULL, NULL),
     (64, 'es_ES', 'Permite a un administrador recrear una contraseña perdida (1 = sí, 0 = no)', NULL, NULL, NULL),
@@ -2169,7 +2169,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
     (59, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL),
     (60, 'fr_FR', 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
-    (61, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+    (61, 'fr_FR', 'Demander aux clients de confirmer leur adresse email dans le formulaire de création de compte (1: oui, 0: non)', NULL, NULL, NULL),
     (62, 'fr_FR', 'Clé secrète pour le jeton CSRF des formulaires', NULL, NULL, NULL),
     (63, 'fr_FR', 'La longueur minimale requise pour un mot de passe administrateur', NULL, NULL, NULL),
     (64, 'fr_FR', 'Permettre à un administrateur de recréer un mot de passe perdu (1 = Oui, 0 = non)', NULL, NULL, NULL),
@@ -2177,8 +2177,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
-    (69, 'fr_FR', NULL, NULL, NULL, NULL),
-    (70, 'fr_FR', NULL, NULL, NULL, NULL)
+    (69, 'fr_FR', 'La création d\'un compte client doit être confilrée par email (1: oui, 0: non)', NULL, NULL, NULL),
+    (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
@@ -2202,7 +2202,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'de_DE', 'Sonderangebot-Block', NULL, NULL, NULL),
     (19, 'de_DE', 'Smarty Template Engine Integration', NULL, NULL, NULL),
     (20, 'de_DE', 'Steuerung für virtuelle Produkte', NULL, NULL, NULL),
-    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
+    (21, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
     (2, 'en_US', '72h delivery', NULL, NULL, NULL),
     (3, 'en_US', 'Pay by cheque', NULL, NULL, NULL),
     (4, 'en_US', 'Front office integration', NULL, NULL, NULL),
@@ -2222,7 +2222,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'en_US', 'Products offer block', NULL, NULL, NULL),
     (19, 'en_US', 'Smarty template engine integration', NULL, NULL, NULL),
     (20, 'en_US', 'Virtual Product Controller', NULL, NULL, NULL),
-    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
+    (21, 'en_US', 'Back-office Home page content', NULL, NULL, NULL),    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
     (2, 'es_ES', 'entrega 72h', NULL, NULL, NULL),
     (3, 'es_ES', 'Pagar con Cheque', NULL, NULL, NULL),
     (4, 'es_ES', 'Front office integración', NULL, NULL, NULL),
@@ -2242,7 +2242,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'es_ES', 'Bloque de oferta de productos', NULL, NULL, NULL),
     (19, 'es_ES', 'Integración del motor de plantillas Smarty', NULL, NULL, NULL),
     (20, 'es_ES', 'Controlador de producto virtual', NULL, NULL, NULL),
-    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
+    (21, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
     (2, 'fr_FR', 'Livraison par colissimo en 72h', NULL, NULL, NULL),
     (3, 'fr_FR', 'Payer par chèque', NULL, NULL, NULL),
     (4, 'fr_FR', 'Module Front office', NULL, NULL, NULL),
@@ -2261,8 +2261,8 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (17, 'fr_FR', 'Bloc nouveaux produits', NULL, NULL, NULL),
     (18, 'fr_FR', 'Bloc promotions', NULL, NULL, NULL),
     (19, 'fr_FR', 'Intégration du moteur de template Smarty', NULL, NULL, NULL),
-    (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL)
-;
+    (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL),
+    (21, 'fr_FR', 'Contenu de la page d\'accueil de l\'administration', NULL, NULL, NULL);
 
 -- Insert I18n front hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES

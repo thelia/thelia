@@ -80,28 +80,28 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW())
 ;
 
-INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', NOW(), NOW()),
-(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
-(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
-(4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
-(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', NOW(), NOW()),
-(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', NOW(), NOW()),
-(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', NOW(), NOW()),
-(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', NOW(), NOW()),
-(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', NOW(), NOW()),
-(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', NOW(), NOW()),
-(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', NOW(), NOW()),
-(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', NOW(), NOW()),
-(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', NOW(), NOW()),
-(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', NOW(), NOW()),
-(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', NOW(), NOW()),
-(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', NOW(), NOW()),
-(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', NOW(), NOW()),
-(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', NOW(), NOW()),
-(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
-(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW()),
-(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', NOW(), NOW())
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
+(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
+(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', 0, 0, NOW(), NOW()),
+(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
+(4, 'Front', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
+(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),
+(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', 0, 0, NOW(), NOW()),
+(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', 0, 0, NOW(), NOW()),
+(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', 0, 0, NOW(), NOW()),
+(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', 0, 0, NOW(), NOW()),
+(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', 0, 0, NOW(), NOW()),
+(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', 0, 0, NOW(), NOW()),
+(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', 0, 0, NOW(), NOW()),
+(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', 0, 0, NOW(), NOW()),
+(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', 0, 0, NOW(), NOW()),
+(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', 0, 0, NOW(), NOW()),
+(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', 0, 0, NOW(), NOW()),
+(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', 0, 0, NOW(), NOW()),
+(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', 0, 0, NOW(), NOW()),
+(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', 0, 0, NOW(), NOW()),
+(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', 0, 0, NOW(), NOW()),
+(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', 0, 0, NOW(), NOW())
 ;
 
 -- Insert front hooks
@@ -2037,8 +2037,8 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (17, '{$locale}', {intl l='New Products block' locale=$locale}, NULL, NULL, NULL),
     (18, '{$locale}', {intl l='Products offer block' locale=$locale}, NULL, NULL, NULL),
     (19, '{$locale}', {intl l='Smarty template engine integration' locale=$locale}, NULL, NULL, NULL),
-    (20, '{$locale}', {intl l='Virtual Product Controller' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
-
+    (20, '{$locale}', {intl l='Virtual Product Controller' locale=$locale}, NULL, NULL, NULL),
+    (21, '{$locale}', {intl l='Back-office Home page content' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 

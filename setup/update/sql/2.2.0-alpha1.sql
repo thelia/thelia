@@ -38,7 +38,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 1, 'de_DE', 'Den Kunden erlauben ihre E-Mail-Adresse zu ändern. 1 für Ja, 0 für Nein', NULL, NULL, NULL),
 (@max_id + 2, 'de_DE', 'Den Kunden fragen, ihre E-Mail-Adresse zu bestätigen. 1 für Jan, 0 für Nein', NULL, NULL, NULL),
 (@max_id + 1, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
-(@max_id + 2, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
+(@max_id + 2, 'en_US', NULL, NULL, NULL, NULL),
 (@max_id + 1, 'es_ES', 'Permitir a los clientes cambiar su correo electrónico. 1 para sí, 0 para no', NULL, NULL, NULL),
 (@max_id + 2, 'es_ES', 'Preguntar al cliente para confirmar su correo electrónico, 1 para sí, 0 no', NULL, NULL, NULL),
 (@max_id + 1, 'fr_FR', 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
