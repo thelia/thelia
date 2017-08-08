@@ -136,9 +136,6 @@ class ParserContext implements \IteratorAggregate
         // Get form field error details
         $formFieldErrors = [];
 
-        // Get form field error details
-        $formFieldErrors = [];
-
         /** @var Form $field */
         foreach ($form->getForm()->getIterator() as $field) {
             $errors = $field->getErrors();
@@ -148,7 +145,12 @@ class ParserContext implements \IteratorAggregate
 
                 /** @var FormError $error */
                 foreach ($errors as $error) {
-                    $formFieldErrors[$field->getName()][] = $error;
+                    $formFieldErrors[$field->getName()][] = [
+                        'message' => $error->getMessage(),
+                        'template' => $error->getMessageTemplate(),
+                        'parameters' => $error->getMessageParameters(),
+                        'pluralization' => $error->getMessagePluralization()
+                    ];
                 }
             }
         }
@@ -218,7 +220,14 @@ class ParserContext implements \IteratorAggregate
                         $field = $form->getForm()->get($fieldName);
 
                         if (null !==  $field && count($field->getErrors()) == 0) {
-                            foreach ($errors as $error) {
+                            foreach ($errors as $errorData) {
+                                $error = new FormError(
+                                    $errorData['message'],
+                                    $errorData['template'],
+                                    $errorData['parameters'],
+                                    $errorData['pluralization']
+                                );
+
                                 $field->addError($error);
                             }
                         }

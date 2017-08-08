@@ -187,20 +187,19 @@ class CustomerController extends BaseFrontController
                 }
 
                 if (ConfigQuery::isCustomerEmailConfirmationEnable() && ! $newCustomer->getEnable()) {
-                    return $this->generateRedirectFromRoute('customer.login.view');
-                }
-
-                $this->processLogin($customerCreateEvent->getCustomer());
-
-                $cart = $this->getSession()->getSessionCart($this->getDispatcher());
-                if ($cart->getCartItems()->count() > 0) {
-                    $response = $this->generateRedirectFromRoute('cart.view');
+                    $response = $this->generateRedirectFromRoute('customer.login.view');
                 } else {
-                    $response = $this->generateSuccessRedirect($customerCreation);
+                    $this->processLogin($customerCreateEvent->getCustomer());
+
+                    $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+                    if ($cart->getCartItems()->count() > 0) {
+                        $response = $this->generateRedirectFromRoute('cart.view');
+                    } else {
+                        $response = $this->generateSuccessRedirect($customerCreation);
+                    }
                 }
 
                 return $response;
-
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
                     "Please check your input: %s",
@@ -466,6 +465,7 @@ class CustomerController extends BaseFrontController
                         );
                     } catch (CustomerNotConfirmedException $e) {
                         if ($e->getUser() !== null) {
+                            // Send the confirmation email again
                             $this->getDispatcher()->dispatch(
                                 TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
                                 new CustomerEvent($e->getUser())
