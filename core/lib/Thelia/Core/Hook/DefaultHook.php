@@ -20,5 +20,4 @@ namespace Thelia\Core\Hook;
  */
 class DefaultHook extends BaseHook
 {
-
 }

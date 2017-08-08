@@ -95,7 +95,6 @@ class CartContainsProducts extends ConditionAbstract
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            
             if ($this->conditionValidator->variableOpComparison(
                 $cartItem->getProduct()->getId(),
                 $this->operators[self::PRODUCTS_LIST],

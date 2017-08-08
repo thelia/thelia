@@ -234,6 +234,12 @@ final class TheliaEvents
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
+
+    /**
+     * Send the account ccreation confirmation email
+     */
+    const SEND_ACCOUNT_CONFIRMATION_EMAIL = "action.customer.sendAccountConfirmationEmail";
+
     // -- END CUSTOMER EVENTS ---------------------------------------------------------
 
 

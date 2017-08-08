@@ -85,7 +85,6 @@ class TaxCreationForm extends BaseForm
         foreach ($requirementList as $name => $requirements) {
             /** @var TaxTypeRequirementDefinition $requirement */
             foreach ($requirements as $requirement) {
-
                 if (!isset(self::$typeList[$requirement->getName()])) {
                     self::$typeList[$requirement->getName()] = $requirement->getType();
                 }

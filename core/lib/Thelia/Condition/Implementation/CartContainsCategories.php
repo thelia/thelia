@@ -99,7 +99,6 @@ class CartContainsCategories extends ConditionAbstract
 
             /** @var Category $category */
             foreach ($categories as $category) {
-
                 if (! $this->conditionValidator->variableOpComparison(
                     $category->getId(),
                     $this->operators[self::CATEGORIES_LIST],

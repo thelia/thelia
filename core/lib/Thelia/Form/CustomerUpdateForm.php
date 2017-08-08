@@ -227,6 +227,4 @@ class CustomerUpdateForm extends BaseForm
     {
         return "thelia_customer_update";
     }
-
-
 }

@@ -2002,7 +2002,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, '{$locale}', {intl l='Show error message instead of a white page on a server error' locale=$locale}, NULL, NULL, NULL),
     (59, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL),
     (60, '{$locale}', {intl l='Allow customers to change their email. 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
-    (61, '{$locale}', {intl l='Ask the customers to confirm their email, 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
+    (61, '{$locale}', {intl l='Ask the customers to confirm their email in customer creation form, 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
     (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL),
     (63, '{$locale}', {intl l='The minimum length required for an administrator password' locale=$locale}, NULL, NULL, NULL),
     (64, '{$locale}', {intl l='Allow an administrator to recreate a lost password (1 = yes, 0 = no)' locale=$locale}, NULL, NULL, NULL),
@@ -2010,7 +2010,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, '{$locale}', {intl l='Number by default of results per page for product list' locale=$locale}, NUll, NULL, NULL),
     (67, '{$locale}', {intl l='Number by default of results per page for order list' locale=$locale}, NUll, NULL, NULL),
     (68, '{$locale}', {intl l='Number by default of results per page for customer list' locale=$locale}, NUll, NULL, NULL),
-    (69, '{$locale}', {intl l='Enable (1) or disable (0) customer email confirmation' locale=$locale}, NULL, NULL, NULL),
+    (69, '{$locale}', {intl l='Customer account creation should be confirmed by email (1: yes, 0: no)' locale=$locale}, NULL, NULL, NULL),
     (70, '{$locale}', {intl l='Default number of coupons per page on coupon list' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}

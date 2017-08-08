@@ -223,7 +223,6 @@ class CouponManager
                 if ($coupon->isMatching()) {
                     $couponsKept[] = $coupon;
                 }
-
             } catch (UnmatchableConditionException $e) {
                 // ignore unmatchable coupon
                 continue;

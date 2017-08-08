@@ -20,5 +20,4 @@ namespace Thelia\Core\Event\State;
  */
 class StateToggleVisibilityEvent extends StateEvent
 {
-
 }

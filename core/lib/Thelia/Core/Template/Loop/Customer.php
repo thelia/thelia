@@ -252,7 +252,9 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set("RESELLER", $customer->getReseller())
                 ->set("SPONSOR", $customer->getSponsor())
                 ->set("DISCOUNT", $customer->getDiscount())
-                ->set("NEWSLETTER", $customer->getVirtualColumn("is_registered_to_newsletter"));
+                ->set("NEWSLETTER", $customer->getVirtualColumn("is_registered_to_newsletter"))
+                ->set("CONFIRMATION_TOKEN", $customer->getConfirmationToken())
+            ;
 
             if ($this->getWithPrevNextInfo()) {
                 // Find previous and next category
