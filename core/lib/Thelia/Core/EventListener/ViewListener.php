@@ -23,6 +23,11 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Exception\OrderException;
+use Thelia\Model\BrandQuery;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\ContentQuery;
+use Thelia\Model\FolderQuery;
+use Thelia\Model\ProductQuery;
 
 /**
  *
@@ -40,6 +45,8 @@ class ViewListener implements EventSubscriberInterface
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
     private $container;
+
+    protected $visibleViews = ['brand', 'category', 'content', 'folder', 'product'];
 
     /**
      *
@@ -65,8 +72,25 @@ class ViewListener implements EventSubscriberInterface
         $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate(), true);
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $response = null;
+
         try {
-            $content = $parser->render($request->attributes->get('_view').".html");
+            /* VIEW is the VISIBLE ? */
+            $view = $request->attributes->get('_view');
+
+            if (in_array($view, $this->visibleViews)) {
+                $viewClass = 'Thelia\Model\\' . ucfirst($view) . 'Query';
+
+                $viewObject = $viewClass::create()
+                    ->filterById($request->attributes->get($view . '_id'))
+                    ->filterByVisible(1)
+                    ->findOne();
+
+                if (! $viewObject) {
+                    throw new NotFoundHttpException();
+                }
+            }
+
+            $content = $parser->render($view . ".html");
 
             if ($content instanceof Response) {
                 $response = $content;
@@ -98,8 +122,12 @@ class ViewListener implements EventSubscriberInterface
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
 
-        if (null === $request->attributes->get('_view')) {
+        if (null === $view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
+        }
+
+        if (in_array($view, $this->visibleViews) && null === $request->attributes->get($view . '_id')) {
+            $request->attributes->set($view . '_id', $this->findViewId($request, $view));
         }
     }
 
@@ -113,6 +141,18 @@ class ViewListener implements EventSubscriberInterface
         }
 
         return $view;
+    }
+
+    public function findViewId(Request $request, $view)
+    {
+        if (! $viewId = $request->query->get($view . '_id')) {
+            $viewId = 0;
+            if ($request->request->has($view . '_id')) {
+                $viewId = $request->request->get($view . '_id');
+            }
+        }
+
+        return $viewId;
     }
 
 
