@@ -2001,7 +2001,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'de_DE', 'Fehlermeldung zeigen anstatt einer weißen Seite im Falle eines eines Serverfehlers', NULL, NULL, NULL),
     (59, 'de_DE', 'Dateiname der Fehlerseite', NULL, NULL, NULL),
     (60, 'de_DE', 'Den Kunden erlauben ihre E-Mail-Adresse zu ändern. 1 für Ja, 0 für Nein', NULL, NULL, NULL),
-    (61, 'de_DE', 'Den Kunden fragen, ihre E-Mail-Adresse zu bestätigen. 1 für Jan, 0 für Nein', NULL, NULL, NULL),
+    (61, 'de_DE', NULL, NULL, NULL, NULL),
     (62, 'de_DE', 'Geheimer Schlüssel für Formular CSRF-token', NULL, NULL, NULL),
     (63, 'de_DE', NULL, NULL, NULL, NULL),
     (64, 'de_DE', NULL, NULL, NULL, NULL),
@@ -2057,7 +2057,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
     (59, 'en_US', 'Filename of the error page', NULL, NULL, NULL),
     (60, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
-    (61, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
+    (61, 'en_US', 'Ask the customers to confirm their email in customer creation form (1: yes, 0: no)', NULL, NULL, NULL),
     (62, 'en_US', 'Secret key for form CSRF token', NULL, NULL, NULL),
     (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (64, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
@@ -2065,7 +2065,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'en_US', 'Default number of products on product list', NUll, NULL, NULL),
     (67, 'en_US', 'Default number of orders on order list', NUll, NULL, NULL),
     (68, 'en_US', 'Default number of customers on customer list', NUll, NULL, NULL),
-    (69, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
+    (69, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (70, 'en_US', 'Default number of coupons per page on coupon list', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
@@ -2113,7 +2113,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'es_ES', 'Mostrar mensaje de error en lugar de una página en blanco cuando ocurre un error de servidor', NULL, NULL, NULL),
     (59, 'es_ES', 'Nombre de archivo de la página de error', NULL, NULL, NULL),
     (60, 'es_ES', 'Permitir a los clientes cambiar su correo electrónico. 1 para sí, 0 para no', NULL, NULL, NULL),
-    (61, 'es_ES', 'Preguntar al cliente para confirmar su correo electrónico, 1 para sí, 0 no', NULL, NULL, NULL),
+    (61, 'es_ES', NULL, NULL, NULL, NULL),
     (62, 'es_ES', 'Clave secreta para el token CSRF del formulario', NULL, NULL, NULL),
     (63, 'es_ES', 'La longitud mínima de la contraseña de administrador', NULL, NULL, NULL),
     (64, 'es_ES', 'Permite a un administrador recrear una contraseña perdida (1 = sí, 0 = no)', NULL, NULL, NULL),
@@ -2169,7 +2169,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
     (59, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL),
     (60, 'fr_FR', 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
-    (61, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+    (61, 'fr_FR', 'Demander aux clients de confirmer leur adresse email dans le formulaire de création de compte (1: oui, 0: non)', NULL, NULL, NULL),
     (62, 'fr_FR', 'Clé secrète pour le jeton CSRF des formulaires', NULL, NULL, NULL),
     (63, 'fr_FR', 'La longueur minimale requise pour un mot de passe administrateur', NULL, NULL, NULL),
     (64, 'fr_FR', 'Permettre à un administrateur de recréer un mot de passe perdu (1 = Oui, 0 = non)', NULL, NULL, NULL),
@@ -2177,8 +2177,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
-    (69, 'fr_FR', NULL, NULL, NULL, NULL),
-    (70, 'fr_FR', NULL, NULL, NULL, NULL)
+    (69, 'fr_FR', 'La création d\'un compte client doit être confilrée par email (1: oui, 0: non)', NULL, NULL, NULL),
+    (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
