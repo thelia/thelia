@@ -17,11 +17,12 @@ use Colissimo\Model\Config\ColissimoConfigValue;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Install\Database;
+use Thelia\Model\Address;
 use Thelia\Model\Country;
-use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\AbstractDeliveryExModule;
 use Thelia\Module\Exception\DeliveryException;
 
-class Colissimo extends AbstractDeliveryModule
+class Colissimo extends AbstractDeliveryExModule
 {
     protected $request;
     protected $dispatcher;
@@ -49,7 +50,7 @@ class Colissimo extends AbstractDeliveryModule
         $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 
-    public function isValidDelivery(Country $country)
+    public function isValidDelivery(Country $country, Address $address = null)
     {
         if (0 == self::getConfigValue(ColissimoConfigValue::ENABLED, 1)) {
             return false;
@@ -135,16 +136,16 @@ class Colissimo extends AbstractDeliveryModule
         return $postage;
 
     }
-
+    
     /**
      *
      * calculate and return delivery price
      *
      * @param Country $country
+     * @param Address $address
      * @return mixed
-     * @throws \Thelia\Exception\OrderException
      */
-    public function getPostage(Country $country)
+    public function getPostage(Country $country, Address $address = null)
     {
         $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 

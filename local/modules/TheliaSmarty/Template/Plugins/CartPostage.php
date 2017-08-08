@@ -26,8 +26,9 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\State;
 use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\DeliveryModuleExInterface;
 use Thelia\Module\Exception\DeliveryException;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -110,7 +111,7 @@ class CartPostage extends AbstractSmartyPlugin
         if (null !== $country) {
             $this->countryId = $country->getId();
             // try to get the cheapest delivery for this country
-            $this->getCheapestDelivery($address, $country);
+            $this->getCheapestDelivery($address, $country, $state);
         }
 
         $template->assign('country_id', $this->countryId);
@@ -133,7 +134,7 @@ class CartPostage extends AbstractSmartyPlugin
      *
      *
      * @param  \Thelia\Model\Customer $customer
-     * @return \Thelia\Model\Country
+     * @return array  [ \Thelia\Model\Address, \Thelia\Model\Country, \Thelia\Model\State ]
      */
     protected function getDeliveryInformation(Customer $customer = null)
     {
@@ -190,9 +191,9 @@ class CartPostage extends AbstractSmartyPlugin
      *
      * @param Address $address
      * @param \Thelia\Model\Country $country
-     * @return DeliveryModuleInterface
+     * @return DeliveryModuleExInterface
      */
-    protected function getCheapestDelivery(Address $address = null, Country $country = null)
+    protected function getCheapestDelivery(Address $address = null, Country $country = null, State $state = null)
     {
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart();
 

@@ -748,7 +748,7 @@ return array(
     'decimal separator' => 'séparateur décimal',
     'delete form' => 'formulaire de suppression',
     'delivery address' => 'adresse de livraison',
-    'delivery module %s is not a Thelia\Module\DeliveryModuleInterface' => 'Le module de livraison %s n\'est pas du type Thelia\Module\DeliveryModuleInterface',
+    'delivery module %s is not a Thelia\Module\DeliveryModuleInterface' => 'Le module de livraison %s n\'est pas du type Thelia\Module\DeliveryModuleInterface ou Thelia\Module\DeliveryModuleExInterface',
     'details pricing form' => 'Formulaire détails des prix',
     'details promotion form' => 'Formulaire détail promotion',
     'email' => 'e-mail',

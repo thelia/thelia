@@ -37,6 +37,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\OrderPostage;
+use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\Exception\DeliveryException;
 use Thelia\Tools\URL;
 
@@ -207,9 +208,12 @@ class CartController extends BaseFrontController
                 $orderEvent = new OrderEvent($order);
 
                 try {
-                    $postage = OrderPostage::loadFromPostage(
-                        $moduleInstance->getPostage($deliveryAddress->getCountry())
-                    );
+                    $postageAmount = $moduleInstance instanceof DeliveryModuleInterface ?
+                        $moduleInstance->getPostage($deliveryAddress->getCountry()) :
+                        $moduleInstance->getPostage($deliveryAddress->getCountry(), $deliveryAddress)
+                    ;
+    
+                    $postage = OrderPostage::loadFromPostage($postageAmount);
 
                     $orderEvent->setPostage($postage->getAmount());
                     $orderEvent->setPostageTax($postage->getAmountTax());
