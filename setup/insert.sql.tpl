@@ -2037,8 +2037,8 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (17, '{$locale}', {intl l='New Products block' locale=$locale}, NULL, NULL, NULL),
     (18, '{$locale}', {intl l='Products offer block' locale=$locale}, NULL, NULL, NULL),
     (19, '{$locale}', {intl l='Smarty template engine integration' locale=$locale}, NULL, NULL, NULL),
-    (20, '{$locale}', {intl l='Virtual Product Controller' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
-
+    (20, '{$locale}', {intl l='Virtual Product Controller' locale=$locale}, NULL, NULL, NULL),
+    (21, '{$locale}', {intl l='Back-office Home page content' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 

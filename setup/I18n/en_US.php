@@ -100,6 +100,7 @@ return array(
     'Austria' => 'Austria',
     'Avellino' => 'Avellino',
     'Azerbaijan' => 'Azerbaijan',
+    'Back-office Home page content' => 'Back-office Home page content',
     'Back-office export management' => 'Back-office export management',
     'Back-office home page' => 'Back-office home page',
     'Back-office search function' => 'Back-office search function',
