@@ -167,7 +167,7 @@ abstract class FeatureProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, FREE_TEXT_VALUE, IS_FREE_TEXT, POSITION, CREATED_AT, UPDATED_AT FROM feature_product WHERE ID = :p0';
+        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FEATURE_ID`, `FEATURE_AV_ID`, `FREE_TEXT_VALUE`, `IS_FREE_TEXT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature_product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);

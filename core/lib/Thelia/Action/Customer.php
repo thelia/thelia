@@ -60,12 +60,17 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
         if ($event->getNotifyCustomerOfAccountCreation()) {
-            $this->mailer->sendEmailToCustomer('customer_account_created', $customer, [ 'password' => $plainPassword ]);
+            $this->mailer->sendEmailToCustomer(
+                'customer_account_created',
+                $customer,
+                [ 'password' => $plainPassword ]
+            );
         }
 
-        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
-            $this->mailer->sendEmailToCustomer('customer_confirmation', $customer, ['customer_id' => $customer->getId()]);
-        }
+        $dispatcher->dispatch(
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
+            new CustomerEvent($customer)
+        );
     }
 
     public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
