@@ -71,7 +71,6 @@ class HookCleanCommand extends ContainerAwareCommand
         } catch (\Exception $ex) {
             $output->writeln(sprintf("<error>%s</error>", $ex->getMessage()));
         }
-
     }
 
     private function getModule(InputInterface $input)

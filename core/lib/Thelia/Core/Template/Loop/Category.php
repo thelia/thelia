@@ -97,7 +97,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                         'alpha', 'alpha_reverse',
                         'manual', 'manual_reverse',
                         'visible', 'visible_reverse',
-                        'created','created_reverse',
+                        'created', 'created_reverse',
                         'updated', 'updated_reverse',
                         'random'
                     ])
@@ -298,8 +298,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             if ($this->getNeedProductCount()) {
                 if ($this->getProductCountVisibleOnly()) {
                     $loopResultRow->set("PRODUCT_COUNT", $category->countAllProductsVisibleOnly());
-                }
-                else {
+                } else {
                     $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
                 }
             }

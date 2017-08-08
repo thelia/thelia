@@ -759,7 +759,6 @@ class Product extends BaseAction implements EventSubscriberInterface
                 return;
             } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
             elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
-
                 $freeTextFeatureAvI18n->setTitle($featureAvId);
                 $freeTextFeatureAvI18n->save();
 

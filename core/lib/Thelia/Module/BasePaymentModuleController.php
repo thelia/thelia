@@ -131,7 +131,6 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $orderId = intval($orderId);
 
             if (null !== $order = $this->getOrder($orderId)) {
-
                 $event = new OrderEvent($order);
 
                 $event->setTransactionRef($transactionRef);

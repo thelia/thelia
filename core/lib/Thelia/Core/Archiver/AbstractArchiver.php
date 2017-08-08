@@ -32,8 +32,8 @@ abstract class AbstractArchiver implements ArchiverInterface
 
     public function __construct($checkIsAvailable = false)
     {
-      if ($checkIsAvailable && !$this->isAvailable()) {
-        throw new \Exception(
+        if ($checkIsAvailable && !$this->isAvailable()) {
+            throw new \Exception(
           Translator::getInstance()->trans(
             "The archiver :name is not available. Please install the php extension :extension first.",
             [
@@ -42,7 +42,7 @@ abstract class AbstractArchiver implements ArchiverInterface
             ]
           )
         );
-      }
+        }
     }
 
     public function getArchivePath()

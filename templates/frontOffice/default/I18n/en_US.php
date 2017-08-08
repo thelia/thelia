@@ -255,6 +255,7 @@ return array(
     'You want to subscribe to the newsletter? Please enter your email address below.' => 'You want to subscribe to the newsletter? Please enter your email address below.',
     'You will receive a link to reset your password.' => 'You will receive a link to reset your password.',
     'Your Cart' => 'Your Cart',
+    'Your customer account was successfully activated, you can now login.' => 'Your customer account was successfully activated, you can now login.',
     'Your order payment' => 'Your order payment',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Your order will be confirmed by us upon receipt of your payment.',
     'Your subscription to our newsletter has been canceled.' => 'Your subscription to our newsletter has been canceled.',

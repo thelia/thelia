@@ -65,7 +65,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max_id + 1, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
+    (@max_id + 1, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL)
 ;

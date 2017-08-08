@@ -134,27 +134,27 @@ class ParserContext implements \IteratorAggregate
     public function addForm(BaseForm $form)
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
-    
+
         // Get form field error details
         $formFieldErrors = [];
-    
+
         // Get form field error details
         $formFieldErrors = [];
-    
+
         /** @var Form $field */
         foreach ($form->getForm()->getIterator() as $field) {
             $errors = $field->getErrors();
-        
+
             if (count($errors) > 0) {
                 $formFieldErrors[$field->getName()] = [];
-            
+
                 /** @var FormError $error */
                 foreach ($errors as $error) {
                     $formFieldErrors[$field->getName()][] = $error;
                 }
             }
         }
-    
+
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
         // Set form error information
@@ -164,7 +164,8 @@ class ParserContext implements \IteratorAggregate
             'errorMessage'      => $form->getErrorMessage(),
             'method'            => $this->requestStack->getCurrentRequest()->getMethod(),
             'timestamp'         => time(),
-            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
+            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups'),
+            'field_errors'      => $formFieldErrors
         ];
 
         $this->getSession()->setFormErrorInformation($formErrorInformation);
@@ -211,13 +212,13 @@ class ParserContext implements \IteratorAggregate
                     } catch (\Exception $ex) {
                         // Ignore the exception.
                     }
-    
+
                     // Manually set the form fields error information, if validateForm() did not the job,
-                    // which is the case when the user has been redirected .
+                    // which is the case when the user has been redirected.
                     foreach ($formInfo['field_errors'] as $fieldName => $errors) {
                         /** @var Form $field */
                         $field = $form->getForm()->get($fieldName);
-        
+
                         if (null !==  $field && count($field->getErrors()) == 0) {
                             foreach ($errors as $error) {
                                 $field->addError($error);

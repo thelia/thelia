@@ -28,6 +28,5 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase
         $actualCurrency = Currency::getDefaultCurrency();
 
         $this->assertEquals($expectedCurrency->getId(), $actualCurrency->getId());
-
     }
 }

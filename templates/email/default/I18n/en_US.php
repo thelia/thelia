@@ -8,9 +8,7 @@ return array(
     'All rights reserved.' => 'All rights reserved.',
     'An account at %store_name has been created by one of our managers.' => 'An account at %store_name has been created by one of our managers.',
     'Billing address:' => 'Billing address:',
-    'Confirm now' => 'Confirm now',
     'Confirm your %store account' => 'Confirm your %store account',
-    'Confirm your email to complete your account' => 'Confirm your email to complete your account',
     'Copyright' => 'Copyright',
     'Customer billing address:' => 'Customer billing address:',
     'Customer delivery address:' => 'Customer delivery address:',
@@ -51,6 +49,7 @@ return array(
     'Thanks' => 'Thanks',
     'The %store team.' => 'The %store team.',
     'Thelia V2' => 'Thelia V2',
+    'To complete your customer account creation, please confirm your email address by clicking the link below, or copying it in your browser address bar.' => 'To complete your customer account creation, please confirm your email address by clicking the link below, or copying it in your browser address bar.',
     'To login, please use the email address <span style="font-family: courier, fixed; font-size: 120%">%email</span>' => 'To login, please use the email address <span style="font-family: courier, fixed; font-size: 120%">%email</span>',
     'To unsubscribe from our newsletter, please <a href="%unsublink">click here</a>.' => 'To unsubscribe from our newsletter, please <a href="%unsublink">click here</a>.',
     'To unsubscribe from our newsletter, please go to the following web address:' => 'To unsubscribe from our newsletter, please go to the following web address:',
@@ -80,5 +79,4 @@ return array(
     'Your password for %store' => 'Your password for %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
     'Your subscriotion to %store newsletter' => 'Your subscriotion to %store newsletter',
-    'just click the button below : ' => 'just click the button below : ',
 );

@@ -332,7 +332,6 @@ class TaxRuleController extends AbstractCrudController
             );
 
             return $this->jsonResponse(json_encode($responseData));
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -411,7 +410,6 @@ class TaxRuleController extends AbstractCrudController
 
                 $taxRuleCountry = $taxRuleCountries->getNext();
             }
-
         }
 
         $data = [

@@ -295,7 +295,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $aProduct = $featureProduct->getProduct();
         $featureAv = $featureProduct->getFeatureAv();
 
-        $featureAv->setLocale( $defaultLang->getLocale() )->setTitle(123);
+        $featureAv->setLocale($defaultLang->getLocale())->setTitle(123);
 
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');

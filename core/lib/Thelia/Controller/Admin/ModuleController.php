@@ -302,7 +302,6 @@ class ModuleController extends AbstractCrudController
                     $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module'))
                 );
             }
-
         } catch (\Exception $e) {
             $message = $e->getMessage();
 

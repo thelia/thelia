@@ -241,5 +241,4 @@ class StateController extends AbstractCrudController
     {
         return new StateToggleVisibilityEvent($this->getExistingObject());
     }
-
 }

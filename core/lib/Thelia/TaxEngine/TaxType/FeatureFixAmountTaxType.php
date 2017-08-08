@@ -47,18 +47,17 @@ class FeatureFixAmountTaxType extends BaseTaxType
             ->findOne();
 
         if (null !== $query) {
-
             if (is_null($query->getFeatureAvId())) {
                 $taxAmount = $query->getFreeTextValue(); //BC for old behavior
             } else {
-                $locale = LangQuery::create()->findPk( $this->getRequirement('lang') )->getLocale();
+                $locale = LangQuery::create()->findPk($this->getRequirement('lang'))->getLocale();
                 $taxAmount = $query->getFeatureAv()->setLocale($locale)->getTitle();
             }
 
             $testFloat = new FloatType();
             if (!$testFloat->isValid($taxAmount)) {
                 //We cannot modify "bad" (consider uninitialized) feature value in backOffice if we throw exception
-                Tlog::getInstance()->error( Translator::getInstance()->trans('Feature value does not match FLOAT format') );
+                Tlog::getInstance()->error(Translator::getInstance()->trans('Feature value does not match FLOAT format'));
                 return 0;
             }
         }

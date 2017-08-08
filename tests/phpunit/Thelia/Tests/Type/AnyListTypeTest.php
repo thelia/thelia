@@ -37,7 +37,6 @@ class AnyListTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($anyListFormat));
         $this->assertCount(3, $anyListFormat);
         $this->assertEquals($anyListFormat[1], 'string_2');
-
     }
 
     public function testEmptyAnyListType()
