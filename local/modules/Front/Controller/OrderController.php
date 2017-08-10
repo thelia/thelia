@@ -25,14 +25,14 @@ namespace Front\Controller;
 use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Response as BaseResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -43,7 +43,6 @@ use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
-use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Module\AbstractDeliveryModule;
@@ -316,14 +315,14 @@ class OrderController extends BaseFrontController
 
         /* check cart count */
         $this->checkCartNotEmpty();
-        
+
         /* check stock not empty */
         if (true === ConfigQuery::checkAvailableStock()) {
             if (null !== $response = $this->checkStockNotEmpty()) {
                 return $response;
             }
         }
-        
+
         /* check delivery address and module */
         $this->checkValidDelivery();
 
@@ -549,23 +548,29 @@ class OrderController extends BaseFrontController
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }
-    
+
+    /**
+     * Redirect to cart view if at least one non product is out of stock
+     *
+     * @return null|BaseResponse
+     */
     private function checkStockNotEmpty()
     {
         $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+
         $cartItems = $cart->getCartItems();
-        $flagQuantity = 0;
+
         foreach ($cartItems as $cartItem) {
             $pse = $cartItem->getProductSaleElements();
-            if ($pse->getQuantity() <= 0) {
-                $flagQuantity = 1;
+
+            $product = $cartItem->getProduct();
+
+            if ($pse->getQuantity() <= 0 && $product->getVirtual() !== 1) {
+                return $this->generateRedirectFromRoute('cart.view');
             }
         }
-        if ($flagQuantity == 1) {
-            return $this->generateRedirectFromRoute('cart.view');
-        } else {
-            return null;
-        }
+
+        return null;
     }
 
     /**
