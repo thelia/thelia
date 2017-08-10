@@ -108,7 +108,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('force_return', true),
             Argument::createBooleanTypeArgument('ignore_processing_errors', true),
             Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
-            Argument::createBooleanTypeArgument('allow_zoom', false)
+            Argument::createBooleanTypeArgument('allow_zoom', false),
+            Argument::createBooleanTypeArgument('with_image_size', false)
         );
 
         // Add possible image sources
@@ -367,6 +368,21 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
                     ->set("PROCESSING_ERROR", false)
                 ;
+
+                $imageSize = $originalImageSize = ['', ''];
+
+                if ($this->getWithImageSize()) {
+                    $originalImageSize = getimagesize($sourceFilePath);
+
+                    $imageSize = getimagesize($event->getCacheFilepath());
+                }
+
+                $loopResultRow
+                    ->set("IMAGE_WIDTH", $imageSize[0])
+                    ->set("IMAGE_HEIGHT", $imageSize[1])
+                    ->set("ORIGINAL_IMAGE_WIDTH", $originalImageSize[0])
+                    ->set("ORIGINAL_IMAGE_HEIGHT", $originalImageSize[1])
+                ;
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
                 Tlog::getInstance()->addError(sprintf("Failed to process image in image loop: %s", $ex->getMessage()));
@@ -377,6 +393,10 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->set("ORIGINAL_IMAGE_URL", '')
                         ->set("IMAGE_PATH", '')
                         ->set("PROCESSING_ERROR", true)
+                        ->set("IMAGE_WIDTH", '')
+                        ->set("IMAGE_HEIGHT", '')
+                        ->set("ORIGINAL_IMAGE_WIDTH", '')
+                        ->set("ORIGINAL_IMAGE_HEIGHT", '')
                     ;
                 } else {
                     $addRow = false;
