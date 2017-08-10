@@ -18,7 +18,7 @@
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping zone "%name"' name="{$NAME}"}</li>
+            <li>{intl l='Editing shipping zone "%name"' name={$NAME}}</li>
         </ul>
 
         {hook name="shipping-configuration-edit.top" area_id=$area_id}
@@ -183,7 +183,7 @@
         </div>
         {/elseloop}
     </div>
-</div>  
+</div>
 
     {* Delete related content confirmation dialog *}
 
@@ -203,12 +203,12 @@
 
         form_action     = {token_url path='/admin/configuration/shipping_configuration/country/remove'}
         form_content    = {$smarty.capture.delete_country_dialog nofilter}
-    }  
+    }
 {/block}
 
 {block name="javascript-initialization"}
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
-        <script src="{$asset_url}"></script>        
+        <script src="{$asset_url}"></script>
     {/javascripts}
 
     {javascripts file='assets/js/libs/underscore-min.js'}
