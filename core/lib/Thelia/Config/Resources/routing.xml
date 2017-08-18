@@ -17,6 +17,7 @@
         <service id="thelia.listener.view" class="Thelia\Core\EventListener\ViewListener">
             <tag name="kernel.event_subscriber"/>
             <argument type="service" id="service_container"/>
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="controller.default" class="Thelia\Controller\DefaultController"/>

@@ -16,6 +16,7 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
@@ -26,6 +27,7 @@ use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
@@ -208,21 +210,50 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Check if is a content view and if content_id is visible
+     *
+     * @param ViewCheckEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        if ($event->getView() == 'content') {
+            $content = ContentQuery::create()
+                ->filterById($event->getViewId())
+                ->filterByVisible(1)
+                ->findOne();
+
+            if (! $content) {
+                $dispatcher->dispatch(TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE, $event);
+            }
+        }
+    }
+
+    public function viewContentIdNotVisible(ViewCheckEvent $event)
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CONTENT_CREATE           => array('create', 128),
-            TheliaEvents::CONTENT_UPDATE            => array('update', 128),
-            TheliaEvents::CONTENT_DELETE            => array('delete', 128),
-            TheliaEvents::CONTENT_TOGGLE_VISIBILITY => array('toggleVisibility', 128),
+            TheliaEvents::CONTENT_CREATE                => array('create', 128),
+            TheliaEvents::CONTENT_UPDATE                => array('update', 128),
+            TheliaEvents::CONTENT_DELETE                => array('delete', 128),
+            TheliaEvents::CONTENT_TOGGLE_VISIBILITY     => array('toggleVisibility', 128),
 
-            TheliaEvents::CONTENT_UPDATE_POSITION   => array('updatePosition', 128),
-            TheliaEvents::CONTENT_UPDATE_SEO        => array('updateSeo', 128),
+            TheliaEvents::CONTENT_UPDATE_POSITION       => array('updatePosition', 128),
+            TheliaEvents::CONTENT_UPDATE_SEO            => array('updateSeo', 128),
 
-            TheliaEvents::CONTENT_ADD_FOLDER        => array('addFolder', 128),
-            TheliaEvents::CONTENT_REMOVE_FOLDER     => array('removeFolder', 128),
+            TheliaEvents::CONTENT_ADD_FOLDER            => array('addFolder', 128),
+            TheliaEvents::CONTENT_REMOVE_FOLDER         => array('removeFolder', 128),
+
+            TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
+            TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE   => array('viewContentIdNotVisible', 128),
         );
     }
 }

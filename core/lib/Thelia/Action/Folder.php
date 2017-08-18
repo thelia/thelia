@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
@@ -23,6 +24,7 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Model\FolderDocumentQuery;
 use Thelia\Model\FolderImageQuery;
 use Thelia\Model\FolderQuery;
@@ -156,6 +158,32 @@ class Folder extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Check if is a folder view and if folder_id is visible
+     *
+     * @param ViewCheckEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        if ($event->getView() == 'folder') {
+            $folder = FolderQuery::create()
+                ->filterById($event->getViewId())
+                ->filterByVisible(1)
+                ->findOne();
+
+            if (! $folder) {
+                $dispatcher->dispatch(TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE, $event);
+            }
+        }
+    }
+
+    public function viewFolderIdNotVisible(ViewCheckEvent $event)
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -167,7 +195,10 @@ class Folder extends BaseAction implements EventSubscriberInterface
             TheliaEvents::FOLDER_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
 
             TheliaEvents::FOLDER_UPDATE_POSITION   => array("updatePosition", 128),
-            TheliaEvents::FOLDER_UPDATE_SEO        => array('updateSeo', 128)
+            TheliaEvents::FOLDER_UPDATE_SEO        => array('updateSeo', 128),
+
+            TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
+            TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE    => array('viewFolderIdNotVisible', 128),
         );
     }
 }
