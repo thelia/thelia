@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\CategoryDocumentQuery;
@@ -29,6 +30,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
+use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\Map\CategoryTableMap;
@@ -213,6 +215,32 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Check if is a category view and if category_id is visible
+     *
+     * @param ViewCheckEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        if ($event->getView() == 'category') {
+            $category = CategoryQuery::create()
+                ->filterById($event->getViewId())
+                ->filterByVisible(1)
+                ->findOne();
+
+            if (! $category) {
+                $dispatcher->dispatch(TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE, $event);
+            }
+        }
+    }
+
+    public function viewcategoryIdNotVisible(ViewCheckEvent $event)
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
@@ -229,6 +257,8 @@ class Category extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CATEGORY_ADD_CONTENT       => array("addContent", 128),
             TheliaEvents::CATEGORY_REMOVE_CONTENT    => array("removeContent", 128),
 
+            TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
+            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE  => array('viewcategoryIdNotVisible', 128),
         );
     }
 }

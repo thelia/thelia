@@ -17,6 +17,7 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
@@ -40,6 +41,7 @@ use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeTemplateQuery;
@@ -864,7 +866,33 @@ class Product extends BaseAction implements EventSubscriberInterface
             );
         }
     }
-    
+
+    /**
+     * Check if is a product view and if product_id is visible
+     *
+     * @param ViewCheckEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        if ($event->getView() == 'product') {
+            $product = ProductQuery::create()
+                ->filterById($event->getViewId())
+                ->filterByVisible(1)
+                ->findOne();
+
+            if (! $product) {
+                $dispatcher->dispatch(TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE, $event);
+            }
+        }
+    }
+
+    public function viewProductIdNotVisible(ViewCheckEvent $event)
+    {
+        throw new NotFoundHttpException();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -902,6 +930,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Those two have to be executed before
             TheliaEvents::IMAGE_DELETE                      => array("deleteImagePSEAssociations", 192),
             TheliaEvents::DOCUMENT_DELETE                   => array("deleteDocumentPSEAssociations", 192),
+
+            TheliaEvents::VIEW_CHECK                        => array('viewCheck', 128),
+            TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE       => array('viewProductIdNotVisible', 128),
         );
     }
 }

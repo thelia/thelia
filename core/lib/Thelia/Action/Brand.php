@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
 use Thelia\Core\Event\Brand\BrandToggleVisibilityEvent;
@@ -21,6 +22,7 @@ use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Model\Brand as BrandModel;
 use Thelia\Model\BrandQuery;
 
@@ -122,6 +124,32 @@ class Brand extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Check if is a brand view and if brand_id is visible
+     *
+     * @param ViewCheckEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        if ($event->getView() == 'brand') {
+            $brand = BrandQuery::create()
+                ->filterById($event->getViewId())
+                ->filterByVisible(1)
+                ->findOne();
+
+            if (! $brand) {
+                $dispatcher->dispatch(TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE, $event);
+            }
+        }
+    }
+
+    public function viewBrandIdNotVisible(ViewCheckEvent $event)
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -135,6 +163,9 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::BRAND_UPDATE_POSITION   => array('updatePosition', 128),
             TheliaEvents::BRAND_TOGGLE_VISIBILITY => array('toggleVisibility', 128),
+
+            TheliaEvents::VIEW_CHECK                => array('viewCheck', 128),
+            TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE => array('viewBrandIdNotVisible', 128),
         );
     }
 }
