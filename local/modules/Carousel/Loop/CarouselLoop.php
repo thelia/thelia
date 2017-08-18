@@ -83,7 +83,7 @@ class CarouselLoop extends Image
             $loopResultRow = new LoopResultRow($carousel);
 
             $event = new ImageEvent();
-            $event->setSourceFilepath(imgSourcePath)
+            $event->setSourceFilepath($imgSourcePath)
                 ->setCacheSubdirectory('carousel');
 
             switch ($this->getResizeMode()) {
