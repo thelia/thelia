@@ -173,7 +173,7 @@ class ModelCriteriaTools
 
                 foreach ($columns as $column) {
                     $search->withColumn(
-                        'CASE WHEN NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.ID) THEN `' . $requestedLocaleI18nAlias . '`.`' . $column . '` ELSE `' . $defaultLocaleI18nAlias . '`.`' . $column . '` END',
+                        'CASE WHEN NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`' . $column . '`) THEN `' . $requestedLocaleI18nAlias . '`.`' . $column . '` ELSE `' . $defaultLocaleI18nAlias . '`.`' . $column . '` END',
                         $aliasPrefix . 'i18n_' . $column
                     );
                 }
