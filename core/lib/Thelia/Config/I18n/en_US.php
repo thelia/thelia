@@ -369,6 +369,7 @@ return array(
     'Password confirmation' => 'Password confirmation',
     'Payment failed' => 'Payment failed',
     'Payment gateway' => 'Payment gateway',
+    'Payment module ID not found' => 'Payment module ID not found',
     'Payment transaction %transaction_ref for order ref. %ref, ID %id has been successfully saved.' => 'Payment transaction %transaction_ref for order ref. %ref, ID %id has been successfully saved.',
     'Per customer' => 'Per customer',
     'Percent' => 'Percent',
