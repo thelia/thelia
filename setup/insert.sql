@@ -2202,7 +2202,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'de_DE', 'Sonderangebot-Block', NULL, NULL, NULL),
     (19, 'de_DE', 'Smarty Template Engine Integration', NULL, NULL, NULL),
     (20, 'de_DE', 'Steuerung für virtuelle Produkte', NULL, NULL, NULL),
-    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
+    (21, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
     (2, 'en_US', '72h delivery', NULL, NULL, NULL),
     (3, 'en_US', 'Pay by cheque', NULL, NULL, NULL),
     (4, 'en_US', 'Front office integration', NULL, NULL, NULL),
@@ -2222,7 +2222,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'en_US', 'Products offer block', NULL, NULL, NULL),
     (19, 'en_US', 'Smarty template engine integration', NULL, NULL, NULL),
     (20, 'en_US', 'Virtual Product Controller', NULL, NULL, NULL),
-    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
+    (21, 'en_US', 'Back-office Home page content', NULL, NULL, NULL),    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
     (2, 'es_ES', 'entrega 72h', NULL, NULL, NULL),
     (3, 'es_ES', 'Pagar con Cheque', NULL, NULL, NULL),
     (4, 'es_ES', 'Front office integración', NULL, NULL, NULL),
@@ -2242,7 +2242,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'es_ES', 'Bloque de oferta de productos', NULL, NULL, NULL),
     (19, 'es_ES', 'Integración del motor de plantillas Smarty', NULL, NULL, NULL),
     (20, 'es_ES', 'Controlador de producto virtual', NULL, NULL, NULL),
-    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
+    (21, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
     (2, 'fr_FR', 'Livraison par colissimo en 72h', NULL, NULL, NULL),
     (3, 'fr_FR', 'Payer par chèque', NULL, NULL, NULL),
     (4, 'fr_FR', 'Module Front office', NULL, NULL, NULL),
@@ -2261,8 +2261,8 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (17, 'fr_FR', 'Bloc nouveaux produits', NULL, NULL, NULL),
     (18, 'fr_FR', 'Bloc promotions', NULL, NULL, NULL),
     (19, 'fr_FR', 'Intégration du moteur de template Smarty', NULL, NULL, NULL),
-    (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL)
-;
+    (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL),
+    (21, 'fr_FR', 'Contenu de la page d\'accueil de l\'administration', NULL, NULL, NULL);
 
 -- Insert I18n front hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
