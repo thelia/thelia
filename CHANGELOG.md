@@ -1,6 +1,28 @@
 # 2.3.4
 
-- Minimum PHP version is now 5.5
+**WARNING** : Minimum PHP version for Thelia 2.3.4 is now **PHP 5.5**. 
+Do not upgrade if you're server is currently using a lower PHP version
+
+- (related to #2391) When creating a customer from the back offcie, the state field is now present.
+- (related to #2384) Fix tinymce_lang guess helper
+- (related to #2377) Added missing translation in OrderPayment.php
+- (related to #2351) Changed ModelCriteriaTools to be less restrictive in checking column. The old code only checked if there was a translation available (a row present) and not the content of a column that could be NULL.
+- (related to #2335) Fix behavior of translate page in back office : "custom_fallback" and "global_fallback" were ignored when "view_missing_traductions_only" was on
+- (related to #2301) "view" authorization is now checked for Thelia feed list and last version number on the back-offcie home page
+- (related to #2286) Fix AbstractExport array rewind bug
+- (related to #2278) Fix i18n typo : Amñinistración => Administración
+- (related to #2275) Fixed select option rendereing in render_form_field.html
+- (related to #2273) Fixed number input in coupon percentage html5 fragment
+- (related to #2262) success_url is now cosidered when deleting a cart_item
+- (related to #2026) regexp significant characters are now escaped whe n processing URL parameters
+- (related to #1949) $CONTENT_COUNT in folder loop now returns the number of visible contents, and not the number of all (including not visible) contents.
+- (related to #1877) Update shipping-configuration-edit.html to escape markup in shipping zone name
+- (related to #1876) Update form.html to escape coupon code HtML
+- (related to #1875) Update coupon-update.html to escape coupon code HtML
+- (related to #1822) To prevent token errors when maniplating cart items, the cart token is no longer refreshed in the delete token code
+- (related to #1743) Back-Office template sale edit
+- (related to #1717) The stock of a virtual product is now checked
+- (related to #2414) In the cart, the first PSE image if nos displayed, if there is one. The product image is displayed otherwise. 
 - (related to #2408) Code style fixes and translations improvements
 - (related to #2408) <br> cound now be used in text email templates to force a line break
 - (related to #2272) Form fields error information are now saved in the global form error context, and remain available after a redirection.
