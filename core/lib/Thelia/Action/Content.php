@@ -224,7 +224,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 ->filterByVisible(1)
                 ->count();
 
-            if (! $content) {
+            if ($content > 0) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE, $event);
             }
         }
