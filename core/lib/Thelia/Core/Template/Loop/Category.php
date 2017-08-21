@@ -61,6 +61,7 @@ use Thelia\Model\Category as CategoryModel;
  * @method int[] getExclude()
  * @method string[] getOrder()
  * @method int[] getTemplateId()
+ * @method bool getProductCountVisibleOnly()
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -125,7 +126,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-    
+
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
@@ -150,7 +151,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         } else {
             $positionOrderAllowed = false;
         }
-    
+
         $excludeParent = $this->getExcludeParent();
 
         if (!is_null($excludeParent)) {
@@ -206,7 +207,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             ;
         }
         $templateIdList = $this->getTemplateId();
-    
+
         if (!is_null($templateIdList)) {
             $search->filterByDefaultTemplateId($templateIdList, Criteria::IN);
         }

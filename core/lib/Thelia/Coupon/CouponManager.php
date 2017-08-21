@@ -384,7 +384,7 @@ class CouponManager
 
                 // If the coupon usage is per user, remove an entry from coupon customer usage count table
                 if ($coupon->getPerCustomerUsageCount()) {
-                    if (null == $customerId) {
+                    if (null === $customerId) {
                         throw new \LogicException("Customer should not be null at this time.");
                     }
 

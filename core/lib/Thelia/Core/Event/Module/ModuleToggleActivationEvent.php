@@ -45,6 +45,8 @@ class ModuleToggleActivationEvent extends ModuleEvent
      */
     public function __construct($module_id, $assume_deactivate = false)
     {
+        parent::__construct();
+
         $this->module_id = $module_id;
         $this->assume_deactivate = $assume_deactivate;
     }
@@ -79,7 +81,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
 
     /**
      * @param boolean $noCheck
-     * @return $this;
+     * @return $this
      */
     public function setNoCheck($noCheck)
     {
@@ -98,7 +100,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
 
     /**
      * @param boolean $recursive
-     * @return $this;
+     * @return $this
      */
     public function setRecursive($recursive)
     {
@@ -115,8 +117,8 @@ class ModuleToggleActivationEvent extends ModuleEvent
     }
 
     /**
-     * @param boolean $recursive
-     * @return $this;
+     * @param boolean $assume_deactivate
+     * @return $this
      */
     public function setAssumeDeactivate($assume_deactivate)
     {

@@ -40,7 +40,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      * count all products for current category and sub categories
      *
-     * @param bool|string $contentVisibility: true (default) to count only visible products, false to count only hidden
+     * @param bool|string $contentVisibility true (default) to count only visible products, false to count only hidden
      *                    products, or * to count all products.
      * @return int
      */
@@ -48,14 +48,14 @@ class Folder extends BaseFolder implements FileModelParentInterface
     {
         $children = FolderQuery::findAllChild($this->getId());
         array_push($children, $this);
-    
-    
+
+
         $query = ContentQuery::create()->filterByFolder(new ObjectCollection($children), Criteria::IN);
-    
+
         if ($contentVisibility !== '*') {
             $query->filterByVisible($contentVisibility);
         }
-    
+
         return $query->count();
     }
 

@@ -77,7 +77,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $customer = $event->getCustomer();
 
-        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
+        if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null && $customer !== null) {
             $this->mailer->sendEmailToCustomer(
                 'customer_confirmation',
                 $customer,

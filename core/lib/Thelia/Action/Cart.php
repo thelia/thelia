@@ -22,6 +22,7 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -113,6 +114,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 $productPrices = $productSaleElements->getPricesByCurrency($currency, $discount);
 
                 $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
+            } else {
+                // We did no find any PSE... Something is wrong with the DB, just throw an exception.
+                throw new TheliaProcessException("This item cannot be added to the cart: no matching product sale element was found.");
             }
         } elseif ($append && $cartItem !== null) {
             $cartItem->addQuantity($quantity)->save();

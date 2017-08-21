@@ -46,4 +46,15 @@ trait StandardI18nFieldsSearchTrait
             $this->addSearchInI18nColumn($search, strtoupper($searchInElement), $searchCriteria, $searchTerm);
         }
     }
+
+    /**
+     * Add the search clause for an I18N column, taking care of the back/front context, as default_locale_i18n is
+     * not defined in the backEnd I18N context.
+     *
+     * @param ModelCriteria $search
+     * @param string $columnName the column to search into, such as TITLE
+     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc.
+     * @param string $searchTerm the searched term
+     */
+    public abstract function addSearchInI18nColumn($search, $columnName, $searchCriteria, $searchTerm);
 }
