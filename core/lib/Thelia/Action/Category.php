@@ -227,7 +227,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             $category = CategoryQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
-                ->findOne();
+                ->count();
 
             if (! $category) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE, $event);
@@ -235,6 +235,10 @@ class Category extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ViewCheckEvent $event
+     * @throws NotFoundHttpException
+     */
     public function viewcategoryIdNotVisible(ViewCheckEvent $event)
     {
         throw new NotFoundHttpException();
