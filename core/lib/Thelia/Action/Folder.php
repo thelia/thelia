@@ -172,7 +172,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 ->filterByVisible(1)
                 ->count();
 
-            if (! $folder) {
+            if ($folder > 0) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE, $event);
             }
         }
