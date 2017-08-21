@@ -82,16 +82,25 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-                            {assign "cart_count" $LOOP_COUNT}
                             <a href="{$PRODUCT_URL nofilter}">
-                            {ifloop rel='product-image'}
-                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
+                            {assign var="product_image_url" value=null}
+                            {ifloop rel="pse-first-image"}
+                                {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                    {loop type="image" name="product-image" id=$PRODUCT_IMAGE_ID product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                        {assign var="product_image_url" value=$IMAGE_URL}
+                                    {/loop}
                                 {/loop}
                             {/ifloop}
-                            {elseloop rel="product-image"}
-                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$cart_count}">
+                            {elseloop rel="pse-first-image"}
+                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    {assign var="product_image_url" value=$IMAGE_URL}
+                                {/loop}
                             {/elseloop}
+                            {if $product_image_url}
+                                <img itemprop="image" src="{$product_image_url nofilter}" alt="Product #{$LOOP_COUNT}">
+                            {else}
+                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$LOOP_COUNT}">
+                            {/if}
                             </a>
                         </td>
                         <td class="product" >
@@ -100,19 +109,19 @@
                             </h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
-                                    <dt>{intl l="Available"} :</dt>
+                                    <dt class="stockView">{intl l="Available"} :</dt>
                                     {if $STOCK > 0}
                                         <dd>{intl l="In Stock"}</dd>
                                     {else}
                                         <dd>{intl l="Out of Stock"}</dd>
                                     {/if}
                                     {loop type="product_sale_elements" name="ref" id=$PRODUCT_SALE_ELEMENTS_ID}
-                                        <dt>{intl l="No."}</dt>
+                                        <dt class="refView">{intl l="No."}</dt>
                                         <dd>{$REF}</dd>
                                     {/loop}
                                     
                                     {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
-                                        <dt>{$ATTRIBUTE_TITLE}</dt>
+                                        <dt class="attributeView">{$ATTRIBUTE_TITLE}</dt>
                                         <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                     {/loop}
                                 </dl>
