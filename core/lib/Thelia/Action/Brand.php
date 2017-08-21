@@ -136,7 +136,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
             $brand = BrandQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
-                ->findOne();
+                ->count();
 
             if (! $brand) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE, $event);
@@ -144,6 +144,10 @@ class Brand extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ViewCheckEvent $event
+     * @throws NotFoundHttpException
+     */
     public function viewBrandIdNotVisible(ViewCheckEvent $event)
     {
         throw new NotFoundHttpException();

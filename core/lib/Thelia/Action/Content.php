@@ -222,7 +222,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             $content = ContentQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
-                ->findOne();
+                ->count();
 
             if (! $content) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE, $event);
@@ -230,6 +230,10 @@ class Content extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ViewCheckEvent $event
+     * @throws NotFoundHttpException
+     */
     public function viewContentIdNotVisible(ViewCheckEvent $event)
     {
         throw new NotFoundHttpException();

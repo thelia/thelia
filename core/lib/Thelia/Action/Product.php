@@ -881,7 +881,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $product = ProductQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
-                ->findOne();
+                ->count();
 
             if (! $product) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE, $event);
@@ -889,6 +889,10 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ViewCheckEvent $event
+     * @throws NotFoundHttpException
+     */
     public function viewProductIdNotVisible(ViewCheckEvent $event)
     {
         throw new NotFoundHttpException();

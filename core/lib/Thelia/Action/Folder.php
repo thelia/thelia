@@ -170,7 +170,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
             $folder = FolderQuery::create()
                 ->filterById($event->getViewId())
                 ->filterByVisible(1)
-                ->findOne();
+                ->count();
 
             if (! $folder) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE, $event);
@@ -178,6 +178,10 @@ class Folder extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ViewCheckEvent $event
+     * @throws NotFoundHttpException
+     */
     public function viewFolderIdNotVisible(ViewCheckEvent $event)
     {
         throw new NotFoundHttpException();
