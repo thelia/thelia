@@ -17,6 +17,8 @@ coverage
 .settings/
 local/media/documents/*
 local/media/images/*
+!local/media/images/store/favicon.png
+!local/media/images/store/logo.png
 web/assets/*
 web/cache/*
 web/tinymce

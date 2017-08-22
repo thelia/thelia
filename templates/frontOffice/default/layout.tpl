@@ -78,8 +78,14 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="stylesheet"}{/block}
 
     {* Favicon *}
-    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/dist/img/favicon.ico'}">
-    <link rel="icon" type="image/png" href="{image file='assets/dist/img/favicon.png'}" />
+    {* PNG file favicons are not supported by IE 10 and lower. In this case, we use the default .ico file in the template. *}
+
+    <!--[if lt IE 11]>
+    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/dist/img/favicon.ico'}" />
+    <![endif]-->
+
+    <link rel="icon" type="image/png" href="{favicon width=32 height=32}" />
+
 
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
@@ -140,11 +146,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <div class="header row">
                     <h1 class="logo container hidden-xs">
                         <a href="{navigate to="index"}" title="{$store_name}">
-                            {$image = {image file='assets/dist/img/logo.png' failsafe=true}}
-                            {if $image == null}
-                                {$image = {image file='assets/dist/img/logo.gif' failsafe=true}}
-                            {/if}
-                            <img src="{$image}" alt="{$store_name}">
+                            <img src="{logo}" alt="{$store_name}">
                         </a>
                     </h1>
                     {hook name="main.navbar-primary"}
