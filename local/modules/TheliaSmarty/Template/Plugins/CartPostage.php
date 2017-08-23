@@ -31,6 +31,7 @@ use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\Exception\DeliveryException;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
+use Thelia\Model\AreaDeliveryModuleQuery;
 
 /**
  * Class CartPostage
@@ -202,9 +203,23 @@ class CartPostage extends AbstractSmartyPlugin
             ->find()
         ;
 
+        $virtual = $cart->isVirtual();
+
         /** @var \Thelia\Model\Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
-            $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+          $areaDeliveryModule = AreaDeliveryModuleQuery::create()
+              ->findByCountryAndModule($country, $deliveryModule, $state);
+          if (null === $areaDeliveryModule && false === $virtual) {
+              continue;
+          }
+
+        	$moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+
+        	if (true === $virtual
+        		&& false === $moduleInstance->handleVirtualProductDelivery()
+        		) {
+        		continue;
+        	}
 
             try {
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
