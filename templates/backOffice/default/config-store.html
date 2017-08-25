@@ -71,7 +71,9 @@
                                                     {render_form_field field='favicon_file'}
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <img id="preview_favicon" src="{favicon width=64 height=64}" width="64" height="64"/>
+                                                    {media type="favicon" width=64 height=64}
+                                                    <img id="preview_favicon" src="{$MEDIA_URL}" width="64" height="64"/>
+                                                    {/media}
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -79,7 +81,9 @@
                                                     {render_form_field field='logo_file'}
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <img id="preview_logo" src="{logo}" style="max-width: 100%"/>
+                                                    {media type="logo"}
+                                                    <img id="preview_logo" src="{$MEDIA_URL}" style="max-width: 100%"/>
+                                                    {/media}
                                                 </div>
                                             </div>
                                         </fieldset>
