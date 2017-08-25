@@ -70,6 +70,8 @@ return array(
     'Available shipping zones' => 'Zones de livraison disponibles',
     'Back Office' => 'Back Office',
     'Bad tax list JSON' => 'Mauvais JSON de la liste des taxes',
+    'Banner' => 'Bannière',
+    'Banner of the website. Used in the e-mails send to the customers.' => 'Bannière du site utilisée dans le contenu des mails envoyés aux clients.',
     'Billing country' => 'Pays de facturation',
     'Billing country is' => 'Le pays de facturation est',
     'Brand' => 'Marque',

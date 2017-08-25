@@ -84,9 +84,9 @@ GNU General Public License : http://www.gnu.org/licenses/
     <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/dist/img/favicon.ico'}" />
     <![endif]-->
 
-    {media type="favicon" width=32 height=32}
+    {local_media type="favicon" width=32 height=32}
     <link rel="icon" type="{$MEDIA_MIME_TYPE}" href="{$MEDIA_URL}" />
-    {/media}
+    {/local_media}
 
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
@@ -147,9 +147,9 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <div class="header row">
                     <h1 class="logo container hidden-xs">
                         <a href="{navigate to="index"}" title="{$store_name}">
-                            {media type="logo"}
+                            {local_media type="logo"}
                             <img src="{$MEDIA_URL}" alt="{$store_name}">
-                            {/media}
+                            {/local_media}
                         </a>
                     </h1>
                     {hook name="main.navbar-primary"}

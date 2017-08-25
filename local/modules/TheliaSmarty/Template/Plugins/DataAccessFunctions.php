@@ -802,7 +802,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     public function storeMediaDataAccess($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         $type = $this->getParam($params, 'type', null);
-        $allowedTypes = ['favicon', 'logo'];
+        $allowedTypes = ['favicon', 'logo', 'banner'];
 
 
         if ($type !== null && in_array($type, $allowedTypes)) {
@@ -814,6 +814,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 case 'logo':
                     $configKey = 'logo_file';
                     $defaultImageName = 'logo.png';
+                    break;
+                case 'banner':
+                    $configKey = 'banner_file';
+                    $defaultImageName = 'banner.jpg';
                     break;
             }
 
@@ -935,7 +939,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'module_config', $this, 'moduleConfigDataAccess'),
             new SmartyPluginDescriptor('function', 'coupon', $this, 'couponDataAccess'),
 
-            new SmartyPluginDescriptor('block', 'media', $this, 'storeMediaDataAccess'),
+            new SmartyPluginDescriptor('block', 'local_media', $this, 'storeMediaDataAccess'),
         );
     }
 

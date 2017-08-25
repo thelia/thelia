@@ -232,6 +232,21 @@ class ConfigStoreForm extends BaseForm
                         'for' => 'logo_file'
                     ]
                 ]
+            )
+            ->add(
+                'banner_file',
+                'file',
+                [
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\Image()
+                    ],
+                    'label' => $tr->trans('Banner'),
+                    'label_attr' => [
+                        'for' => 'banner_file',
+                        'help' => $tr->trans('Banner of the website. Used in the e-mails send to the customers.'),
+                    ]
+                ]
             );
     }
 
