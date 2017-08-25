@@ -21,9 +21,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Exception\OrderException;
 
@@ -38,11 +38,11 @@ use Thelia\Exception\OrderException;
 
 class ViewListener implements EventSubscriberInterface
 {
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
     /** @var ContainerInterface */
     private $container;
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
 
     /**
      * @param ContainerInterface $container
@@ -75,7 +75,7 @@ class ViewListener implements EventSubscriberInterface
 
             $this->eventDispatcher->dispatch(TheliaEvents::VIEW_CHECK, new ViewCheckEvent($view, $viewId));
 
-            $content = $parser->render($view . ".html");
+            $content = $parser->render($view . '.html');
 
             if ($content instanceof Response) {
                 $response = $content;
@@ -119,7 +119,7 @@ class ViewListener implements EventSubscriberInterface
     public function findView(Request $request)
     {
         if (! $view = $request->query->get('view')) {
-            $view = "index";
+            $view = 'index';
             if ($request->request->has('view')) {
                 $view = $request->request->get('view');
             }

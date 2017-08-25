@@ -138,7 +138,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
                 ->filterByVisible(1)
                 ->count();
 
-            if ($brand > 0) {
+            if ($brand == 0) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE, $event);
             }
         }

@@ -229,7 +229,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->filterByVisible(1)
                 ->count();
 
-            if ($category > 0) {
+            if ($category == 0) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE, $event);
             }
         }
