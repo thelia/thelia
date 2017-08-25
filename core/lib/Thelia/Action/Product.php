@@ -882,7 +882,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->filterByVisible(1)
                 ->count();
 
-            if ($product > 0) {
+            if ($product == 0) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE, $event);
             }
         }

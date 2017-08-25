@@ -224,7 +224,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 ->filterByVisible(1)
                 ->count();
 
-            if ($content > 0) {
+            if ($content == 0) {
                 $dispatcher->dispatch(TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE, $event);
             }
         }
@@ -245,16 +245,16 @@ class Content extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CONTENT_CREATE                => array('create', 128),
-            TheliaEvents::CONTENT_UPDATE                => array('update', 128),
-            TheliaEvents::CONTENT_DELETE                => array('delete', 128),
-            TheliaEvents::CONTENT_TOGGLE_VISIBILITY     => array('toggleVisibility', 128),
+            TheliaEvents::CONTENT_CREATE            => array('create', 128),
+            TheliaEvents::CONTENT_UPDATE            => array('update', 128),
+            TheliaEvents::CONTENT_DELETE            => array('delete', 128),
+            TheliaEvents::CONTENT_TOGGLE_VISIBILITY => array('toggleVisibility', 128),
 
-            TheliaEvents::CONTENT_UPDATE_POSITION       => array('updatePosition', 128),
-            TheliaEvents::CONTENT_UPDATE_SEO            => array('updateSeo', 128),
+            TheliaEvents::CONTENT_UPDATE_POSITION   => array('updatePosition', 128),
+            TheliaEvents::CONTENT_UPDATE_SEO        => array('updateSeo', 128),
 
-            TheliaEvents::CONTENT_ADD_FOLDER            => array('addFolder', 128),
-            TheliaEvents::CONTENT_REMOVE_FOLDER         => array('removeFolder', 128),
+            TheliaEvents::CONTENT_ADD_FOLDER        => array('addFolder', 128),
+            TheliaEvents::CONTENT_REMOVE_FOLDER     => array('removeFolder', 128),
 
             TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
             TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE   => array('viewContentIdNotVisible', 128),
