@@ -19,6 +19,7 @@ local/media/documents/*
 local/media/images/*
 !local/media/images/store/favicon.png
 !local/media/images/store/logo.png
+!local/media/images/store/banner.jpg
 web/assets/*
 web/cache/*
 web/tinymce

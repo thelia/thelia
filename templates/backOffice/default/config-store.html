@@ -71,21 +71,34 @@
                                                     {render_form_field field='favicon_file'}
                                                 </div>
                                                 <div class="col-md-2">
-                                                    {media type="favicon" width=64 height=64}
+                                                    {local_media type="favicon" width=64 height=64}
                                                     <img id="preview_favicon" src="{$MEDIA_URL}" width="64" height="64"/>
-                                                    {/media}
+                                                    {/local_media}
                                                 </div>
                                             </div>
+
                                             <div class="row">
                                                 <div class="col-md-10">
                                                     {render_form_field field='logo_file'}
                                                 </div>
                                                 <div class="col-md-2">
-                                                    {media type="logo"}
+                                                    {local_media type="logo"}
                                                     <img id="preview_logo" src="{$MEDIA_URL}" style="max-width: 100%"/>
-                                                    {/media}
+                                                    {/local_media}
                                                 </div>
                                             </div>
+
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    {render_form_field field='banner_file'}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    {local_media type="banner"}
+                                                    <img id="preview_banner" src="{$MEDIA_URL}" style="max-width: 100%"/>
+                                                    {/local_media}
+                                                </div>
+                                            </div>
+
                                         </fieldset>
                                     </div>
 
@@ -169,6 +182,10 @@
 
         $("#logo_file").change(function(){
             readURL(this, '#preview_logo');
+        });
+
+        $("#banner_file").change(function(){
+            readURL(this, '#preview_banner');
         });
     </script>
     {hook name="config-store.js" location="config-store-js" }

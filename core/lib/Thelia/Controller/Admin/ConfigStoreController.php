@@ -89,14 +89,23 @@ class ConfigStoreController extends BaseAdminController
 
             $storeMediaUploadDir .= DS . 'store';
 
-            $this->getAndWriteStoreMediaFileInConfig($form, 'favicon_file', 'favicon_file', $storeMediaUploadDir);
-            $this->getAndWriteStoreMediaFileInConfig($form, 'logo_file', 'logo_file', $storeMediaUploadDir);
+            // List of medias that can be uploaded through this form.
+            //  [Name of the form input] => [Key in the config table]
+            $storeMediaList = [
+                'favicon_file' => 'favicon_file',
+                'logo_file' =>  'logo_file',
+                'banner_file' => 'banner_file'
+            ];
+
+            foreach ($storeMediaList as $input_name => $config_key) {
+                $this->getAndWriteStoreMediaFileInConfig($form, $input_name, $config_key, $storeMediaUploadDir);
+            }
 
             $data = $form->getData();
 
             // Update store
             foreach ($data as $name => $value) {
-                if ($name != 'favicon_file' && $name != 'logo_file' && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
+                if (!array_key_exists($name, $storeMediaList) && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
                     ConfigQuery::write($name, $value, false);
                 }
             }
