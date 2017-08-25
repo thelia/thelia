@@ -43,6 +43,16 @@ class CacheClearTest extends ContainerAwareTestCase
         $fs->mkdir(THELIA_WEB_DIR . "/assets");
     }
 
+    public function tearDown()
+    {
+        $fs = new Filesystem();
+
+        if ($fs->exists($this->cache_dir)) {
+            $fs->chmod($this->cache_dir, 0700);
+            $fs->remove($this->cache_dir);
+        }
+    }
+
     public function testCacheClear()
     {
         // Fails on windows - do not execute this test on windows
