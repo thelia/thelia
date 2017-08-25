@@ -243,7 +243,7 @@ return array(
     'Hooks' => 'Points d\'accroche',
     'Host' => 'Nom de l\'hôte',
     'I would like to receive the newsletter or the latest news.' => 'Je souhaite recevoir la lettre d\'information ou les dernières actualités.',
-    'Icon of the website. Only PNG files are allowed.' => 'Icône du site. Seuls les fichiers au format PNG sont autorisés.',
+    'Icon of the website. Only PNG and ICO files are allowed.' => 'Icône du site. Seuls les fichiers au format PNG ou ICO sont autorisés.',
     'ISO 4217 code' => 'Code ISO 4217',
     'ISO 639-1 Code' => 'Code ISO 639-1',
     'ISO Alpha-2 code' => 'Code ISO Alpha-2',

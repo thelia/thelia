@@ -209,13 +209,13 @@ class ConfigStoreForm extends BaseForm
                     'required' => false,
                     'constraints' => [
                         new Constraints\Image(array(
-                            'mimeTypes' => 'image/png'
+                            'mimeTypes' => ['image/png', 'image/x-icon']
                         ))
                     ],
                     'label' => $tr->trans('Favicon image'),
                     'label_attr' => [
                         'for' => 'favicon_file',
-                        'help' => $tr->trans('Icon of the website. Only PNG files are allowed.'),
+                        'help' => $tr->trans('Icon of the website. Only PNG and ICO files are allowed.'),
                     ]
                 ]
             )
