@@ -43,6 +43,8 @@ use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\DateTimeFormat;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
+use Thelia\Core\Event\Image\ImageEvent;
+use Thelia\Core\Event\TheliaEvents;
 
 /**
  * Implementation of data access to main Thelia objects (users, cart, etc.)
@@ -785,6 +787,134 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return $return;
     }
 
+
+
+
+    /**
+     * Provides access to the uploaded store-related images (such as logo or favicon)
+     *
+     * @param array $params
+     * @param string $content
+     * @param \Smarty_Internal_Template $template
+     * @param boolean $repeat
+     * @return string|null
+     */
+    public function storeMediaDataAccess($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+        $type = $this->getParam($params, 'type', null);
+        $allowedTypes = ['favicon', 'logo', 'banner'];
+
+
+        if ($type !== null && in_array($type, $allowedTypes)) {
+            switch ($type) {
+                case 'favicon':
+                    $configKey = 'favicon_file';
+                    $defaultImageName = 'favicon.png';
+                    break;
+                case 'logo':
+                    $configKey = 'logo_file';
+                    $defaultImageName = 'logo.png';
+                    break;
+                case 'banner':
+                    $configKey = 'banner_file';
+                    $defaultImageName = 'banner.jpg';
+                    break;
+            }
+
+            $uploadDir = ConfigQuery::read('images_library_path');
+
+            if ($uploadDir === null) {
+                $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+            } else {
+                $uploadDir = THELIA_ROOT . $uploadDir;
+            }
+
+            $uploadDir .= DS . 'store';
+
+
+            $imageFileName = ConfigQuery::read($configKey);
+
+            $skipImageTransform = false;
+
+            // If we couldn't find the image path in the config table or if it doesn't exist, we take the default image provided.
+            if ($imageFileName == null) {
+                $imageSourcePath = $uploadDir . DS . $defaultImageName;
+            } else {
+                $imageSourcePath = $uploadDir . DS . $imageFileName;
+
+                if (!file_exists($imageSourcePath)) {
+                    Tlog::getInstance()->error(sprintf('Source image file %s does not exists.', $imageSourcePath));
+                    $imageSourcePath = $uploadDir . DS . $defaultImageName;
+                }
+
+                if ($type == 'favicon') {
+                    $extension = pathinfo($imageSourcePath, PATHINFO_EXTENSION);
+                    if ($extension == 'ico') {
+                        $mime_type = 'image/x-icon';
+
+                        // If the media is a .ico favicon file, we skip the image transformations,
+                        //    as transformations on .ico file are not supported by Thelia.
+                        $skipImageTransform = true;
+                    } else {
+                        $mime_type = 'image/png';
+                    }
+
+                    $template->assign('MEDIA_MIME_TYPE', $mime_type);
+                }
+            }
+
+            $event = new ImageEvent();
+            $event->setSourceFilepath($imageSourcePath)
+                ->setCacheSubdirectory('store');
+
+
+            if (!$skipImageTransform) {
+                switch ($this->getParam($params, 'resize_mode', null)) {
+                    case 'crop':
+                        $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
+                        break;
+
+                    case 'borders':
+                        $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
+                        break;
+
+                    case 'none':
+                    default:
+                        $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
+                }
+
+                // Prepare transformations
+                $width = $this->getParam($params, 'width', null);
+                $height = $this->getParam($params, 'height', null);
+                $rotation = $this->getParam($params, 'rotation', null);
+
+                if (!is_null($width)) {
+                    $event->setWidth($width);
+                }
+                if (!is_null($height)) {
+                    $event->setHeight($height);
+                }
+                $event->setResizeMode($resize_mode);
+                if (!is_null($rotation)) {
+                    $event->setRotation($rotation);
+                }
+            }
+
+            $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
+
+            $template->assign('MEDIA_URL', $event->getFileUrl());
+        }
+
+        if (isset($content)) {
+            return $content;
+        }
+
+        return null;
+    }
+
+
+
+
     /**
      * @inheritdoc
      */
@@ -808,6 +938,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'meta', $this, 'metaAccess'),
             new SmartyPluginDescriptor('function', 'module_config', $this, 'moduleConfigDataAccess'),
             new SmartyPluginDescriptor('function', 'coupon', $this, 'couponDataAccess'),
+
+            new SmartyPluginDescriptor('block', 'local_media', $this, 'storeMediaDataAccess'),
         );
     }
 

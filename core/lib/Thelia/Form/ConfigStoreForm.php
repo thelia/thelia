@@ -201,6 +201,52 @@ class ConfigStoreForm extends BaseForm
                         'placeholder' => $tr->trans('Country'),
                     ]
                 ]
+            )
+            ->add(
+                'favicon_file',
+                'file',
+                [
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\Image(array(
+                            'mimeTypes' => ['image/png', 'image/x-icon']
+                        ))
+                    ],
+                    'label' => $tr->trans('Favicon image'),
+                    'label_attr' => [
+                        'for' => 'favicon_file',
+                        'help' => $tr->trans('Icon of the website. Only PNG and ICO files are allowed.'),
+                    ]
+                ]
+            )
+            ->add(
+                'logo_file',
+                'file',
+                [
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\Image()
+                    ],
+                    'label' => $tr->trans('Store logo'),
+                    'label_attr' => [
+                        'for' => 'logo_file'
+                    ]
+                ]
+            )
+            ->add(
+                'banner_file',
+                'file',
+                [
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\Image()
+                    ],
+                    'label' => $tr->trans('Banner'),
+                    'label_attr' => [
+                        'for' => 'banner_file',
+                        'help' => $tr->trans('Banner of the website. Used in the e-mails send to the customers.'),
+                    ]
+                ]
             );
     }
 

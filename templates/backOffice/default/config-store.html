@@ -33,7 +33,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {form name='thelia.configuration.store'}
-	 						<form method="POST" action="{url path='/admin/configuration/store/save'}">
+	 						<form method="POST" action="{url path='/admin/configuration/store/save'}" {form_enctype}>
                                 {form_hidden_fields}
 
                                 {form_field field='success_url'}
@@ -63,6 +63,42 @@
 
                                             {render_form_field field='store_email'}
                                             {render_form_field field='store_notification_emails'}
+
+                                            <p class="title title-without-tabs">{intl l='Media'}</p>
+
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    {render_form_field field='favicon_file'}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    {local_media type="favicon" width=64 height=64}
+                                                    <img id="preview_favicon" src="{$MEDIA_URL}" width="64" height="64"/>
+                                                    {/local_media}
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    {render_form_field field='logo_file'}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    {local_media type="logo"}
+                                                    <img id="preview_logo" src="{$MEDIA_URL}" style="max-width: 100%"/>
+                                                    {/local_media}
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    {render_form_field field='banner_file'}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    {local_media type="banner"}
+                                                    <img id="preview_banner" src="{$MEDIA_URL}" style="max-width: 100%"/>
+                                                    {/local_media}
+                                                </div>
+                                            </div>
+
                                         </fieldset>
                                     </div>
 
@@ -127,5 +163,30 @@
 {/block}
 
 {block name="javascript-last-call"}
+    <script>
+        function readURL(input, preview_id) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $(preview_id).attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("#favicon_file").change(function(){
+            readURL(this, '#preview_favicon');
+        });
+
+        $("#logo_file").change(function(){
+            readURL(this, '#preview_logo');
+        });
+
+        $("#banner_file").change(function(){
+            readURL(this, '#preview_banner');
+        });
+    </script>
     {hook name="config-store.js" location="config-store-js" }
 {/block}
