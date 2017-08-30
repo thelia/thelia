@@ -540,7 +540,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $order->setStatusId($newStatus);
 
-        // The invoice_ref would be not null if order is paid (issue #2346)
+        // The invoice_ref would not be null if order is paid (issue #2346)
         if ($order->isPaid() && null === $order->getInvoiceRef()) {
             $order->setInvoiceRef($order->getRef());
         }
