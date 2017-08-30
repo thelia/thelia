@@ -3,6 +3,8 @@
 **WARNING** : Minimum PHP version for Thelia 2.3.4 is now **PHP 5.5**. 
 Do not upgrade if you're server is currently using a lower PHP version
 
+- (related to #2416) Favicon, store logo and e-mail banner are now managed from the back-office -> Configuration -> Store
+- (related to #2420) The cheque instructions defined in the back-office were displayed only for en_US locales. This PR fixes this problem, the instructions are now displayed for every locale.
 - (related to #2391) When creating a customer from the back offcie, the state field is now present.
 - (related to #2384) Fix tinymce_lang guess helper
 - (related to #2377) Added missing translation in OrderPayment.php
