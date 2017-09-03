@@ -13,6 +13,7 @@
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Exception\OrderException;
@@ -35,23 +38,23 @@ use Thelia\Exception\OrderException;
 
 class ViewListener implements EventSubscriberInterface
 {
-    /**
-     *
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
+    /** @var ContainerInterface */
     private $container;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     *
      * @param ContainerInterface $container
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, EventDispatcherInterface $eventDispatcher)
     {
         $this->container = $container;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     *
      * Launch the parser defined on the constructor and get the result.
      *
      * The result is transform id needed into a Response object
@@ -66,7 +69,13 @@ class ViewListener implements EventSubscriberInterface
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $response = null;
         try {
-            $content = $parser->render($request->attributes->get('_view').".html");
+            $view = $request->attributes->get('_view');
+
+            $viewId = $request->attributes->get($view . '_id');
+
+            $this->eventDispatcher->dispatch(TheliaEvents::VIEW_CHECK, new ViewCheckEvent($view, $viewId));
+
+            $content = $parser->render($view . '.html');
 
             if ($content instanceof Response) {
                 $response = $content;
@@ -98,15 +107,19 @@ class ViewListener implements EventSubscriberInterface
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
 
-        if (null === $request->attributes->get('_view')) {
+        if (null === $view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
+        }
+
+        if (null === $request->attributes->get($view . '_id')) {
+            $request->attributes->set($view . '_id', $this->findViewId($request, $view));
         }
     }
 
     public function findView(Request $request)
     {
         if (! $view = $request->query->get('view')) {
-            $view = "index";
+            $view = 'index';
             if ($request->request->has('view')) {
                 $view = $request->request->get('view');
             }
@@ -115,6 +128,17 @@ class ViewListener implements EventSubscriberInterface
         return $view;
     }
 
+    public function findViewId(Request $request, $view)
+    {
+        if (! $viewId = $request->query->get($view . '_id')) {
+            $viewId = 0;
+            if ($request->request->has($view . '_id')) {
+                $viewId = $request->request->get($view . '_id');
+            }
+        }
+
+        return $viewId;
+    }
 
     /**
      * {@inheritdoc}
