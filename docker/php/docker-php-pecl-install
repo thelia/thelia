@@ -1,34 +1,36 @@
 #!/bin/bash
 set -e
 
-cd /usr/src/php/ext
-
 usage() {
-  echo "usage: $0 extension-version [extension-version] ...]"
-  echo "   ie: $0 oauth-1.2.3 uploadprogress-1.0.3.1"
+    echo "usage: $0 [channel/]<package> ..."
+    echo "   ie: $0 uploadprogress oauth-1.2.3"
 }
 
-while [ $# -gt 0 ]; do
-  ext="$1"
-  shift
-  if [ -d "$ext" ]; then
-    echo >&2 "error: $(pwd -P)/$ext exists already"
-    echo >&2
+if [ $# -eq 0 ]; then
     usage >&2
     exit 1
-  fi
-  exts+=( "$ext" )
-done
-
-if [ "${#exts[@]}" -eq 0 ]; then
-  usage >&2
-  exit 1
 fi
 
-for ext in "${exts[@]}"; do
-  (
-    mkdir -p $ext
-    curl -sSL "http://pecl.php.net/get/$ext" | tar xvz -C "$ext" --strip-components=1
-    docker-php-ext-install $ext
-  )
+pecl install "$@"
+
+while [ $# -gt 0 ]; do
+    ext="$1"
+    ext=$(echo "$ext" | cut -d- -f1)
+    ext=$(echo "$ext" | cut -d\/ -f2)
+    shift
+
+    for module in $(find /usr/local/lib/php/extensions -name "$ext.so"); do
+        ini="/usr/local/etc/php/conf.d/docker-php-pecl-$ext.ini"
+        if grep -q zend_extension_entry "$module"; then
+            # https://wiki.php.net/internals/extensions#loading_zend_extensions
+            line="zend_extension=$(readlink -f "$module")"
+        else
+            line="extension=$(basename "$module")"
+        fi
+        if ! grep -q "$line" "$ini" 2>/dev/null; then
+            echo "$line" >> "$ini"
+        fi
+    done
 done
+
+rm -rf /tmp/*

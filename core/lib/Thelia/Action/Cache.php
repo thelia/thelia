@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -24,8 +25,23 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class Cache extends BaseAction implements EventSubscriberInterface
 {
+    /** @var AdapterInterface */
+    protected $adapter;
+
+    /**
+     * CacheListener constructor.
+     * @param AdapterInterface $adapter
+     */
+    public function __construct(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
+
     public function cacheClear(CacheEvent $event)
     {
+        // clear cache on thelia.cache service
+        $this->adapter->clear();
+
         $dir = $event->getDir();
 
         $fs = new Filesystem();

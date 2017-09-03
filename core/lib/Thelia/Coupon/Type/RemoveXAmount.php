@@ -61,6 +61,12 @@ class RemoveXAmount extends AbstractRemove
      */
     public function exec()
     {
+        $cartTotal = $this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers());
+        
+        if ($this->amount > $cartTotal) {
+            return $cartTotal;
+        }
+        
         return $this->amount;
     }
 

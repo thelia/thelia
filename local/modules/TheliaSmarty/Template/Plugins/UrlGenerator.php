@@ -22,6 +22,9 @@ use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\RewritingUrlQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\ConfigQuery;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
@@ -119,6 +122,35 @@ class UrlGenerator extends AbstractSmartyPlugin
                 $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
                 $mode
             );
+            
+            $request = $this->getRequest();
+            $requestedLangCodeOrLocale = $params["lang"];
+            $view = $request->attributes->get('_view', null);
+            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+
+            if (null !== $requestedLangCodeOrLocale) {
+                if (strlen($requestedLangCodeOrLocale) > 2) {
+                    $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
+                } else {
+                    $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+                }
+
+                if (ConfigQuery::isMultiDomainActivated()) {
+                    $urlRewrite = RewritingUrlQuery::create()
+                        ->filterByView($view)
+                        ->filterByViewId($viewId)
+                        ->filterByViewLocale($lang->getLocale())
+                        ->findOneByRedirected(null)
+                    ;
+                    
+                    $path = '';
+                    if (null != $urlRewrite) {
+                        $path = "/".$urlRewrite->getUrl();
+                    }
+                    $url = rtrim($lang->getUrl(), "/").$request->getBaseUrl().$path;
+                }
+
+            }
         }
         return $this->applyNoAmpAndTarget($params, $url);
     }

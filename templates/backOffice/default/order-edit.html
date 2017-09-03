@@ -38,8 +38,6 @@
                                     {$orderCurrency=$SYMBOL}
                                 {/loop}
 
-                                {assign "orderStatusId" $STATUS}
-
                                 <div class="row">
                                     <div class="col-md-4 title">
                                         {intl l='Order %ref - ID %id' id={$ID} ref={$REF}}
@@ -52,16 +50,9 @@
                                                 <label class="col-sm-6 control-label">{intl l="Order status:"}</label>
                                                 <div class="col-sm-6">
                                                     <select class="js-update-order-status" name="status_id" data-toggle="selectpicker">
+                                                    {assign "orderStatusId" $STATUS}
                                                     {loop type="order-status" name="all-status"}
-                                                        {assign "orderStatusCode" "order_$CODE"}
-                                                        {if #$orderStatusCode# == ''}
-                                                            {assign "defaultLabel" "label-default"}
-                                                            {assign "orderStatusLabel" $CODE}
-                                                        {else}
-                                                            {assign "defaultLabel" ''}
-                                                            {assign "orderStatusLabel" #$orderStatusCode#}
-                                                        {/if}
-                                                        <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label {$defaultLabel} label-{$orderStatusLabel}'>{$TITLE}</span>">{$TITLE}</option>
+                                                        <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label' style='background-color: {$COLOR};'>{$TITLE}</span>">{$TITLE}</option>
                                                     {/loop}
                                                     </select>
                                                 </div>

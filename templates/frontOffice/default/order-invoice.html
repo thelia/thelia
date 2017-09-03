@@ -82,16 +82,25 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-                            {assign "cart_count" $LOOP_COUNT}
                             <a href="{$PRODUCT_URL nofilter}">
-                            {ifloop rel='product-image'}
-                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
+                            {assign var="product_image_url" value=null}
+                            {ifloop rel="pse-first-image"}
+                                {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                    {loop type="image" name="product-image" id=$PRODUCT_IMAGE_ID product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                        {assign var="product_image_url" value=$IMAGE_URL}
+                                    {/loop}
                                 {/loop}
                             {/ifloop}
-                            {elseloop rel="product-image"}
-                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$cart_count}">
+                            {elseloop rel="pse-first-image"}
+                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    {assign var="product_image_url" value=$IMAGE_URL}
+                                {/loop}
                             {/elseloop}
+                            {if $product_image_url}
+                                <img itemprop="image" src="{$product_image_url nofilter}" alt="Product #{$LOOP_COUNT}">
+                            {else}
+                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$LOOP_COUNT}">
+                            {/if}
                             </a>
                         </td>
                         <td class="product" >
@@ -100,16 +109,19 @@
                             </h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
-                                    <dt>{intl l="Available"} :</dt>
+                                    <dt class="stockView">{intl l="Available"} :</dt>
                                     {if $STOCK > 0}
                                         <dd>{intl l="In Stock"}</dd>
                                     {else}
                                         <dd>{intl l="Out of Stock"}</dd>
                                     {/if}
-                                    <dt>{intl l="No."}</dt>
-                                    <dd>{$REF}</dd>
+                                    {loop type="product_sale_elements" name="ref" id=$PRODUCT_SALE_ELEMENTS_ID}
+                                        <dt class="refView">{intl l="No."}</dt>
+                                        <dd>{$REF}</dd>
+                                    {/loop}
+                                    
                                     {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
-                                        <dt>{$ATTRIBUTE_TITLE}</dt>
+                                        <dt class="attributeView">{$ATTRIBUTE_TITLE}</dt>
                                         <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                     {/loop}
                                 </dl>
@@ -215,6 +227,7 @@
                         </table>
                     </div>
                 </div>
+                {hook name="order-invoice.coupon-form"}
                 </form>
             {/form}
             
@@ -265,41 +278,39 @@
                         {/if}
 
                         <div class="panel-body">
-
-                        {loop type="address" name="invoice-address"}
-                            {assign var="isInvoiceAddressChecked" value="0"}
-                            {if $isPost}
-                                {if $value == $ID && $value != ""}
-                                    {assign var="isInvoiceAddressChecked" value="1"}
+                            {loop type="address" name="invoice-address"}
+                                {assign var="isInvoiceAddressChecked" value="0"}
+                                {if $isPost}
+                                    {if $value == $ID && $value != ""}
+                                        {assign var="isInvoiceAddressChecked" value="1"}
+                                    {elseif $DEFAULT}
+                                        {assign var="isInvoiceAddressChecked" value="1"}
+                                    {/if}
                                 {elseif $DEFAULT}
                                     {assign var="isInvoiceAddressChecked" value="1"}
                                 {/if}
-                            {elseif $DEFAULT}
-                                {assign var="isInvoiceAddressChecked" value="1"}
-                            {/if}
 
-                            <div class="radio">
-                                <label for="invoice-address_{$ID}">
-                                    <input type="radio" name="{$name}" id="invoice-address_{$ID}" value="{$ID}"{if $isInvoiceAddressChecked} checked="checked"{/if}>
-                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
-                                    <span class="org">{$COMPANY}</span>
-                                    <address class="adr">
-                                        <span class="street-address">{$ADDRESS1}</span><br>
-                                        {if $ADDRESS2 != ""}
-                                            <span class="street-address">{$ADDRESS2}</span><br>
-                                        {/if}
-                                        {if $ADDRESS3 != ""}
-                                            <span class="street-address">{$ADDRESS3}</span><br>
-                                        {/if}
-                                        <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY},
-                                        <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
-                                        {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
-                                    </address>
-                                </label>
-                            </div>
-                        {/loop}
-
+                                <div class="radio">
+                                    <label for="invoice-address_{$ID}">
+                                        <input type="radio" name="{$name}" id="invoice-address_{$ID}" value="{$ID}"{if $isInvoiceAddressChecked} checked="checked"{/if}>
+                                        <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                        <span class="org">{$COMPANY}</span>
+                                        <address class="adr">
+                                            <span class="street-address">{$ADDRESS1}</span><br>
+                                            {if $ADDRESS2 != ""}
+                                                <span class="street-address">{$ADDRESS2}</span><br>
+                                            {/if}
+                                            {if $ADDRESS3 != ""}
+                                                <span class="street-address">{$ADDRESS3}</span><br>
+                                            {/if}
+                                            <span class="postal-code">{$ZIPCODE}</span>
+                                            <span class="locality">{$CITY},
+                                            <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                            {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
+                                        </address>
+                                    </label>
+                                </div>
+                            {/loop}
                             <a href="#" class="btn btn-change-address btn-link hidden"><i class="fa fa-pencil"></i> {intl l="Change address"}</a>
                         </div>
 
@@ -360,6 +371,8 @@
                     </div><!--/.form-group-->
                 </div>
                 {/form_field}
+
+                {hook name="order-invoice.payment-form"}
 
                 <a href="{url path="/order/delivery"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Back"}</a>
                 <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Next Step"}</button>

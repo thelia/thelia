@@ -192,6 +192,7 @@
                         {/loop}
                         </p>
                         {/ifloop}
+                        {hook name="account-order.product-list" order_id={$order_id} order_product_id={$ID} product={$PRODUCT_ID}}
                     </td>
                     <td class="unitprice"><p>{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
                     <td class="unitprice"><p>{format_money number=$realTaxedPrice currency_id=$CURRENCY}</p></td>

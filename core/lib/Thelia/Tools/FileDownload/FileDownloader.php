@@ -75,6 +75,7 @@ class FileDownloader implements FileDownloaderInterface
          */
         $con = curl_init($url);
         curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($con, CURLOPT_FOLLOWLOCATION, true);
 
         $response = curl_exec($con);
         $errno = curl_errno($con);

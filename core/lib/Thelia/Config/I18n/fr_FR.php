@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array(
     ' content create form' => 'Formulaire de création de contenu',
     ' note: only non-visible documents can be associated.' => 'remarque : seuls ces modules. les documents non visibles peuvent être associés.',
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'Le paramètre "%param" ne peut être vide dans la boucle type: %type, nom: %name ',
@@ -70,6 +70,8 @@ return [
     'Available shipping zones' => 'Zones de livraison disponibles',
     'Back Office' => 'Back Office',
     'Bad tax list JSON' => 'Mauvais JSON de la liste des taxes',
+    'Banner' => 'Bannière',
+    'Banner of the website. Used in the e-mails send to the customers.' => 'Bannière du site utilisée dans le contenu des mails envoyés aux clients.',
     'Billing country' => 'Pays de facturation',
     'Billing country is' => 'Le pays de facturation est',
     'Brand' => 'Marque',
@@ -80,6 +82,8 @@ return [
     'By Module' => 'Par module',
     'CSS' => 'CSS',
     'CSS stylesheet' => 'Feuille de style CSS',
+    'Can\'t deactivate a secure module' => 'Impossible de désactiver un module sécurisé',
+    'Can\'t remove a core module' => 'Impossible de supprimer un module de base',
     'Cannot disable the default language' => 'Impossible de désactiver la langue par défaut',
     'Cannot find a default country. Please define one.' => 'Impossible de trouver un pays par défaut. Veuillez en définir un.',
     'Cannot find the shop country. Please select a shop country.' => 'Impossible de trouver le pays du magasin. Veuillez en sélectionner un.',
@@ -203,6 +207,7 @@ return [
     'Failed to open translation file %file. Please be sure that this file is writable by your Web server' => 'L\'ouverture du fichier %file a échoué. Merci de vérifier que ce fichier est accessible en écriture pour votre serveur Web.',
     'Failed to send message %code. Failed recipients: %failed_addresses' => 'Erreur lors de l\'envoi du message %code. Echec pour les destinataires %failed_addresses',
     'Failed to update language definition: %ex' => 'Erreur lors de la mise à jour de la définition de la langue : %ex',
+    'Favicon image' => 'Icône du site',
     'Fax' => 'Fax',
     'Feature' => 'Caractéristique',
     'Feature value does not match FLOAT format' => 'valeur de caractéristique n\'est pas un FLOAT',
@@ -240,6 +245,7 @@ return [
     'Hooks' => 'Points d\'accroche',
     'Host' => 'Nom de l\'hôte',
     'I would like to receive the newsletter or the latest news.' => 'Je souhaite recevoir la lettre d\'information ou les dernières actualités.',
+    'Icon of the website. Only PNG and ICO files are allowed.' => 'Icône du site. Seuls les fichiers au format PNG ou ICO sont autorisés.',
     'ISO 4217 code' => 'Code ISO 4217',
     'ISO 639-1 Code' => 'Code ISO 639-1',
     'ISO Alpha-2 code' => 'Code ISO Alpha-2',
@@ -355,6 +361,7 @@ return [
     'Password confirmation' => 'Confirmation du mot de passe.',
     'Payment failed' => 'Echec du paiement',
     'Payment gateway' => 'Passerelle de paiement',
+    'Payment module ID not found' => 'ID du module de paiement non trouvé',
     'Per customer' => 'Par client',
     'Percent' => 'Pourcent',
     'Percentage' => 'Pourcentage',
@@ -419,6 +426,7 @@ return [
     'Range date Start' => 'Date de début',
     'Rate' => 'Taux',
     'Rate from %currencyCode' => 'Taux pour %currencyCode',
+    'Recipient e-mail address' => 'Adresse e-mail du destinataire',
     'Redirecting ...' => 'Redirection ...',
     'Redirecting to %url' => 'Redirection vers %url',
     'Reference' => 'Référence',
@@ -451,6 +459,7 @@ return [
     'Select the product brand, or supplier.' => 'Choisissez la marque ou le fournisseur  du produit.',
     'Select the products covered by this operation' => 'Produits inclus dans cette promotion',
     'Select the virtual document' => 'Sélectionnez le document virtuel',
+    'Send test e-mail to:' => 'Envoyer un email de test à: ',
     'Service ID' => 'ID du service',
     'Shipping configuration' => 'Configuration du transport',
     'Shipping zone name' => 'Nom de la zone de livraison',
@@ -478,6 +487,7 @@ return [
     'Store configuration failed.' => 'Erreur de configuration du magasin.',
     'Store description' => 'Description du magasin',
     'Store email address' => 'Adresse mail du magasin',
+    'Store logo' => 'Logo de la boutique',
     'Store logs into text file' => 'Conserver les logs dans des fichiers texte',
     'Store logs into text file, up to a certian size, then a new file is created' => 'Sauvegarder les logs dans un fichier texte. A partir d\'une certaine taille un nouveau fichier est créé',
     'Store name' => 'Nom du magasin',
@@ -535,7 +545,7 @@ return [
     'The method %method% doesn\'t exist in classname %classname%' => 'La méthode %method% n\'existe pas dans la classe %classname%',
     'The method name that will handle the hook event.' => 'Le nom de la méthode qui va traiter l\'évènement du point d\'accroche.',
     'The module "%name%" is currently in use by at least one order, and can\'t be deleted.' => 'Le module "%name%" est utilisé par au moins une commande, et ne peut être supprimé.',
-    'The module %module has been installed successfully.' => 'Le module %module a été activé avec succès.',
+    'The module %module has been installed successfully.' => 'Le module %module a été installé avec succès.',
     'The module %name is already installed in the same or greater version.' => 'Le module %name est déja installé dans la même version, ou dans une version plus récente.',
     'The module %name requires Thelia %version or newer' => 'Le module %name nécessite Thelia %version ou plus récent',
     'The module has to be activated.' => 'Le module doit être activé.',
@@ -820,4 +830,4 @@ return [
     'update form' => 'Formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
-];
+);

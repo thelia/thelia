@@ -6,6 +6,9 @@ use Thelia\Model\Base\OrderStatus as BaseOrderStatus;
 
 class OrderStatus extends BaseOrderStatus
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use \Thelia\Model\Tools\PositionManagementTrait;
+
     const CODE_NOT_PAID = "not_paid";
     const CODE_PAID = "paid";
     const CODE_PROCESSING = "processing";

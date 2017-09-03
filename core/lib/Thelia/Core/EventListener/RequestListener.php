@@ -275,9 +275,11 @@ class RequestListener implements EventSubscriberInterface
             ) {
                 $request->getSession()->setCurrency($find);
                 $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($find, $request));
+            } else {
+                $defaultCurrency = Currency::getDefaultCurrency();
+                $request->getSession()->setCurrency($defaultCurrency);
+                $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($defaultCurrency, $request));
             }
-        } else {
-            $request->getSession()->setCurrency(Currency::getDefaultCurrency());
         }
     }
 

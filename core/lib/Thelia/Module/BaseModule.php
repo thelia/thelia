@@ -55,6 +55,12 @@ class BaseModule implements BaseModuleInterface
     const IS_ACTIVATED     = 1;
     const IS_NOT_ACTIVATED = 0;
 
+    const IS_MANDATORY       = 1;
+    const IS_NOT_MANDATORY   = 0;
+
+    const IS_HIDDEN        = 1;
+    const IS_NOT_HIDDEN    = 0;
+
     protected $reflected;
 
     protected $dispatcher = null;
@@ -429,7 +435,9 @@ class BaseModule implements BaseModuleInterface
         /** @var Country $country */
         $country = $taxEngine->getDeliveryCountry();
 
-        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
+        $state = $taxEngine->getDeliveryState();
+
+        $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount, $state) : $cart->getTotalAmount($with_discount);
 
         if ($with_postage) {
             if ($with_tax) {

@@ -18,6 +18,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\ContentFolderQuery;
@@ -54,6 +55,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
+
     protected $timestampable = true;
     protected $versionable = true;
 
@@ -77,18 +80,15 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
-                            'alpha',
-                            'alpha-reverse',
-                            'manual',
-                            'manual_reverse',
+                            'id', 'id_reverse',
+                            'alpha', 'alpha-reverse', 'alpha_reverse',
+                            'manual', 'manual_reverse',
+                            'visible', 'visible_reverse',
                             'random',
                             'given_id',
-                            'created',
-                            'created_reverse',
-                            'updated',
-                            'updated_reverse',
-                            'position',
-                            'position_reverse'
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
+                            'position', 'position_reverse'
                         )
                     )
                 ),
@@ -104,22 +104,20 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     public function getSearchIn()
     {
-        return [
-            "title"
-        ];
+        return $this->getStandardI18nSearchFields();
     }
 
     /**
      * @param ContentQuery $search
      * @param string $searchTerm
-     * @param string $searchIn
+     * @param array $searchIn
      * @param string $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
 
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function buildModelCriteria()
@@ -169,7 +167,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `FolderSelect`.POSITION END',
+            'CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `FolderSelect`.POSITION END AS SIGNED)',
             'position_delegate'
         );
         $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
@@ -204,7 +202,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $exclude = $this->getExclude();
@@ -226,10 +224,17 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
@@ -253,6 +258,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         $search->withColumn(ContentTableMap::ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();

@@ -173,7 +173,7 @@
 
     <route id="admin.customer.update.process" path="/admin/customer/save">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::processUpdateAction</default>
-     </route>
+    </route>
 
     <route id="admin.customer.delete" path="/admin/customer/delete">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
@@ -251,6 +251,36 @@
     </route>
 
     <!-- end order management -->
+
+    <!-- order status management -->
+
+    <route id="admin.order-status.default" path="/admin/configuration/order-status">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::defaultAction</default>
+    </route>
+
+    <route id="admin.order-status.create" path="/admin/configuration/order-status/create">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::createAction</default>
+    </route>
+
+    <route id="admin.order-status.update" path="/admin/configuration/order-status/update/{order_status_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::updateAction</default>
+        <requirement key="order_status_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order-status.save" path="/admin/configuration/order-status/save/{order_status_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::processUpdateAction</default>
+        <requirement key="order_status_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order-status.delete" path="/admin/configuration/order-status/delete">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::deleteAction</default>
+    </route>
+
+    <route id="admin.order-status.update-position" path="/admin/configuration/order-status/update-position">
+        <default key="_controller">Thelia\Controller\Admin\OrderStatusController::updatePositionAction</default>
+    </route>
+
+    <!-- end order status management -->
 
     <!-- Categories management -->
 
@@ -723,6 +753,10 @@
 
     <route id="admin.configuration.templates.delete" path="/admin/configuration/templates/delete">
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.duplicate" path="/admin/configuration/templates/duplicate">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::duplicateAction</default>
     </route>
 
     <route id="admin.configuration.templates.features.list" path="/admin/configuration/templates/features/list">
@@ -1541,6 +1575,11 @@
 
     <route id="admin.email.preview_text" path="/admin/message/preview/text/{messageId}" methods="get">
         <default key="_controller">Thelia:Admin\Message:previewAsText</default>
+        <requirement key="messageId">\d+</requirement>
+    </route>
+
+    <route id="admin.email.test_send" path="/admin/message/send/{messageId}" methods="post">
+        <default key="_controller">Thelia:Admin\Message:sendSampleByEmail</default>
         <requirement key="messageId">\d+</requirement>
     </route>
 

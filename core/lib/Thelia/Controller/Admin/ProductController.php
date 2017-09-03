@@ -329,7 +329,6 @@ class ProductController extends AbstractSeoCrudController
                 $this->appendValue($combinationPseData, "isdefault", $saleElement->getIsDefault() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "ean_code", $saleElement->getEanCode());
             }
-
         }
 
         $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, "form", $defaultPseData);

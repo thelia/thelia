@@ -469,6 +469,87 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
+     * @covers Thelia\Coupon\CouponManager::incrementQuantity
+     */
+    public function testIncrementeQuantity()
+    {
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $coupon = new RemoveXAmount($stubFacade);
+        $date = new \DateTime();
+        $coupon->set(
+            $stubFacade,
+            'XMAS',
+            '',
+            '',
+            '',
+            array('amount' => 21.00),
+            true,
+            true,
+            true,
+            true,
+            254,
+            $date->setTimestamp(strtotime("today + 3 months")),
+            new ObjectCollection(),
+            new ObjectCollection(),
+            false
+        );
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
+        $coupon->setConditions($conditions);
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array($coupon)));
+
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade));
+
+        $couponManager = new CouponManager($stubContainer);
+
+        $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubModel->expects($this->any())
+            ->method('getUsagesLeft')
+            ->will($this->returnValue(21));
+        $stubModel->expects($this->any())
+            ->method('setMaxUsage')
+            ->will($this->returnValue(true));
+
+        $actual = $couponManager->incrementQuantity($stubModel, null);
+        $expected = 22;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * @covers Thelia\Coupon\CouponManager::decrementQuantity
      */
     public function testDecrementeQuantityIllimited()
@@ -538,13 +619,100 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubModel->expects($this->any())
             ->method('getMaxUsage')
-            ->will($this->returnValue(-1));
+            ->willReturn(-1);
+        $stubModel->expects($this->any())
+            ->method('isUsageUnlimited')
+            ->willReturn(true);
         $stubModel->expects($this->any())
             ->method('setMaxUsage')
             ->will($this->returnValue(true));
 
         $actual = $couponManager->decrementQuantity($stubModel, null);
-        $expected = false;
+        $expected = true;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\CouponManager::incrementQuantity
+     */
+    public function testIncrementQuantityIllimited()
+    {
+        $stubFacade = $this->generateFacadeStub();
+        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+
+        $coupon = new RemoveXAmount($stubFacade);
+        $date = new \DateTime();
+        $coupon->set(
+            $stubFacade,
+            'XMAS',
+            '',
+            '',
+            '',
+            array('amount' => 21.00),
+            true,
+            true,
+            true,
+            true,
+            254,
+            $date->setTimestamp(strtotime("today + 3 months")),
+            new ObjectCollection(),
+            new ObjectCollection(),
+            false
+        );
+
+        $condition1 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::CART_TOTAL => 40.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmount($stubFacade);
+        $operators = array(
+            MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmount::CART_TOTAL => 400.00,
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions[] = $condition1;
+        $conditions[] = $condition2;
+        $coupon->setConditions($conditions);
+
+        $stubFacade->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(array($coupon)));
+
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->onConsecutiveCalls($stubFacade));
+
+        $couponManager = new CouponManager($stubContainer);
+
+        $stubModel = $this->getMockBuilder('\Thelia\Model\Coupon')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubModel->expects($this->any())
+            ->method('getMaxUsage')
+            -> willReturn(-1);
+        $stubModel->expects($this->any())
+            ->method('isUsageUnlimited')
+            ->willReturn(true);
+        $stubModel->expects($this->any())
+            ->method('setMaxUsage')
+            ->will($this->returnValue(true));
+
+        $actual = $couponManager->incrementQuantity($stubModel, null);
+        $expected = true;
 
         $this->assertEquals($expected, $actual);
     }

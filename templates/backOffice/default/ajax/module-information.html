@@ -103,25 +103,49 @@
             </tr>
         {/if}
 
-        <tr>
-            <th>{intl l="Author"}</th>
-            <td>
-                {if $moduleData.author.name}{$moduleData.author.name}{else}{intl l='Unspecified'}{/if}{if $moduleData.author.company}, {$moduleData.author.company}{/if}
-            </td>
-        </tr>
-
-        {if $moduleData.author.email}
+        {if $moduleData.authors.author}
             <tr>
-                <th>{intl l="E-mail"}</th>
-                <td>{mailto address=$moduleData.author.email encode='hex'}</td>
+                <th colspan="2">{intl l="Authors"}</th>
             </tr>
-        {/if}
-
-        {if $moduleData.author.website}
+            
+            {foreach $moduleData.authors.author as $author}
+                <tr>
+                    <th>
+                        <span class="glyphicon glyphicon-user"></span> {if $author.name}{$author.name}{else}{intl l='Unspecified'}{/if}{if $author.company}, {$author.company}{/if}
+                    </th>
+                    <td>
+                        {if $author.email}
+                            <i class="glyphicon glyphicon-envelope"></i> {mailto address=$author.email encode='hex'}
+                        {/if}
+                        &nbsp;&nbsp;&nbsp;
+                        {if $author.website}
+                            <i class="glyphicon glyphicon-globe"></i> <a href="{$author.website}">{$author.website}</a>
+                        {/if}
+                        
+                    </td>
+                </tr>
+            {/foreach}
+        {else}
             <tr>
-                <th>{intl l="Web site"}</th>
-                <td><a href="{$moduleData.author.website}">{$moduleData.author.website}</a></td>
+                <th>{intl l="Author"}</th>
+                <td>
+                    {if $moduleData.author.name}{$moduleData.author.name}{else}{intl l='Unspecified'}{/if}{if $moduleData.author.company}, {$moduleData.author.company}{/if}
+                </td>
             </tr>
+    
+            {if $moduleData.author.email}
+                <tr>
+                    <th>{intl l="E-mail"}</th>
+                    <td>{mailto address=$moduleData.author.email encode='hex'}</td>
+                </tr>
+            {/if}
+    
+            {if $moduleData.author.website}
+                <tr>
+                    <th>{intl l="Web site"}</th>
+                    <td><a href="{$moduleData.author.website}">{$moduleData.author.website}</a></td>
+                </tr>
+            {/if}
         {/if}
     </table>
 {/loop}

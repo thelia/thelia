@@ -24,11 +24,17 @@ use Thelia\Model\Map\OrderStatusTableMap;
  *
  * @method     ChildOrderStatusQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildOrderStatusQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildOrderStatusQuery orderByColor($order = Criteria::ASC) Order by the color column
+ * @method     ChildOrderStatusQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildOrderStatusQuery orderByProtectedStatus($order = Criteria::ASC) Order by the protected_status column
  * @method     ChildOrderStatusQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderStatusQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildOrderStatusQuery groupById() Group by the id column
  * @method     ChildOrderStatusQuery groupByCode() Group by the code column
+ * @method     ChildOrderStatusQuery groupByColor() Group by the color column
+ * @method     ChildOrderStatusQuery groupByPosition() Group by the position column
+ * @method     ChildOrderStatusQuery groupByProtectedStatus() Group by the protected_status column
  * @method     ChildOrderStatusQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderStatusQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -49,11 +55,17 @@ use Thelia\Model\Map\OrderStatusTableMap;
  *
  * @method     ChildOrderStatus findOneById(int $id) Return the first ChildOrderStatus filtered by the id column
  * @method     ChildOrderStatus findOneByCode(string $code) Return the first ChildOrderStatus filtered by the code column
+ * @method     ChildOrderStatus findOneByColor(string $color) Return the first ChildOrderStatus filtered by the color column
+ * @method     ChildOrderStatus findOneByPosition(int $position) Return the first ChildOrderStatus filtered by the position column
+ * @method     ChildOrderStatus findOneByProtectedStatus(boolean $protected_status) Return the first ChildOrderStatus filtered by the protected_status column
  * @method     ChildOrderStatus findOneByCreatedAt(string $created_at) Return the first ChildOrderStatus filtered by the created_at column
  * @method     ChildOrderStatus findOneByUpdatedAt(string $updated_at) Return the first ChildOrderStatus filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildOrderStatus objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildOrderStatus objects filtered by the code column
+ * @method     array findByColor(string $color) Return ChildOrderStatus objects filtered by the color column
+ * @method     array findByPosition(int $position) Return ChildOrderStatus objects filtered by the position column
+ * @method     array findByProtectedStatus(boolean $protected_status) Return ChildOrderStatus objects filtered by the protected_status column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderStatus objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderStatus objects filtered by the updated_at column
  *
@@ -144,7 +156,7 @@ abstract class OrderStatusQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `CREATED_AT`, `UPDATED_AT` FROM `order_status` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `COLOR`, `POSITION`, `PROTECTED_STATUS`, `CREATED_AT`, `UPDATED_AT` FROM `order_status` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -301,6 +313,103 @@ abstract class OrderStatusQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderStatusTableMap::CODE, $code, $comparison);
+    }
+
+    /**
+     * Filter the query on the color column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByColor('fooValue');   // WHERE color = 'fooValue'
+     * $query->filterByColor('%fooValue%'); // WHERE color LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $color The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderStatusQuery The current query, for fluid interface
+     */
+    public function filterByColor($color = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($color)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $color)) {
+                $color = str_replace('*', '%', $color);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderStatusTableMap::COLOR, $color, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderStatusQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(OrderStatusTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(OrderStatusTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderStatusTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
+     * Filter the query on the protected_status column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByProtectedStatus(true); // WHERE protected_status = true
+     * $query->filterByProtectedStatus('yes'); // WHERE protected_status = true
+     * </code>
+     *
+     * @param     boolean|string $protectedStatus The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderStatusQuery The current query, for fluid interface
+     */
+    public function filterByProtectedStatus($protectedStatus = null, $comparison = null)
+    {
+        if (is_string($protectedStatus)) {
+            $protected_status = in_array(strtolower($protectedStatus), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(OrderStatusTableMap::PROTECTED_STATUS, $protectedStatus, $comparison);
     }
 
     /**

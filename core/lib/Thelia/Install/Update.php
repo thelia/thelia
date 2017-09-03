@@ -599,7 +599,7 @@ class Update
 
         try {
             if (Version::parse($res)) {
-                return $res;
+                return trim($res);
             }
         } catch (\Exception $e) {
             return null;

@@ -3,7 +3,9 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
 use Thelia\Core\Event\TheliaEvents;
@@ -42,22 +44,40 @@ class Category extends BaseCategory implements FileModelParentInterface
      *
      * /!\ the number of queries is exponential, use it with caution
      *
+     * @param bool|string $productVisibility: true (default) to count only visible products, false to count only hidden
+     *                    products, or * to count all products.
      * @return int
      */
-    public function countAllProducts()
+    public function countAllProducts($productVisibility = true)
     {
         $children = CategoryQuery::findAllChild($this->getId());
         array_push($children, $this);
 
-        $countProduct = 0;
+        $query = ProductQuery::create();
 
-        foreach ($children as $child) {
-            $countProduct += ProductQuery::create()
-                ->filterByCategory($child)
-                ->count();
+        if ($productVisibility !== '*') {
+            $query->filterByVisible($productVisibility);
         }
 
-        return $countProduct;
+        $query
+            ->useProductCategoryQuery()
+                ->filterByCategory(new ObjectCollection($children), Criteria::IN)
+            ->endUse();
+
+        return $query->count();
+    }
+
+    /**
+     *
+     * count visible products only for current category and sub categories
+     *
+     * /!\ the number of queries is exponential, use it with caution
+     *
+     * @return int
+     */
+    public function countAllProductsVisibleOnly()
+    {
+        return $this->countAllProducts(true);
     }
 
     /**
@@ -82,6 +102,7 @@ class Category extends BaseCategory implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our parent
+     * @param CategoryQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
     {
@@ -96,10 +117,10 @@ class Category extends BaseCategory implements FileModelParentInterface
             ->find($con);
 
         if ($productsCategories) {
+            /** @var ProductCategory $productCategory */
             foreach ($productsCategories as $productCategory) {
-                $product = $productCategory->getProduct();
-                if ($product) {
-                    $product->delete($con);
+                if (null !== $product = $productCategory->getProduct()) {
+                    $this->dispatchEvent(TheliaEvents::PRODUCT_DELETE, new ProductDeleteEvent($product->getId()));
                 }
             }
         }

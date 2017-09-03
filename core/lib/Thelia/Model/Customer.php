@@ -14,6 +14,7 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -28,7 +29,7 @@ use Thelia\Core\Translation\Translator;
  */
 class Customer extends BaseCustomer implements UserInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
     /**
      * @param  int                                       $titleId          customer title id (from customer_title table)
@@ -119,6 +120,10 @@ class Customer extends BaseCustomer implements UserInterface
                     ;
 
                 $this->addAddress($address);
+                
+                if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
+                    $this->setConfirmationToken(bin2hex(random_bytes(32)));
+                }
             } else {
                 $address = $this->getDefaultAddress();
 
@@ -143,7 +148,7 @@ class Customer extends BaseCustomer implements UserInterface
 
             $con->commit();
         } catch (PropelException $e) {
-            $con->rollback();
+            $con->rollBack();
             throw $e;
         }
     }
@@ -282,7 +287,7 @@ class Customer extends BaseCustomer implements UserInterface
         return parent::setEmail($email);
     }
 
-   /**
+    /**
      * {@inheritDoc}
      */
     public function getUsername()

@@ -20,5 +20,4 @@ namespace Thelia\Core\Event\Country;
  */
 class CountryToggleVisibilityEvent extends CountryEvent
 {
-
 }

@@ -11,7 +11,7 @@
 {block name='no-return-functions' append}
     {if {$content_id}}
         {loop name="content.seo.title" type="content" id={$content_id} limit="1"}
-            {$page_title = {$META_TITLE}}
+            {$page_title = $META_TITLE}
         {/loop}
     {/if}
 {/block}

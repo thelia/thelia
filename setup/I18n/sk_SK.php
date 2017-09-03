@@ -501,7 +501,6 @@ return [
     'You have lost your password <br />\r\nYour new password is' => 'Stratili ste heslo <br />\r\n Vaše nové heslo je',
     'Your new passord is : {$password}' => 'Nové heslo je: {$password}',
     'Your subscription to %store newsletter' => 'Odoberanie noviniek %store',
-    'Your subscription to {config key="store_name"} newsletter' => 'Odber {kľúč config = "store_name"} noviniek',
     'Yuan' => 'Yuan',
     'Yucatán' => 'Yucatán',
     'Yukon' => 'Yukon',

@@ -1,3 +1,123 @@
+# 2.3.4
+
+**WARNING** : Minimum PHP version for Thelia 2.3.4 is now **PHP 5.5**. 
+Do not upgrade if you're server is currently using a lower PHP version
+
+- (related to #2422) Installation with PHP 7.1 is now working properly. The mcrypt dependency is now replaced by openssl
+- (related to #2413) Requesting the view of a not visible product, category, contents, folder or brand now causes an HTTP 404 error instead of displaying the view 
+- (related to #2416) Favicon, store logo and e-mail banner are now managed from the back-office -> Configuration -> Store
+- (related to #2420) The cheque instructions defined in the back-office were displayed only for en_US locales. This PR fixes this problem, the instructions are now displayed for every locale.
+- (related to #2391) When creating a customer from the back offcie, the state field is now present.
+- (related to #2384) Fix tinymce_lang guess helper
+- (related to #2377) Added missing translation in OrderPayment.php
+- (related to #2351) Changed ModelCriteriaTools to be less restrictive in checking column. The old code only checked if there was a translation available (a row present) and not the content of a column that could be NULL.
+- (related to #2335) Fix behavior of translate page in back office : "custom_fallback" and "global_fallback" were ignored when "view_missing_traductions_only" was on
+- (related to #2301) "view" authorization is now checked for Thelia feed list and last version number on the back-offcie home page
+- (related to #2286) Fix AbstractExport array rewind bug
+- (related to #2278) Fix i18n typo : Amñinistración => Administración
+- (related to #2275) Fixed select option rendereing in render_form_field.html
+- (related to #2273) Fixed number input in coupon percentage html5 fragment
+- (related to #2262) success_url is now cosidered when deleting a cart_item
+- (related to #2026) regexp significant characters are now escaped whe n processing URL parameters
+- (related to #1949) $CONTENT_COUNT in folder loop now returns the number of visible contents, and not the number of all (including not visible) contents.
+- (related to #1877) Update shipping-configuration-edit.html to escape markup in shipping zone name
+- (related to #1876) Update form.html to escape coupon code HtML
+- (related to #1875) Update coupon-update.html to escape coupon code HtML
+- (related to #1822) To prevent token errors when maniplating cart items, the cart token is no longer refreshed in the delete token code
+- (related to #1743) Back-Office template sale edit
+- (related to #1717) The stock of a virtual product is now checked
+- (related to #2414) In the cart, the first PSE image if nos displayed, if there is one. The product image is displayed otherwise. 
+- (related to #2408) Code style fixes and translations improvements
+- (related to #2408) <br> cound now be used in text email templates to force a line break
+- (related to #2272) Form fields error information are now saved in the global form error context, and remain available after a redirection.
+- (related to #2276) Product loop fix: addOutputFields() method may now to manipulate fields that were set in associateValues()
+- (related to #2293) performance improvement for calculating order total. This calculation uses now only one request instead of (1 + number of products).
+- (related to #2345) fix and improvement of counting sub categories and sub folders. The number of request is reduced, and the visibility status of products or contents is now considered. Category and subcategory products are now deleted by dispatching a TheliaEvents::PRODUCT_DELETE instead of calling Product::delete()
+- (related to #2349) New feature: It is now possible to send a test email message from the Preview tab of mailing template modification page
+- (related to #2380) Fix for wrong product reference on cart and order-invoice pages
+- (related to #2402) "Coupon" substitutions are now available in the templates
+- (related to #2400) Back-office HTML typo
+- (related to #2394) The customer state is now used to calculate cart taxes
+- (related to #2357) When the resize mode is "none", and required image is bigger than original image in both dimensions, the image is now zoomed if allow_zoom is true.
+- (related to #2403) Fix for wrong or missing types in ProductCloneEvent
+- (related to #2363) Improved products templates features. 1) When a product's template is modified, only the obsolete attribute combinations are deleted, this is much better than deleting all attribute combinations. 2) When an attribute is removed from a template, all related products are also updated, and obsolete attribute combinations are removed. 3) When a feature is removed from a template, the related products are updated, and the feature is removed from the product. 4) The template management page now displays the related products and categories, making finding which products or categories uses the template easier. 5) It is now possible to duplicate a product template. 6) Product and Category loops have now a template_id parameter, to filter results on one ore more template IDs. 
+- (related to #2369) PHP7 related fix: $return was declared as string, and used as array
+- (related to #2372) When an URL for a disabled language is invoked, the page in the disabled locale was displayed. The user is now redirected to the default language URL.
+- (related to #2396) Fix for domain-based language selection
+- (related to #2395) In RemoveXPercent coupon type, the discount is no longer rounded to 2 decimals.
+- (related to #2389) `Thelia export --list-archiver` will not return an error if one of the supported archiver extensions is not installed
+- (related to #2379) When creating a product, the default tax rule is used if none is defined in the ProductCreateEvent event. 
+- (related to #2378) When used in the back-office context (backend_context=1), the feature loop will return all features
+- (related to #2296) &lt;option&gt; label margin using CSS is not working in IE and Safari, making category tree selection hard to use. &amp;nbsp; is now used, via the `{option_offset l=n label='some label'}` Smarty custon function  
+- (related to #2375) Force an update of Cart model after deleting an item, so that the listeners will not notice the change
+- (related to #2374) Image position field is now available in Carousel module configuration
+- (related to #2365) en_US translation improvements
+- (related to #2364) On the contact page, the map is now fetched using https
+- (related to #2356) Parameter `product_count_visible_only` added to `category` loop
+- (related to #2283) Typo which prevents to save the custom-css.less file in TinyMCE module
+- (related to #2338) All exceptions are now logged in the Thelia log file
+- (related to #2348) fix customer delete in back-offcie search view
+- (related to #2339) Fix for #2337 to always get a correct LOOP_TOTAL 
+- (related to #2334) Fix "Class not found" in AbstractArchiver
+- (related to #2327) Add cart success_url, which is missing for mobile
+- (no related PR) Thelia version is now fetched using https insteade of http 
+- (related to #2326) Fix the "visible" argument of folder-path and category-path loops, which was not working after the first iteration. The code for the "depth" element was missing in these loops, and is now written.
+- (related to #2325) Cart discount is now updated after login
+- (related to #2323) Fix possible html break if the database contains a product that has multiple product sale element by default.
+- (related to #2277) Module information is now displaying properly module information of 2.2 module.xml files, and specially authors.
+- (related to #2309) Added missing hooks in back-office search results tables head and body
+- (related to #2320) Fix the sorting feature in categories and folders back-office views: some sorting criteria, such as visible or ID where not implemented in the loops.
+- (related to #2310) Fix for of array based loops extensions, to allow listeners to change array content.
+- (related to #2312) Added order ID to 'customer.orders-table-row' hook parameters
+- (related to #2313) The manual order is now working properly in the content loop.
+- (related to #2308) Use service in ContainerAwareCommand to get URL instance. It will prevent further calls to this service to override request context.
+- (related to #2291) Fix currency change to default where no currency in request. Change to default only if requested currency not exists.
+- (related to #2287) Fix for not working decimals=0 in {format_number} or {format_money} 
+- (related to #2306) fr_FR translation imrpovement
+- (related to #2303) en_US translation imrpovement
+- (related to #2300) Back-office HTML typo
+- (related to #2299) Back-office HTML tag typo for displaying current lang flag
+- (related to #2295) Fix method initRequest on the ContainerAwareCommand
+- (related to #2281) Fixed PECL extentions install script in docker setup
+- (related to #2271) Invisible (off-line) categories are now available in coupon conditions and types
+- (related to #2264) Check if php extension "dom" is installed (issue #2263)
+- (related to #2265) Fix #2225 wrong version displayed in db update script (issue #2225) 
+- (related to #2266) Bad parsing of web version in DB update script (issue #2226)
+- (related to #2259) Fixed "cart contains products" & "cart contains categories" coupon conditions
+- (related to #2261) The manual order is now working properly in the product loop.
+- (related to #2257) Fix for wrong order coupon amount  
+- (related to #2256) Check if a RemoveXAmount type coupon is valid for special offers 
+- (related to #2255) Moved php shebang in the right file
+- (related to #2254) add parameter "module_code" to "modules.table-row" hook
+- (related to #2238) New method BasePaymentModuleController::saveTransactionRef() to save order transaction reference
+- (related to #2232) Moved to container-based infrastructure for Travis CI
+- (related to #2235) Add `DISCOUNT_AMOUNT` variable to `order_coupon` loop
+- (related to #2227) Fix for two problems with CART_FINDITEM event processing: 1) The CartEvent dispatched with CART_FINDITEM was the one received by Thelia\Action\Cart::addItem(), thus stopping event propagation will stop the whole cart add process. 2) Thelia\Action\Cart::findCartItem() was not aware of a cart item set in the event by event listeners with a higher priority, thus this cart item is always overwritten.
+- (related to #2221) Completed default email template FR and EN translations
+- (related to #2224) Added simple messages (no Message object required) processing to the MailerFactory, throug the sendSimpleEmailMessage() and createSimpleEmailMessage() methods. A new getMessageInstance() method has been added, to prevent direct usage of \Swift_Message::newInstance()
+- (related to #2217) New feature: Protected and hidden modules
+- (related to #2197) Pagination of coupon list
+- (related to #2198) Cancel coupon usage on order cancel
+- (related to #2190) Admin Home page statistics improvements
+- (related to #2189) Performance improvement in feature-availability loop
+- (related to #2188) A more effective way to solve issue free text feature problem (see #2061)
+- (related to #2174) New PSR-6 implementation + thelia.cache service and smarty cache block
+- (related to #2167) Add global variable `app` to Smarty to be consistent with Twig
+- (related to #2165) Add replyTo parameter in mailer factory
+- (related to #2081) Order Status improvements
+- (related to #2164) New confirmation email option after customer creation 
+- (related to #2153) Lighten placeholders color to be more different than filled inputs
+- (related to #2149) Fixed status_id parameter access
+- (related to #2148) Added search by EAN code to product sale elements loop
+- (related to #2146) Fix search in i18n fields when backend_context=1, and search improvements. The loop search system is imporved, by providing the StandardI18nFieldsSearchTrait, which manages searches in the standard internationalized fields (title, chapo, description and postscriptum). In the back-office, customer search is now in sentence (%term%) mode, to allow incomplete word matches, such as part of an email address.
+- (related to #2140) Added missing "calendar" PHP extension to docker config
+- (related to #2107) Add create function for AlphaNumStringType argument
+- (related to #2082) Product and PSE references added to invoice template
+- (related to #2093) Fix #1662 add of hooks in pdf email and account-order
+- (related to #2106) Added order-invoice form hooks
+- (related to #2109) Module routers priority improvement
+- (related to #1912) Fix for feature loop with product filter
+
 # 2.3.3
 
 - (related to #2249) Fix identical queries in the productSaleElement loop and the Product loop

@@ -27,6 +27,7 @@ use Thelia\Model\MessageQuery;
  * Class MailerFactory
  * @package Thelia\Mailer
  * @author Manuel Raynaud <manu@raynaud.io>
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
 class MailerFactory
 {
@@ -85,14 +86,32 @@ class MailerFactory
         return $smtpTransporter;
     }
 
+    /**
+     * @param \Swift_Mime_Message $message
+     * @param null $failedRecipients
+     * @return int number of recipients who were accepted for delivery.
+     */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
         return $this->swiftMailer->send($message, $failedRecipients);
     }
 
+    /**
+     * @return \Swift_Mailer
+     */
     public function getSwiftMailer()
     {
         return $this->swiftMailer;
+    }
+
+    /**
+     * Return a new message instance
+     *
+     * @return \Swift_Message
+     */
+    public function getMessageInstance()
+    {
+        return \Swift_Message::newInstance();
     }
 
     /**
@@ -121,8 +140,9 @@ class MailerFactory
      *
      * @param string $messageCode
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailToShopManagers($messageCode, $messageParameters = [])
+    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = [])
     {
         $storeName = ConfigQuery::getStoreName();
 
@@ -139,7 +159,11 @@ class MailerFactory
             $messageCode,
             [ConfigQuery::getStoreEmail() => $storeName],
             $to,
-            $messageParameters
+            $messageParameters,
+            null,
+            [],
+            [],
+            $replyTo
         );
     }
 
@@ -153,14 +177,15 @@ class MailerFactory
      * @param string $locale            If null, the default store locale is used.
      * @param array  $cc                Cc addresses. An array of (email-address => name) [optional]
      * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
+    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
     {
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
             if (! empty($to)) {
-                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc);
+                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 
                 $sentCount = $this->send($instance, $failedRecipients);
 
@@ -190,16 +215,17 @@ class MailerFactory
      * Create a SwiftMessage instance from a given message code.
      *
      * @param  string $messageCode
-     * @param  array  $from              From addresses. An array of (name => email-address)
-     * @param  array  $to                To addresses. An array of (name => email-address)
+     * @param  array  $from              From addresses. An array of (email-address => name)
+     * @param  array  $to                To addresses. An array of (email-address => name)
      * @param  array  $messageParameters an array of (name => value) parameters that will be available in the message.
      * @param  string $locale            If null, the default store locale is used.
      * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
      * @param  array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param  array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      *
      * @return \Swift_Message the generated and built message.
      */
-    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [])
+    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
     {
         if (null !== $message = MessageQuery::getFromName($messageCode)) {
             if ($locale === null) {
@@ -215,28 +241,10 @@ class MailerFactory
 
             $this->parser->assign('locale', $locale);
 
-            $instance = \Swift_Message::newInstance();
+            $instance = $this->getMessageInstance();
 
-            // Add from addresses
-            foreach ($from as $address => $name) {
-                $instance->addFrom($address, $name);
-            }
+            $this->setupMessageHeaders($instance, $from, $to, $cc, $bcc, $replyTo);
 
-            // Add to addresses
-            foreach ($to as $address => $name) {
-                $instance->addTo($address, $name);
-            }
-
-            // Add cc addresses
-            foreach ($cc as $address => $name) {
-                $instance->addCc($address, $name);
-            }
-            
-            // Add bcc addresses
-            foreach ($bcc as $address => $name) {
-                $instance->addBcc($address, $name);
-            }
-            
             $message->buildMessage($this->parser, $instance);
 
             return $instance;
@@ -248,5 +256,99 @@ class MailerFactory
                 [ '%code%' => $messageCode ]
             )
         );
+    }
+
+    /**
+     * Create a SwiftMessage instance from text
+     *
+     * @param  array  $from              From addresses. An array of (email-address => name)
+     * @param  array  $to                To addresses. An array of (email-address => name)
+     * @param  string $subject           the message subject
+     * @param  string $htmlBody          the HTML message body, or null
+     * @param  string $textBody          the text message body, or null
+     * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param  array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param  array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     *
+     * @return \Swift_Message the generated and built message.
+     */
+    public function createSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = [])
+    {
+        $instance = $this->getMessageInstance();
+
+        $this->setupMessageHeaders($instance, $from, $to, $cc, $bcc, $replyTo);
+
+        $instance->setSubject($subject);
+
+        // If we do not have an HTML message
+        if (empty($htmlBody)) {
+            // Message body is the text message
+            $instance->setBody($textBody, 'text/plain');
+        } else {
+            // The main body is the HTML messahe
+            $instance->setBody($htmlBody, 'text/html');
+
+            // Use the text as a message part, if we have one.
+            if (! empty($textBody)) {
+                $instance->addPart($textBody, 'text/plain');
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param  array  $from              From addresses. An array of (email-address => name)
+     * @param  array  $to                To addresses. An array of (email-address => name)
+     * @param  string $subject           the message subject
+     * @param  string $htmlBody          the HTML message body, or null
+     * @param  string $textBody          the text message body, or null
+     * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param  array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param  array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     * @param  null   $failedRecipients  The failed recipients list
+     * @return int    number of recipients who were accepted for delivery
+     */
+    public function sendSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = [], &$failedRecipients = null)
+    {
+        $instance = $this->createSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc, $bcc, $replyTo);
+
+        return $this->send($instance, $failedRecipients);
+    }
+
+    /**
+     * @param \Swift_Message $instance
+     * @param  array  $from              From addresses. An array of (email-address => name)
+     * @param  array  $to                To addresses. An array of (email-address => name)
+     * @param  array  $cc                Cc addresses. An array of (email-address => name) [optional]
+     * @param  array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
+     * @param  array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
+     */
+    protected function setupMessageHeaders($instance, $from, $to, $cc = [], $bcc = [], $replyTo = [])
+    {
+        // Add from addresses
+        foreach ($from as $address => $name) {
+            $instance->addFrom($address, $name);
+        }
+
+        // Add to addresses
+        foreach ($to as $address => $name) {
+            $instance->addTo($address, $name);
+        }
+
+        // Add cc addresses
+        foreach ($cc as $address => $name) {
+            $instance->addCc($address, $name);
+        }
+
+        // Add bcc addresses
+        foreach ($bcc as $address => $name) {
+            $instance->addBcc($address, $name);
+        }
+
+        // Add reply to addresses
+        foreach ($replyTo as $address => $name) {
+            $instance->addReplyTo($address, $name);
+        }
     }
 }

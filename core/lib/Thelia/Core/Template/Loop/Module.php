@@ -47,6 +47,8 @@ use Thelia\Type\TypeCollection;
  * @method int[] getExclude()
  * @method bool|string getActive()
  * @method string[] getOrder()
+ * @method bool|string getMandatory()
+ * @method bool|string getHidden()
  */
 class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -87,24 +89,26 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 'order',
                 new TypeCollection(
                     new Type\EnumListType([
-                            'id',
-                            'id_reverse',
-                            'code',
-                            'code_reverse',
-                            'title',
-                            'title_reverse',
-                            'type',
-                            'type_reverse',
-                            'manual',
-                            'manual_reverse',
-                            'enabled',
-                            'enabled_reverse'
+                        'id',
+                        'id_reverse',
+                        'code',
+                        'code_reverse',
+                        'title',
+                        'title_reverse',
+                        'type',
+                        'type_reverse',
+                        'manual',
+                        'manual_reverse',
+                        'enabled',
+                        'enabled_reverse'
                     ])
                 ),
                 'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('active', Type\BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('hidden', Type\BooleanOrBothType::ANY),
+            Argument::createBooleanOrBothTypeArgument('mandatory', Type\BooleanOrBothType::ANY)
         );
     }
 
@@ -167,6 +171,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($active !== Type\BooleanOrBothType::ANY) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
+        }
+
+        $hidden = $this->getHidden();
+
+        if ($hidden !== Type\BooleanOrBothType::ANY) {
+            $search->filterByHidden($hidden ? 1 : 0, Criteria::EQUAL);
+        }
+
+        $mandatory = $this->getMandatory();
+
+        if ($mandatory !== Type\BooleanOrBothType::ANY) {
+            $search->filterByMandatory($mandatory ? 1 : 0, Criteria::EQUAL);
         }
 
         $orders = $this->getOrder();
@@ -245,6 +261,8 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("VERSION", $module->getVersion())
                     ->set("CLASS", $module->getFullNamespace())
                     ->set("POSITION", $module->getPosition())
+                    ->set("MANDATORY", $module->getMandatory())
+                    ->set("HIDDEN", $module->getHidden())
                     ->set("EXISTS", $exists);
 
                 $hasConfigurationInterface = false;

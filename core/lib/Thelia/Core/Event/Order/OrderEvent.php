@@ -61,6 +61,9 @@ class OrderEvent extends ActionEvent
     /** @var null|int */
     protected $cartItemId = null;
 
+    /** @var null|string  */
+    protected $transactionRef = null;
+
     /**
      * @var Response
      */
@@ -350,6 +353,26 @@ class OrderEvent extends ActionEvent
     {
         $this->postageTaxRuleTitle = $postageTaxRuleTitle;
 
+        return $this;
+    }
+
+    /**
+     * @since 2.4.0
+     * @return null|string
+     */
+    public function getTransactionRef()
+    {
+        return $this->transactionRef;
+    }
+
+    /**
+     * @since 2.4.0
+     * @param null|string $transactionRef
+     * @return $this
+     */
+    public function setTransactionRef($transactionRef)
+    {
+        $this->transactionRef = $transactionRef;
         return $this;
     }
 }

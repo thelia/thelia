@@ -157,6 +157,13 @@ abstract class OrderCoupon implements ActiveRecordInterface
     protected $per_customer_usage_count;
 
     /**
+     * The value for the usage_canceled field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $usage_canceled;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -236,6 +243,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->amount = '0.000000';
+        $this->usage_canceled = false;
     }
 
     /**
@@ -682,6 +690,17 @@ abstract class OrderCoupon implements ActiveRecordInterface
     }
 
     /**
+     * Get the [usage_canceled] column value.
+     *
+     * @return   boolean
+     */
+    public function getUsageCanceled()
+    {
+
+        return $this->usage_canceled;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -1073,6 +1092,35 @@ abstract class OrderCoupon implements ActiveRecordInterface
     } // setPerCustomerUsageCount()
 
     /**
+     * Sets the value of the [usage_canceled] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
+     */
+    public function setUsageCanceled($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->usage_canceled !== $v) {
+            $this->usage_canceled = $v;
+            $this->modifiedColumns[OrderCouponTableMap::USAGE_CANCELED] = true;
+        }
+
+
+        return $this;
+    } // setUsageCanceled()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -1125,6 +1173,10 @@ abstract class OrderCoupon implements ActiveRecordInterface
     public function hasOnlyDefaultValues()
     {
             if ($this->amount !== '0.000000') {
+                return false;
+            }
+
+            if ($this->usage_canceled !== false) {
                 return false;
             }
 
@@ -1206,13 +1258,16 @@ abstract class OrderCoupon implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderCouponTableMap::translateFieldName('PerCustomerUsageCount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->per_customer_usage_count = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderCouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderCouponTableMap::translateFieldName('UsageCanceled', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->usage_canceled = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderCouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderCouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderCouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1225,7 +1280,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 17; // 17 = OrderCouponTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 18; // 18 = OrderCouponTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderCoupon object", 0, $e);
@@ -1600,6 +1655,9 @@ abstract class OrderCoupon implements ActiveRecordInterface
         if ($this->isColumnModified(OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT)) {
             $modifiedColumns[':p' . $index++]  = '`PER_CUSTOMER_USAGE_COUNT`';
         }
+        if ($this->isColumnModified(OrderCouponTableMap::USAGE_CANCELED)) {
+            $modifiedColumns[':p' . $index++]  = '`USAGE_CANCELED`';
+        }
         if ($this->isColumnModified(OrderCouponTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1661,6 +1719,9 @@ abstract class OrderCoupon implements ActiveRecordInterface
                         break;
                     case '`PER_CUSTOMER_USAGE_COUNT`':
                         $stmt->bindValue($identifier, (int) $this->per_customer_usage_count, PDO::PARAM_INT);
+                        break;
+                    case '`USAGE_CANCELED`':
+                        $stmt->bindValue($identifier, (int) $this->usage_canceled, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1776,9 +1837,12 @@ abstract class OrderCoupon implements ActiveRecordInterface
                 return $this->getPerCustomerUsageCount();
                 break;
             case 15:
-                return $this->getCreatedAt();
+                return $this->getUsageCanceled();
                 break;
             case 16:
+                return $this->getCreatedAt();
+                break;
+            case 17:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1825,8 +1889,9 @@ abstract class OrderCoupon implements ActiveRecordInterface
             $keys[12] => $this->getIsAvailableOnSpecialOffers(),
             $keys[13] => $this->getSerializedConditions(),
             $keys[14] => $this->getPerCustomerUsageCount(),
-            $keys[15] => $this->getCreatedAt(),
-            $keys[16] => $this->getUpdatedAt(),
+            $keys[15] => $this->getUsageCanceled(),
+            $keys[16] => $this->getCreatedAt(),
+            $keys[17] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1923,9 +1988,12 @@ abstract class OrderCoupon implements ActiveRecordInterface
                 $this->setPerCustomerUsageCount($value);
                 break;
             case 15:
-                $this->setCreatedAt($value);
+                $this->setUsageCanceled($value);
                 break;
             case 16:
+                $this->setCreatedAt($value);
+                break;
+            case 17:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1967,8 +2035,9 @@ abstract class OrderCoupon implements ActiveRecordInterface
         if (array_key_exists($keys[12], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setSerializedConditions($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setPerCustomerUsageCount($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setUpdatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[15], $arr)) $this->setUsageCanceled($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
     }
 
     /**
@@ -1995,6 +2064,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
         if ($this->isColumnModified(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) $criteria->add(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, $this->is_available_on_special_offers);
         if ($this->isColumnModified(OrderCouponTableMap::SERIALIZED_CONDITIONS)) $criteria->add(OrderCouponTableMap::SERIALIZED_CONDITIONS, $this->serialized_conditions);
         if ($this->isColumnModified(OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT)) $criteria->add(OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT, $this->per_customer_usage_count);
+        if ($this->isColumnModified(OrderCouponTableMap::USAGE_CANCELED)) $criteria->add(OrderCouponTableMap::USAGE_CANCELED, $this->usage_canceled);
         if ($this->isColumnModified(OrderCouponTableMap::CREATED_AT)) $criteria->add(OrderCouponTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderCouponTableMap::UPDATED_AT)) $criteria->add(OrderCouponTableMap::UPDATED_AT, $this->updated_at);
 
@@ -2074,6 +2144,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
         $copyObj->setIsAvailableOnSpecialOffers($this->getIsAvailableOnSpecialOffers());
         $copyObj->setSerializedConditions($this->getSerializedConditions());
         $copyObj->setPerCustomerUsageCount($this->getPerCustomerUsageCount());
+        $copyObj->setUsageCanceled($this->getUsageCanceled());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -3072,6 +3143,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
         $this->is_available_on_special_offers = null;
         $this->serialized_conditions = null;
         $this->per_customer_usage_count = null;
+        $this->usage_canceled = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

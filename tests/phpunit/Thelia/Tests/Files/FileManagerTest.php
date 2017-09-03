@@ -176,6 +176,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
 
         $file = $this->fileManager->copyUploadedFile($model, $uploadedFile);
 
+        // Normalize path
+        $file = str_replace('/', DS, $file);
+
         $this->assertEquals("".$file, $targetFile);
 
         $this->assertEquals(basename($targetFile), $model->getFile());
@@ -212,6 +215,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $file = $this->fileManager->copyUploadedFile($model, $uploadedFile);
+
+        // Normalize path
+        $file = str_replace('/', DS, $file);
 
         $this->assertEquals("".$file, $targetFile);
 

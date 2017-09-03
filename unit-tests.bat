@@ -13,7 +13,7 @@ php Thelia module:refresh
 echo [INFO] Activating Hook Test Module
 php Thelia module:activate HookTest
 
-call phpunit %*
+call bin\phpunit %*
 
 echo [INFO] Desactivating Hook Test Module
 php Thelia module:deactivate HookTest

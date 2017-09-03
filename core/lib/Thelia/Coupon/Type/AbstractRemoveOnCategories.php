@@ -15,6 +15,7 @@ namespace Thelia\Coupon\Type;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
+use Thelia\Model\Category;
 
 /**
  * Allow to remove an amount from the checkout total
@@ -31,7 +32,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
     /**
      * Set the value of specific coupon fields.
      *
-     * @param Array $effects the Coupon effects params
+     * @param array $effects the Coupon effects params
      */
     abstract public function setFieldsValue($effects);
 

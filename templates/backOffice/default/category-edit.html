@@ -125,7 +125,7 @@
                                                               {/loop}
                                                               {$myparent=$PARENT}
                                                               {loop name="cat-parent" type="category-tree" visible="*" category="0" exclude={','|implode:$excludeCategories}}
-                                                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                                                                   <option value="{$ID}" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{option_offset l=$LEVEL+1 label=$TITLE}</option>
                                                               {/loop}
                                                         </select>
                                                     {/custom_render_form_field}
@@ -193,7 +193,7 @@
                                                             <select name="folder_id" id="folder_id" class="form-control">
                                                                 <option value="">{intl l='Select a folder...'}</option>
                                                                 {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
-                                                                    <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
+                                                                    <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
                                                                 {/loop}
                                                             </select>
                                                         </div>

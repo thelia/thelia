@@ -19,6 +19,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
+use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
@@ -76,11 +77,14 @@ use Thelia\Type\TypeCollection;
  * @method int[] getFeatureAvailability()
  * @method string[] getFeatureValues()
  * @method string[] getAttributeNonStrictMatch()
+ * @method int[] getTemplateId()
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
     protected $timestampable = true;
     protected $versionable = true;
+
+    use StandardI18nFieldsSearchTrait;
 
     /**
      * @return ArgumentCollection
@@ -112,6 +116,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntTypeArgument('currency'),
             Argument::createAnyTypeArgument('title'),
+            Argument::createIntListTypeArgument('template_id'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -125,6 +130,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'updated', 'updated_reverse',
                             'ref', 'ref_reverse',
                             'visible', 'visible_reverse',
+                            'position', 'position_reverse',
                             'promo',
                             'new',
                             'random',
@@ -173,10 +179,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function getSearchIn()
     {
-        return [
-            "ref",
-            "title",
-        ];
+        return array_merge(
+            [ 'ref' ],
+            $this->getStandardI18nSearchFields()
+        );
     }
 
     /**
@@ -188,6 +194,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
+
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
                 $search->_or();
@@ -196,18 +203,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 case "ref":
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
-                case "title":
-                    $search->where(
-                        "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
-                        THEN `requested_locale_i18n`.`TITLE`
-                        ELSE `default_locale_i18n`.`TITLE`
-                        END ".$searchCriteria." ?",
-                        $searchTerm,
-                        \PDO::PARAM_STR
-                    );
-                    break;
             }
         }
+
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -282,9 +281,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("IS_NEW", $product->getVirtualColumn('is_new'))
                 ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
                 ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'));
+
+            $this->associateValues($loopResultRow, $product, $defaultCategoryId);
+
             $this->addOutputFields($loopResultRow, $product);
 
-            $loopResult->addRow($this->associateValues($loopResultRow, $product, $defaultCategoryId));
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
@@ -325,7 +327,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
 
-            $loopResult->addRow($this->associateValues($loopResultRow, $product, $defaultCategoryId));
+            $this->associateValues($loopResultRow, $product, $defaultCategoryId);
+
+            $this->addOutputFields($loopResultRow, $product);
+
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
@@ -575,7 +581,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
+        }
+
+        $templateIdList = $this->getTemplateId();
+
+        if (!is_null($templateIdList)) {
+            $search->filterByTemplateId($templateIdList, Criteria::IN);
         }
 
         $manualOrderAllowed = false;
@@ -613,7 +625,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN \'' . PHP_INT_MAX . '\' ELSE `CategorySelect`.POSITION END',
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN ' . PHP_INT_MAX . ' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
             'position_delegate'
         );
         $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
@@ -1087,6 +1099,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case "updated_reverse":
                     $search->addDescendingOrderByColumn('updated_at');
+                    break;
+                case "position":
+                    $search->addAscendingOrderByColumn('position_delegate');
+                    break;
+                case "position_reverse":
+                    $search->addDescendingOrderByColumn('position_delegate');
                     break;
                 case "given_id":
                     if (null === $id) {

@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array(
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les utilisateurs d\'administration',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Délai d\'expiration du cookie "Remember me", en secondes, pour les clients',
     '"Remember me" cookie name for administration users' => 'Nom du cookie "Remember me" pour les utilisateurs d\'administration',
@@ -76,6 +76,7 @@ return [
     'Arkansas' => 'Arkansas',
     'Armenia' => 'Arménie',
     'Ascoli Piceno' => 'Ascoli Piceno',
+    'Ask the customers to confirm their email in customer creation form, 1 for yes, 0 for no' => 'Demander aux clients de confirmer leur adresse email dans le formulaire de création de compte (1: oui, 0: non)',
     'Ask the customers to confirm their email, 1 for yes, 0 for no' => 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non',
     'Asti' => 'Asti',
     'Attribut - Edit JavaScript' => 'Attribut - JavaScript modification',
@@ -98,6 +99,7 @@ return [
     'Austria' => 'Autriche',
     'Avellino' => 'Avellino',
     'Azerbaijan' => 'Azerbaïdjan',
+    'Back-office Home page content' => 'Contenu de la page d\'accueil de l\'administration',
     'Back-office export management' => 'gestion des exports',
     'Back-office home page' => 'Page d\'acceuil de l\'administration',
     'Back-office search function' => 'Fonction de recherche dans l\'administration',
@@ -283,6 +285,7 @@ return [
     'Configuration / Tax' => 'Configuration / Taxe',
     'Configuration / Template' => 'Configuration / Modèle',
     'Configuration variables' => 'Variables de configuration',
+    'Confirm your %store account' => 'Confirmez la création de votre compte {config key="store_name"}',
     'Congo' => 'Congo',
     'Connecticut' => 'Connecticut',
     'Contact block' => 'Bloc contact',
@@ -379,6 +382,7 @@ return [
     'Customer - order table row' => 'Client - ligne tableau commande',
     'Customer account - additional information' => 'Compte client - informations additionnelles',
     'Customer account block' => 'Bloc compte client',
+    'Customer account creation should be confirmed by email (1: yes, 0: no)' => 'La création d\'un compte client doit être confilrée par email (1: oui, 0: non)',
     'Customer title' => 'civilité client',
     'Customers - JavaScript' => 'Clients - JavaScript',
     'Customers - caption' => 'Clients - légende',
@@ -395,6 +399,7 @@ return [
     'Data import / export' => 'Importation / exportation de données',
     'Default available stock when check-available-stock is set to 0.' => 'Stock disponible par défaut quand check-available-stock est à 0.',
     'Default lang without translation' => 'Langue par défaut sans traduction',
+    'Default number of coupons per page on coupon list' => 'Nombre de coupons par page dans la liste des coupons',
     'Delaware' => 'Delaware',
     'Delivery - After delivery module' => 'Commande - après le module de livraison',
     'Delivery - CSS' => 'Bon de livraison - CSS',
@@ -774,6 +779,7 @@ return [
     'Madagascar' => 'Madagascar',
     'Mail sent after a subscription to newsletter' => 'Email envoyé après l\'inscription à la newsletter',
     'Mail sent to an administrator who requested a new password' => 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe',
+    'Mail sent to the customer to confirm its account' => 'E-mail de confirmation de création de compte client',
     'Mail sent to the customer when its account is created by an administrator in the back-office' => 'Mail envoyé au client lorsque son compte est créé depuis le back-office par un administrateur',
     'Mail sent to the customer when its password or email is changed in the back-office' => 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office',
     'Mailing system - JavaScript' => 'Envoi des e-mails - JavaScript',
@@ -889,7 +895,7 @@ return [
     'New York' => 'New York',
     'New Zealand' => 'Nouvelle-Zélande',
     'New order {$order_ref} placed on {config key="store_name"}' => 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}',
-    'New password request on {config key="store_name"}' => 'Nouvelle demande de mot de passe sur {config key="store_name"}',
+    'New password request on %store' => 'Votre demande de mot de passe {config key="store_name"}',
     'Newfoundland and Labrador' => 'Terre Neuve et Labrador',
     'Newsletter block' => 'Bloc newsletter',
     'Newsletter page - CSS stylesheet' => 'Page newsletter - feuille de style CSS',
@@ -1403,8 +1409,7 @@ return [
     'Your new password' => 'Votre nouveau mot de passe',
     'Your new password for {config key="store_name"}' => 'Votre nouveau mot de passe {config key="store_name"}',
     'Your order {$order_ref} at {config key="store_name"}' => 'Votre commande {$order_ref} chez {config key="store_name"}',
-    'Your subscription to %store newsletter' => 'Vous avez souscrit à la newsletter du site %store',
-    'Your subscription to {config key="store_name"} newsletter' => 'Votre abonnement à {config key="store_name"} newsletter',
+    'Your subscription to %store newsletter' => 'Votre abonnement à {config key="store_name"} newsletter',
     'Yuan' => 'Yuan',
     'Yucatán' => 'Yucatán',
     'Yukon' => 'Yukon',
@@ -1447,4 +1452,4 @@ return [
     'tinymce wysiwyg editor' => 'Editeur TinyMCE',
     'Đồng' => 'Đồng',
     'Гривна' => 'Hryvnia Ukrainien',
-];
+);

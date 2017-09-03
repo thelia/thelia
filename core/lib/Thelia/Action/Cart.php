@@ -22,6 +22,7 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -100,9 +101,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $productId = $event->getProduct();
 
         // Search for an identical item in the cart
-        $dispatcher->dispatch(TheliaEvents::CART_FINDITEM, $event);
+        $findItemEvent = clone $event;
 
-        $cartItem = $event->getCartItem();
+        $dispatcher->dispatch(TheliaEvents::CART_FINDITEM, $findItemEvent);
+
+        $cartItem = $findItemEvent->getCartItem();
 
         if ($cartItem === null || $newness) {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
@@ -111,6 +114,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 $productPrices = $productSaleElements->getPricesByCurrency($currency, $discount);
 
                 $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
+            } else {
+                // We did no find any PSE... Something is wrong with the DB, just throw an exception.
+                throw new TheliaProcessException("This item cannot be added to the cart: no matching product sale element was found.");
             }
         } elseif ($append && $cartItem !== null) {
             $cartItem->addQuantity($quantity)->save();
@@ -133,6 +139,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->filterByCartId($cart->getId())
                 ->filterById($cartItemId)
                 ->delete();
+
+            // Force an update of the Cart object to provide
+            // to other listeners an updated CartItem collection.
+            $cart->clearCartItems();
         }
     }
 
@@ -301,7 +311,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function findCartItem(CartEvent $event)
     {
-        if (null !== $foundItem = CartItemQuery::create()
+        // Do not try to find a cartItem if one exists in the event, as previous event handlers
+        // mays have put it in th event.
+        if (null === $event->getCartItem() && null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProduct())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())

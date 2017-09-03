@@ -331,7 +331,7 @@
                                                 <td>
                                                     <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
                                                 </td>
-                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id }
+                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id order_id=$ID}
                                             </tr>
                                         {/loop}
 
@@ -354,7 +354,7 @@
                                                 page_param_name = "order_page"
                                                 loop_ref       = "order-list"
                                                 max_page_count = 10
-                                                page_url       = "{url path="/admin/customer/update" customer_id=$customer_id page=$page}"
+                                                page_url       = {url path="/admin/customer/update" customer_id=$customer_id page=$page}
                                                 page_param_name = "page_order"
                                                 }
                                             </td>

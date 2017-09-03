@@ -22,6 +22,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Module;
@@ -48,35 +49,35 @@ class MessageController extends AbstractCrudController
             null  // No position update
         );
     }
-
+    
     protected function getCreationForm()
     {
         return $this->createForm(AdminForm::MESSAGE_CREATION);
     }
-
+    
     protected function getUpdateForm()
     {
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION);
     }
-
+    
     protected function getCreationEvent($formData)
     {
         $createEvent = new MessageCreateEvent();
-
+        
         $createEvent
             ->setMessageName($formData['name'])
             ->setLocale($formData["locale"])
             ->setTitle($formData['title'])
             ->setSecured($formData['secured'] ? true : false)
-            ;
-
+        ;
+        
         return $createEvent;
     }
-
+    
     protected function getUpdateEvent($formData)
     {
         $changeEvent = new MessageUpdateEvent($formData['id']);
-
+        
         // Create and dispatch the change event
         $changeEvent
             ->setMessageName($formData['name'])
@@ -91,20 +92,20 @@ class MessageController extends AbstractCrudController
             ->setHtmlMessage($formData['html_message'])
             ->setTextMessage($formData['text_message'])
         ;
-
+        
         return $changeEvent;
     }
-
+    
     protected function getDeleteEvent()
     {
         return new MessageDeleteEvent($this->getRequest()->get('message_id'));
     }
-
+    
     protected function eventContainsObject($event)
     {
         return $event->hasMessage();
     }
-
+    
     protected function hydrateObjectForm($object)
     {
         // Prepare the data that will hydrate the form
@@ -117,34 +118,34 @@ class MessageController extends AbstractCrudController
             'subject'       => $object->getSubject(),
             'html_message'  => $object->getHtmlMessage(),
             'text_message'  => $object->getTextMessage(),
-
+            
             'html_layout_file_name'   => $object->getHtmlLayoutFileName(),
             'html_template_file_name' => $object->getHtmlTemplateFileName(),
             'text_layout_file_name'   => $object->getTextLayoutFileName(),
             'text_template_file_name' => $object->getTextTemplateFileName(),
         );
-
+        
         // Setup the object form
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION, "form", $data);
     }
-
+    
     protected function getObjectFromEvent($event)
     {
         return $event->hasMessage() ? $event->getMessage() : null;
     }
-
+    
     protected function getExistingObject()
     {
         $message = MessageQuery::create()
-        ->findOneById($this->getRequest()->get('message_id', 0));
-
+            ->findOneById($this->getRequest()->get('message_id', 0));
+        
         if (null !== $message) {
             $message->setLocale($this->getCurrentEditionLocale());
         }
-
+        
         return $message;
     }
-
+    
     /**
      * @param Message $object
      * @return string
@@ -153,7 +154,7 @@ class MessageController extends AbstractCrudController
     {
         return $object->getName();
     }
-
+    
     /**
      * @param Message $object
      * @return int
@@ -162,30 +163,30 @@ class MessageController extends AbstractCrudController
     {
         return $object->getId();
     }
-
+    
     protected function renderListTemplate($currentOrder)
     {
         return $this->render('messages');
     }
-
+    
     protected function listDirectoryContent($requiredExtension)
     {
         $list = array();
-
+        
         $dir = $this->getTemplateHelper()->getActiveMailTemplate()->getAbsolutePath();
-
+        
         $finder = Finder::create()->files()->in($dir)->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
-
+        
         foreach ($finder as $file) {
             $list[] = $file->getBasename();
         }
-
+        
         // Add modules templates
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
             $dir = $module->getAbsoluteTemplateBasePath() . DS . TemplateDefinition::EMAIL_SUBDIR . DS . 'default';
-
+            
             if (file_exists($dir)) {
                 $finder = Finder::create()
                     ->files()
@@ -193,7 +194,7 @@ class MessageController extends AbstractCrudController
                     ->ignoreDotFiles(true)
                     ->sortByName()
                     ->name("*.$requiredExtension");
-
+                
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();
                     if (!in_array($fileName, $list)) {
@@ -202,20 +203,20 @@ class MessageController extends AbstractCrudController
                 }
             }
         }
-
+        
         return $list;
     }
-
+    
     protected function renderEditionTemplate()
     {
         return $this->render('message-edit', array(
-                'message_id'         => $this->getRequest()->get('message_id'),
-                'layout_list'        => $this->listDirectoryContent('tpl'),
-                'html_template_list' =>  $this->listDirectoryContent('html'),
-                'text_template_list' =>  $this->listDirectoryContent('txt'),
+            'message_id'         => $this->getRequest()->get('message_id'),
+            'layout_list'        => $this->listDirectoryContent('tpl'),
+            'html_template_list' =>  $this->listDirectoryContent('html'),
+            'text_template_list' =>  $this->listDirectoryContent('txt'),
         ));
     }
-
+    
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
@@ -225,47 +226,95 @@ class MessageController extends AbstractCrudController
             ]
         );
     }
-
+    
     protected function redirectToListTemplate()
     {
         return $this->generateRedirectFromRoute('admin.configuration.messages.default');
     }
-
+    
     public function previewAction($messageId, $html = true)
     {
         if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
             return $response;
         }
-
+        
         if (null === $message = MessageQuery::create()->findPk($messageId)) {
             $this->pageNotFound();
         }
-
+        
         $parser = $this->getParser($this->getTemplateHelper()->getActiveMailTemplate());
-
+        
         foreach ($this->getRequest()->query->all() as $key => $value) {
             $parser->assign($key, $value);
         }
-
+        
         if ($html) {
             $content = $message->setLocale($this->getCurrentEditionLocale())->getHtmlMessageBody($parser);
         } else {
             $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
         }
-
+        
         return new Response($content);
     }
-
+    
     public function previewAsHtmlAction($messageId)
     {
         return $this->previewAction($messageId);
     }
-
+    
     public function previewAsTextAction($messageId)
     {
         $response = $this->previewAction($messageId, false);
         $response->headers->add(["Content-Type" => "text/plain"]);
-
+        
         return $response;
+    }
+    
+    public function sendSampleByEmailAction($messageId)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+            return $response;
+        }
+        
+        if (null !== $message = MessageQuery::create()->findPk($messageId)) {
+            // Ajax submission: prevent CRSF control, as page is not refreshed
+            $baseForm = $this->createForm(AdminForm::MESSAGE_SEND_SAMPLE, 'form', [], ['csrf_protection' => false]);
+            
+            try {
+                $form = $this->validateForm($baseForm, "POST");
+                
+                $data = $form->getData();
+                
+                $messageParameters = [];
+                
+                foreach ($this->getRequest()->request->all() as $key => $value) {
+                    $messageParameters[$key] = $value;
+                }
+                
+                $this->getMailer()->sendEmailMessage(
+                    $message->getName(),
+                    [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                    [ $data['recipient_email'] => $data['recipient_email'] ],
+                    $messageParameters,
+                    $this->getCurrentEditionLocale()
+                );
+                
+                return new Response(
+                    $this->getTranslator()->trans(
+                        "The message has been successfully sent to %recipient.",
+                        [ '%recipient' => $data['recipient_email'] ]
+                    )
+                );
+            } catch (\Exception $ex) {
+                return new Response(
+                    $this->getTranslator()->trans(
+                        "Something goes wrong, the message was not sent to recipient. Error is : %err",
+                        [ '%err' => $ex->getMessage() ]
+                    )
+                );
+            }
+        } else {
+            return $this->pageNotFound();
+        }
     }
 }

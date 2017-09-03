@@ -93,6 +93,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
                 $loopResultRow->set("ID", $orderCoupon->getId())
                     ->set("CODE", $orderCoupon->getCode())
+                    ->set("DISCOUNT_AMOUNT", $orderCoupon->getAmount())
                     ->set("TITLE", $orderCoupon->getTitle())
                     ->set("SHORT_DESCRIPTION", $orderCoupon->getShortDescription())
                     ->set("DESCRIPTION", $orderCoupon->getDescription())
@@ -104,6 +105,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
                     ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
                     ->set("PER_CUSTOMER_USAGE_COUNT", $orderCoupon->getPerCustomerUsageCount())
+                    ->set("IS_USAGE_CANCELED", $orderCoupon->getUsageCanceled())
                 ;
                 $this->addOutputFields($loopResultRow, $orderCoupon);
 

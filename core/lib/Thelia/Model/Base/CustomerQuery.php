@@ -35,6 +35,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildCustomerQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
  * @method     ChildCustomerQuery orderByRememberMeSerial($order = Criteria::ASC) Order by the remember_me_serial column
+ * @method     ChildCustomerQuery orderByEnable($order = Criteria::ASC) Order by the enable column
+ * @method     ChildCustomerQuery orderByConfirmationToken($order = Criteria::ASC) Order by the confirmation_token column
  * @method     ChildCustomerQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCustomerQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCustomerQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -55,6 +57,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery groupByDiscount() Group by the discount column
  * @method     ChildCustomerQuery groupByRememberMeToken() Group by the remember_me_token column
  * @method     ChildCustomerQuery groupByRememberMeSerial() Group by the remember_me_serial column
+ * @method     ChildCustomerQuery groupByEnable() Group by the enable column
+ * @method     ChildCustomerQuery groupByConfirmationToken() Group by the confirmation_token column
  * @method     ChildCustomerQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCustomerQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCustomerQuery groupByVersion() Group by the version column
@@ -110,6 +114,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomer findOneByDiscount(string $discount) Return the first ChildCustomer filtered by the discount column
  * @method     ChildCustomer findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomer filtered by the remember_me_token column
  * @method     ChildCustomer findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildCustomer filtered by the remember_me_serial column
+ * @method     ChildCustomer findOneByEnable(int $enable) Return the first ChildCustomer filtered by the enable column
+ * @method     ChildCustomer findOneByConfirmationToken(string $confirmation_token) Return the first ChildCustomer filtered by the confirmation_token column
  * @method     ChildCustomer findOneByCreatedAt(string $created_at) Return the first ChildCustomer filtered by the created_at column
  * @method     ChildCustomer findOneByUpdatedAt(string $updated_at) Return the first ChildCustomer filtered by the updated_at column
  * @method     ChildCustomer findOneByVersion(int $version) Return the first ChildCustomer filtered by the version column
@@ -130,6 +136,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     array findByDiscount(string $discount) Return ChildCustomer objects filtered by the discount column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomer objects filtered by the remember_me_token column
  * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildCustomer objects filtered by the remember_me_serial column
+ * @method     array findByEnable(int $enable) Return ChildCustomer objects filtered by the enable column
+ * @method     array findByConfirmationToken(string $confirmation_token) Return ChildCustomer objects filtered by the confirmation_token column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomer objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCustomer objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCustomer objects filtered by the version column
@@ -230,7 +238,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE_ID`, `LANG_ID`, `REF`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `customer` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TITLE_ID`, `LANG_ID`, `REF`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `ENABLE`, `CONFIRMATION_TOKEN`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `customer` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -787,6 +795,76 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::REMEMBER_ME_SERIAL, $rememberMeSerial, $comparison);
+    }
+
+    /**
+     * Filter the query on the enable column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEnable(1234); // WHERE enable = 1234
+     * $query->filterByEnable(array(12, 34)); // WHERE enable IN (12, 34)
+     * $query->filterByEnable(array('min' => 12)); // WHERE enable > 12
+     * </code>
+     *
+     * @param     mixed $enable The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByEnable($enable = null, $comparison = null)
+    {
+        if (is_array($enable)) {
+            $useMinMax = false;
+            if (isset($enable['min'])) {
+                $this->addUsingAlias(CustomerTableMap::ENABLE, $enable['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($enable['max'])) {
+                $this->addUsingAlias(CustomerTableMap::ENABLE, $enable['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::ENABLE, $enable, $comparison);
+    }
+
+    /**
+     * Filter the query on the confirmation_token column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByConfirmationToken('fooValue');   // WHERE confirmation_token = 'fooValue'
+     * $query->filterByConfirmationToken('%fooValue%'); // WHERE confirmation_token LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $confirmationToken The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByConfirmationToken($confirmationToken = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($confirmationToken)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $confirmationToken)) {
+                $confirmationToken = str_replace('*', '%', $confirmationToken);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::CONFIRMATION_TOKEN, $confirmationToken, $comparison);
     }
 
     /**

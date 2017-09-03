@@ -255,11 +255,16 @@
             <tr class="table-2">
                 <td>
                     <p>{$TITLE}</p>
+                    <p>
+                        {intl l="Product ref : "}{$REF}<br>
+                        {intl l="Combination ref : "}{$PRODUCT_SALE_ELEMENTS_REF}
+                    </p>
                     {ifloop rel="combinations"}
                     {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                     {/loop}
                     {/ifloop}
+                    {hook name="invoice.product-list" order_product=$ID order=$order_id}
                 </td>
                 <td><p class="align-right">{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
                 <td><p class="align-right">{format_money number=$realTax currency_id=$CURRENCY}</p></td>

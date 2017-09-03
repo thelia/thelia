@@ -73,20 +73,15 @@
             </li>
 
             {loop name="order-status-list" type="order-status"}
-                {assign "orderStatusCode" "order_$CODE"}
-                {if #$orderStatusCode# == ''}
-                    {assign "defaultLabel" "label-default"}
-                    {assign "orderStatusLabel" $CODE}
-                {else}
-                    {assign "defaultLabel" ''}
-                    {assign "orderStatusLabel" #$orderStatusCode#}
-                {/if}
+                {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
+                {if $count}
                 <li role="menuitem">
                     <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
                         <span class="pull-left">{$TITLE}</span>
-                        <span class="label {$defaultLabel} label-{$orderStatusLabel} pull-right">{count type="order" customer="*" backend_context="1" status={$ID}}</span>
+                        <span class="label pull-right" style="background-color: {$COLOR};">{$count}</span>
                     </a>
                 </li>
+                {/if}
             {/loop}
             {hookblock name="main.top-menu-order" fields="id,class,url,title"}
                 {forhook rel="main.top-menu-order"}

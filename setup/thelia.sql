@@ -475,6 +475,8 @@ CREATE TABLE `customer`
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
+    `enable` TINYINT DEFAULT 0,
+    `confirmation_token` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -888,6 +890,9 @@ CREATE TABLE `order_status`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
+    `color` CHAR(7),
+    `position` INTEGER,
+    `protected_status` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -939,6 +944,8 @@ CREATE TABLE `module`
     `activate` TINYINT,
     `position` INTEGER,
     `full_namespace` VARCHAR(255),
+    `mandatory` TINYINT DEFAULT 0,
+    `hidden` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1198,12 +1205,12 @@ CREATE TABLE `coupon`
     INDEX `idx_is_enabled` (`is_enabled`),
     INDEX `idx_is_used` (`is_used`),
     INDEX `idx_type` (`type`),
-    INDEX `idx_start_date` (`start_date`),
     INDEX `idx_expiration_date` (`expiration_date`),
     INDEX `idx_is_cumulative` (`is_cumulative`),
     INDEX `idx_is_removing_postage` (`is_removing_postage`),
     INDEX `idx_max_usage` (`max_usage`),
-    INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`)
+    INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`),
+    INDEX `idx_start_date` (`start_date`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -1733,6 +1740,7 @@ CREATE TABLE `order_coupon`
     `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
     `per_customer_usage_count` TINYINT(1) NOT NULL,
+    `usage_canceled` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -3285,6 +3293,8 @@ CREATE TABLE `customer_version`
     `discount` DECIMAL(16,6) DEFAULT 0.000000,
     `remember_me_token` VARCHAR(255),
     `remember_me_serial` VARCHAR(255),
+    `enable` TINYINT DEFAULT 0,
+    `confirmation_token` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

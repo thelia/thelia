@@ -122,6 +122,26 @@
                             </table>
                         </div>
                     </div>
+
+                    <div class="menu-list-table general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <caption>{intl l='Order path configuration'}</caption>
+
+                                {hook name="configuration.order-path.top"}
+
+                                {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.order-status" access="VIEW"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/order-status'}">{intl l='Order status'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/order-status'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
+
+                                {hook name="configuration.order-path.bottom"}
+
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-4">

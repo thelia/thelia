@@ -82,7 +82,7 @@ class ConfigureController extends BaseAdminController
             // Save Custom CSS in default assets
             $customCss = __DIR__ .DS.'..'.DS.'templates'.DS.'backOffice'.DS.'default'.DS.'assets'.DS.'css'.DS.'custom-css.less';
 
-            if (1 || false === file_put_contents($customCss, $data['custom_css'])) {
+            if (false === file_put_contents($customCss, $data['custom_css'])) {
                 throw new TheliaProcessException(
                     $this->getTranslator()->trans(
                         "Failed to update custom CSS file \"%file\". Please check this file or parent folder write permissions.",

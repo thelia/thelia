@@ -128,6 +128,14 @@ class CartController extends BaseFrontController
         }
 
         $this->changeViewForAjax();
+
+        if (null != $successUrl = $this->getRequest()->query->get('success_url')) {
+            $response = $this->generateRedirect(
+                URL::getInstance()->absoluteUrl($successUrl)
+            );
+
+            return $response;
+        }
     }
 
     protected function changeViewForAjax()

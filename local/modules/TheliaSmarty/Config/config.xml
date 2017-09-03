@@ -114,6 +114,7 @@
             <argument type="service" id="thelia.taxEngine" />
             <argument type="service" id="thelia.parser.context"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="thelia.coupon.manager"/>
         </service>
 
         <service id="smarty.plugin.adminUtilities" class="TheliaSmarty\Template\Plugins\AdminUtilities">
@@ -138,6 +139,13 @@
             <argument>%kernel.debug%</argument>
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="smarty.plugin.cache" class="TheliaSmarty\Template\Plugins\Cache">
+            <argument type="service" id="thelia.cache"/>
+            <argument type="service" id="request_stack"/>
+            <argument>%kernel.debug%</argument>
+            <tag name="thelia.parser.register_plugin"/>
         </service>
     </services>
 

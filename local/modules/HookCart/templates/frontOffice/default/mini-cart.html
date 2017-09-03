@@ -16,9 +16,19 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-                            {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
-                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
-                            {/loop}
+                            {ifloop rel="pse-first-image"}
+                                {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                    {loop type="image" name="product-image" id=$PRODUCT_IMAGE_ID product=$PRODUCT_ID limit="1" width="118" height="60"}
+                                        {assign var="product_image_url" value=$IMAGE_URL}
+                                        <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
+                                    {/loop}
+                                {/loop}
+                            {/ifloop}
+                            {elseloop rel="pse-first-image"}
+                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
+                                    <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
+                                {/loop}
+                            {/elseloop}
                         </td>
                         <td class="product">
                             <h3 class="name" style="margin:0">

@@ -58,7 +58,7 @@ class OrderCouponTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 17;
+    const NUM_COLUMNS = 18;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class OrderCouponTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 17;
+    const NUM_HYDRATE_COLUMNS = 18;
 
     /**
      * the column name for the ID field
@@ -146,6 +146,11 @@ class OrderCouponTableMap extends TableMap
     const PER_CUSTOMER_USAGE_COUNT = 'order_coupon.PER_CUSTOMER_USAGE_COUNT';
 
     /**
+     * the column name for the USAGE_CANCELED field
+     */
+    const USAGE_CANCELED = 'order_coupon.USAGE_CANCELED';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'order_coupon.CREATED_AT';
@@ -167,12 +172,12 @@ class OrderCouponTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'Code', 'Type', 'Amount', 'Title', 'ShortDescription', 'Description', 'StartDate', 'ExpirationDate', 'IsCumulative', 'IsRemovingPostage', 'IsAvailableOnSpecialOffers', 'SerializedConditions', 'PerCustomerUsageCount', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'code', 'type', 'amount', 'title', 'shortDescription', 'description', 'startDate', 'expirationDate', 'isCumulative', 'isRemovingPostage', 'isAvailableOnSpecialOffers', 'serializedConditions', 'perCustomerUsageCount', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderCouponTableMap::ID, OrderCouponTableMap::ORDER_ID, OrderCouponTableMap::CODE, OrderCouponTableMap::TYPE, OrderCouponTableMap::AMOUNT, OrderCouponTableMap::TITLE, OrderCouponTableMap::SHORT_DESCRIPTION, OrderCouponTableMap::DESCRIPTION, OrderCouponTableMap::START_DATE, OrderCouponTableMap::EXPIRATION_DATE, OrderCouponTableMap::IS_CUMULATIVE, OrderCouponTableMap::IS_REMOVING_POSTAGE, OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, OrderCouponTableMap::SERIALIZED_CONDITIONS, OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT, OrderCouponTableMap::CREATED_AT, OrderCouponTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'CODE', 'TYPE', 'AMOUNT', 'TITLE', 'SHORT_DESCRIPTION', 'DESCRIPTION', 'START_DATE', 'EXPIRATION_DATE', 'IS_CUMULATIVE', 'IS_REMOVING_POSTAGE', 'IS_AVAILABLE_ON_SPECIAL_OFFERS', 'SERIALIZED_CONDITIONS', 'PER_CUSTOMER_USAGE_COUNT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_id', 'code', 'type', 'amount', 'title', 'short_description', 'description', 'start_date', 'expiration_date', 'is_cumulative', 'is_removing_postage', 'is_available_on_special_offers', 'serialized_conditions', 'per_customer_usage_count', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'Code', 'Type', 'Amount', 'Title', 'ShortDescription', 'Description', 'StartDate', 'ExpirationDate', 'IsCumulative', 'IsRemovingPostage', 'IsAvailableOnSpecialOffers', 'SerializedConditions', 'PerCustomerUsageCount', 'UsageCanceled', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'code', 'type', 'amount', 'title', 'shortDescription', 'description', 'startDate', 'expirationDate', 'isCumulative', 'isRemovingPostage', 'isAvailableOnSpecialOffers', 'serializedConditions', 'perCustomerUsageCount', 'usageCanceled', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderCouponTableMap::ID, OrderCouponTableMap::ORDER_ID, OrderCouponTableMap::CODE, OrderCouponTableMap::TYPE, OrderCouponTableMap::AMOUNT, OrderCouponTableMap::TITLE, OrderCouponTableMap::SHORT_DESCRIPTION, OrderCouponTableMap::DESCRIPTION, OrderCouponTableMap::START_DATE, OrderCouponTableMap::EXPIRATION_DATE, OrderCouponTableMap::IS_CUMULATIVE, OrderCouponTableMap::IS_REMOVING_POSTAGE, OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, OrderCouponTableMap::SERIALIZED_CONDITIONS, OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT, OrderCouponTableMap::USAGE_CANCELED, OrderCouponTableMap::CREATED_AT, OrderCouponTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'CODE', 'TYPE', 'AMOUNT', 'TITLE', 'SHORT_DESCRIPTION', 'DESCRIPTION', 'START_DATE', 'EXPIRATION_DATE', 'IS_CUMULATIVE', 'IS_REMOVING_POSTAGE', 'IS_AVAILABLE_ON_SPECIAL_OFFERS', 'SERIALIZED_CONDITIONS', 'PER_CUSTOMER_USAGE_COUNT', 'USAGE_CANCELED', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'order_id', 'code', 'type', 'amount', 'title', 'short_description', 'description', 'start_date', 'expiration_date', 'is_cumulative', 'is_removing_postage', 'is_available_on_special_offers', 'serialized_conditions', 'per_customer_usage_count', 'usage_canceled', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
     );
 
     /**
@@ -182,12 +187,12 @@ class OrderCouponTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'Code' => 2, 'Type' => 3, 'Amount' => 4, 'Title' => 5, 'ShortDescription' => 6, 'Description' => 7, 'StartDate' => 8, 'ExpirationDate' => 9, 'IsCumulative' => 10, 'IsRemovingPostage' => 11, 'IsAvailableOnSpecialOffers' => 12, 'SerializedConditions' => 13, 'PerCustomerUsageCount' => 14, 'CreatedAt' => 15, 'UpdatedAt' => 16, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'code' => 2, 'type' => 3, 'amount' => 4, 'title' => 5, 'shortDescription' => 6, 'description' => 7, 'startDate' => 8, 'expirationDate' => 9, 'isCumulative' => 10, 'isRemovingPostage' => 11, 'isAvailableOnSpecialOffers' => 12, 'serializedConditions' => 13, 'perCustomerUsageCount' => 14, 'createdAt' => 15, 'updatedAt' => 16, ),
-        self::TYPE_COLNAME       => array(OrderCouponTableMap::ID => 0, OrderCouponTableMap::ORDER_ID => 1, OrderCouponTableMap::CODE => 2, OrderCouponTableMap::TYPE => 3, OrderCouponTableMap::AMOUNT => 4, OrderCouponTableMap::TITLE => 5, OrderCouponTableMap::SHORT_DESCRIPTION => 6, OrderCouponTableMap::DESCRIPTION => 7, OrderCouponTableMap::START_DATE => 8, OrderCouponTableMap::EXPIRATION_DATE => 9, OrderCouponTableMap::IS_CUMULATIVE => 10, OrderCouponTableMap::IS_REMOVING_POSTAGE => 11, OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS => 12, OrderCouponTableMap::SERIALIZED_CONDITIONS => 13, OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT => 14, OrderCouponTableMap::CREATED_AT => 15, OrderCouponTableMap::UPDATED_AT => 16, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'CODE' => 2, 'TYPE' => 3, 'AMOUNT' => 4, 'TITLE' => 5, 'SHORT_DESCRIPTION' => 6, 'DESCRIPTION' => 7, 'START_DATE' => 8, 'EXPIRATION_DATE' => 9, 'IS_CUMULATIVE' => 10, 'IS_REMOVING_POSTAGE' => 11, 'IS_AVAILABLE_ON_SPECIAL_OFFERS' => 12, 'SERIALIZED_CONDITIONS' => 13, 'PER_CUSTOMER_USAGE_COUNT' => 14, 'CREATED_AT' => 15, 'UPDATED_AT' => 16, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'code' => 2, 'type' => 3, 'amount' => 4, 'title' => 5, 'short_description' => 6, 'description' => 7, 'start_date' => 8, 'expiration_date' => 9, 'is_cumulative' => 10, 'is_removing_postage' => 11, 'is_available_on_special_offers' => 12, 'serialized_conditions' => 13, 'per_customer_usage_count' => 14, 'created_at' => 15, 'updated_at' => 16, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'Code' => 2, 'Type' => 3, 'Amount' => 4, 'Title' => 5, 'ShortDescription' => 6, 'Description' => 7, 'StartDate' => 8, 'ExpirationDate' => 9, 'IsCumulative' => 10, 'IsRemovingPostage' => 11, 'IsAvailableOnSpecialOffers' => 12, 'SerializedConditions' => 13, 'PerCustomerUsageCount' => 14, 'UsageCanceled' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'code' => 2, 'type' => 3, 'amount' => 4, 'title' => 5, 'shortDescription' => 6, 'description' => 7, 'startDate' => 8, 'expirationDate' => 9, 'isCumulative' => 10, 'isRemovingPostage' => 11, 'isAvailableOnSpecialOffers' => 12, 'serializedConditions' => 13, 'perCustomerUsageCount' => 14, 'usageCanceled' => 15, 'createdAt' => 16, 'updatedAt' => 17, ),
+        self::TYPE_COLNAME       => array(OrderCouponTableMap::ID => 0, OrderCouponTableMap::ORDER_ID => 1, OrderCouponTableMap::CODE => 2, OrderCouponTableMap::TYPE => 3, OrderCouponTableMap::AMOUNT => 4, OrderCouponTableMap::TITLE => 5, OrderCouponTableMap::SHORT_DESCRIPTION => 6, OrderCouponTableMap::DESCRIPTION => 7, OrderCouponTableMap::START_DATE => 8, OrderCouponTableMap::EXPIRATION_DATE => 9, OrderCouponTableMap::IS_CUMULATIVE => 10, OrderCouponTableMap::IS_REMOVING_POSTAGE => 11, OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS => 12, OrderCouponTableMap::SERIALIZED_CONDITIONS => 13, OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT => 14, OrderCouponTableMap::USAGE_CANCELED => 15, OrderCouponTableMap::CREATED_AT => 16, OrderCouponTableMap::UPDATED_AT => 17, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'CODE' => 2, 'TYPE' => 3, 'AMOUNT' => 4, 'TITLE' => 5, 'SHORT_DESCRIPTION' => 6, 'DESCRIPTION' => 7, 'START_DATE' => 8, 'EXPIRATION_DATE' => 9, 'IS_CUMULATIVE' => 10, 'IS_REMOVING_POSTAGE' => 11, 'IS_AVAILABLE_ON_SPECIAL_OFFERS' => 12, 'SERIALIZED_CONDITIONS' => 13, 'PER_CUSTOMER_USAGE_COUNT' => 14, 'USAGE_CANCELED' => 15, 'CREATED_AT' => 16, 'UPDATED_AT' => 17, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'code' => 2, 'type' => 3, 'amount' => 4, 'title' => 5, 'short_description' => 6, 'description' => 7, 'start_date' => 8, 'expiration_date' => 9, 'is_cumulative' => 10, 'is_removing_postage' => 11, 'is_available_on_special_offers' => 12, 'serialized_conditions' => 13, 'per_customer_usage_count' => 14, 'usage_canceled' => 15, 'created_at' => 16, 'updated_at' => 17, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
     );
 
     /**
@@ -221,6 +226,7 @@ class OrderCouponTableMap extends TableMap
         $this->addColumn('IS_AVAILABLE_ON_SPECIAL_OFFERS', 'IsAvailableOnSpecialOffers', 'BOOLEAN', true, 1, null);
         $this->addColumn('SERIALIZED_CONDITIONS', 'SerializedConditions', 'LONGVARCHAR', true, null, null);
         $this->addColumn('PER_CUSTOMER_USAGE_COUNT', 'PerCustomerUsageCount', 'BOOLEAN', true, 1, null);
+        $this->addColumn('USAGE_CANCELED', 'UsageCanceled', 'BOOLEAN', false, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -412,6 +418,7 @@ class OrderCouponTableMap extends TableMap
             $criteria->addSelectColumn(OrderCouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS);
             $criteria->addSelectColumn(OrderCouponTableMap::SERIALIZED_CONDITIONS);
             $criteria->addSelectColumn(OrderCouponTableMap::PER_CUSTOMER_USAGE_COUNT);
+            $criteria->addSelectColumn(OrderCouponTableMap::USAGE_CANCELED);
             $criteria->addSelectColumn(OrderCouponTableMap::CREATED_AT);
             $criteria->addSelectColumn(OrderCouponTableMap::UPDATED_AT);
         } else {
@@ -430,6 +437,7 @@ class OrderCouponTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.IS_AVAILABLE_ON_SPECIAL_OFFERS');
             $criteria->addSelectColumn($alias . '.SERIALIZED_CONDITIONS');
             $criteria->addSelectColumn($alias . '.PER_CUSTOMER_USAGE_COUNT');
+            $criteria->addSelectColumn($alias . '.USAGE_CANCELED');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

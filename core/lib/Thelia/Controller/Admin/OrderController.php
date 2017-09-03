@@ -63,7 +63,7 @@ class OrderController extends BaseAdminController
 
             $order = OrderQuery::create()->findPk($order_id);
 
-            $statusId = $this->getRequest()->request->get("status_id");
+            $statusId = $this->getRequest()->get("status_id");
             $status = OrderStatusQuery::create()->findPk($statusId);
 
             if (null === $order) {

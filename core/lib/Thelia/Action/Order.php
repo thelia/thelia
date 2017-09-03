@@ -643,6 +643,19 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param OrderEvent $event
+     */
+    public function updateTransactionRef(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->setTransactionRef($event->getTransactionRef());
+        $order->save();
+
+        $event->setOrder($order);
+    }
+
+    /**
      * @param OrderAddressEvent $event
      */
     public function updateAddress(OrderAddressEvent $event)
@@ -710,6 +723,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => array("sendNotificationEmail", 128),
             TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
             TheliaEvents::ORDER_UPDATE_DELIVERY_REF => array("updateDeliveryRef", 128),
+            TheliaEvents::ORDER_UPDATE_TRANSACTION_REF => array("updateTransactionRef", 128),
             TheliaEvents::ORDER_UPDATE_ADDRESS => array("updateAddress", 128),
             TheliaEvents::ORDER_CREATE_MANUAL => array("createManual", 128),
         );

@@ -33,7 +33,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
     /**
      * Set the value of specific coupon fields.
-     * @param Array $effects the Coupon effects params
+     * @param array $effects the Coupon effects params
      */
     abstract public function setFieldsValue($effects);
 

@@ -10,4 +10,5 @@ return [
     'Edit your carousel.' => 'slayt  düzenleyin.',
     'Remove this image' => 'Bu resmi kaldırma',
     'Your carousel contains no image. Please add one using the form above.' => 'Senin slayt hiçbir görüntü içermiyor . Lütfen yukarıdaki formu kullanarak ekleyin.',
+    'Position' => 'Pozisyon',
 ];

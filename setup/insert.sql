@@ -50,10 +50,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (40, 'store_email','', 0, 1, NOW(), NOW()),
 (41, 'store_notification_emails','', 0, 1, NOW(), NOW()),
 (42, 'one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-(43, 'thelia_version','2.3.3', 1, 1, NOW(), NOW()),
+(43, 'thelia_version','2.3.4', 1, 1, NOW(), NOW()),
 (44, 'thelia_major_version','2', 1, 1, NOW(), NOW()),
 (45, 'thelia_minus_version','3', 1, 1, NOW(), NOW()),
-(46, 'thelia_release_version','3', 1, 1, NOW(), NOW()),
+(46, 'thelia_release_version','4', 1, 1, NOW(), NOW()),
 (47, 'thelia_extra_version','', 1, 1, NOW(), NOW()),
 (48, 'front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 (49, 'front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
@@ -75,31 +75,33 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (65, 'notify_newsletter_subscription', '1', 0, 0, NOW(), NOW()),
 (66, 'number_default_results_per_page.product_list', '20', 0, 0, NOW(), NOW()),
 (67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
-(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW())
+(68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
+(69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW()),
+(70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW())
 ;
 
-INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', NOW(), NOW()),
-(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
-(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
-(4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
-(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', NOW(), NOW()),
-(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', NOW(), NOW()),
-(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', NOW(), NOW()),
-(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', NOW(), NOW()),
-(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', NOW(), NOW()),
-(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', NOW(), NOW()),
-(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', NOW(), NOW()),
-(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', NOW(), NOW()),
-(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', NOW(), NOW()),
-(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', NOW(), NOW()),
-(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', NOW(), NOW()),
-(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', NOW(), NOW()),
-(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', NOW(), NOW()),
-(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', NOW(), NOW()),
-(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
-(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW()),
-(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', NOW(), NOW())
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
+(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
+(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', 0, 0, NOW(), NOW()),
+(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
+(4, 'Front', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
+(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),
+(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', 0, 0, NOW(), NOW()),
+(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', 0, 0, NOW(), NOW()),
+(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', 0, 0, NOW(), NOW()),
+(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', 0, 0, NOW(), NOW()),
+(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', 0, 0, NOW(), NOW()),
+(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', 0, 0, NOW(), NOW()),
+(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', 0, 0, NOW(), NOW()),
+(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', 0, 0, NOW(), NOW()),
+(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', 0, 0, NOW(), NOW()),
+(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', 0, 0, NOW(), NOW()),
+(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', 0, 0, NOW(), NOW()),
+(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', 0, 0, NOW(), NOW()),
+(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', 0, 0, NOW(), NOW()),
+(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', 0, 0, NOW(), NOW()),
+(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', 0, 0, NOW(), NOW()),
+(21, 'HookAdminHome', 1, 1, 18, 'HookAdminHome\\HookAdminHome', 0, 0, NOW(), NOW())
 ;
 
 -- Insert front hooks
@@ -342,7 +344,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (236, 'newsletter-unsubscribe.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (237, 'newsletter-unsubscribe.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (238, 'newsletter-unsubscribe.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(239, 'newsletter-unsubscribe.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(240, 'order-invoice.coupon-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(241, 'order-invoice.payment-form', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(242, 'account-order.product-list', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert admin hooks
@@ -762,7 +767,16 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1412, 'states.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1413, 'state.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1414, 'state.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1416, 'configuration.order-path.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1417, 'configuration.order-path.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1418, 'order-status.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1419, 'order-status.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1420, 'order-status.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1421, 'order-status.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -801,7 +815,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2037, 'delivery.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2038, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert email hooks
@@ -832,7 +848,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (3023, 'email-txt.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3024, 'email-txt.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (3025, 'email-txt.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
+(3026, 'email-txt.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3027, 'email-html.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(3028, 'email-txt.order-confirmation.product-list', 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -1857,13 +1875,13 @@ VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
 
-INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
-(1, 'not_paid', NOW(), NOW()),
-(2, 'paid', NOW(), NOW()),
-(3, 'processing', NOW(), NOW()),
-(4, 'sent', NOW(), NOW()),
-(5, 'canceled', NOW(), NOW()),
-(6, 'refunded', NOW(), NOW());
+INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', '#f0ad4e', 1, 1, NOW(), NOW()),
+(2, 'paid', '#5cb85c', 2, 1, NOW(), NOW()),
+(3, 'processing', '#f39922', 3, 1, NOW(), NOW()),
+(4, 'sent', '#5bc0de', 4, 1, NOW(), NOW()),
+(5, 'canceled', '#d9534f', 5, 1, NOW(), NOW()),
+(6, 'refunded', '#986dff', 6, 1, NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
@@ -1917,7 +1935,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (46, 'admin.profile', NOW(), NOW()),
 (47, 'admin.search', NOW(), NOW()),
 (48, 'admin.configuration.api', NOW(), NOW()),
-(49, 'admin.customer.title', NOW(), NOW())
+(49, 'admin.customer.title', NOW(), NOW()),
+(50, 'admin.configuration.order-status', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -1927,7 +1946,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
 (5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW()),
 (6, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW()),
-(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW())
+(7, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW()),
+(8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW())
 ;
 
 /**
@@ -1981,7 +2001,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'de_DE', 'Fehlermeldung zeigen anstatt einer weißen Seite im Falle eines eines Serverfehlers', NULL, NULL, NULL),
     (59, 'de_DE', 'Dateiname der Fehlerseite', NULL, NULL, NULL),
     (60, 'de_DE', 'Den Kunden erlauben ihre E-Mail-Adresse zu ändern. 1 für Ja, 0 für Nein', NULL, NULL, NULL),
-    (61, 'de_DE', 'Den Kunden fragen, ihre E-Mail-Adresse zu bestätigen. 1 für Jan, 0 für Nein', NULL, NULL, NULL),
+    (61, 'de_DE', NULL, NULL, NULL, NULL),
     (62, 'de_DE', 'Geheimer Schlüssel für Formular CSRF-token', NULL, NULL, NULL),
     (63, 'de_DE', NULL, NULL, NULL, NULL),
     (64, 'de_DE', NULL, NULL, NULL, NULL),
@@ -1989,6 +2009,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'de_DE', NULL, NUll, NULL, NULL),
     (67, 'de_DE', NULL, NUll, NULL, NULL),
     (68, 'de_DE', NULL, NUll, NULL, NULL),
+    (69, 'de_DE', NULL, NULL, NULL, NULL),
+    (70, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2035,14 +2057,16 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
     (59, 'en_US', 'Filename of the error page', NULL, NULL, NULL),
     (60, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
-    (61, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
+    (61, 'en_US', 'Ask the customers to confirm their email in customer creation form (1: yes, 0: no)', NULL, NULL, NULL),
     (62, 'en_US', 'Secret key for form CSRF token', NULL, NULL, NULL),
     (63, 'en_US', 'The minimum length required for an administrator password', NULL, NULL, NULL),
     (64, 'en_US', 'Allow an administrator to recreate a lost password (1 = yes, 0 = no)', NULL, NULL, NULL),
     (65, 'en_US', 'Send a confirmation email to newsletter subscribers (1 = yes, 0 = no)', NULL, NULL, NULL),
-    (66, 'en_US', 'Number by default of results per page for product list', NUll, NULL, NULL),
-    (67, 'en_US', 'Number by default of results per page for order list', NUll, NULL, NULL),
-    (68, 'en_US', 'Number by default of results per page for customer list', NUll, NULL, NULL),
+    (66, 'en_US', 'Default number of products on product list', NUll, NULL, NULL),
+    (67, 'en_US', 'Default number of orders on order list', NUll, NULL, NULL),
+    (68, 'en_US', 'Default number of customers on customer list', NUll, NULL, NULL),
+    (69, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
+    (70, 'en_US', 'Default number of coupons per page on coupon list', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2089,7 +2113,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'es_ES', 'Mostrar mensaje de error en lugar de una página en blanco cuando ocurre un error de servidor', NULL, NULL, NULL),
     (59, 'es_ES', 'Nombre de archivo de la página de error', NULL, NULL, NULL),
     (60, 'es_ES', 'Permitir a los clientes cambiar su correo electrónico. 1 para sí, 0 para no', NULL, NULL, NULL),
-    (61, 'es_ES', 'Preguntar al cliente para confirmar su correo electrónico, 1 para sí, 0 no', NULL, NULL, NULL),
+    (61, 'es_ES', NULL, NULL, NULL, NULL),
     (62, 'es_ES', 'Clave secreta para el token CSRF del formulario', NULL, NULL, NULL),
     (63, 'es_ES', 'La longitud mínima de la contraseña de administrador', NULL, NULL, NULL),
     (64, 'es_ES', 'Permite a un administrador recrear una contraseña perdida (1 = sí, 0 = no)', NULL, NULL, NULL),
@@ -2097,6 +2121,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'es_ES', 'Número predeterminado de resultados por página para la lista de productos', NUll, NULL, NULL),
     (67, 'es_ES', 'Número predeterminado de resultados por página para la lista de pedidos', NUll, NULL, NULL),
     (68, 'es_ES', 'Número predeterminado de resultados por página para la lista de clientes', NUll, NULL, NULL),
+    (69, 'es_ES', NULL, NULL, NULL, NULL),
+    (70, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2143,14 +2169,16 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
     (59, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL),
     (60, 'fr_FR', 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
-    (61, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+    (61, 'fr_FR', 'Demander aux clients de confirmer leur adresse email dans le formulaire de création de compte (1: oui, 0: non)', NULL, NULL, NULL),
     (62, 'fr_FR', 'Clé secrète pour le jeton CSRF des formulaires', NULL, NULL, NULL),
     (63, 'fr_FR', 'La longueur minimale requise pour un mot de passe administrateur', NULL, NULL, NULL),
     (64, 'fr_FR', 'Permettre à un administrateur de recréer un mot de passe perdu (1 = Oui, 0 = non)', NULL, NULL, NULL),
     (65, 'fr_FR', 'Envoyer un email de confirmation aux abonnés de la newsletter (1 = Oui, 0 = non)', NULL, NULL, NULL),
     (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
-    (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL)
+    (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
+    (69, 'fr_FR', 'La création d\'un compte client doit être confilrée par email (1: oui, 0: non)', NULL, NULL, NULL),
+    (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
@@ -2174,7 +2202,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'de_DE', 'Sonderangebot-Block', NULL, NULL, NULL),
     (19, 'de_DE', 'Smarty Template Engine Integration', NULL, NULL, NULL),
     (20, 'de_DE', 'Steuerung für virtuelle Produkte', NULL, NULL, NULL),
-    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
+    (21, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
     (2, 'en_US', '72h delivery', NULL, NULL, NULL),
     (3, 'en_US', 'Pay by cheque', NULL, NULL, NULL),
     (4, 'en_US', 'Front office integration', NULL, NULL, NULL),
@@ -2194,7 +2222,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'en_US', 'Products offer block', NULL, NULL, NULL),
     (19, 'en_US', 'Smarty template engine integration', NULL, NULL, NULL),
     (20, 'en_US', 'Virtual Product Controller', NULL, NULL, NULL),
-    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
+    (21, 'en_US', 'Back-office Home page content', NULL, NULL, NULL),    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
     (2, 'es_ES', 'entrega 72h', NULL, NULL, NULL),
     (3, 'es_ES', 'Pagar con Cheque', NULL, NULL, NULL),
     (4, 'es_ES', 'Front office integración', NULL, NULL, NULL),
@@ -2214,7 +2242,7 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (18, 'es_ES', 'Bloque de oferta de productos', NULL, NULL, NULL),
     (19, 'es_ES', 'Integración del motor de plantillas Smarty', NULL, NULL, NULL),
     (20, 'es_ES', 'Controlador de producto virtual', NULL, NULL, NULL),
-    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
+    (21, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
     (2, 'fr_FR', 'Livraison par colissimo en 72h', NULL, NULL, NULL),
     (3, 'fr_FR', 'Payer par chèque', NULL, NULL, NULL),
     (4, 'fr_FR', 'Module Front office', NULL, NULL, NULL),
@@ -2233,8 +2261,8 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (17, 'fr_FR', 'Bloc nouveaux produits', NULL, NULL, NULL),
     (18, 'fr_FR', 'Bloc promotions', NULL, NULL, NULL),
     (19, 'fr_FR', 'Intégration du moteur de template Smarty', NULL, NULL, NULL),
-    (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL)
-;
+    (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL),
+    (21, 'fr_FR', 'Contenu de la page d\'accueil de l\'administration', NULL, NULL, NULL);
 
 -- Insert I18n front hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
@@ -2477,6 +2505,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, 'de_DE', NULL, NULL, NULL),
     (238, 'de_DE', NULL, NULL, NULL),
     (239, 'de_DE', NULL, NULL, NULL),
+    (240, 'de_DE', NULL, NULL, NULL),
+    (241, 'de_DE', NULL, NULL, NULL),
+    (242, 'de_DE', NULL, NULL, NULL),
     (1, 'en_US', 'Invoice choice - at the top', NULL, NULL),
     (2, 'en_US', 'Invoice choice - delivery address', NULL, NULL),
     (3, 'en_US', 'Invoice choice - extra payment zone', NULL, NULL),
@@ -2716,6 +2747,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, 'en_US', 'Newsletter unsubscribe page - CSS stylesheet', NULL, NULL),
     (238, 'en_US', 'Newsletter unsubscribe page - after javascript include', NULL, NULL),
     (239, 'en_US', 'Newsletter unsubscribe page - after javascript initialisation', NULL, NULL),
+    (240, 'en_US', 'Order invoice page - bottom of coupon form', NULL, NULL),
+    (241, 'en_US', 'Order invoice page - bottom of payment form', NULL, NULL),
+    (242, 'en_US', 'Account order - after product information', NULL, NULL),
     (1, 'es_ES', 'Opción de factura - en la parte superior', NULL, NULL),
     (2, 'es_ES', 'Opción de factura - dirección de envío', NULL, NULL),
     (3, 'es_ES', 'Opción de factura - zona de pago extra', NULL, NULL),
@@ -2955,6 +2989,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (237, 'es_ES', 'Página de baja del boletín - Hoja de estilos CSS', NULL, NULL),
     (238, 'es_ES', 'Página de baja del boletín - después de incluir JavaScript', NULL, NULL),
     (239, 'es_ES', 'Página de baja del boletín - después de la inicialización de JavaScript', NULL, NULL),
+    (240, 'es_ES', NULL, NULL, NULL),
+    (241, 'es_ES', NULL, NULL, NULL),
+    (242, 'es_ES', NULL, NULL, NULL),
     (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
     (2, 'fr_FR', 'Choix du mode de paiement - adresse de livraison', NULL, NULL),
     (3, 'fr_FR', 'Choix du mode de paiement - zone de paiement supplémentaire', NULL, NULL),
@@ -3193,7 +3230,10 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (236, 'fr_FR', 'Désabonnement newsletter - en bas', NULL, NULL),
     (237, 'fr_FR', 'Désabonnement newsletter - feuille de style CSS', NULL, NULL),
     (238, 'fr_FR', 'Désabonnement newsletter - après l\'inclusion du JavaScript', NULL, NULL),
-    (239, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL)
+    (239, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL),
+    (240, 'fr_FR', NULL, NULL, NULL),
+    (241, 'fr_FR', NULL, NULL, NULL),
+    (242, 'fr_FR', NULL, NULL, NULL)
 ;
 
 -- Insert I18n admin hooks
@@ -3614,6 +3654,15 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1413, 'de_DE', NULL, '',  ''),
     (1414, 'de_DE', NULL, '', ''),
     (1415, 'de_DE', NULL, '', ''),
+    (1416,  'de_DE', NULL, NULL, NULL),
+    (1417,  'de_DE', NULL, NULL, NULL),
+    (1418,  'de_DE', NULL, NULL, NULL),
+    (1419,  'de_DE', NULL, NULL, NULL),
+    (1420,  'de_DE', NULL, NULL, NULL),
+    (1421,  'de_DE', NULL, NULL, NULL),
+    (1422,  'de_DE', NULL, NULL, NULL),
+    (1423,  'de_DE', NULL, NULL, NULL),
+    (1424, 'de_DE', NULL, NULL, NULL),
     (1000, 'en_US', 'Category - content', NULL, NULL),
     (1001, 'en_US', 'Content - content', NULL, NULL),
     (1002, 'en_US', 'Folder - content', NULL, NULL),
@@ -4030,6 +4079,15 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1413, 'en_US', 'state - creation form', '',  ''),
     (1414, 'en_US', 'state - delete form', '', ''),
     (1415, 'en_US', 'states - JavaScript', '', ''),
+    (1416,  'en_US', 'Configuration - Order path - top', NULL, NULL),
+    (1417,  'en_US', 'Configuration - Order path - bottom', NULL, NULL),
+    (1418,  'en_US', 'Order status - top', NULL, NULL),
+    (1419,  'en_US', 'Order status - bottom', NULL, NULL),
+    (1420,  'en_US', 'Order status - table header', NULL, NULL),
+    (1421,  'en_US', 'Order status - table row', NULL, NULL),
+    (1422,  'en_US', 'Order status - form creation', NULL, NULL),
+    (1423,  'en_US', 'Order status - form modification', NULL, NULL),
+    (1424, 'en_US', 'Order status - JavaScript', NULL, NULL),
     (1000, 'es_ES', 'Categoría - contenido', NULL, NULL),
     (1001, 'es_ES', 'Contenido - contenido', NULL, NULL),
     (1002, 'es_ES', 'Carpeta - contenido', NULL, NULL),
@@ -4446,6 +4504,15 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1413, 'es_ES', 'estado - formulario de creación', '',  ''),
     (1414, 'es_ES', 'estado - formulario de borrado', '', ''),
     (1415, 'es_ES', 'estados - JavaScript', '', ''),
+    (1416,  'es_ES', NULL, NULL, NULL),
+    (1417,  'es_ES', NULL, NULL, NULL),
+    (1418,  'es_ES', NULL, NULL, NULL),
+    (1419,  'es_ES', NULL, NULL, NULL),
+    (1420,  'es_ES', NULL, NULL, NULL),
+    (1421,  'es_ES', NULL, NULL, NULL),
+    (1422,  'es_ES', NULL, NULL, NULL),
+    (1423,  'es_ES', NULL, NULL, NULL),
+    (1424, 'es_ES', NULL, NULL, NULL),
     (1000, 'fr_FR', 'Catégorie - contenu', NULL, NULL),
     (1001, 'fr_FR', 'Contenu - contenu', NULL, NULL),
     (1002, 'fr_FR', 'Dossier - contenu', NULL, NULL),
@@ -4861,7 +4928,16 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1412, 'fr_FR', 'états - bas', '', ''),
     (1413, 'fr_FR', 'état - formulaire de création', '',  ''),
     (1414, 'fr_FR', 'état - formulaire de suppression', '', ''),
-    (1415, 'fr_FR', 'états - JavaScript', '', '')
+    (1415, 'fr_FR', 'états - JavaScript', '', ''),
+    (1416,  'fr_FR', NULL, NULL, NULL),
+    (1417,  'fr_FR', NULL, NULL, NULL),
+    (1418,  'fr_FR', NULL, NULL, NULL),
+    (1419,  'fr_FR', NULL, NULL, NULL),
+    (1420,  'fr_FR', NULL, NULL, NULL),
+    (1421,  'fr_FR', NULL, NULL, NULL),
+    (1422,  'fr_FR', NULL, NULL, NULL),
+    (1423,  'fr_FR', NULL, NULL, NULL),
+    (1424, 'fr_FR', NULL, NULL, NULL)
 ;
 
 -- Insert I18n pdf hooks
@@ -4902,7 +4978,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, 'de_DE', 'Lieferung - Nach dem Liefermodul', NULL, NULL),
     (2035, 'de_DE', 'Rechnung - Weitere Produktinformationen', NULL, NULL),
     (2036, 'de_DE', 'Lieferung - Weitere Produktinformationen', NULL, NULL),
-    (2001, 'en_US', 'Invoice - CSS', NULL, NULL),
+    (2037, 'de_DE', NULL, NULL, NULL),
+    (2038, 'de_DE', NULL, NULL, NULL),    (2001, 'en_US', 'Invoice - CSS', NULL, NULL),
     (2002, 'en_US', 'Invoice - in the header', NULL, NULL),
     (2003, 'en_US', 'Invoice - at the top of the footer', NULL, NULL),
     (2004, 'en_US', 'Invoice - imprint', NULL, NULL),
@@ -4938,7 +5015,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, 'en_US', 'Delivery - After delivery module', NULL, NULL),
     (2035, 'en_US', 'Invoice - additional product information', NULL, NULL),
     (2036, 'en_US', 'Delivery - additional product information', NULL, NULL),
-    (2001, 'es_ES', 'Factura - CSS', NULL, NULL),
+    (2037, 'en_US', 'Delivery - after product information', NULL, NULL),
+    (2038, 'en_US', 'Invoice - after product information', NULL, NULL),    (2001, 'es_ES', 'Factura - CSS', NULL, NULL),
     (2002, 'es_ES', 'Factura - en la cabecera', NULL, NULL),
     (2003, 'es_ES', 'Factura - en la parte superior del pie de página', NULL, NULL),
     (2004, 'es_ES', 'Factura - pie de imprenta', NULL, NULL),
@@ -4974,7 +5052,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2034, 'es_ES', 'Entrega - después del módulo de entrega', NULL, NULL),
     (2035, 'es_ES', 'Factura - información adicional del producto', NULL, NULL),
     (2036, 'es_ES', 'Entrega - información adicional del producto', NULL, NULL),
-    (2001, 'fr_FR', 'Facture - CSS', NULL, NULL),
+    (2037, 'es_ES', NULL, NULL, NULL),
+    (2038, 'es_ES', NULL, NULL, NULL),    (2001, 'fr_FR', 'Facture - CSS', NULL, NULL),
     (2002, 'fr_FR', 'Facture - dans l\'en-tête', NULL, NULL),
     (2003, 'fr_FR', 'Facture - en haut du pied de page', NULL, NULL),
     (2004, 'fr_FR', 'Facture - mentions légales', NULL, NULL),
@@ -5009,8 +5088,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
     (2034, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
     (2035, 'fr_FR', 'Facture - informations additionnelles pour un produit', NULL, NULL),
-    (2036, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', NULL, NULL)
-;
+    (2036, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', NULL, NULL),
+    (2037, 'fr_FR', NULL, NULL, NULL),
+    (2038, 'fr_FR', NULL, NULL, NULL);
 
 -- Insert I18n email hooks
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
@@ -5041,7 +5121,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3024, 'de_DE', NULL, NULL, NULL),
     (3025, 'de_DE', NULL, NULL, NULL),
     (3026, 'de_DE', NULL, NULL, NULL),
-    (3000, 'en_US', 'Email html - layout - CSS', NULL, NULL),
+    (3027, 'de_DE', NULL, NULL, NULL),
+    (3028, 'de_DE', NULL, NULL, NULL),    (3000, 'en_US', 'Email html - layout - CSS', NULL, NULL),
     (3001, 'en_US', 'Email html - layout - footer', NULL, NULL),
     (3002, 'en_US', 'Email html - order confirmation - before address', NULL, NULL),
     (3003, 'en_US', 'Email html - order confirmation - delivery address', NULL, NULL),
@@ -5068,7 +5149,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3024, 'en_US', 'Email txt - order notification - order product', NULL, NULL),
     (3025, 'en_US', 'Email txt - order notification - before products', NULL, NULL),
     (3026, 'en_US', 'Email txt - order notification - after products', NULL, NULL),
-    (3000, 'es_ES', 'Email HTML - Interfaz - CSS', NULL, NULL),
+    (3027, 'en_US', 'Email html - order notification - after product information', NULL, NULL),
+    (3028, 'en_US', 'Email txt - order notification - after product information', NULL, NULL),    (3000, 'es_ES', 'Email HTML - Interfaz - CSS', NULL, NULL),
     (3001, 'es_ES', 'Email HTML - Interfaz - pie', NULL, NULL),
     (3002, 'es_ES', NULL, NULL, NULL),
     (3003, 'es_ES', NULL, NULL, NULL),
@@ -5095,7 +5177,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3024, 'es_ES', NULL, NULL, NULL),
     (3025, 'es_ES', NULL, NULL, NULL),
     (3026, 'es_ES', NULL, NULL, NULL),
-    (3000, 'fr_FR', 'Email html - layout - CSS', NULL, NULL),
+    (3027, 'es_ES', NULL, NULL, NULL),
+    (3028, 'es_ES', NULL, NULL, NULL),    (3000, 'fr_FR', 'Email html - layout - CSS', NULL, NULL),
     (3001, 'fr_FR', 'Email html - layout - pied de page', NULL, NULL),
     (3002, 'fr_FR', 'Email html - confirmation commande - avant adresses', NULL, NULL),
     (3003, 'fr_FR', 'Email html - confirmation commande - adresse de livraison', NULL, NULL),
@@ -5121,8 +5204,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (3023, 'fr_FR', 'Email txt - notification commande - après adresses', NULL, NULL),
     (3024, 'fr_FR', 'Email txt - notification commande - produit de la commande', NULL, NULL),
     (3025, 'fr_FR', 'Email txt - notification commande - avant produits', NULL, NULL),
-    (3026, 'fr_FR', 'Email txt - notification commande - après produits', NULL, NULL)
-;
+    (3026, 'fr_FR', 'Email txt - notification commande - après produits', NULL, NULL),
+    (3027, 'fr_FR', NULL, NULL, NULL),
+    (3028, 'fr_FR', NULL, NULL, NULL);
 
 INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
     (1, 'de_DE', 'Hr.', 'Herr'),
@@ -7512,6 +7596,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'de_DE', 'Back-Office Suchfunktion', NULL, NULL, NULL),
     (48, 'de_DE', 'API-Konfiguration', NULL, NULL, NULL),
     (49, 'de_DE', 'Kunde-Andere', NULL, NULL, NULL),
+    (50, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -7561,6 +7646,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'en_US', 'Back-office search function', NULL, NULL, NULL),
     (48, 'en_US', 'API Configuration', NULL, NULL, NULL),
     (49, 'en_US', 'Customer title', NULL, NULL, NULL),
+    (50, 'en_US', 'Configuration order status', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -7610,6 +7696,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'es_ES', 'Función de búsqueda de back office', NULL, NULL, NULL),
     (48, 'es_ES', 'Configuración de API', NULL, NULL, NULL),
     (49, 'es_ES', 'Estado civil cliente', NULL, NULL, NULL),
+    (50, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -7658,7 +7745,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (46, 'fr_FR', 'Gestion des profils d\'administration', NULL, NULL, NULL),
     (47, 'fr_FR', 'Fonction de recherche dans l\'administration', NULL, NULL, NULL),
     (48, 'fr_FR', 'Configuration de l\'API', NULL, NULL, NULL),
-    (49, 'fr_FR', 'civilité client', NULL, NULL, NULL)
+    (49, 'fr_FR', 'civilité client', NULL, NULL, NULL),
+    (50, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
 
 
@@ -7670,25 +7758,29 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (5, 'de_DE', 'Mail an den Kunden geschickt, wenn sein Konto von einem Administrator im Back-Office erstellt wird', 'Ein Konto {config key=\"store_name\"} wurde für Sie erstellt.', NULL, NULL),
     (6, 'de_DE', NULL, NULL, NULL, NULL),
     (7, 'de_DE', NULL, NULL, NULL, NULL),
+    (8, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Order confirmation sent to the customer', 'Your order {$order_ref} at {config key=\"store_name\"}', NULL, NULL),
     (2, 'en_US', 'Your new password', 'Your new password for {config key=\"store_name\"}', NULL, NULL),
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key=\"store_name\"}', NULL, NULL),
     (4, 'en_US', 'Mail sent to the customer when its password or email is changed in the back-office', 'Your account information on {config key=\"store_name\"} has been changed.', NULL, NULL),
     (5, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key=\"store_name\"} account has been created for you', NULL, NULL),
-    (6, 'en_US', 'Mail sent to an administrator who requested a new password', NULL, NULL, NULL),
-    (7, 'en_US', 'Newsletter subscription confirmation mail', 'Your subscription to %store newsletter', NULL, NULL),
+    (6, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
+    (7, 'en_US', 'Newsletter subscription confirmation mail', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),
+    (8, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your {config key=\"store_name\"} account', NULL, NULL),
     (1, 'es_ES', 'Confirmación de la orden enviada al cliente', 'Su orden {$order_ref} en {tecla config = \"store_name\"}', NULL, NULL),
     (2, 'es_ES', 'Su nueva contraseña', 'Su nueva contraseña para {tecla config = \"store_name\"}', NULL, NULL),
     (3, 'es_ES', 'Mensaje enviado al propietario de la tienda cuando se envía una nueva orden', 'Nueva orden {$order_ref} ubicada en {tecla config = \"store_name\"}', NULL, NULL),
     (4, 'es_ES', 'Correo enviado al cliente cuando se cambia su contraseña o correo electrónico en el back-office', 'La información de su cuenta en {tecla config = \"store_name\"} ha sido cambiada.', NULL, NULL),
     (5, 'es_ES', 'Correo enviado al cliente cuando se crea su cuenta por un administrador en el back-office', 'Una {config key=\"store_name\"} cuenta ha sido creada para ti', NULL, NULL),
-    (6, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', NULL, NULL, NULL),
-    (7, 'es_ES', 'Confirmación de suscripción por correo al boletín', 'Tu suscripción al boletín de %store', NULL, NULL),
+    (6, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', 'Nueva contraseña solicitada en {config key=\"store_name\"}', NULL, NULL),
+    (7, 'es_ES', 'Confirmación de suscripción por correo al boletín', 'Tu suscripción al boletín de {config key=\"store_name\"}', NULL, NULL),
+    (8, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Confirmation de commande envoyée au client', 'Votre commande {$order_ref} chez {config key=\"store_name\"}', NULL, NULL),
     (2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe {config key=\"store_name\"}', NULL, NULL),
     (3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d\'une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key=\"store_name\"}', NULL, NULL),
     (4, 'fr_FR', 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office', 'L\'accès à votre compte {config key=\"store_name\"} a changé', NULL, NULL),
     (5, 'fr_FR', 'Mail envoyé au client lorsque son compte est créé depuis le back-office par un administrateur', 'Un compte {config key=\"store_name\"} vient d\'être créé pour vous.', NULL, NULL),
-    (6, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', NULL, NULL, NULL),
-    (7, 'fr_FR', 'Mail de confirmation d\'inscription à la newsletter', 'Vous avez souscrit à la newsletter du site %store', NULL, NULL)
+    (6, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', 'Votre demande de mot de passe {config key=\"store_name\"}', NULL, NULL),
+    (7, 'fr_FR', 'Mail de confirmation d\'inscription à la newsletter', 'Votre abonnement à {config key=\"store_name\"} newsletter', NULL, NULL),
+    (8, 'fr_FR', 'E-mail de confirmation de création de compte client', 'Confirmez la création de votre compte {config key=\"store_name\"}', NULL, NULL)
 ;

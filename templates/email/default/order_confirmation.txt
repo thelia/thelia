@@ -38,6 +38,7 @@
     - {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
     {/loop}
 {/ifloop}
+{hook name="email-txt.order-confirmation.product-list" order=$order_id order_product=$ID}
     {intl l="Quantity : %qty" qty=$QUANTITY}
     {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice currency_id=$CURRENCY}}
     {hook name="email-txt.order-confirmation.order-product" order="{$order_id}" order_product="{$ID}"}

@@ -73,7 +73,7 @@
                             </thead>
 
                             <tbody>
-                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_term=$searchTerm search_in="ref,firstname,lastname,email" limit=26}
+                            {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" search_mode="sentence" search_term=$searchTerm search_in="ref,firstname,lastname,email" limit=26}
                                 {assign "lastOrderDate" ''}
                                 {assign "lastOrderAmount" ''}
                                 {assign "lastOrderCurrency" ''}
@@ -102,7 +102,7 @@
                                     <td>
                                         {mailto address="{$EMAIL}" encode="hex"}
                                     </td>
-                                    {hook name="customers.row" location="customer_list_row" }
+                                    {hook name="customers.row" location="customer_list_row" customer_id={$ID}}
 
                                     <td>
                                         {$lastOrderDate}
@@ -169,7 +169,9 @@
                                 <th>{intl l="Name"}</th>
                                 <th>{intl l="Amount"}</th>
                                 <th>{intl l="Status"}</th>
-
+                                
+                                {hook name="orders.table-header" location="orders_table_header" }
+                                
                                 <th class="actions">{intl l="Actions"}</th>
                             </tr>
                             </thead>
@@ -193,7 +195,6 @@
 
                             {if $LOOP_COUNT < 26}
                                 <tr>
-
                                     <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
                                     <td>{format_date date=$CREATE_DATE}</td>
                                     <td>{$INVOICE_REF}</td>
@@ -203,7 +204,8 @@
                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                     <td>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$currencySymbol}</td>
                                     <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
-
+                                    
+                                    {hook name="orders.table-row" location="orders_table_row" order_id={$ID}}
                                     <td>
                                         <div class="btn-toolbar btn toolbar-primary">
                                             <span class="glyphicon glyphicon-cog"></span>
@@ -244,6 +246,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Category title"}</th>
+                                
+                                {hook name="categories.header" location="category_list_header" }
+                                
                                 <th class="text-center">
                                     {intl l='Online'}
                                 </th>
@@ -252,13 +257,16 @@
                             </thead>
 
                             <tbody>
-                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {loop type="category" name="category-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
 
                             {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
                                 <td class="object-title"><a href="{url path="/admin/categories/update" category_id={$ID}}">{$TITLE}</a></td>
+                                
+                                {hook name="categories.row" location="category_list_row" category_id={$ID} }
+                                
                                 <td class="text-center">
                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
                                         <div class="make-switch switch-small categoryVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
@@ -331,7 +339,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title" return_url=false  limit=26}
+                            {loop type="product" name="product-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 {$id_product=$ID}
                                  <tr>
@@ -352,7 +360,7 @@
 
                                      <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
-                                     {hook name="products.row" location="product_list_row" product_id={$ID} }
+                                     {hook name="products.row" location="product_list_row" product_id={$ID}}
 
                                      <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol={currency attr="symbol"}}</a></td>
 
@@ -415,6 +423,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Folder title"}</th>
+                                
+                                {hook name="folders.header" location="folder_list_header" }
+                                
                                 <th class="text-center">
                                     {intl l='Online'}
                                 </th>
@@ -423,14 +434,16 @@
                             </thead>
 
                             <tbody>
-                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {loop type="folder" name="folder-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td>{$ID}</td>
                                     <td></td>
 
                                     <td class="object-title"><a href="{url path="/admin/folders/update/%id" id=$ID}">{$TITLE}</a></td>
-
+                                    
+                                    {hook name="folders.row" location="folder_list_row" folder_id={$ID} }
+                                    
                                     <td class="text-center">
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
                                             <div class="make-switch switch-small folderVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
@@ -491,6 +504,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Content title"}</th>
+                                
+                                {hook name="contents.header" location="content_list_header" }
+    
                                 <th class="text-center">
                                     {intl l='Online'}
                                 </th>
@@ -499,14 +515,16 @@
                             </thead>
 
                             <tbody>
-                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=$searchTerm search_in="title" return_url=false  limit=26}
+                            {loop type="content" name="content-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 <tr>
                                     <td>{$ID}</td>
                                     <td></td>
 
                                     <td class="object-title"><a href="{url path="/admin/content/update/%id" id=$ID}">{$TITLE}</a></td>
-
+                                    
+                                    {hook name="contents.row" location="content_list_row" }
+                                    
                                     <td class="text-center">
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
                                             <div class="make-switch switch-small contentVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
@@ -657,7 +675,7 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
     form_action         = {token_url path='/admin/customer/delete'}
-    form_content        = {$smarty.capture.delete_customer_dialog nofilter}
+    form_content        = {$smarty.capture.customer_delete_dialog nofilter}
     form_id             = "customer_delete_dialog"
 }
 
@@ -677,22 +695,27 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     <script>
         $(function() {
 
-            // Set proper category ID in delete from
+            // Set proper customer ID in delete form
+            $('a.customer-delete').click(function(ev) {
+                $('#delete_customer_id').val($(this).data('id'));
+            });
+
+            // Set proper category ID in delete form
             $('a.category-delete').click(function(ev) {
                 $('#category_delete_id').val($(this).data('id'));
             });
 
-            // Set proper product ID in delete from
+            // Set proper product ID in delete form
             $('a.product-delete').click(function(ev) {
                 $('#product_delete_id').val($(this).data('id'));
             });
 
-            // Set proper folder ID in delete from
+            // Set proper folder ID in delete form
             $('a.folder-delete').click(function(ev) {
                 $('#folder_delete_id').val($(this).data('id'));
             });
 
-            // Set proper content ID in delete from
+            // Set proper content ID in delete form
             $('a.content-delete').click(function(ev) {
                 $('#content_delete_id').val($(this).data('id'));
             });

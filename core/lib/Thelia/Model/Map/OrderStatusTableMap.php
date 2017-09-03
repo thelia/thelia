@@ -58,7 +58,7 @@ class OrderStatusTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class OrderStatusTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
@@ -79,6 +79,21 @@ class OrderStatusTableMap extends TableMap
      * the column name for the CODE field
      */
     const CODE = 'order_status.CODE';
+
+    /**
+     * the column name for the COLOR field
+     */
+    const COLOR = 'order_status.COLOR';
+
+    /**
+     * the column name for the POSITION field
+     */
+    const POSITION = 'order_status.POSITION';
+
+    /**
+     * the column name for the PROTECTED_STATUS field
+     */
+    const PROTECTED_STATUS = 'order_status.PROTECTED_STATUS';
 
     /**
      * the column name for the CREATED_AT field
@@ -111,12 +126,12 @@ class OrderStatusTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderStatusTableMap::ID, OrderStatusTableMap::CODE, OrderStatusTableMap::CREATED_AT, OrderStatusTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Color', 'Position', 'ProtectedStatus', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'color', 'position', 'protectedStatus', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderStatusTableMap::ID, OrderStatusTableMap::CODE, OrderStatusTableMap::COLOR, OrderStatusTableMap::POSITION, OrderStatusTableMap::PROTECTED_STATUS, OrderStatusTableMap::CREATED_AT, OrderStatusTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'COLOR', 'POSITION', 'PROTECTED_STATUS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'color', 'position', 'protected_status', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -126,12 +141,12 @@ class OrderStatusTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(OrderStatusTableMap::ID => 0, OrderStatusTableMap::CODE => 1, OrderStatusTableMap::CREATED_AT => 2, OrderStatusTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Color' => 2, 'Position' => 3, 'ProtectedStatus' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'color' => 2, 'position' => 3, 'protectedStatus' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(OrderStatusTableMap::ID => 0, OrderStatusTableMap::CODE => 1, OrderStatusTableMap::COLOR => 2, OrderStatusTableMap::POSITION => 3, OrderStatusTableMap::PROTECTED_STATUS => 4, OrderStatusTableMap::CREATED_AT => 5, OrderStatusTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'COLOR' => 2, 'POSITION' => 3, 'PROTECTED_STATUS' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'color' => 2, 'position' => 3, 'protected_status' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -152,6 +167,9 @@ class OrderStatusTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
+        $this->addColumn('COLOR', 'Color', 'CHAR', false, 7, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
+        $this->addColumn('PROTECTED_STATUS', 'ProtectedStatus', 'BOOLEAN', false, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -328,11 +346,17 @@ class OrderStatusTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(OrderStatusTableMap::ID);
             $criteria->addSelectColumn(OrderStatusTableMap::CODE);
+            $criteria->addSelectColumn(OrderStatusTableMap::COLOR);
+            $criteria->addSelectColumn(OrderStatusTableMap::POSITION);
+            $criteria->addSelectColumn(OrderStatusTableMap::PROTECTED_STATUS);
             $criteria->addSelectColumn(OrderStatusTableMap::CREATED_AT);
             $criteria->addSelectColumn(OrderStatusTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.COLOR');
+            $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.PROTECTED_STATUS');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

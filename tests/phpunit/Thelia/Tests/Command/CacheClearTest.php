@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Command;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -101,7 +102,7 @@ class CacheClearTest extends ContainerAwareTestCase
     protected function buildContainer(ContainerBuilder $container)
     {
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addSubscriber(new Cache());
+        $eventDispatcher->addSubscriber(new Cache(new ArrayAdapter()));
 
         $container->set("event_dispatcher", $eventDispatcher);
 

@@ -1,6 +1,7 @@
 <?php
 
 return array(
+    'Combination ref : ' => 'Combination ref : ',
     'Customer Number' => 'Customer Number',
     'DELIVERY' => 'DELIVERY',
     'Delivery address' => 'Delivery address',
@@ -15,6 +16,7 @@ return array(
     'Phone: ' => 'Phone: ',
     'Postage' => 'Postage',
     'Product' => 'Product',
+    'Product ref : ' => 'Product ref : ',
     'Quantity' => 'Quantity',
     'Ref' => 'Ref',
     'Tax' => 'Tax',
@@ -24,8 +26,6 @@ return array(
     'Total without tax' => 'Total without tax',
     'Unit taxed price' => 'Unit taxed price',
     'Unit. price' => 'Unit. price',
-    'delivery.imprint' => 'delivery.imprint',
-    'invoice.imprint' => 'invoice.imprint',
     'page' => 'page',
     'product' => 'product',
 );

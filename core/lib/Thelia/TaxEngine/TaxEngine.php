@@ -80,8 +80,9 @@ class TaxEngine
                     foreach ($directoryIterator as $fileinfo) {
                         if ($fileinfo->isFile()) {
                             $extension = $fileinfo->getExtension();
-                            if (strtolower($extension) !== 'php')
+                            if (strtolower($extension) !== 'php') {
                                 continue;
+                            }
                             $className  = $fileinfo->getBaseName('.php');
 
                             try {

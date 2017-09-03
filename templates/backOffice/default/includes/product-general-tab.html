@@ -64,7 +64,7 @@
                               <option value="0" disabled>{intl l="Top level"}</option>
 
                               {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0" return_url=false}
-                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                   <option value="{$ID}" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{option_offset l=$LEVEL+1 label={$TITLE}}</option>
                               {/loop}
 
                         </select>

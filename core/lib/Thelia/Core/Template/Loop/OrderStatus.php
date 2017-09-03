@@ -30,9 +30,11 @@ use Thelia\Model\OrderStatus as OrderStatusModel;
  * Class OrderStatus
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Gilles Bourgeat <gbourgeat@gmail.com>
  *
  * @method int[] getId()
  * @method string getCode()
+ * @method string[] getOrder()
  */
 class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -45,7 +47,17 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createAnyTypeArgument('code')
+            Argument::createAnyTypeArgument('code'),
+            Argument::createEnumListTypeArgument(
+                'order',
+                [
+                    'alpha',
+                    'alpha_reverse',
+                    'manual',
+                    'manual_reverse'
+                ],
+                'manual'
+            )
         );
     }
 
@@ -56,16 +68,31 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         /* manage translations */
         $this->configureI18nProcessing($search);
 
-        $id = $this->getId();
-
-        if (null !== $id) {
+        if (null !== $id = $this->getId()) {
             $search->filterById($id, Criteria::IN);
         }
 
-        $code = $this->getCode();
-
-        if (null !== $code) {
+        if (null !== $code = $this->getCode()) {
             $search->filterByCode($code, Criteria::EQUAL);
+        }
+
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+            }
         }
 
         return $search;
@@ -80,6 +107,9 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("IS_TRANSLATED", $orderStatus->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)
                 ->set("CODE", $orderStatus->getCode())
+                ->set("COLOR", $orderStatus->getColor())
+                ->set("POSITION", $orderStatus->getPosition())
+                ->set("PROTECTED_STATUS", $orderStatus->getProtectedStatus())
                 ->set("TITLE", $orderStatus->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $orderStatus->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))

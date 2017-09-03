@@ -80,6 +80,20 @@ class LoopResult implements \Iterator, \JsonSerializable
 
         $this->collection[] = $row;
     }
+    
+    /**
+     * Adjust the collection once all results have been added.
+     */
+    public function finalizeRows()
+    {
+        // Fix rows LOOP_TOTAL if parseResults() did not added all resultsCollection items to the collection array
+        // see https://github.com/thelia/thelia/issues/2337
+        if (true === $this->countable && $this->getResultDataCollectionCount() !== $realCount = $this->getCount()) {
+            foreach ($this->collection as &$item) {
+                $item->set('LOOP_TOTAL', $realCount);
+            }
+        }
+    }
 
     public function getCount()
     {

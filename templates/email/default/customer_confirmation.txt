@@ -1,0 +1,11 @@
+{default_translation_domain domain='email.default'}
+{loop type="customer" name="confirmation" current=false id=$customer_id}
+{intl l="Welcome to %store," store={config key="store_name"}}
+<br>
+{intl l="To complete your customer account creation, please confirm your email address by clicking the link below, or copying it in your browser address bar."}
+<br>
+{url path='/customer/confirm/%token' token=$CONFIRMATION_TOKEN}
+<br>
+{intl l='Kind regards'},
+{intl l="The %store team." store={config key="store_name"}}
+{/loop}

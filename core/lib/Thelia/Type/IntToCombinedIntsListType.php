@@ -47,7 +47,7 @@ class IntToCombinedIntsListType extends BaseType
     public function getFormattedValue($values)
     {
         if ($this->isValid($values)) {
-            $return = '';
+            $return = [];
 
             $values = preg_replace('#[\s]#', '', $values);
             foreach (explode(',', $values) as $intToCombinedInts) {

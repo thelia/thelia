@@ -435,7 +435,6 @@ class LangController extends BaseAdminController
                 ),
                 $changedObject->getId()
             );
-
         } catch (\Exception $e) {
             Tlog::getInstance()->error(sprintf("Error on changing languages with message : %s", $e->getMessage()));
             $errorMessage = $e->getMessage();

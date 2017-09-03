@@ -1,0 +1,48 @@
+{loop type="currency" name="default-currency" default_only="1"}
+{$defaultCurrency = $SYMBOL}
+{/loop}
+
+{if empty($startDate)}{$startDate = 'this_month'}{/if}
+{if empty($startDate)}{$startDate = 'this_month'}{/if}
+
+{if empty($prevMonthStartDate)}{$prevMonthStartDate = 'last_month'}{/if}
+{if empty($prevMonthEndDate)}{$prevMonthEndDate = 'last_month'}{/if}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <th>{intl l="Overall sales" d='hookadminhome.bo.default'}</th>
+            <td>{format_money number={stats key="sales" startDate=$startDate endDate=$endDate} symbol=$defaultCurrency}</td>
+        </tr>
+        <tr>
+            <th>{intl l="Sales excluding shipping" d='hookadminhome.bo.default'}</th>
+            <td>
+                {$salesNoShipping = {stats key="sales" startDate=$startDate endDate=$endDate includeShipping="false"}}
+                {format_money number=$salesNoShipping symbol=$defaultCurrency}
+            </td>
+        </tr>
+        <tr>
+            <th>{intl l="Previous month sales" d='hookadminhome.bo.default'}</th>
+            <td>{format_money number={stats key="sales" startDate=$prevMonthStartDate endDate=$prevMonthEndDate} symbol=$defaultCurrency}</td>
+        </tr>
+        <tr>
+            <th>{intl l="Orders" d='hookadminhome.bo.default'}</th>
+            <td>
+                {$orderCount =  {stats key="orders" startDate=$startDate endDate=$endDate}}
+                {$orderCount}
+            </td>
+        </tr>
+        <tr>
+            <th>{intl l="Average cart" d='hookadminhome.bo.default'}</th>
+            <td>
+                {if $orderCount == 0}
+                    {format_money number=0 symbol=$defaultCurrency}
+                {else}
+                    {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency}
+                {/if}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

@@ -28,6 +28,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.order_status" class="Thelia\Action\OrderStatus">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.coupon" class="Thelia\Action\Coupon">
             <argument type="service" id="request_stack"/>
             <argument type="service" id="thelia.coupon.factory"/>
@@ -171,6 +175,7 @@
         </service>
 
         <service id="thelia.action.cache" class="Thelia\Action\Cache">
+            <argument type="service" id="thelia.cache"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
