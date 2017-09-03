@@ -353,6 +353,7 @@ class CheckPermission extends BaseInstall
     {
         $val = trim($val);
         $last = strtolower($val[strlen($val)-1]);
+        $val = intval($val);
         // Do not add breaks in the switch below
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0

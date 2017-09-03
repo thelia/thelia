@@ -1,4 +1,8 @@
 sudo: false
+# Temporarly use Ubuntu precise instread of trusty as the GD version provided with trusty 5.5 and 5.6 PHP version
+# is not compiled with FreeType support, causing errors in faker images generation.
+# Once this problem will be fixed by Travis CI, il will be safe to remive this line.
+dist: precise
 addons:
   apt_packages:
     - language-pack-fr
