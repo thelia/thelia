@@ -6,8 +6,8 @@ Readme
 
 Thelia
 ------
-[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) 
-[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) 
+[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia)
+[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
 [Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
@@ -22,7 +22,7 @@ Requirements
 * PHP 5.5
     * Required extensions :
         * PDO_Mysql
-        * mcrypt
+        * openssl
         * intl
         * gd
         * curl
@@ -95,8 +95,8 @@ $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar create-project thelia/thelia path/ 2.3.3 (2.2.6 or 2.1.11)
 ```
 
-If something goes wrong during the install process, you can restart Thelia install wizard with 
-the following command : `php composer.phar run-script post-create-project-cmd` 
+If something goes wrong during the install process, you can restart Thelia install wizard with
+the following command : `php composer.phar run-script post-create-project-cmd`
 
 ## Install it
 
@@ -169,11 +169,11 @@ docker exec -it thelia_web_1 unit-tests.sh
 
 Once started, you can open your local Thelia website at [127.0.0.1:8080](http://127.0.0.1:8080) and your phpMyAdmin installation at [127.0.0.1:8081](http://127.0.0.1:8081).
 
-What is missing : 
+What is missing :
 
 * confguration for export compression (zip, gzip, etc)
 
-Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it : 
+Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it :
 
 ```
 docker-compose build --no-cache
