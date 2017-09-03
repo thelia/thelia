@@ -730,6 +730,7 @@ return array(
     'Manage taxes' => 'Gérer les taxes',
     'Manage the tax rule taxes appliance order' => 'Gérer les règles de taxe et leur ordre d\'application',
     'Maximum usage count :' => 'Nombre maximum d\'utilisations',
+    'Media' => 'Média',
     'Message created on %date_create. Last modification: %date_change' => 'Message créé le %date_create. Dernière modification le %date_change',
     'Message data' => 'Données du message',
     'Message level' => 'Niveau de message',
