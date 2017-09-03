@@ -213,13 +213,13 @@ class CartPostage extends AbstractSmartyPlugin
               continue;
           }
 
-        	$moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+          $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-        	if (true === $virtual
-        		&& false === $moduleInstance->handleVirtualProductDelivery()
-        		) {
-        		continue;
-        	}
+          if (true === $virtual
+            && false === $moduleInstance->handleVirtualProductDelivery()
+            ) {
+            continue;
+          }
 
             try {
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);

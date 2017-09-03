@@ -129,9 +129,9 @@ class TaxEngine
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();
                     if (isset($customerDefaultAddress)) {
-											$this->taxCountry = $customerDefaultAddress->getCountry();
-											$this->taxState = $customerDefaultAddress->getState();
-										}
+                      $this->taxCountry = $customerDefaultAddress->getCountry();
+                      $this->taxState = $customerDefaultAddress->getState();
+                    }
                 }
             }
 
