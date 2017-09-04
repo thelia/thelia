@@ -128,8 +128,10 @@ class TaxEngine
                     $this->taxState = $currentDeliveryAddress->getState();
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();
-                    $this->taxCountry = $customerDefaultAddress->getCountry();
-                    $this->taxState = $customerDefaultAddress->getState();
+                    if (isset($customerDefaultAddress)) {
+                      $this->taxCountry = $customerDefaultAddress->getCountry();
+                      $this->taxState = $customerDefaultAddress->getState();
+                    }
                 }
             }
 
