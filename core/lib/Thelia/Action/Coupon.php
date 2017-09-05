@@ -430,7 +430,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 $usedCoupon->setUsageCanceled(false)->save();
             }
         }
-
     }
 
     /**

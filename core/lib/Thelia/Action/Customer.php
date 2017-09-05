@@ -60,11 +60,29 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
         if ($event->getNotifyCustomerOfAccountCreation()) {
-            $this->mailer->sendEmailToCustomer('customer_account_created', $customer, [ 'password' => $plainPassword ]);
+            $this->mailer->sendEmailToCustomer(
+                'customer_account_created',
+                $customer,
+                [ 'password' => $plainPassword ]
+            );
         }
 
+        $dispatcher->dispatch(
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
+            new CustomerEvent($customer)
+        );
+    }
+
+    public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        $customer = $event->getCustomer();
+
         if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
-            $this->mailer->sendEmailToCustomer('customer_confirmation', $customer, ['customer' => $customer]);
+            $this->mailer->sendEmailToCustomer(
+                'customer_confirmation',
+                $customer,
+                ['customer_id' => $customer->getId()]
+            );
         }
     }
 
@@ -214,7 +232,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
             TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
             TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
-            TheliaEvents::LOST_PASSWORD             => array('lostPassword', 128)
+            TheliaEvents::LOST_PASSWORD             => array('lostPassword', 128),
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL => array('customerConfirmationEmail', 128)
         );
     }
 }

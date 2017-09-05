@@ -108,7 +108,7 @@ return [
     'Available taxes' => 'Impuestos disponibles',
     'Back' => 'Volver',
     'Back Office' => 'Panel de administración',
-    'Back-office home' => 'Página de inicio del panel de adñinistración',
+    'Back-office home' => 'Página de inicio del panel de administración',
     'Back-office template you want to translate' => 'Plantilla de back office que deseas traducir',
     'Back-office templates' => 'Plantillad de Back office',
     'Back-office users' => 'Usuarios del back office',

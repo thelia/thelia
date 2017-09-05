@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\TheliaFormValidatorInterface;
@@ -133,6 +135,28 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
+        // Get form field error details
+        $formFieldErrors = [];
+
+        /** @var Form $field */
+        foreach ($form->getForm()->getIterator() as $field) {
+            $errors = $field->getErrors();
+
+            if (count($errors) > 0) {
+                $formFieldErrors[$field->getName()] = [];
+
+                /** @var FormError $error */
+                foreach ($errors as $error) {
+                    $formFieldErrors[$field->getName()][] = [
+                        'message' => $error->getMessage(),
+                        'template' => $error->getMessageTemplate(),
+                        'parameters' => $error->getMessageParameters(),
+                        'pluralization' => $error->getMessagePluralization()
+                    ];
+                }
+            }
+        }
+
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
         // Set form error information
@@ -142,7 +166,8 @@ class ParserContext implements \IteratorAggregate
             'errorMessage'      => $form->getErrorMessage(),
             'method'            => $this->requestStack->getCurrentRequest()->getMethod(),
             'timestamp'         => time(),
-            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
+            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups'),
+            'field_errors'      => $formFieldErrors
         ];
 
         $this->getSession()->setFormErrorInformation($formErrorInformation);
@@ -188,6 +213,26 @@ class ParserContext implements \IteratorAggregate
                         $this->formValidator->validateForm($form, $formInfo['method']);
                     } catch (\Exception $ex) {
                         // Ignore the exception.
+                    }
+
+                    // Manually set the form fields error information, if validateForm() did not the job,
+                    // which is the case when the user has been redirected.
+                    foreach ($formInfo['field_errors'] as $fieldName => $errors) {
+                        /** @var Form $field */
+                        $field = $form->getForm()->get($fieldName);
+
+                        if (null !==  $field && count($field->getErrors()) == 0) {
+                            foreach ($errors as $errorData) {
+                                $error = new FormError(
+                                    $errorData['message'],
+                                    $errorData['template'],
+                                    $errorData['parameters'],
+                                    $errorData['pluralization']
+                                );
+
+                                $field->addError($error);
+                            }
+                        }
                     }
                 }
 

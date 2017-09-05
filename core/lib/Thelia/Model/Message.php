@@ -124,13 +124,16 @@ class Message extends BaseMessage
      */
     public function getTextMessageBody(ParserInterface $parser)
     {
-        return $this->getMessageBody(
+        $message = $this->getMessageBody(
             $parser,
             $this->getTextMessage(),
             $this->getTextLayoutFileName(),
             $this->getTextTemplateFileName(),
             true // Do not compress the output, and keep empty lines.
         );
+
+        // Replaced all <br> by newlines.
+        return preg_replace("/<br>/i", "\n", $message);
     }
 
     /**

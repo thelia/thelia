@@ -6,6 +6,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
@@ -134,26 +135,23 @@ class Order extends BaseOrder
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
-        $amount = 0;
-        $tax = 0;
-
-        /* browse all products */
-        foreach ($this->getOrderProducts() as $orderProduct) {
-            $taxAmountQuery = OrderProductTaxQuery::create();
-
-            if ($orderProduct->getWasInPromo() == 1) {
-                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::PROMO_AMOUNT . ')', 'total_tax');
-            } else {
-                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax');
-            }
-
-            $taxAmount = $taxAmountQuery->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
-                ->findOne();
-            $price = ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice());
-            $amount += $price * $orderProduct->getQuantity();
-            $tax += $taxAmount->getVirtualColumn('total_tax') * $orderProduct->getQuantity();
-        }
-
+        $orderInfo = OrderProductQuery::create()
+            ->filterByOrderId($this->getId())
+            ->leftJoinOrderProductTax()
+            ->withColumn('SUM(
+                ' . OrderProductTableMap::QUANTITY . '
+                * IF('.OrderProductTableMap::WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::PROMO_AMOUNT.', '.OrderProductTaxTableMap::AMOUNT.')
+            )', 'total_tax')
+            ->withColumn('SUM(
+                ' . OrderProductTableMap::QUANTITY . '
+                * IF('.OrderProductTableMap::WAS_IN_PROMO.' = 1, '.OrderProductTableMap::PROMO_PRICE.', '.OrderProductTableMap::PRICE.')
+            )', 'total_amount')
+            ->select([ 'total_tax', 'total_amount' ])
+            ->findOne();
+    
+        $tax = $orderInfo['total_tax'];
+        $amount = $orderInfo['total_amount'];
+        
         $total = $amount + $tax;
 
         // @todo : manage discount : free postage ?

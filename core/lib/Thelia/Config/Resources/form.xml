@@ -74,6 +74,7 @@
 
         <form name="thelia.admin.message.creation" class="Thelia\Form\MessageCreationForm"/>
         <form name="thelia.admin.message.modification" class="Thelia\Form\MessageModificationForm"/>
+        <form name="thelia.admin.message.send-sample" class="Thelia\Form\MessageSendSampleForm"/>
 
         <form name="thelia.admin.currency.creation" class="Thelia\Form\CurrencyCreationForm"/>
         <form name="thelia.admin.currency.modification" class="Thelia\Form\CurrencyModificationForm"/>

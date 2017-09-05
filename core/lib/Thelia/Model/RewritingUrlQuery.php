@@ -120,6 +120,5 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
         return $viewLocale;
     }
-
 }
 // RewritingUrlQuery

@@ -11,51 +11,51 @@
 
 {block name="main-content"}
     <div class="templates edit-template">
-
+        
         <div id="wrapper" class="container">
-
+            
             {loop name="template_edit" type="product-template" id="$template_id" backend_context="1" lang="$edit_language_id"}
-
+                
                 <ul class="breadcrumb">
-        			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                    <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
                     <li><a href="{url path='/admin/configuration/templates'}">{intl l="Templates"}</a></li>
                     <li>{intl l='Editing template "%name"' name={$NAME}}</li>
                 </ul>
-
-                {hook name="template-edit.top" template_id=$template_id}
-
-        		<div class="row">
-        			<div class="col-md-12 general-block-decorator">
-        				<div class="row">
-
-        					<div class="col-md-12 title title-without-tabs">
-        					   {intl l='Edit template "%name"' name={$NAME}}
-        					</div>
-
+            
+            {hook name="template-edit.top" template_id=$template_id}
+                
+                <div class="row">
+                    <div class="col-md-12 general-block-decorator">
+                        <div class="row">
+                            
+                            <div class="col-md-12 title title-without-tabs">
+                                {intl l='Edit template "%name"' name={$NAME}}
+                            </div>
+                            
                             <div class="form-container">
                                 <div class="col-md-12">
-
-        						    {form name="thelia.admin.template.modification"}
-        						    	<form method="POST" action="{url path='/admin/configuration/templates/save'}" {form_enctype} class="clearfix">
-
-        	                                {* Be sure to get the template ID, even if the form could not be validated *}
-        	                                <input type="hidden" name="template_id" value="{$template_id}" />
-
-                                        	{include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/templates'}"}
-
-        						        	{form_hidden_fields}
-
-        						        	{form_field field='success_url'}
-        						        		<input type="hidden" name="{$name}" value="{url path='/admin/configuration/templates'}" />
-        						        	{/form_field}
-
-        			                        {form_field field='locale'}
-        			                        	<input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-        			                        {/form_field}
-
-        					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
+                                    
+                                    {form name="thelia.admin.template.modification"}
+                                        <form method="POST" action="{url path='/admin/configuration/templates/save'}" {form_enctype} class="clearfix">
+                                            
+                                            {* Be sure to get the template ID, even if the form could not be validated *}
+                                            <input type="hidden" name="template_id" value="{$template_id}" />
+                                            
+                                            {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/templates'}"}
+                                            
+                                            {form_hidden_fields}
+                                            
+                                            {form_field field='success_url'}
+                                                <input type="hidden" name="{$name}" value="{url path='/admin/configuration/templates'}" />
+                                            {/form_field}
+                                            
+                                            {form_field field='locale'}
+                                                <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                                            {/form_field}
+                                            
+                                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                                            
                                             {form_field field='name'}
                                                 <div class="form-group {if $error}has-error{/if}">
                                                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
@@ -67,43 +67,125 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="row">
-                           <div class="form-container">
-                                <div class="col-md-6">
-                                       <div class="well well-sm">
-	                                    <p class="title title-without-tabs">
-                                            <a href="{url path='/admin/configuration/attributes'}">{intl l='Attributes'}</a>
-                                        </p>
-	                                    <p>{intl l="Manage attributes included in this product template"}</p>
-
-	                                    <div id="attribute_list_management">
-	                                       <div class="loading"></div>
-	                                    </div>
-                                       </div>
-                                </div>
-
+                            <div class="form-container">
                                 <div class="col-md-6">
                                     <div class="well well-sm">
-	                                    <p class="title title-without-tabs">
+                                        <p class="title title-without-tabs">
+                                            <a href="{url path='/admin/configuration/attributes'}">{intl l='Attributes'}</a>
+                                        </p>
+                                        <p>{intl l="Manage attributes included in this product template"}</p>
+                                        
+                                        <div id="attribute_list_management">
+                                            <div class="loading"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="well well-sm">
+                                        <p class="title title-without-tabs">
                                             <a href="{url path='/admin/configuration/features'}">{intl l='Features'}</a>
                                         </p>
-	                                    <p>{intl l="Manage features included in this product template"}</p>
-
+                                        <p>{intl l="Manage features included in this product template"}</p>
+                                        
                                         <div id="feature_list_management">
-                                           <div class="loading"></div>
+                                            <div class="loading"></div>
                                         </div>
-                                       </div>
-        						</div>
-       						</div>
-        				</div>
-        			</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="well well-sm">
+                                    {$max_products = {$smarty.get.p|default:50}}
+                                    {$total = {count type="product" backend_context=1 visible='*' template_id=$template_id}}
+                                    {$not_loaded = $total - $max_products}
+                                    <p class="title title-without-tabs">
+                                        {intl l='Products using this template (%num)' num=$total}
+                                    </p>
+                                    {ifloop rel='prod-using'}
+                                        <table id="product-list" class="table table-condensed table-striped">
+                                            <tr>
+                                                <th>{intl l="ID"}</th>
+                                                <th>{intl l="Reference"}</th>
+                                                <th>{intl l="Title"}</th>
+                                            </tr>
+                                            
+                                            {loop type="product" name="prod-using" backend_context=1 visible='*' template_id=$template_id limit=$max_products order='ref'}
+                                            {$url = {url path="/admin/products/update" product_id=$ID}}
+                                                <tr>
+                                                    <td><a href="{$url}">{$ID}</a></td>
+                                                    <td><a href="{$url}">{$REF}</a></td>
+                                                    <td>{$TITLE}</td>
+                                                </tr>
+                                            {/loop}
+                                        </table>
+                                        {if $total > $max_products}
+                                            <p class="text-center">
+                                                <a href="{navigate to="current" p=$total}#product-list">{intl l="Showing %loaded products. Click here to load the %remaining  other products" loaded=$max_products remaining=$not_loaded}</a>
+                                            </p>
+                                        {/if}
+                                    {/ifloop}
+                                    
+                                    {elseloop rel='prod-using'}
+                                        <div class="alert alert-info">
+                                            {intl l='This template is not used by any product.'}
+                                        </div>
+                                    {/elseloop}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="well well-sm">
+                                    {$max_categories = {$smarty.get.c|default:50}}
+                                    {$total = {count type="category" name="cat-using" backend_context=1 visible='*' template_id=$template_id}}
+                                    {$not_loaded = $total - $max_categories}
+    
+                                    <p class="title title-without-tabs">
+                                        {intl l='Is the default template for categories (%num)' num={count type="category" backend_context=1 visible='*' template_id=$template_id}}
+                                    </p>
+                                    {ifloop rel='cat-using'}
+                                        <table id="category-list" class="table table-condensed table-striped">
+                                            <tr>
+                                                <th>{intl l="ID"}</th>
+                                                <th>{intl l="Title"}</th>
+                                            </tr>
+                                            
+                                            {loop type="category" name="cat-using" backend_context=1 visible='*' template_id=$template_id limit=$loaded_categories order='alpha'}
+                                            {$url = {url path="/admin/categories/update" category_id=$ID}}
+                                                <tr>
+                                                    <td><a href="{$url}">{$ID}</a></td>
+                                                    <td><a href="{$url}">{$TITLE}</a></td>
+                                                </tr>
+                                            {/loop}
+                                        </table>
+                                        {if $total > $max_categories}
+                                            <p class="text-center">
+                                                <a href="{navigate to="current" p=$total}#category-list">{intl l="Showing %loaded categories. Click here to load the %remaining  other categories" loaded=$max_categories remaining=$not_loaded}</a>
+                                            </p>
+                                        {/if}
 
-        		</div>
-
-                {hook name="template-edit.bottom" template_id=$template_id}
-    		{/loop}
-
+                                    {/ifloop}
+                                    
+                                    {elseloop rel='cat-using'}
+                                        <div class="alert alert-info">
+                                            {intl l='No categories are using this template as the default.'}
+                                        </div>
+                                    {/elseloop}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            
+            {hook name="template-edit.bottom" template_id=$template_id}
+            {/loop}
+            
             {elseloop rel="template_edit"}
                 <div class="row">
                     <div class="col-md-12">
@@ -113,22 +195,22 @@
                     </div>
                 </div>
             {/elseloop}
-
+        
         </div>
     </div>
 {/block}
 
 {block name="javascript-initialization"}
-
+    
     {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-
+    
     <script>
         $(function() {
-        	$('#feature_list_management').load("{url noamp='1' path='/admin/configuration/templates/features/list' template_id=$template_id}");
+            $('#feature_list_management').load("{url noamp='1' path='/admin/configuration/templates/features/list' template_id=$template_id}");
             $('#attribute_list_management').load("{url noamp='1' path='/admin/configuration/templates/attributes/list'  template_id=$template_id}");
-       });
+        });
     </script>
 {/block}
 

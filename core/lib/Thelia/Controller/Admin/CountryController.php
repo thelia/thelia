@@ -127,7 +127,6 @@ class CountryController extends AbstractCrudController
         ;
 
         return $event;
-
     }
 
     protected function hydrateEvent($event, $formData)

@@ -129,6 +129,15 @@ class Database
     {
         $sql = str_replace(";',", "-CODE-", $sql);
         $sql = trim($sql);
+        preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
+        foreach ($m[0] as $k => $v) {
+            if ($m[1][$k] == '|') {
+                throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
+            }
+            $stored = str_replace(';', '|', $m[2][$k]);
+            $stored = str_replace($m[1][$k], ";\n", $stored);
+            $sql = str_replace($v, $stored, $sql);
+        }
         $query = array();
 
         $tab = explode(";\n", $sql);

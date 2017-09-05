@@ -8,9 +8,7 @@ return array(
     'All rights reserved.' => 'Tous droits réservés',
     'An account at %store_name has been created by one of our managers.' => 'Un compte client %store_name a été créé pour vous.',
     'Billing address:' => 'Adresse de facturation : ',
-    'Confirm now' => 'Confirmer maintenant',
     'Confirm your %store account' => 'Confirmez la création de votre compte sur %store',
-    'Confirm your email to complete your account' => 'Merci de confirmer votre adresse e-mail pour confirmer la création de votre compte',
     'Copyright' => 'Copyright',
     'Customer billing address:' => 'Adresse de facturation',
     'Customer delivery address:' => 'Adresse de livraison',
@@ -51,6 +49,7 @@ return array(
     'Thanks' => 'Merci',
     'The %store team.' => 'L\'équipe %store.',
     'Thelia V2' => 'Thelia v2',
+    'To complete your customer account creation, please confirm your email address by clicking the link below, or copying it in your browser address bar.' => 'Pour terminer la création de votre compte client, merci de confirmer votre adresse email en cliquant le lien ci-dessous. Vous pouvez aussi le copier dans la barre d\'adresse de votre navigateur.',
     'To login, please use the email address <span style="font-family: courier, fixed; font-size: 120%">%email</span>' => 'Pour vous connecter, merci d\'utiliser l\'adresse e-mail <span style="font-family: courier, fixed; font-size: 120%">%email</span>',
     'To unsubscribe from our newsletter, please <a href="%unsublink">click here</a>.' => 'Pour vous désabonner de notre newsletter, merci de <a href="%unsublink">cliquer ici</a>.',
     'To unsubscribe from our newsletter, please go to the following web address:' => 'Pour vous désabonner de notre newsletter, merci de vous rendre à l\'adresse ci-dessous:',
@@ -80,5 +79,4 @@ return array(
     'Your password for %store' => 'Votre mot de passe pour %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Votre mot de passe est <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
     'Your subscriotion to %store newsletter' => 'Votre abonnement à la newletter %store',
-    'just click the button below : ' => 'il suffit de cliquer le bouton ci-dessous :',
 );

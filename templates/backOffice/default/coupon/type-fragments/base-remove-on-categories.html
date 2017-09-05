@@ -8,7 +8,7 @@
 
     <select required multiple size="10" class="form-control" id="coupon-categories-id" name="{$categories_field_name}[]">
         {loop type="category-tree" category=0 name="list-of-categories" backend_context="1" visible="*"}
-            <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if in_array($ID, $categories_values)}selected="selected"{/if}>{$TITLE}</option>
+            <option value="{$ID}" {if in_array($ID, $categories_values)}selected="selected"{/if}>{option_offset l=$LEVEL label={$TITLE}}</option>
         {/loop}
     </select>
 

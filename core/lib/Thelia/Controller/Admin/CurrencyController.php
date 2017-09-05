@@ -205,7 +205,6 @@ class CurrencyController extends AbstractCrudController
                     'undefined_rates' => $event->getUndefinedRates()
                 ]);
             }
-
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);

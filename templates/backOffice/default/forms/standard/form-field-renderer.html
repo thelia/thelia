@@ -12,9 +12,7 @@ fragment uses the following additional variables :
 *}
 
 {* Get standard fields attributes *}
-{capture assign=attributes}
-    {include file="forms/$field_template/form-field-attributes-renderer.html"}
-{/capture}
+{capture assign=attributes}{include file="forms/$field_template/form-field-attributes-renderer.html"}{/capture}
 
 {*
 Use the optionnal $field_value parameter if no value is defined
@@ -105,8 +103,8 @@ Use the optionnal $field_value parameter if no value is defined
 
                 <select {$attributes nofilter}>
                     {foreach $choices as $choice}
-                    <option value="{$choice->value}" {if (is_array($value) && in_array($choice->value, $value)) || $choice->value == $value}selected="selected"{/if}>{$choice->label}
-                        {/foreach}
+                    <option value="{$choice->value}" {if (is_array($value) && in_array($choice->value, $value)) || $choice->value == $value}selected="selected"{/if}>{$choice->label}</option>
+                    {/foreach}
                 </select>
 
             {elseif $type == 'textarea'}

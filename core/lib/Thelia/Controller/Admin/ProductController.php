@@ -329,7 +329,6 @@ class ProductController extends AbstractSeoCrudController
                 $this->appendValue($combinationPseData, "isdefault", $saleElement->getIsDefault() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "ean_code", $saleElement->getEanCode());
             }
-
         }
 
         $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, "form", $defaultPseData);
@@ -840,7 +839,7 @@ class ProductController extends AbstractSeoCrudController
                     // Check if a FeatureProduct exists for this product and this feature (for another lang)
                     $freeTextFeatureProduct = FeatureProductQuery::create()
                         ->filterByProductId($productId)
-                        ->filterByFreeTextValue(true)
+                        ->filterByIsFreeText(true)
                         ->findOneByFeatureId($featureId);
 
                     // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing

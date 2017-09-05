@@ -58,7 +58,7 @@ class FeatureProductTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 9;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class FeatureProductTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /**
      * the column name for the ID field
@@ -94,6 +94,11 @@ class FeatureProductTableMap extends TableMap
      * the column name for the FREE_TEXT_VALUE field
      */
     const FREE_TEXT_VALUE = 'feature_product.FREE_TEXT_VALUE';
+
+    /**
+     * the column name for the IS_FREE_TEXT field
+     */
+    const IS_FREE_TEXT = 'feature_product.IS_FREE_TEXT';
 
     /**
      * the column name for the POSITION field
@@ -122,12 +127,12 @@ class FeatureProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'FeatureId', 'FeatureAvId', 'FreeTextValue', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'featureId', 'featureAvId', 'freeTextValue', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(FeatureProductTableMap::ID, FeatureProductTableMap::PRODUCT_ID, FeatureProductTableMap::FEATURE_ID, FeatureProductTableMap::FEATURE_AV_ID, FeatureProductTableMap::FREE_TEXT_VALUE, FeatureProductTableMap::POSITION, FeatureProductTableMap::CREATED_AT, FeatureProductTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FEATURE_ID', 'FEATURE_AV_ID', 'FREE_TEXT_VALUE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_id', 'feature_id', 'feature_av_id', 'free_text_value', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'FeatureId', 'FeatureAvId', 'FreeTextValue', 'IsFreeText', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'featureId', 'featureAvId', 'freeTextValue', 'isFreeText', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(FeatureProductTableMap::ID, FeatureProductTableMap::PRODUCT_ID, FeatureProductTableMap::FEATURE_ID, FeatureProductTableMap::FEATURE_AV_ID, FeatureProductTableMap::FREE_TEXT_VALUE, FeatureProductTableMap::IS_FREE_TEXT, FeatureProductTableMap::POSITION, FeatureProductTableMap::CREATED_AT, FeatureProductTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FEATURE_ID', 'FEATURE_AV_ID', 'FREE_TEXT_VALUE', 'IS_FREE_TEXT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_id', 'feature_id', 'feature_av_id', 'free_text_value', 'is_free_text', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -137,12 +142,12 @@ class FeatureProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'FeatureId' => 2, 'FeatureAvId' => 3, 'FreeTextValue' => 4, 'Position' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'featureId' => 2, 'featureAvId' => 3, 'freeTextValue' => 4, 'position' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        self::TYPE_COLNAME       => array(FeatureProductTableMap::ID => 0, FeatureProductTableMap::PRODUCT_ID => 1, FeatureProductTableMap::FEATURE_ID => 2, FeatureProductTableMap::FEATURE_AV_ID => 3, FeatureProductTableMap::FREE_TEXT_VALUE => 4, FeatureProductTableMap::POSITION => 5, FeatureProductTableMap::CREATED_AT => 6, FeatureProductTableMap::UPDATED_AT => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FEATURE_ID' => 2, 'FEATURE_AV_ID' => 3, 'FREE_TEXT_VALUE' => 4, 'POSITION' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'feature_id' => 2, 'feature_av_id' => 3, 'free_text_value' => 4, 'position' => 5, 'created_at' => 6, 'updated_at' => 7, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'FeatureId' => 2, 'FeatureAvId' => 3, 'FreeTextValue' => 4, 'IsFreeText' => 5, 'Position' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'featureId' => 2, 'featureAvId' => 3, 'freeTextValue' => 4, 'isFreeText' => 5, 'position' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+        self::TYPE_COLNAME       => array(FeatureProductTableMap::ID => 0, FeatureProductTableMap::PRODUCT_ID => 1, FeatureProductTableMap::FEATURE_ID => 2, FeatureProductTableMap::FEATURE_AV_ID => 3, FeatureProductTableMap::FREE_TEXT_VALUE => 4, FeatureProductTableMap::IS_FREE_TEXT => 5, FeatureProductTableMap::POSITION => 6, FeatureProductTableMap::CREATED_AT => 7, FeatureProductTableMap::UPDATED_AT => 8, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FEATURE_ID' => 2, 'FEATURE_AV_ID' => 3, 'FREE_TEXT_VALUE' => 4, 'IS_FREE_TEXT' => 5, 'POSITION' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'feature_id' => 2, 'feature_av_id' => 3, 'free_text_value' => 4, 'is_free_text' => 5, 'position' => 6, 'created_at' => 7, 'updated_at' => 8, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -166,6 +171,7 @@ class FeatureProductTableMap extends TableMap
         $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
         $this->addForeignKey('FEATURE_AV_ID', 'FeatureAvId', 'INTEGER', 'feature_av', 'ID', false, null, null);
         $this->addColumn('FREE_TEXT_VALUE', 'FreeTextValue', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('IS_FREE_TEXT', 'IsFreeText', 'BOOLEAN', true, 1, false);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -337,6 +343,7 @@ class FeatureProductTableMap extends TableMap
             $criteria->addSelectColumn(FeatureProductTableMap::FEATURE_ID);
             $criteria->addSelectColumn(FeatureProductTableMap::FEATURE_AV_ID);
             $criteria->addSelectColumn(FeatureProductTableMap::FREE_TEXT_VALUE);
+            $criteria->addSelectColumn(FeatureProductTableMap::IS_FREE_TEXT);
             $criteria->addSelectColumn(FeatureProductTableMap::POSITION);
             $criteria->addSelectColumn(FeatureProductTableMap::CREATED_AT);
             $criteria->addSelectColumn(FeatureProductTableMap::UPDATED_AT);
@@ -346,6 +353,7 @@ class FeatureProductTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.FEATURE_ID');
             $criteria->addSelectColumn($alias . '.FEATURE_AV_ID');
             $criteria->addSelectColumn($alias . '.FREE_TEXT_VALUE');
+            $criteria->addSelectColumn($alias . '.IS_FREE_TEXT');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

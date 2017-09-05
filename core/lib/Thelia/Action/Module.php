@@ -84,7 +84,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             try {
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
-
                     if ($module->getMandatory() == BaseModule::IS_MANDATORY && $event->getAssumeDeactivate() === false) {
                         throw new \Exception(
                             Translator::getInstance()->trans('Can\'t deactivate a secure module')

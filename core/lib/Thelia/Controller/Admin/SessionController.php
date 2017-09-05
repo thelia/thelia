@@ -185,7 +185,6 @@ class SessionController extends BaseAdminController
             $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, null);
 
             return $this->generateSuccessRedirect($adminCreatePasswordForm);
-
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);

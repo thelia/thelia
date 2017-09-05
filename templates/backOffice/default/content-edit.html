@@ -135,7 +135,7 @@
 
                                                                         {$myparent=$DEFAULT_FOLDER}
                                                                         {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
-                                                                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                                                            <option value="{$ID}" {if $myparent == $ID}selected="selected"{/if}>{option_offset l=$LEVEL+1 label={$TITLE}}</option>
                                                                         {/loop}
 
                                                                     </select>

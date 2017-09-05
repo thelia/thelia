@@ -26,6 +26,10 @@ final class TheliaEvents
      * sent at the beginning
      */
     const BOOT = "thelia.boot";
+    /**
+     * Kernel View Check Handle
+     */
+    const VIEW_CHECK = "thelia.view_check";
     // -- END CORE EVENTS ---------------------------------------------------------
     // -- ADDRESS EVENTS ---------------------------------------------------------
     /**
@@ -115,6 +119,8 @@ final class TheliaEvents
     const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
     const CATEGORY_UPDATE_SEO        = "action.updateCategorySeo";
+
+    const VIEW_CATEGORY_ID_NOT_VISIBLE = "action.viewCategoryIdNotVisible";
     // -- END CATEGORIES EVENTS -----------------------------------------------
 
 
@@ -137,6 +143,8 @@ final class TheliaEvents
 
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
+
+    const VIEW_CONTENT_ID_NOT_VISIBLE = "action.viewContentIdNotVisible";
     // -- END CONTENT EVENTS ---------------------------------------------------------
 
 
@@ -234,6 +242,12 @@ final class TheliaEvents
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
+
+    /**
+     * Send the account ccreation confirmation email
+     */
+    const SEND_ACCOUNT_CONFIRMATION_EMAIL = "action.customer.sendAccountConfirmationEmail";
+
     // -- END CUSTOMER EVENTS ---------------------------------------------------------
 
 
@@ -253,6 +267,8 @@ final class TheliaEvents
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
     const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
+
+    const VIEW_FOLDER_ID_NOT_VISIBLE = "action.viewFolderIdNotVisible";
     // -- END FOLDER EVENTS ---------------------------------------------------------
 
 
@@ -299,6 +315,7 @@ final class TheliaEvents
     const VIRTUAL_PRODUCT_ORDER_HANDLE = "action.virtualProduct.handleOrder";
     const VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE = "action.virtualProduct.downloadResponse";
 
+    const VIEW_PRODUCT_ID_NOT_VISIBLE = "action.viewProductIdNotVisible";
     // -- END PRODUCT EVENTS ---------------------------------------------------------
 
 
@@ -695,6 +712,7 @@ final class TheliaEvents
     const TEMPLATE_CREATE          = "action.createTemplate";
     const TEMPLATE_UPDATE          = "action.updateTemplate";
     const TEMPLATE_DELETE          = "action.deleteTemplate";
+    const TEMPLATE_DUPLICATE       = "action.duplicateTemplate";
 
     const TEMPLATE_ADD_ATTRIBUTE    = "action.templateAddAttribute";
     const TEMPLATE_DELETE_ATTRIBUTE = "action.templateDeleteAttribute";
@@ -912,6 +930,8 @@ final class TheliaEvents
 
     const BEFORE_UPDATEBRAND = "action.before_updateBrand";
     const AFTER_UPDATEBRAND  = "action.after_updateBrand";
+
+    const VIEW_BRAND_ID_NOT_VISIBLE = "action.viewBrandIdNotVisible";
 
     // -- Import ----------------------------------------------
 

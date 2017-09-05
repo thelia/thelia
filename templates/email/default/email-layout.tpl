@@ -389,11 +389,9 @@ body,#bodyTable{
                                         <table border="0" cellpadding="0" cellspacing="0" class="templateContainer" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 600px;border-collapse: collapse !important;">
                                             <tr>
                                                 <td class="headerContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #202020;font-family: Helvetica;font-size: 20px;font-weight: bold;line-height: 100%;padding-top: 40px;padding-right: 0;padding-bottom: 20px;padding-left: 0;text-align: left;vertical-align: middle;border-collapse: collapse !important;">
-                                                    {$image = {image file='assets/img/logo.png' failsafe=true}}
-                                                    {if $image == null}
-                                                        {$image = {image file='assets/img/logo.gif' failsafe=true}}
-                                                    {/if}
-                                                    <img src="{$image}" alt="{$company_name}" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 75px;width: 135px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;" width="135" height="75">
+                                                    {local_media type="logo"}
+                                                        <img src="{$MEDIA_URL}" alt="{$company_name}" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 75px;width: 135px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;" width="135" height="75">
+                                                    {/local_media}
                                                 </td>
                                             </tr>
                                         </table>
@@ -426,7 +424,9 @@ body,#bodyTable{
                                                         {block name="image-header"}
                                                         <tr>
                                                             <td class="bodyContent" style="padding-bottom: 20px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #505050;font-family: Helvetica;font-size: 16px;line-height: 150%;padding-top: 20px;text-align: left;border-collapse: collapse !important;">
-                                                                <img class="bodyImage" src="{image file='assets/img/header.jpg'}" alt="" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 188px;width: 580px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;display: inline;max-width: 600px;" width="580" height="188">
+                                                                {local_media type="banner"}
+                                                                <img class="bodyImage" src="{$MEDIA_URL}" alt="" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;display: inline;max-width: 600px;">
+                                                                {/local_media}
                                                             </td>
                                                         </tr>
                                                         {/block}

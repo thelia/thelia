@@ -247,5 +247,4 @@ interface BaseModuleInterface
      * Create or update module hooks returned by the `getHooks` function
      */
     public function registerHooks();
-
 }

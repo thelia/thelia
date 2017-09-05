@@ -131,7 +131,7 @@
                                         {* *}
                                         {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
-                                        <td>
+                                        <td class="actions">
                                             <div class="btn-toolbar btn toolbar-primary">
                                                 <span class="glyphicon glyphicon-cog"></span>
                                             </div>
@@ -157,7 +157,7 @@
 
                                             loop_ref       = "order-list"
                                             max_page_count = 10
-                                            page_url       = "{url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}"
+                                            page_url       = {url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}
                                         }
 
                                     </td>

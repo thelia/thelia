@@ -47,7 +47,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
 {foreach $locales as $locale}
-    (@max_id + 1, '{$locale}', {intl l='Enable (1) or disable (0) customer email confirmation' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (@max_id + 1, '{$locale}', {intl l='Customer account creation should be confirmed by email (1: yes, 0: no)' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

@@ -6,8 +6,8 @@ Readme
 
 Thelia
 ------
-[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) 
-[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) 
+[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia)
+[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
 [Thelia](http://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
@@ -22,7 +22,7 @@ Requirements
 * PHP 5.5
     * Required extensions :
         * PDO_Mysql
-        * mcrypt
+        * openssl
         * intl
         * gd
         * curl
@@ -95,8 +95,8 @@ $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar create-project thelia/thelia path/ 2.3.3 (2.2.6 or 2.1.11)
 ```
 
-If something goes wrong during the install process, you can restart Thelia install wizard with 
-the following command : `php composer.phar run-script post-create-project-cmd` 
+If something goes wrong during the install process, you can restart Thelia install wizard with
+the following command : `php composer.phar run-script post-create-project-cmd`
 
 ## Install it
 
@@ -140,36 +140,40 @@ This repo contains all the configuration needed to run Thelia with docker and do
 
 It requires obviously [docker](https://docker.com/) and [docker-compose](http://docs.docker.com/compose/)
 
-How to start the configuration : 
+To install Thelia within Docker, run :
 
 ```
 docker-compose up -d
+docker-compose exec web composer install
+docker-compose exec web php Thelia thelia:install
 ```
 
-tip : create an alias for docker-compose, it's boring to write it all the time
-
-All the script are launched through docker. For examples : 
-
-```
-docker exec -it thelia_web_1 php Thelia cache:clear
-docker exec -it thelia_web_1 php setup/faker.php
-docker exec -it thelia_web_1 unit-tests.sh
-docker exec -it thelia_web_1 php composer.phar install
-```
-
-Database information : 
+This will prompt you for database information. Enter the following :
 
 * host : mariaDB
+* port : 3306 (default)
+* name : thelia
 * login : root
 * password : toor
 
-Once started, you can access it with your browser at this url : http://127.0.0.1:8080 and phpmyadmin : http://127.0.0.1:8081
+tip : create an alias for docker-compose, it's boring to write it all the time
 
-What is missing : 
+All the scripts can be launched through docker (or the corresponding `docker-compose exec web ...` command. For example :
+
+```
+docker exec -it thelia_web_1 composer install
+docker exec -it thelia_web_1 php Thelia cache:clear
+docker exec -it thelia_web_1 php setup/faker.php
+docker exec -it thelia_web_1 unit-tests.sh
+```
+
+Once started, you can open your local Thelia website at [127.0.0.1:8080](http://127.0.0.1:8080) and your phpMyAdmin installation at [127.0.0.1:8081](http://127.0.0.1:8081).
+
+What is missing :
 
 * confguration for export compression (zip, gzip, etc)
 
-Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it : 
+Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it :
 
 ```
 docker-compose build --no-cache

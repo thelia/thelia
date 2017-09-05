@@ -50,7 +50,7 @@
             <td>{$ID}</td>
 
             <td>
-                {$TITLE}
+                <a href="{url path="admin/configuration/features/update" feature_id=$ID}">{$TITLE}</a>
             </td>
 
             <td class="text-center">
@@ -102,7 +102,7 @@
 
     dialog_id       = "delete_feature_dialog"
     dialog_title    = {intl l="Remove feature"}
-    dialog_message  = {intl l="Do you really want to remove this feature from the template ?"}
+    dialog_message  = {intl l="Do you really want to remove this feature from the template ? It will also be removed from the products that uses this template."}
 
     form_action     = {token_url path='/admin/configuration/templates/features/delete'}
     form_content    = {$smarty.capture.delete_feature_dialog nofilter}

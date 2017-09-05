@@ -301,11 +301,18 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $delta_x = $delta_y = $border_width = $border_height = 0;
 
             if ($width_diff > 1 && $height_diff > 1) {
-                $resize_width = $width_orig;
-                $resize_height = $height_orig;
+                // Set the default final size. If zoom is allowed, we will get the required
+                // image dimension. Otherwise, the final image may be smaller than required.
+                if ($allow_zoom) {
+                    $resize_width = $dest_width;
+                    $resize_height = $dest_height;
+                } else {
+                    $resize_width = $width_orig;
+                    $resize_height = $height_orig;
+                }
 
                 // When cropping, be sure to always generate an image which is
-                //  no smaller than the required size, zooming it if required.
+                // not smaller than the required size, zooming it if required.
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                     if ($allow_zoom) {
                         if ($width_diff > $height_diff) {

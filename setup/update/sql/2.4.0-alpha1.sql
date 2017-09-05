@@ -65,7 +65,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max_id + 1, 'en_US', 'Enable (1) or disable (0) customer email confirmation', NULL, NULL, NULL),
+    (@max_id + 1, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL)
 ;
@@ -172,7 +172,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (@max+1, 'number_default_results_per_page.coupon_list', '20', '0', '0', NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', 'Default number of coupons per page on coupon list', NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', NULL, NUll, NULL, NULL);
+    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', 'Default number of coupons per page on coupon list', NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NUll, NULL, NULL);
 
 ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
 UPDATE `module` SET `mandatory` = 0, `hidden` = 0;

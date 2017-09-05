@@ -94,6 +94,10 @@
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="UPDATE"}
     	                                            <a class="template-change" title="{intl l='Change this product template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
+    
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="CREATE"}
+                                                    <a class="template-change" title="{intl l='Duplicate this product template'}" href="{url path='/admin/configuration/templates/duplicate' template_id=$ID}"><span class="glyphicon glyphicon-plus-sign"></span></a>
+                                                {/loop}
 
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="DELETE"}
     	                                            <a class="template-delete" title="{intl l='Delete this product template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
