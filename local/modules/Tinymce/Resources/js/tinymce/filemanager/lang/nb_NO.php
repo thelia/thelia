@@ -1,77 +1,123 @@
 <?php
-define('lang_Select','Velg');
-define('lang_Erase','Slett');
-define('lang_Open','Åpne');
-define('lang_Confirm_del','Er du sikker på at du vil slette denne filen?');
-define('lang_All','Alle');
-define('lang_Files','Filer');
-define('lang_Images','Bilder');
-define('lang_Archives','Arkiv');
-define('lang_Error_Upload','Den opplastede filen overskrider maksimal tillatt størrelse.');
-define('lang_Error_extension','Filtypen er ikke tillatt.');
-define('lang_Upload_file','Last opp fil');
-define('lang_Filters','Filter');
-define('lang_Videos','Videoer');
-define('lang_Music','Musikk');
-define('lang_New_Folder','Ny mappe');
-define('lang_Folder_Created','Mappe opprettet');
-define('lang_Existing_Folder','Eksisterende mappe');
-define('lang_Confirm_Folder_del','Er du sikker på at du vil slette mappen og alt innholdet?');
-define('lang_Return_Files_List','Tilbake til filoversikten');
-define('lang_Preview','Forhåndsvisning');
-define('lang_Download','Last ned');
-define('lang_Insert_Folder_Name','Gi mappen et navn:');
-define('lang_Root','Rot');
-define('lang_Rename','Gi nytt navn');
-define('lang_Back','Tilbake');
-define('lang_View','Visning');
-define('lang_View_list','Listevisning');
-define('lang_View_columns_list','Side ved side');
-define('lang_View_boxes','Boksvisning');
-define('lang_Toolbar','Verktøylinje');
-define('lang_Actions','Gjøremål');
-define('lang_Rename_existing_file','Filen er allerede opprettet');
-define('lang_Rename_existing_folder','Mappen er allerede opprettet');
-define('lang_Empty_name','Tomt navn');
-define('lang_Text_filter','Tekst-filter');
-define('lang_Swipe_help','Sveip filnavnet/mappenavnet for å vise alternativer');
-define('lang_Upload_base','Vanlig opplasting');
-define('lang_Upload_java','Java-opplasting (store filer)');
-define('lang_Upload_java_help',"Hvis java-appleten ikke lastes: 1. Sjekk om Java er installert, hvis ikke <a href='http://java.com/en/download/'>last ned Java</a> 2. Sjekk brannmur-innstillingene.");
-define('lang_Upload_base_help',"Dra og slipp filen(e) i området over eller klikk (virker for moderne nettlesere). Ved bruk av gammel nettleser: Velg filen og klikk på knappen. Når opplastingen er ferdig, klikk på tilbake-knappen øverst.");
-define('lang_Type_dir','Mappe');
-define('lang_Type','Type');
-define('lang_Dimension','Dimensjoner');
-define('lang_Size','Størrelse');
-define('lang_Date','Dato');
-define('lang_Filename','Filnavn');
-define('lang_Operations','Handlinger');
-define('lang_Date_type','d.m.y');
-define('lang_OK','OK');
-define('lang_Cancel','Avbryt');
-define('lang_Sorting','Sortering');
-define('lang_Show_url','Vis URL');
-define('lang_Extract','Pakk ut her');
-define('lang_File_info','Fil-info');
-define('lang_Edit_image','Rediger bilde');
-define('lang_Duplicate','Duplikat');
-define('lang_Folders', 'Mapper');
-define('lang_Copy','Kopier');
-define('lang_Cut','Klipp ut');
-define('lang_Paste','Lim inn');
-define('lang_CB', 'Utklippstavle'); // clipboard
-define('lang_Paste_Here','Lim inn i denne mappen');
-define('lang_Paste_Confirm','Er du sikker på at du vil lime inn i denne mappen? Dette vil overskrive eventuelle eksisterende filer eller mapper.');
-define('lang_Paste_Failed','Lim inn feilet');
-define('lang_Clear_Clipboard','Tøm utklippstavlen');
-define('lang_Clear_Clipboard_Confirm','Er du sikker på at du vil tømme utklippstavlen?');
-define('lang_Files_ON_Clipboard','Der er filer på utklippstavlen.');
-define('lang_Copy_Cut_Size_Limit','De valgte filene/mappene er for store for %s. Grense: %d MB/operasjon'); // %s = cut or copy
-define('lang_Copy_Cut_Count_Limit','Du valgte for mange filer/mapper for %s. Grense: %d filer/operasjon'); // %s = cut or copy
-define('lang_Copy_Cut_Not_Allowed','Du har ikke lov til å %s filer.'); // %s(1) = cut or copy, %s(2) = files or folders
-define('lang_Aviary_No_Save', 'Kunne ikke lagre bildet');
-define('lang_Zip_No_Extract', 'Kunne ikke pakke ut. Filen er muligens ødelagt.');
-define('lang_Zip_Invalid', 'Dette filetternavnet er ikke støttet. Valide filer: zip, gz, tar.');
-define('lang_Dir_No_Write', 'Mappen du valgte er ikke skrivbar.');
-define('lang_Function_Disabled', 'Funksjonen %s er blitt deaktivert av serveren.'); // %s = cut or copy
-?>
+
+return array(
+
+	'Select' => 'Velg',
+	'Erase' => 'Slett',
+	'Open' => 'Åpne',
+	'Confirm_del' => 'Er du sikker på at du vil slette denne filen?',
+	'All' => 'Alle',
+	'Files' => 'Filer',
+	'Images' => 'Bilder',
+	'Archives' => 'Arkiv',
+	'Error_Upload' => 'Den opplastede filen overskrider maksimal tillatt størrelse.',
+	'Error_extension' => 'Filtypen er ikke tillatt.',
+	'Upload_file' => 'Last opp fil',
+	'Filters' => 'Filter',
+	'Videos' => 'Videoer',
+	'Music' => 'Musikk',
+	'New_Folder' => 'Ny mappe',
+	'Folder_Created' => 'Mappe opprettet',
+	'Existing_Folder' => 'Eksisterende mappe',
+	'Confirm_Folder_del' => 'Er du sikker på at du vil slette mappen og alt innholdet?',
+	'Return_Files_List' => 'Tilbake til filoversikten',
+	'Preview' => 'Forhåndsvisning',
+	'Download' => 'Last ned',
+	'Insert_Folder_Name' => 'Gi mappen et navn:',
+	'Root' => 'Rot',
+	'Rename' => 'Gi nytt navn',
+	'Back' => 'Tilbake',
+	'View' => 'Visning',
+	'View_list' => 'Listevisning',
+	'View_columns_list' => 'Side ved side',
+	'View_boxes' => 'Boksvisning',
+	'Toolbar' => 'Verktøylinje',
+	'Actions' => 'Gjøremål',
+	'Rename_existing_file' => 'Filen er allerede opprettet',
+	'Rename_existing_folder' => 'Mappen er allerede opprettet',
+	'Empty_name' => 'Tomt navn',
+	'Text_filter' => 'Tekst-filter',
+	'Swipe_help' => 'Sveip filnavnet/mappenavnet for å vise alternativer',
+	'Upload_base' => 'Vanlig opplasting',
+	'Upload_url' => 'URL',
+	'Upload_java' => 'Java-opplasting (store filer)',
+	'Upload_java_help' => "Hvis java-appleten ikke lastes: 1. Sjekk om Java er installert, hvis ikke <a href='http://java.com/en/download/'>last ned Java</a> 2. Sjekk brannmur-innstillingene.",
+	'Upload_base_help' => "Dra og slipp filen(e) i området over eller klikk (virker for moderne nettlesere). Ved bruk av gammel nettleser: Velg filen og klikk på knappen. Når opplastingen er ferdig, klikk på tilbake-knappen øverst.",
+	'Type_dir' => 'Mappe',
+	'Type' => 'Type',
+	'Dimension' => 'Dimensjoner',
+	'Size' => 'Størrelse',
+	'Date' => 'Dato',
+	'Filename' => 'Filnavn',
+	'Operations' => 'Handlinger',
+	'Date_type' => 'd.m.y',
+	'OK' => 'OK',
+	'Cancel' => 'Avbryt',
+	'Sorting' => 'Sortering',
+	'Show_url' => 'Vis URL',
+	'Extract' => 'Pakk ut her',
+	'File_info' => 'Fil-info',
+	'Edit_image' => 'Rediger bilde',
+	'Duplicate' => 'Duplikat',
+	'Folders' => 'Mapper',
+	'Copy' => 'Kopier',
+	'Cut' => 'Klipp ut',
+	'Paste' => 'Lim inn',
+	'CB' => 'Utklippstavle', // clipboard
+	'Paste_Here' => 'Lim inn i denne mappen',
+	'Paste_Confirm' => 'Er du sikker på at du vil lime inn i denne mappen? Dette vil overskrive eventuelle eksisterende filer eller mapper.',
+	'Paste_Failed' => 'Lim inn feilet',
+	'Clear_Clipboard' => 'Tøm utklippstavlen',
+	'Clear_Clipboard_Confirm' => 'Er du sikker på at du vil tømme utklippstavlen?',
+	'Files_ON_Clipboard' => 'Der er filer på utklippstavlen.',
+	'Copy_Cut_Size_Limit' => 'De valgte filene/mappene er for store for %s. Grense: %d MB/operasjon', // %s = cut or copy
+	'Copy_Cut_Count_Limit' => 'Du valgte for mange filer/mapper for %s. Grense: %d filer/operasjon', // %s = cut or copy
+	'Copy_Cut_Not_Allowed' => 'Du har ikke lov til å %s filer.', // %s(1) = cut or copy, %s(2) = files or folders
+	'Aviary_No_Save' => 'Kunne ikke lagre bildet',
+	'Zip_No_Extract' => 'Kunne ikke pakke ut. Filen er muligens ødelagt.',
+	'Zip_Invalid' => 'Dette filetternavnet er ikke støttet. Gyldige filer: zip, gz, tar.',
+	'Dir_No_Write' => 'Mappen du valgte er ikke skrivbar.',
+	'Function_Disabled' => 'Funksjonen %s er blitt deaktivert av serveren.', // %s = cut or copy
+	'File_Permission' => 'Filrettigheter',
+	'File_Permission_Not_Allowed' => 'Forandring av %s rettigheter er ikke tillatt.', // %s = files or folders
+	'File_Permission_Recursive' => 'Utfør rekursivt?',
+	'File_Permission_Wrong_Mode' => "Filrettigheten er feil.",
+	'User' => 'Bruker',
+	'Group' => 'Gruppe',
+	'Yes' => 'Ja',
+	'No' => 'Nei',
+	'Lang_Not_Found' => 'Kunne ikke finne språk.',
+	'Lang_Change' => 'Forandre språk',
+	'File_Not_Found' => 'Fant ikke filen.',
+	'File_Open_Edit_Not_Allowed' => 'Du har ikke tillatelse til å %s denne filen.', // %s = open or edit
+	'Edit' => 'Rediger',
+	'Edit_File' => "Rediger filens innhold",
+	'File_Save_OK' => "Filen ble lagret.",
+	'File_Save_Error' => "Det oppstod en feil når filen ble lagret.",
+	'New_File' => 'Ny fil',
+	'No_Extension' => 'Du må legge til et fil-etternavn.',
+	'Valid_Extensions' => 'Gyldige fil-etternavn: %s', // %s = txt,log etc.
+	'Upload_message' => "Drop file here to upload",
+
+	'SERVER ERROR' => "SERVER ERROR",
+	'forbiden' => "Forbiden",
+	'wrong path' => "Wrong path",
+	'wrong name' => "Wrong name",
+	'wrong extension' => "Wrong extension",
+	'wrong option' => "Wrong option",
+	'wrong data' => "Wrong data",
+	'wrong action' => "Wrong action",
+	'wrong sub-action' => "Wrong sub-actio",
+	'no action passed' => "No action passed",
+	'no path' => "No path",
+	'no file' => "No file",
+	'view type number missing' => "View type number missing",
+	'Not enought Memory' => "Not enought Memory",
+	'max_size_reached' => "Your image folder has reach its maximale size of %d MB.", //%d = max overall size
+	'B' => "B",
+	'KB' => "KB",
+	'MB' => "MB",
+	'GB' => "GB",
+	'TB' => "TB",
+	'total size' => "Total size",
+);
