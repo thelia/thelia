@@ -1,78 +1,123 @@
 <?php
-define('lang_Select','Select');
-define('lang_Erase','Erase');
-define('lang_Open','Open');
-define('lang_Confirm_del','Are you sure you want to delete this file?');
-define('lang_All','All');
-define('lang_Files','Files');
-define('lang_Images','Images');
-define('lang_Archives','Archives');
-define('lang_Error_Upload','The uploaded file exceeds the max size allowed.');
-define('lang_Error_extension','File extension is not allowed.');
-define('lang_Upload_file','Upload');
-define('lang_Filters','Filters');
-define('lang_Videos','Videos');
-define('lang_Music','Music');
-define('lang_New_Folder','New Folder');
-define('lang_Folder_Created','Folder correctly created');
-define('lang_Existing_Folder','Existing folder');
-define('lang_Confirm_Folder_del','Are you sure to delete the folder and all the elements in it?');
-define('lang_Return_Files_List','Return to files list');
-define('lang_Preview','Preview');
-define('lang_Download','Download');
-define('lang_Insert_Folder_Name','Insert folder name:');
-define('lang_Root','root');
-define('lang_Rename','Rename');
-define('lang_Back','back');
-define('lang_View','View');
-define('lang_View_list','List view');
-define('lang_View_columns_list','Columns list view');
-define('lang_View_boxes','Box view');
-define('lang_Toolbar','Toolbar');
-define('lang_Actions','Actions');
-define('lang_Rename_existing_file','The file is already existing');
-define('lang_Rename_existing_folder','The folder is already existing');
-define('lang_Empty_name','The name is empty');
-define('lang_Text_filter','text filter');
-define('lang_Swipe_help','Swipe the name of file/folder to show options');
-define('lang_Upload_base','Base upload');
-define('lang_Upload_java','JAVA upload (big size files)');
-define('lang_Upload_java_help',"If the Java Applet doesn't load, 1. make sure you have Java installed, otherwise <a href='http://java.com/en/download/'>[download link]</a>   2. make sure nothing is blocked by your firewall");
-define('lang_Upload_base_help',"Drag & Drop files or click in the area above (modern browsers) and select the file(s). When the upload is complete, click the 'Return to files list' button.");
-define('lang_Type_dir','dir');
-define('lang_Type','Type');
-define('lang_Dimension','Dimension');
-define('lang_Size','Size');
-define('lang_Date','Date');
-define('lang_Filename','Filename');
-define('lang_Operations','Operations');
-define('lang_Date_type','y-m-d');
-define('lang_OK','OK');
-define('lang_Cancel','Cancel');
-define('lang_Sorting','sorting');
-define('lang_Show_url','show URL');
-define('lang_Extract','Extract here');
-define('lang_File_info','file info');
-define('lang_Edit_image','edit image');
-define('lang_Duplicate','Duplicate');
-define('lang_Folders', 'Folders');
-define('lang_Copy','Copy');
-define('lang_Cut','Cut');
-define('lang_Paste','Paste');
-define('lang_CB', 'CB'); // clipboard
-define('lang_Paste_Here','Paste to this directory');
-define('lang_Paste_Confirm','Are you sure you want to paste to this directory? This will overwrite existing files/folders if encountered any.');
-define('lang_Paste_Failed','Failed to paste file(s)');
-define('lang_Clear_Clipboard','Clear clipboard');
-define('lang_Clear_Clipboard_Confirm','Are you sure you want to clear the clipboard?');
-define('lang_Files_ON_Clipboard','There are files on the clipboard.');
-define('lang_Copy_Cut_Size_Limit','The selected files/folders are too big to %s. Limit: %d MB/operation'); // %s = cut or copy
-define('lang_Copy_Cut_Count_Limit','You selected too many files/folders to %s. Limit: %d files/operation'); // %s = cut or copy
-define('lang_Copy_Cut_Not_Allowed','You are not allowed to %s files.'); // %s(1) = cut or copy, %s(2) = files or folders
-define('lang_Aviary_No_Save', 'Could not save image');
-define('lang_Zip_No_Extract', 'Could not extract. File might be corrupt.');
-define('lang_Zip_Invalid', 'This extension is not supported. Valid: zip, gz, tar.');
-define('lang_Dir_No_Write', 'The directory you selected is not writable.');
-define('lang_Function_Disabled', 'The %s function has been disabled by the server.'); // %s = cut or copy
 
-?>
+return array(
+
+	'Select' => 'Select',
+	'Erase' => 'Erase',
+	'Open' => 'Open',
+	'Confirm_del' => 'Are you sure you want to delete this file?',
+	'All' => 'All',
+	'Files' => 'Files',
+	'Images' => 'Images',
+	'Archives' => 'Archives',
+	'Error_Upload' => 'The uploaded file exceeds the max size allowed.',
+	'Error_extension' => 'File extension is not allowed.',
+	'Upload_file' => 'Upload',
+	'Filters' => 'Filters',
+	'Videos' => 'Videos',
+	'Music' => 'Music',
+	'New_Folder' => 'New Folder',
+	'Folder_Created' => 'Folder correctly created',
+	'Existing_Folder' => 'Existing folder',
+	'Confirm_Folder_del' => 'Are you sure to delete the folder and all the elements in it?',
+	'Return_Files_List' => 'Return to files list',
+	'Preview' => 'Preview',
+	'Download' => 'Download',
+	'Insert_Folder_Name' => 'Insert folder name:',
+	'Root' => 'root',
+	'Rename' => 'Rename',
+	'Back' => 'back',
+	'View' => 'View',
+	'View_list' => 'List view',
+	'View_columns_list' => 'Columns list view',
+	'View_boxes' => 'Box view',
+	'Toolbar' => 'Toolbar',
+	'Actions' => 'Actions',
+	'Rename_existing_file' => 'The file is already existing',
+	'Rename_existing_folder' => 'The folder is already existing',
+	'Empty_name' => 'The name is empty',
+	'Text_filter' => 'text filter',
+	'Swipe_help' => 'Swipe the name of file/folder to show options',
+	'Upload_base' => 'Base upload',
+	'Upload_url' => 'URL',
+	'Upload_java' => 'JAVA upload (big size files)',
+	'Upload_java_help' => "If the Java Applet doesn't load, 1. make sure you have Java installed, otherwise <a href='http://java.com/en/download/'>[download link]</a>   2. make sure nothing is blocked by your firewall",
+	'Upload_base_help' => "Drag & Drop files or click in the area above (modern browsers) and select the file(s). When the upload is complete, click the 'Return to files list' button.",
+	'Type_dir' => 'dir',
+	'Type' => 'Type',
+	'Dimension' => 'Dimension',
+	'Size' => 'Size',
+	'Date' => 'Date',
+	'Filename' => 'Filename',
+	'Operations' => 'Operations',
+	'Date_type' => 'y-m-d',
+	'OK' => 'OK',
+	'Cancel' => 'Cancel',
+	'Sorting' => 'sorting',
+	'Show_url' => 'Show URL',
+	'Extract' => 'Extract here',
+	'File_info' => 'file info',
+	'Edit_image' => 'Edit image',
+	'Duplicate' => 'Duplicate',
+	'Folders' => 'Folders',
+	'Copy' => 'Copy',
+	'Cut' => 'Cut',
+	'Paste' => 'Paste',
+	'CB' => 'CB', // clipboard
+	'Paste_Here' => 'Paste to this directory',
+	'Paste_Confirm' => 'Are you sure you want to paste to this directory? This will overwrite existing files/folders if encountered any.',
+	'Paste_Failed' => 'Failed to paste file(s)',
+	'Clear_Clipboard' => 'Clear clipboard',
+	'Clear_Clipboard_Confirm' => 'Are you sure you want to clear the clipboard?',
+	'Files_ON_Clipboard' => 'There are files on the clipboard.',
+	'Copy_Cut_Size_Limit' => 'The selected files/folders are too big to %1$s. Limit: %2$d MB/operation', // %1$s = cut or copy, %2$d = max size
+	'Copy_Cut_Count_Limit' => 'You selected too many files/folders to %1$s. Limit: %2$d files/operation', // %1$s = cut or copy, %2$d = max count
+	'Copy_Cut_Not_Allowed' => 'You are not allowed to %1$s %2$s.', // %12$s = cut or copy, %2$s = files or folders
+	'Aviary_No_Save' => 'Could not save image',
+	'Zip_No_Extract' => 'Could not extract. File might be corrupt.',
+	'Zip_Invalid' => 'This extension is not supported. Valid: zip, gz, tar.',
+	'Dir_No_Write' => 'The directory you selected is not writable.',
+	'Function_Disabled' => 'The %s function has been disabled by the server.', // %s = cut or copy
+	'File_Permission' => 'File permission',
+	'File_Permission_Not_Allowed' => 'Changing %s permissions are not allowed.', // %s = files or folders
+	'File_Permission_Recursive' => 'Apply recursively?',
+	'File_Permission_Wrong_Mode' => "The supplied permission mode is incorrect.",
+	'User' => 'User',
+	'Group' => 'Group',
+	'Yes' => 'Yes',
+	'No' => 'No',
+	'Lang_Not_Found' => 'Could not find the language.',
+	'Lang_Change' => 'Change the language',
+	'File_Not_Found' => 'Could not find the file.',
+	'File_Open_Edit_Not_Allowed' => 'You are not allowed to %s this file.', // %s = open or edit
+	'Edit' => 'Edit',
+	'Edit_File' => "Edit file's content",
+	'File_Save_OK' => "File successfully saved.",
+	'File_Save_Error' => "There was an error while saving the file.",
+	'New_File' => 'New File',
+	'No_Extension' => 'You have to add a file extension.',
+	'Valid_Extensions' => 'Valid extensions: %s', // %s = txt,log etc.
+	'Upload_message' => "Drop file here to upload",
+
+	'SERVER ERROR' => "SERVER ERROR",
+	'forbiden' => "Forbiden",
+	'wrong path' => "Wrong path",
+	'wrong name' => "Wrong name",
+	'wrong extension' => "Wrong extension",
+	'wrong option' => "Wrong option",
+	'wrong data' => "Wrong data",
+	'wrong action' => "Wrong action",
+	'wrong sub-action' => "Wrong sub-actio",
+	'no action passed' => "No action passed",
+	'no path' => "No path",
+	'no file' => "No file",
+	'view type number missing' => "View type number missing",
+	'Not enought Memory' => "Not enought Memory",
+	'max_size_reached' => "Your image folder has reach its maximale size of %d MB.", //%d = max overall size
+	'B' => "B",
+	'KB' => "KB",
+	'MB' => "MB",
+	'GB' => "GB",
+	'TB' => "TB",
+	'total size' => "Total size",
+);
