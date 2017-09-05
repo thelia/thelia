@@ -179,7 +179,7 @@ define('USE_ACCESS_KEYS', false); // TRUE or FALSE
 |--------------------------------------------------------------------------
 */
 
-define('DEBUG_ERROR_MESSAGE', true); // TRUE or FALSE
+define('DEBUG_ERROR_MESSAGE', false); // TRUE or FALSE
 
 /*
 |--------------------------------------------------------------------------
