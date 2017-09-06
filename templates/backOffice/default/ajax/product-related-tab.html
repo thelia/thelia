@@ -147,12 +147,18 @@
 
 		                {ifloop rel="categories"}
 		                <div class="form-group">
-		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
-		                        <option value="">{intl l='Select a category...'}</option>
-		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
-		                            <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
-		                        {/loop}
-		                    </select>
+							<div class="input-group">
+								<select name="accessory_category_id" id="accessory_category_id" class="form-control">
+									<option value="">{intl l='Select a category...'}</option>
+									{loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
+										<option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
+									{/loop}
+								</select>
+
+								<span class="input-group-btn">
+									<a class="js-btn-accessories-search-category btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
+								</span>
+							</div>
 
 		                    <span class="help-block">{intl l='Select a category to get its products'}</span>
 		                </div>
@@ -164,6 +170,7 @@
 		                        </select>
 		                        <span class="input-group-btn" id="accessory_add_button">
 		                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+									<a class="js-btn-accessories-search-product btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
 		                        </span>
 		                    </div>
 
@@ -279,7 +286,7 @@
 	                    {ifloop rel="categories"}
 	                    <div class="input-group">
 
-	                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
+	                        <select name="additional_category_id" id="additional_category_id" class="form-control" required>
 	                            <option value="">{intl l='Select a category...'}</option>
 	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id" return_url=false}
 	                                <option value="{$ID}" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
@@ -290,6 +297,7 @@
 
 	                        <span class="input-group-btn" id="content_add_button">
 	                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+								<a class="js-btn-additional-search-category btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
 	                        </span>
 
 	                    </div>
@@ -570,6 +578,45 @@ $(function() {
 
         event.preventDefault();
     });
+
+
+
+	// Search categories and products
+
+
+	$('.js-btn-accessories-search-category').on('click', function(event){
+		event.preventDefault();
+
+		$modalSearch.initAndShow(
+				'{intl l="Search category"}',
+				'{url path="/admin/categories/search"}',
+				'#accessory_category_id',
+				'{intl l="Category title"}'
+		);
+	});
+
+	$('.js-btn-accessories-search-product').on('click', function(event){
+		event.preventDefault();
+
+		$modalSearch.initAndShow(
+				'{intl l="Search product in category %category"}'.replace('%category', $("#accessory_category_id option:selected" ).text().trim()),
+				'{url path="/admin/products/search"}',
+				'#accessory_id',
+				'{intl l="Product title"}',
+				$('#accessory_category_id').val()
+		);
+	});
+
+	$('.js-btn-additional-search-category').on('click', function(event){
+		event.preventDefault();
+
+		$modalSearch.initAndShow(
+				'{intl l="Search category"}',
+				'{url path="/admin/categories/search"}',
+				'#additional_category_id',
+				'{intl l="Category title"}'
+		);
+	});
 });
 </script>
 {/loop}

@@ -26,6 +26,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryAssociatedContentQuery;
+use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
@@ -401,5 +402,30 @@ class CategoryController extends AbstractSeoCrudController
         }
 
         return $this->redirectToEditionTemplate();
+    }
+
+    /**
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function searchAction()
+    {
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
+        $search = '%'.$this->getRequest()->query->get('q').'%';
+
+        $resultArray = array();
+
+        $categoriesI18n = CategoryI18nQuery::create()->filterByTitle($search)->limit(100);
+
+        /** @var \Thelia\Model\CategoryI18n $categoryI18n */
+        foreach ($categoriesI18n as $categoryI18n) {
+            $category = $categoryI18n->getCategory();
+            $resultArray[$category->getId()] = $categoryI18n->getTitle();
+        }
+
+        return $this->jsonResponse(json_encode($resultArray));
     }
 }

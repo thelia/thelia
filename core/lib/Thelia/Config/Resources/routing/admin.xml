@@ -300,6 +300,10 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processUpdateAction</default>
     </route>
 
+    <route id="admin.categories.search" path="/admin/categories/search">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::searchAction</default>
+    </route>
+
     <route id="admin.categories.seo.save" path="/admin/categories/seo/save">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processUpdateSeoAction</default>
     </route>
@@ -353,6 +357,10 @@
 
     <route id="admin.products.save" path="/admin/products/save">
         <default key="_controller">Thelia\Controller\Admin\ProductController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.products.search" path="/admin/products/search">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::searchAction</default>
     </route>
 
     <route id="admin.products.seo.save" path="/admin/products/seo/save">
