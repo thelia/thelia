@@ -118,7 +118,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             if (! file_exists($originalImagePathInCache)) {
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
-                if ($mode == 'symlink') {
+                if ($mode == 'symlink' && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
                     if (false === symlink($source_file, $originalImagePathInCache)) {
                         throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
                     }
