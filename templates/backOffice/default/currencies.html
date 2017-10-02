@@ -28,7 +28,7 @@
                     {if ! empty($undefined_rates)}
                         <div class="alert alert-warning">
                             {$currencyList = ''}
-                            {loop type="currency" name="err-currencies" id={","|implode:$undefined_rates}}
+                            {loop type="currency" visible"*" name="err-currencies" id={","|implode:$undefined_rates}}
                                 {$currencyList = "$currencyList, $NAME ($ISOCODE)"}
                             {/loop}
 
