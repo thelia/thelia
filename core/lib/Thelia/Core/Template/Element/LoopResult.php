@@ -80,7 +80,17 @@ class LoopResult implements \Iterator, \JsonSerializable
 
         $this->collection[] = $row;
     }
-    
+
+    /**
+     * @param int $key
+     */
+    public function remove($key)
+    {
+        if (isset($this->collection[$key])) {
+            unset($this->collection[$key]);
+        }
+    }
+
     /**
      * Adjust the collection once all results have been added.
      */
