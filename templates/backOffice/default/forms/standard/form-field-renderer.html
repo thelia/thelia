@@ -13,6 +13,10 @@ fragment uses the following additional variables :
 
 {* Get standard fields attributes *}
 {capture assign=attributes}{include file="forms/$field_template/form-field-attributes-renderer.html"}{/capture}
+{* see form-field-attributes-renderer.html *}
+{if empty({$label_attr.for})}
+    {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
+{/if}
 
 {*
 Use the optionnal $field_value parameter if no value is defined
