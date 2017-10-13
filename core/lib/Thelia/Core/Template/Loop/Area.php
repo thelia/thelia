@@ -61,7 +61,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new EnumListType([
                         'id', 'id_reverse',
-                        'name', 'name_reverse'
+                        'alpha', 'name', 'name_reverse'
                     ])
                 ),
                 'name'
@@ -130,6 +130,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
+                case 'alpha':
                 case 'name':
                     $search->orderByName(Criteria::ASC);
                     break;
