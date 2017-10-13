@@ -74,6 +74,7 @@ class CacheClearTest extends ContainerAwareTestCase
     {
         // Fails on windows - mock this test on windows
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $oldPerms = octdec(substr(sprintf('%o', fileperms($this->cache_dir)), -4));
             $fs = new Filesystem();
             $fs->chmod($this->cache_dir, 0100);
 
@@ -86,10 +87,16 @@ class CacheClearTest extends ContainerAwareTestCase
 
             $command = $application->find("cache:clear");
             $commandTester = new CommandTester($command);
-            $commandTester->execute(array(
-                "command" => $command->getName(),
-                "--env" => "test"
-            ));
+            try {
+                $commandTester->execute(array(
+                    "command" => $command->getName(),
+                    "--env" => "test"
+                ));
+            } catch (\RuntimeException $e) {
+                $fs->chmod($this->cache_dir, $oldPerms);
+                throw $e;
+            }
+            $fs->chmod($this->cache_dir, $oldPerms);
         } else {
             throw new \RuntimeException("");
         }

@@ -245,6 +245,8 @@ class CustomerControllerTest extends ApiTestCase
 
     public function testUpdateCustomer()
     {
+        $customer = CustomerQuery::create()->findPk(1);
+
         $user = [
             'id' => 1,
             'title' => 1,
@@ -254,7 +256,7 @@ class CustomerControllerTest extends ApiTestCase
             'city'      => 'Clermont-Ferrand',
             'zipcode'   => 63100,
             'country'   => 64,
-            'email'     => sprintf("%s@thelia.fr", uniqid()),
+            'email'     => $customer->getEmail(),
             'lang_id'   => 1
         ];
 
