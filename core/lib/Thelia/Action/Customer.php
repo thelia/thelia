@@ -96,7 +96,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
-        if (! empty($plainPassword) || $emailChanged) {
+        if ($event->getNotifyCustomerOfAccountModification() && (! empty($plainPassword) || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
