@@ -76,6 +76,13 @@ class TranslationsController extends BaseAdminController
             $modulePart = false;
         }
 
+        // Pagination info
+
+        $pagination_limit = $this->getRequest()->get('limit_pagination', null);
+        $pagination_page = $this->getRequest()->get('current_page_pagination', 1);
+
+        $view_missing_translations_only = $this->getRequest()->get('view_missing_traductions_only');
+
         $template = $directory = $i18nDirectory = false;
 
         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
@@ -84,8 +91,11 @@ class TranslationsController extends BaseAdminController
                 'item_to_translate'             => $itemToTranslate,
                 'item_name'                     => $itemName,
                 'module_part'                   => $modulePart,
-                'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only'),
+                'view_missing_traductions_only' => $view_missing_translations_only,
                 'max_input_vars_warning'        => false,
+                'current_page_pagination'       => $pagination_page,
+                'last_page_pagination'          => 1,
+                'limit_pagination'              => $pagination_limit,
         );
 
         // Find the i18n directory, and the directory to examine.
@@ -242,26 +252,73 @@ class TranslationsController extends BaseAdminController
 
             // Load strings to translate
             if ($directory && ! empty($domain)) {
+
+                // Load strings
+                $event = TranslationEvent::createGetStringsEvent(
+                    $directory,
+                    $walkMode,
+                    $this->getCurrentEditionLocale(),
+                    $domain
+                );
+
+                $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_GET_STRINGS, $event);
+
+                $all_strings = $event->getTranslatableStrings();
+
+
                 // Save the string set, if the form was submitted
                 if ($i18nDirectory) {
                     $save_mode = $this->getRequest()->get('save_mode', false);
 
                     if ($save_mode !== false) {
-                        $texts = $this->getRequest()->get('text', array());
+                        $request_texts = $this->getRequest()->get('text', array());
 
-                        if (! empty($texts)) {
+                        if (! empty($request_texts)) {
+                            $request_translations = $this->getRequest()->get('translation', []);
+                            $request_translations_custom = $this->getRequest()->get('translation_custom', []);
+                            $request_translations_global = $this->getRequest()->get('translation_global', []);
+
+                            $hasTranslationsCustom = !empty($request_translations_custom);
+                            $hasTranslationsGlobal = !empty($request_translations_global);
+
+                            // Adds up the newly translated strings with the already translated ones as we must have them all to write the file.
+
+                            $all_texts = array();
+                            $all_translations = array();
+                            $all_translations_custom = array();
+                            $all_translations_global = array();
+                            foreach ($all_strings as $hash => $translation_object) {
+                                $all_texts[] = $translation_object['text'];
+                                $index = array_search($translation_object['text'], $request_texts);
+                                if ($index === false) {
+                                    $all_translations[] = $translation_object['translation'];
+                                    $all_translations_custom[] = $translation_object['custom_fallback'];
+                                    $all_translations_global[] = $translation_object['global_fallback'];
+                                } else {
+                                    $all_translations[] = $request_translations[$index];
+                                    if ($hasTranslationsCustom) {
+                                        $all_translations_custom[] = $request_translations_custom[$index];
+                                    }
+                                    if ($hasTranslationsGlobal) {
+                                        $all_translations_global[] = $request_translations_global[$index];
+                                    }
+                                    array_slice($request_texts, $index, 1);
+                                    array_slice($request_translations, $index, 1);
+                                }
+                            }
+
                             $event = TranslationEvent::createWriteFileEvent(
                                 sprintf("%s".DS."%s.php", $i18nDirectory, $this->getCurrentEditionLocale()),
-                                $texts,
-                                $this->getRequest()->get('translation', []),
+                                $all_texts,
+                                $all_translations,
                                 true
                             );
 
                             $event
                                 ->setDomain($domain)
                                 ->setLocale($this->getCurrentEditionLocale())
-                                ->setCustomFallbackStrings($this->getRequest()->get('translation_custom', []))
-                                ->setGlobalFallbackStrings($this->getRequest()->get('translation_global', []));
+                                ->setCustomFallbackStrings($all_translations_custom)
+                                ->setGlobalFallbackStrings($all_translations_global);
 
                             $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_WRITE_FILE, $event);
 
@@ -277,25 +334,41 @@ class TranslationsController extends BaseAdminController
                     }
                 }
 
-                // Load strings
-                $event = TranslationEvent::createGetStringsEvent(
-                    $directory,
-                    $walkMode,
-                    $this->getCurrentEditionLocale(),
-                    $domain
-                );
-
-                $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_GET_STRINGS, $event);
 
                 // Estimate number of fields, and compare to php ini max_input_vars
-                $stringsCount = $event->getTranslatableStringCount() * 4 + 6;
+                if (!empty($pagination_limit)) {
+                    $stringsCount = $pagination_limit * 4 + 6;
+                } else {
+                    $stringsCount = $event->getTranslatableStringCount() * 4 + 6;
+                }
 
                 if ($stringsCount > ini_get('max_input_vars')) {
                     $templateArguments['max_input_vars_warning']  = true;
                     $templateArguments['required_max_input_vars'] = $stringsCount;
                     $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
                 } else {
-                    $templateArguments['all_strings'] = $event->getTranslatableStrings();
+                    if (empty($pagination_limit)) {
+                        $templateArguments['all_strings'] = $all_strings;
+                    } else {
+                        if ($view_missing_translations_only) {
+                            $stringsToDisplay = [];
+                            foreach ($all_strings as $hash => $translation_object) {
+                                if (empty($translation_object['translation']) && empty($translation_object['custom_fallback']) && empty($translation_object['global_fallback'])) {
+                                    $stringsToDisplay[$hash] = $translation_object;
+                                }
+                            }
+                            $all_strings = $stringsToDisplay;
+                        }
+                        $number_of_page = ceil(count($all_strings) / $pagination_limit);
+                        $array_offset = ($pagination_page - 1) * $pagination_limit;
+                        $templateArguments['last_page_pagination'] = $number_of_page;
+
+                        if (!empty($all_strings)) {
+                            $templateArguments['all_strings'] = array_slice($all_strings, $array_offset, $pagination_limit);
+                        } else {
+                            $templateArguments['all_strings'] = array();
+                        }
+                    }
                 }
 
                 $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR . 'I18n');
@@ -348,7 +421,7 @@ class TranslationsController extends BaseAdminController
 
             /** @var \DirectoryIterator $file */
             foreach ($finder as $file) {
-                list($locale, $format) = explode('.', $file->getBaseName(), 2);
+                list($locale, $format) = explode('.', $file->getBasename(), 2);
 
                 Translator::getInstance()->addResource($format, $file->getPathname(), $locale, $domain);
             }

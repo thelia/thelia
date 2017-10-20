@@ -39,6 +39,31 @@
 	                                }
 
                                     <input type="hidden" name="edit_language_id" value="{$edit_language_id}" />
+                                    <input id="js_hidden_input_pagination_page" type="hidden" name="current_page_pagination" value="{$current_page_pagination|default:1}" />
+
+
+                                    {*********** Compute pagination variables ***********}
+
+                                    {$PAGINATION_MAX_COUNT = 10}
+                                    {$PAGINATION_CURRENT = $current_page_pagination}
+                                    {$PAGINATION_LAST = $last_page_pagination}
+                                    {if $last_page_pagination < $PAGINATION_MAX_COUNT}
+                                        {$PAGINATION_START = 1}
+                                        {$PAGINATION_END = $PAGINATION_LAST}
+                                    {else}
+                                        {$half = ceil($PAGINATION_MAX_COUNT / 2)}
+                                        {$PAGINATION_START = $PAGINATION_CURRENT - $half}
+                                        {$PAGINATION_END = $PAGINATION_CURRENT + $half}
+                                        {if $PAGINATION_START <= 0}
+                                            {$PAGINATION_START = 1}
+                                            {$PAGINATION_END = $PAGINATION_MAX_COUNT}
+                                        {else}
+                                            {if $PAGINATION_END > $PAGINATION_LAST}
+                                                {$PAGINATION_END = $PAGINATION_LAST}
+                                                {$PAGINATION_START = $PAGINATION_LAST - $PAGINATION_MAX_COUNT}
+                                            {/if}
+                                        {/if}
+                                    {/if}
 
 	                                <div class="row">
 	                                    <div class="col-md-4">
@@ -240,7 +265,21 @@
                                                 </label>
                                             </div>
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <div class="pull-right">
+                                                <label class="control-label" for="select_pagination_limit">{intl l='Items per page'}</label>
+
+                                                <select id="select_pagination_limit" required="required" name="limit_pagination" class="submit-on-change form-control">
+                                                    <option value="10" {if $limit_pagination == 10}selected{/if}>10</option>
+                                                    <option value="20" {if $limit_pagination == 20}selected{/if}>20</option>
+                                                    <option value="50" {if $limit_pagination == 50 || !$limit_pagination}selected{/if}>50</option>
+                                                    <option value="100" {if $limit_pagination == 100}selected{/if}>100</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </fieldset>
 
                                 {* -- STRINGS TO TRANSLATE --------------------------------------------- *}
@@ -256,108 +295,95 @@
 
                                     {$not_translated = empty($info.translation) && empty($info.custom_fallback) && empty($info.global_fallback)}
 
-                                    {if $view_missing_traductions_only != 1 || $not_translated }
+                                    {* Create a liste of files names *}
 
-                                        {* Create a liste of files names *}
-
-                                        {if count($info.files) > 1}
-                                            {$label = {intl l='In pages:'}}
-                                            {capture name="banner" assign=file_names}
-                                                <ul>
-                                                {foreach $info.files as $file}
-                                                   <li>{$file}</li>
-                                                {/foreach}
-                                                </ul>
-                                            {/capture}
-                                        {else}
-                                            {$label = {intl l='In page'}}
-                                            {$file_names = $info.files.0}
-                                        {/if}
-
-                                        {* Display current file liste, if required *}
-
-                                        {if $file_names != $currfile}
-
-                                            {if $currfile !== false}
-                                                {* Close current panel *}
-                                                </tbody></table></div>
-                                                {$close_last_panel = false}
-                                            {/if}
-
-                                            {$currfile = $file_names}
-
-											<div class="panel panel-default">
-											    <div class="panel-heading">
-                                                    {loop name="lang_list" type="lang" id=$edit_language_id}
-                                                        <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" />
-                                                    {/loop}
-
-                                                    {$label} {$file_names nofilter}
-
-											    </div>
-
-											    <table class="table table-condensed table-hover">
-											        <tbody>
-											        {$close_last_panel = true}
-                                        {/if}
-
-	                                    <tr>
-	                                        <td class="col-md-6">
-	                                            {$info.text}
-
-
-												{if $info.dollar}
-												    <div>
-												        <span class="label label-warning">{intl l='Warning'}</span>
-												        {intl l='Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.'}
-												    </div>
-												{/if}
-		                                    </td>
-
-	                                        <td class="col-md-6" >
-	                                            <div class="input-group input-group-default {if $not_translated}has-error{/if}">
-												    <span class="input-group-addon">
-												        <a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}">
-												            <span class="glyphicon glyphicon-chevron-right"></span>
-												        </a>
-                                                    </span>
-												    <input type="text" name="translation[]" id="translation_{$idx}"
-												        class="translation_field translation_field_default form-control" value="{$info.translation}"
-                                                    />
-												</div>
-												<div class="input-group input-group-custom">
-												    <span class="input-group-addon">
-												        <a href="#" data-text-num="{$idx}" class="copy-translation-custom" title="{intl l='Copy source text in input field'}">
-												            <span class="glyphicon glyphicon-play"></span>
-												        </a>
-                                                    </span>
-												    <input type="text" name="translation_custom[]" id="translation_custom_{$idx}"
-												        class="translation_field translation_field_custom form-control" value="{$info.custom_fallback}"
-												        placeholder="specific redefinition" />
-												</div>
-												<div class="input-group input-group-global">
-												    <span class="input-group-addon">
-												        <a href="#" data-text-num="{$idx}" class="copy-translation-global" title="{intl l='Copy source text in input field'}">
-												            <span class="glyphicon glyphicon-forward"></span>
-                                                        </a>
-                                                    </span>
-												    <input type="text" name="translation_global[]" id="translation_global_{$idx}"
-												        class="translation_field translation_field_global form-control" value="{$info.global_fallback}"
-												        placeholder="global redefinition" />
-												</div>
-	                                        </td>
-	                                    </tr>
-
-	                                {else}
-                                        <tr class="hidden">
-                                            <td colspan="2">
-                                                {* Text is not displayed, put it in a hidden field *}
-                                                <input type="hidden" id="translation_{$idx}" name="translation[]" value="{$info.translation}" />
-                                                <input type="hidden" id="translation_custom{$idx}" name="translation_custom[]" value="{$info.custom_fallback}" />
-                                                <input type="hidden" id="translation_global_{$idx}" name="translation_global[]" value="{$info.global_fallback}" />
-                                            </td>
-                                        </tr>
+                                    {if count($info.files) > 1}
+                                        {$label = {intl l='In pages:'}}
+                                        {capture name="banner" assign=file_names}
+                                            <ul>
+                                            {foreach $info.files as $file}
+                                               <li>{$file}</li>
+                                            {/foreach}
+                                            </ul>
+                                        {/capture}
+                                    {else}
+                                        {$label = {intl l='In page'}}
+                                        {$file_names = $info.files.0}
                                     {/if}
+
+                                    {* Display current file liste, if required *}
+
+                                    {if $file_names != $currfile}
+
+                                        {if $currfile !== false}
+                                            {* Close current panel *}
+                                            </tbody></table></div>
+                                            {$close_last_panel = false}
+                                        {/if}
+
+                                        {$currfile = $file_names}
+
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                {loop name="lang_list" type="lang" id=$edit_language_id}
+                                                    <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" />
+                                                {/loop}
+
+                                                {$label} {$file_names nofilter}
+
+                                            </div>
+
+                                            <table class="table table-condensed table-hover">
+                                                <tbody>
+                                                {$close_last_panel = true}
+                                    {/if}
+
+                                    <tr>
+                                        <td class="col-md-6">
+                                            {$info.text}
+
+
+                                            {if $info.dollar}
+                                                <div>
+                                                    <span class="label label-warning">{intl l='Warning'}</span>
+                                                    {intl l='Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.'}
+                                                </div>
+                                            {/if}
+                                        </td>
+
+                                        <td class="col-md-6" >
+                                            <div class="input-group input-group-default {if $not_translated}has-error{/if}">
+                                                <span class="input-group-addon">
+                                                    <a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}">
+                                                        <span class="glyphicon glyphicon-chevron-right"></span>
+                                                    </a>
+                                                </span>
+                                                <input type="text" name="translation[]" id="translation_{$idx}"
+                                                    class="translation_field translation_field_default form-control" value="{$info.translation}"
+                                                />
+                                            </div>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-addon">
+                                                    <a href="#" data-text-num="{$idx}" class="copy-translation-custom" title="{intl l='Copy source text in input field'}">
+                                                        <span class="glyphicon glyphicon-play"></span>
+                                                    </a>
+                                                </span>
+                                                <input type="text" name="translation_custom[]" id="translation_custom_{$idx}"
+                                                    class="translation_field translation_field_custom form-control" value="{$info.custom_fallback}"
+                                                    placeholder="specific redefinition" />
+                                            </div>
+                                            <div class="input-group input-group-global">
+                                                <span class="input-group-addon">
+                                                    <a href="#" data-text-num="{$idx}" class="copy-translation-global" title="{intl l='Copy source text in input field'}">
+                                                        <span class="glyphicon glyphicon-forward"></span>
+                                                    </a>
+                                                </span>
+                                                <input type="text" name="translation_global[]" id="translation_global_{$idx}"
+                                                    class="translation_field translation_field_global form-control" value="{$info.global_fallback}"
+                                                    placeholder="global redefinition" />
+                                            </div>
+                                        </td>
+                                    </tr>
 
                                     {$idx = $idx + 1}
                                 {/foreach}
@@ -388,6 +414,62 @@
 	                                }
 	                            </div>
 	                            {/if}
+
+                                {if $PAGINATION_END > $PAGINATION_START}
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="text-center">
+                                            <ul class="pagination pagination-centered">
+                                                {for $PAGE=$PAGINATION_START to $PAGINATION_END}
+                                                {$has_prev  = $PAGINATION_CURRENT > 1}
+                                                {$has_next  = $PAGINATION_CURRENT < $PAGINATION_LAST}
+
+                                                {$has_pages_after = $PAGINATION_END < $PAGINATION_LAST && $PAGINATION_LAST > $PAGINATION_MAX_COUNT}
+                                                {$has_pages_before = $PAGINATION_START > 1}
+
+                                                {if $PAGE == $PAGINATION_START}
+                                                {if $has_prev}
+                                                <li><a class="jsPaginationLink" title="{intl l="Go to first page"}" href="#" data-page="1">&laquo;</a></li>
+                                                <li><a class="jsPaginationLink" title="{intl l="Go to previous page"}" href="#" data-page="{$PAGINATION_CURRENT + 1}">&lsaquo;</a></li>
+
+                                                {if $has_pages_before}
+                                                <li title="{intl l="More pages before"}" class="disabled"><a href="#">&hellip;</a></li>
+                                                {/if}
+
+                                                {else}
+                                                <li class="disabled"><a href="#">&laquo;</a></li>
+                                                <li class="disabled"><a href="#">&lsaquo;</a></li>
+                                                {/if}
+                                                {/if}
+
+                                                {if $PAGE != $PAGINATION_CURRENT}
+                                                <li><a class="jsPaginationLink" href="#" data-page="{$PAGE}">{$PAGE}</a></li>
+                                                {else}
+                                                <li class="active"><a href="#">{$PAGE}</a></li>
+                                                {/if}
+
+                                                {if $PAGE == $PAGINATION_END}
+                                                {if $has_next}
+                                                {if $has_pages_after}
+                                                <li title="{intl l="More pages after"}" class="disabled"><a href="#">&hellip;</a></li>
+                                                {/if}
+
+                                                <li><a class="jsPaginationLink" title="{intl l="Go to next page"}" href="#" data-page="{$PAGINATION_CURRENT + 1}">&rsaquo;</a></li>
+                                                <li><a class="jsPaginationLink" title="{intl l="Go to last page"}" href="#" data-page="{$PAGINATION_LAST}">&raquo;</a></li>
+
+                                                {else}
+                                                <li class="disabled"><a href="#">&rsaquo;</a></li>
+                                                <li class="disabled"><a href="#">&raquo;</a></li>
+                                                {/if}
+                                                {/if}
+                                                {/for}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/if}
 
 							</form>
 						</div>
@@ -427,6 +509,7 @@
 
 
             $('.submit-on-change').change(function() {
+                $('#js_hidden_input_pagination_page').val(1);
                 $('#translation_form').submit();
             });
 
@@ -537,6 +620,15 @@
                 $('#translation_form').submit();
 
                 ev.preventDefault();
+            });
+
+
+            // Pagination
+
+            $('.jsPaginationLink').click(function(ev){
+                ev.preventDefault();
+                $('#js_hidden_input_pagination_page').val(this.dataset.page);
+                $('#translation_form').submit();
             });
         });
     </script>

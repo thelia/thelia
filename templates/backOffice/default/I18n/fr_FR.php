@@ -712,6 +712,7 @@ return array(
     'Invoice reference' => 'Facture ref',
     'Is the default template for categories (%num)' => 'Gabarit par défaut pour %num categories',
     'It\'s strongly recommended to use our translation platform' => 'Il est vivement recommandé d\'utiliser notre plateforme de traduction',
+    'Items per page' => 'Eléments par page',
     'Items to translate' => 'Elément à traduire',
     'Keep attention that in translating you can override the resource translations.<br>' => 'Attention ! en faisant la traduction vous pouvez écraser les traductions de ces ressources.<br>',
     'Kg' => 'Kg',
