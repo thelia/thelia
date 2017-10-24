@@ -39,8 +39,9 @@
                                 {/loop}
 
                                 <div class="row">
-                                    <div class="col-md-4 title">
-                                        {intl l='Order %ref - ID %id' id={$ID} ref={$REF}}
+                                    <div class="col-md-4">
+                                        <div class="title">{intl l='Order %ref - ID %id' id={$ID} ref={$REF}}</div>
+                                        <p>{intl l='Order placed on %order_date at %order_time' order_date={format_date date=$CREATE_DATE output='date'} order_time={format_date date=$CREATE_DATE output='time'}}</p>
                                     </div>
 
                                     <div class="col-md-4 actions">
@@ -566,7 +567,7 @@
         {capture "edit_order_address_dialog"}
             
             {form_hidden_fields}
-                    
+            
             {form_field field='id'}
                 <input type="hidden" id="{$label_attr.for}" name="{$name}" class="js-order-address-id" value="{$value}">
             {/form_field}
@@ -586,7 +587,7 @@
                         {loop type="title" name="title1"}
                             <option value='{$ID}'>{$LONG}</option>
                         {/loop}
-                    </select>                    
+                    </select>
                 </div>
             {/form_field}
 
@@ -613,7 +614,7 @@
                 <div class="form-group">
                     {form_field field='address2'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address2" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
-                    {/form_field}                    
+                    {/form_field}
                 </div>
 
                 <div class="form-group">
