@@ -756,6 +756,33 @@ class FileController extends BaseAdminController
         return new Response($message);
     }
 
+    public function updateImageTitleAction($imageId, $parentType)
+    {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $fileManager = $this->getFileManager();
+
+        $fileModelInstance = $fileManager->getModelInstance('image', $parentType);
+
+        /** @var FileModelInterface $file */
+        $file = $fileModelInstance->getQueryInstance()->findPk($imageId);
+
+        $new_title = $this->getRequest()->request->get('title');
+        $locale = $this->getRequest()->request->get('locale');
+
+        if (!empty($new_title)) {
+            $file->setLocale($locale);
+            $file->setTitle($new_title);
+            $file->save();
+        }
+
+        return $this->generateRedirect(
+            URL::getInstance()->absoluteUrl($this->getRequest()->request->get('success_url'), ['current_tab' => 'images'])
+        );
+    }
+
     public function updateImagePositionAction($parentType, /** @noinspection PhpUnusedParameterInspection */  $parentId)
     {
         $imageId = $this->getRequest()->request->get('image_id');

@@ -390,27 +390,38 @@ ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
 }
 
 
-.existing-image .col-sm-6{
-    position: relative;
+.existing-image .col-sm-6 {
     margin-bottom: 30px;
 
-    .btn-group{
-        position: absolute;
-        bottom: 5px;
-        right: 20px;
-    }
+    .thumbnail-container{
+        position: relative;
 
-    .loading{
-        position: absolute;
-        bottom: 5px;
-        right: 20px;
-        display: block;
-        line-height: 1;
-        padding: 0;
-        margin: 0 auto;
-        z-index: 2;
-        width: 30px;
-        height: 30px;
+        .btn-group {
+            position: absolute;
+        }
+
+        .container-btn-left{
+            left: 10px;
+            bottom: 1px;
+        }
+
+        .container-btn-right{
+            right: 10px;
+            bottom: -7px;
+        }
+
+        .loading {
+            position: absolute;
+            bottom: -7px;
+            right: 10px;
+            display: block;
+            line-height: 1;
+            padding: 0;
+            margin: 0 auto;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
+        }
     }
 }
 

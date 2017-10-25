@@ -21,6 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
@@ -293,7 +294,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             case 'none':
             default:
                 $resizeMode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
-
         }
 
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
@@ -353,6 +353,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("OBJECT_ID", $this->objectId)
             ;
 
+            $this->findNextPrev($loopResultRow, $result->getId(), $this->objectType, $result->getPosition());
+
             $addRow = true;
 
             $returnErroredImages = $this->getBackendContext() || ! $this->getIgnoreProcessingErrors();
@@ -391,5 +393,62 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
+    }
+
+    /**
+     * Set the fields HAS_PREVIOUS, HAS_NEXT, PREVIOUS, NEXT for the image loop
+     *
+     * @param LoopResultRow $loopResultRow
+     * @param int $imageId Image id
+     * @param string $imageType Type of the image. Only 'product' is currently supported to get the NEXT and PREVIOUS values
+     * @param int $currentPosition The position of the image
+     */
+    private function findNextPrev(LoopResultRow $loopResultRow, $imageId, $imageType, $currentPosition)
+    {
+        if ($imageType == 'product') {
+            $imageRow = ProductImageQuery::create()
+                ->filterById($imageId)
+                ->findOne();
+
+            if ($imageRow != null) {
+                $previousQuery = ProductImageQuery::create()
+                    ->filterByProductId($imageRow->getProductId())
+                    ->filterByPosition($currentPosition, Criteria::LESS_THAN);
+
+                $nextQuery = ProductImageQuery::create()
+                    ->filterByProductId($imageRow->getProductId())
+                    ->filterByPosition($currentPosition, Criteria::GREATER_THAN);
+
+                if (!$this->getBackendContext()) {
+                    $previousQuery->useProductQuery()
+                        ->filterByVisible(true)
+                        ->endUse();
+
+                    $previousQuery->useProductQuery()
+                        ->filterByVisible(true)
+                        ->endUse();
+                }
+
+                $previous = $previousQuery
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne();
+
+                $next = $nextQuery
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne();
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
+
+                return;
+            }
+        }
+
+        $loopResultRow
+            ->set("HAS_PREVIOUS", 0)
+            ->set("HAS_NEXT", 0);
     }
 }
