@@ -900,16 +900,20 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 }
             }
 
-            $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
-
-            $template->assign('MEDIA_URL', $event->getFileUrl());
+            try {
+                $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
+                $template->assign('MEDIA_URL', $event->getFileUrl());
+            } catch (\Exception $ex) {
+                Tlog::getInstance()->error($ex->getMessage());
+                $template->assign('MEDIA_URL', '');
+            }
         }
 
         if (isset($content)) {
             return $content;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
 
