@@ -228,6 +228,38 @@
         </div>
     </div>
     {/form}
+
+    <div class="modal fade js-modal-search-category-product" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="js-btn-dismiss-modal close">×</button>
+                    <h3></h3>
+                </div>
+                <div class="modal-body align-center">
+                    <div class="js-form-search">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">{intl l="Search"}</div>
+                                <input name="search" class="js-input-search form-control" type="text"/>
+                            </div>
+                        </div>
+                        <div class="js-loader text-center hide">{intl l="Please wait, loading"}</div>
+                        <div class="alert alert-warning text-center hide js-alert-no-result">
+                            {intl l="No results found for your search."}
+                        </div>
+                        <div class="form-group js-block-search-result hide">
+                            <select class="form-control" size="10"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="js-btn-dismiss-modal btn btn-default">{intl l="Close"}</a>
+                    <a href="#" class="js-modal-btn-select btn btn-primary">{intl l="Select"}</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block name="javascript-initialization"}
@@ -255,6 +287,8 @@
     {/javascripts}
 
 <script>
+    var $modalSearch;
+
 $(function() {
     // show tab documents
     $(".alert-warning a[href^='javascript']").on('click', function () {
@@ -644,6 +678,114 @@ $(function() {
 
             $("#pse-assoc-image-document-modal").modal();
         });
+    });
+
+
+    // Search categories and products
+
+    $modalSearch = $('.js-modal-search-category-product');
+
+
+    $modalSearch.initAndShow = function(title, searchUrl, selectSelector, searchPlaceholder, categoryIdToFilter){
+        categoryIdToFilter = (typeof categoryIdToFilter !== 'undefined') ?  categoryIdToFilter : null;
+
+        $modalSearch.find('.modal-header h3').text(title);
+        $modalSearch.data('url', searchUrl);
+        $modalSearch.data('selectselector', selectSelector);
+        if(categoryIdToFilter != null){
+            $modalSearch.data('categoryid', categoryIdToFilter);
+            $modalSearch.data('filterbycategory', '1');
+        }else{
+            $modalSearch.data('filterbycategory', '0');
+        }
+
+        $modalSearch.find('.js-input-search').attr('placeholder',searchPlaceholder);
+
+        $modalSearch.modal('show');
+    };
+
+    $modalSearch.dismiss = function(){
+        $modalSearch.find('.js-block-search-result').addClass('hide');
+        $modalSearch.find('.js-alert-no-result').addClass('hide');
+        $modalSearch.find('.js-input-search').val('');
+        $modalSearch.modal('hide');
+    };
+
+    $modalSearch.on('click', '.js-modal-btn-select', function(e){
+        e.preventDefault();
+        var selectedVal = $modalSearch.find('.js-block-search-result select').val();
+        if(selectedVal != null) {
+            $($modalSearch.data('selectselector')).val(selectedVal).trigger('change');
+            $modalSearch.dismiss();
+        }
+    });
+
+    $modalSearch.on('click', '.js-btn-dismiss-modal', function(e) {
+        e.preventDefault();
+        $modalSearch.dismiss();
+    });
+
+    var searchTimer = null;
+    $modalSearch.on('keyup' ,'.js-input-search', function(){
+        var val = $(this).val();
+
+        if (searchTimer !== null) {
+            clearTimeout(searchTimer);
+        }
+
+        $modalSearch.find('.js-alert-no-result').addClass('hide');
+
+        var ajaxData = { q: val };
+        if($modalSearch.data('filterbycategory') == '1'){
+            ajaxData['category_id'] = $modalSearch.data('categoryid');
+        }
+
+        if (val.length > 2) {
+            $modalSearch.find('.js-loader').removeClass('hide');
+
+            searchTimer = setTimeout(function() {
+                $.ajax({
+                    url: $modalSearch.data('url'),
+                    data: ajaxData,
+                    dataType: 'json',
+                    method: 'GET',
+                    success: function(data) {
+                        $modalSearch.find('.js-loader').addClass('hide');
+                        var options = [];
+                        for (var id in data) {
+                            options.push('<option value="' + id + '">' + data[id] + '</option>');
+                        }
+
+                        if (options.length > 0) {
+                            $modalSearch.find(".js-block-search-result select").html(options.join(''));
+                            $modalSearch.find('.js-block-search-result').removeClass('hide');
+                        } else {
+                            this.error();
+                        }
+                    },
+                    error: function() {
+                        $modalSearch.find('.js-loader').addClass('hide');
+
+                        $modalSearch.find('.js-block-search-result').addClass('hide');
+                        $modalSearch.find('.js-alert-no-result').removeClass('hide');
+                    }
+                });
+            }, 350, this);
+        } else {
+            $modalSearch.find('.js-loader').addClass('hide');
+            $modalSearch.find('.js-block-search-result').addClass('hide');
+        }
+    });
+
+    $('.js-btn-search-default-category').on('click', function(event){
+        event.preventDefault();
+
+        $modalSearch.initAndShow(
+                '{intl l="Search category"}',
+                '{url path="/admin/categories/search"}',
+                '.js-default-category-select',
+                '{intl l="Category title"}'
+        );
     });
 
 });

@@ -60,14 +60,20 @@
                             {$label} :
                         </label>
 
-                        <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                              <option value="0" disabled>{intl l="Top level"}</option>
+                        <div class="input-group">
+                            <select id="{$label_attr.for}" required="required" name="{$name}" class="js-default-category-select form-control">
+                                  <option value="0" disabled>{intl l="Top level"}</option>
 
-                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0" return_url=false}
-                                   <option value="{$ID}" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{option_offset l=$LEVEL+1 label={$TITLE}}</option>
-                              {/loop}
+                                  {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0" return_url=false}
+                                       <option value="{$ID}" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{option_offset l=$LEVEL+1 label={$TITLE}}</option>
+                                  {/loop}
 
-                        </select>
+                            </select>
+                            <span class="input-group-btn" id="accessory_add_button">
+                                <a class="js-btn-search-default-category btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
+                            </span>
+                        </div>
+
                         <span class="help-block">{intl l='You can attach this product to more categories in the details tab.'}</span>
                      </div>
                 {/form_field}

@@ -49,6 +49,11 @@
 
                                             <p class="title title-without-tabs">{intl l="Image information"}</p>
 
+                                            <div class="actions">
+                                                <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous image'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                                <a {if $HAS_NEXT != 0}href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next image'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                            </div>
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
