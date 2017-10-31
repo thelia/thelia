@@ -207,7 +207,7 @@ $config = array(
 	| without final / (DON'T TOUCH)
 	|
 	*/
-	'base_url' => ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && ! in_array(strtolower($_SERVER['HTTPS']), array( 'off', 'no' ))) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'],
+	'base_url' => $base_url,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -217,7 +217,7 @@ $config = array(
 	| with start and final /
 	|
 	*/
-	'upload_dir' => $upload_dir,//'/source/',
+	'upload_dir' => $upload_dir,
 	/*
 	|--------------------------------------------------------------------------
 	| relative path from filemanager folder to upload folder
@@ -226,7 +226,7 @@ $config = array(
 	| with final /
 	|
 	*/
-	'current_path' => $current_path,//'../source/',
+	'current_path' => $current_path,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -237,7 +237,7 @@ $config = array(
 	| DO NOT put inside upload folder
 	|
 	*/
-	'thumbs_base_path' => $thumbs_base_path,//'../thumbs/',
+	'thumbs_base_path' => $thumbs_base_path,
 
 
 	/*
@@ -325,7 +325,7 @@ $config = array(
 	| default language file name
 	|--------------------------------------------------------------------------
 	*/
-	'default_language' => $default_language,//"en_EN",
+	'default_language' => $default_language,
 
 	/*
 	|--------------------------------------------------------------------------
