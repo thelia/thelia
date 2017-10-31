@@ -392,7 +392,7 @@ $get_params = http_build_query($get_params);
 <body>
 	<input type="hidden" id="ftp" value="<?php echo !!$ftp; ?>" />
 	<input type="hidden" id="popup" value="<?php echo $popup;?>" />
-	<input type="hidden" id="callback" value="<?php echo $callback; ?>" />	
+	<input type="hidden" id="callback" value="<?php echo $callback; ?>" />
 	<input type="hidden" id="crossdomain" value="<?php echo $crossdomain;?>" />
 	<input type="hidden" id="editor" value="<?php echo $editor;?>" />
 	<input type="hidden" id="view" value="<?php echo $view;?>" />
@@ -986,9 +986,13 @@ $files=$sorted;
 						$src_thumb = "img/".$icon_theme."/default.jpg";
 					}
 					$is_icon_thumb=true;
+				} else {
+					$src_thumb = $base_url.$thumbs_dir.$file;
 				}
 				if($mini_src==""){
-				$is_icon_thumb_mini=false;
+					$is_icon_thumb_mini=false;
+				} else {
+					$mini_src = $src_thumb;
 				}
 
 				$class_ext=0;
