@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Core\Security\UserProvider\AdminUserProvider;
 use Thelia\Model\Customer;
 
 /**
@@ -211,6 +212,16 @@ class SecurityContext
 
         if (! $this->hasRequiredRole($user, $roles)) {
             $user = $this->getAdminUser();
+
+            if ($user) {
+                // check that admin still exists with the same password
+                $adminUserProvider = new AdminUserProvider;
+                $userFromDB = $adminUserProvider->getUser($user->getUsername());
+                if (!$userFromDB || $userFromDB->getPassword() !== $user->getPassword()) {
+                    $this->getSession()->clearAdminUser();
+                    $user = null;
+                }
+            }
 
             if (! $this->hasRequiredRole($user, $roles)) {
                 $user = null;
