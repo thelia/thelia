@@ -944,7 +944,7 @@ $files=$sorted;
 				$mini_src="";
 				$src_thumb="";
 				if(in_array($file_array['extension'], $ext_img)){
-					$src = $file_path;
+					$src = $base_url.$cur_dir.$file;
 					$is_img=true;
 
 					$img_width = $img_height = "";
