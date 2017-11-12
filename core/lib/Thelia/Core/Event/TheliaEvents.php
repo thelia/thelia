@@ -402,6 +402,9 @@ final class TheliaEvents
      */
     const CART_DUPLICATED = "cart.duplicated";
 
+    /**
+     * Sent when a cart item is duplicated
+     */
     const CART_ITEM_DUPLICATE = "cart.item.duplicate";
 
     /**
