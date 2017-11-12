@@ -5,6 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
@@ -80,6 +81,9 @@ class Cart extends BaseCart
                 $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
         }
+
+        // Dispatche the duplication event before delting the cart from the database,
+        $dispatcher->dispatch(TheliaEvents::CART_DUPLICATED, new CartDuplicationEvent($cart, $this));
 
         try {
             $this->delete();
