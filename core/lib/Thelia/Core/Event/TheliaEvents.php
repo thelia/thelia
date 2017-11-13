@@ -393,9 +393,18 @@ final class TheliaEvents
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
+     * The old cart is already deleted from the database when this event is dispatched.
      */
     const CART_DUPLICATE = "cart.duplicate";
 
+    /**
+     * Sent when the cart is duplicated, but not yet deleted from the database.
+     */
+    const CART_DUPLICATED = "cart.duplicated";
+
+    /**
+     * Sent when a cart item is duplicated
+     */
     const CART_ITEM_DUPLICATE = "cart.item.duplicate";
 
     /**
