@@ -44,7 +44,7 @@
                                         <p>{intl l='Order placed on %order_date at %order_time' order_date={format_date date=$CREATE_DATE output='date'} order_time={format_date date=$CREATE_DATE output='time'}}</p>
                                     </div>
 
-                                    <div class="col-md-4 actions">
+                                    <div class="col-md-6 actions">
                                         <form class="form-horizontal" role="form" id="order-update-status-form" action="{url path="/admin/order/update/$ID/status"}" method="post">
                                             <input class="js-current-tab" type="hidden" name="tab" value="{$order_tab}">
                                             <div class="form-group">
@@ -61,7 +61,7 @@
                                         </form>
                                     </div>
 
-                                    <div class="col-md-4 actions">
+                                    <div class="col-md-2 actions">
                                         {if $HAS_PREVIOUS != 0}
                                         <a href="{url path="/admin/order/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous order'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                                         {else}
