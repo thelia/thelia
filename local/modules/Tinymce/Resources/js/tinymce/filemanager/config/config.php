@@ -363,7 +363,7 @@ $config = array(
 
 	// -1: There is no lazy loading at all, 0: Always lazy-load images, 0+: The minimum number of the files in a directory
 	// when lazy loading should be turned on.
-	'lazy_loading_file_number_threshold'	=> 0,
+	'lazy_loading_file_number_threshold'	=> -1,
 
 
 	//*******************************************
