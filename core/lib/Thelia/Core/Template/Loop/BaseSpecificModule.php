@@ -28,7 +28,7 @@ use Thelia\Type\TypeCollection;
  * {@inheritdoc}
  * @method int getId()
  * @method int[] getExclude()
- * @method int[] getExcludeCode()
+ * @method string[] getExcludeCode()
  * @method string getCode()
  * @method string[] getOrder()
  */
