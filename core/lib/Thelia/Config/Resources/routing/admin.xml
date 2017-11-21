@@ -99,6 +99,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.update-title" path="/admin/image/type/{parentType}/{imageId}/update-title" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateImageTitleAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
     <route id="admin.image.toggle.process" path="/admin/image/type/{parentType}/{documentId}/toggle">
         <default key="_controller">Thelia\Controller\Admin\FileController::toggleVisibilityImageAction</default>
         <requirement key="parentType">.*</requirement>

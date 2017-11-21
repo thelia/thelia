@@ -13,39 +13,63 @@ Parameters:
 
 {ifloop rel="image"}
     <ul id="js-sort-image" class="row list-unstyled">
-        {loop type="image" name="image" backend_context="on" source=$imageType order="manual" source_id=$parentId width="200" height="100" resize_mode="borders" visible="*"}
-            <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
-                <a href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" title="{intl l='Update this image'}" class="thumbnail">
-                    {if $PROCESSING_ERROR}
-                        <img src="//placehold.it/200x100&text={intl l='Image+file+not+found'}" alt="{$TITLE}">
-                    {else}
-                        <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
-                    {/if}
-                </a>
+        {loop type="image" name="image" backend_context="on" lang="$edit_language_id" source=$imageType order="manual" source_id=$parentId width="200" height="100" resize_mode="borders" visible="*"}
 
-                <div class="btn-group" >
-                    <a class="image-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
+        <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
 
-                    {loop type="auth" name="can_change" role="ADMIN" resource="{$resource|default:"admin.$imageType"}" access="UPDATE"}
-                    <a class="image-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/image/type/%image/%id/toggle" image=$imageType id=$ID}" data-error-message="{intl l='Please retry'}">
-                        <i class="glyphicon glyphicon-eye-open"></i><i class="glyphicon glyphicon-eye-close"></i>
+                <div class="thumbnail-container">
+                    <a href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" title="{intl l='Update this image'}" class="thumbnail">
+                        {if $PROCESSING_ERROR}
+                            <img src="//placehold.it/200x100&text={intl l='Image+file+not+found'}" alt="{$TITLE}">
+                        {else}
+                            <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
+                        {/if}
                     </a>
-                    <a class="image-update-btn btn btn-default btn-xs" href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" data-error-message="{intl l='Please retry'}">
-                        <i class="glyphicon glyphicon-edit"></i>
-                    </a>
-                    {/loop}
-                    {elseloop rel="can_change"}
-                    <a class="btn btn-default btn-xs">
-                        <i class="glyphicon {if $VISIBLE}glyphicon-eye-open{else}glyphicon-eye-close{/if}"></i>
-                    </a>
-                    {/elseloop}
 
-                    {loop type="auth" name="can_delete" role="ADMIN" resource="{$resource|default:"admin.$imageType"}" access="DELETE"}
-                    <a class="image-delete-btn btn btn-default btn-xs" id="image-{$ID}" href="{url path="/admin/image/type/%image/delete/%id" image=$imageType id=$ID}" data-error-message="{intl l='Please retry'}">
-                        <i class="glyphicon glyphicon-trash"></i>
-                    </a>
-                    {/loop}
+                    <div class="container-btn-left btn-group">
+                        <input class="form-control image-select-checkbox" type="checkbox" data-id="image-{$ID}"/>
+                    </div>
+
+                    <div class="container-btn-right btn-group" >
+                        <a class="image-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
+
+                        {loop type="auth" name="can_change" role="ADMIN" resource="{$resource|default:"admin.$imageType"}" access="UPDATE"}
+                        <a class="image-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/image/type/%image/%id/toggle" image=$imageType id=$ID}" data-error-message="{intl l='Please retry'}">
+                            <i class="glyphicon glyphicon-eye-open"></i><i class="glyphicon glyphicon-eye-close"></i>
+                        </a>
+                        <a class="image-update-btn btn btn-default btn-xs" href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" data-error-message="{intl l='Please retry'}">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </a>
+                        {/loop}
+                        {elseloop rel="can_change"}
+                        <a class="btn btn-default btn-xs">
+                            <i class="glyphicon {if $VISIBLE}glyphicon-eye-open{else}glyphicon-eye-close{/if}"></i>
+                        </a>
+                        {/elseloop}
+
+                        {loop type="auth" name="can_delete" role="ADMIN" resource="{$resource|default:"admin.$imageType"}" access="DELETE"}
+                        <a class="image-delete-btn btn btn-default btn-xs" id="image-{$ID}" href="{url path="/admin/image/type/%image/delete/%id" image=$imageType id=$ID}" data-error-message="{intl l='Please retry'}">
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </a>
+                        {/loop}
+                    </div>
                 </div>
+
+                <form method="POST" action="{url path="/admin/image/type/%image/%id/update-title" image=$imageType id=$ID}" class="clearfix">
+                    <input type="hidden" name="success_url" value="{navigate to='current'}"/>
+                    <input type="hidden" name="locale" value="{$edit_language_locale}"/>
+
+                    <div class="input-group">
+                        <input type="text" name="title" class="form-control" placeholder="{intl l='Title'}" value="{$TITLE}">
+
+                        <span class="input-group-btn">
+                            <button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-default btn-success" title="{intl l='Save'}">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+
             </li>
         {/loop}
     </ul>

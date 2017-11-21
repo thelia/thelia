@@ -12,7 +12,25 @@ Parameters:
 
 {hook name="tab-image.top" id=$parentId type=$imageType}
 
-<div class="image-manager" >
+<div class="image-manager form-container" >
+
+    {include
+        file = "includes/inner-form-toolbar.html"
+        hide_submit_buttons = true
+        hide_save_buttons = true
+        hide_save_and_close_button = true
+        current_tab = "images"
+        page_url  = "{navigate to="current"}"
+    }
+
+    <div class="inner-toolbar">
+        <div class="inner-actions">
+            <a class="btn-select-all-images btn btn-default" href="#">{intl l="Select all"}</a>
+            <a class="btn-deselect-all-images btn btn-default" href="#">{intl l="Deselect all"}</a>
+            <a class="btn-delete-selected-images btn btn-danger" href="#"><span class="glyphicon glyphicon-trash"></span> {intl l="Delete selected images"}</a>
+        </div>
+    </div>
+
     <form action="{url path="/admin/image/type/%image/%id/save-ajax" image=$imageType id=$parentId}" method="post" class="dropzone" id="images-dropzone" enctype="multipart/form-data">
         <div class="fallback">
             <input name="file" type="file" />
@@ -24,8 +42,6 @@ Parameters:
             <span>{intl l="Or"}</span>
             <button type="button" class="btn btn-info btn-upload"><span class="glyphicon glyphicon-upload"></span> {intl l="Browse files"}</button>
         </div>
-
-
     </form>
 
     <div class="existing-image">
@@ -46,6 +62,11 @@ Parameters:
     var imageReorder = "{url path="/admin/image/type/%image/%id/update-position" image=$imageType id=$parentId}";
     var imageListErrorMessage = "{intl l='Can\'t load images, please refresh this page.'}";
     var imageReorderErrorMessage = "{intl l='Can\'t reorder images, please refresh this page.'}";
+    var imageDeleteOneWarningMessage = "{intl l='Do you really want to delete this image ?'}";
+    var imageDeleteMultipleWarningMessage = "{intl l='Do you really want to delete these %count image(s) ?'}";
+    var imageDeleteNoImageSelectedMessage = "{intl l='Please select at least one image to delete.'}";
+    var textBtnDeleteImageModal_No = "{intl l='No'}";
+    var textBtnDeleteImageModal_Close = "{intl l='Close'}";
 </script>
 
 <div class="modal fade" id="image_delete_dialog" tabindex="-1" role="dialog" aria-hidden="true">
@@ -55,13 +76,12 @@ Parameters:
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>{intl l="delete image"}</h3>
             </div>
-                <div class="modal-body">
-                    {intl l="Do you really want to delete this image ?"}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span>{intl l="No"}</button>
-                    <button type="button" id="submit-delete-image" data-element-id="" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span>{intl l="Yes"}</button>
-                </div>
+            <div id="modal-body-delete-image" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="jsBtnDismissImageDeleteModal" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span>{intl l="No"}</button>
+                <button type="button" id="submit-delete-image" data-element-id="" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span>{intl l="Yes"}</button>
+            </div>
         </div>
     </div>
 </div>
