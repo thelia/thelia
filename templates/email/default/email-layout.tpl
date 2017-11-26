@@ -390,7 +390,7 @@ body,#bodyTable{
                                             <tr>
                                                 <td class="headerContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #202020;font-family: Helvetica;font-size: 20px;font-weight: bold;line-height: 100%;padding-top: 40px;padding-right: 0;padding-bottom: 20px;padding-left: 0;text-align: left;vertical-align: middle;border-collapse: collapse !important;">
                                                     {local_media type="logo"}
-                                                        <img src="{$MEDIA_URL}" alt="{$company_name}" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;height: 75px;width: 135px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;" width="135" height="75">
+                                                        <img src="{$MEDIA_URL}" alt="{$company_name}" border="0" style="border: 0px none;border-color: ;border-style: none;border-width: 0px;margin: 0;padding: 0;line-height: 100%;outline: none;text-decoration: none;">
                                                     {/local_media}
                                                 </td>
                                             </tr>
