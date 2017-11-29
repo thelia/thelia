@@ -14,6 +14,8 @@ namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Order;
@@ -38,6 +40,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Module\BaseModule;
 
@@ -48,6 +51,11 @@ use Thelia\Module\BaseModule;
  */
 class OrderTest extends BaseAction
 {
+    /**
+     * @var EventDispatcherInterface $realDispatcher
+     */
+    protected $realDispatcher;
+
     /**
      * @var ContainerBuilder $container
      */
@@ -117,6 +125,9 @@ class OrderTest extends BaseAction
             $this->securityContext
         );
 
+        $this->realDispatcher = new EventDispatcher();
+        $this->realDispatcher->addSubscriber($this->orderAction);
+
         /* load customer */
         $this->customer = $this->loadCustomer();
         if (null === $this->customer) {
@@ -152,7 +163,7 @@ class OrderTest extends BaseAction
 
         /* add 3 items */
         $productList = array();
-        for ($i=0; $i<3; $i++) {
+        for ($i = 0; $i < 3; $i++) {
             $pse = ProductSaleElementsQuery::create()
                 ->filterByProduct(
                     ProductQuery::create()
@@ -174,11 +185,11 @@ class OrderTest extends BaseAction
                 ->setCart($cart)
                 ->setProduct($pse->getProduct())
                 ->setProductSaleElements($pse)
-                ->setQuantity($i+1)
+                ->setQuantity($i + 1)
                 ->setPrice($pse->getPrice())
                 ->setPromoPrice($pse->getPromoPrice())
                 ->setPromo($pse->getPromo())
-                ->setPriceEndOfLife(time() + 60*60*24*30)
+                ->setPriceEndOfLife(time() + 60 * 60 * 24 * 30)
                 ->save();
             $this->cartItems[] = $cartItem;
         }
@@ -261,15 +272,6 @@ class OrderTest extends BaseAction
             throw new \Exception('No Payment Module fixture found');
         }
 
-        /* define payment module in container */
-        $paymentModuleClass = $paymentModule->getFullNamespace();
-
-        /** @var \Thelia\Module\PaymentModuleInterface $paymentInstance */
-        $paymentInstance = new $paymentModuleClass();
-        $this->container->set(sprintf('module.%s', $paymentModule->getCode()), $paymentInstance);
-        $manageStock = $paymentInstance->manageStockOnCreation();
-
-
         $this->orderEvent->getOrder()->setChoosenDeliveryAddress($validDeliveryAddress->getId());
         $this->orderEvent->getOrder()->setChoosenInvoiceAddress($validInvoiceAddress->getId());
         $this->orderEvent->getOrder()->setDeliveryModuleId($deliveryModule->getId());
@@ -288,6 +290,8 @@ class OrderTest extends BaseAction
 
         $this->assertNotNull($placedOrder);
         $this->assertNotNull($placedOrder->getId());
+
+        $manageStock = $placedOrder->isStockManagedOnOrderCreation($this->getMockEventDispatcher());
 
         /* check customer */
         $this->assertEquals($this->customer->getId(), $placedOrder->getCustomerId(), 'customer i does not  match');
@@ -507,24 +511,76 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function testUpdateStatus(OrderModel $order)
     {
-        $newStatus = $order->getStatusId() == 5 ? 1 : 5;
-        $this->orderEvent->setStatus($newStatus);
+        // Set Status to "not paid"
+        $newStatusId = OrderStatusQuery::getNotPaidStatus()->getId();
+        $this->orderEvent->setStatus($newStatusId);
         $this->orderEvent->setOrder($order);
 
-        $this->orderAction->updateStatus($this->orderEvent, null, $this->getMockEventDispatcher());
+        $this->orderAction->updateStatus($this->orderEvent, null, $this->realDispatcher);
 
-        $this->assertEquals(
-            $newStatus,
-            $this->orderEvent->getOrder()->getStatusId()
-        );
-        $this->assertEquals(
-            $newStatus,
-            OrderQuery::create()->findPk($order->getId())->getStatusId()
-        );
+        $this->assertEquals($newStatusId, $this->orderEvent->getOrder()->getStatusId());
+        $this->assertEquals($newStatusId, OrderQuery::create()->findPk($order->getId())->getStatusId());
+
+        $orderProductList = $order->getOrderProducts();
+
+        $orderProductList[0]->setQuantity(2)->save();
+
+        /** @var ProductSaleElements $testProductSaleElement */
+        $testProductSaleElement = ProductSaleElementsQuery::create()->findPk($orderProductList[0]->getProductSaleElementsId());
+        $testProductSaleElement->setQuantity(100)->save();
+
+        // Set status to paid
+        $newStatusId = OrderStatusQuery::getPaidStatus()->getId();
+        $this->orderEvent->setStatus($newStatusId);
+        $this->orderAction->updateStatus($this->orderEvent, null, $this->realDispatcher);
+
+        $this->assertEquals($newStatusId, $this->orderEvent->getOrder()->getStatusId());
+        $this->assertEquals($newStatusId, OrderQuery::create()->findPk($order->getId())->getStatusId());
+
+        // The stock should have been decreased
+        $testProductSaleElement->reload();
+        $this->assertEquals(98, $testProductSaleElement->getQuantity());
+
+        // Set status to canceled
+        $newStatusId = OrderStatusQuery::getCancelledStatus()->getId();
+        $this->orderEvent->setStatus($newStatusId);
+        $this->orderAction->updateStatus($this->orderEvent, null, $this->realDispatcher);
+
+        $this->assertEquals($newStatusId, $this->orderEvent->getOrder()->getStatusId());
+        $this->assertEquals($newStatusId, OrderQuery::create()->findPk($order->getId())->getStatusId());
+
+        // The stock should have been updated
+        $testProductSaleElement->reload();
+        $this->assertEquals(100, $testProductSaleElement->getQuantity());
+
+        // Set status to sent
+        $newStatusId = OrderStatusQuery::getSentStatus()->getId();
+        $this->orderEvent->setStatus($newStatusId);
+        $this->orderAction->updateStatus($this->orderEvent, null, $this->realDispatcher);
+
+        $this->assertEquals($newStatusId, $this->orderEvent->getOrder()->getStatusId());
+        $this->assertEquals($newStatusId, OrderQuery::create()->findPk($order->getId())->getStatusId());
+
+        // The stock should have been updated
+        $testProductSaleElement->reload();
+        $this->assertEquals(98, $testProductSaleElement->getQuantity());
+
+        // Set status to not paid
+        $newStatusId = OrderStatusQuery::getNotPaidStatus()->getId();
+        $this->orderEvent->setStatus($newStatusId);
+        $this->orderAction->updateStatus($this->orderEvent, null, $this->realDispatcher);
+
+        $this->assertEquals($newStatusId, $this->orderEvent->getOrder()->getStatusId());
+        $this->assertEquals($newStatusId, OrderQuery::create()->findPk($order->getId())->getStatusId());
+
+        // The stock should have been updated
+        $testProductSaleElement->reload();
+        $this->assertEquals(100, $testProductSaleElement->getQuantity());
     }
 
     /**
