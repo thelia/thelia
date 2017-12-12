@@ -78,7 +78,9 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                             'created',
                             'created-reverse',
                             'updated',
-                            'updated-reverse'
+                            'updated-reverse',
+                            'visible',
+                            'visible-reverse'
                         )
                     )
                 ),
@@ -196,6 +198,12 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                     break;
                 case "updated-reverse":
                     $search->addDescendingOrderByColumn('updated_at');
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible-reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
             }
         }
