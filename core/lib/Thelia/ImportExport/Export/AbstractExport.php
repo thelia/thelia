@@ -147,18 +147,17 @@ abstract class AbstractExport implements \Iterator
         // but we do not permit to go back
 
         if ($this->data === null) {
-            $data = $this->getData();
+            $this->data = $this->getData();
 
-            if (is_array($data)) {
-                $this->data = $data;
+            if (is_array($this->data)) {
                 $this->dataIsArray = true;
                 reset($this->data);
 
                 return;
             }
 
-            if ($data instanceof ModelCriteria) {
-                $this->data = $data->setFormatter(ModelCriteria::FORMAT_ON_DEMAND)->keepQuery(false)->paginate(1, 1000);
+            if ($this->data instanceof ModelCriteria) {
+                $this->data = $this->data->setFormatter(ModelCriteria::FORMAT_ON_DEMAND)->keepQuery(false)->paginate(1, 1000);
                 $this->data->getIterator()->rewind();
 
                 return;
