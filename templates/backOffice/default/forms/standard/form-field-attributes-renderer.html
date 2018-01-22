@@ -6,8 +6,9 @@ In addition to the standard form_field block output, this fragment uses the foll
 - field_template : the template style ('standard', or something else)
 - field_value : the value of the input field, which is used if the form_field value is empty. For radios and checkboxes,
   the field is supposed to set the checked property if the form checked status is not defined: 0 -> not checked, != 0 -> checked.
-- field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
-- field_no_standard_classes : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
+- field_extra_class : an extra class to add to the input class (see form-field-renderer.html)
+- field_no_standard_classes : an extra class to add to the input class (see form-field-renderer.html)
+- field_id : the ID of the input field. Override the ID defined in the form definition (see form-field-renderer.html)
 *}
 
 {*
@@ -26,8 +27,11 @@ Use the optionnal $field_value parameter if no value is defined
     {/if}
 {/if}
 
-{* Synthetize an ID if none was given *}
-{if empty({$label_attr.for})}
+{* Use the provided id if any *}
+{if (! empty($field_id))}
+    {$label_attr.for = {$field_id}}
+{elseif empty({$label_attr.for})}
+    {* Synthetize an ID if none was given *}
     {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
 {/if}
 
