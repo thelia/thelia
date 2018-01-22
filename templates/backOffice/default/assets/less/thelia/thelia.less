@@ -640,3 +640,19 @@ footer {
         }
     }
 }
+
+// -- Make printed pages more readable
+@media print {
+    a,
+    a:visited {
+        text-decoration: none;
+    }
+    
+    a[href]:after {
+        content: "";
+    }
+    
+    abbr[title]:after {
+        content: "";
+    }
+}
