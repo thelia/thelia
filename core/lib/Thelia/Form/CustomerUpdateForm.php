@@ -26,30 +26,16 @@ class CustomerUpdateForm extends BaseForm
     use AddressCountryValidationTrait;
 
     /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->form attribute :
-     *
-     * $this->form->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
+     * @param bool $backendContext
+     * @return null|void
      */
-    protected function buildForm()
+    protected function buildForm($backendContext = false)
     {
         $this->formBuilder
-            ->add('update_logged_in_user',
-                'integer')// In a front office context, update the in-memory logged-in user data
+            ->add(
+                'update_logged_in_user',
+                'integer'// In a front office context, update the in-memory logged-in user data
+            )
             ->add("company", "text", array(
                 "label" => Translator::getInstance()->trans("Company"),
                 "label_attr" => array(
@@ -101,8 +87,10 @@ class CustomerUpdateForm extends BaseForm
             ))
             ->add("password", "text", array(
                 "label" => Translator::getInstance()->trans("Password"),
+                "required" => false,
                 "label_attr" => array(
                     "for" => "password",
+                    "help" => Translator::getInstance()->trans('Leave blank to keep current customer password')
                 ),
             ))
             ->add("address1", "text", array(
@@ -115,12 +103,14 @@ class CustomerUpdateForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Street Address "),
             ))
             ->add("address2", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Address Line 2"),
                 "label_attr" => array(
                     "for" => "address2",
                 ),
             ))
             ->add("address3", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Address Line 3"),
                 "label_attr" => array(
                     "for" => "address3",
@@ -173,6 +163,7 @@ class CustomerUpdateForm extends BaseForm
                 ),
             ))
             ->add("state", "text", array(
+                "required" => false,
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
@@ -180,7 +171,7 @@ class CustomerUpdateForm extends BaseForm
                         ),
                     )),
                 ),
-                "label" => Translator::getInstance()->trans("State"),
+                "label" => Translator::getInstance()->trans("State *"),
                 "label_attr" => array(
                     "for" => "state",
                 ),
@@ -200,7 +191,8 @@ class CustomerUpdateForm extends BaseForm
                     'for' => 'discount',
                 ),
             ))
-            ->add('reseller', 'integer', array(
+            ->add('reseller', 'checkbox', array(
+                'required' => false,
                 'label' => Translator::getInstance()->trans('Reseller'),
                 'label_attr' => array(
                     'for' => 'reseller',

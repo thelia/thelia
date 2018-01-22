@@ -27,8 +27,8 @@
 </div>
 
 {render_form_field field='address1'}
-{render_form_field field='address2'}
-{render_form_field field='address3'}
+{render_form_field field='address2' show_label=false}
+{render_form_field field='address3' show_label=false}
 
 <div class="row">
     <div class="col-md-4">{render_form_field field='zipcode'}</div>
@@ -37,8 +37,8 @@
 
 <div class="row">
     <div class="col-sm-6">
-        {custom_render_form_field field='country'}
-            {$countryFieldId="{$dialog_type}-country"}
+        {$countryFieldId="{$dialog_type}-country"}
+        {custom_render_form_field field='country' field_id=$countryFieldId}
             <select {form_field_attributes field='country' field_id=$countryFieldId}>
                 <option value="">-- {intl l="Select Country"} --</option>
                 {loop type="country" name="country.list" visible="*" order="alpha"}
@@ -56,8 +56,8 @@
     </div>
     
     <div class="col-md-6 group-modal-state">
-        {custom_render_form_field field='state'}
-            <select {form_field_attributes field='state'}
+        {custom_render_form_field field='state' field_id="{$dialog_type}-state"}
+            <select {form_field_attributes field='state' field_id="{$dialog_type}-state"}
                 data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-modal-state">
                 <option value="">-- {intl l="Select State"} --</option>
                 {loop type="state" name="state1" visible="*" order="alpha"}
@@ -71,31 +71,7 @@
         {/custom_render_form_field}
     </div>
 </div>
-{*
-{form_field field='country'}
-    {$countryFieldId=$label_attr.for}
-    <div class="form-group {if $error}has-error{/if}">
-        <label for="{$dialog_type}-{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-        <select {if $required}required{/if} name="{$name}" id="{$dialog_type}-{$label_attr.for}" class="form-control">
-            {loop type="country" name="country1" visible="*"}
-                <option value="{$ID}" {if $value == $ID}selected{/if}>{$TITLE}</option>
-            {/loop}
-        </select>
-    </div>
-{/form_field}
 
-{form_field field='state'}
-    <div class="form-group group-modal-state{if $error}has-error{/if}">
-        <label for="{$dialog_type}-{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-        <select name="{$name}" id="{$dialog_type}-{$label_attr.for}" class="form-control"
-                data-thelia-state="1" data-thelia-country="#{$dialog_type}-{$countryFieldId}" data-thelia-toggle=".group-modal-state">
-            {loop type="state" name="state1" visible="*"}
-                <option value="{$ID}" {if {$value} == $ID}selected{/if} data-country="{$COUNTRY}">{$TITLE}</option>
-            {/loop}
-        </select>
-    </div>
-{/form_field}
-*}
 <div class="row">
     <div class="col-md-6">{render_form_field field='phone'}</div>
     <div class="col-md-6">{render_form_field field='cellphone'}</div>

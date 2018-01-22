@@ -478,7 +478,7 @@ return array(
     'Start date' => 'Date de début ',
     'Start date and expiration date are inconsistent' => 'Les date de début et date d\'expiration sont incompatibles',
     'Start date of sales' => 'Date de début de la promotion',
-    'State' => 'État/région',
+    'State *' => 'État/région *',
     'State ID %id not found' => 'L\'ID pays \'%id\' est introuvable',
     'State title' => 'Nom de l\'état',
     'Stock' => 'Stock',

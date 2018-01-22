@@ -709,7 +709,7 @@ return array(
     'Invoice and Delivery' => 'Livraison et facturation',
     'Invoice date' => 'Date de facturation',
     'Invoice informations' => 'Informations de facturation',
-    'Invoice reference' => 'Facture ref',
+    'Invoice reference' => 'Référence de la facture',
     'Is the default template for categories (%num)' => 'Gabarit par défaut pour %num categories',
     'It\'s strongly recommended to use our translation platform' => 'Il est vivement recommandé d\'utiliser notre plateforme de traduction',
     'Items to translate' => 'Elément à traduire',
