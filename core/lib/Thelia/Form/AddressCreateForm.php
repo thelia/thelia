@@ -147,6 +147,7 @@ class AddressCreateForm extends FirewallForm
                     ),
                 ))
             ->add("state", "text", array(
+                "required" => false,
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
@@ -155,7 +156,7 @@ class AddressCreateForm extends FirewallForm
                     )),
                 ),
 
-                "label" => Translator::getInstance()->trans("State"),
+                "label" => Translator::getInstance()->trans("State *"),
                 "label_attr" => array(
                     "for" => "state",
                 ),

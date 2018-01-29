@@ -2,6 +2,7 @@
 This file bind a form field to an HTML representation. In addition to the standard form_field block output, this
 fragment uses the following additional variables :
 
+- field_id : the ID of the input field. Override the ID defined in the form definition
 - field_template : the template style ('standard', or somethingelse)
 - field_value : the value of the input field, which is used if the form_field value is empty.
 - field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
@@ -14,7 +15,12 @@ fragment uses the following additional variables :
 {* Get standard fields attributes *}
 {capture assign=attributes}{include file="forms/$field_template/form-field-attributes-renderer.html"}{/capture}
 {* see form-field-attributes-renderer.html *}
-{if empty({$label_attr.for})}
+
+{* Use the provided id if any *}
+{if (! empty($field_id))}
+    {$label_attr.for = $field_id}
+{elseif empty({$label_attr.for})}
+    {* Synthetize an ID if none was given *}
     {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
 {/if}
 

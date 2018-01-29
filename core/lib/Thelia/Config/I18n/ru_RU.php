@@ -472,7 +472,7 @@ return array(
     'Start date' => 'Дата начала',
     'Start date and expiration date are inconsistent' => 'Дата начала и окончания не соответствуют друг другу',
     'Start date of sales' => 'Дата начала продаж',
-    'State' => 'Штат',
+    'State *' => 'Штат *',
     'State ID %id not found' => 'Штат с ID %id не найден',
     'State title' => 'Название штата',
     'Stock' => 'Остаток на складе',

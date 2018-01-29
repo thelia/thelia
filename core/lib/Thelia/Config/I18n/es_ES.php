@@ -469,7 +469,7 @@ return [
     'Start date' => 'Fecha de inicio',
     'Start date and expiration date are inconsistent' => 'Fecha de inicio y fecha de vencimiento son incompatibles',
     'Start date of sales' => 'Fecha de inicio de ventas',
-    'State' => 'Estado',
+    'State *' => 'Estado *',
     'State ID %id not found' => 'ID estado %id no encontrado',
     'State title' => 'Título estado',
     'Stock' => 'Existencias',

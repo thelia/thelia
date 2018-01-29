@@ -489,7 +489,7 @@ return array(
     'Start date' => 'Start date',
     'Start date and expiration date are inconsistent' => 'Start date and expiration date are inconsistent',
     'Start date of sales' => 'Start date of sales',
-    'State' => 'State',
+    'State *' => 'State *',
     'State ID %id not found' => 'State ID %id not found',
     'State title' => 'State title',
     'Stock' => 'Stock',

@@ -71,150 +71,55 @@
                                             {loop name="address" type="address" customer="$customer_id" backend_context="1" default="true"}
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs">{intl l="Customer informations"}</p>
+    
+                                                {custom_render_form_field field='title'}
+                                                    <select {form_field_attributes field='title'} >
+                                                        {loop type="title" name="title1"  backend_context="1"}
+                                                            <option value="{$ID}"{if $value == $ID} selected{/if}>{$LONG}</option>
+                                                        {/loop}
+                                                    </select>
+                                                {/custom_render_form_field}
 
-                                                {form_field field='title'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                                                {render_form_field field='firstname'}
+                                                {render_form_field field='lastname'}
+                                                {render_form_field field='email'}
+                                                {render_form_field field='discount'}
+                                                {render_form_field field='reseller'}
+                                                {render_form_field field='password'}
 
-                                                        <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                                                            {loop type="title" name="title1" backend_context="1"}
-                                                                <option value="{$ID}" {if $ID == $TITLE}selected{/if}>{$LONG}</option>
+                                                <p class="title title-without-tabs">{intl l="Default address"}</p>
+
+                                                {render_form_field field='company'}
+                                                {render_form_field field='address1'}
+                                                {render_form_field field='address2' show_label=false}
+                                                {render_form_field field='address3' show_label=false}
+                                                {render_form_field field='zipcode'}
+                                                {render_form_field field='city'}
+
+                                                {custom_render_form_field field='country'}
+                                                    <select {form_field_attributes field='country'}>
+                                                        {loop type="country" name="country.list" visible="*" order="alpha"}
+                                                            <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
+                                                        {/loop}
+                                                    </select>
+                                                    {$countryFieldId=$label_attr.for}
+                                                {/custom_render_form_field}
+    
+                                                <div class="group-state">
+                                                    {custom_render_form_field field='state'}
+                                                        <select {form_field_attributes field='state'}
+                                                            data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state">
+                                                            {loop type="state" name="state1" visible="*" order="alpha"}
+                                                                <option value="{$ID}" {if {$value} == $ID}selected{/if} data-country="{$COUNTRY}">{$TITLE}</option>
                                                             {/loop}
                                                         </select>
-                                                    </div>
-                                                {/form_field}
+                                                    {/custom_render_form_field}
+                                                </div>
 
-                                                {form_field field='firstname'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
-                                                    </div>
-                                                {/form_field}
-
-                                                {form_field field='lastname'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
-                                                    </div>
-                                                {/form_field}
-
-                                                {form_field field='email'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email'}">
-                                                    </div>
-                                                {/form_field}
-
-                                                {form_field field='discount'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='permanent discount'}">
-                                                    </div>
-                                                {/form_field}
-
-                                                {form_field field='reseller'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                            <div class="checkbox">
-                                                                <label>
-                                                                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-                                                                    {$label}
-                                                                </label>
-                                                            </div>
-                                                    </div>
-                                                {/form_field}
-
-                                                {form_field field='password'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{$label} (leave blank to keep current customer password) {if $required} <span class="required">*</span>{/if} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Password'}">
-                                                    </div>
-                                                {/form_field}
-
-
-
-                                                    <p class="title title-without-tabs">{intl l="Default address"}</p>
-
-                                                    {form_field field='company'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='address1'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='address2'}
-                                                        <div class="form-group">
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='address3'}
-                                                        <div class="form-group">
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='zipcode'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='city'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='country'}
-                                                        {$countryFieldId=$label_attr.for}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                                                                {loop type="country" name="country1" visible="*"}
-                                                                    <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
-                                                                {/loop}
-                                                            </select>
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='state'}
-                                                        <div class="form-group group-state{if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <select name="{$name}" id="{$label_attr.for}" class="form-control"
-                                                                    data-thelia-state="1" data-thelia-country="#{$countryFieldId}" data-thelia-toggle=".group-state">
-                                                                {loop type="state" name="state1" visible="*"}
-                                                                    <option value="{$ID}" {if {$value} == $ID}selected{/if} data-country="{$COUNTRY}">{$TITLE}</option>
-                                                                {/loop}
-                                                            </select>
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='phone'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Phone'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                    {form_field field='cellphone'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Cellphone'}">
-                                                        </div>
-                                                    {/form_field}
-
-                                                {/loop}
-
+                                                {render_form_field field='phone'}
+                                                {render_form_field field='cellphone'}
                                             </div>
+                                            {/loop}
 
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs clearfix">
