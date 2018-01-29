@@ -18,4 +18,9 @@ END IF
 $$
 DELIMITER ;
 
+-- Missing timestamps in ignored_module_hook
+
+ALTER TABLE `ignored_module_hook` ADD `created_at` DATETIME NOT NULL;
+ALTER TABLE `ignored_module_hook` ADD `updated_at` DATETIME NOT NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
