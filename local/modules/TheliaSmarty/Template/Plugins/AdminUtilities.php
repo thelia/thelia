@@ -34,37 +34,47 @@ class AdminUtilities extends AbstractSmartyPlugin
         $this->templateHelper = $templateHelper;
     }
 
+    /**
+     * @param \Smarty $smarty
+     * @param string $templateName
+     * @param array $variablesArray
+     * @return string
+     * @throws \Exception
+     * @throws \SmartyException
+     */
     protected function fetchSnippet($smarty, $templateName, $variablesArray)
     {
-        $data = '';
-
-        $snippet_path = sprintf(
-            '%s/%s/%s.html',
-            THELIA_TEMPLATE_DIR,
-            $this->templateHelper->getActiveAdminTemplate()->getPath(),
-            $templateName
+        $snippet_content = file_get_contents(
+            $this->templateHelper->getActiveAdminTemplate()->getTemplateFilePath(
+                $templateName . '.html'
+            )
         );
 
-        if (false !== $snippet_content = file_get_contents($snippet_path)) {
-            $smarty->assign($variablesArray);
+        $smarty->assign($variablesArray);
 
-            $data = $smarty->fetch(sprintf('string:%s', $snippet_content));
-        }
+        $data = $smarty->fetch(sprintf('string:%s', $snippet_content));
 
         return $data;
     }
-    
+
     public function optionOffsetGenerator($params, &$smarty)
     {
         $label = $this->getParam($params, 'label', null);
-        
+
         if (null !== $level = $this->getParam($params, [ 'l', 'level'], null)) {
             $label = str_repeat('&nbsp;', 4 * $level) . $label;
         }
-        
+
         return $label;
     }
 
+    /**
+     * @param $params
+     * @param $smarty
+     * @return mixed|string
+     * @throws \Exception
+     * @throws \SmartyException
+     */
     public function generatePositionChangeBlock($params, &$smarty)
     {
         // The required permissions
@@ -116,8 +126,10 @@ class AdminUtilities extends AbstractSmartyPlugin
      * Generates the link of a sortable column header
      *
      * @param  array   $params
-     * @param  unknown $smarty
+     * @param  \Smarty $smarty
      * @return string  no text is returned.
+     * @throws \Exception
+     * @throws \SmartyException
      */
     public function generateSortableColumnHeader($params, &$smarty)
     {

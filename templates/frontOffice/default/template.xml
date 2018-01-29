@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template xmlns="http://thelia.net/schema/dic/template"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/template http://thelia.net/schema/dic/template/template-1_0.xsd">
+    <descriptive locale="fr">
+        <title>Template front office par défaut</title>
+    </descriptive>
+    <descriptive locale="en">
+        <title>Default front office template</title>
+    </descriptive>
+    <languages>
+        <language>ar_SA</language>
+        <language>cs_CZ</language>
+        <language>de_DE</language>
+        <language>el_GR</language>
+        <language>en_US</language>
+        <language>es_ES</language>
+        <language>fa_IR</language>
+        <language>fr_FR</language>
+        <language>hu_HU</language>
+        <language>id_ID</language>
+        <language>it_IT</language>
+        <language>nl_NL</language>
+        <language>pl_PL</language>
+        <language>pt_BR</language>
+        <language>pt_PT</language>
+        <language>ru_RU</language>
+        <language>sk_SK</language>
+        <language>tr_TR</language>
+        <language>uk_UA</language>
+    </languages>
+    <version>1.0.0</version>
+    <authors>
+        <author>
+            <name>Thelia team</name>
+            <company>thelia.net</company>
+            <email>contact@thelia.net</email>
+            <website>thelia.net</website>
+        </author>
+    </authors>
+    <thelia>2.4.0</thelia>
+    <stability>prod</stability>
+</template>

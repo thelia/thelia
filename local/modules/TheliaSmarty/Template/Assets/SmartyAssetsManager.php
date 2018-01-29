@@ -14,6 +14,7 @@ namespace TheliaSmarty\Template\Assets;
 
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Exception\TheliaProcessException;
 use TheliaSmarty\Template\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
@@ -87,39 +88,35 @@ class SmartyAssetsManager
         $assets_directory,
         SmartyParser $smartyParser
     ) {
-        // Get the registered template directories for the current template path
+        // Get the registered template directories for the current template type
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
-        if (isset($templateDirectories[$templateDefinition->getName()])) {
-            /* create assets foreach registered directory : main @ modules */
-            foreach ($templateDirectories[$templateDefinition->getName()] as $key => $directory) {
-                // This is the assets directory in the template's tree
-                $tpl_path = $directory . DS . $assets_directory;
+        // Use the template name first
+        $templateDefinitionList = array_merge(
+            [ $templateDefinition ],
+            $templateDefinition->getParentList()
+        );
 
-                $asset_dir_absolute_path = realpath($tpl_path);
+        // Prepare assets for all template hierarchy.
+        // Copy current template assets and its parents assets to the web/assets directory
 
-                if (false !== $asset_dir_absolute_path) {
-                    // If we're processing template assets (not module assets),
-                    // we will use the $assets_directory as the assets parent dir.
-                    if (SmartyParser::TEMPLATE_ASSETS_KEY == $key && ! null !== $assets_directory) {
-                        $assetsWebDir = SmartyParser::TEMPLATE_ASSETS_KEY . DS . $assets_directory;
-                    } else {
-                        $assetsWebDir = $key;
+        /** @var TemplateDefinition $templateDefinitionItem */
+        foreach ($templateDefinitionList as $templateDefinitionItem) {
+            // Use also the parent directories
+            if (isset($templateDirectories[$templateDefinitionItem->getName()])) {
+                /* create assets foreach registered directory : main @ modules */
+                foreach ($templateDirectories[$templateDefinitionItem->getName()] as $key => $directory) {
+                    // This is the assets directory in the template's tree
+                    $tpl_path = $directory . DS . $assets_directory;
+
+                    if (false !== $asset_dir_absolute_path = realpath($tpl_path)) {
+                        $this->assetsManager->prepareAssets(
+                            $asset_dir_absolute_path,
+                            $this->web_root . $this->path_relative_to_web_root,
+                            $templateDefinitionItem->getPath(),
+                            $key . DS . $assets_directory
+                        );
                     }
-
-                    Tlog::getInstance()->addDebug(
-                        "Preparing assets: source assets directory $asset_dir_absolute_path, "
-                        . "web assets dir base: " . $this->web_root . $this->path_relative_to_web_root . ", "
-                        . "template: ".$templateDefinition->getPath().", "
-                        . "web asset key: $assetsWebDir (key=$key)"
-                    );
-
-                    $this->assetsManager->prepareAssets(
-                        $asset_dir_absolute_path,
-                        $this->web_root . $this->path_relative_to_web_root,
-                        $templateDefinition->getPath(),
-                        $key . DS . $assets_directory
-                    );
                 }
             }
         }
@@ -139,11 +136,10 @@ class SmartyAssetsManager
      *
      * @param bool $allowFilters if false, the 'filters' parameter is ignored
      * @return string
+     * @throws \Exception
      */
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template, $allowFilters = true)
     {
-        $assetUrl = "";
-
         $file = $params['file'];
 
         // The 'file' parameter is mandatory
@@ -153,7 +149,7 @@ class SmartyAssetsManager
             );
         }
 
-        $assetOrigin  = isset($params['source']) ? $params['source'] : SmartyParser::TEMPLATE_ASSETS_KEY;
+        $assetOrigin  = isset($params['source']) ? $params['source'] : ParserInterface::TEMPLATE_ASSETS_KEY;
         $filters      = $allowFilters && isset($params['filters']) ? $params['filters'] : '';
         $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $templateName = isset($params['template']) ? $params['template'] : false;
@@ -182,26 +178,24 @@ class SmartyAssetsManager
                 $templateDefinition->getType(),
                 $templateDefinition->getName(),
                 THELIA_TEMPLATE_DIR . $templateDefinition->getPath(),
-                SmartyParser::TEMPLATE_ASSETS_KEY
+                ParserInterface::TEMPLATE_ASSETS_KEY
             );
 
             $this->prepareTemplateAssets($templateDefinition, self::$assetsDirectory, $smartyParser);
         }
 
-        $assetSource = $this->assetsResolver->resolveAssetSourcePath($assetOrigin, $templateName, $file, $smartyParser);
+        $assetUrl = $this->assetsResolver->resolveAssetURL(
+            $assetOrigin,
+            $file,
+            $assetType,
+            $smartyParser,
+            $filters,
+            $debug,
+            self::$assetsDirectory,
+            $templateName
+        );
 
-        if (null !== $assetSource) {
-            $assetUrl = $this->assetsResolver->resolveAssetURL(
-                $assetOrigin,
-                $file,
-                $assetType,
-                $smartyParser,
-                $filters,
-                $debug,
-                self::$assetsDirectory,
-                $templateName
-            );
-        } else {
+        if (empty($assetUrl)) {
             // Log the problem
             if ($failsafe) {
                 // The asset URL will be ''
@@ -214,6 +208,15 @@ class SmartyAssetsManager
         return $assetUrl;
     }
 
+    /**
+     * @param $assetType
+     * @param $params
+     * @param $content
+     * @param \Smarty_Internal_Template $template
+     * @param $repeat
+     * @return null
+     * @throws \Exception
+     */
     public function processSmartyPluginCall(
         $assetType,
         $params,
