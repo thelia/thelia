@@ -26,6 +26,7 @@ use Thelia\Core\Event\Lang\LangToggleVisibleEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
@@ -52,6 +53,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $this->requestStack = $requestStack;
     }
 
+    /**
+     * @param LangUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
@@ -72,6 +79,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param LangToggleDefaultEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
@@ -83,6 +96,10 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param LangToggleActiveEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function toggleActive(LangToggleActiveEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
@@ -104,6 +121,10 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param LangToggleVisibleEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function toggleVisible(LangToggleVisibleEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
@@ -125,6 +146,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param LangCreateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $lang = new LangModel();
@@ -145,6 +172,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $event->setLang($lang);
     }
 
+    /**
+     * @param LangDeleteEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
@@ -174,6 +207,11 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param LangDefaultBehaviorEvent $event
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function defaultBehavior(LangDefaultBehaviorEvent $event)
     {
         ConfigQuery::create()
@@ -181,6 +219,11 @@ class Lang extends BaseAction implements EventSubscriberInterface
             ->update(array('Value' => $event->getDefaultBehavior()));
     }
 
+    /**
+     * @param LangUrlEvent $event
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function langUrl(LangUrlEvent $event)
     {
         foreach ($event->getUrl() as $id => $url) {
@@ -197,24 +240,26 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $adminTemplate = $this->templateHelper->getActiveAdminTemplate();
         $unknownFlag = ConfigQuery::getUnknownFlagPath();
 
-        $unknownFlagPath = $adminTemplate->getAbsolutePath().DS.$unknownFlag;
+        try {
+            $unknownFlagPath = $adminTemplate->getTemplateFilePath($unknownFlag);
 
-        if (! file_exists($unknownFlagPath)) {
+            // Check if the country flag exists
+            $countryFlag = rtrim(dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
+
+            if (! file_exists($countryFlag)) {
+                $fs = new Filesystem();
+
+                $fs->copy($unknownFlagPath, $countryFlag);
+            }
+        } catch (TemplateException $ex) {
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     "The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.",
                     array("%file" => $unknownFlag)
-                )
+                ),
+                0,
+                $ex
             );
-        }
-
-        // Check if the country flag exists
-        $countryFlag = rtrim(dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
-
-        if (! file_exists($countryFlag)) {
-            $fs = new Filesystem();
-
-            $fs->copy($unknownFlagPath, $countryFlag);
         }
     }
 

@@ -38,6 +38,7 @@ use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
@@ -208,10 +209,11 @@ class Thelia extends Kernel
     }
 
     /**
-     *
      * Load some configuration
      * Initialize all plugins
      *
+     * @param ContainerBuilder $container
+     * @throws \Exception
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
@@ -299,11 +301,19 @@ class Thelia extends Kernel
             $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR . 'I18n';
 
             // Standard templates (front, back, pdf, mail)
-
             /** @var TemplateDefinition $templateDefinition */
             foreach ($templateHelper->getStandardTemplateDefinitions() as $templateDefinition) {
-                if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
-                    $translationDirs[$templateDefinition->getTranslationDomain()] = $dir;
+                // Load parent templates transaltions, the current template translations.
+                $templateList = array_merge(
+                    $templateDefinition->getParentList(),
+                    [ $templateDefinition ]
+                );
+
+                /** @var TemplateDefinition $tplDef */
+                foreach ($templateList as $tplDef) {
+                    if (is_dir($dir = $tplDef->getAbsoluteI18nPath())) {
+                        $translationDirs[$tplDef->getTranslationDomain()] = $dir;
+                    }
                 }
             }
 
@@ -313,6 +323,11 @@ class Thelia extends Kernel
         }
     }
 
+    /**
+     * @param Module $module
+     * @param array $translationDirs
+     * @param TemplateHelperInterface $templateHelper
+     */
     private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper)
     {
         // Core module translation
@@ -421,11 +436,11 @@ class Thelia extends Kernel
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
-     *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function buildContainer()
     {
+        /** @var TheliaContainerBuilder $container */
         $container = parent::buildContainer();
 
         $this->loadConfiguration($container);
@@ -487,8 +502,7 @@ class Thelia extends Kernel
      *
      * Part of Symfony\Component\HttpKernel\KernelInterface
      *
-     * @return array An array of bundle instances.
-     *
+     * @return Bundle\TheliaBundle[] An array of bundle instances.
      */
     public function registerBundles()
     {
@@ -517,7 +531,7 @@ class Thelia extends Kernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        //Nothing is load here but it's possible to load container configuration here.
-        //exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
+        // Nothing is load here but it's possible to load container configuration here.
+        // exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
 }

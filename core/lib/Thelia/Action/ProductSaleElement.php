@@ -235,7 +235,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $pse
                         ->setIsDefault(true)
                         ->save($con);
-
                     // Delete the related attribute combination.
                     AttributeCombinationQuery::create()
                         ->filterByProductSaleElementsId($pse->getId())
@@ -243,7 +242,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 } else {
                     // Delete the PSE
                     $pse->delete($con);
-
                     // If we deleted the default PSE, make the last created one the default
                     if ($pse->getIsDefault()) {
                         $newDefaultPse = ProductSaleElementsQuery::create()
@@ -252,7 +250,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                             ->orderByCreatedAt(Criteria::DESC)
                             ->findOne($con)
                         ;
-
                         if (null !== $newDefaultPse) {
                             $newDefaultPse->setIsDefault(true)->save($con);
                         }

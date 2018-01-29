@@ -7,6 +7,7 @@ use Thelia\Core\Event\Message\MessageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Log\Tlog;
 use Thelia\Model\Base\Message as BaseMessage;
 
 class Message extends BaseMessage
@@ -85,7 +86,7 @@ class Message extends BaseMessage
             try {
                 $body = $parser->render($template, [], $compressOutput);
             } catch (ResourceNotFoundException $ex) {
-                // Ignore this.
+                Tlog::getInstance()->addError("Failed to get mail message template body $template");
             }
         }
 
@@ -147,15 +148,18 @@ class Message extends BaseMessage
      *                                              the template file located in the module under
      *                                              `templates/email/default/' directory is used if
      *                                              `$useFallbackTemplate` is set to `true`.
+     * @return \Swift_Message
+     * @throws \SmartyException
      */
     public function buildMessage(ParserInterface $parser, \Swift_Message $messageInstance, $useFallbackTemplate = true)
     {
-        $parser->setTemplateDefinition(
+        // Set mail template, and save the current template
+        $parser->pushTemplateDefinition(
             $parser->getTemplateHelper()->getActiveMailTemplate(),
             $useFallbackTemplate
         );
 
-        $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
+        $subject     = $parser->renderString($this->getSubject());
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);
 
@@ -174,6 +178,9 @@ class Message extends BaseMessage
                 $messageInstance->addPart($textMessage, 'text/plain');
             }
         }
+
+        // Restore previous template
+        $parser->popTemplateDefinition();
 
         return $messageInstance;
     }
