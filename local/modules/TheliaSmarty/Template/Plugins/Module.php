@@ -13,10 +13,9 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\Template\Smarty\Plugins\an;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Model\ModuleQuery;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Module extends AbstractSmartyPlugin
 {
@@ -41,18 +40,21 @@ class Module extends AbstractSmartyPlugin
      * - countvar : this is the name of a template variable where the number of found modules includes will be assigned.
      *
      * @param array                     $params
-     * @param \Smarty_Internal_Template $template
+     * @param \Smarty_Internal_Template $parser
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *
      * @return string
+     *
+     * @throws \Exception
+     * @throws \SmartyException
      */
-    public function theliaModule($params, \Smarty_Internal_Template $template)
+    public function theliaModule($params, \Smarty_Internal_Template $parser)
     {
         $content = null;
         $count = 0;
         if (false !== $location = $this->getParam($params, 'location', false)) {
             if ($this->debug === true && $this->requestStack->getCurrentRequest()->get('SHOW_INCLUDE')) {
-                echo sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $location);
+                echo sprintf('<div style="background-color: #C82D26; color: #fff; border: solid #000000;">%s</div>', $location);
             }
 
             $moduleLimit = $this->getParam($params, 'module', null);
@@ -80,11 +82,11 @@ class Module extends AbstractSmartyPlugin
         }
 
         if (false !== $countvarname = $this->getParam($params, 'countvar', false)) {
-            $template->assign($countvarname, $count);
+            $parser->assign($countvarname, $count);
         }
 
         if (! empty($content)) {
-            return $template->fetch(sprintf("string:%s", $content));
+            return $parser->fetch(sprintf("string:%s", $content));
         }
 
         return "";
@@ -93,7 +95,7 @@ class Module extends AbstractSmartyPlugin
     /**
      * Define the various smarty plugins hendled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {

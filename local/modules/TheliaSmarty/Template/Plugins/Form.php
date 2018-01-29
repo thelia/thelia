@@ -13,12 +13,13 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Form as SymfonyForm;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
@@ -28,10 +29,9 @@ use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Form\BaseForm;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
-use Thelia\Form\BaseForm;
-use Symfony\Component\Form\Form as SymfonyForm;
 
 /**
  *
@@ -263,7 +263,7 @@ class Form extends AbstractSmartyPlugin
                     if (!isset($formFieldView->vars['options']['choices']) ||
                         !is_array($formFieldView->vars['options']['choices'])
                     ) {
-                        //throw new
+                        // throw new FIXME
                     }
                     $choices = array();
                     foreach ($formFieldView->vars['options']['choices'] as $value => $choice) {
@@ -348,6 +348,9 @@ class Form extends AbstractSmartyPlugin
      * @param  string $templateFile
      * @param  \Smarty_Internal_Template $template
      * @return string
+     * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     * @throws \Exception
+     * @throws \SmartyException
      */
     protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
     {
@@ -355,46 +358,41 @@ class Form extends AbstractSmartyPlugin
 
         $templateStyle = $this->getParam($params, 'template', 'standard');
 
-        $snippet_path = sprintf(
-            '%s' . DS . 'forms' . DS . '%s' . DS . '%s.html',
-            $this->parser->getTemplateDefinition()->getAbsolutePath(),
-            $templateStyle,
-            $templateFile
+        $snippet_content = file_get_contents(
+            $this->parser->getTemplateDefinition()->getTemplateFilePath(
+                'forms' . DS . $templateStyle . DS . $templateFile . ".html"
+            )
         );
 
-        if (false !== $snippet_content = file_get_contents($snippet_path)) {
-            $this->processFormField($params, $template);
+        $this->processFormField($params, $template);
 
-            if (null === $form = $this->getParam($params, 'form', null)) {
-                $form = $this->parserContext->getCurrentForm();
-            }
-
-            $field_name = $this->getParam($params, 'field', false);
-            $field_id = $this->getParam($params, 'field_id', false);
-            $field_extra_class = $this->getParam($params, 'extra_class', '');
-            $field_extra_class = $this->getParam($params, 'extra_classes', $field_extra_class);
-            $field_no_standard_classes = $this->getParam($params, 'no_standard_classes', false);
-            $field_value = $this->getParam($params, 'value', '');
-            $show_label = $this->getParam($params, 'show_label', true);
-            $value_key = $this->getParam($params, 'value_key', false);
-
-            $template->assign([
-                'content' => trim($content),
-                'form' => $form,
-                'field_name' => $field_name,
-                'field_id' => $field_id,
-                'field_extra_class' => $field_extra_class,
-                'field_no_standard_classes' => $field_no_standard_classes,
-                'field_value' => $field_value,
-                'field_template' => $templateStyle,
-                'value_key' => $value_key,
-                'show_label' => $show_label,
-            ]);
-
-            $data = $template->fetch(sprintf('string:%s', $snippet_content));
+        if (null === $form = $this->getParam($params, 'form', null)) {
+            $form = $this->parserContext->getCurrentForm();
         }
 
-        return $data;
+        $field_name = $this->getParam($params, 'field', false);
+        $field_id = $this->getParam($params, 'field_id', false);
+        $field_extra_class = $this->getParam($params, 'extra_class', '');
+        $field_extra_class = $this->getParam($params, 'extra_classes', $field_extra_class);
+        $field_no_standard_classes = $this->getParam($params, 'no_standard_classes', false);
+        $field_value = $this->getParam($params, 'value', '');
+        $show_label = $this->getParam($params, 'show_label', true);
+        $value_key = $this->getParam($params, 'value_key', false);
+
+        $template->assign([
+            'content' => trim($content),
+            'form' => $form,
+            'field_name' => $field_name,
+            'field_id' => $field_id,
+            'field_extra_class' => $field_extra_class,
+            'field_no_standard_classes' => $field_no_standard_classes,
+            'field_value' => $field_value,
+            'field_template' => $templateStyle,
+            'value_key' => $value_key,
+            'show_label' => $show_label,
+        ]);
+
+        return $template->fetch(sprintf('string:%s', $snippet_content));
     }
 
     /**
@@ -402,7 +400,10 @@ class Form extends AbstractSmartyPlugin
      * @param $content
      * @param  \Smarty_Internal_Template $template
      * @param $repeat
-     * @return mixed
+     * @return string
+     * @throws \Exception
+     * @throws \SmartyException
+     * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
      */
     public function customFormFieldRendering($params, $content, $template, &$repeat)
     {
@@ -411,11 +412,27 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
+    /**
+     * @param $params
+     * @param \Smarty_Internal_Template $template
+     * @return string
+     * @throws \Exception
+     * @throws \SmartyException
+     * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     */
     public function standardFormFieldRendering($params, \Smarty_Internal_Template $template)
     {
         return $this->automaticFormFieldRendering($params, '', $template, 'form-field-renderer');
     }
 
+    /**
+     * @param $params
+     * @param \Smarty_Internal_Template $template
+     * @return string
+     * @throws \Exception
+     * @throws \SmartyException
+     * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     */
     public function standardFormFieldAttributes($params, \Smarty_Internal_Template $template)
     {
         return $this->automaticFormFieldRendering($params, '', $template, 'form-field-attributes-renderer');

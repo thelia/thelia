@@ -233,7 +233,7 @@ class TranslationsController extends BaseAdminController
 
                 $domain = $template->getTranslationDomain();
 
-                // Load translations files is this template is not the current template
+                // Load translations files if this template is not the current template
                 // as it is not loaded in Thelia.php
                 if (! $this->getTemplateHelper()->isActive($template)) {
                     $this->loadTranslation($i18nDirectory, $domain);
