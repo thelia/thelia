@@ -382,7 +382,7 @@ return array(
     'Customer - order table row' => 'Client - ligne tableau commande',
     'Customer account - additional information' => 'Compte client - informations additionnelles',
     'Customer account block' => 'Bloc compte client',
-    'Customer account creation should be confirmed by email (1: yes, 0: no)' => 'La création d\'un compte client doit être confilrée par email (1: oui, 0: non)',
+    'Customer account creation should be confirmed by email (1: yes, 0: no)' => 'La création d\'un compte client doit être confirmée par email (1: oui, 0: non)',
     'Customer title' => 'civilité client',
     'Customers - JavaScript' => 'Clients - JavaScript',
     'Customers - caption' => 'Clients - légende',
