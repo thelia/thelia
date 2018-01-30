@@ -41,7 +41,11 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $company;
     protected $ref;
     protected $emailUpdateAllowed;
+
+    /** @var  bool */
     protected $notifyCustomerOfAccountCreation;
+    /** @var  bool */
+    protected $notifyCustomerOfAccountModification = true;
 
     /**
      * @param int    $title     the title customer id
@@ -63,6 +67,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param float  $discount
      * @param string $company
      * @param string $ref
+     * @param int $state thre State ID
      */
     public function __construct(
         $title,
@@ -86,6 +91,8 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $ref,
         $state = null
     ) {
+        parent::__construct();
+
         $this->address1 = $address1;
         $this->address2 = $address2;
         $this->address3 = $address3;
@@ -315,5 +322,23 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     public function getNotifyCustomerOfAccountCreation()
     {
         return $this->notifyCustomerOfAccountCreation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNotifyCustomerOfAccountModification()
+    {
+        return $this->notifyCustomerOfAccountModification;
+    }
+
+    /**
+     * @param bool $notifyCustomerOfAccountModification
+     * @return $this
+     */
+    public function setNotifyCustomerOfAccountModification($notifyCustomerOfAccountModification)
+    {
+        $this->notifyCustomerOfAccountModification = $notifyCustomerOfAccountModification;
+        return $this;
     }
 }

@@ -325,7 +325,7 @@ return [
     'Sorry, you\'re not allowed to perform this action' => 'Ospravedlňujeme sa, ale nemôžete vykonávať túto činnosť',
     'Start date' => 'Počiatočný Dátum',
     'Start date of sales' => 'Dátum začatia predaja',
-    'State' => 'Štát',
+    'State *' => 'Štát *',
     'State ID %id not found' => 'Štátna ID %id nebol nájdený',
     'State title' => 'Názov štátu',
     'Stock' => 'Sklad',

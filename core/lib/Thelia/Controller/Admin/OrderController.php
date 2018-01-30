@@ -215,7 +215,7 @@ class OrderController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
             return $response;
         }
-        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), $browser);
+        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), $browser == 0);
     }
 
     public function generateDeliveryPdf($order_id, $browser)
@@ -223,12 +223,12 @@ class OrderController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
             return $response;
         }
-        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser);
+        return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser == 0);
     }
 
     private function generateBackOfficeOrderPdf($order_id, $fileName, $browser)
     {
-        if (null === $response = $this->generateOrderPdf($order_id, $fileName, true, true, $browser)) {
+        if (null === $response = $this->generateOrderPdf($order_id, $fileName, true, true, $browser == 0)) {
             return $this->generateRedirectFromRoute(
                 "admin.order.update.view",
                 [],

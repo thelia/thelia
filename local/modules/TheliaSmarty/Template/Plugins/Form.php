@@ -189,7 +189,7 @@ class Form extends AbstractSmartyPlugin
             $template->assign("error", $errors->count() ? true : false);
             $this->assignFieldErrorVars($template, $errors);
         }
-        
+
         $attr = array();
 
         foreach ($fieldVars["attr"] as $key => $value) {
@@ -370,6 +370,7 @@ class Form extends AbstractSmartyPlugin
             }
 
             $field_name = $this->getParam($params, 'field', false);
+            $field_id = $this->getParam($params, 'field_id', false);
             $field_extra_class = $this->getParam($params, 'extra_class', '');
             $field_extra_class = $this->getParam($params, 'extra_classes', $field_extra_class);
             $field_no_standard_classes = $this->getParam($params, 'no_standard_classes', false);
@@ -381,6 +382,7 @@ class Form extends AbstractSmartyPlugin
                 'content' => trim($content),
                 'form' => $form,
                 'field_name' => $field_name,
+                'field_id' => $field_id,
                 'field_extra_class' => $field_extra_class,
                 'field_no_standard_classes' => $field_no_standard_classes,
                 'field_value' => $field_value,

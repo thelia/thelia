@@ -104,7 +104,7 @@ class CustomerController extends AbstractCrudController
                 'email'     => $object->getEmail(),
                 'title'     => $object->getTitleId(),
                 'discount'  => $object->getDiscount(),
-                'reseller'  => $object->getReseller(),
+                'reseller'  => $object->getReseller() ? true : false,
         );
 
         if ($address !== null) {

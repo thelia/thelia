@@ -4,13 +4,15 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Exception\TheliaProcessException;
+use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
-use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
-use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
@@ -86,6 +88,9 @@ class Order extends BaseOrder
         return $this->choosenInvoiceAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function preSave(ConnectionInterface $con = null)
     {
         if ($this->isPaid(false) && null === $this->getInvoiceDate()) {
@@ -132,6 +137,7 @@ class Order extends BaseOrder
      * @param  bool      $includePostage  if true, the postage cost is included to the total
      * @param  bool      $includeDiscount if true, the discount will be included to the total
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
@@ -148,10 +154,10 @@ class Order extends BaseOrder
             )', 'total_amount')
             ->select([ 'total_tax', 'total_amount' ])
             ->findOne();
-    
+
         $tax = $orderInfo['total_tax'];
         $amount = $orderInfo['total_amount'];
-        
+
         $total = $amount + $tax;
 
         // @todo : manage discount : free postage ?
@@ -180,6 +186,7 @@ class Order extends BaseOrder
      * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
      *
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getWeight()
     {
@@ -204,7 +211,7 @@ class Order extends BaseOrder
         } else {
             $untaxedPostage = $this->getPostage();
         }
-        
+
         return $untaxedPostage;
     }
 
@@ -226,6 +233,7 @@ class Order extends BaseOrder
 
     /**
      * Set the status of the current order to NOT PAID
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setNotPaid()
     {
@@ -235,15 +243,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is NOT PAID
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is NOT PAID, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isNotPaid()
+    public function isNotPaid($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
+        return $this->getOrderStatus()->isNotPaid($exact);
     }
 
     /**
      * Set the status of the current order to PAID
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setPaid()
     {
@@ -253,21 +264,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PAID
      *
-     * @param bool $exact if true, the method will check if the current status is exactly OrderStatus::CODE_PAID.
-     * if false, it will check if the order has been paid, whatever the current status is. The default is true.
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is PAID, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function isPaid($exact = true)
     {
-        return $this->hasStatusHelper(
-            $exact ?
-            OrderStatus::CODE_PAID :
-            [ OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
-        );
+        return $this->getOrderStatus()->isPaid($exact);
     }
 
     /**
      * Set the status of the current order to PROCESSING
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setProcessing()
     {
@@ -277,15 +285,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PROCESSING
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is PROCESSING, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isProcessing()
+    public function isProcessing($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_PROCESSING);
+        return $this->getOrderStatus()->isProcessing($exact);
     }
 
     /**
      * Set the status of the current order to SENT
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setSent()
     {
@@ -295,15 +306,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is SENT
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is SENT, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isSent()
+    public function isSent($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_SENT);
+        return $this->getOrderStatus()->isSent($exact);
     }
 
     /**
      * Set the status of the current order to CANCELED
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setCancelled()
     {
@@ -313,15 +327,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is CANCELED
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is CANCELED, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isCancelled()
+    public function isCancelled($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_CANCELED);
+        return $this->getOrderStatus()->isCancelled($exact);
     }
 
     /**
      * Set the status of the current order to REFUNDED
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setRefunded()
     {
@@ -331,17 +348,20 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is REFUNDED
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is REFUNDED, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isRefunded()
+    public function isRefunded($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_REFUNDED);
+        return $this->getOrderStatus()->isRefunded($exact);
     }
 
     /**
      * Set the status of the current order to the provided status
      *
      * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setStatusHelper($statusCode)
     {
@@ -351,18 +371,57 @@ class Order extends BaseOrder
     }
 
     /**
-     * Check if the current status of this order is $statusCode or, if $statusCode is an array, if the current
-     * status is in the $statusCode array.
+     * Get an instance of the payment module
      *
-     * @param  string|array $statusCode the status code, one of OrderStatus::CODE_xxx constants.
-     * @return bool   true if this order have the provided status, false otherwise.
+     * @return \Thelia\Module\PaymentModuleInterface
+     * @throws TheliaProcessException
      */
-    public function hasStatusHelper($statusCode)
+    public function getPaymentModuleInstance()
     {
-        if (is_array($statusCode)) {
-            return in_array($this->getOrderStatus()->getCode(), $statusCode);
-        } else {
-            return $this->getOrderStatus()->getCode() == $statusCode;
+        if (null === $paymentModule = ModuleQuery::create()->findPk($this->getPaymentModuleId())) {
+            throw new TheliaProcessException("Payment module ID=" . $this->getPaymentModuleId() . " was not found.");
         }
+
+        return $paymentModule->createInstance();
+    }
+
+    /**
+     * Get an instance of the delivery module
+     *
+     * @return \Thelia\Module\DeliveryModuleInterface
+     * @throws TheliaProcessException
+     */
+    public function getDeliveryModuleInstance()
+    {
+        if (null === $deliveryModule = ModuleQuery::create()->findPk($this->getDeliveryModuleId())) {
+            throw new TheliaProcessException("Delivery module ID=" . $this->getDeliveryModuleId() . " was not found.");
+        }
+
+        return $deliveryModule->createInstance();
+    }
+
+    /**
+     * Check if stock was decreased at stock creation for this order.
+     * TODO : we definitely have to store modules in an order_modules table juste like order_product and other order related information.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @return bool true if the stock was decreased at order creation, false otherwise
+     */
+    public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher)
+    {
+        $paymentModule = $this->getPaymentModuleInstance();
+
+        $event = new ManageStockOnCreationEvent($paymentModule);
+
+        $dispatcher->dispatch(
+            TheliaEvents::getModuleEvent(
+                TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
+                $paymentModule->getCode()
+            )
+        );
+
+        return (null !== $event->getManageStock())
+            ? $event->getManageStock()
+            : $paymentModule->manageStockOnCreation();
     }
 }
