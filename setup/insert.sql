@@ -2177,7 +2177,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (66, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
-    (69, 'fr_FR', 'La création d\'un compte client doit être confilrée par email (1: oui, 0: non)', NULL, NULL, NULL),
+    (69, 'fr_FR', 'La création d\'un compte client doit être confirmée par email (1: oui, 0: non)', NULL, NULL, NULL),
     (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL)
 ;
 
