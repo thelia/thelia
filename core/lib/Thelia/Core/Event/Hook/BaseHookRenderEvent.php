@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\Event;
  * Class BaseHookRenderEvent
  * @package Thelia\Core\Event\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BaseHookRenderEvent extends Event
 {
@@ -84,6 +85,16 @@ class BaseHookRenderEvent extends Event
     }
 
     /**
+     * Get all template vars
+     *
+     * @return array all template vars
+     */
+    public function getTemplateVars()
+    {
+        return $this->templateVars;
+    }
+
+    /**
      * add or replace an argument
      *
      * @param  string $key
@@ -118,6 +129,7 @@ class BaseHookRenderEvent extends Event
     {
         return array_key_exists($key, $this->arguments);
     }
+
 
     /**
      * Return a template variable value. An exception is thorwn if the variable is not defined.
