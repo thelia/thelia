@@ -109,7 +109,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('force_return', true),
             Argument::createBooleanTypeArgument('ignore_processing_errors', true),
             Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
-            Argument::createBooleanTypeArgument('allow_zoom', false)
+            Argument::createBooleanTypeArgument('allow_zoom', false),
+            Argument::createBooleanTypeArgument('base64', false)
         );
 
         // Add possible image sources
