@@ -369,6 +369,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
                     ->set("PROCESSING_ERROR", false)
                 ;
+
+
+                if ($this->getBase64()) {
+                    $loopResultRow->set("IMAGE_BASE64", $this->toBase64($event->getCacheFilepath()));
+                }
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
                 Tlog::getInstance()->addError(sprintf("Failed to process image in image loop: %s", $ex->getMessage()));
@@ -450,5 +455,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $loopResultRow
             ->set("HAS_PREVIOUS", 0)
             ->set("HAS_NEXT", 0);
+    }
+    
+    private function toBase64($path) 
+    {
+        $imgData = base64_encode(file_get_contents($path));
+        return $src = 'data: '.mime_content_type($path).';base64,'.$imgData;
     }
 }
