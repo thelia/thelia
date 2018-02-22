@@ -217,6 +217,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                                     $image->effects()->colorize($the_color);
                                 }
                                 break;
+                                
+                            case 'blur':
+                                if (isset($params[1])) {
+                                    $blur_level = intval($params[1]);
+
+                                    $image->effects()->blur($blur_level);
+                                }
+                                break;                                      
                         }
                     }
 
