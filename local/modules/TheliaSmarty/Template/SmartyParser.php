@@ -57,6 +57,9 @@ class SmartyParser extends Smarty implements ParserInterface
     /** @var TemplateDefinition */
     protected $templateDefinition;
 
+    /** @var bool if true, resources will also be searched in the default template */
+    protected $fallbackToDefaultTemplate = false;
+
     /** @var int */
     protected $status = 200;
 
@@ -65,6 +68,9 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /** @var bool */
     protected $debug;
+
+    /** @var array The template stack  */
+    protected $tplStack = [];
 
     /**
      * @param RequestStack             $requestStack
@@ -277,43 +283,116 @@ class SmartyParser extends Smarty implements ParserInterface
         }
     }
 
+
     /**
+     * Set a new template definition, and save the current one
+     *
      * @param TemplateDefinition $templateDefinition
-     * @param bool $useFallback
+     * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
+     * @throws \SmartyException
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $useFallback = false)
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    {
+        if (null !== $this->templateDefinition) {
+            array_push($this->tplStack, [$this->templateDefinition, $this->fallbackToDefaultTemplate]);
+        }
+
+        $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
+    }
+
+    /**
+     * Restore the previous stored template definition, if one exists.
+     *
+     * @throws \SmartyException
+     */
+    public function popTemplateDefinition()
+    {
+        if (count($this->tplStack) > 0) {
+            list ($templateDefinition, $fallbackToDefaultTemplate) = array_pop($this->tplStack);
+
+            $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
+        }
+    }
+
+    /**
+     * Configure the parser to use the template defined by $templateDefinition
+     *
+     * @param TemplateDefinition $templateDefinition
+     * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
+     * @throws \SmartyException
+     */
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
         $this->templateDefinition = $templateDefinition;
 
-        /* init template directories */
+        $this->fallbackToDefaultTemplate = $fallbackToDefaultTemplate;
+
+        // Clear the current Smarty template path list
         $this->setTemplateDir(array());
 
-        /* define config directory */
-        $configDirectory = THELIA_TEMPLATE_DIR . $this->getTemplatePath() . DS . 'configs';
-        $this->addConfigDir($configDirectory, self::TEMPLATE_ASSETS_KEY);
+        // -------------------------------------------------------------------------------------------------------------
+        // Add current template and its parent to the registered template list
+        // using "*template-assets" keys.
+        // -------------------------------------------------------------------------------------------------------------
 
-        /* add modules template directories */
-        $this->addTemplateDirectory(
-            $templateDefinition->getType(),
-            $templateDefinition->getName(),
-            THELIA_TEMPLATE_DIR . $this->getTemplatePath(),
-            self::TEMPLATE_ASSETS_KEY,
-            true
-        );
+        $templateList = ['' => $templateDefinition] + $templateDefinition->getParentList();
+
+        /** @var  TemplateDefinition $template */
+        foreach (array_reverse($templateList) as $template) {
+            // Add template directories  in the current template, in order to get assets
+            $this->addTemplateDirectory(
+                $templateDefinition->getType(),
+                $template->getName(), // $templateDefinition->getName(), // We add the template definition in the main template directory
+                $template->getAbsolutePath(),
+                self::TEMPLATE_ASSETS_KEY, //$templateKey,
+                true
+            );
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+        // Add template and its parent pathes to the Smarty template path list
+        // using "*template-assets" keys.
+        // -------------------------------------------------------------------------------------------------------------
+
+        /**
+         * @var string $keyPrefix
+         * @var  TemplateDefinition $template
+         */
+        foreach ($templateList as $keyPrefix => $template) {
+            $templateKey = $keyPrefix . self::TEMPLATE_ASSETS_KEY;
+
+            // Add the template directory to the Smarty search path
+            $this->addTemplateDir($template->getAbsolutePath(), $templateKey);
+
+            // Also add the configuration directory
+            $this->addConfigDir(
+                $template->getAbsolutePath() . DS . 'configs',
+                $templateKey
+            );
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+        // Add all modules template directories foreach of the template list to the Smarty search path.
+        // -------------------------------------------------------------------------------------------------------------
 
         $type = $templateDefinition->getType();
-        $name = $templateDefinition->getName();
 
-        /* do not pass array directly to addTemplateDir since we cant control on keys */
-        if (isset($this->templateDirectories[$type][$name])) {
-            foreach ($this->templateDirectories[$type][$name] as $key => $directory) {
-                $this->addTemplateDir($directory, $key);
-                $this->addConfigDir($directory . DS . 'configs', $key);
+        foreach ($templateList as $keyPrefix => $template) {
+            if (isset($this->templateDirectories[$type][$template->getName()])) {
+                foreach ($this->templateDirectories[$type][$template->getName()] as $key => $directory) {
+                    if (null === $this->getTemplateDir($key)) {
+                        $this->addTemplateDir($directory, $key);
+                        $this->addConfigDir($directory . DS . 'configs', $key);
+                    }
+                }
             }
         }
 
-        // fallback on default template
-        if ($useFallback && 'default' !== $name) {
+        // -------------------------------------------------------------------------------------------------------------
+        // Add the "default" modules template directories if we have to fallback to "default"
+        // -------------------------------------------------------------------------------------------------------------
+
+        if ($fallbackToDefaultTemplate) {
             if (isset($this->templateDirectories[$type]['default'])) {
                 foreach ($this->templateDirectories[$type]['default'] as $key => $directory) {
                     if (null === $this->getTemplateDir($key)) {
@@ -328,22 +407,32 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Get template definition
      *
-     * @param bool $webAssetTemplate Allow to load asset from another template
-     *                               If the name of the template if provided
+     * @param bool|string $webAssetTemplateName false to use the current template path, or a template name to
+     *     load assets from this template instead of the current one.
      *
      * @return TemplateDefinition
      */
-    public function getTemplateDefinition($webAssetTemplate = false)
+    public function getTemplateDefinition($webAssetTemplateName = false)
     {
         $ret = clone $this->templateDefinition;
 
-        if (false !== $webAssetTemplate) {
-            $customPath = str_replace($ret->getName(), $webAssetTemplate, $ret->getPath());
-            $ret->setName($webAssetTemplate);
+        if (false !== $webAssetTemplateName) {
+            $customPath = str_replace($ret->getName(), $webAssetTemplateName, $ret->getPath());
+            $ret->setName($webAssetTemplateName);
             $ret->setPath($customPath);
         }
 
         return $ret;
+    }
+
+    /**
+     * Get the current status of the fallback to "default" feature
+     *
+     * @return bool
+     */
+    public function getFallbackToDefaultTemplate()
+    {
+        return $this->fallbackToDefaultTemplate;
     }
 
     /**
@@ -363,6 +452,8 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool   $compressOutput  if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @return string the rendered template text
+     * @throws \Exception
+     * @throws \SmartyException
      */
     protected function internalRenderer($resourceType, $resourceContent, array $parameters, $compressOutput = true)
     {
@@ -395,6 +486,8 @@ class SmartyParser extends Smarty implements ParserInterface
      * @return string                    the rendered template text
      * @param  bool                      $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @throws ResourceNotFoundException if the template cannot be found
+     * @throws \Exception
+     * @throws \SmartyException
      */
     public function render($realTemplateName, array $parameters = array(), $compressOutput = true)
     {
@@ -449,6 +542,8 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param  array  $parameters     an associative array of names / value pairs
      * @param  bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @return string the rendered template text
+     * @throws \Exception
+     * @throws \SmartyException
      */
     public function renderString($templateText, array $parameters = array(), $compressOutput = true)
     {
@@ -480,6 +575,9 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->plugins[] = $plugin;
     }
 
+    /**
+     * @throws \SmartyException
+     */
     public function registerPlugins()
     {
         /** @var  AbstractSmartyPlugin $register_plugin */

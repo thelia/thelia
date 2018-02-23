@@ -220,7 +220,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 if ($product->countSaleElements($con) <= 0) {
                     // If we just deleted the last PSE, create a default one
-                    $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+                    if (null === $currencyId = $event->getCurrencyId()) {
+                        $currencyId = \Thelia\Model\Currency::getDefaultCurrency()->getId();
+                    }
+                    $product->createProductSaleElement($con, 0, 0, 0, $currencyId, true);
                 } elseif ($pse->getIsDefault()) {
                     // If we deleted the default PSE, make the last created one the default
                     $newDefaultPse = ProductSaleElementsQuery::create()
