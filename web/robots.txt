@@ -3,7 +3,9 @@
 
 User-agent: *
 Disallow: /admin
-Disallow: /cart
+Disallow: /cart/
+Disallow: /cart$
+Disallow: /cart?
 Disallow: /404
 
 #Sitemap: http://www.yourdomain.com/sitemap
