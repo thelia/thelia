@@ -31,6 +31,12 @@ class PdfEvent extends ActionEvent
     protected $marges;
     protected $fontName;
 
+    //Add by mbruchet
+    protected $testTdInOnePage;
+    protected $testIsImage;
+    protected $page;
+
+
     /**
      * @param string $content     html content to transform into pdf
      * @param string $orientation page orientation, same as TCPDF
@@ -40,6 +46,11 @@ class PdfEvent extends ActionEvent
      * @param string $encoding    charset encoding; default is UTF-8
      * @param array  $marges      Default marges (left, top, right, bottom)
      * @param string $fontName    Default font name
+     *
+     * // Add by mbruchet :
+     *      @param bool   $testTdInOnePage  TRUE means that if TD is in the page
+     *      @param bool   $testIsImage      TRUE means that the image exists
+     *      @param int    $page             Current page number
      */
     public function __construct(
         $content,
@@ -49,7 +60,13 @@ class PdfEvent extends ActionEvent
         $unicode = true,
         $encoding = 'UTF-8',
         array $marges = [ 0, 0, 0, 0],
-        $fontName = 'freesans'
+        $fontName = 'freesans',
+
+
+        $testTdInOnePage = true,
+        $testIsImage = true,
+
+        $page = 0
     ) {
         $this->content = $content;
         $this->orientation = $orientation;
@@ -59,6 +76,11 @@ class PdfEvent extends ActionEvent
         $this->encoding = $encoding;
         $this->marges = $marges;
         $this->fontName = $fontName;
+
+
+        $this->testTdInOnePage = $testTdInOnePage;
+        $this->testIsImage = $testIsImage;
+        $this->page = $page;
     }
 
     /**
@@ -228,4 +250,62 @@ class PdfEvent extends ActionEvent
         $this->fontName = $fontName;
         return $this;
     }
+
+
+    //***** Méthode Ajoutée par mbruchet
+
+    /**
+     * @return bool
+     */
+    public function getTestTdInOnePage()
+    {
+        return $this->testTdInOnePage;
+    }
+    /**
+     * @param $testTdInOnePage
+     * @return $this
+     */
+    public function setTestTdInOnePage($testTdInOnePage)
+    {
+        $this->testIsImage = $testTdInOnePage;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTestIsImage()
+    {
+        return $this->testIsImage ;
+    }
+
+    /**
+     * @param $testIsImage
+     * @return $this
+     */
+    public function setTestIsImage($testIsImage)
+    {
+        $this->testIsImage = $testIsImage;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * @param $page
+     * @return $this
+     */
+    public function setPage($page)
+    {
+        $this->page = $page;
+        return $this;
+    }
+
 }

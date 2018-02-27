@@ -34,6 +34,33 @@ class Pdf extends BaseAction implements EventSubscriberInterface
             $event->getMarges()
         );
 
+        //*** *** Modified part : (mbruchet)
+        // Test if is null or empty then if it's empty or null set those variable to default like in HTML2PDF
+
+        if(is_null($event->getTestTdInOnePage()) || empty($event->getTestTdInOnePage()))
+        {
+            $html2pdf->setTestTdInOnePage(true);
+        }
+        else
+        {
+            $html2pdf->setTestTdInOnePage($event->getTestTdInOnePage());
+        }
+
+
+        if(is_null($event->getTestIsImage()) || empty($event->getTestIsImage()))
+        {
+            $html2pdf->setTestIsImage(true);
+        }
+        else
+        {
+            $html2pdf->setTestIsImage($event->getTestIsImage());
+        }
+
+        $html2pdf->pdf->setPage($event->getPage());
+
+
+        //*** *** End
+
         $html2pdf->setDefaultFont($event->getFontName());
 
         $html2pdf->pdf->SetDisplayMode('real');
