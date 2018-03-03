@@ -67,7 +67,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL)
+    (@max_id + 1, 'fr_FR', 'La création d\'un compte client doit être confirmée par email (1: oui, 0: non)', NULL, NULL, NULL)
 ;
 
 SELECT @max_id :=IFNULL(MAX(`id`),0) FROM `message`;

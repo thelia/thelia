@@ -458,6 +458,8 @@ final class TheliaEvents
 
     const ORDER_UPDATE_STATUS = "action.order.updateStatus";
 
+    const ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE = "action.order.getStockUpdateOperationOnOrderStatusChange";
+
     const ORDER_SEND_CONFIRMATION_EMAIL = "action.order.sendOrderConfirmationEmail";
 
     const ORDER_SEND_NOTIFICATION_EMAIL = "action.order.sendOrderNotificationEmail";

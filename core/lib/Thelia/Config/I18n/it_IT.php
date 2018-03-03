@@ -222,7 +222,7 @@ return [
     'Sorry, you are not allowed to perform this action.' => 'Siamo spiacenti, non è consentito eseguire questa azione.',
     'Sorry, you\'re not allowed to perform this action' => 'Siamo spiacenti, non sei autorizzato ad eseguire questa azione',
     'Source IP' => 'IP di origine',
-    'State' => 'Stato',
+    'State *' => 'Stato *',
     'State ID %id not found' => 'Stato ID %id non trovato',
     'Stock' => 'Magazzino',
     'Store Business Identification Number (SIRET, etc).' => 'Memorizzare il numero di identificazione del Business (SIRET, ecc).',

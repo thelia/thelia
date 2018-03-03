@@ -453,7 +453,7 @@ return [
     'Source IP' => 'Quell-IP',
     'Start date' => 'Startdatum',
     'Start date of sales' => 'Sonderangebot Startdatum',
-    'State' => 'Bundesland',
+    'State *' => 'Bundesland *',
     'State ID %id not found' => 'Bundesland ID %id wurde nicht gefunden',
     'State title' => 'Name d. Bundeslandes',
     'Stock' => 'Lagerbestand',

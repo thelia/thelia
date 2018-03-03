@@ -23,7 +23,7 @@ class FreeOrder extends BaseModule implements PaymentModuleInterface
 {
     public function isValidPayment()
     {
-        return $this->getCurrentOrderTotalAmount() == 0;
+        return round($this->getCurrentOrderTotalAmount(), 4) == 0;
     }
 
     public function pay(Order $order)
