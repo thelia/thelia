@@ -38,7 +38,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
 
         new Translator(new Container());
 
-        $this->request = $this->getMock("\Thelia\Core\HttpFoundation\Request");
+        $this->request = $this->createMock("\Thelia\Core\HttpFoundation\Request");
         $this->request
             ->expects($this->any())
                 ->method("getClientIp")
@@ -54,7 +54,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
         /**
          * Get an example form. We
          */
-        $this->form = $this->getMock(
+        $this->form = $this->getMockObjectGenerator()->getMock(
             "\Thelia\Form\FirewallForm",
             [
                 "buildForm",

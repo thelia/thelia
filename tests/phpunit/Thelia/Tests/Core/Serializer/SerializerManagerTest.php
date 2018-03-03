@@ -35,7 +35,7 @@ class SerializerManagerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->sut = new SUT;
-        $this->stubSerializer = $this->getMock('Thelia\\Core\\Serializer\\SerializerInterface');
+        $this->stubSerializer = $this->createMock('Thelia\\Core\\Serializer\\SerializerInterface');
 
         new Translator(new Container);
     }
