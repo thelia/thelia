@@ -68,7 +68,8 @@
         "fzaninotto/faker": "1.5.*",
         "thelia/hooktest-module": "~1.1",
         "thelia/hooktest-template": "~1.1",
-        "phpunit/phpunit": "4.8.*"
+        "phpunit/phpunit": "~5.0",
+        "phpunit/php-token-stream": "~1.0"
     },
     "minimum-stability": "stable",
     "config": {
