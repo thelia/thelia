@@ -23,7 +23,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetUriAddingParameters()
     {
-        $request = $this->getMock(
+        $request = $this->getMockObjectGenerator()->getMock(
             "Thelia\Core\HttpFoundation\Request",
             array("getUri", "getQueryString")
         );

@@ -36,7 +36,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
      */
     protected function getMockEventDispatcher()
     {
-        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     /**
