@@ -35,7 +35,7 @@ class ArchiverManagerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->sut = new SUT;
-        $this->stubArchiver = $this->getMock('Thelia\\Core\\Archiver\\ArchiverInterface');
+        $this->stubArchiver = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');
 
         new Translator(new Container);
     }
@@ -225,7 +225,7 @@ class ArchiverManagerTest extends \PHPUnit_Framework_TestCase
         ;
         $this->stubArchiver->expects($this->any())->method('isAvailable')->will($this->returnValue(true));
 
-        $unavailableMock = $this->getMock('Thelia\\Core\\Archiver\\ArchiverInterface');
+        $unavailableMock = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');
         $unavailableMock->expects($this->any())->method('getId')->will($this->returnValue('archiver2'));
         $unavailableMock->expects($this->any())->method('isAvailable')->will($this->returnValue(false));
 

@@ -63,7 +63,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = new EventDispatcher();
 
-        $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
+        $translator = new Translator($this->createMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
 
         $token = new TokenProvider($this->requestStack, $translator, 'test');
 
@@ -79,9 +79,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             new TokenProvider($this->requestStack, $translator, 'baba au rhum')
         );
 
-        $this->dispatcherNull = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcherNull = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->dispatcher = $this->getMock(
+        $this->dispatcher = $this->getMockObjectGenerator()->getMock(
             'Symfony\Component\EventDispatcher\EventDispatcherInterface',
             array(),
             array(),

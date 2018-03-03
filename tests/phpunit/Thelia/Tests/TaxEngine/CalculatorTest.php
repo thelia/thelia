@@ -74,7 +74,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $taxRuleQuery = $this->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
+        $taxRuleQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
             ->with($productQuery->getTaxRule(), $countryQuery)

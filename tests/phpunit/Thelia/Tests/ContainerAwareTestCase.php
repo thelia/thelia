@@ -92,7 +92,7 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getMockEventDispatcher()
     {
-        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     /**
@@ -100,7 +100,7 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getKernel()
     {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+        $kernel = $this->createMock("Symfony\Component\HttpKernel\KernelInterface");
 
         return $kernel;
     }

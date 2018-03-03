@@ -85,7 +85,7 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
      */
     public function getKernel()
     {
-        $kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
+        $kernel = $this->createMock('Symfony\\Component\\HttpKernel\\KernelInterface');
 
         return $kernel;
     }

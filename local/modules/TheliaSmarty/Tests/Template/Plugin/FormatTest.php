@@ -217,9 +217,7 @@ class FormatTest extends SmartyPluginTestCase
             'United States',
         ];
         $this->assertEquals($data, implode("\n", $expected));
-
     }
-
 
     /**
      * @param ContainerBuilder $container

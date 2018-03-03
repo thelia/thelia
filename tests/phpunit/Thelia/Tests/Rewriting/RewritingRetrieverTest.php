@@ -77,7 +77,7 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
 
-        $retrieverQuery = $this->getMock('\Thelia\Model\RewritingUrlQuery', array('getViewUrlQuery'));
+        $retrieverQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\RewritingUrlQuery', array('getViewUrlQuery'));
         $retrieverQuery->expects($this->any())
             ->method('getViewUrlQuery')
             ->with('view', 'fr_FR', 1)
@@ -99,7 +99,7 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
 
-        $retrieverQuery = $this->getMock('\Thelia\Model\RewritingUrlQuery', array('getSpecificUrlQuery'));
+        $retrieverQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\RewritingUrlQuery', array('getSpecificUrlQuery'));
         $retrieverQuery->expects($this->any())
             ->method('getSpecificUrlQuery')
             ->with('view', 'fr_FR', 1, array('foo0' => 'bar0', 'foo1' => 'bar1'))

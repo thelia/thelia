@@ -62,7 +62,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $request->setSession($session);
 
