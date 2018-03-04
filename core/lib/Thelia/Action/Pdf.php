@@ -40,6 +40,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
         $html2pdf->pdf->SetDisplayMode('real');
 
         $html2pdf->writeHTML($event->getContent());
+
         $event->setPdf($html2pdf->output('output.pdf', 'S'));
     }
 

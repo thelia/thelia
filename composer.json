@@ -72,7 +72,8 @@
         "fzaninotto/faker": "1.5.*",
         "thelia/hooktest-module": "~1.1",
         "thelia/hooktest-template": "~1.1",
-        "phpunit/phpunit": "^5.0"
+        "phpunit/phpunit": "^5.0",
+        "symfony/var-dumper": "~3.4.0"
     },
     "minimum-stability": "stable",
     "config": {
