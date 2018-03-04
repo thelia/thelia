@@ -47,7 +47,7 @@
         "symfony/http-foundation": "2.8.*",
         "symfony/form": "2.8.*",
         "symfony/class-loader": "2.8.*",
-        "symfony/icu": "1.0",
+        "symfony/icu": "1.2.*",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
         "doctrine/cache": "1.5.*",
@@ -62,10 +62,11 @@
         "ramsey/array_column": "~1.1",
         "propel/propel": "dev-thelia",
         "commerceguys/addressing": "0.8.*",
-        "symfony/cache": "~3.1.0",
+        "symfony/cache": "3.4.*",
         "symfony/polyfill-php56": "^1.0",
         "symfony/polyfill-php70": "^1.0",
-        "symfony/polyfill-php71": "^1.0"
+        "symfony/polyfill-php71": "^1.0",
+        "symfony/polyfill-php72": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",
