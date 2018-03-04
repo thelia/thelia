@@ -41,7 +41,6 @@
         "symfony/dom-crawler": "2.8.*",
         "symfony/property-access": "2.8.*",
         "symfony/serializer": "2.8.*",
-        "ensepar/html2pdf": "1.0.1",
         "symfony/finder": "2.8.*",
         "symfony/browser-kit": "2.8.*",
         "symfony/http-foundation": "2.8.*",
@@ -66,7 +65,8 @@
         "symfony/polyfill-php56": "^1.0",
         "symfony/polyfill-php70": "^1.0",
         "symfony/polyfill-php71": "^1.0",
-        "symfony/polyfill-php72": "^1.0"
+        "symfony/polyfill-php72": "^1.0",
+        "spipu/html2pdf": "^5.0"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",
