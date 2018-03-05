@@ -1,3 +1,13 @@
+# 2.4.0-alpha2
+
+- #2486 Add compatibility with php 7.2
+- #2486 Update to Symfony 2.8.35
+- #2486 Add Symfony VarDumper for dev environment
+- #2486 Update to Propel Alpha 8, special thanks to @bcbrr
+- #2486 Update to Html2Pdf 5.2
+- #2483 Fix color status in search order
+- #2482 Fix FreeOrder: round total amount to avoid problems with floats
+
 # 2.4.0-alpha1
 
 - (related to #2266) Fix #2226 : Bad parsing of web version in db update script

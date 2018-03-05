@@ -36,7 +36,7 @@ class CurrencyTest extends ContainerAwareTestCase
      */
     protected function getMockEventDispatcher()
     {
-        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     public function testCreate()

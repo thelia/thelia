@@ -39,7 +39,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     {
         $container = new ContainerBuilder();
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $container->set("event_dispatcher", $dispatcher);
 

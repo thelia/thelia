@@ -26,9 +26,10 @@ class ProductCreationForm extends BaseProductCreationForm
     use StandardDescriptionFieldsTrait;
 
     /**
+     * @param bool $change_mode
      * @inherited
      */
-    protected function buildForm()
+    protected function buildForm($change_mode = false)
     {
         $translator = Translator::getInstance();
         BaseProductCreationForm::buildForm();

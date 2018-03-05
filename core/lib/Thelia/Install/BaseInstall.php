@@ -39,7 +39,7 @@ abstract class BaseInstall
         } else {
             $this->isConsoleMode = false;
         }
-        if (file_exists(THELIA_ROOT . '/local/config/database.yml') && $verifyInstall) {
+        if (file_exists(THELIA_CONF_DIR . '/database.yml') && $verifyInstall) {
             throw new AlreadyInstallException("Thelia is already installed");
         }
 

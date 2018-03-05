@@ -16,10 +16,19 @@ This is the new major version of Thelia.
 
 A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
 
+Compatibility
+------------
+
+|  | Thelia 2.1 | Thelia 2.2 | Thelia 2.3 | Thelia 2.4 |
+| ------------- |:-------------:| -----:| -----:| -----:|
+| PHP      | 5.4 5.5 5.6 | 5.4 5.5 5.6 | 5.5 5.6 7.0 7.1 | 5.6 7.0 7.1 7.2 |
+| MySQL    | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 5.7 |
+| Symfony  | 2.3 | 2.3 | 2.8 | 2.8 |
+
 Requirements
 ------------
 
-* PHP 5.5
+* PHP
     * Required extensions :
         * PDO_Mysql
         * openssl

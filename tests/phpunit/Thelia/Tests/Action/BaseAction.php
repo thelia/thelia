@@ -28,7 +28,7 @@ class BaseAction extends \PHPUnit_Framework_TestCase
      */
     protected function getMockEventDispatcher()
     {
-        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
     /**
@@ -36,7 +36,7 @@ class BaseAction extends \PHPUnit_Framework_TestCase
      */
     protected function getMockParserInterface()
     {
-        return $this->getMock("Thelia\\Core\\Template\\ParserInterface");
+        return $this->createMock("Thelia\\Core\\Template\\ParserInterface");
     }
 
     public function getContainer()

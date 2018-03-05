@@ -29,8 +29,8 @@ echo "phantomjs : ${PHANTOMJS_EXECUTABLE} $(${PHANTOMJS_EXECUTABLE} --version)"
 
 export DISPLAY=:99.0
 
-echo "Front tests"
-casperjs test --local-to-remote-url-access=true --ignore-ssl-errors=true --ssl-protocol=any --pre=tests/functionnal/casperjs/conf/local.js --verbose tests/functionnal/casperjs/exe/front/ --thelia2_base_url="http://127.0.0.1:8000/index.php/" --thelia2_screenshot_path="tests/functionnal/casperjs/screenshot/" --thelia2_screenshot_disabled
+# echo "Front tests"
+# casperjs test --local-to-remote-url-access=true --ignore-ssl-errors=true --ssl-protocol=any --pre=tests/functionnal/casperjs/conf/local.js --verbose tests/functionnal/casperjs/exe/front/ --thelia2_base_url="http://127.0.0.1:8000/index.php/" --thelia2_screenshot_path="tests/functionnal/casperjs/screenshot/" --thelia2_screenshot_disabled
 
-echo "Back tests"
-casperjs test --local-to-remote-url-access=true --ignore-ssl-errors=true --ssl-protocol=any --pre=tests/functionnal/casperjs/conf/local.js --verbose tests/functionnal/casperjs/exe/back/ --thelia2_base_url="http://127.0.0.1:8000/index_dev.php/" --thelia2_screenshot_path="tests/functionnal/casperjs/screenshot/" --thelia2_screenshot_disabled
+# echo "Back tests"
+# casperjs test --local-to-remote-url-access=true --ignore-ssl-errors=true --ssl-protocol=any --pre=tests/functionnal/casperjs/conf/local.js --verbose tests/functionnal/casperjs/exe/back/ --thelia2_base_url="http://127.0.0.1:8000/index_dev.php/" --thelia2_screenshot_path="tests/functionnal/casperjs/screenshot/" --thelia2_screenshot_disabled

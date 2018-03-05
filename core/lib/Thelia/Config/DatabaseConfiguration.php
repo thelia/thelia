@@ -12,45 +12,94 @@
 
 namespace Thelia\Config;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Describes the Thelia database configuration.
+ */
 class DatabaseConfiguration implements ConfigurationInterface
 {
     /**
-     * Generates the configuration tree builder.
-     *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * Name of the main database connection used by Thelia.
+     * @var string
+     */
+    const THELIA_CONNECTION_NAME = 'thelia';
+
+    /**
+     * @inheritDoc
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root("database");
+        $databaseNode = $treeBuilder->root('database');
+        $databaseNodeBuilder = $databaseNode->children();
 
-        $rootNode
-            ->children()
-                ->arrayNode("connection")
-                    ->children()
-                        ->scalarNode("driver")
-                            ->defaultValue("mysql")
-                        ->end()
-                        ->scalarNode("user")
-                            ->defaultValue("root")
-                        ->end()
-                        ->scalarNode("password")
-                            ->defaultValue("")
-                        ->end()
-                        ->scalarNode("dsn")
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode("classname")
-                            ->defaultValue('\Propel\Runtime\Connection\ConnectionWrapper')
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
+        $connectionNode = $this->buildConnectionNode('connection', false);
+        $databaseNodeBuilder->append($connectionNode);
+
+        $connectionsNode = $this->buildConnectionNode('connections', true);
+        $connectionsNode
+            ->validate()
+            ->ifTrue(
+                function ($connections) {
+                    return !isset($connections[static::THELIA_CONNECTION_NAME]);
+                }
+            )
+            ->thenInvalid(
+                "The '" . static::THELIA_CONNECTION_NAME . "' connection must be defined."
+            );
+        $databaseNodeBuilder->append($connectionsNode);
+
+        $databaseNode
+            ->validate()
+            ->ifTrue(
+                function ($database) {
+                    return !empty($database['connection']) && !empty($database['connections']);
+                }
+            )
+            ->thenInvalid(
+                "The 'database' node must contain either a 'connection' node or a 'connections' node, but not both."
+            );
 
         return $treeBuilder;
+    }
+
+    /**
+     * Build a configuration node describing one or more database connection
+     * @param string $rootName Node name.
+     * @param bool $isArray Whether the node is a single connection or an array of connections.
+     * @return ArrayNodeDefinition|NodeDefinition Connection(s) node.
+     */
+    public function buildConnectionNode($rootName, $isArray)
+    {
+        $treeBuilder = new TreeBuilder();
+        $connectionNode = $treeBuilder->root($rootName);
+        if ($isArray) {
+            /** @var ArrayNodeDefinition $connectionNodePrototype */
+            $connectionNodePrototype = $connectionNode->prototype('array');
+            $connectionNodeBuilder = $connectionNodePrototype->children();
+        } else {
+            $connectionNodeBuilder = $connectionNode->children();
+        }
+
+        $connectionNodeBuilder->scalarNode('driver')
+            ->defaultValue('mysql');
+
+        $connectionNodeBuilder->scalarNode('user')
+            ->defaultValue('root');
+
+        $connectionNodeBuilder->scalarNode('password')
+            ->defaultValue('');
+
+        $connectionNodeBuilder->scalarNode('dsn')
+            ->cannotBeEmpty();
+
+        $connectionNodeBuilder->scalarNode('classname')
+            ->defaultValue('\Propel\Runtime\Connection\ConnectionWrapper');
+
+        return $connectionNode;
     }
 }

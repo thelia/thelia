@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
+        "php": "^5.6|^7.0",
         "ircmaxell/password-compat": "1.0.*",
         "psr/log": "1.0",
         "symfony/config": "2.8.*",
@@ -41,13 +41,12 @@
         "symfony/dom-crawler": "2.8.*",
         "symfony/property-access": "2.8.*",
         "symfony/serializer": "2.8.*",
-        "ensepar/html2pdf": "1.0.1",
         "symfony/finder": "2.8.*",
         "symfony/browser-kit": "2.8.*",
         "symfony/http-foundation": "2.8.*",
         "symfony/form": "2.8.*",
         "symfony/class-loader": "2.8.*",
-        "symfony/icu": "1.0",
+        "symfony/icu": "1.2.*",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
         "doctrine/cache": "1.5.*",
@@ -60,15 +59,21 @@
         "michelf/php-markdown": "1.6.*",
         "smarty/smarty": "3.1.20",
         "ramsey/array_column": "~1.1",
-        "propel/propel": "dev-thelia-2.3",
+        "propel/propel": "dev-thelia",
         "commerceguys/addressing": "0.8.*",
-        "symfony/cache": "~3.1.0"
+        "symfony/cache": "3.4.*",
+        "symfony/polyfill-php56": "^1.0",
+        "symfony/polyfill-php70": "^1.0",
+        "symfony/polyfill-php71": "^1.0",
+        "symfony/polyfill-php72": "^1.0",
+        "spipu/html2pdf": "^5.0"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",
         "thelia/hooktest-module": "~1.1",
         "thelia/hooktest-template": "~1.1",
-        "phpunit/phpunit": "4.8.*"
+        "phpunit/phpunit": "^5.0",
+        "symfony/var-dumper": "~3.4.0"
     },
     "minimum-stability": "stable",
     "config": {
@@ -93,7 +98,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

@@ -545,7 +545,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     protected function getMockContainer()
     {
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $stubContainer->expects($this->any())
             ->method('has')

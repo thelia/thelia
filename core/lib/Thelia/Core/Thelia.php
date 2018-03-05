@@ -21,13 +21,10 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
-use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
-use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -35,16 +32,14 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Yaml\Yaml;
-use Thelia\Config\DatabaseConfiguration;
-use Thelia\Config\DefinePropel;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
-use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -59,45 +54,11 @@ class Thelia extends Kernel
         if ($debug) {
             Debug::enable();
         }
-
-        $this->initPropel();
     }
 
     public static function isInstalled()
     {
         return file_exists(THELIA_CONF_DIR . 'database.yml');
-    }
-
-    protected function initPropel()
-    {
-        if (self::isInstalled() === false) {
-            return ;
-        }
-
-        /** @var \Propel\Runtime\ServiceContainer\StandardServiceContainer $serviceContainer */
-        $serviceContainer = Propel::getServiceContainer();
-        $serviceContainer->setDefaultDatasource('thelia');
-
-        $manager = new ConnectionManagerSingle();
-        $manager->setConfiguration($this->getPropelConfig());
-        $manager->setName('thelia');
-
-        $serviceContainer->setConnectionManager('thelia', $manager);
-        $serviceContainer->setAdapterClass('thelia', 'mysql');
-
-        /** @var ConnectionWrapper $con */
-        $con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
-        $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
-
-        if ($this->isDebug()) {
-            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-            Tlog::getInstance()->setLevel(Tlog::DEBUG);
-
-            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
-            $con->useDebug(true);
-        }
-
-        $this->checkMySQLConfigurations($con);
     }
 
     protected function checkMySQLConfigurations(ConnectionWrapper $con)
@@ -162,55 +123,35 @@ class Thelia extends Kernel
     }
 
     /**
-     *
-     * process the configuration and create a cache.
-     *
-     * @return array configuration for propel
-     */
-    protected function getPropelConfig()
-    {
-        $cachePath = $this->getCacheDir() . DS . 'PropelConfig.php';
-
-        $cache = new ConfigCache($cachePath, $this->debug);
-
-        if (!$cache->isFresh()) {
-            if (file_exists(THELIA_CONF_DIR."database_".$this->environment.".yml")) {
-                $file = THELIA_CONF_DIR."database_".$this->environment.".yml";
-            } else {
-                $file = THELIA_CONF_DIR . 'database.yml';
-            }
-
-            $definePropel = new DefinePropel(
-                new DatabaseConfiguration(),
-                Yaml::parse(file_get_contents($file)),
-                $this->getEnvParameters()
-            );
-
-            $resource = [
-                new FileResource($file)
-            ];
-
-            $config = $definePropel->getConfig();
-
-            $code = sprintf("<?php return %s;", var_export($config, true));
-
-            $cache->write($code, $resource);
-        }
-
-        $config = require $cachePath;
-
-        return $config;
-    }
-
-    /**
-     * dispatch an event when application is boot
+     * @inheritDoc
      */
     public function boot()
     {
+        // initialize Propel, building its cache if necessary
+        $propelSchemaLocator = new SchemaLocator(
+            THELIA_CONF_DIR,
+            THELIA_MODULE_DIR
+        );
+        $propelInitService = new PropelInitService(
+            $this->getEnvironment(),
+            $this->isDebug(),
+            $this->getEnvParameters(),
+            $propelSchemaLocator
+        );
+        $propelConnectionAvailable = $propelInitService->init();
+
+        if ($propelConnectionAvailable) {
+            $theliaDatabaseConnection = Propel::getConnection('thelia');
+            $this->checkMySQLConfigurations($theliaDatabaseConnection);
+        }
+
         parent::boot();
 
+        $this->getContainer()->set('thelia.propel.schema.locator', $propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $propelInitService);
+
         if (self::isInstalled()) {
-            $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
+            $this->getContainer()->get('event_dispatcher')->dispatch(TheliaEvents::BOOT);
         }
     }
 
