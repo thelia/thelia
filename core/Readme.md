@@ -17,19 +17,31 @@ You can download this version and have a try or take a look at the  source code 
 
 A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
 
+
+Compatibility
+------------
+
+|  | Thelia 2.1 | Thelia 2.2 | Thelia 2.3 | Thelia 2.4 |
+| ------------- |:-------------:| -----:| -----:| -----:|
+| PHP      | 5.4 5.5 5.6 | 5.4 5.5 5.6 | 5.5 5.6 7.0 7.1 | 5.6 7.0 7.1 7.2 |
+| MySQL    | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 5.7 |
+| Symfony  | 2.3 | 2.3 | 2.8 | 2.8 |
+
 Requirements
 ------------
 
-* php 5.5
+* PHP
     * Required extensions :
         * PDO_Mysql
         * openssl
         * intl
         * gd
         * curl
+        * dom
     * safe_mode off
     * memory_limit at least 128M, preferably 256.
-    * post_max_size 20M
-    * upload_max_filesize 2M
-* apache 2
-* mysql
+    * post\_max\_size 20M
+    * upload\_max\_filesize 2M
+    * date.timezone must be defined
+* Web Server Apache 2 or Nginx
+* MySQL 5
