@@ -10,26 +10,26 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-    <div class="customers edit-customer">
+<div class="customers edit-customer">
 
         <div id="wrapper" class="container">
             {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" with_prev_next_info="true" lang="$edit_language_id"}
 
                 <ul class="breadcrumb">
-        			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                    <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
                     <li>{intl l="Edit customer %firstname %lastname" firstname={$FIRSTNAME} lastname={$LASTNAME}}</li>
                 </ul>
 
             {hook name="customer-edit.top" customer_id=$customer_id}
 
-        		<div class="row">
-        			<div class="col-md-12 general-block-decorator">
-        				<div class="row">
+                <div class="row">
+                    <div class="col-md-12 general-block-decorator">
+                        <div class="row">
 
-        					<div class="col-md-6 title title-without-tabs">
+                            <div class="col-md-6 title title-without-tabs">
                                 {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname={$FIRSTNAME} lastname={$LASTNAME} ref={$REF}}
-        					</div>
+                            </div>
 
                             <div class="col-md-6 actions">
 
@@ -49,8 +49,8 @@
                             <div class="form-container">
                                 <div class="col-md-12">
                                     <br>
-        						    {form name="thelia.admin.customer.update"}
-        						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype} class="clearfix">
+                                        {form name="thelia.admin.customer.update"}
+                                        <form method="POST" action="{url path='/admin/customer/save'}" {form_enctype} class="clearfix">
 
                                             {include
                                                 file="includes/inner-form-toolbar.html"
@@ -58,16 +58,16 @@
                                                 close_url  = {url path='/admin/customers'}
                                             }
 
-         						        	{form_hidden_fields}
+                                            {form_hidden_fields}
 
                                             <input type="hidden" name="page" value="{$page}" />
                                             <input type="hidden" name="customer_id" value="{$customer_id}" />
 
-        						        	{form_field field='success_url'}
-        						        		<input type="hidden" name="{$name}" value="{url path='/admin/customers' page=$page}" />
-        						        	{/form_field}
+                                            {form_field field='success_url'}
+                                                <input type="hidden" name="{$name}" value="{url path='/admin/customers' page=$page}" />
+                                            {/form_field}
 
-        					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                                             {loop name="address" type="address" customer="$customer_id" backend_context="1" default="true"}
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs">{intl l="Customer informations"}</p>
@@ -196,15 +196,15 @@
                                             </div>
 
                                         </form>
-        							{/form}
+                                    {/form}
 
-        						</div>
-        					</div>
+                                </div>
+                            </div>
 
-        				</div>
-        			</div>
+                        </div>
+                    </div>
 
-        		</div>
+                </div>
                 <div class="row">
                     <div class="col-md-12 general-block-decorator">
                         <div class="row">
@@ -228,13 +228,15 @@
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}
+                                        {assign "orderStatusCodeColor" $COLOR}
+
                                         {/loop}
                                             <tr>
                                                 <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
                                                 <td>{format_date date=$CREATE_DATE}</td>
                                                 <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT}</td>
                                                 <td>
-                                                    <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
+                                                    <span class="label label-{#$orderStatusLabel#}" style="background-color:{$orderStatusCodeColor};">{$orderStatus}</span>
                                                 </td>
                                                 {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id order_id=$ID}
                                             </tr>
@@ -350,7 +352,7 @@
 	        form_error_message = $form_error_message
 	    }
 
-	{/form}
+    {/form}
 {/if}
 
 {* -- Confirm making an address the default --------------------------------- *}
