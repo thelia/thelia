@@ -111,7 +111,7 @@ class Accessory extends Product
 
         foreach ($results as $loopResultRow) {
             $accessoryProductId = $loopResultRow->get('ID');
-            \Thelia\Log\Tlog::getInstance()->notice($this->accessoryId);
+
             $loopResultRow
                 ->set("ID", $this->accessoryId[$accessoryProductId])
                 ->set("POSITION", $this->accessoryPosition[$accessoryProductId])
