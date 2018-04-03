@@ -12,34 +12,34 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Product\ProductCloneEvent;
-use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
 use Thelia\Core\Template\Loop\ProductSaleElementsImage;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductPrice;
-use Thelia\Model\AttributeCombination;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
-use Thelia\Model\ProductPriceQuery;
-use Propel\Runtime\Propel;
-use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\Map\AttributeCombinationTableMap;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
-use Propel\Runtime\Connection\ConnectionInterface;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 {
@@ -216,22 +216,34 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
-                $pse->delete($con);
+                // If we are deleting the last PSE of the product, don(t delete it, but insteaf
+                // transform it into a PSE detached for any attribute combination, so that product
+                // prices, weight, stock and attributes will not be lost.
+                if ($product->countSaleElements($con) === 1) {
+                    $pse
+                        ->setIsDefault(true)
+                        ->save($con);
 
-                if ($product->countSaleElements($con) <= 0) {
-                    // If we just deleted the last PSE, create a default one
-                    $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
-                } elseif ($pse->getIsDefault()) {
+                    // Delete the related attribute combination.
+                    AttributeCombinationQuery::create()
+                        ->filterByProductSaleElementsId($pse->getId())
+                        ->delete($con);
+                } else {
+                    // Delete the PSE
+                    $pse->delete($con);
+
                     // If we deleted the default PSE, make the last created one the default
-                    $newDefaultPse = ProductSaleElementsQuery::create()
-                        ->filterByProductId($product->getId())
-                        ->filterById($pse->getId(), Criteria::NOT_EQUAL)
-                        ->orderByCreatedAt(Criteria::DESC)
-                        ->findOne($con)
-                    ;
+                    if ($pse->getIsDefault()) {
+                        $newDefaultPse = ProductSaleElementsQuery::create()
+                            ->filterByProductId($product->getId())
+                            ->filterById($pse->getId(), Criteria::NOT_EQUAL)
+                            ->orderByCreatedAt(Criteria::DESC)
+                            ->findOne($con)
+                        ;
 
-                    if (null !== $newDefaultPse) {
-                        $newDefaultPse->setIsDefault(true)->save($con);
+                        if (null !== $newDefaultPse) {
+                            $newDefaultPse->setIsDefault(true)->save($con);
+                        }
                     }
                 }
 
@@ -300,6 +312,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * @param ConnectionInterface $con                   the Propel connection
      * @param ProductSaleElements $salesElement          the product sale element
      * @param array               $combinationAttributes an array oif attributes av IDs
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
     {
@@ -313,7 +326,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     ->setAttributeAvId($attributeAvId)
                     ->setAttribute($attributeAv->getAttribute())
                     ->setProductSaleElements($salesElement)
-                ->save($con);
+                    ->save($con);
             }
         }
     }
@@ -326,6 +339,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * Clone product's PSEs and associated datas
      *
      * @param ProductCloneEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function clonePSE(ProductCloneEvent $event)
     {
@@ -371,6 +385,13 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ProductCloneEvent $event
+     * @param ProductSaleElements $originalProductPSE
+     * @param $currencyId
+     * @return int
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId)
     {
         $attributeCombinationList = AttributeCombinationQuery::create()
@@ -409,6 +430,13 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
     }
 
+    /**
+     * @param $clonedProductId
+     * @param $clonedProductPSEId
+     * @param $originalProductPSEFiles
+     * @param $type
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type)
     {
         /** @var ProductSaleElementsDocument|ProductSaleElementsImage $originalProductPSEFile */
