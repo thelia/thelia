@@ -134,14 +134,26 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 $salesElement->setProduct($event->getProduct());
             }
 
-            // If this PSE is the default one, be sure to have *only one* default for this product
-            if ($event->getIsDefault()) {
+            $defaultStatus = $event->getIsDefault();
+
+            // If this PSE will become the default one, be sure to have *only one* default for this product
+            if ($defaultStatus) {
                 ProductSaleElementsQuery::create()
                     ->filterByProduct($event->getProduct())
                     ->filterByIsDefault(true)
                     ->filterById($event->getProductSaleElementId(), Criteria::NOT_EQUAL)
                     ->update(['IsDefault' => false], $con)
                 ;
+            } else {
+                // We will not allow the default PSE to become non default if no other default PSE exists for this product.
+                if ($salesElement->getIsDefault() && ProductSaleElementsQuery::create()
+                        ->filterByProduct($event->getProduct())
+                        ->filterByIsDefault(true)
+                        ->filterById($salesElement->getId(), Criteria::NOT_EQUAL)
+                        ->count() === 0) {
+                    // Prevent setting the only default PSE to non-default
+                    $defaultStatus = true;
+                }
             }
 
             // Update sale element
@@ -151,7 +163,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->setPromo($event->getOnsale())
                 ->setNewness($event->getIsnew())
                 ->setWeight($event->getWeight())
-                ->setIsDefault($event->getIsDefault())
+                ->setIsDefault($defaultStatus)
                 ->setEanCode($event->getEanCode())
                 ->save()
             ;
