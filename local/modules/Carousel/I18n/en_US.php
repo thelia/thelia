@@ -9,6 +9,7 @@ return array(
     'Conclusion' => 'Conclusion',
     'Detailed description' => 'Detailed description',
     'Displayed when image is not visible' => 'Displayed when image is not visible',
+    'Edit your carousel' => 'Edit your carousel',
     'Image URL' => 'Image URL',
     'Image position in carousel' => 'Image position in carousel',
     'Please enter a valid URL' => 'Please enter a valid URL',
