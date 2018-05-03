@@ -251,13 +251,13 @@ class CustomerController extends BaseFrontController
         /** @var Customer $customer */
         $customer   = $this->getSecurityContext()->getCustomerUser();
         $newsletter = NewsletterQuery::create()->findOneByEmail($customer->getEmail());
-        $data = array(
-            'id'           => $customer->getId(),
-            'title'        => $customer->getTitleId(),
-            'firstname'    => $customer->getFirstName(),
-            'lastname'     => $customer->getLastName(),
-            'email'        => $customer->getEmail(),
-            'email_confirm'        => $customer->getEmail(),
+        $data       = array(
+            'id'            => $customer->getId(),
+            'title'         => $customer->getTitleId(),
+            'firstname'     => $customer->getFirstName(),
+            'lastname'      => $customer->getLastName(),
+            'email'         => $customer->getEmail(),
+            'email_confirm' => $customer->getEmail(),
             'newsletter'    => $newsletter instanceof Newsletter ? !$newsletter->getUnsubscribed() : false,
         );
 
