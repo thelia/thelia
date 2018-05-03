@@ -79,6 +79,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             $nl->setEmail($event->getEmail())
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
+                ->setUnsubscribed(0)
                 ->setLocale($event->getLocale())
                 ->save();
 
