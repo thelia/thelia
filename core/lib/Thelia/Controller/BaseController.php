@@ -100,7 +100,11 @@ abstract class BaseController
             $status,
             array(
                 'Content-type' => "application/pdf",
-                'Content-Disposition' => $browser === false ? sprintf('Attachment;filename=%s.pdf', $fileName) : '',
+                'Content-Disposition' =>sprintf(
+                    '%s; filename=%s.pdf',
+                    boolval($browser) === false ? 'attachment' : 'inline',
+                    $fileName
+                )
             )
         );
     }
