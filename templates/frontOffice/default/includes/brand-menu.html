@@ -1,6 +1,7 @@
-{hook name="brand.sidebar-top"}
+{$brand_id = {brand attr="id"}}
+{hook name="brand.sidebar-top" brand=$brand_id}
 {ifhook rel="brand.sidebar-body"}
-{hook name="brand.sidebar-body"}
+    {hook name="brand.sidebar-body" brand=$brand_id}
 {/ifhook}
 {elsehook rel="brand.sidebar-body"}
 <section id="brands" class="block block-nav" role="navigation" aria-labelledby="brands-label">
@@ -9,11 +10,11 @@
         <nav class="nav-brands">
             <ul id="brand" class="accordion">
                 {loop name="brands-list" type="brand"}
-                    <li><a href="{$URL nofilter}">{$TITLE} ({count type="product" brand="{$ID}"})</a></li>
+                    <li><a href="{$URL nofilter}">{$TITLE} ({count type="product" brand={$ID}})</a></li>
                 {/loop}
             </ul>
         </nav>
     </div>
 </section>
 {/elsehook}
-{hook name="brand.sidebar-bottom"}
+{hook name="brand.sidebar-bottom" brand=$brand_id}

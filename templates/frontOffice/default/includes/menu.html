@@ -1,6 +1,8 @@
-{hook name="category.sidebar-top"}
+{$category_id = {category attr="id"}}
+
+{hook name="category.sidebar-top" category=$category_id}
 {ifhook rel="category.sidebar-body"}
-   {hook name="category.sidebar-body"}
+   {hook name="category.sidebar-body" category=$category_id}
 {/ifhook}
 {elsehook rel="category.sidebar-body"}
 <section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
@@ -71,4 +73,4 @@
     </div>
 </section>
 {/elsehook}
-{hook name="category.sidebar-bottom"}
+{hook name="category.sidebar-bottom" category=$category_id}
