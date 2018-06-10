@@ -21,6 +21,12 @@ use Thelia\Model\Map\OrderTableMap;
  */
 class OrderQuery extends BaseOrderQuery
 {
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public static function getMonthlySaleStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -45,8 +51,8 @@ class OrderQuery extends BaseOrderQuery
         $stats = array();
         for ($day=1; $day<=$numberOfDay; $day++) {
             $dayOrdersQuery = self::create()
-                ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
-                ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
+                ->filterByInvoiceDate(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByInvoiceDate(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
             if (null !== $status) {
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
@@ -57,6 +63,12 @@ class OrderQuery extends BaseOrderQuery
         return $stats;
     }
 
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public static function getFirstOrdersStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -90,6 +102,8 @@ class OrderQuery extends BaseOrderQuery
      * @param           $includeShipping
      *
      * @return int
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
     {
@@ -139,9 +153,10 @@ class OrderQuery extends BaseOrderQuery
 
     protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
     {
+        // The sales are considered at invoice date, not order creation date
         return self::create($modelAlias)
-            ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-            ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByInvoiceDate(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByInvoiceDate(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->filterByStatusId([2, 3, 4], Criteria::IN);
     }
 
