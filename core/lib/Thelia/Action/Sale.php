@@ -26,7 +26,7 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Base\ProductPriceQuery;
+use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\Country as CountryModel;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductSaleElements;
@@ -56,6 +56,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * @param Calculator          $taxCalculator        the tax calculator
      * @param array               $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
      * @param ConnectionInterface $con
+     * @throws PropelException
      */
     protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con)
     {
@@ -224,26 +225,18 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
             try {
                 // Disable all promo flag on sale's currently selected products,
-                // to reset promo status of the products that have been removed from the selection.
+                // to reset promo status of the products that may have been removed from the selection.
                 $sale->setActive(false);
 
-                $now = new \DateTime();
-                $startDate = $event->getStartDate();
-                $endDate = $event->getEndDate();
-
-                $update = ($startDate <= $now && $now <= $endDate);
-
-                if ($update) {
-                    $dispatcher->dispatch(
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                        new ProductSaleStatusUpdateEvent($sale)
-                    );
-                }
+                $dispatcher->dispatch(
+                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                    new ProductSaleStatusUpdateEvent($sale)
+                );
 
                 $sale
                     ->setActive($event->getActive())
-                    ->setStartDate($startDate)
-                    ->setEndDate($endDate)
+                    ->setStartDate($event->getStartDate())
+                    ->setEndDate($event->getEndDate())
                     ->setPriceOffsetType($event->getPriceOffsetType())
                     ->setDisplayInitialPrice($event->getDisplayInitialPrice())
                     ->setLocale($event->getLocale())
@@ -300,9 +293,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     }
                 }
 
-
-                if ($update) {
-                    // Update related products sale status
+                // Update related products sale status if the Sale is active. This is not required if the sale is
+                // not active, as we de-activated promotion for this sale at the beginning ofd this method
+                if ($sale->getActive()) {
                     $dispatcher->dispatch(
                         TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                         new ProductSaleStatusUpdateEvent($sale)
@@ -396,8 +389,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all sales
      *
-     * @param  SaleClearStatusEvent                      $event
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @param  SaleClearStatusEvent $event
+     * @throws \Exception
      */
     public function clearStatus(/** @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event)
     {
