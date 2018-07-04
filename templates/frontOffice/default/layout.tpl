@@ -142,7 +142,6 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </div>
             </div>
 
-
             <header class="container" role="banner">
                 <div class="header row">
                     <h1 class="logo container hidden-xs">
@@ -171,13 +170,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
 
             {ifhook rel="main.footer-top"}
-                <section class="footer-block">
-                    <div class="container">
-                        <div class="blocks row">
-                            {hook name="main.footer-top"}
-                        </div>
-                    </div>
-                </section>
+                {hook name="main.footer-top"}
             {/ifhook}
             {elsehook rel="main.footer-top"}
                 <section class="footer-banner">
@@ -222,18 +215,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             {/ifhook}
 
             {ifhook rel="main.footer-bottom"}
-                <footer class="footer-info" role="contentinfo">
-                    <div class="container">
-                        <div class="info row">
-                            <div class="col-lg-9">
-                                {hook name="main.footer-bottom"}
-                            </div>
-                            <div class="col-lg-3">
-                                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+                {hook name="main.footer-bottom"}
             {/ifhook}
             {elsehook rel="main.footer-bottom"}
                 <footer class="footer-info" role="contentinfo">
