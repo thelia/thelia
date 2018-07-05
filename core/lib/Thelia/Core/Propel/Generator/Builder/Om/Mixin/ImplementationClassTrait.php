@@ -32,7 +32,7 @@ trait ImplementationClassTrait
         return $fs->makePathRelative(
             THELIA_CACHE_DIR
             . (defined('THELIA_PROPEL_BUILDER_ENVIRONMENT') ? THELIA_PROPEL_BUILDER_ENVIRONMENT : '')
-            . '/propel/model/'
+            . DS . 'propel' . DS . 'model' . DS
             . parent::getClassFilePath(),
             THELIA_ROOT
         );
