@@ -31,12 +31,12 @@ trait StubClassTrait
 
         if ($this->getPackage() === 'Thelia.Model') {
             return $fs->makePathRelative(
-                THELIA_LIB . '/../' . parent::getClassFilePath(),
+                THELIA_LIB . '../' . parent::getClassFilePath(),
                 THELIA_ROOT
             );
         } else {
             return $fs->makePathRelative(
-                THELIA_MODULE_DIR . '/' . parent::getClassFilePath(),
+                THELIA_MODULE_DIR . parent::getClassFilePath(),
                 THELIA_ROOT
             );
         }
