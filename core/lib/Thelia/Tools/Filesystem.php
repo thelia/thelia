@@ -10,31 +10,34 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Propel\Generator\Builder\Om\Mixin;
+namespace Thelia\Tools;
 
-use Propel\Generator\Builder\Om\AbstractOMBuilder;
-use Thelia\Tools\Filesystem;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
-/**
- * Override a Propel model class builder.
- * Add building behavior for implementation model classes (the classes extended by the stub classes and containing
- * generated Propel code, e.g. Model\Base\Foo)
- * Generate the classes in the global model directory.
- */
-trait ImplementationClassTrait
+class Filesystem
 {
-    public function getClassFilePath()
+    /** @var SymfonyFilesystem */
+    private $filesystem;
+
+    public function __construct()
     {
-        /** @var $this AbstractOMBuilder */
+        $this->filesystem = new SymfonyFilesystem();
+    }
 
-        $fs = new Filesystem();
+    /**
+     * Same function as \Symfony\Component\Filesystem\Filesystem::makePathRelative(), but converts back separators
+     * to the platform separator.
+     *
+     * @see \Symfony\Component\Filesystem\Filesystem::makePathRelative()
+     */
+    public function makePathRelative($endPath, $startPath)
+    {
+        $path = $this->filesystem->makePathRelative($endPath, $startPath);
 
-        return $fs->makePathRelative(
-            THELIA_CACHE_DIR
-            . (defined('THELIA_PROPEL_BUILDER_ENVIRONMENT') ? THELIA_PROPEL_BUILDER_ENVIRONMENT : '')
-            . DS . 'propel' . DS . 'model' . DS
-            . parent::getClassFilePath(),
-            THELIA_ROOT
-        );
+        if ('/' !== DS) {
+            $path = str_replace('/', DS, $path);
+        }
+
+        return $path;
     }
 }

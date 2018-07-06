@@ -13,7 +13,7 @@
 namespace Thelia\Core\Propel\Generator\Builder\Om\Mixin;
 
 use Propel\Generator\Builder\Om\AbstractOMBuilder;
-use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Tools\Filesystem;
 
 /**
  * Override a Propel model class builder.
