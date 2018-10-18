@@ -5,12 +5,11 @@
         {assign var="hasSubmit" value = true}
     {/if}
     {assign var="productTitle" value="{$TITLE}"}
-	{if not $product_id}
-	   {assign var="product_id" value=$ID}
-	{/if}
+    {if not $product_id}
+       {assign var="product_id" value=$ID}
+    {/if}
     <article class="row" itemscope itemtype="http://schema.org/Product">
-		
-		{hook name="singleproduct.top" product="{$product_id}"}
+        {hook name="singleproduct.top" product="{$product_id}"}
 
         <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if} overlay col-sm-3">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
@@ -43,15 +42,16 @@
         <div class="product-price col-sm-3">
             <div class="price-container row" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                 <meta itemprop="category" content="{category attr="title"}">
+                {* Issue #2525 Remove itemCondition need improvement (not used like this) *}
                 {* List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition *}
-                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
+                {*<meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">*}
                 {* List of currency : The currency used to describe the product price, in three-letter ISO format. *}
                 <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
                 <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
                 {if $IS_PROMO }
 
                     {assign var="combination_count" value={count type="product_sale_elements" promo="1" product=$ID}}
-                    <span class="special-price col-xs-6"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">
+                    <span class="special-price col-xs-6"><span itemprop="price" class="price-label" content="{$BEST_TAXED_PRICE}">{intl l="Special Price:"} </span><span class="price">
                         {if $combination_count > 1}
                             {intl l="From %price" price={format_money number=$BEST_TAXED_PRICE}}
                         {else}
@@ -62,7 +62,7 @@
                     <span class="old-price col-xs-6"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE}</span></span>
                     {/if}
                 {else}
-                    <span class="regular-price col-xs-12"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE}</span></span>
+                    <span class="regular-price col-xs-12"><span itemprop="price" class="price" content="{$BEST_TAXED_PRICE}">{format_money number=$BEST_TAXED_PRICE}</span></span>
                 {/if}
             </div>
 
