@@ -41,6 +41,15 @@
     <div class="main">
         {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
         <article id="product" class="col-main row" role="main" itemscope itemtype="http://schema.org/Product">
+            {* Stock *}
+            {assign var="current_stock_content" value = "in_stock"}
+            {assign var="current_stock_href" value = "http://schema.org/InStock"}
+            {if $check_availability != 0}
+                {if $VIRTUAL == 0 && $QUANTITY <= 0}
+                    {assign var="current_stock_content" value = "out_stock"}
+                    {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
+                {/if}
+            {/if}
 
             {$pse_count=$PSE_COUNT}
 
@@ -142,7 +151,7 @@
                 <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                     <div class="availability">
                         <span class="availibity-label sr-only">{intl l="Availability"}: </span>
-                        <span itemprop="availability" href="{$current_stock_href}" class="" id="pse-availability">
+                        <span itemprop="availability" href="{$current_stock_href}" class="" id="pse-availability" content="{$current_stock_content}">
                             <span class="in">{intl l='In Stock'}</span>
                             <span class="out">{intl l='Out of Stock'}</span>
                         </span>
