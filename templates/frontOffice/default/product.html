@@ -5,6 +5,50 @@
     {$pse_count=1}
     {$product_virtual={product attr="virtual"}}
     {$check_availability={config key="check-available-stock" default="1"}}
+
+    {$pse=[]}
+    {$combination_label=[]}
+    {$combination_values=[]}
+    {$default_pse=[]}
+    {loop name="pse" type="product_sale_elements" product=$product_id}
+        {if $IS_PROMO}
+            {$finalPrice=$TAXED_PROMO_PRICE}
+        {else}
+            {$finalPrice=$TAXED_PRICE}
+        {/if}
+        {$pse[$ID]=[
+            "id" => $ID,
+            "isDefault" => $IS_DEFAULT,
+            "isPromo" => $IS_PROMO,
+            "isNew" => $IS_NEW,
+            "ref" => $REF,
+            "ean" => $EAN,
+            "quantity" => $QUANTITY,
+            "price" => {format_money number=$TAXED_PRICE},
+            "promo" => {format_money number=$TAXED_PROMO_PRICE},
+            "finalPrice" => $finalPrice
+        ]}
+        {if $IS_DEFAULT}
+            {$default_pse=$pse[$ID]}
+        {/if}
+        {$pse_combination=[]}
+        {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="manual"}
+            {if ! $combination_label[$ATTRIBUTE_ID]}
+                {$combination_label[$ATTRIBUTE_ID]=["name" => {$ATTRIBUTE_TITLE}, "values" => []]}
+            {/if}
+            {if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
+                {$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
+                {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=[{$ATTRIBUTE_AVAILABILITY_TITLE}, $ATTRIBUTE_ID]}
+            {/if}
+            {$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
+        {/loop}
+        {$pse[$ID]["combinations"]=$pse_combination}
+        {$pse_images=[]}
+        {loop name="pse_images" type="product-sale-elements-image" product_sale_elements_id="$ID"}
+            {$pse_images[]=$PRODUCT_IMAGE_ID}
+        {/loop}
+        {$pse[$ID]["images"]=$pse_images}
+    {/loop}
 {/block}
 
 {* Body Class *}
@@ -42,21 +86,14 @@
         {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
         <article id="product" class="col-main row" role="main" itemscope itemtype="http://schema.org/Product">
             {* Stock *}
-            {assign var="current_stock_content" value = "in_stock"}
-            {assign var="current_stock_href" value = "http://schema.org/InStock"}
-            {if $check_availability != 0}
-                {if $VIRTUAL == 0 && $QUANTITY <= 0}
-                    {assign var="current_stock_content" value = "out_stock"}
-                    {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
-                {/if}
+            {assign var="current_stock_content" value="in_stock"}
+            {assign var="current_stock_href" value="http://schema.org/InStock"}
+            {if ($check_availability != 0 && $VIRTUAL == 0 && $QUANTITY <= 0)}
+                {assign var="current_stock_content" value="out_stock"}
+                {assign var="current_stock_href" value="http://schema.org/OutOfStock"}
             {/if}
 
             {$pse_count=$PSE_COUNT}
-
-            {* Use the meta tag to specify content that is not visible on the page in any way *}
-            {loop name="brand.feature" type="brand" product={$ID}}
-                <meta itemprop="brand" content="{$TITLE}">
-            {/loop}
 
             {* Add custom feature if needed
             {loop name="isbn.feature" type="feature" product={$ID} title="isbn"}
@@ -126,10 +163,11 @@
                 {hook name="product.details-top" product={$ID}}
 
                 <div class="product-info">
-                    <h1 class="name"><span itemprop="name">{$TITLE}</span><span id="pse-name" class="pse-name"></span></h1>
-                    {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: <span id="pse-ref">{$REF}</span></span>{/if}
+                    <h1 class="name"><span itemprop="name" content="{$TITLE}">{$TITLE}</span><span id="pse-name" class="pse-name"></span></h1>
+                    <span itemprop="sku" content="{$default_pse['id']}" class="sku">{intl l='Ref.'}: <span itemprop="mpn" id="pse-ref">{$default_pse['ref']}</span></span>
 
                     {loop name="brand_info" type="brand" product={$ID} limit="1"}
+                        {assign var="brand_title" value={$TITLE nofilter}}
                         <p><a href="{$URL nofilter}" title="{intl l="More information about this brand"}"><span itemprop="brand">{$TITLE}</span></a></p>
                     {/loop}
 
@@ -168,7 +206,8 @@
 
                         <span id="pse-promo">
                             <span class="special-price"><span class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
-                            <meta itemprop="price" content="{$TAXED_PROMO_PRICE}">
+                            <meta itemprop="price" content="{if $IS_PROMO}{$TAXED_PROMO_PRICE}{else}{$TAXED_PRICE}{/if}">
+
                             {if $SHOW_ORIGINAL_PRICE}
                                 <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE}</span></span>
                             {/if}
@@ -351,40 +390,21 @@
             </section>
             {hook name="product.bottom" product={$ID}}
 
-{* javascript confiuguration to display pse *}
-{$pse=[]}
-{$combination_label=[]}
-{$combination_values=[]}
-{loop name="pse" type="product_sale_elements" product=$product_id}
-    {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => {$REF}, "ean" => {$EAN_CODE}, "quantity" => {$QUANTITY}, "price" => {format_money number=$TAXED_PRICE}, "promo" => {format_money number=$TAXED_PROMO_PRICE} ]}
-    {$pse_combination=[]}
-    {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="manual"}
-        {if ! $combination_label[$ATTRIBUTE_ID]}
-            {$combination_label[$ATTRIBUTE_ID]=["name" => {$ATTRIBUTE_TITLE}, "values" => []]}
-        {/if}
-        {if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
-            {$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
-            {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=[{$ATTRIBUTE_AVAILABILITY_TITLE}, $ATTRIBUTE_ID]}
-        {/if}
-        {$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
-    {/loop}
-    {$pse[$ID]["combinations"]=$pse_combination}
-{/loop}
-
-<script type="text/javascript">
-    // Product sale elements
-    var PSE_FORM = true;
-    var PSE_COUNT = {$pse_count};
-    {if $check_availability == 0 || $product_virtual == 1 }
-        var PSE_CHECK_AVAILABILITY = false;
-    {else}
-        var PSE_CHECK_AVAILABILITY = true;
-    {/if}
-    var PSE_DEFAULT_AVAILABLE_STOCK = {config key="default_available_stock" default="100"};
-    var PSE = {$pse|json_encode nofilter};
-    var PSE_COMBINATIONS = {$combination_label|json_encode nofilter};
-    var PSE_COMBINATIONS_VALUE = {$combination_values|json_encode nofilter};
-</script>
+            {* javascript configuration to display pse *}
+            <script type="text/javascript">
+                // Product sale elements
+                var PSE_FORM = true;
+                var PSE_COUNT = {$pse_count};
+                {if $check_availability == 0 || $product_virtual == 1 }
+                    var PSE_CHECK_AVAILABILITY = false;
+                {else}
+                    var PSE_CHECK_AVAILABILITY = true;
+                {/if}
+                var PSE_DEFAULT_AVAILABLE_STOCK = {config key="default_available_stock" default="100"};
+                var PSE = {$pse|json_encode nofilter};
+                var PSE_COMBINATIONS = {$combination_label|json_encode nofilter};
+                var PSE_COMBINATIONS_VALUE = {$combination_values|json_encode nofilter};
+            </script>
 
         </article><!-- /#product -->
 
@@ -400,6 +420,35 @@
                 {/loop}
             {/if}
         </ul>
+        {foreach $pse as $pseItem}
+            {if !$pseItem['isDefault']}
+                <span itemscope itemtype="http://schema.org/Product">
+                    <meta itemprop="name" content="{$TITLE}" />
+                    <meta itemprop="sku" content="{$pseItem['id']}" />
+                    <meta itemprop="mpn" content="{$pseItem['ref']}" />
+                    <meta itemprop="description" content="{$DESCRIPTION|strip_tags}" />
+                    <meta itemprop="brand" content="{$brand_title}" />
+                    {ifloop rel="additionalProperty"}
+                        <div itemprop="additionalProperty" itemscope itemtype="http://schema.org/PropertyValue">
+                            {loop name="additionalProperty" type="attribute_combination" product_sale_elements=$pseItem['id'] order="manual"}
+                                <meta itemprop="name" content="{$ATTRIBUTE_TITLE}" />
+                                <meta itemprop="value" content="{$ATTRIBUTE_AVAILABILITY_TITLE}" />
+                            {/loop}
+                        </div>
+                    {/ifloop}
+                    <span itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                        {if ($check_availability != 0 && $VIRTUAL == 0 && {$pseItem['quantity']} <= 0)}
+                            <meta itemprop="availability" href="http://schema.org/OutOfStock" content="out_stock" />
+                        {else}
+                            <meta itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+                        {/if}
+                        <meta itemprop="itemCondition" itemtype="http://schema.org/ItemCondition" content="NewCondition" />
+                        <meta itemprop="price" content="{$pseItem['finalPrice']}" />
+                        <meta itemprop="priceCurrency" content="{currency attr="code"}" />
+                    </span>
+                </span>
+            {/if}
+        {/foreach}
         {/loop}
 
     </div><!-- /.main -->
