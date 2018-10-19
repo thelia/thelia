@@ -10,6 +10,7 @@
     {$combination_label=[]}
     {$combination_values=[]}
     {$default_pse=[]}
+    {$gtins=[8,12,13,14]}
     {loop name="pse" type="product_sale_elements" product=$product_id}
         {if $IS_PROMO}
             {$finalPrice=$TAXED_PROMO_PRICE}
@@ -22,7 +23,7 @@
             "isPromo" => $IS_PROMO,
             "isNew" => $IS_NEW,
             "ref" => $REF,
-            "ean" => $EAN,
+            "ean" => $EAN_CODE,
             "quantity" => $QUANTITY,
             "price" => {format_money number=$TAXED_PRICE},
             "promo" => {format_money number=$TAXED_PROMO_PRICE},
@@ -165,6 +166,7 @@
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name" content="{$TITLE}">{$TITLE}</span><span id="pse-name" class="pse-name"></span></h1>
                     <span itemprop="sku" content="{$default_pse['id']}" class="sku">{intl l='Ref.'}: <span itemprop="mpn" id="pse-ref">{$default_pse['ref']}</span></span>
+                    {if in_array(strlen($default_pse['ean']), $gtins)}<meta itemprop="gtin{strlen($default_pse['ean'])}" content="{$default_pse['ean']}" />{/if}
 
                     {loop name="brand_info" type="brand" product={$ID} limit="1"}
                         {assign var="brand_title" value={$TITLE nofilter}}
@@ -426,6 +428,9 @@
                     <meta itemprop="name" content="{$TITLE}" />
                     <meta itemprop="sku" content="{$pseItem['id']}" />
                     <meta itemprop="mpn" content="{$pseItem['ref']}" />
+                    {if in_array(strlen($pseItem['ean']), $gtins)}
+                        <meta itemprop="gtin{strlen($pseItem['ean'])}" content="{$pseItem['ean']}" />
+                    {/if}
                     <meta itemprop="description" content="{$DESCRIPTION|strip_tags}" />
                     <meta itemprop="brand" content="{$brand_title}" />
                     {ifloop rel="additionalProperty"}
