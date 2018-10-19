@@ -315,7 +315,7 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
-                        <p>{$DESCRIPTION|default:'N/A' nofilter}</p>
+                        <div>{$DESCRIPTION|default:'N/A' nofilter}</div>
                     </div>
                     {if $smarty.capture.additional ne ""}
                         <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
