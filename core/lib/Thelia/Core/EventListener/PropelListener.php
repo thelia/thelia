@@ -46,8 +46,7 @@ class PropelListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::BOOT => 'buildTableMaps',
-            TheliaEvents::CACHE_CLEAR => ['rebuildCache', 127],
+            TheliaEvents::BOOT => 'buildTableMaps'
         ];
     }
 

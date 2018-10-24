@@ -13,8 +13,10 @@
 namespace Thelia\Action;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -22,11 +24,17 @@ use Thelia\Core\Event\TheliaEvents;
  * Class Cache
  * @package Thelia\Action
  * @author Manuel Raynaud <manu@raynaud.io>
+ * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
 class Cache extends BaseAction implements EventSubscriberInterface
 {
     /** @var AdapterInterface */
     protected $adapter;
+
+    /**
+     * @var CacheEvent[]
+     */
+    protected $onTerminateCacheClearEvents = [];
 
     /**
      * CacheListener constructor.
@@ -39,7 +47,33 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
     public function cacheClear(CacheEvent $event)
     {
-        // clear cache on thelia.cache service
+        if (!$event->isOnKernelTerminate()) {
+            $this->execCacheClear($event);
+            return;
+        }
+
+        $findDir = false;
+        foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
+            if ($cacheEvent->getDir() === $event->getDir()) {
+                $findDir = true;
+                break;
+            }
+        }
+
+        if (!$findDir) {
+            $this->onTerminateCacheClearEvents[] = $event;
+        }
+    }
+
+    public function onTerminate()
+    {
+        foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
+            $this->execCacheClear($cacheEvent);
+        }
+    }
+
+    protected function execCacheClear(CacheEvent $event)
+    {
         $this->adapter->clear();
 
         $dir = $event->getDir();
@@ -54,7 +88,9 @@ class Cache extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CACHE_CLEAR => array('cacheClear', 128)
+            TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
+            KernelEvents::TERMINATE => ['onTerminate', 128],
+            ConsoleEvents::TERMINATE => ['onTerminate', 128]
         );
     }
 }
