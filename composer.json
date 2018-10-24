@@ -73,7 +73,7 @@
         "thelia/hooktest-module": "~1.1",
         "thelia/hooktest-template": "~1.1",
         "phpunit/phpunit": "^5.0",
-        "symfony/var-dumper": "~3.4.0"
+        "symfony/var-dumper": "^2.0|^3.0|^4.0"
     },
     "minimum-stability": "stable",
     "config": {
