@@ -43,6 +43,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Newsletter;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
@@ -248,15 +249,16 @@ class CustomerController extends BaseFrontController
         $this->checkAuth();
 
         /** @var Customer $customer */
-        $customer = $this->getSecurityContext()->getCustomerUser();
-        $data = array(
-            'id'           => $customer->getId(),
-            'title'        => $customer->getTitleId(),
-            'firstname'    => $customer->getFirstName(),
-            'lastname'     => $customer->getLastName(),
-            'email'        => $customer->getEmail(),
-            'email_confirm'        => $customer->getEmail(),
-            'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
+        $customer   = $this->getSecurityContext()->getCustomerUser();
+        $newsletter = NewsletterQuery::create()->findOneByEmail($customer->getEmail());
+        $data       = array(
+            'id'            => $customer->getId(),
+            'title'         => $customer->getTitleId(),
+            'firstname'     => $customer->getFirstName(),
+            'lastname'      => $customer->getLastName(),
+            'email'         => $customer->getEmail(),
+            'email_confirm' => $customer->getEmail(),
+            'newsletter'    => $newsletter instanceof Newsletter ? !$newsletter->getUnsubscribed() : false,
         );
 
         $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE, 'form', $data);
