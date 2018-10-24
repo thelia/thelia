@@ -264,6 +264,10 @@
                                                     <th>{intl l="Customer"}</th>
                                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                                 </tr>
+                                                <tr>
+                                                    <th>{intl l="Email"}</th>
+                                                    <td>{loop type="customer" name="customer" id=$CUSTOMER backend_context="on" current="false"}<a href="mailto:{$EMAIL}?Subject={intl l='Order %ref' ref={$REF}}">{$EMAIL}</a>{/loop}</td>
+                                                </tr>
                                                 {if $orderInvoiceCompany}
                                                 <tr>
                                                     <th>{intl l="Company"}</th>

@@ -114,6 +114,10 @@
         convert_urls: false,
         relative_urls : false,
         // Use file to get an url without index.php or index_dev.php
-        document_base_url : "{url file="/"}"
+        document_base_url : "{url file="/"}",
+        // Trigger a "ready" event to the document
+        init_instance_callback : function(editor) {
+            $(document).trigger('tinymce-editor-setup', editor);
+        }
     });
 </script>
