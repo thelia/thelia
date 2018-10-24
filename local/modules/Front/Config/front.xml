@@ -248,6 +248,9 @@
     <route id="sitemap.process" path="/sitemap">
         <default key="_controller">Front\Controller\SitemapController::generateAction</default>
     </route>
+    <route id="sitemap.process.xml" path="/sitemap.xml">
+        <default key="_controller">Front\Controller\SitemapController::generateAction</default>
+    </route>
     <!-- end sitemap generator -->
 
     <!-- feed generator -->

@@ -79,6 +79,10 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
+    /**
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function buildModelCriteria()
     {
         $search = FeatureQuery::create();
@@ -111,30 +115,31 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         $this->useFeaturePosition = true;
 
         if (null !== $product) {
-            // Find all template assigned to the products.
-            $products = ProductQuery::create()->findById($product);
+            // As we join with freature_value, we may get multiple times the same line
+            $search->distinct();
 
-            // Ignore if the product cannot be found.
-            if ($products !== null) {
-                // Create template array
-                if ($template == null) {
-                    $template = array();
+            // Find all template assigned to the products.
+            $products = ProductQuery::create()->filterById($product, Criteria::IN)->find();
+
+            // Create template array
+            if ($template == null) {
+                $template = [];
+            }
+
+            /** @var ProductModel $product */
+            foreach ($products as $product) {
+                if (! $this->getBackendContext()) {
+                    $search
+                        ->useFeatureProductQuery()
+                        ->filterByProduct($product)
+                        ->endUse()
+                    ;
                 }
 
-                /** @var ProductModel $product */
-                foreach ($products as $product) {
-                    if (!$this->getBackendContext()) {
-                        $search
-                            ->useFeatureProductQuery()
-                                ->filterByProduct($product)
-                            ->endUse()
-                        ;
-                    }
-                    $tplId = $product->getTemplateId();
+                $tplId = $product->getTemplateId();
 
-                    if (! is_null($tplId)) {
-                        $template[] = $tplId;
-                    }
+                if (! empty($tplId)) {
+                    $template[] = $tplId;
                 }
             }
 
@@ -146,13 +151,17 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (! empty($template)) {
-            // Join with feature_template table to get position
-            $search
-                ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
-                ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
-            ;
+            // Join with feature_template table to get position, if a manual order position is required
+            if (in_array(['manual_reverse', 'manual'], $this->getOrder())) {
+                $search
+                    ->filterByTemplate(
+                        TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
+                        Criteria::IN
+                    )
+                    ->withColumn(FeatureTemplateTableMap::POSITION, 'position');
 
-            $this->useFeaturePosition = false;
+                $this->useFeaturePosition = false;
+            }
         }
 
         if (null !== $excludeTemplate) {
@@ -217,6 +226,11 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
+    /**
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function parseResults(LoopResult $loopResult)
     {
         /** @var FeatureModel $feature */
