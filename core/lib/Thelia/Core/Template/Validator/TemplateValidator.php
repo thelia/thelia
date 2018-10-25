@@ -115,14 +115,14 @@ class TemplateValidator
                         $message = Translator::getInstance()->trans(
                             "The parent template \"%parent\" of template \"%name\" could not be found",
                             [
-                                '%parent' => $templateDescriptor->getParent(),
+                                '%parent' => $templateDescriptor->getParent()->getName(),
                                 '%name' => $templateDescriptor->getName(),
                             ]
                         );
                     } catch (\Exception $ex) {
                         $message = sprintf(
                             "The parent template \"%s\" of template \"%s\" could not be found",
-                            $templateDescriptor->getParent(),
+                            $templateDescriptor->getParent()->getName(),
                             $templateDescriptor->getName()
                         );
                     }

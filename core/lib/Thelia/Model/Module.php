@@ -213,7 +213,7 @@ class Module extends BaseModule
     /**
      * Return the absolute path to one of the module's template directories
      *
-     * @param  int    $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
+     * @param  string    $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
      * @return string a path
      */
     public function getAbsoluteTemplateDirectoryPath($templateSubdirName)
