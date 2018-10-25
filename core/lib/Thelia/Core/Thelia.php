@@ -21,7 +21,8 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
-use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -35,7 +36,6 @@ use Symfony\Component\HttpKernel\Kernel;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -62,9 +62,10 @@ class Thelia extends Kernel
         return file_exists(THELIA_CONF_DIR . 'database.yml');
     }
 
-    protected function checkMySQLConfigurations(ConnectionWrapper $con)
+    protected function checkMySQLConfigurations(ConnectionInterface $con)
     {
-        // todo add cache for this test
+        // TODO : add cache for this test
+        /** @var  PDODataFetcher $result */
         $result = $con->query("SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode");
 
         if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
@@ -125,6 +126,7 @@ class Thelia extends Kernel
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
     public function boot()
     {
@@ -159,8 +161,8 @@ class Thelia extends Kernel
     /**
      * Add all module's standard templates to the parser environment
      *
-     * @param ParserInterface $parser the parser
-     * @param Module          $module the Module.
+     * @param Definition $parser the parser
+     * @param Module     $module the Module.
      */
     protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
     {
@@ -174,10 +176,10 @@ class Thelia extends Kernel
     /**
      * Add a module template directory to the parser environment
      *
-     * @param ParserInterface $parser             the parser
-     * @param Module          $module             the Module.
-     * @param string          $templateType       the template type (one of the TemplateDefinition type constants)
-     * @param string          $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     * @param Definition $parser             the parser
+     * @param Module     $module             the Module.
+     * @param string     $templateType       the template type (one of the TemplateDefinition type constants)
+     * @param string     $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
     protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName)
     {
