@@ -25,16 +25,12 @@ trait ImplementationClassTrait
 {
     public function getClassFilePath()
     {
-        /** @var $this AbstractOMBuilder */
-
-        $fs = new Filesystem();
-
-        return $fs->makePathRelative(
+        return rtrim((new Filesystem())->makePathRelative(
             THELIA_CACHE_DIR
-            . (defined('THELIA_PROPEL_BUILDER_ENVIRONMENT') ? ('/' . THELIA_PROPEL_BUILDER_ENVIRONMENT) : '')
-            . '/propel/model/'
+            . (defined('THELIA_PROPEL_BUILDER_ENVIRONMENT') ? THELIA_PROPEL_BUILDER_ENVIRONMENT : '')
+            . DS . 'propel' . DS . 'model' . DS
             . parent::getClassFilePath(),
             THELIA_ROOT
-        );
+        ), '/');
     }
 }
