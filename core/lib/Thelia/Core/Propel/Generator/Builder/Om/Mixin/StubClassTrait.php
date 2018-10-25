@@ -30,15 +30,17 @@ trait StubClassTrait
         $fs = new Filesystem();
 
         if ($this->getPackage() === 'Thelia.Model') {
-            return $fs->makePathRelative(
-                THELIA_LIB . '/../' . parent::getClassFilePath(),
+            $path = $fs->makePathRelative(
+                THELIA_LIB . '..' . DS . parent::getClassFilePath(),
                 THELIA_ROOT
             );
         } else {
-            return $fs->makePathRelative(
-                THELIA_MODULE_DIR . '/' . parent::getClassFilePath(),
+            $path = $fs->makePathRelative(
+                THELIA_MODULE_DIR . parent::getClassFilePath(),
                 THELIA_ROOT
             );
         }
+
+        return rtrim($path, DS.'/');
     }
 }
