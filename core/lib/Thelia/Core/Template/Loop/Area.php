@@ -75,7 +75,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (count($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -104,7 +104,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $modules = $this->getModuleId();
 
-        if (count($modules)) {
+        if (null !== $modules) {
             $search
                 ->useAreaDeliveryModuleQuery()
                 ->filterByDeliveryModuleId($modules, Criteria::IN)
@@ -113,7 +113,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $countries = $this->getCountry();
 
-        if (count($countries)) {
+        if (null !== $countries) {
             $search
                 ->useCountryAreaQuery()
                 ->filterByCountryId($countries, Criteria::IN)
