@@ -276,7 +276,6 @@ class Thelia extends Kernel
                 }
             }
 
-            /** @var ParserInterface $parser */
             $parser = $container->getDefinition('thelia.parser');
 
             /** @var \Thelia\Core\Template\TemplateHelperInterface $templateHelper */
