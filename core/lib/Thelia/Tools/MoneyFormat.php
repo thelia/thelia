@@ -40,9 +40,16 @@ class MoneyFormat extends NumberFormat
         $decimals = null,
         $decPoint = null,
         $thousandsSep = null,
-        $symbol = null
+        $symbol = null, 
+        $remove_zero_decimal = false
     ) {
         $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
+        
+        if ($remove_zero_decimal === true) {
+            if($number == (int)$number) {
+                $number = intval($number);
+            }
+        }
 
         if ($symbol !== null) {
             return $number . ' ' . $symbol;
@@ -58,6 +65,7 @@ class MoneyFormat extends NumberFormat
      * @param string $decPoint
      * @param string $thousandsSep
      * @param int|null $currencyId
+     * @param boolean $remove_zero_decimal
      * @return string
      */
     public function formatByCurrency(
@@ -65,9 +73,16 @@ class MoneyFormat extends NumberFormat
         $decimals = null,
         $decPoint = null,
         $thousandsSep = null,
-        $currencyId = null
+        $currencyId = null, 
+        $remove_zero_decimal = false
     ) {
         $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
+        
+        if ($remove_zero_decimal === true) {
+            if($number == (int)$number) {
+                $number = intval($number);
+            }
+        }
 
         $currency = $currencyId !== null ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
 
