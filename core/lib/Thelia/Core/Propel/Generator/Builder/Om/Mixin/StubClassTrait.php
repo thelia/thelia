@@ -26,7 +26,6 @@ trait StubClassTrait
     public function getClassFilePath()
     {
         /** @var $this AbstractOMBuilder */
-
         $fs = new Filesystem();
 
         if ($this->getPackage() === 'Thelia.Model') {
@@ -41,6 +40,6 @@ trait StubClassTrait
             );
         }
 
-        return rtrim($path, DS.'/');
+        return rtrim($path, '/');
     }
 }
