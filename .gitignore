@@ -68,6 +68,9 @@ codekit-config.json
 config.codekit
 .codekit-cache
 
+#MacOS
+.DS_Store
+
 # Ignore casperjs screenshots
 tests/functionnal/casperjs/screenshot/
 tests/phpunit/Thelia/Tests/Api/fixtures/visuel*.png
