@@ -72,6 +72,9 @@ class SmartyParser extends Smarty implements ParserInterface
     /** @var array The template stack  */
     protected $tplStack = [];
 
+    /** @var bool */
+    protected $useMethodCallWrapper = false;
+
     /**
      * @param RequestStack             $requestStack
      * @param EventDispatcherInterface $dispatcher
@@ -79,6 +82,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param TemplateHelperInterface  $templateHelper
      * @param string                   $env
      * @param bool                     $debug
+     * @throws \SmartyException
      */
     public function __construct(
         RequestStack $requestStack,
@@ -97,6 +101,9 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->env = $env;
         $this->debug = $debug;
 
+        // Use methos call coamptibility wrapper ?
+        $this->useMethodCallWrapper = version_compare(self::SMARTY_VERSION, "3.1.33", '>=');
+
         // Configure basic Smarty parameters
 
         $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'compile';
@@ -111,7 +118,6 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
-        $this->inheritance_merge_compiled_includes = false;
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
@@ -289,7 +295,6 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param TemplateDefinition $templateDefinition
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
-     * @throws \SmartyException
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
@@ -302,8 +307,6 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /**
      * Restore the previous stored template definition, if one exists.
-     *
-     * @throws \SmartyException
      */
     public function popTemplateDefinition()
     {
@@ -319,7 +322,6 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param TemplateDefinition $templateDefinition
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
-     * @throws \SmartyException
      */
     public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
@@ -576,6 +578,16 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
+     * From Smarty 3.1.33, we cannot pass parameters by reference to plugin mehods, and declarations like the
+     * following will throw the error "Warning: Parameter 2 to <method> expected to be a reference, value given",
+     * because Smarty uses call_user_func_array() to call plugins methods.
+     *
+     *     public function categoryDataAccess($params, &$smarty)
+     *
+     * We use now a wrapper to provide compatibility with this declaration style
+     *
+     * @see AbstractSmartyPlugin::__call() for details
+     *
      * @throws \SmartyException
      */
     public function registerPlugins()
@@ -590,12 +602,18 @@ class SmartyParser extends Smarty implements ParserInterface
 
             /** @var SmartyPluginDescriptor $plugin */
             foreach ($plugins as $plugin) {
+                // Use the wrapper to ensure Smarty 3.1.33 compatibility
+                $methodName = $this->useMethodCallWrapper && $plugin->getType() === 'function' ?
+                    AbstractSmartyPlugin::WRAPPED_METHOD_PREFIX . $plugin->getMethod() :
+                    $plugin->getMethod()
+                ;
+
                 $this->registerPlugin(
                     $plugin->getType(),
                     $plugin->getName(),
                     array(
                         $plugin->getClass(),
-                        $plugin->getMethod()
+                        $methodName
                     )
                 );
             }

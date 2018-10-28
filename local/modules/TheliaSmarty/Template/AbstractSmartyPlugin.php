@@ -13,6 +13,8 @@
 namespace TheliaSmarty\Template;
 
 
+use Prophecy\Exception\Doubler\MethodNotFoundException;
+
 /**
  *
  * The class all Smarty Thelia plugin shoud extend
@@ -22,6 +24,8 @@ namespace TheliaSmarty\Template;
  */
 abstract class AbstractSmartyPlugin
 {
+    const WRAPPED_METHOD_PREFIX = '__wrap__';
+
     /**
      * Explode a comma separated list in a array, trimming all array elements
      *
@@ -91,6 +95,40 @@ abstract class AbstractSmartyPlugin
     }
 
     /**
+     * From Smarty 3.1.33, we cannot pass parameters by reference to plugin mehods, and declarations like the
+     * following will throw the error "Warning: Parameter 2 to <method> expected to be a reference, value given",
+     * because Smarty uses call_user_func_array() to call plugins methods.
+     *
+     *     public function categoryDataAccess($params, &$smarty)
+     *
+     * This method wraps the method call to prevent this error
+     *
+     * @param string $functionName the method name
+     * @param mixed[] $args the method arguments
+     * @return mixed
+     *
+     * @throws MethodNotFoundException if the method was not found in this class
+     */
+    public function __call($functionName, $args)
+    {
+        if (false !== strpos($functionName, self::WRAPPED_METHOD_PREFIX)) {
+            $functionName = str_replace(self::WRAPPED_METHOD_PREFIX, '', $functionName);
+
+            $params = isset($args[0]) ? $args[0] : [];
+            $smarty = isset($args[1]) ? $args[1] : null;
+
+            return $this->$functionName($params, $smarty);
+        }
+
+        throw new MethodNotFoundException("Smarty plugin method '$functionName' was not found.", $this, $functionName);
+    }
+
+    protected function compatibilityFunctionCaller($params, $smarty, $functionName)
+    {
+        return $functionName($params, $smarty);
+    }
+
+        /**
      * @return SmartyPluginDescriptor[] an array of SmartyPluginDescriptor
      */
     abstract public function getPluginDescriptors();
