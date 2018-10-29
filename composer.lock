@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "516cdb06bac91fc4a0a3f9d0bb304e2b",
+    "content-hash": "28af2243aa5a0be9c6cf9cafffe94c75",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -924,16 +924,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.20",
+            "version": "v3.1.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "cef27602bba3acd00ae14a8804ebd086e75e65e3"
+                "reference": "dd55b23121e55a3b4f1af90a707a6c4e5969530f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/cef27602bba3acd00ae14a8804ebd086e75e65e3",
-                "reference": "cef27602bba3acd00ae14a8804ebd086e75e65e3",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/dd55b23121e55a3b4f1af90a707a6c4e5969530f",
+                "reference": "dd55b23121e55a3b4f1af90a707a6c4e5969530f",
                 "shasum": ""
             },
             "require": {
@@ -946,10 +946,8 @@
                 }
             },
             "autoload": {
-                "classmap": [
-                    "libs/Smarty.class.php",
-                    "libs/SmartyBC.class.php",
-                    "libs/sysplugins/smarty_security.php"
+                "files": [
+                    "libs/bootstrap.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -975,7 +973,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2014-10-31T04:12:39+00:00"
+            "time": "2018-09-12T20:54:16+00:00"
         },
         {
             "name": "spipu/html2pdf",

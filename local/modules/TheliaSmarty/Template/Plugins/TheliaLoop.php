@@ -18,13 +18,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Element\LoopResult;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
-
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\Exception\InvalidElementException;
+use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class TheliaLoop extends AbstractSmartyPlugin
 {
@@ -56,7 +56,11 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     protected $varstack = array();
 
+    /** @var bool */
+    protected $isDebugActive;
+
     /**
+     * TheliaLoop constructor.
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
@@ -66,6 +70,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
         $this->translator = $container->get("thelia.translator");
+        $this->isDebugActive = $container->getParameter("kernel.debug");
     }
 
     /**
@@ -104,9 +109,21 @@ class TheliaLoop extends AbstractSmartyPlugin
             );
         }
 
-        $loop = $this->createLoopInstance($params);
+        try {
+            $loop = $this->createLoopInstance($params);
 
-        return $loop->count();
+            return $loop->count();
+        } catch (ElementNotFoundException $ex) {
+            // If loop is not found, when in development mode, rethrow the exception to make it visible
+            if ($this->isDebugActive) {
+                throw $ex;
+            }
+
+            // Otherwise, log the problem and return a count of 0
+            Tlog::getInstance()->error($ex->getMessage());
+
+            return 0;
+        }
     }
 
     /**
@@ -147,21 +164,37 @@ class TheliaLoop extends AbstractSmartyPlugin
                 );
             }
 
-            $loop = $this->createLoopInstance($params);
+            try {
+                $loop = $this->createLoopInstance($params);
 
-            self::$pagination[$name] = null;
+                self::$pagination[$name] = null;
 
-            // We have to clone the result, as exec() returns a cached LoopResult object, which may cause side effects
-            // if loops with the same argument set are nested (see https://github.com/thelia/thelia/issues/2213)
-            $loopResults = clone($loop->exec(self::$pagination[$name]));
+                // We have to clone the result, as exec() returns a cached LoopResult object, which may cause side effects
+                // if loops with the same argument set are nested (see https://github.com/thelia/thelia/issues/2213)
+                $loopResults = clone($loop->exec(self::$pagination[$name]));
 
-            $loopResults->rewind();
+                $loopResults->rewind();
 
-            $this->loopstack[$name] = $loopResults;
+                $this->loopstack[$name] = $loopResults;
 
-            // No results ? The loop is terminated, do not evaluate loop text.
-            if ($loopResults->isEmpty()) {
+                // No results ? The loop is terminated, do not evaluate loop text.
+                if ($loopResults->isEmpty()) {
+                    $repeat = false;
+                }
+            } catch (ElementNotFoundException $ex) {
+                // If loop is not found, when in development mode, rethrow the exception to make it visible
+                if ($this->isDebugActive) {
+                    throw $ex;
+                }
+
+                // Otherwise, log the problem and simulate an empty result.
+                Tlog::getInstance()->error($ex->getMessage());
+
+                // Do not evaluate loop text.
                 $repeat = false;
+
+                // Provide an empty result
+                $loopResults = new LoopResult(null);
             }
         } else {
             $loopResults = $this->loopstack[$name];
@@ -382,6 +415,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      * @return BaseLoop
      * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
      * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
+     * @throws \ReflectionException
      */
     protected function createLoopInstance($smartyParams)
     {
@@ -401,6 +435,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             );
         }
 
+        /** @var BaseLoop $loop */
         $loop = $class->newInstance(
             $this->container
         );
