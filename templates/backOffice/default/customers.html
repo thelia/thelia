@@ -251,31 +251,47 @@
             {form_field field="password_confirm"}
                 <input type="hidden" name="{$name}" value="dummmy-password" />
             {/form_field}
-    
+
             {render_form_field field="company"}
-    
-            {custom_render_form_field field='title'}
-                <select {form_field_attributes field='title'} >
-                    {loop type="title" name="title1"}
-                        <option value="{$ID}"{if $value == $ID} selected{/if}>{$LONG}</option>
-                    {/loop}
-                </select>
-            {/custom_render_form_field}
-    
+
+            <div class="row">
+                <div class="col-sm-6">
+                    {custom_render_form_field field='title'}
+                        <select {form_field_attributes field='title'} >
+                            {loop type="title" name="title1"}
+                                <option value="{$ID}"{if $value == $ID} selected{/if}>{$LONG}</option>
+                            {/loop}
+                        </select>
+                    {/custom_render_form_field}
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-sm-6">{render_form_field field="firstname"}</div>
                 <div class="col-sm-6">{render_form_field field='lastname'}</div>
             </div>
-    
+
+            <div class="row">
+                <div class="col-sm-6">
+                    {custom_render_form_field field='lang_id'}
+                        <select {form_field_attributes field='lang_id'}>
+                            {loop type="lang" name="lang.list" visible="*" order="alpha"}
+                                <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
+                            {/loop}
+                        </select>
+                    {/custom_render_form_field}
+                </div>
+            </div>
+
             {render_form_field field='address1'}
             {render_form_field field='address2' show_label=false}
             {render_form_field field='address3' show_label=false}
-    
+
             <div class="row">
                 <div class="col-md-4">{render_form_field field='zipcode'}</div>
                 <div class="col-md-8">{render_form_field field='city'}</div>
             </div>
-    
+
             <div class="row">
                 <div class="col-sm-6">
                     {custom_render_form_field field='country'}
@@ -288,14 +304,14 @@
                                     {else}
                                         {if $IS_DEFAULT}selected{/if}
                                     {/if}
-                    
+
                                 >{$TITLE}</option>
                             {/loop}
                         </select>
                         {$countryFieldId=$label_attr.for}
                     {/custom_render_form_field}
                 </div>
-    
+
                 <div class="col-md-6 group-state">
                     {custom_render_form_field field='state'}
                         <select {form_field_attributes field='state'}
@@ -312,7 +328,7 @@
                     {/custom_render_form_field}
                 </div>
             </div>
-    
+
             <div class="row">
                 {if {config key="customer_confirm_email"}}
                     <div class="col-sm-6">{render_form_field field="email"}</div>
