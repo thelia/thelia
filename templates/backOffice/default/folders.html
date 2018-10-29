@@ -143,20 +143,30 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            <a title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
-
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
-                                                <a class="folder-delete" title="{intl l='Delete this folder and all its contents'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'folder-open',
+                                                'title' => {intl l='Browse this folder'},
+                                                'href' => {url path='admin/folders' parent=$ID}
+                                            ],
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this folder'},
+                                                'href' => {url path="/admin/folders/update/%id" id=$ID},
+                                                'auth' => ['resource' => 'admin.folder']
+                                            ],
+                                            [
+                                                'type' => 'delete',
+                                                'class' => 'folder-delete',
+                                                'title' => {intl l='Delete this folder and all its contents'},
+                                                'href' => '#folder_delete_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'auth' => ['resource' => 'admin.folder']
+                                            ]
+                                        ]}
                                     </td>
                                 </tr>
                             {/loop}
@@ -222,7 +232,7 @@
                                     reverse_order='id_reverse'
                                     request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
-                                    label="{intl l='ID'}"
+                                    label={intl l='ID'}
                                     }
 
                                 <th>&nbsp;</th>
@@ -234,7 +244,7 @@
                                     reverse_order='alpha_reverse'
                                     request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
-                                    label="{intl l='Content title'}"
+                                    label={intl l='Content title'}
                                     }
 
                                     {hook name="contents.header" location="content_list_header" }
@@ -246,7 +256,7 @@
                                     reverse_order='visible_reverse'
                                     request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
-                                    label="{intl l='Online'}"
+                                    label={intl l='Online'}
                                     }
                                 </th>
 
@@ -257,7 +267,7 @@
                                     reverse_order='manual_reverse'
                                     request_parameter_name='content_order'
                                     path={url path='/admin/folders' parent=$parent target='contents'}
-                                    label="{intl l='Position'}"
+                                    label={intl l='Position'}
                                     }
                                 </th>
 
@@ -308,18 +318,25 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a title="{intl l='Edit this content'}" href="{url path="admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
-                                                <a class="content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
+                                         {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this content'},
+                                                'href' => {url path='/admin/products/update' product_id=$ID page=$page},
+                                                'auth' => ['resource' => 'admin.content']
+                                            ],
+                                            [
+                                                'type' => 'delete',
+                                                'class' => 'content-delete',
+                                                'title' => {intl l='Delete this content'},
+                                                'href' => '#content_delete_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'auth' => ['resource' => 'admin.content']
+                                            ]
+                                        ]}
                                     </td>
                                 </tr>
                             {/loop}

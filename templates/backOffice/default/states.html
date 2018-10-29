@@ -82,22 +82,26 @@
                                                 {hook name="states.table-row" location="states_table_row" state_id={$ID} }
 
                                                 <td class="actions">
-                                                    <div class="btn-toolbar btn toolbar-primary">
-                                                        <span class="glyphicon glyphicon-cog"></span>
-                                                    </div>
-                                                    <div class="toolbar-options hidden">
-                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.state" access="UPDATE"}
-                                                            <a class="state-change" title="{intl l='Change this state'}" href="{url path="/admin/configuration/state/update/%id" id=$ID}">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                            </a>
-                                                        {/loop}
-
-                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.state" access="DELETE"}
-                                                            <a class="state-delete" title="{intl l='Delete this state'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-trash"></span>
-                                                            </a>
-                                                        {/loop}
-                                                    </div>
+                                                    {include file='renderer/buttons.html' buttons=[
+                                                        [
+                                                            'type' => 'edit',
+                                                            'class' => 'state-change',
+                                                            'title' => {intl l='Change this state'},
+                                                            'href' => {url path="/admin/configuration/state/update/%id" id=$ID},
+                                                            'auth' => ['resource' => 'admin.configuration.state']
+                                                        ],
+                                                        [
+                                                            'type' => 'delete',
+                                                            'class' => 'state-delete',
+                                                            'title' => {intl l='Delete this state'},
+                                                            'href' => '#delete_dialog',
+                                                            'data' => [
+                                                                'id' => $ID,
+                                                                'toggle' => 'modal'
+                                                            ],
+                                                            'auth' => ['resource' => 'admin.configuration.state']
+                                                        ]
+                                                    ]}
                                                 </td>
                                             </tr>
                                         {/loop}
@@ -120,7 +124,7 @@
 
                                                 loop_ref       = "state_list"
                                                 max_page_count = 10
-                                                page_url       = "{url path="/admin/configuration/states"}"
+                                                page_url       = {url path="/admin/configuration/states"}
                                                 }
                                             </td>
                                         </tr>
@@ -152,7 +156,7 @@
             {form_hidden_fields exclude="locale"}
 
             {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-            {render_form_field field='success_url' value="{url path='/admin/configuration/state/update/_ID_'}"}
+            {render_form_field field='success_url' value={url path='/admin/configuration/state/update/_ID_'}}
 
             {custom_render_form_field field="title"}
             {loop type="lang" name="default-lang" default_only="1"}
@@ -163,7 +167,7 @@
 
                 <div class="input-group">
                     <input type="text" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="$TITLE" /></span>
                 </div>
             {/loop}
             {/custom_render_form_field}

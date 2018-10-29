@@ -27,6 +27,8 @@ return array(
     'Activate this log destination' => 'Activer cette destination',
     'Active' => 'Actif',
     'Add' => 'Ajouter',
+    'Duplicate' => 'Dupliquer',
+    'Remove' => 'Retirer',
     'Add a condition' => 'Ajouter une condition',
     'Add a module to a hook' => 'Ajouter un module à un point d\'accroche',
     'Add a new Customer' => 'Ajouter un client',

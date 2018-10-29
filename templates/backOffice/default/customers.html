@@ -163,24 +163,40 @@
                                                 {$lastOrderCurrency} {$lastOrderAmount}
                                             </td>
                                             <td class="actions">
-                                                <div class="btn-toolbar btn toolbar-primary">
-                                                    <span class="glyphicon glyphicon-cog"></span>
-                                                </div>
-                                                <div class="toolbar-options hidden">
-                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
-                                                        <a title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                    {/loop}
-                                                    {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
-                                                        <a title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
-                                                    {/loop}
-                                                    {loop type="auth" name="can_delete" role="ADMIN" resource="admin.customer" access="DELETE"}
-                                                    {if $hasOrders}
-                                                        <a class="disabled" title="{intl l='This customer has orders, and can\'t be deleted.'}"  href="#"><span class="glyphicon glyphicon-question-sign"></span></a>
-                                                    {else}
-                                                        <a class="customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                                    {/if}
-                                                    {/loop}
-                                                </div>
+                                                {if $hasOrders}
+                                                    {$deleteClass = 'disabled'}
+                                                    {$deleteTitle = {intl l='This customer has orders, and can\'t be deleted.'}}
+                                                    {$deleteHref = ''}
+                                                {else}
+                                                    {$deleteClass = 'customer-delete'}
+                                                    {$deleteTitle = {intl l='Delete this customer and all his orders'}}
+                                                    {$deleteHref = '#delete_customer_dialog'}
+                                                {/if}
+                                                {include file='renderer/buttons.html' buttons=[
+                                                    [
+                                                        'type' => 'edit',
+                                                        'title' => {intl l='Edit this customer'},
+                                                        'href' => {url path='/admin/customer/update' customer_id=$ID page=$page},
+                                                        'auth' => ['resource' => 'admin.customer']
+                                                    ],
+                                                    [
+                                                        'title' => {intl l="Send a mail to this customer"},
+                                                        'href' => "mailto:$EMAIL",
+                                                        'icon' => ['class' => 'glyphicon glyphicon-envelope'],
+                                                        'auth' => ['resource' => 'admin.customer']
+                                                    ],
+                                                    [
+                                                        'type' => 'delete',
+                                                        'class' => $deleteClass,
+                                                        'title' => $deleteTitle,
+                                                        'href' => $deleteHref,
+                                                        'data' => [
+                                                            'id' => $ID,
+                                                            'toggle' => 'modal'
+                                                        ],
+                                                        'auth' => ['resource' => 'admin.customer']
+                                                    ]
+                                                ]}
                                             </td>
 
                                         </tr>

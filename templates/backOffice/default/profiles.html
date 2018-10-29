@@ -40,11 +40,11 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    <th class="col-md-1">{intl l="Code"}</th>
-                                    <th class="col-md-3">{intl l="Name"}</th>
-                                    <th class="col-md-4">{intl l="Description"}</th>
+                                    <th>{intl l="Code"}</th>
+                                    <th>{intl l="Name"}</th>
+                                    <th>{intl l="Description"}</th>
                                     {hook name="profile.table-header"}
-                                    <th class="col-md-1">{intl l="Actions"}</th>
+                                    <th class="actions">{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -77,18 +77,35 @@
                                     </td>
                                     <td>{$DESCRIPTION}</td>
                                     {hook name="profile.table-row" profile_id=$ID}
-                                    <td>
-                                        <div class="btn-group">
-                                            {if $can_change}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/if}
+                                    <td class="actions">
+                                        {$buttons = []}
 
-                                            {assign linkedAdminCount {count name="linked-admin" type="admin" profile=$ID}}
+                                        {if $can_change}
+                                        {$buttons[] = [
+                                            'type' => 'edit',
+                                            'title' => {intl l='Change this profile'},
+                                            'href' => {url path="/admin/configuration/profiles/update/%id" id=$ID},
+                                            'auth' => ['resource' => 'admin.configuration.profile']
+                                        ]}
+                                        {/if}
 
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.profile" access="DELETE"}
-                                                <a class="btn btn-default btn-xs js-delete-profile" title="{intl l='Delete this profile'}" href="#{if $linkedAdminCount > 0}profile_cannot_delete_dialog{else}profile_delete_dialog{/if}" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {assign linkedAdminCount {count name="linked-admin" type="admin" profile=$ID}}
+
+                                        {if $linkedAdminCount > 0}{$href = "#profile_cannot_delete_dialog"}{else}{$href="#profile_delete_dialog"}{/if}
+
+                                        {$buttons[] = [
+                                            'type' => 'delete',
+                                            'class' => 'js-delete-profile',
+                                            'title' => {intl l='Delete this profile'},
+                                            'href' => $href,
+                                            'data' => [
+                                                'id' => $ID,
+                                                'toggle' => 'modal'
+                                            ],
+                                            'auth' => ['resource' => 'admin.configuration.profile']
+                                        ]}
+
+                                        {include file='renderer/buttons.html' buttons=$buttons}
                                     </td>
                                 </tr>
 

@@ -157,16 +157,7 @@
                }).always(function(){
                    $("#loading-event").remove();
                }).done(function() {
-            	   if (is_checked) {
-                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
-                           .removeClass('disabled')
-                           .removeClass('no-follow-link');
-                   } else {
-                       $('.config-btn-' + module_id + ', .hook-btn-' + module_id)
-                           .addClass('disabled')
-                           .addClass('no-follow-link');
-                   }
-
+                   location.reload();
                }).fail(function(jqXHR, textStatus, errorThrown){
                     checkbox.bootstrapSwitch('toggleState', true);
                     $('#module-failed-body').html(jqXHR.responseJSON.error);

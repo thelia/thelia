@@ -147,39 +147,55 @@
 
                             <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
-                        <div class="separate-from-left btn-toolbar btn toolbar-primary">
-                            <span class="glyphicon glyphicon-cog"></span>
-                        </div>
-                        <div class="toolbar-options hidden">
-                            {if $EXISTS}
 
-                                {if $CONFIGURABLE == 1}
-                                    {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="config-btn-{$ID}{if ! $ACTIVE} disabled no-follow-link{/if}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
-                                    {/loop}
-                                {/if}
+                        {$buttons = []}
 
-                                {if $HOOKABLE}
-                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
-                                    <a class="hook-btn-{$ID}{if ! $ACTIVE} disabled no-follow-link{/if}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-indent-left"></span></a>
-                                {/loop}
-                                {/if}
+                        {if $EXISTS}
 
-                                {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
-                                    <a title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"></a>
-                                {/loop*}
-
-                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
-                                    <a title="{intl l='Edit this module'}" href="{url path="/admin/module/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                {/loop}
+                            {if $CONFIGURABLE == 1 && $ACTIVE}
+                                {$buttons[] = [
+                                    'type' => 'config',
+                                    'class' => "config-btn-$ID",
+                                    'title' => {intl l='Configure this module'},
+                                    'href' => {url path="/admin/module/%code" code=$CODE},
+                                    'auth' => ['resource' => $CODE]
+                                ]}
                             {/if}
 
-                            {if $MANDATORY ne 1}
-                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
-                                <a class="module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                            {/loop}
+                            {if $HOOKABLE && $ACTIVE}
+                                {$buttons[] = [
+                                    'type' => 'hook',
+                                    'class' => "hook-btn-$ID",
+                                    'title' => {intl l="Manage its hooks"},
+                                    'href' => {url path="/admin/module-hooks" module=$ID},
+                                    'auth' => ['resource' => 'admin.module-hook']
+                                ]}
                             {/if}
-                        </div>
+
+                            {$buttons[] = [
+                                'type' => 'edit',
+                                'class' => "hook-btn-$ID",
+                                'title' => {intl l='Edit this module'},
+                                'href' => {url path="/admin/module/update/%id" id=$ID},
+                                'auth' => ['resource' => 'admin.module']
+                            ]}
+                        {/if}
+
+                        {if $MANDATORY ne 1}
+                            {$buttons[] = [
+                                'type' => 'delete',
+                                'class' => "module-delete-action",
+                                'title' => {intl l='Delete this module'},
+                                'href' => "#delete_module_dialog",
+                                'data' => [
+                                    'id' => $ID,
+                                    'toggle' => 'modal'
+                                ],
+                                'auth' => ['resource' => 'admin.module']
+                            ]}
+                        {/if}
+
+                        {include file='renderer/buttons.html' buttons=$buttons}
                     </td>
                 </tr>
                 {/loop}
