@@ -175,12 +175,6 @@ class TheliaLoop extends AbstractSmartyPlugin
 
                 $loopResults->rewind();
 
-                $this->loopstack[$name] = $loopResults;
-
-                // No results ? The loop is terminated, do not evaluate loop text.
-                if ($loopResults->isEmpty()) {
-                    $repeat = false;
-                }
             } catch (ElementNotFoundException $ex) {
                 // If loop is not found, when in development mode, rethrow the exception to make it visible
                 if ($this->isDebugActive) {
@@ -190,11 +184,15 @@ class TheliaLoop extends AbstractSmartyPlugin
                 // Otherwise, log the problem and simulate an empty result.
                 Tlog::getInstance()->error($ex->getMessage());
 
-                // Do not evaluate loop text.
-                $repeat = false;
-
                 // Provide an empty result
                 $loopResults = new LoopResult(null);
+            }
+
+            $this->loopstack[$name] = $loopResults;
+
+            // No results ? The loop is terminated, do not evaluate loop text.
+            if ($loopResults->isEmpty()) {
+                $repeat = false;
             }
         } else {
             $loopResults = $this->loopstack[$name];
