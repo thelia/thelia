@@ -145,12 +145,12 @@ class Order extends BaseOrder
             ->filterByOrderId($this->getId())
             ->leftJoinOrderProductTax()
             ->withColumn('SUM(
-                ' . OrderProductTableMap::QUANTITY . '
-                * IF('.OrderProductTableMap::WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::PROMO_AMOUNT.', '.OrderProductTaxTableMap::AMOUNT.')
+                ' . OrderProductTableMap::COL_QUANTITY . '
+                * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')
             )', 'total_tax')
             ->withColumn('SUM(
-                ' . OrderProductTableMap::QUANTITY . '
-                * IF('.OrderProductTableMap::WAS_IN_PROMO.' = 1, '.OrderProductTableMap::PROMO_PRICE.', '.OrderProductTableMap::PRICE.')
+                ' . OrderProductTableMap::COL_QUANTITY . '
+                * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
             )', 'total_amount')
             ->select([ 'total_tax', 'total_amount' ])
             ->findOne();

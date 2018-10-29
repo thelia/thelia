@@ -68,7 +68,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $salesElement = ProductSaleElementsQuery::create()
                 ->filterByProductId($event->getProduct()->getId())
                 ->joinAttributeCombination(null, Criteria::LEFT_JOIN)
-                ->add(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, null, Criteria::ISNULL)
+                ->add(AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID, null, Criteria::ISNULL)
                 ->findOne($con);
 
             if ($salesElement == null) {

@@ -57,7 +57,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 
         $search = TaxQuery::create()
             ->filterByTaxRuleCountry($taxRuleQuery->find())
-            ->withColumn(TaxRuleCountryTableMap::POSITION, self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION)
+            ->withColumn(TaxRuleCountryTableMap::COL_POSITION, self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION)
             ->orderBy(self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION, Criteria::ASC);
         ;
 

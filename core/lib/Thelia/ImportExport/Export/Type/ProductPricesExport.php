@@ -36,63 +36,63 @@ class ProductPricesExport extends AbstractExport
     const FILE_NAME = 'product_price';
 
     protected $orderAndAliases = [
-        ProductSaleElementsTableMap::ID => 'id',
+        ProductSaleElementsTableMap::COL_ID => 'id',
         'productID' => 'product_id',
         'product_i18nTITLE' => 'title',
         'attribute_av_i18n_ATTRIBUTES' => 'attributes',
-        ProductSaleElementsTableMap::EAN_CODE => 'ean',
+        ProductSaleElementsTableMap::COL_EAN_CODE => 'ean',
         'product_pricePRICE' => 'price',
         'product_pricePROMO_PRICE' => 'promo_price',
         'currencyCODE' => 'currency',
-        ProductSaleElementsTableMap::PROMO => 'promo'
+        ProductSaleElementsTableMap::COL_PROMO => 'promo'
     ];
 
     protected function getData()
     {
         $locale = $this->language->getLocale();
 
-        $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
-        $attributeAvJoin = new Join(AttributeAvTableMap::ID, AttributeAvI18nTableMap::ID, Criteria::LEFT_JOIN);
+        $productJoin = new Join(ProductTableMap::COL_ID, ProductI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
+        $attributeAvJoin = new Join(AttributeAvTableMap::COL_ID, AttributeAvI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
 
         $query = ProductSaleElementsQuery::create()
             ->addSelfSelectColumns()
             ->useProductPriceQuery()
                 ->useCurrencyQuery()
-                    ->withColumn(CurrencyTableMap::CODE)
+                    ->withColumn(CurrencyTableMap::COL_CODE)
                     ->endUse()
-                ->withColumn(ProductPriceTableMap::PRICE)
-                ->withColumn(ProductPriceTableMap::PROMO_PRICE)
+                ->withColumn(ProductPriceTableMap::COL_PRICE)
+                ->withColumn(ProductPriceTableMap::COL_PROMO_PRICE)
                 ->endUse()
             ->useProductQuery()
                 ->addJoinObject($productJoin, 'product_join')
                 ->addJoinCondition(
                     'product_join',
-                    ProductI18nTableMap::LOCALE . ' = ?',
+                    ProductI18nTableMap::COL_LOCALE . ' = ?',
                     $locale,
                     null,
                     \PDO::PARAM_STR
                 )
-                ->withColumn(ProductI18nTableMap::TITLE)
-                ->withColumn(ProductTableMap::ID)
+                ->withColumn(ProductI18nTableMap::COL_TITLE)
+                ->withColumn(ProductTableMap::COL_ID)
                 ->endUse()
             ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
                 ->useAttributeAvQuery(null, Criteria::LEFT_JOIN)
                     ->addJoinObject($attributeAvJoin, 'attribute_av_join')
                     ->addJoinCondition(
                         'attribute_av_join',
-                        AttributeAvI18nTableMap::LOCALE . ' = ?',
+                        AttributeAvI18nTableMap::COL_LOCALE . ' = ?',
                         $locale,
                         null,
                         \PDO::PARAM_STR
                     )
                     ->addAsColumn(
                         'attribute_av_i18n_ATTRIBUTES',
-                        'GROUP_CONCAT(DISTINCT ' . AttributeAvI18nTableMap::TITLE . ')'
+                        'GROUP_CONCAT(DISTINCT ' . AttributeAvI18nTableMap::COL_TITLE . ')'
                     )
                     ->endUse()
                 ->endUse()
-            ->orderBy(ProductSaleElementsTableMap::ID)
-            ->groupBy(ProductSaleElementsTableMap::ID)
+            ->orderBy(ProductSaleElementsTableMap::COL_ID)
+            ->groupBy(ProductSaleElementsTableMap::COL_ID)
         ;
 
         return $query;

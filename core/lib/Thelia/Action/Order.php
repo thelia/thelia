@@ -183,9 +183,9 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder->setId(null)->setRef(null)->setNew(true);
 
         // Dates should be marked as not updated so that Propel will update them.
-        $placedOrder->resetModified(OrderTableMap::CREATED_AT);
-        $placedOrder->resetModified(OrderTableMap::UPDATED_AT);
-        $placedOrder->resetModified(OrderTableMap::VERSION_CREATED_AT);
+        $placedOrder->resetModified(OrderTableMap::COL_CREATED_AT);
+        $placedOrder->resetModified(OrderTableMap::COL_UPDATED_AT);
+        $placedOrder->resetModified(OrderTableMap::COL_VERSION_CREATED_AT);
 
         $placedOrder->setDispatcher($dispatcher);
 

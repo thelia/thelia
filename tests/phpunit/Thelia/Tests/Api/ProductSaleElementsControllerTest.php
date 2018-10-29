@@ -136,7 +136,7 @@ class ProductSaleElementsControllerTest extends ApiTestCase
 
         $attributeAvs = AttributeAvQuery::create()
             ->limit(2)
-            ->select(AttributeAvTableMap::ID)
+            ->select(AttributeAvTableMap::COL_ID)
             ->find()
             ->toArray()
         ;
@@ -281,7 +281,7 @@ class ProductSaleElementsControllerTest extends ApiTestCase
 
         $attributeAvs = AttributeAvQuery::create()
             ->limit(2)
-            ->select(AttributeAvTableMap::ID)
+            ->select(AttributeAvTableMap::COL_ID)
             ->find()
             ->toArray();
 

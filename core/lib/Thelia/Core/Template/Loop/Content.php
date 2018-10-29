@@ -255,7 +255,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     }
                     foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_' . $singleId;
-                        $search->withColumn(ContentTableMap::ID . "='$singleId'", $givenIdMatched);
+                        $search->withColumn(ContentTableMap::COL_ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
                     break;
