@@ -71,18 +71,26 @@
 
         	                                <td class="actions">
         	                                    {if ! $SECURED}
-                                                    <div class="btn-toolbar btn toolbar-primary">
-                                                        <span class="glyphicon glyphicon-cog"></span>
-                                                    </div>
-                                                    <div class="toolbar-options hidden">
-                                                       {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
-                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                       {/loop}
-
-                                                       {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.message" access="DELETE"}
-                                                           <a class="message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                                       {/loop}
-        		                                    </div>
+                                                    {include file='renderer/buttons.html' buttons=[
+                                                        [
+                                                            'type' => 'edit',
+                                                            'class' => 'message-change',
+                                                            'title' => {intl l='Change this mailing template'},
+                                                            'href' => {url path="/admin/configuration/country/update/%id" id=$ID},
+                                                            'auth' => ['resource' => 'admin.configuration.message']
+                                                        ],
+                                                        [
+                                                            'type' => 'delete',
+                                                            'class' => 'message-delete',
+                                                            'title' => {intl l='Delete this mailing template'},
+                                                            'href' => '#delete_dialog',
+                                                            'data' => [
+                                                                'id' => $ID,
+                                                                'toggle' => 'modal'
+                                                            ],
+                                                            'auth' => ['resource' => 'admin.configuration.message']
+                                                        ]
+                                                    ]}
         		                                {else}
         		                                    <span title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></span>
         	                                    {/if}

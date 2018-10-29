@@ -64,18 +64,28 @@
                                         {/if}
                                     </td>
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
-                                                <a title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
+                                       {$buttons = []}
 
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}
-                                                <a class="js-delete-api" title="{intl l='Delete this api access'}" href="#api_delete_dialog" data-id="{$api.Id}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {$buttons[] = [
+                                            'type' => 'edit',
+                                            'title' => {intl l='Change this api access'},
+                                            'href' => {url path="/admin/configuration/api/update/%id" id=$api.Id},
+                                            'auth' => ['resource' => 'admin.configuration.api']
+                                        ]}
+
+                                        {$buttons[] = [
+                                            'type' => 'delete',
+                                            'class' => 'js-delete-api',
+                                            'title' => {intl l='Delete this api access'},
+                                            'href' => '#api_delete_dialog',
+                                            'data' => [
+                                                'id' => $api.Id,
+                                                'toggle' => 'modal'
+                                            ],
+                                            'auth' => ['resource' => 'admin.configuration.api']
+                                        ]}
+
+                                        {include file='renderer/buttons.html' buttons=$buttons}
                                     </td>
                                 </tr>
 
