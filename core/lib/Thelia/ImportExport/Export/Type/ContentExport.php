@@ -41,12 +41,12 @@ class ContentExport extends AbstractExport
     const DIRECTORY_NAME = "content";
 
     protected $orderAndAliases = [
-        ContentTableMap::ID => 'id',
+        ContentTableMap::COL_ID => 'id',
         'content_TITLE' => 'title',
         'content_CHAPO' => 'chapo',
         'content_DESCRIPTION' => 'description',
         'content_CONCLUSION' => 'conclusion',
-        ContentTableMap::VISIBLE => 'visible',
+        ContentTableMap::COL_VISIBLE => 'visible',
         'content_seo_TITLE' => 'seo_title',
         'content_seo_DESCRIPTION' => 'seo_description',
         'content_seo_KEYWORDS' => 'seo_keywords',
@@ -74,47 +74,47 @@ class ContentExport extends AbstractExport
     {
         $locale = $this->language->getLocale();
 
-        $contentI18nJoin = new Join(ContentTableMap::ID, ContentI18nTableMap::ID, Criteria::LEFT_JOIN);
-        $folderI18nJoin = new Join(FolderTableMap::ID, FolderI18nTableMap::ID, Criteria::LEFT_JOIN);
-        $urlJoin = new Join(ContentTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
+        $contentI18nJoin = new Join(ContentTableMap::COL_ID, ContentI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
+        $folderI18nJoin = new Join(FolderTableMap::COL_ID, FolderI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
+        $urlJoin = new Join(ContentTableMap::COL_ID, RewritingUrlTableMap::COL_VIEW_ID, Criteria::LEFT_JOIN);
 
         $query = ContentQuery::create()
             ->addSelfSelectColumns()
             ->useContentFolderQuery(null, Criteria::LEFT_JOIN)
                 ->useFolderQuery(null, Criteria::LEFT_JOIN)
                     ->addJoinObject($folderI18nJoin, "folder_i18n_join")
-                    ->addJoinCondition("folder_i18n_join", FolderI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
-                    ->addAsColumn("folder_TITLE", FolderI18nTableMap::TITLE)
-                    ->addAsColumn("folder_ID", FolderTableMap::ID)
+                    ->addJoinCondition("folder_i18n_join", FolderI18nTableMap::COL_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
+                    ->addAsColumn("folder_TITLE", FolderI18nTableMap::COL_TITLE)
+                    ->addAsColumn("folder_ID", FolderTableMap::COL_ID)
                 ->endUse()
-                ->addAsColumn("folder_IS_DEFAULT", ContentFolderTableMap::DEFAULT_FOLDER)
+                ->addAsColumn("folder_IS_DEFAULT", ContentFolderTableMap::COL_DEFAULT_FOLDER)
             ->endUse()
             ->addJoinObject($contentI18nJoin, "content_i18n_join")
-            ->addJoinCondition("content_i18n_join", ContentI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
-            ->addAsColumn("content_TITLE", ContentI18nTableMap::TITLE)
-            ->addAsColumn("content_CHAPO", ContentI18nTableMap::CHAPO)
-            ->addAsColumn("content_DESCRIPTION", ContentI18nTableMap::DESCRIPTION)
-            ->addAsColumn("content_CONCLUSION", ContentI18nTableMap::POSTSCRIPTUM)
-            ->addAsColumn("content_seo_TITLE", ContentI18nTableMap::META_TITLE)
-            ->addAsColumn("content_seo_DESCRIPTION", ContentI18nTableMap::META_DESCRIPTION)
-            ->addAsColumn("content_seo_KEYWORDS", ContentI18nTableMap::META_KEYWORDS)
+            ->addJoinCondition("content_i18n_join", ContentI18nTableMap::COL_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
+            ->addAsColumn("content_TITLE", ContentI18nTableMap::COL_TITLE)
+            ->addAsColumn("content_CHAPO", ContentI18nTableMap::COL_CHAPO)
+            ->addAsColumn("content_DESCRIPTION", ContentI18nTableMap::COL_DESCRIPTION)
+            ->addAsColumn("content_CONCLUSION", ContentI18nTableMap::COL_POSTSCRIPTUM)
+            ->addAsColumn("content_seo_TITLE", ContentI18nTableMap::COL_META_TITLE)
+            ->addAsColumn("content_seo_DESCRIPTION", ContentI18nTableMap::COL_META_DESCRIPTION)
+            ->addAsColumn("content_seo_KEYWORDS", ContentI18nTableMap::COL_META_KEYWORDS)
             ->addJoinObject($urlJoin, "url_rewriting_join")
             ->addJoinCondition(
                 "url_rewriting_join",
-                RewritingUrlTableMap::VIEW . " = ?",
+                RewritingUrlTableMap::COL_VIEW . " = ?",
                 (new Content())->getRewrittenUrlViewName(),
                 null,
                 \PDO::PARAM_STR
             )
             ->addJoinCondition(
                 "url_rewriting_join",
-                RewritingUrlTableMap::VIEW_LOCALE . " = ?",
+                RewritingUrlTableMap::COL_VIEW_LOCALE . " = ?",
                 $locale,
                 null,
                 \PDO::PARAM_STR
             )
-            ->addAsColumn("url_URL", RewritingUrlTableMap::URL)
-            ->groupBy(ContentTableMap::ID)
+            ->addAsColumn("url_URL", RewritingUrlTableMap::COL_URL)
+            ->groupBy(ContentTableMap::COL_ID)
             ->groupBy("folder_ID")
             ->orderById()
         ;

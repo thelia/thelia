@@ -66,15 +66,15 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
         // new join to get the product id if it exists
         $pseJoin = new Join(
-            OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID,
-            ProductSaleElementsTableMap::ID,
+            OrderProductTableMap::COL_PRODUCT_SALE_ELEMENTS_ID,
+            ProductSaleElementsTableMap::COL_ID,
             Criteria::LEFT_JOIN
         );
         $search
             ->addJoinObject($pseJoin)
             ->addAsColumn(
                 "product_id",
-                ProductSaleElementsTableMap::PRODUCT_ID
+                ProductSaleElementsTableMap::COL_PRODUCT_ID
             )
         ;
 

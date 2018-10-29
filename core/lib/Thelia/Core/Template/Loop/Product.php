@@ -1006,7 +1006,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $this->manageFeatureValue($search, $feature_values);
 
-        $search->groupBy(ProductTableMap::ID);
+        $search->groupBy(ProductTableMap::COL_ID);
 
         if (! $complex) {
             $search->withColumn('`pse`.ID', 'pse_id');
@@ -1112,7 +1112,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     }
                     foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_' . $singleId;
-                        $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
+                        $search->withColumn(ProductTableMap::COL_ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
                     break;

@@ -33,14 +33,14 @@ class CustomerExport extends AbstractExport
     const FILE_NAME = 'customer';
 
     protected $orderAndAliases = [
-        CustomerTableMap::REF => 'ref',
+        CustomerTableMap::COL_REF => 'ref',
         'title_TITLE' => 'title',
-        CustomerTableMap::LASTNAME => 'last_name',
-        CustomerTableMap::FIRSTNAME => 'first_name',
-        CustomerTableMap::EMAIL => 'email',
-        CustomerTableMap::DISCOUNT => 'discount',
+        CustomerTableMap::COL_LASTNAME => 'last_name',
+        CustomerTableMap::COL_FIRSTNAME => 'first_name',
+        CustomerTableMap::COL_EMAIL => 'email',
+        CustomerTableMap::COL_DISCOUNT => 'discount',
         'newsletter_IS_REGISTRED' => 'is_registered_to_newsletter',
-        CustomerTableMap::CREATED_AT => 'sign_up_date',
+        CustomerTableMap::COL_CREATED_AT => 'sign_up_date',
         'order_TOTAL' => 'total_orders',
         'last_order_AMOUNT' => 'last_order_amount',
         'last_order_DATE' => 'last_order_date',
@@ -66,7 +66,7 @@ class CustomerExport extends AbstractExport
         /**
          * This first query get each customer info and addresses.
          */
-        $newsletterJoin = new Join(CustomerTableMap::EMAIL, NewsletterTableMap::EMAIL, Criteria::LEFT_JOIN);
+        $newsletterJoin = new Join(CustomerTableMap::COL_EMAIL, NewsletterTableMap::COL_EMAIL, Criteria::LEFT_JOIN);
 
         $query = new CustomerQuery;
         $results = $query
@@ -80,7 +80,7 @@ class CustomerExport extends AbstractExport
                 ->useCountryQuery()
                     ->useCountryI18nQuery()
                         ->filterByLocale($locale)
-                        ->addAsColumn('address_COUNTRY', CountryI18nTableMap::TITLE)
+                        ->addAsColumn('address_COUNTRY', CountryI18nTableMap::COL_TITLE)
                         ->endUse()
                     ->endUse()
                     ->useCustomerTitleQuery('address_title')
@@ -90,28 +90,28 @@ class CustomerExport extends AbstractExport
                     ->endUse()
                 ->endUse()
                 ->filterByIsDefault(true)
-                ->addAsColumn('address_LABEL', AddressTableMap::LABEL)
-                ->addAsColumn('address_FIRST_NAME', AddressTableMap::FIRSTNAME)
-                ->addAsColumn('address_LAST_NAME', AddressTableMap::LASTNAME)
-                ->addAsColumn('address_COMPANY', AddressTableMap::COMPANY)
-                ->addAsColumn('address_ADDRESS1', AddressTableMap::ADDRESS1)
-                ->addAsColumn('address_ADDRESS2', AddressTableMap::ADDRESS2)
-                ->addAsColumn('address_ADDRESS3', AddressTableMap::ADDRESS3)
-                ->addAsColumn('address_ZIPCODE', AddressTableMap::ZIPCODE)
-                ->addAsColumn('address_CITY', AddressTableMap::CITY)
-                ->addAsColumn('address_PHONE', AddressTableMap::PHONE)
-                ->addAsColumn('address_CELLPHONE', AddressTableMap::CELLPHONE)
+                ->addAsColumn('address_LABEL', AddressTableMap::COL_LABEL)
+                ->addAsColumn('address_FIRST_NAME', AddressTableMap::COL_FIRSTNAME)
+                ->addAsColumn('address_LAST_NAME', AddressTableMap::COL_LASTNAME)
+                ->addAsColumn('address_COMPANY', AddressTableMap::COL_COMPANY)
+                ->addAsColumn('address_ADDRESS1', AddressTableMap::COL_ADDRESS1)
+                ->addAsColumn('address_ADDRESS2', AddressTableMap::COL_ADDRESS2)
+                ->addAsColumn('address_ADDRESS3', AddressTableMap::COL_ADDRESS3)
+                ->addAsColumn('address_ZIPCODE', AddressTableMap::COL_ZIPCODE)
+                ->addAsColumn('address_CITY', AddressTableMap::COL_CITY)
+                ->addAsColumn('address_PHONE', AddressTableMap::COL_PHONE)
+                ->addAsColumn('address_CELLPHONE', AddressTableMap::COL_CELLPHONE)
             ->endUse()
             ->addJoinObject($newsletterJoin)
-            ->addAsColumn('newsletter_IS_REGISTRED', 'IF(NOT ISNULL('.NewsletterTableMap::EMAIL.'),1,0)')
+            ->addAsColumn('newsletter_IS_REGISTRED', 'IF(NOT ISNULL('.NewsletterTableMap::COL_EMAIL.'),1,0)')
             ->select([
-                CustomerTableMap::ID,
-                CustomerTableMap::REF,
-                CustomerTableMap::LASTNAME,
-                CustomerTableMap::FIRSTNAME,
-                CustomerTableMap::EMAIL,
-                CustomerTableMap::DISCOUNT,
-                CustomerTableMap::CREATED_AT,
+                CustomerTableMap::COL_ID,
+                CustomerTableMap::COL_REF,
+                CustomerTableMap::COL_LASTNAME,
+                CustomerTableMap::COL_FIRSTNAME,
+                CustomerTableMap::COL_EMAIL,
+                CustomerTableMap::COL_DISCOUNT,
+                CustomerTableMap::COL_CREATED_AT,
                 'title_TITLE',
                 'address_TITLE',
                 'address_LABEL',
@@ -155,18 +155,18 @@ class CustomerExport extends AbstractExport
         for ($i = 0; $i < $arrayLength; ++$i) {
             $currentCustomer = &$results[$i];
 
-            $currentCustomerId = $currentCustomer[CustomerTableMap::ID];
-            unset($currentCustomer[CustomerTableMap::ID]);
+            $currentCustomerId = $currentCustomer[CustomerTableMap::COL_ID];
+            unset($currentCustomer[CustomerTableMap::COL_ID]);
 
             if ($currentCustomerId === $previousCustomerId) {
                 $currentCustomer["title_TITLE"] = "";
-                $currentCustomer[CustomerTableMap::LASTNAME] = "";
-                $currentCustomer[CustomerTableMap::FIRSTNAME] = "";
-                $currentCustomer[CustomerTableMap::EMAIL] = "";
+                $currentCustomer[CustomerTableMap::COL_LASTNAME] = "";
+                $currentCustomer[CustomerTableMap::COL_FIRSTNAME] = "";
+                $currentCustomer[CustomerTableMap::COL_EMAIL] = "";
                 $currentCustomer["address_COMPANY"] = "";
                 $currentCustomer["newsletter_IS_REGISTRED"] = "";
-                $currentCustomer[CustomerTableMap::CREATED_AT] = "";
-                $currentCustomer[CustomerTableMap::DISCOUNT] = "";
+                $currentCustomer[CustomerTableMap::COL_CREATED_AT] = "";
+                $currentCustomer[CustomerTableMap::COL_DISCOUNT] = "";
 
                 $currentCustomer += [
                     "order_TOTAL" => "",
@@ -177,9 +177,9 @@ class CustomerExport extends AbstractExport
                 /**
                  * Reformat created_at date
                  */
-                $date = $currentCustomer[CustomerTableMap::CREATED_AT];
+                $date = $currentCustomer[CustomerTableMap::COL_CREATED_AT];
                 $dateTime = new \DateTime($date);
-                $currentCustomer[CustomerTableMap::CREATED_AT] = $dateTime->format($this->language->getDatetimeFormat());
+                $currentCustomer[CustomerTableMap::COL_CREATED_AT] = $dateTime->format($this->language->getDatetimeFormat());
 
                 /**
                  * Then compute everything about the orders

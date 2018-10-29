@@ -335,7 +335,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew()) {
-            if (isset($this->modifiedColumns[ProductTableMap::POSITION]) && $this->modifiedColumns[ProductTableMap::POSITION]) {
+            if (isset($this->modifiedColumns[ProductTableMap::COL_POSITION]) && $this->modifiedColumns[ProductTableMap::COL_POSITION]) {
                 if (null !== $productCategory = ProductCategoryQuery::create()
                         ->filterByProduct($this)
                         ->filterByDefaultCategory(true)

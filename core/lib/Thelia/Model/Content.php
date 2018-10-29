@@ -203,7 +203,7 @@ class Content extends BaseContent implements FileModelParentInterface
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew()) {
-            if (isset($this->modifiedColumns[ContentTableMap::POSITION]) && $this->modifiedColumns[ContentTableMap::POSITION]) {
+            if (isset($this->modifiedColumns[ContentTableMap::COL_POSITION]) && $this->modifiedColumns[ContentTableMap::COL_POSITION]) {
                 if (null !== $productCategory = ContentFolderQuery::create()
                         ->filterByContent($this)
                         ->filterByDefaultFolder(true)

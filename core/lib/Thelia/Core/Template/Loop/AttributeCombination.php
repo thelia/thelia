@@ -148,10 +148,10 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 ->joinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
                 ->addJoinCondition(
                     AttributeTemplateTableMap::TABLE_NAME,
-                    AttributeTemplateTableMap::TEMPLATE_ID . Criteria::EQUAL . ProductTableMap::TEMPLATE_ID
+                    AttributeTemplateTableMap::COL_TEMPLATE_ID . Criteria::EQUAL . ProductTableMap::COL_TEMPLATE_ID
                 )
             ->endUse()
-            ->orderBy(AttributeTemplateTableMap::POSITION, $order);
+            ->orderBy(AttributeTemplateTableMap::COL_POSITION, $order);
 
         return $search;
     }
