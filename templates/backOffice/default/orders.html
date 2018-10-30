@@ -134,8 +134,9 @@
                                         <td class="actions">
                                             {$buttons = [
                                                 [
+                                                    'text' => {intl l='Details'},
                                                     'type' => 'edit',
-                                                    'title' => {intl l='Edit this order'},
+                                                    'title' => {intl l='View details and edit this order'},
                                                     'href' => {url path="/admin/order/update/%id" id=$ID},
                                                     'auth' => ['resource' => 'admin.order']
                                                 ]
@@ -143,6 +144,7 @@
 
                                             {if $STATUS !== 5}
                                             {$buttons[] = [
+                                                    'text' => {intl l='Cancel'},
                                                     'type' => 'delete',
                                                     'class' => 'order-cancel',
                                                     'title' => {intl l='Cancel this order'},
