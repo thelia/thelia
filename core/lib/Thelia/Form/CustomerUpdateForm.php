@@ -198,6 +198,13 @@ class CustomerUpdateForm extends BaseForm
                     'for' => 'reseller',
                 ),
             ))
+            ->add('lang_id', 'integer', array(
+                'required' => false,
+                'label' => Translator::getInstance()->trans('Preferred language'),
+                'label_attr' => array(
+                    'for' => 'lang_id',
+                ),
+            ))
         ;
     }
 

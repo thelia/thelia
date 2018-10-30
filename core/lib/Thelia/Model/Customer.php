@@ -45,7 +45,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param  int                                       $countryId        customer country id (from Country table)
      * @param  string                                    $email            customer email, must be unique
      * @param  string                                    $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param  string                                    $lang
+     * @param  int                                       $lang
      * @param  int                                       $reseller
      * @param  null                                      $sponsor
      * @param  int                                       $discount
@@ -120,7 +120,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ;
 
                 $this->addAddress($address);
-                
+
                 if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
                     $this->setConfirmationToken(bin2hex(random_bytes(32)));
                 }
