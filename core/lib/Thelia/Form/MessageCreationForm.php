@@ -20,19 +20,16 @@ use Thelia\Core\Translation\Translator;
 
 class MessageCreationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
-        $name_constraints = array(new Constraints\NotBlank());
-
-        if (!$change_mode) {
-            $name_constraints[] = new Constraints\Callback(array(
-                "methods" => array(array($this, "checkDuplicateName")),
-            ));
-        }
-
         $this->formBuilder
             ->add("name", "text", array(
-                "constraints" => $name_constraints,
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Callback(array(
+                        "methods" => array(array($this, "checkDuplicateName")),
+                    ))
+                ),
                 "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
                     "for" => "name",

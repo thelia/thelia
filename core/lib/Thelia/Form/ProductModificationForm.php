@@ -23,9 +23,9 @@ class ProductModificationForm extends ProductCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm($change_mode = true)
+    protected function buildForm()
     {
-        parent::buildForm($change_mode);
+        parent::doBuildForm(true);
 
         $this->formBuilder
             ->add("id", "integer", array(

@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 
 class ConfigCreationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $name_constraints = array(new Constraints\NotBlank());
 

@@ -33,7 +33,7 @@ class ModuleInstallForm extends BaseForm
 
     protected $modulePath = null;
 
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add(

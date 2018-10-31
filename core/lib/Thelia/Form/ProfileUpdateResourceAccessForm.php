@@ -28,7 +28,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
 {
     const RESOURCE_ACCESS_FIELD_PREFIX = "resource";
 
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add("id", "hidden", array(
