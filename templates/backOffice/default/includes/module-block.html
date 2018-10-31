@@ -74,7 +74,7 @@
             <tbody>
 
             {$hidden = $smarty.post.hidden|default:'0'}
-            
+
             {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1 hidden=$hidden }
                 {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
                 <tr id="module-{$ID}" {if ! $EXISTS || $MANDATORY}class="warning"{/if}>
@@ -145,7 +145,7 @@
                                 {$btnstyle="btn-danger"}
                             {/elseloop}
 
-                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID} btn-area-config" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
 
                         {$buttons = []}

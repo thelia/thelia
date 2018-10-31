@@ -43,11 +43,7 @@
                             </tr>
                             </thead>
                             <tbody>
-
                             {foreach $api_list as $api}
-
-
-
                                 <tr>
                                     <td >{$api.Label}</td>
                                     <td >{$api.ApiKey}</td>
@@ -88,9 +84,15 @@
                                         {include file='renderer/buttons.html' buttons=$buttons}
                                     </td>
                                 </tr>
-
+                            {foreachelse}
+                                <tr>
+                                    <td colspan="99">
+                                        <div class="alert alert-info">
+                                            {intl l="No API key has been created yet. Click the [+} button to create one."}
+                                        </div>
+                                    </td>
+                                </tr>
                             {/foreach}
-
                             </tbody>
                         </table>
                     </div>

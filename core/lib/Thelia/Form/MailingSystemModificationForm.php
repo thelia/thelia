@@ -24,8 +24,8 @@ class MailingSystemModificationForm extends BaseForm
     protected function buildForm($change_mode = false)
     {
         $this->formBuilder
-            ->add("enabled", "choice", array(
-                "choices" => array(1 => "Yes", 0 => "No"),
+            ->add("enabled", "checkbox", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Enable remote SMTP use"),
                 "label_attr" => array("for" => "enabled_field"),
             ))
