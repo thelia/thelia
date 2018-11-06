@@ -26,10 +26,9 @@ class CustomerUpdateForm extends BaseForm
     use AddressCountryValidationTrait;
 
     /**
-     * @param bool $backendContext
      * @return null|void
      */
-    protected function buildForm($backendContext = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add(

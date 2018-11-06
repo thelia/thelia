@@ -21,7 +21,7 @@ use Thelia\Core\Translation\Translator;
  */
 class MailingSystemModificationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add("enabled", "checkbox", array(
