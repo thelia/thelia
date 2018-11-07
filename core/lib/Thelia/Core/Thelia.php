@@ -36,7 +36,6 @@ use Symfony\Component\HttpKernel\Kernel;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -152,6 +151,10 @@ class Thelia extends Kernel
 
         $this->getContainer()->set('thelia.propel.schema.locator', $propelSchemaLocator);
         $this->getContainer()->set('thelia.propel.init', $propelInitService);
+
+        if ($propelConnectionAvailable) {
+            $theliaDatabaseConnection->setEventDispatcher($this->getContainer()->get('event_dispatcher'));
+        }
 
         if (self::isInstalled()) {
             $this->getContainer()->get('event_dispatcher')->dispatch(TheliaEvents::BOOT);
