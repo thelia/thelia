@@ -38,13 +38,19 @@
                     <form action="" method="">
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption>
-                               {intl l="Languages management"}
-                               {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.language" access="CREATE"}
-                                <a class="btn btn-primary action-btn" title="{intl l='Add a new language'}" href="#creation_dialog" data-toggle="modal">
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
-                                </a>
-                            {/loop}
-
+                                {intl l="Languages management"}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Add a new language'},
+                                        'href' => '#creation_dialog',
+                                        'auth' => ['resource' => 'admin.configuration.language'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
                                 <tr>

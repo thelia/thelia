@@ -35,11 +35,18 @@
 
                                     {hook name="customers.caption" location="customer_list_caption" }
 
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.customer" access="CREATE"}
-                                        <a class="btn btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus-sign"></span>
-                                        </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new Customer'},
+                                            'href' => '#add_customer_dialog',
+                                            'auth' => ['resource' => 'admin.customer'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
 
                                 {ifloop rel="customer_list"}

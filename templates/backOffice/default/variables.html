@@ -29,15 +29,30 @@
                     <div class="table-responsive">
 	                    <table class="table table-striped table-condensed table-left-aligned">
 	                        <caption class="clearfix">
-	                           {intl l='Thelia system variables'}
-	                           {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.variable" access="CREATE"}
-                               <div class="pull-right">
-                                  <a class="btn btn-primary action-btn" title="{intl l='Add a new variable'}" href="#creation_dialog" data-toggle="modal">
-                                      <span class="glyphicon glyphicon-plus-sign"></span>
-                                  </a>
-                                  <button class="btn btn-primary" title="{intl l='Save chages'}"><span class="glyphicon glyphicon-ok"></span> {intl l='Save changes'}</button>
-                                </div>
-                            {/loop}
+	                            {intl l='Thelia system variables'}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Add a new variable'},
+                                        'href' => '#creation_dialog',
+                                        'auth' => ['resource' => 'admin.configuration.variable'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ],
+                                    [
+                                        'type' => 'save',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Save chages'},
+                                        'href' => '#creation_dialog',
+                                        'auth' => ['resource' => 'admin.configuration.variable'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ],
+                                        'with_text' => true
+                                    ]
+                                ]}
 
 	                        </caption>
                             <colgroup>

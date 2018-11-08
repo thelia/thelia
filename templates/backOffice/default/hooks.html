@@ -53,11 +53,18 @@
                             <table class="table table-striped table-condensed">
                                 <caption class="clearfix">
                                     {intl l='Hooks'}
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.hook" access="CREATE"}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new hook'}" href="#add_hook_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new hook'},
+                                            'href' => '#add_hook_dialog',
+                                            'auth' => ['resource' => 'admin.hook'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                     <select class="form-control action-select" id="filter-template">
                                         <option value="1" {if $template_type eq "1"}selected {/if}>{intl l="Front Office"}</option>
                                         <option value="2" {if $template_type eq "2"}selected {/if}>{intl l="Back Office"}</option>

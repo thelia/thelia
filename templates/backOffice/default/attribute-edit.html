@@ -72,13 +72,19 @@
 
 		     						         {intl l='Attribute values'}
 
-		                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
 		                                     <span class="pull-right">
-		                                         <a data-toggle="modal" href="#creation_dialog" title="Add a new attribute value" class="btn btn-primary">
-		                                             <span class="glyphicon glyphicon-plus-sign"></span>
-		                                         </a>
+                                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                                    [
+                                                        'type' => 'create',
+                                                        'title' => {intl l='Add a new attribute value'},
+                                                        'href' => '#creation_dialog',
+                                                        'auth' => ['resource' => 'admin.configuration.attribute'],
+                                                        'data' => [
+                                                            'toggle' => 'modal'
+                                                        ]
+                                                    ]
+                                                ]}
 		                                     </span>
-		                                     {/loop}
 		     						    </p>
 
 		     						    <div class="alert alert-info">

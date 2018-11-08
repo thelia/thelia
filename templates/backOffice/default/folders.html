@@ -35,11 +35,18 @@
 
                             {hook name="folders.caption" location="folder_list_caption" }
 
-                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.folder" access="CREATE"}
-                                <a class="btn btn-primary action-btn" title="{intl l='Add a new folder'}" href="#folder_creation_dialog" data-toggle="modal">
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
-                                </a>
-                            {/loop}
+                            {include file='renderer/buttons.html' btn_group=false buttons=[
+                                [
+                                    'type' => 'create',
+                                    'class' => 'action-btn',
+                                    'title' => {intl l='Add a new folder'},
+                                    'href' => '#folder_creation_dialog',
+                                    'auth' => ['resource' => 'admin.folder'],
+                                    'data' => [
+                                        'toggle' => 'modal'
+                                    ]
+                                ]
+                            ]}
                         </caption>
 
                         {ifloop rel="folder_list"}
@@ -217,9 +224,18 @@
 
                             {hook name="contents.caption" location="content_list_caption" }
 
-                            <a class="btn btn-primary action-btn" title="{intl l='Add a new content'}" href="#content_creation_dialog" data-toggle="modal">
-                                <span class="glyphicon glyphicon-plus-sign"></span>
-                            </a>
+                            {include file='renderer/buttons.html' btn_group=false buttons=[
+                                [
+                                    'type' => 'create',
+                                    'class' => 'action-btn',
+                                    'title' => {intl l='Add a new content'},
+                                    'href' => '#content_creation_dialog',
+                                    'auth' => ['resource' => 'admin.content'],
+                                    'data' => [
+                                        'toggle' => 'modal'
+                                    ]
+                                ]
+                            ]}
                         </caption>
 
                         {ifloop rel="content_list"}

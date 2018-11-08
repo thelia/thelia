@@ -133,11 +133,17 @@
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs clearfix">
                                                     {intl l="Other addresses"}
-                                                    <span class="pull-right">
-                                                        <a class="btn btn-primary" title="{intl l='Add a new address'}" href="#address_creation_dialog" data-toggle="modal">
-                                                            <span class="glyphicon glyphicon-plus-sign"></span>
-                                                        </a>
-                                                    </span>
+                                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                                        [
+                                                            'type' => 'create',
+                                                            'class' => 'pull-right',
+                                                            'title' => {intl l='Add a new address'},
+                                                            'href' => '#address_creation_dialog',
+                                                            'data' => [
+                                                                'toggle' => 'modal'
+                                                            ]
+                                                        ]
+                                                    ]}
                                                 </p>
 
                                                 {ifloop rel="address"}

@@ -32,11 +32,18 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption class="clearfix">
                                 {intl l="Administrators"}
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.administrator" access="CREATE"}
-                                    <a class="btn btn-primary pull-right" title="{intl l='Create a new administrator'}" href="#administrator_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Create a new administrator'},
+                                        'href' => '#administrator_create_dialog',
+                                        'auth' => ['resource' => 'admin.administrator'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
                                 <tr>

@@ -29,11 +29,18 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption class="clearfix">
                                 {intl l='Shipping zones management'}
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.shipping-configuration" access="CREATE"}
-                                <a class="btn btn-primary pull-right" title="{intl l='Add a new shipping zone'}" href="#creation_dialog" data-toggle="modal">
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
-                                </a>
-                                {/loop}                        
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Add a new shipping zone'},
+                                        'href' => '#creation_dialog',
+                                        'auth' => ['resource' => 'admin.configuration.shipping-configuration'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
     	                        <tr>	                           
@@ -125,7 +132,7 @@
             {form_hidden_fields}
 
             {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-            {render_form_field field='success_url' value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}"}
+            {render_form_field field='success_url' value={url path='/admin/configuration/shipping_configuration/update/_ID_'}}
             {render_form_field field='name'}
 
             {hook name="shipping-configuration.create-form" location="shipping_configuration_create_form" }

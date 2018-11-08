@@ -334,14 +334,31 @@
 
 					        {hook name="product.combinations-list-caption" location="product_combinations_list_caption" }
 
-					        {loop type="auth" name="can_create" role="ADMIN" resource="admin.product" access="UPDATE"}
-                            <a class="btn btn-primary action-btn" id="open_combination_builder" title="{intl l='Quickly create combinations using the combination builder'}" href="#combination_builder_dialog" data-toggle="modal">
-                                {intl l='Combination builder'}
-                            </a>
-					        <a class="btn btn-primary action-btn" title="{intl l='Add a new combination'}" href="#combination_creation_dialog" data-toggle="modal">
-					            <span class="glyphicon glyphicon-plus-sign"></span>
-					        </a>
-					        {/loop}
+                            {include file='renderer/buttons.html' btn_group=false buttons=[
+                                [
+                                    'type' => 'create',
+                                    'id' => 'open_combination_builder',
+                                    'class' => 'action-btn',
+                                    'title' => {intl l='Quickly create combinations using the combination builder'},
+                                    'text' => {intl l='Combination builder'},
+                                    'href' => '#combination_builder_dialog',
+                                    'auth' => ['resource' => 'admin.product', 'access' => 'UPDATE'],
+                                    'data' => [
+                                        'toggle' => 'modal'
+                                    ],
+                                    'with_text' => true
+                                ],
+                                [
+                                    'type' => 'create',
+                                    'class' => 'action-btn',
+                                    'title' => {intl l='Add a new combination'},
+                                    'href' => '#combination_creation_dialog',
+                                    'auth' => ['resource' => 'admin.product', 'access' => 'UPDATE'],
+                                    'data' => [
+                                        'toggle' => 'modal'
+                                    ]
+                                ]
+                            ]}
 					    </caption>
 
 					    <thead>

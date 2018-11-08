@@ -31,11 +31,18 @@
     	                        <caption>
     	                           {intl l='Thelia product features'}
 
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="CREATE"}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new product feature'}" href="#creation_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new product feature'},
+                                            'href' => '#creation_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.feature'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
     	                        </caption>
                                 <thead>
                                     <tr>

@@ -34,13 +34,19 @@
                         <div class="table-responsive">
     	                    <table class="table table-striped table-condensed table-left-aligned">
     	                        <caption>
-    	                           {intl l='Thelia product templates'}
-
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template" access="CREATE"}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new product template'}" href="#creation_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
-                                    {/loop}
+    	                            {intl l='Thelia product templates'}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new product template'},
+                                            'href' => '#creation_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.template'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
     	                        </caption>
                                 <thead>
                                     <tr>

@@ -34,9 +34,18 @@
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l='Orders status'}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new order status'}" href="#creation_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new order status'},
+                                            'href' => '#creation_dialog',
+                                            'auth' => ['resource' => 'admin.order-status'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
 
                                 <thead>

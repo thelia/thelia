@@ -46,11 +46,18 @@
                                 <table class="table table-striped table-condensed">
                                     <caption class="clearfix">
                                         {intl l='Countries'}
-                                        {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.country" access="CREATE"}
-                                            <a class="btn btn-primary action-btn" title="{intl l='Add a new country'}" href="#add_country_dialog" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-plus-sign"></span>
-                                            </a>
-                                        {/loop}
+                                        {include file='renderer/buttons.html' btn_group=false buttons=[
+                                            [
+                                                'type' => 'create',
+                                                'class' => 'action-btn',
+                                                'title' => {intl l='admin.configuration.country'},
+                                                'href' => '#add_country_dialog',
+                                                'auth' => ['resource' => 'admin.configuration.country'],
+                                                'data' => [
+                                                    'toggle' => 'modal'
+                                                ]
+                                            ]
+                                        ]}
                                     </caption>
                                     <thead>
                                         <tr>

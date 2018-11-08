@@ -69,16 +69,19 @@
 		     						<div class="col-md-6">
 
 		     						    <p class="title title-without-tabs clearfix">
-
-		     						         {intl l='Feature values'}
-
-		                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-		                                     <span class="pull-right">
-		                                         <a data-toggle="modal" href="#creation_dialog" title="Add a new feature value" class="btn btn-primary">
-		                                             <span class="glyphicon glyphicon-plus-sign"></span>
-		                                         </a>
-		                                     </span>
-		                                     {/loop}
+                                            {intl l='Feature values'}
+                                            {include file='renderer/buttons.html' btn_group=false buttons=[
+                                                [
+                                                    'type' => 'create',
+                                                    'class' => 'action-btn',
+                                                    'title' => {intl l='Add a new feature value'},
+                                                    'href' => '#creation_dialog',
+                                                    'auth' => ['resource' => 'admin.configuration.feature', 'access' => 'UPDATE'],
+                                                    'data' => [
+                                                        'toggle' => 'modal'
+                                                    ]
+                                                ]
+                                            ]}
 		     						    </p>
 
 		     						    <div class="alert alert-info">
