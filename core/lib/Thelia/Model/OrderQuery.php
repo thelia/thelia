@@ -57,6 +57,12 @@ class OrderQuery extends BaseOrderQuery
         return $stats;
     }
 
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public static function getFirstOrdersStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -87,9 +93,10 @@ class OrderQuery extends BaseOrderQuery
     /**
      * @param \DateTime $startDate
      * @param \DateTime $endDate
-     * @param           $includeShipping
+     * @param bool $includeShipping
      *
-     * @return int
+     * @return float|int
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
     {
@@ -134,7 +141,7 @@ class OrderQuery extends BaseOrderQuery
             $amount += $query->findOne();
         }
 
-        return null === $amount ? 0 : round($amount, 2);
+        return null === $amount ? 0 : $amount;
     }
 
     protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
@@ -142,7 +149,7 @@ class OrderQuery extends BaseOrderQuery
         return self::create($modelAlias)
             ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
             ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
-            ->filterByStatusId([2, 3, 4], Criteria::IN);
+            ->filterByStatusId(OrderStatusQuery::getPaidStatusIdList(), Criteria::IN);
     }
 
 

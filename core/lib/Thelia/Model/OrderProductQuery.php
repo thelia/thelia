@@ -21,12 +21,16 @@ class OrderProductQuery extends BaseOrderProductQuery
         $productRef,
         \DateTime $startDate = null,
         \DateTime $endDate = null,
-        $orderStatus = array(2, 3, 4),
+        $orderStatusIdList = null,
         $customerId = null
     ) {
         $query = self::create('op');
 
-        if (null !== $customerId || null !== $startDate || null !== $endDate || count($orderStatus) > 0) {
+        if (null === $orderStatusIdList) {
+            $orderStatusIdList = OrderStatusQuery::getPaidStatusIdList();
+        }
+
+        if (null !== $customerId || null !== $startDate || null !== $endDate || count($orderStatusIdList) > 0) {
             $subQuery = $query->useOrderQuery();
 
             if (null !== $customerId) {
@@ -47,8 +51,8 @@ class OrderProductQuery extends BaseOrderProductQuery
                 );
             }
 
-            if (count($orderStatus) > 0) {
-                $subQuery->filterByStatusId($orderStatus, Criteria::IN);
+            if (count($orderStatusIdList) > 0) {
+                $subQuery->filterByStatusId($orderStatusIdList, Criteria::IN);
             }
 
             $subQuery->endUse();
