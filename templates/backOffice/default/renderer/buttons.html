@@ -11,6 +11,9 @@
 {if !isset($btn_responsive)}
     {$btn_responsive = true}
 {/if}
+{if !isset($with_text)}
+    {$with_text = false}
+{/if}
 {if $btn_group == true}
 <div class="btn-group" role="group">
 {/if}
@@ -31,9 +34,6 @@
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-primary'}
         {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='View'}}
-        {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='View'}}
         {/if}
@@ -47,9 +47,6 @@
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-info'}
         {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Edit'}}
-        {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Edit'}}
         {/if}
@@ -62,9 +59,6 @@
     {elseif $button['type'] == 'delete'}
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-danger'}
-        {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Delete'}}
         {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Delete'}}
@@ -99,9 +93,6 @@
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-primary'}
         {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Open'}}
-        {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Open'}}
         {/if}
@@ -114,9 +105,6 @@
     {elseif $button['type'] == 'duplicate'}
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-warning'}
-        {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Duplicate'}}
         {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Duplicate'}}
@@ -131,9 +119,6 @@
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-success'}
         {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Add'}}
-        {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Add'}}
         {/if}
@@ -146,9 +131,6 @@
     {elseif $button['type'] == 'remove'}
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-danger'}
-        {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Remove'}}
         {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Remove'}}
@@ -163,9 +145,6 @@
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-primary'}
         {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Config'}}
-        {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Config'}}
         {/if}
@@ -178,9 +157,6 @@
     {elseif $button['type'] == 'hook'}
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-warning'}
-        {/if}
-        {if !$button['text']}
-            {$button['text'] = {intl l='Hook'}}
         {/if}
         {if !$button['title']}
             {$button['title'] = {intl l='Hook'}}
@@ -221,7 +197,9 @@
     {if $button['icon']['class']}
         <{$button['icon']['tag']} class="{$button['icon']['class']}"></{$button['icon']['tag']}>
     {/if}
-    <span> {$button['text']}</span>
+    {if $with_text || !isset($button['icon']['class'])}
+        <span> {if isset($button['text'])}{$button['text']}{else}{$button['title']}{/if}</span>
+    {/if}
     </{$button['tag']}>
 
 {/foreach}
