@@ -29,14 +29,19 @@
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed">
                                <caption class="clearfix">
-                                   {intl l='Brands'}
-                                   {loop type="auth" name="can_create" role="ADMIN" resource="admin.brand" access="CREATE"}
-                                       <span class="pull-right">
-                                        <a class="btn btn-primary" title="{intl l='Add a new brand'}" href="#creation_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus-sign"></span>
-                                        </a>
-                                        </span>
-                                   {/loop}
+                                    {intl l='Brands'}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new brand'},
+                                            'href' => '#creation_dialog',
+                                            'auth' => ['resource' => 'admin.brand'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
 
                                 <thead>
@@ -203,7 +208,7 @@
 
                     <div class="input-group">
                         <input type="text" {form_field_attributes field="title"}>
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
             {/custom_render_form_field}

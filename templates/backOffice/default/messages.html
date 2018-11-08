@@ -29,13 +29,19 @@
                         <div class="table-responsive">
     	                    <table class="table table-striped table-condensed table-left-aligned">
     	                        <caption>
-    	                           {intl l='Thelia mailing templates'}
-    	                           {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.message" access="CREATE"}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
-                                {/loop}
-
+    	                            {intl l='Thelia mailing templates'}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='admin.configuration.country'},
+                                            'href' => '#creation_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.message'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
     	                        </caption>
                                 <thead>
         	                        <tr>

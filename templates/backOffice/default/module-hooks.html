@@ -20,13 +20,20 @@
 
         <div class="general-block-decorator ">
             <div class="clearfix">
-                {loop type="auth" name="can_create" role="ADMIN" resource="admin.module-hook" access="CREATE"}
                 <div class="pull-right">
-                    <a class="btn btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                    </a>
+                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                        [
+                            'type' => 'create',
+                            'class' => 'action-btn',
+                            'title' => {intl l='Add a new module in a hook'},
+                            'href' => '#add_module_hook_dialog',
+                            'auth' => ['resource' => 'admin.module-hook'],
+                            'data' => [
+                                'toggle' => 'modal'
+                            ]
+                        ]
+                    ]}
                 </div>
-                {/loop}
                 <p class="title title-without-tabs">{intl l="Modules attachments"}</p>
             </div>
             <div class="hooks-filter">

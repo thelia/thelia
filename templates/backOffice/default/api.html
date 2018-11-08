@@ -27,11 +27,18 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption class="clearfix">
                                 {intl l="Api"}
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.api" access="CREATE"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new API access'}" href="#api_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Create a new API access'},
+                                        'href' => '#api_create_dialog',
+                                        'auth' => ['resource' => 'admin.configuration.api'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
                             <tr>

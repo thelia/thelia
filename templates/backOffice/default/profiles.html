@@ -32,11 +32,18 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption class="clearfix">
                                 {intl l="Administration profiles"}
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.profile" access="CREATE"}
-                                    <a class="btn btn-primary pull-right" title="{intl l='Create a new profile'}" href="#profile_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Create a new profile'},
+                                        'href' => '#profile_create_dialog',
+                                        'auth' => ['resource' => 'admin.profile'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
                                 <tr>

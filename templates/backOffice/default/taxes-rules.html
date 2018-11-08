@@ -59,17 +59,24 @@
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l="Taxes"}
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.tax" access="CREATE"}
-                                        <a class="btn btn-primary pull-right" title="{intl l='Create a new tax'}" href="#tax_create_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Create a new tax'},
+                                            'href' => '#tax_create_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.tax'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
                                 <thead>
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-5">{intl l="Description"}</th>
-                                    <th class="col-md-1">{intl l="Actions"}</th>
+                                    <th class="col-md-1 actions">{intl l="Actions"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -121,18 +128,25 @@
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l="Taxes rules"}
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                        <a class="btn btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Create a new tax rule'},
+                                            'href' => '#tax_rule_create_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.tax', 'access' => 'UPDATE'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
                                 <thead>
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-4">{intl l="Description"}</th>
                                     <th class="col-md-1 text-center">{intl l="Default"}</th>
-                                    <th class="col-md-1">{intl l="Actions"}</th>
+                                    <th class="col-md-1 actions">{intl l="Actions"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
