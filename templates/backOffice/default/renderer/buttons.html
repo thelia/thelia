@@ -43,6 +43,19 @@
         {if $button['auth'] && !$button['auth']['access']}
             {$button['auth']['access'] = 'VIEW'}
         {/if}
+    {elseif $button['type'] == 'create'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-primary'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Create'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-plus-sign'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'CREATE'}
+        {/if}
     {elseif $button['type'] == 'edit'}
         {if !$button['baseClass']}
             {$button['baseClass'] = 'btn btn-info'}
