@@ -140,4 +140,10 @@ class Api extends BaseApi implements UserInterface
     {
         throw new \RuntimeException("setSerial is not implemented");
     }
+
+    public function getLocale()
+    {
+        throw new \RuntimeException("getLocale is not implemented");
+
+    }
 }

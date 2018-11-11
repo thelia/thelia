@@ -134,8 +134,6 @@ class RequestListener implements EventSubscriberInterface
      * @param Request $request
      * @param Session $session
      * @param EventDispatcherInterface $dispatcher
-     *
-     * @return array
      */
     protected function getRememberMeCustomer(Request $request, Session $session, EventDispatcherInterface $dispatcher)
     {
@@ -207,7 +205,10 @@ class RequestListener implements EventSubscriberInterface
         // Set the current language according to locale preference
         $locale = $user->getLocale();
 
-        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+        if (null === $lang = LangQuery::create()
+                ->filterByActive(true)
+                ->filterByLocale($locale)
+                ->findOne($locale)) {
             $lang = Lang::getDefaultLanguage();
         }
 
@@ -246,6 +247,7 @@ class RequestListener implements EventSubscriberInterface
 
             // Set previous URL, if defined
             if (null !== $referrer) {
+                /** @var Session $session */
                 $session = $request->getSession();
 
                 if (ConfigQuery::isMultiDomainActivated()) {
@@ -282,6 +284,7 @@ class RequestListener implements EventSubscriberInterface
         if ($request->query->has("currency")) {
             if (null !== $find = CurrencyQuery::create()
                     ->filterById($request->getSession()->getCurrency(true)->getId(), Criteria::NOT_EQUAL)
+                    ->filterByVisible(true)
                     ->filterByCode($request->query->get("currency"))
                     ->findOne()
             ) {
