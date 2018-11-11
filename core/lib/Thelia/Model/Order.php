@@ -90,6 +90,7 @@ class Order extends BaseOrder
 
     /**
      * {@inheritDoc}
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function preSave(ConnectionInterface $con = null)
     {
@@ -112,7 +113,8 @@ class Order extends BaseOrder
     }
 
     /**
-     * {@inheritDoc}
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postInsert(ConnectionInterface $con = null)
     {
@@ -164,16 +166,14 @@ class Order extends BaseOrder
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
 
-            if ($total<0) {
+            if ($total < 0) {
                 $total = 0;
-            } else {
-                $total = round($total, 2);
             }
         }
 
         if (false !== $includePostage) {
-            $total += $this->getPostage();
-            $tax += $this->getPostageTax();
+            $total += floatval($this->getPostage());
+            $tax += floatval($this->getPostageTax());
         }
 
         return $total;
@@ -207,7 +207,7 @@ class Order extends BaseOrder
     public function getUntaxedPostage()
     {
         if (0 < $this->getPostageTax()) {
-            $untaxedPostage =  round($this->getPostage() - $this->getPostageTax(), 2);
+            $untaxedPostage =  $this->getPostage() - $this->getPostageTax();
         } else {
             $untaxedPostage = $this->getPostage();
         }
