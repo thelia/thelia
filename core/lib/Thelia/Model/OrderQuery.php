@@ -134,7 +134,7 @@ class OrderQuery extends BaseOrderQuery
             $amount += $query->findOne();
         }
 
-        return null === $amount ? 0 : round($amount, 2);
+        return null === $amount ? 0 : $amount;
     }
 
     protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
