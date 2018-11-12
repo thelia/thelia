@@ -48,14 +48,14 @@ class Folder extends BaseFolder implements FileModelParentInterface
     {
         $children = FolderQuery::findAllChild($this->getId());
         array_push($children, $this);
-    
-    
+
+
         $query = ContentQuery::create()->filterByFolder(new ObjectCollection($children), Criteria::IN);
-    
+
         if ($contentVisibility !== '*') {
             $query->filterByVisible($contentVisibility);
         }
-    
+
         return $query->count();
     }
 
@@ -94,6 +94,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFOLDER, new FolderEvent($this));
@@ -103,11 +105,15 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEFOLDER, new FolderEvent($this));
     }
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFOLDER, new FolderEvent($this));
 
         return true;
@@ -115,11 +121,15 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFOLDER, new FolderEvent($this));
     }
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFOLDER, new FolderEvent($this));
         $this->reorderBeforeDelete(
             array(
@@ -132,6 +142,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));

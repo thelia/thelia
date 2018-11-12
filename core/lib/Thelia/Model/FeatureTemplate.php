@@ -24,6 +24,8 @@ class FeatureTemplate extends BaseFeatureTemplate
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         // Set the current position for the new object
         $this->setPosition($this->getNextPosition());
 

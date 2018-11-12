@@ -366,6 +366,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 
@@ -383,6 +385,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
     }
 
@@ -391,6 +395,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -401,6 +407,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECUSTOMER, new CustomerEvent($this));
     }
 
@@ -409,6 +417,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -419,6 +429,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECUSTOMER, new CustomerEvent($this));
     }
 }

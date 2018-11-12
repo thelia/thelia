@@ -17,6 +17,8 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFEATURE_PRODUCT, new FeatureProductEvent($this));
 
         return true;
@@ -27,6 +29,8 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEFEATURE_PRODUCT, new FeatureProductEvent($this));
     }
 
@@ -35,6 +39,8 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFEATURE_PRODUCT, new FeatureProductEvent($this));
 
         return true;
@@ -45,6 +51,8 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFEATURE_PRODUCT, new FeatureProductEvent($this));
     }
 
@@ -53,6 +61,8 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFEATURE_PRODUCT, new FeatureProductEvent($this));
 
         return true;
@@ -63,6 +73,8 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFEATURE_PRODUCT, new FeatureProductEvent($this));
     }
 

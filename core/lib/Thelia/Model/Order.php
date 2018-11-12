@@ -107,6 +107,8 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
@@ -118,6 +120,8 @@ class Order extends BaseOrder
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->setRef($this->generateRef())
             ->setDisableVersioning(true)
             ->save($con);

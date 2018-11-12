@@ -157,6 +157,8 @@ class Content extends BaseContent implements FileModelParentInterface
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECONTENT, new ContentEvent($this));
 
         return true;
@@ -164,11 +166,15 @@ class Content extends BaseContent implements FileModelParentInterface
 
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECONTENT, new ContentEvent($this));
     }
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONTENT, new ContentEvent($this));
 
         return true;
@@ -176,6 +182,8 @@ class Content extends BaseContent implements FileModelParentInterface
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONTENT, new ContentEvent($this));

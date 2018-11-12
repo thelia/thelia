@@ -262,6 +262,8 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEPRODUCT, new ProductEvent($this));
 
         return true;
@@ -272,6 +274,8 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEPRODUCT, new ProductEvent($this));
     }
 
@@ -280,6 +284,8 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         // Delete free_text feature AV for this product (see issue #2061). We have to do this before
         // deleting the product, as the delete is cascaded to the feature_product table.
         $featureAvs = FeatureAvQuery::create()
@@ -308,6 +314,8 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
