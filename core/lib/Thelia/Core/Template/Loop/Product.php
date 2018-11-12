@@ -444,7 +444,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @param ProductQuery $search
-     * @param [] $feature_availability
+     * @param array $feature_availability
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function manageFeatureAv(&$search, $feature_availability)
     {
@@ -479,7 +480,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @param ProductQuery $search
-     * @param [] $feature_values
+     * @param array $feature_values
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function manageFeatureValue(&$search, $feature_values)
     {
