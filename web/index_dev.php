@@ -13,9 +13,14 @@
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\Dotenv\Dotenv;
 
 $env = 'dev';
 require __DIR__ . '/../core/vendor/autoload.php';
+
+if (file_exists(THELIA_ROOT.'.env')) {
+    (new Dotenv())->load(THELIA_ROOT.'.env');
+}
 
 // List of allowed IP
 $trustedIp = array(

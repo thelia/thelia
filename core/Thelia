@@ -42,6 +42,11 @@ use Thelia\Core\Thelia;
 use Thelia\Core\Application;
 use Thelia\Command\Output\TheliaConsoleOutput;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Dotenv\Dotenv;
+
+if (file_exists(THELIA_ROOT.'.env')) {
+    (new Dotenv())->load(THELIA_ROOT.'.env');
+}
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(array('--env', '-e'), getenv('THELIA_ENV') ?: 'dev');
