@@ -41,6 +41,7 @@
         "symfony/form": "2.8.*",
         "symfony/class-loader": "2.8.*",
         "symfony/icu": "1.2.*",
+        "symfony/dotenv": "^3.4",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
         "doctrine/cache": "1.5.*",
