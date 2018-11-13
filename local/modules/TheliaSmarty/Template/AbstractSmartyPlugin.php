@@ -13,8 +13,6 @@
 namespace TheliaSmarty\Template;
 
 
-use Prophecy\Exception\Doubler\MethodNotFoundException;
-
 /**
  *
  * The class all Smarty Thelia plugin shoud extend
@@ -107,7 +105,7 @@ abstract class AbstractSmartyPlugin
      * @param mixed[] $args the method arguments
      * @return mixed
      *
-     * @throws MethodNotFoundException if the method was not found in this class
+     * @throws \BadMethodCallException if the method was not found in this class
      */
     public function __call($functionName, $args)
     {
@@ -120,7 +118,7 @@ abstract class AbstractSmartyPlugin
             return $this->$functionName($params, $smarty);
         }
 
-        throw new MethodNotFoundException("Smarty plugin method '$functionName' was not found.", $this, $functionName);
+        throw new \BadMethodCallException("Smarty plugin method '$functionName' was not found.", $this, $functionName);
     }
 
     protected function compatibilityFunctionCaller($params, $smarty, $functionName)
