@@ -590,12 +590,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thelia/Propel2.git",
-                "reference": "a10238ea9f0799010e8644028b3594881dc5ef6a"
+                "reference": "09d964d1f6a975fa3b8f9b4c59fbbdedcab4f951"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Propel2/zipball/a10238ea9f0799010e8644028b3594881dc5ef6a",
-                "reference": "a10238ea9f0799010e8644028b3594881dc5ef6a",
+                "url": "https://api.github.com/repos/thelia/Propel2/zipball/09d964d1f6a975fa3b8f9b4c59fbbdedcab4f951",
+                "reference": "09d964d1f6a975fa3b8f9b4c59fbbdedcab4f951",
                 "shasum": ""
             },
             "require": {
@@ -649,7 +649,7 @@
             "support": {
                 "source": "https://github.com/thelia/Propel2/tree/thelia-2.4"
             },
-            "time": "2018-11-08T00:06:18+00:00"
+            "time": "2018-11-13T11:05:42+00:00"
         },
         {
             "name": "psr/cache",
