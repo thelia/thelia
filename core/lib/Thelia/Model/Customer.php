@@ -344,6 +344,15 @@ class Customer extends BaseCustomer implements UserInterface
         return $this->getRememberMeSerial();
     }
 
+    /**
+     * @return string
+     * @throws PropelException
+     */
+    public function getLocale()
+    {
+        return $this->getLangModel()->getLocale();
+    }
+
     public function hasOrder()
     {
         $order = OrderQuery::create()
