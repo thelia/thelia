@@ -12,9 +12,9 @@
 
 // Check php version
 
-if (version_compare(phpversion(), "5.4", "<")) {
+if (version_compare(phpversion(), "5.6", "<")) {
     die(sprintf(
-        "Thelia needs at least php 5.4, but you are using php %s. Please upgrade before using Thelia.\n",
+        "Thelia needs at least php 5.6, but you are using php %s. Please upgrade before using Thelia.\n",
         phpversion()
     ));
 }
