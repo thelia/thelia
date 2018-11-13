@@ -10,31 +10,26 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-//use Thelia\Core\HttpKernel\HttpCache\HttpCache;
-use Symfony\Component\ClassLoader\ApcClassLoader;
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
-
-//use Symfony\Component\DependencyInjection;
+use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 
 $env = 'prod';
 $loader = require __DIR__ . '/../core/vendor/autoload.php';
 
-// Enable APC for autoloading to improve performance.
-// You should change the ApcClassLoader first argument to a unique prefix
-// in order to prevent cache key conflicts with other applications
-// also using APC.
-/*
-$cacheLoader = new ApcClassLoader(sha1(__FILE__), $loader);
-$loader->unregister();
-$cacheLoader->register(true);
-*/
-
-
 $request = Request::createFromGlobals();
 
 $thelia = new Thelia("prod", false);
+
+if (PHP_VERSION_ID < 70000) {
+    $thelia->loadClassCache();
+}
+
 //$thelia = new HttpCache($thelia);
+
+// When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
+//Request::enableHttpMethodParameterOverride();
+
 $response = $thelia->handle($request)->prepare($request)->send();
 
 $thelia->terminate($request, $response);
