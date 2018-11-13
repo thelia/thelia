@@ -21,6 +21,12 @@ use Thelia\Model\Map\OrderTableMap;
  */
 class OrderQuery extends BaseOrderQuery
 {
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public static function getMonthlySaleStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -57,6 +63,12 @@ class OrderQuery extends BaseOrderQuery
         return $stats;
     }
 
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public static function getFirstOrdersStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -87,9 +99,10 @@ class OrderQuery extends BaseOrderQuery
     /**
      * @param \DateTime $startDate
      * @param \DateTime $endDate
-     * @param           $includeShipping
+     * @param bool $includeShipping
      *
-     * @return int
+     * @return float|int
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
     {
@@ -137,24 +150,34 @@ class OrderQuery extends BaseOrderQuery
         return null === $amount ? 0 : $amount;
     }
 
+    /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @param string $modelAlias
+     * @return OrderQuery
+     */
     protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
     {
         return self::create($modelAlias)
             ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
             ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
-            ->filterByStatusId([2, 3, 4], Criteria::IN);
+            ->filterByStatusId(OrderStatusQuery::getPaidStatusIdList(), Criteria::IN);
     }
 
 
     /**
      * @param \DateTime $startDate
      * @param \DateTime $endDate
-     * @param           $status
+     * @param int[]     $status
      *
      * @return int
      */
-    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = array(1, 2, 3, 4))
+    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = null)
     {
+        if ($status === null) {
+            $status = OrderStatusQuery::getPaidStatusIdList();
+        }
+
         return self::create()
             ->filterByStatusId($status, Criteria::IN)
             ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
