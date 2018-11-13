@@ -26,6 +26,8 @@ class Accessory extends BaseAccessory
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEACCESSORY, new AccessoryEvent($this));
@@ -38,6 +40,8 @@ class Accessory extends BaseAccessory
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEACCESSORY, new AccessoryEvent($this));
     }
 
@@ -46,6 +50,8 @@ class Accessory extends BaseAccessory
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEACCESSORY, new AccessoryEvent($this));
 
         return true;
@@ -56,6 +62,8 @@ class Accessory extends BaseAccessory
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEACCESSORY, new AccessoryEvent($this));
     }
 
@@ -64,6 +72,8 @@ class Accessory extends BaseAccessory
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEACCESSORY, new AccessoryEvent($this));
 
         return true;
@@ -74,6 +84,8 @@ class Accessory extends BaseAccessory
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEACCESSORY, new AccessoryEvent($this));
     }
 }

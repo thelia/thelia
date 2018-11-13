@@ -55,71 +55,41 @@ class ConditionEvaluator
      */
     public function variableOpComparison($v1, $o, $v2)
     {
-        if ($o == Operators::DIFFERENT) {
-            return ($v1 != $v2);
-        }
-
         switch ($o) {
+            case Operators::DIFFERENT:
+                // !=
+                return ($v1 != $v2);
+
             case Operators::SUPERIOR:
                 // >
-                if ($v1 > $v2) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return ($v1 > $v2);
+
             case Operators::SUPERIOR_OR_EQUAL:
                 // >=
-                if ($v1 >= $v2) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return ($v1 >= $v2);
+
             case Operators::INFERIOR:
                 // <
-                if ($v1 < $v2) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return ($v1 < $v2);
+
             case Operators::INFERIOR_OR_EQUAL:
                 // <=
-                if ($v1 <= $v2) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return ($v1 <= $v2);
+
             case Operators::EQUAL:
                 // ==
-                if ($v1 == $v2) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return ($v1 == $v2);
+
             case Operators::IN:
                 // in
-                if (in_array($v1, $v2)) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return (in_array($v1, $v2));
+
             case Operators::OUT:
                 // not in
-                if (!in_array($v1, $v2)) {
-                    return true;
-                } else {
-                    continue;
-                }
-                break;
+                return (!in_array($v1, $v2));
+
             default:
                 throw new \Exception('Unrecognized operator ' . $o);
         }
-
-        return false;
     }
 }

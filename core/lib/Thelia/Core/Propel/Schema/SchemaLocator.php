@@ -74,7 +74,21 @@ class SchemaLocator
      */
     public function findForActiveModules()
     {
-        return $this->findForModules($this->queryActiveModuleCodes());
+        $fs = new Filesystem();
+
+        $codes = $this->queryActiveModuleCodes();
+
+        foreach ($codes as $key => $code) {
+            // test if the module exists on the file system
+            if (!$fs->exists(THELIA_MODULE_DIR . $code)) {
+                unset($codes[$key]);
+            }
+        }
+
+        // reset keys
+        $codes = array_values($codes);
+
+        return $this->findForModules($codes);
     }
 
     /**

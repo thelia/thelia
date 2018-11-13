@@ -35,11 +35,18 @@
 
                                     {hook name="customers.caption" location="customer_list_caption" }
 
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.customer" access="CREATE"}
-                                        <a class="btn btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus-sign"></span>
-                                        </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new Customer'},
+                                            'href' => '#add_customer_dialog',
+                                            'auth' => ['resource' => 'admin.customer'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
 
                                 {ifloop rel="customer_list"}
@@ -163,24 +170,40 @@
                                                 {$lastOrderCurrency} {$lastOrderAmount}
                                             </td>
                                             <td class="actions">
-                                                <div class="btn-toolbar btn toolbar-primary">
-                                                    <span class="glyphicon glyphicon-cog"></span>
-                                                </div>
-                                                <div class="toolbar-options hidden">
-                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
-                                                        <a title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                    {/loop}
-                                                    {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
-                                                        <a title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
-                                                    {/loop}
-                                                    {loop type="auth" name="can_delete" role="ADMIN" resource="admin.customer" access="DELETE"}
-                                                    {if $hasOrders}
-                                                        <a class="disabled" title="{intl l='This customer has orders, and can\'t be deleted.'}"  href="#"><span class="glyphicon glyphicon-question-sign"></span></a>
-                                                    {else}
-                                                        <a class="customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                                    {/if}
-                                                    {/loop}
-                                                </div>
+                                                {if $hasOrders}
+                                                    {$deleteClass = 'disabled'}
+                                                    {$deleteTitle = {intl l='This customer has orders, and can\'t be deleted.'}}
+                                                    {$deleteHref = ''}
+                                                {else}
+                                                    {$deleteClass = 'customer-delete'}
+                                                    {$deleteTitle = {intl l='Delete this customer and all his orders'}}
+                                                    {$deleteHref = '#delete_customer_dialog'}
+                                                {/if}
+                                                {include file='renderer/buttons.html' buttons=[
+                                                    [
+                                                        'type' => 'edit',
+                                                        'title' => {intl l='Edit this customer'},
+                                                        'href' => {url path='/admin/customer/update' customer_id=$ID page=$page},
+                                                        'auth' => ['resource' => 'admin.customer']
+                                                    ],
+                                                    [
+                                                        'title' => {intl l="Send a mail to this customer"},
+                                                        'href' => "mailto:$EMAIL",
+                                                        'icon' => ['class' => 'glyphicon glyphicon-envelope'],
+                                                        'auth' => ['resource' => 'admin.customer']
+                                                    ],
+                                                    [
+                                                        'type' => 'delete',
+                                                        'class' => $deleteClass,
+                                                        'title' => $deleteTitle,
+                                                        'href' => $deleteHref,
+                                                        'data' => [
+                                                            'id' => $ID,
+                                                            'toggle' => 'modal'
+                                                        ],
+                                                        'auth' => ['resource' => 'admin.customer']
+                                                    ]
+                                                ]}
                                             </td>
 
                                         </tr>
@@ -251,31 +274,47 @@
             {form_field field="password_confirm"}
                 <input type="hidden" name="{$name}" value="dummmy-password" />
             {/form_field}
-    
+
             {render_form_field field="company"}
-    
-            {custom_render_form_field field='title'}
-                <select {form_field_attributes field='title'} >
-                    {loop type="title" name="title1"}
-                        <option value="{$ID}"{if $value == $ID} selected{/if}>{$LONG}</option>
-                    {/loop}
-                </select>
-            {/custom_render_form_field}
-    
+
+            <div class="row">
+                <div class="col-sm-6">
+                    {custom_render_form_field field='title'}
+                        <select {form_field_attributes field='title'} >
+                            {loop type="title" name="title1"}
+                                <option value="{$ID}"{if $value == $ID} selected{/if}>{$LONG}</option>
+                            {/loop}
+                        </select>
+                    {/custom_render_form_field}
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-sm-6">{render_form_field field="firstname"}</div>
                 <div class="col-sm-6">{render_form_field field='lastname'}</div>
             </div>
-    
+
+            <div class="row">
+                <div class="col-sm-6">
+                    {custom_render_form_field field='lang_id'}
+                        <select {form_field_attributes field='lang_id'}>
+                            {loop type="lang" name="lang.list" visible="*" order="alpha"}
+                                <option value="{$ID}" {if {$value} == $ID}selected{/if}>{$TITLE}</option>
+                            {/loop}
+                        </select>
+                    {/custom_render_form_field}
+                </div>
+            </div>
+
             {render_form_field field='address1'}
             {render_form_field field='address2' show_label=false}
             {render_form_field field='address3' show_label=false}
-    
+
             <div class="row">
                 <div class="col-md-4">{render_form_field field='zipcode'}</div>
                 <div class="col-md-8">{render_form_field field='city'}</div>
             </div>
-    
+
             <div class="row">
                 <div class="col-sm-6">
                     {custom_render_form_field field='country'}
@@ -288,14 +327,14 @@
                                     {else}
                                         {if $IS_DEFAULT}selected{/if}
                                     {/if}
-                    
+
                                 >{$TITLE}</option>
                             {/loop}
                         </select>
                         {$countryFieldId=$label_attr.for}
                     {/custom_render_form_field}
                 </div>
-    
+
                 <div class="col-md-6 group-state">
                     {custom_render_form_field field='state'}
                         <select {form_field_attributes field='state'}
@@ -312,7 +351,7 @@
                     {/custom_render_form_field}
                 </div>
             </div>
-    
+
             <div class="row">
                 {if {config key="customer_confirm_email"}}
                     <div class="col-sm-6">{render_form_field field="email"}</div>

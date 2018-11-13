@@ -119,11 +119,18 @@
                                                     </td>
                                                     {hook name="export.table-row" export_id=$ID}
                                                     <td>
-                                                        <div class="btn-group">
-                                                            <a class="btn btn-default btn-xs btn-show-export-modal" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this export"}">
-                                                                <span class="glyphicon glyphicon-open"></span>
-                                                            </a>
-                                                        </div>
+                                                        {include file='renderer/buttons.html' buttons=[
+                                                            [
+                                                                'type' => 'default',
+                                                                'class' => 'btn-show-export-modal',
+                                                                'title' => {intl l="Do this export"},
+                                                                'data' => [
+                                                                    'id' => $ID,
+                                                                    'url' => {$URL nofilter}
+                                                                ],
+                                                                'icon' => ['class' => 'glyphicon glyphicon-open']
+                                                            ]
+                                                        ]}
                                                     </td>
                                                 </tr>
                                             {/loop}

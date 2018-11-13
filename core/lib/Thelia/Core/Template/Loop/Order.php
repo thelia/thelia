@@ -243,28 +243,28 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 case 'company':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
-                        ->withColumn(OrderAddressTableMap::COMPANY, 'company')
+                        ->withColumn(OrderAddressTableMap::COL_COMPANY, 'company')
                         ->orderBy('company', Criteria::ASC);
                     break;
                 case 'company-reverse':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
-                        ->withColumn(OrderAddressTableMap::COMPANY, 'company')
+                        ->withColumn(OrderAddressTableMap::COL_COMPANY, 'company')
                         ->orderBy('company', Criteria::DESC);
                     break;
                 case 'customer-name':
                     $search
                         ->joinCustomer()
-                        ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
-                        ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
+                        ->withColumn(CustomerTableMap::COL_FIRSTNAME, 'firstname')
+                        ->withColumn(CustomerTableMap::COL_LASTNAME, 'lastname')
                         ->orderBy('lastname', Criteria::ASC)
                         ->orderBy('firstname', Criteria::ASC);
                     break;
                 case 'customer-name-reverse':
                     $search
                         ->joinCustomer()
-                        ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
-                        ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
+                        ->withColumn(CustomerTableMap::COL_FIRSTNAME, 'firstname')
+                        ->withColumn(CustomerTableMap::COL_LASTNAME, 'lastname')
                         ->orderBy('lastname', Criteria::DESC)
                         ->orderBy('firstname', Criteria::DESC);
                     break;

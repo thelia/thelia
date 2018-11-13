@@ -84,7 +84,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $search
             ->useFeatureAvQuery('feature_av')
-                ->withColumn(FeatureAvTableMap::POSITION, 'feature_av_position')
+                ->withColumn(FeatureAvTableMap::COL_POSITION, 'feature_av_position')
             ->endUse();
 
         $feature = $this->getFeature();

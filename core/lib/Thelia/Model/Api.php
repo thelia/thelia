@@ -16,6 +16,8 @@ class Api extends BaseApi implements UserInterface
 
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         if (null === $this->getApiKey()) {
             $this->setApiKey(Password::generateHexaRandom(25));
         }
@@ -27,6 +29,8 @@ class Api extends BaseApi implements UserInterface
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $fs = new Filesystem();
         $fs->remove($this->getKeyDir(). DS . $this->getApiKey() . '.key');
     }
@@ -139,5 +143,11 @@ class Api extends BaseApi implements UserInterface
     public function setSerial($serial)
     {
         throw new \RuntimeException("setSerial is not implemented");
+    }
+
+    public function getLocale()
+    {
+        throw new \RuntimeException("getLocale is not implemented");
+
     }
 }

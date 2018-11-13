@@ -481,9 +481,9 @@ abstract class AbstractCrudController extends BaseAdminController
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        /*} catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex->getMessage();*/
+            $error_msg = $ex->getMessage();
         }
 
         if (false !== $error_msg) {

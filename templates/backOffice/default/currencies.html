@@ -44,14 +44,30 @@
                                 <table class="table table-striped table-condensed">
                                     <caption class="clearfix">
                                         {intl l='Currencies'}
-                                        {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.currency" access="CREATE"}
-                                            <span class="pull-right">
-                                                <button class="btn btn-default btn-info" title="{intl l='Update rates'}">{intl l='Update rates'} <span class="glyphicon glyphicon-globe"></span></button>
-                                                <a class="btn btn-primary" title="{intl l='Add a new currency'}" href="#creation_dialog" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-plus-sign"></span>
-                                                </a>
-                                            </span>
-                                        {/loop}
+                                        {include file='renderer/buttons.html' btn_group=false buttons=[
+                                            [
+                                                'type' => 'create',
+                                                'class' => 'action-btn',
+                                                'title' => {intl l='Add a new currency'},
+                                                'href' => '#creation_dialog',
+                                                'auth' => ['resource' => 'admin.configuration.currency'],
+                                                'data' => [
+                                                    'toggle' => 'modal'
+                                                ]
+                                            ],
+                                            [
+                                                'type' => 'info',
+                                                'class' => 'action-btn',
+                                                'title' => {intl l='Update rates'},
+                                                'href' => '#creation_dialog',
+                                                'auth' => ['resource' => 'admin.configuration.currency'],
+                                                'data' => [
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'icon' => ['class' => 'glyphicon glyphicon-globe'],
+                                                'with_text' => true
+                                            ]
+                                        ]}
                                     </caption>
                                     <thead>
                                     <tr>
@@ -189,23 +205,31 @@
                                             {hook name="currencies.table-row" location="currencies_table_row" currency_id={$ID} }
 
                                             <td class="actions">
-                                                <div class="btn-toolbar btn toolbar-primary">
-                                                    <span class="glyphicon glyphicon-cog"></span>
-                                                </div>
-                                                <div class="toolbar-options hidden">
-                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.currency" access="UPDATE"}
-                                                        <a class="currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
-                                                            <span class="glyphicon glyphicon-edit"></span>
-                                                        </a>
-                                                    {/loop}
-                                                    {if !$IS_DEFAULT}
-                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.currency" access="DELETE"}
-                                                            <a class="currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-trash"></span>
-                                                            </a>
-                                                        {/loop}
-                                                    {/if}
-                                                </div>
+                                                {$buttons = [
+                                                    [
+                                                        'type' => 'edit',
+                                                        'class' => 'currency-change',
+                                                        'title' => {intl l='Change this currency'},
+                                                        'href' => {url path='/admin/configuration/currencies/update' currency_id=$ID},
+                                                        'auth' => ['resource' => 'admin.configuration.currency']
+                                                    ]
+                                                ]}
+
+                                                {if !$IS_DEFAULT}
+                                                {$buttons[] = [
+                                                        'type' => 'delete',
+                                                        'class' => 'country-delete',
+                                                        'title' => {intl l='Delete this country'},
+                                                        'href' => '#delete_dialog',
+                                                        'data' => [
+                                                            'id' => $ID,
+                                                            'toggle' => 'modal'
+                                                        ],
+                                                        'auth' => ['resource' => 'admin.configuration.country']
+                                                ]}
+                                                {/if}
+
+                                                {include file='renderer/buttons.html' buttons=$buttons}
                                             </td>
                                         </tr>
                                     {/loop}

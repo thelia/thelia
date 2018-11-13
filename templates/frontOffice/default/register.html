@@ -108,6 +108,24 @@
                             </div><!--/.form-group-->
                         {/form_field}
                         {/if}
+
+                        {form_field field="lang_id"}
+                            <div class="form-group group-lastname {if $error}has-error{/if}">
+                                <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <div class="control-input col-sm-5">
+                                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                                        {loop type="lang" name="lang.list" visible="*" order="alpha"}
+                                            <option value="{$ID}"{if (empty($value) && $ID == {lang attr='id'}) || (! empty($value) && $value == $ID)} selected{/if}>{$TITLE}</option>
+                                        {/loop}
+                                    </select>
+                                    {if $error }
+                                        <span class="help-block">{$message}</span>
+                                        {assign var="error_focus" value="true"}
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
+
                         {form_field field="phone"}
                             <div class="form-group group-phone{if $error} has-error{/if}">
                                 <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>

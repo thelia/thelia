@@ -16,6 +16,8 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
 
         return true;
@@ -26,6 +28,8 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
     }
 
@@ -34,6 +38,8 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
 
         return true;
@@ -44,6 +50,8 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
     }
 
@@ -52,6 +60,8 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
 
         return true;
@@ -62,6 +72,8 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
     }
 }

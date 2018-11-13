@@ -59,17 +59,24 @@
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l="Taxes"}
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.tax" access="CREATE"}
-                                        <a class="btn btn-primary pull-right" title="{intl l='Create a new tax'}" href="#tax_create_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Create a new tax'},
+                                            'href' => '#tax_create_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.tax'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
                                 <thead>
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-5">{intl l="Description"}</th>
-                                    <th class="col-md-1">{intl l="Actions"}</th>
+                                    <th class="col-md-1 actions">{intl l="Actions"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -87,18 +94,25 @@
                                         </td>
                                         <td class="description">{$DESCRIPTION nofilter}</td>
                                         <td class="actions">
-                                            <div class="btn-toolbar btn toolbar-primary">
-                                                <span class="glyphicon glyphicon-cog"></span>
-                                            </div>
-                                            <div class="toolbar-options hidden">
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                                    <a title="{intl l='Change this tax'}" href="{url path="/admin/configuration/taxes/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                {/loop}
-
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                                    <a class="js-delete-tax" title="{intl l='Delete this tax'}" href="#tax_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                                {/loop}
-                                            </div>
+                                            {include file='renderer/buttons.html' buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'title' => {intl l='Change this tax'},
+                                                    'href' => {url path="/admin/configuration/taxes/update/%id" id=$ID},
+                                                    'auth' => ['resource' => 'admin.configuration.tax']
+                                                ],
+                                                [
+                                                    'type' => 'delete',
+                                                    'class' => 'js-delete-tax',
+                                                    'title' => {intl l='Delete this tax'},
+                                                    'href' => '#tax_delete_dialog',
+                                                    'data' => [
+                                                        'id' => $ID,
+                                                        'toggle' => 'modal'
+                                                    ],
+                                                    'auth' => ['resource' => 'admin.configuration.tax']
+                                                ]
+                                            ]}
                                         </td>
                                     </tr>
 
@@ -114,18 +128,25 @@
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l="Taxes rules"}
-                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                        <a class="btn btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </a>
-                                    {/loop}
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Create a new tax rule'},
+                                            'href' => '#tax_rule_create_dialog',
+                                            'auth' => ['resource' => 'admin.configuration.tax', 'access' => 'UPDATE'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
                                 <thead>
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-4">{intl l="Description"}</th>
                                     <th class="col-md-1 text-center">{intl l="Default"}</th>
-                                    <th class="col-md-1">{intl l="Actions"}</th>
+                                    <th class="col-md-1 actions">{intl l="Actions"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -148,19 +169,35 @@
                                             {/if}
                                         </td>
                                         <td class="actions">
-                                            <div class="btn-toolbar btn toolbar-primary">
-                                                <span class="glyphicon glyphicon-cog"></span>
-                                            </div>
-                                            <div class="toolbar-options hidden">
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="UPDATE"}
-                                                    <a title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                    <a title="{intl l='Set as default tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/set_default/%id" id=$ID}" {if $IS_DEFAULT == 1}disabled{/if}><span class="glyphicon glyphicon-star"></span></a>
-                                                {/loop}
-
-                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.tax" access="DELETE"}
-                                                    <a class="js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                                {/loop}
-                                            </div>
+                                            {$class = ""}
+                                            {if $IS_DEFAULT == 1}{$class = "disabled"}{/if}
+                                            {include file='renderer/buttons.html' buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'title' => {intl l='Change this tax rule'},
+                                                    'href' => {url path="/admin/configuration/taxes_rules/update/%id" id=$ID},
+                                                    'auth' => ['resource' => 'admin.configuration.tax']
+                                                ],
+                                                [
+                                                    'type' => 'warning',
+                                                    'class' => $class,
+                                                    'title' => {intl l='Set as default tax rule'},
+                                                    'href' => {url path="/admin/configuration/taxes_rules/update/set_default/%id" id=$ID},
+                                                    'auth' => ['resource' => 'admin.configuration.tax'],
+                                                    'icon' => ['class' => 'glyphicon glyphicon-star']
+                                                ],
+                                                [
+                                                    'type' => 'delete',
+                                                    'class' => 'js-delete-tax-rule',
+                                                    'title' => {intl l='Delete this tax rule'},
+                                                    'href' => '#tax_rule_delete_dialog',
+                                                    'data' => [
+                                                        'id' => $ID,
+                                                        'toggle' => 'modal'
+                                                    ],
+                                                    'auth' => ['resource' => 'admin.configuration.tax']
+                                                ]
+                                            ]}
                                         </td>
                                     </tr>
 

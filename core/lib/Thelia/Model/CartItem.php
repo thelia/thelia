@@ -25,6 +25,8 @@ class CartItem extends BaseCartItem
 
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         if ($this->dispatcher) {
             $cartItemEvent = new CartItemEvent($this);
             $this->dispatcher->dispatch(TheliaEvents::CART_ITEM_CREATE_BEFORE, $cartItemEvent);
@@ -34,6 +36,8 @@ class CartItem extends BaseCartItem
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         if ($this->dispatcher) {
             $cartItemEvent = new CartItemEvent($this);
             $this->dispatcher->dispatch(TheliaEvents::CART_ITEM_UPDATE_BEFORE, $cartItemEvent);
@@ -43,6 +47,8 @@ class CartItem extends BaseCartItem
 
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
@@ -52,6 +58,8 @@ class CartItem extends BaseCartItem
 
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 

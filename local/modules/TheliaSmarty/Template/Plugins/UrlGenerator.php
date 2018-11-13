@@ -339,9 +339,10 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function getNavigateToValues()
     {
         return array(
-            "current"  => "getCurrentUrl",
-            "previous" => "getPreviousUrl",
-            "index"    => "getIndexUrl",
+            "current"       => "getCurrentUrl",
+            "previous"      => "getPreviousUrl",
+            "catalog_last"  => "getCatalogLastUrl",
+            "index"         => "getIndexUrl",
         );
     }
 
@@ -370,6 +371,11 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function getPreviousUrl()
     {
         return URL::getInstance()->absoluteUrl($this->getSession()->getReturnToUrl());
+    }
+
+    protected function getCatalogLastUrl()
+    {
+        return URL::getInstance()->absoluteUrl($this->getSession()->getReturnToCatalogLastUrl());
     }
 
     protected function getIndexUrl()

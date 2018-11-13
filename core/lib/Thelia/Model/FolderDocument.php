@@ -37,6 +37,8 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;
@@ -62,6 +64,8 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->reorderBeforeDelete(
             array(
                 "folder_id" => $this->getFolderId(),

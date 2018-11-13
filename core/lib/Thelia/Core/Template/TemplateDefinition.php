@@ -12,6 +12,10 @@
 
 namespace Thelia\Core\Template;
 
+use Thelia\Core\Template\Exception\TemplateException;
+use Thelia\Core\Template\Validator\TemplateDescriptor;
+use Thelia\Core\Template\Validator\TemplateValidator;
+
 class TemplateDefinition
 {
     const FRONT_OFFICE = 1;
@@ -24,6 +28,15 @@ class TemplateDefinition
     const PDF_SUBDIR = 'pdf';
     const EMAIL_SUBDIR = 'email';
 
+    /** @var string the template directory full path */
+    protected $path;
+
+    /** @var TemplateDescriptor */
+    protected $templateDescriptor;
+
+    /** @var string the prefix for translation domain name */
+    protected $translationDomainPrefix;
+
     protected static $standardTemplatesSubdirs = array(
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
         self::BACK_OFFICE  => self::BACK_OFFICE_SUBDIR,
@@ -31,28 +44,17 @@ class TemplateDefinition
         self::EMAIL        => self::EMAIL_SUBDIR,
     );
 
-    /**
-     * @var string the template directory name (e.g. 'default')
-     */
-    protected $name;
+    /**  @var array|null the parent list cache */
+    protected $parentList = null;
 
     /**
-     * @var string the template directory full path
+     * TemplateDefinition constructor.
+     * @param string $name the template name (= directory name)
+     * @param int $type the remplate type (see $standardTemplatesSubdirs)
+     * @throws \Exception
      */
-    protected $path;
-
-    /**
-     * @var int the template type (front, back, pdf)
-     */
-    protected $type;
-
-    protected $translationDomainPrefix;
-
     public function __construct($name, $type)
     {
-        $this->name = $name;
-        $this->type = $type;
-
         switch ($type) {
             case TemplateDefinition::FRONT_OFFICE:
                 $this->path = self::FRONT_OFFICE_SUBDIR . DS . $name;
@@ -75,6 +77,9 @@ class TemplateDefinition
                 $this->translationDomainPrefix = 'generic.';
                 break;
         }
+
+        // Load template descriprot, if any.
+        $this->templateDescriptor = (new TemplateValidator($this->getAbsolutePath()))->getTemplateDefinition($name, $type);
     }
 
     public function getTranslationDomain()
@@ -87,12 +92,12 @@ class TemplateDefinition
      */
     public function getName()
     {
-        return $this->name;
+        return $this->templateDescriptor->getName();
     }
 
     public function setName($name)
     {
-        $this->name = $name;
+        $this->templateDescriptor->setName($name);
 
         return $this;
     }
@@ -139,14 +144,24 @@ class TemplateDefinition
      */
     public function getType()
     {
-        return $this->type;
+        return $this->templateDescriptor->getType();
     }
 
     public function setType($type)
     {
-        $this->type = $type;
+        $this->$this->templateDescriptor->setType($type);
 
         return $this;
+    }
+
+    /**
+     * Get teh template descriptor
+     *
+     * @return TemplateDescriptor
+     */
+    public function getDescriptor()
+    {
+        return $this->templateDescriptor;
     }
 
     /**
@@ -155,5 +170,58 @@ class TemplateDefinition
     public static function getStandardTemplatesSubdirsIterator()
     {
         return new \ArrayIterator(self::$standardTemplatesSubdirs);
+    }
+
+    /**
+     * Return the template parent list
+     *
+     * @return array|null
+     */
+    public function getParentList()
+    {
+        if (null === $this->parentList) {
+            $this->parentList = [];
+
+            $parent = $this->getDescriptor()->getParent();
+
+            for ($index = 1; null !== $parent; $index++) {
+                $this->parentList[$parent->getName() . '-'] = $parent;
+
+                $parent = $parent->getDescriptor()->getParent();
+            }
+        }
+
+        return $this->parentList;
+    }
+
+    /**
+     * Find a template file path, considering the template parents, if any.
+     *
+     * @param string $templateName the template name, with path
+     * @return string
+     * @throws TemplateException
+     */
+    public function getTemplateFilePath($templateName)
+    {
+        $templateList = array_merge(
+            [ $this ],
+            $this->getParentList()
+        );
+
+        /** @var TemplateDefinition $templateDefinition */
+        foreach ($templateList as $templateDefinition) {
+            $templateFilePath = sprintf(
+                '%s%s/%s',
+                THELIA_TEMPLATE_DIR,
+                $templateDefinition->getPath(),
+                $templateName
+            );
+
+            if (file_exists($templateFilePath)) {
+                return $templateFilePath;
+            }
+        }
+
+        throw new TemplateException("Template file not found: $templateName");
     }
 }

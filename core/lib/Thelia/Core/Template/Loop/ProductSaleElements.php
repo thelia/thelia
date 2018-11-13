@@ -78,6 +78,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     new Type\EnumListType(
                         array(
                             'id', 'id_reverse',
+                            'ref', 'ref_reverse',
                             'quantity', 'quantity_reverse',
                             'min_price', 'max_price',
                             'promo', 'new',
@@ -144,6 +145,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 case "id_reverse":
                     $search->orderById(Criteria::DESC);
                     break;
+                case "ref":
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case "ref_reverse":
+                    $search->orderByRef(Criteria::DESC);
+                    break;
                 case "quantity":
                     $search->orderByQuantity(Criteria::ASC);
                     break;
@@ -197,11 +204,11 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 6)';
-        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 6)';
+        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END';
+        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
-            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
+            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::COL_PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
 
         $search->groupById();
 

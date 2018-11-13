@@ -37,6 +37,7 @@ use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 use Thelia\TaxEngine\TaxEngine;
@@ -602,7 +603,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 return OrderQuery::getSaleStats($startDate, $endDate, $includeShipping);
                 break;
             case 'orders':
-                return OrderQuery::getOrderStats($startDate, $endDate, array(1,2,3,4));
+                return OrderQuery::getOrderStats($startDate, $endDate, OrderStatusQuery::getPaidStatusIdList());
                 break;
         }
 

@@ -33,7 +33,7 @@ class TaxCreationForm extends BaseForm
 
     protected static $typeList = [];
 
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         if (!$this->container) {
             throw new \LogicException(

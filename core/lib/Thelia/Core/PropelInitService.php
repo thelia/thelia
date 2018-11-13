@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
@@ -81,9 +82,9 @@ class PropelInitService
     {
         $fs = new Filesystem();
 
-        $databaseConfigFile = THELIA_CONF_DIR . '/database_' . $this->environment . '.yml';
+        $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $this->environment . '.yml';
         if (!$fs->exists($databaseConfigFile)) {
-            $databaseConfigFile = THELIA_CONF_DIR . '/database.yml';
+            $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
         }
 
         return $databaseConfigFile;
@@ -94,7 +95,7 @@ class PropelInitService
      */
     public function getPropelCacheDir()
     {
-        return THELIA_CACHE_DIR . '/' . $this->environment . '/propel/';
+        return THELIA_CACHE_DIR . $this->environment . DS . 'propel' . DS;
     }
 
     /**
@@ -102,7 +103,7 @@ class PropelInitService
      */
     public function getPropelConfigDir()
     {
-        return $this->getPropelCacheDir() . '/config/';
+        return $this->getPropelCacheDir() . 'config' . DS;
     }
 
     /**
@@ -110,7 +111,7 @@ class PropelInitService
      */
     public function getPropelConfigFile()
     {
-        return $this->getPropelConfigDir() . '/propel.yml';
+        return $this->getPropelConfigDir() . 'propel.yml';
     }
 
     /**
@@ -118,7 +119,7 @@ class PropelInitService
      */
     public function getPropelInitFile()
     {
-        return $this->getPropelConfigDir() . '/' . static::$PROPEL_CONFIG_CACHE_FILENAME;
+        return $this->getPropelConfigDir() . static::$PROPEL_CONFIG_CACHE_FILENAME;
     }
 
     /**
@@ -126,7 +127,7 @@ class PropelInitService
      */
     public function getPropelSchemaDir()
     {
-        return $this->getPropelCacheDir() . '/schema/';
+        return $this->getPropelCacheDir() . 'schema' . DS;
     }
 
     /**
@@ -134,7 +135,7 @@ class PropelInitService
      */
     public function getPropelModelDir()
     {
-        return $this->getPropelCacheDir() . '/model/';
+        return $this->getPropelCacheDir() . 'model' . DS;
     }
 
     /**
@@ -142,7 +143,7 @@ class PropelInitService
      */
     public function getPropelMigrationDir()
     {
-        return $this->getPropelCacheDir() . '/migration/';
+        return $this->getPropelCacheDir() . 'migration' . DS;
     }
 
     /**
@@ -151,6 +152,7 @@ class PropelInitService
      * @param array $parameters Command parameters.
      * @param OutputInterface|null $output Command output.
      * @return int Command exit code.
+     * @throws \Exception
      */
     public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null)
     {
@@ -205,6 +207,8 @@ class PropelInitService
             => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder',
             'tablemap'
             => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
+            'event'
+            => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder',
         ];
 
         $propelConfigCache->write(
@@ -215,6 +219,7 @@ class PropelInitService
 
     /**
      * Generate the Propel initialization file.
+     * @throws \Exception
      */
     public function buildPropelInitFile()
     {
@@ -264,7 +269,7 @@ class PropelInitService
 
         foreach ($schemaCombiner->getDatabases() as $database) {
             $databaseSchemaCache = new ConfigCache(
-                "{$this->getPropelSchemaDir()}/{$database}.schema.xml",
+                "{$this->getPropelSchemaDir()}{$database}.schema.xml",
                 $this->debug
             );
 
@@ -282,6 +287,7 @@ class PropelInitService
 
     /**
      * Generate the base Propel models.
+     * @throws \Exception
      */
     public function buildPropelModels()
     {
@@ -321,6 +327,7 @@ class PropelInitService
     /**
      * Initialize the Propel environment and connection.
      * @return bool Whether a Propel connection is available.
+     * @throws \Exception
      */
     public function init()
     {

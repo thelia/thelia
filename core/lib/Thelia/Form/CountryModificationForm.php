@@ -20,7 +20,7 @@ class CountryModificationForm extends CountryCreationForm
 
     protected function buildForm()
     {
-        parent::buildForm(true);
+        parent::buildForm();
 
         $this->formBuilder
             ->add('id', 'hidden', ['constraints' => [new GreaterThan(['value' => 0])]])

@@ -28,7 +28,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
 {
     const MODULE_ACCESS_FIELD_PREFIX = "module";
 
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add("id", "hidden", array(

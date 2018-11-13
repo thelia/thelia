@@ -21,7 +21,8 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
-use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -35,9 +36,8 @@ use Symfony\Component\HttpKernel\Kernel;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Core\Propel\Schema\SchemaCombiner;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
@@ -61,9 +61,10 @@ class Thelia extends Kernel
         return file_exists(THELIA_CONF_DIR . 'database.yml');
     }
 
-    protected function checkMySQLConfigurations(ConnectionWrapper $con)
+    protected function checkMySQLConfigurations(ConnectionInterface $con)
     {
-        // todo add cache for this test
+        // TODO : add cache for this test
+        /** @var  PDODataFetcher $result */
         $result = $con->query("SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode");
 
         if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
@@ -124,6 +125,7 @@ class Thelia extends Kernel
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
     public function boot()
     {
@@ -150,6 +152,10 @@ class Thelia extends Kernel
         $this->getContainer()->set('thelia.propel.schema.locator', $propelSchemaLocator);
         $this->getContainer()->set('thelia.propel.init', $propelInitService);
 
+        if ($propelConnectionAvailable) {
+            $theliaDatabaseConnection->setEventDispatcher($this->getContainer()->get('event_dispatcher'));
+        }
+
         if (self::isInstalled()) {
             $this->getContainer()->get('event_dispatcher')->dispatch(TheliaEvents::BOOT);
         }
@@ -158,8 +164,8 @@ class Thelia extends Kernel
     /**
      * Add all module's standard templates to the parser environment
      *
-     * @param ParserInterface $parser the parser
-     * @param Module          $module the Module.
+     * @param Definition $parser the parser
+     * @param Module     $module the Module.
      */
     protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
     {
@@ -173,10 +179,10 @@ class Thelia extends Kernel
     /**
      * Add a module template directory to the parser environment
      *
-     * @param ParserInterface $parser             the parser
-     * @param Module          $module             the Module.
-     * @param string          $templateType       the template type (one of the TemplateDefinition type constants)
-     * @param string          $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     * @param Definition $parser             the parser
+     * @param Module     $module             the Module.
+     * @param string     $templateType       the template type (one of the TemplateDefinition type constants)
+     * @param string     $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
     protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName)
     {
@@ -208,10 +214,11 @@ class Thelia extends Kernel
     }
 
     /**
-     *
      * Load some configuration
      * Initialize all plugins
      *
+     * @param ContainerBuilder $container
+     * @throws \Exception
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
@@ -272,7 +279,6 @@ class Thelia extends Kernel
                 }
             }
 
-            /** @var ParserInterface $parser */
             $parser = $container->getDefinition('thelia.parser');
 
             /** @var \Thelia\Core\Template\TemplateHelperInterface $templateHelper */
@@ -299,11 +305,19 @@ class Thelia extends Kernel
             $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR . 'I18n';
 
             // Standard templates (front, back, pdf, mail)
-
             /** @var TemplateDefinition $templateDefinition */
             foreach ($templateHelper->getStandardTemplateDefinitions() as $templateDefinition) {
-                if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
-                    $translationDirs[$templateDefinition->getTranslationDomain()] = $dir;
+                // Load parent templates transaltions, the current template translations.
+                $templateList = array_merge(
+                    $templateDefinition->getParentList(),
+                    [ $templateDefinition ]
+                );
+
+                /** @var TemplateDefinition $tplDef */
+                foreach ($templateList as $tplDef) {
+                    if (is_dir($dir = $tplDef->getAbsoluteI18nPath())) {
+                        $translationDirs[$tplDef->getTranslationDomain()] = $dir;
+                    }
                 }
             }
 
@@ -313,6 +327,11 @@ class Thelia extends Kernel
         }
     }
 
+    /**
+     * @param Module $module
+     * @param array $translationDirs
+     * @param TemplateHelperInterface $templateHelper
+     */
     private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper)
     {
         // Core module translation
@@ -421,11 +440,11 @@ class Thelia extends Kernel
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
-     *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function buildContainer()
     {
+        /** @var TheliaContainerBuilder $container */
         $container = parent::buildContainer();
 
         $this->loadConfiguration($container);
@@ -487,8 +506,7 @@ class Thelia extends Kernel
      *
      * Part of Symfony\Component\HttpKernel\KernelInterface
      *
-     * @return array An array of bundle instances.
-     *
+     * @return Bundle\TheliaBundle[] An array of bundle instances.
      */
     public function registerBundles()
     {
@@ -517,7 +535,7 @@ class Thelia extends Kernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        //Nothing is load here but it's possible to load container configuration here.
-        //exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
+        // Nothing is load here but it's possible to load container configuration here.
+        // exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
 }

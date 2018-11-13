@@ -193,6 +193,24 @@ class Session extends BaseSession
         return $this->get('thelia.return_to_url', URL::getInstance()->getIndexPage());
     }
 
+    // -- Return catalog last page ----------------------------------------------------------
+
+    public function setReturnToCatalogLastUrl($url)
+    {
+        $this->set('thelia.return_to_catalog_last_url', $url);
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return string the return-to catalog last URL, or the index page if none is defined.
+     */
+    public function getReturnToCatalogLastUrl()
+    {
+        return $this->get('thelia.return_to_catalog_last_url', URL::getInstance()->getIndexPage());
+    }
+
     // -- Cart ------------------------------------------------------------------
 
     /**
