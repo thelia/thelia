@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
@@ -206,6 +207,8 @@ class PropelInitService
             => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder',
             'tablemap'
             => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
+            'event'
+            => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder',
         ];
 
         $propelConfigCache->write(
