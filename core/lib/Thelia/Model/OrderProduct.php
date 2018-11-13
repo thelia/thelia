@@ -38,6 +38,8 @@ class OrderProduct extends BaseOrderProduct
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(
             TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE,
             (new OrderProductEvent($this->getOrder(), null))
@@ -52,6 +54,8 @@ class OrderProduct extends BaseOrderProduct
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(
             TheliaEvents::ORDER_PRODUCT_AFTER_CREATE,
             (new OrderProductEvent($this->getOrder(), $this->getId()))

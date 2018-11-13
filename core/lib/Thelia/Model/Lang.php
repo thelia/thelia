@@ -67,6 +67,8 @@ class Lang extends BaseLang
 
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATELANG, new LangEvent($this));
 
         return true;
@@ -74,6 +76,8 @@ class Lang extends BaseLang
 
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATELANG, new LangEvent($this));
 
         $this->dispatchEvent(TheliaEvents::LANG_FIX_MISSING_FLAG, new LangEvent($this));
@@ -81,6 +85,8 @@ class Lang extends BaseLang
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATELANG, new LangEvent($this));
 
         return true;
@@ -88,6 +94,8 @@ class Lang extends BaseLang
 
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATELANG, new LangEvent($this));
 
         $this->dispatchEvent(TheliaEvents::LANG_FIX_MISSING_FLAG, new LangEvent($this));
@@ -95,6 +103,8 @@ class Lang extends BaseLang
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETELANG, new LangEvent($this));
 
         return true;
@@ -102,6 +112,8 @@ class Lang extends BaseLang
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETELANG, new LangEvent($this));
     }
 

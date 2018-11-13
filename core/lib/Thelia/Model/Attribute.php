@@ -17,6 +17,8 @@ class Attribute extends BaseAttribute
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEATTRIBUTE, new AttributeEvent($this));
 
         // Set the current position for the new object
@@ -30,6 +32,8 @@ class Attribute extends BaseAttribute
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEATTRIBUTE, new AttributeEvent($this));
     }
 
@@ -38,6 +42,8 @@ class Attribute extends BaseAttribute
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEATTRIBUTE, new AttributeEvent($this));
 
         return true;
@@ -48,6 +54,8 @@ class Attribute extends BaseAttribute
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEATTRIBUTE, new AttributeEvent($this));
     }
 
@@ -56,6 +64,8 @@ class Attribute extends BaseAttribute
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEATTRIBUTE, new AttributeEvent($this));
 
         return true;
@@ -66,6 +76,8 @@ class Attribute extends BaseAttribute
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEATTRIBUTE, new AttributeEvent($this));
     }
 }

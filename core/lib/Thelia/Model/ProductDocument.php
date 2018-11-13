@@ -39,6 +39,8 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;
@@ -64,6 +66,8 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->reorderBeforeDelete(
             array(
                 "product_id" => $this->getProductId(),

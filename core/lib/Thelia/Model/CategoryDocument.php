@@ -39,6 +39,8 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;
@@ -64,6 +66,8 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->reorderBeforeDelete(
             array(
                 "category_id" => $this->getCategoryId(),

@@ -19,6 +19,8 @@ class Message extends BaseMessage
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEMESSAGE, new MessageEvent($this));
 
         return true;
@@ -29,6 +31,8 @@ class Message extends BaseMessage
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEMESSAGE, new MessageEvent($this));
     }
 
@@ -37,6 +41,8 @@ class Message extends BaseMessage
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEMESSAGE, new MessageEvent($this));
 
         return true;
@@ -47,6 +53,8 @@ class Message extends BaseMessage
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEMESSAGE, new MessageEvent($this));
     }
 
@@ -55,6 +63,8 @@ class Message extends BaseMessage
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEMESSAGE, new MessageEvent($this));
 
         return true;
@@ -65,6 +75,8 @@ class Message extends BaseMessage
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEMESSAGE, new MessageEvent($this));
     }
 

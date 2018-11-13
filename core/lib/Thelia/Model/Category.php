@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use phpDocumentor\Reflection\Types\Parent_;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Event\Category\CategoryEvent;
@@ -131,6 +132,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
@@ -143,6 +146,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY, new CategoryEvent($this));
     }
 
@@ -151,6 +156,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECATEGORY, new CategoryEvent($this));
 
         return true;
@@ -161,6 +168,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECATEGORY, new CategoryEvent($this));
     }
 
@@ -169,6 +178,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
         $this->reorderBeforeDelete(
             array(
@@ -185,6 +196,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         //delete all subcategories
