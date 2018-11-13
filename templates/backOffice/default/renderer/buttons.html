@@ -227,6 +227,11 @@
         data-{$name}="{$data}"
     {/foreach}
     {/if}
+    {if $button['attr'] && $button['attr']|is_array}
+        {foreach from=$button['attr'] key=name item=data}
+            {$name}="{$data}"
+        {/foreach}
+    {/if}
     >
     {if $button['icon']['class']}
         <{$button['icon']['tag']} class="{$button['icon']['class']}"></{$button['icon']['tag']}>
