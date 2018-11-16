@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\FeatureProduct;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\FeatureProduct;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\FeatureProductEvent
+ */
 class FeatureProductEvent extends ActionEvent
 {
     protected $featureProduct = null;

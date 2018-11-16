@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A trait to provide event dispatching mechanism to Model objects
+ * @deprecated since 2.4, please use the EventDispatcher available on ConnectionInterface
  */
 trait ModelEventDispatcherTrait
 {

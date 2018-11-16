@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Attribute;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\AttributeAv;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\AttributeAvEvent
+ */
 class AttributeAvEvent extends ActionEvent
 {
     protected $attributeAv = null;

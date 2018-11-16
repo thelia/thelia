@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Config;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Config;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\ConfigEvent
+ */
 class ConfigEvent extends ActionEvent
 {
     protected $config = null;

@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Currency;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Currency;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\CurrencyEvent
+ */
 class CurrencyEvent extends ActionEvent
 {
     protected $currency = null;
