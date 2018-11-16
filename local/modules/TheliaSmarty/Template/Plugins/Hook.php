@@ -17,6 +17,7 @@ use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
+use Thelia\Log\Tlog;
 use TheliaSmarty\Template\Plugins\Module;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyParser;
@@ -287,9 +288,17 @@ class Hook extends AbstractSmartyPlugin
         // first call
         if ($content === null) {
             if (!array_key_exists($rel, $this->hookResults)) {
-                throw new \InvalidArgumentException(
+                $exception = new \InvalidArgumentException(
                     $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $rel])
                 );
+
+                Tlog::getInstance()->error($exception->getMessage());
+
+                if ($this->debug) {
+                    throw $exception;
+                }
+
+                return '';
             }
 
             $fragments = $this->hookResults[$rel];
@@ -414,9 +423,17 @@ class Hook extends AbstractSmartyPlugin
         }
 
         if (!isset($this->hookResults[$hookName])) {
-            throw new \InvalidArgumentException(
+            $exception = new \InvalidArgumentException(
                 $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $hookName])
             );
+
+            Tlog::getInstance()->error($exception->getMessage());
+
+            if ($this->debug) {
+                throw $exception;
+            }
+
+            return true;
         }
 
         return (is_string($this->hookResults[$hookName]) && '' === $this->hookResults[$hookName]
