@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1f2013ae5c70674dae9651b7f18b58d6",
+    "content-hash": "8436713a570a666d1fc0eea2c4f95e8d",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -2146,76 +2146,25 @@
             "time": "2018-11-03T09:53:57+00:00"
         },
         {
-            "name": "symfony/icu",
-            "version": "v1.2.2",
-            "target-dir": "Symfony/Component/Icu",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/icu.git",
-                "reference": "d4d85d6055b87f394d941b45ddd3a9173e1e3d2a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/icu/zipball/d4d85d6055b87f394d941b45ddd3a9173e1e3d2a",
-                "reference": "d4d85d6055b87f394d941b45ddd3a9173e1e3d2a",
-                "shasum": ""
-            },
-            "require": {
-                "ext-intl": "*",
-                "lib-icu": ">=4.4",
-                "php": ">=5.3.3",
-                "symfony/intl": "~2.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\Icu\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
-                    "name": "Bernhard Schussek",
-                    "email": "bschussek@gmail.com"
-                }
-            ],
-            "description": "Contains an excerpt of the ICU data and classes to load it.",
-            "homepage": "http://symfony.com",
-            "keywords": [
-                "icu",
-                "intl"
-            ],
-            "abandoned": "symfony/intl",
-            "time": "2014-07-25T09:58:17+00:00"
-        },
-        {
             "name": "symfony/intl",
-            "version": "v2.8.47",
+            "version": "v3.2.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/intl.git",
-                "reference": "4a4e6fe5234aef7d5105c6f674a02cee86ad1866"
+                "reference": "3fd98dde8e7d1c34c974d65b09e9c32abe88dafe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/intl/zipball/4a4e6fe5234aef7d5105c6f674a02cee86ad1866",
-                "reference": "4a4e6fe5234aef7d5105c6f674a02cee86ad1866",
+                "url": "https://api.github.com/repos/symfony/intl/zipball/3fd98dde8e7d1c34c974d65b09e9c32abe88dafe",
+                "reference": "3fd98dde8e7d1c34c974d65b09e9c32abe88dafe",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.9",
-                "symfony/polyfill-intl-icu": "~1.0",
-                "symfony/polyfill-php54": "~1.0"
+                "php": ">=5.5.9",
+                "symfony/polyfill-intl-icu": "~1.0"
             },
             "require-dev": {
-                "symfony/filesystem": "~2.1|~3.0.0"
+                "symfony/filesystem": "~2.8|~3.0"
             },
             "suggest": {
                 "ext-intl": "to use the component with locales other than \"en\""
@@ -2223,7 +2172,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.8-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2269,7 +2218,7 @@
                 "l10n",
                 "localization"
             ],
-            "time": "2018-10-20T23:16:31+00:00"
+            "time": "2017-11-16T17:55:54+00:00"
         },
         {
             "name": "symfony/options-resolver",
