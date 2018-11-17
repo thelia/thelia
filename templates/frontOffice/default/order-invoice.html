@@ -119,7 +119,7 @@
                                         <dt class="refView">{intl l="No."}</dt>
                                         <dd>{$REF}</dd>
                                     {/loop}
-                                    
+
                                     {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
                                         <dt class="attributeView">{$ATTRIBUTE_TITLE}</dt>
                                         <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
@@ -230,12 +230,16 @@
                 {hook name="order-invoice.coupon-form"}
                 </form>
             {/form}
-            
+
             {form name="thelia.order.payment"}
             {assign var="isPost" value=$smarty.post|count}
             <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype}>
 
                 {form_hidden_fields}
+
+                {form_field field="error_url"}
+                    <input type="hidden" name="{$name}" value="{url path="/order/invoice"}">
+                {/form_field}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
