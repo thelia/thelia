@@ -390,6 +390,16 @@ class OrderController extends BaseFrontController
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
 
+    public function orderFailedMessageAsParameter($order_id)
+    {
+        return $this->orderFailed(
+            $order_id,
+            $this->getRequest()->get(
+                'message',
+                $this->getTranslator()->trans("Unknown error occured.")
+            )
+        );
+    }
 
     public function orderFailed($order_id, $message)
     {

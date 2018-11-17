@@ -81,17 +81,16 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      */
     public function getPaymentFailurePageUrl($order_id, $message)
     {
+        /** @var Router $frontOfficeRouter */
         $frontOfficeRouter = $this->getContainer()->get('router.front');
 
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
-                "order.failed",
-                array(
-                    "order_id" => $order_id,
-                    "message" => $message
-                ),
+                "order.failed_message_as_parameter",
+                [ "order_id" => $order_id ],
                 Router::ABSOLUTE_URL
-            )
+            ),
+            [ "message" => $message ]
         );
     }
 
