@@ -338,7 +338,7 @@
                                 {assign "paymentModuleId" $ID}
                                 <li class="list-group-item text-left">
                                     <label for="payment_{$paymentModuleId}">
-                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
+                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if ($LOOP_TOTAL ==1 && $LOOP_COUNT == 1) || ($value == $paymentModuleId)}checked{/if}>
                                         {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
                                             <img src="{$IMAGE_URL nofilter}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                         {/loop}
