@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Product;
 use Thelia\Model\Product;
 use Thelia\Core\Event\ActionEvent;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\ProductEvent
+ */
 class ProductEvent extends ActionEvent
 {
     public $product = null;

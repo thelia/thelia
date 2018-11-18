@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Template;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Template;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\TemplateEvent
+ */
 class TemplateEvent extends ActionEvent
 {
     /**

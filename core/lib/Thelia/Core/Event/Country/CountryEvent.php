@@ -19,6 +19,7 @@ use Thelia\Model\Country;
  * Class CountryEvent
  * @package Thelia\Core\Event\Country
  * @author Manuel Raynaud <manu@raynaud.io>
+ * @deprecated since 2.4, please use \Thelia\Model\Event\CountryEvent
  */
 class CountryEvent extends ActionEvent
 {
