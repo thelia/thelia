@@ -15,7 +15,6 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
@@ -24,6 +23,7 @@ use Thelia\Log\Tlog;
 
 /**
  * Propel cache and initialization service.
+ * @since 2.4
  */
 class PropelInitService
 {
@@ -327,10 +327,15 @@ class PropelInitService
     /**
      * Initialize the Propel environment and connection.
      * @return bool Whether a Propel connection is available.
+     * @param bool $force force cache generation
      * @throws \Exception
      */
-    public function init()
+    public function init($force = false)
     {
+        if ($force) {
+            (new Filesystem())->remove($this->getPropelCacheDir());
+        }
+
         if (!file_exists($this->getTheliaDatabaseConfigFile())) {
             return false;
         }

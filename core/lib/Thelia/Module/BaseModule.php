@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
@@ -76,18 +77,26 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
+            $moduleModel->setActivate(self::IS_ACTIVATED);
+            $moduleModel->save();
+
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
                 $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
-                    $moduleModel->setActivate(self::IS_ACTIVATED);
-                    $moduleModel->save($con);
+                    if ($this->hasPropelSchema()) {
+                        // force models generation for this module
+                        $this->container->get('thelia.propel.init')->init(true);
+                    }
+
                     $this->postActivation($con);
                     $con->commit();
                 }
             } catch (\Exception $e) {
                 $con->rollBack();
+                $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
+                $moduleModel->save();
                 throw $e;
             }
 
@@ -743,6 +752,24 @@ class BaseModule implements BaseModuleInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @since 2.4
+     * @return string
+     */
+    protected function getPropelSchemaDir()
+    {
+        return THELIA_MODULE_DIR . $this->getCode() . DS . 'Config' . DS . 'schema.xml';
+    }
+
+    /**
+     * @since 2.4
+     * @return bool
+     */
+    protected function hasPropelSchema()
+    {
+        return (new Filesystem())->exists($this->getPropelSchemaDir());
     }
 
     /**
