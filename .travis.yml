@@ -2,30 +2,56 @@ sudo: false
 dist: trusty
 addons:
   apt_packages:
-    - language-pack-fr
-    - language-pack-fr-base
+  - language-pack-fr
+  - language-pack-fr-base
 language: php
 cache:
   directories:
   - $HOME/.composer/cache
   - $HOME/casperjs-1.1.4
-php:
-- 5.6
-- 7.0
-- 7.1
-- 7.2
-- nightly
 matrix:
+  include:
+  - name: "PHP 5.6 MariaDB 10.2"
+    php: "5.6"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
+  - name: "PHP 7.0"
+    php: "7.0"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
+  - name: "PHP 7.0 Composer full update"
+    php: "7.0"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=1 DISABLE_XDEBUG=1
+  - name: "PHP 7.1"
+    php: "7.1"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
+  - name: "PHP 7.1 Composer full update"
+    php: "7.1"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=1 DISABLE_XDEBUG=1
+  - name: "PHP 7.2"
+    php: "7.2"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
+  - name: "PHP 7.2 Composer full update"
+    php: "7.2"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=1 DISABLE_XDEBUG=1
+  - name: "PHP 7.3"
+    php: "7.3"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0
+  - name: "PHP 7.3 Composer full update"
+    php: "7.3"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=1
+  - name: "PHP nightly"
+    php: "nightly"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0
+  - name: "PHP nightly Composer full update"
+    php: "nightly"
+    env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=1
   allow_failures:
   - php: nightly
-env:
-- DB_USER=root DB_HOST=127.0.0.1
 before_script:
+- if [ "$DISABLE_XDEBUG" = "1" ]; then phpenv config-rm xdebug.ini; fi
 - phpenv config-add travis.php.ini
-# xdebug.ini is missing in 7.2 distrib.
-# - phpenv config-rm xdebug.ini
 - composer self-update
 - composer install --no-interaction --prefer-dist
+- if [ "$COMPOSIER_FULL_UPDATE" = "1" ]; then composer update --no-interaction --prefer-dist; fi
 - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS
   thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
 - php Thelia thelia:install --db_host=$DB_HOST --db_username=$DB_USER --db_name=thelia

@@ -181,7 +181,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $schemaContent = str_replace(
                     '%%XSD_LOCATION%%',
                     $fs->makePathRelative(
-                        THELIA_VENDOR . 'propel/propel/resources/xsd/',
+                        THELIA_VENDOR . 'thelia/propel/resources/xsd/',
                         $this->moduleDirectory
                     ) . 'database.xsd',
                     $schemaContent

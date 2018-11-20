@@ -40,7 +40,7 @@ class SchemaCombinerTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/propel/propel/resources/xsd/database.xsd';
+        self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/thelia/propel/resources/xsd/database.xsd';
 
         $schemaProcessorReflection = new \ReflectionClass('Thelia\Core\Propel\Schema\SchemaCombiner');
         $databaseInheritableAttributesProperty

@@ -7,12 +7,6 @@
         "forum": "http://thelia.net/forum",
         "wiki": "http://doc.thelia.net"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/thelia/Propel2"
-        }
-    ],
     "require": {
         "php": "^5.6|^7.0",
         "psr/log": "1.0",
@@ -51,7 +45,7 @@
         "oyejorge/less.php": "1.7.*",
         "michelf/php-markdown": "1.6.*",
         "smarty/smarty": "3.1.33",
-        "propel/propel": "dev-thelia-2.4",
+        "thelia/propel": "dev-thelia-2.4",
         "commerceguys/addressing": "0.8.*",
         "symfony/cache": "^3.4|^4.0",
         "symfony/polyfill-php56": "^1.0",
