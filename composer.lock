@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "805373ef94600d608c880af0d1d4c6cb",
+    "content-hash": "42329c310f661b86a7ca45b448aa32fa",
     "packages": [
         {
             "name": "commerceguys/addressing",
