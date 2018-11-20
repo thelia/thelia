@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\PropelInitService;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -48,6 +49,10 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMockEventDispatcher();
 
         $container->set("event_dispatcher", $dispatcher);
+
+        $propelInitService = $this->getMockPropelInitService();
+
+        $container->set('thelia.propel.init', $propelInitService);
 
         $request = new Request();
         $request->setSession($this->getSession());
@@ -93,6 +98,14 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
     protected function getMockEventDispatcher()
     {
         return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+    }
+
+    /**
+     * @return PropelInitService
+     */
+    protected function getMockPropelInitService()
+    {
+        return $this->createMock(PropelInitService::class);
     }
 
     /**
