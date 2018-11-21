@@ -214,7 +214,7 @@ class Form extends AbstractSmartyPlugin
             $template->assign("choices", $formFieldView->vars['choices']);
         }
 
-        /* access to collections */
+        /* access to choice collections */
         if ($formFieldType instanceof CollectionType) {
             /* access to choices */
             if ($formFieldConfig->getOption('prototype', false)
@@ -222,17 +222,17 @@ class Form extends AbstractSmartyPlugin
                 isset($formFieldView->vars['prototype']->vars['choices'])
             ) {
                 /*
-                 * Get option from this form of declaration :
+                 * Get list of choices for a collection of 'choice' from this form of declaration :
                  * ->formBuilder->add(
-                    'name',
-                    'collection', [
-                        'type'         => 'choice',
-                        'allow_add'    => true,
-                        'allow_delete' => true,
-                        'options' => [
-                            'choices' => PrixEtPoints::getRubriquesChoices(),
-                        ]
-                    ])
+                 *   'name',
+                 *   'collection', [
+                 *       'type'         => 'choice',
+                 *       'allow_add'    => true,
+                 *       'allow_delete' => true,
+                 *       'options' => [
+                 *           'choices' => PrixEtPoints::getRubriquesChoices(),
+                 *       ]
+                 *   ])
                  */
                 $formFieldView->vars['choices'] = $formFieldView->vars['prototype']->vars['choices'];
             } else {
