@@ -135,7 +135,7 @@ class PropelInitService
      */
     public function getPropelModelDir()
     {
-        return $this->getPropelCacheDir() . 'model' . DS;
+        return THELIA_PROPEL_BUILD_PATH;
     }
 
     /**
@@ -261,6 +261,8 @@ class PropelInitService
             return;
         }
 
+        $hash = '';
+
         $fs->mkdir($this->getPropelSchemaDir());
 
         $schemaCombiner = new SchemaCombiner(
@@ -282,7 +284,11 @@ class PropelInitService
                 $schemaCombiner->getCombinedDocument($database)->saveXML(),
                 $databaseSchemaResources
             );
+
+            $hash .= md5(file_get_contents($this->getPropelSchemaDir() . $database .'.schema.xml'));
         }
+
+        $fs->dumpFile($this->getPropelCacheDir() . 'hash', $hash);
     }
 
     /**
@@ -293,10 +299,13 @@ class PropelInitService
     {
         $fs = new Filesystem();
 
-        // TODO: caching rules ?
-        if ($fs->exists($this->getPropelModelDir())) {
+        // cache testing
+        if ($fs->exists($this->getPropelModelDir() . 'hash')
+            && file_get_contents($this->getPropelCacheDir() . 'hash') === file_get_contents($this->getPropelModelDir() . 'hash')) {
             return;
         }
+
+        $fs->remove($this->getPropelModelDir());
 
         $this->runCommand(
             new ModelBuildCommand(),
@@ -304,6 +313,11 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
             ]
+        );
+
+        $fs->copy(
+            $this->getPropelCacheDir() . 'hash',
+            $this->getPropelModelDir() . 'hash'
         );
     }
 
@@ -338,11 +352,6 @@ class PropelInitService
 
         if (!file_exists($this->getTheliaDatabaseConfigFile())) {
             return false;
-        }
-
-        // this will be used in our Propel model builders
-        if (!defined('THELIA_PROPEL_BUILDER_ENVIRONMENT')) {
-            define('THELIA_PROPEL_BUILDER_ENVIRONMENT', $this->environment);
         }
 
         $this->buildPropelConfig();
