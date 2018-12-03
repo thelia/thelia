@@ -120,7 +120,7 @@
     .clear-none {
         padding: 0.5%;
     }
-	
+
 	{hook name="invoice.css"}
 
 </style>
@@ -195,7 +195,7 @@
         {/forhook}
         {/hookblock}
     </table>
-	
+
 	{hook name="invoice.after-information" order=$order_id}
 
     <table class="table-address">
@@ -208,7 +208,7 @@
                     {* delivery module can customize the delivery address *}
                     {hook name="invoice.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                 {/ifhook}
-                {elsehook rel="invoice.delivery-address"}                
+                {elsehook rel="invoice.delivery-address"}
 				    {format_address order_address=$DELIVERY_ADDRESS locale=$locale}
                	{/elsehook}
             </td>
@@ -250,7 +250,7 @@
                 {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
             {/if}
 
-            {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
+            {$taxes[{$TAX_RULE_TITLE}][] = floatval($realTax) * $QUANTITY}
 
             <tr class="table-2">
                 <td>
@@ -273,7 +273,7 @@
                 <td><p class="align-right">{format_money number=$realTotalPrice currency_id=$CURRENCY}</p></td>
             </tr>
 
-            {hook name="invoice.order-product" order="{$order_id}" order_product="{$ID}"}
+            {hook name="invoice.order-product" order={$order_id} order_product={$ID}}
         {/loop}
     </table>
 
