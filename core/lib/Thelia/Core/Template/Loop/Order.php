@@ -88,6 +88,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                             'id', 'id-reverse',
                             'reference', 'reference-reverse',
                             'create-date', 'create-date-reverse',
+                            'invoice-date', 'invoice-date-reverse',
                             'company', 'company-reverse',
                             'customer-name', 'customer-name-reverse',
                             'status', 'status-reverse'
@@ -233,6 +234,12 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     break;
                 case 'create-date-reverse':
                     $search->orderByCreatedAt(Criteria::DESC);
+                    break;
+                case 'invoice-date':
+                    $search->orderByInvoiceDate(Criteria::ASC);
+                    break;
+                case 'invoice-date-reverse':
+                    $search->orderByInvoiceDate(Criteria::DESC);
                     break;
                 case 'status':
                     $search->orderByStatusId(Criteria::ASC);
