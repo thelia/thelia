@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8101a46ea4f2609c94ab3992a467200",
+    "content-hash": "2aa7e177dc5de271b8ffe0b5de1cef99",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -1721,7 +1721,7 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v2.8.48",
+            "version": "v2.8.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
