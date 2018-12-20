@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "628bd7632612c75c3bf7a8772b86f32e",
+    "content-hash": "9cc2bbc47b1c3834181044e21c069282",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -2890,7 +2890,7 @@
         },
         {
             "name": "symfony/property-access",
-            "version": "v2.8.48",
+            "version": "v2.8.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/property-access.git",
