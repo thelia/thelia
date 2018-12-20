@@ -9,6 +9,9 @@
     },
     "require": {
         "php": "^5.6|^7.0",
+        "ext-xml": "*",
+        "ext-zip": "*",
+        "ext-curl": "*",
         "psr/log": "1.0",
         "composer/composer": "^1.8",
         "symfony/config": "^2.8|^3.4|^4.0",
