@@ -56,7 +56,7 @@ Parameters:
                 </div>
 
                 <form method="POST" action="{url path="/admin/image/type/%image/%id/update-title" image=$imageType id=$ID}" class="clearfix">
-                    <input type="hidden" name="success_url" value="{navigate to='current'}"/>
+                    <input type="hidden" name="success_url" value="{$success_url}"/>
                     <input type="hidden" name="locale" value="{$edit_language_locale}"/>
 
                     <div class="input-group">
