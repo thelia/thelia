@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9cc2bbc47b1c3834181044e21c069282",
+    "content-hash": "8afc1bc5b48023e05d417d0ab4cef028",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -1260,7 +1260,7 @@
         },
         {
             "name": "symfony/config",
-            "version": "v2.8.48",
+            "version": "v2.8.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
