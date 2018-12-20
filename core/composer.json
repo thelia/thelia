@@ -24,7 +24,7 @@
         "symfony/options-resolver": "2.8.*",
         "symfony/security": "2.8.*",
         "symfony/expression-language": "2.8.*",
-        "symfony/process": "2.8.*",
+        "symfony/process": "^2.8|^3.4|^4.0",
         "symfony/dom-crawler": "2.8.*",
         "symfony/property-access": "2.8.*",
         "symfony/serializer": "2.8.*",
