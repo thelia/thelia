@@ -1154,7 +1154,7 @@ return array(
     'This category has no sub-categories.' => 'Cette rubrique n\'a pas de sous-rubrique.',
     'This category has no sub-categories. To create a new one, click the + button above.' => 'Cette rubrique n\'a pas de sous-rubrique. Pour en créer une nouvelle, cliquez sur le bouton + ci-dessus.',
     'This country is not included in any shipping zone' => 'Ce pays ne fait partie d\'aucune zone de livraison',
-    'This customer has not defined any delivery address' => 'Ce client n\'a pas saisi aucune adresse de livraison',
+    'This customer has not defined any delivery address' => 'Ce client n\'a saisi aucune adresse de livraison',
     'This customer has orders, and can\'t be deleted.' => 'Ce client a effectué des commandes, et ne peut être supprimé.',
     'This delivery module handles all shipping zones.' => 'Ce module livre dans toutes les zones de livraison.',
     'This folder doesn\'t contains any contents. To add a new content, <strong>click the + button</strong> above.' => 'Ce dossier n\'a aucun contenu. Pour ajouter un nouveau contenu, <strong>cliquez sur le bouton + ci-dessus</strong>.',
