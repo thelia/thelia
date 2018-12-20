@@ -2,11 +2,11 @@
 
 namespace Thelia\Core;
 
+use Composer\Autoload\ClassLoader;
 use Propel\Generator\Command\ConfigConvertCommand;
 use Propel\Generator\Command\ModelBuildCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
-use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Console\Command\Command;
@@ -328,7 +328,7 @@ class PropelInitService
     {
         $loader = new ClassLoader();
 
-        $loader->addPrefix(
+        $loader->add(
             '', // no prefix, models already define their full namespace
             $this->getPropelModelDir()
         );

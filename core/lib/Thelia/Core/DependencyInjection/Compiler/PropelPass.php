@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\DependencyInjection\Compiler;
 
-use Symfony\Component\ClassLoader\ClassMapGenerator;
+use Composer\Autoload\ClassMapGenerator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Finder\Finder;
