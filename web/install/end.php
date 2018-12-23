@@ -49,8 +49,7 @@ try {
         exit; // Don't forget to exit, otherwise, the script will continue to run.
     }
 
-    if($_SESSION['install']['step'] == 5){
-
+    if ($_SESSION['install']['step'] == 5) {
         // Check now if we can create the App.
         $thelia = new \Thelia\Core\Thelia("install", true);
         $thelia->boot();
@@ -64,22 +63,10 @@ try {
             ->setEmail($_POST['admin_email'])
             ->save();
 
-
-        \Thelia\Model\ConfigQuery::create()
-            ->filterByName('store_email')
-            ->update(array('Value' => $_POST['store_email']));
-
-        \Thelia\Model\ConfigQuery::create()
-            ->filterByName('store_notification_emails')
-            ->update(array('Value' => $_POST['store_email']));
-
-        \Thelia\Model\ConfigQuery::create()
-            ->filterByName('store_name')
-            ->update(array('Value' => $_POST['store_name']));
-
-        \Thelia\Model\ConfigQuery::create()
-            ->filterByName('url_site')
-            ->update(array('Value' => $_POST['url_site']));
+        \Thelia\Model\ConfigQuery::write('store_email', $_POST['store_email']);
+        \Thelia\Model\ConfigQuery::write('store_notification_emails', $_POST['store_email']);
+        \Thelia\Model\ConfigQuery::write('store_name', $_POST['store_name']);
+        \Thelia\Model\ConfigQuery::write('url_site', $_POST['url_site']);
 
         $lang = \Thelia\Model\LangQuery::create()
             ->findOneByLocale(empty($_POST['shop_locale']) ? "en_US" : $_POST['shop_locale'])
@@ -88,9 +75,33 @@ try {
         if (null !== $lang) {
             $lang->toggleDefault();
         }
+
         $secret = \Thelia\Tools\TokenProvider::generateToken();
 
         \Thelia\Model\ConfigQuery::write('form.secret', $secret, 0, 0);
+
+        // Check if symlinks are working, and adjust original_image_delivery_mode and original_document_delivery_mode
+        $target = __DIR__ . '/../symlink_test';
+        // One never knows...
+        @unlink($target);
+
+        if (true === touch($target)) {
+            $link = $target . '.tmp';
+            // One never knows...
+            @unlink($link);
+
+            if (false === @symlink($target, $link)) {
+                $mode = 'copy';
+            } else {
+                $mode = 'symlink';
+                @unlink($link);
+            }
+
+            @unlink($target);
+
+            \Thelia\Model\ConfigQuery::write('original_image_delivery_mode', $mode);
+            \Thelia\Model\ConfigQuery::write('original_document_delivery_mode', $mode);
+        }
     }
 
     //clean up cache directories
@@ -106,7 +117,7 @@ try {
 
     // Retrieve the website url
     $url = $_SERVER['PHP_SELF'];
-    $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
+    $website_url = preg_replace("#/install/[a-z](.*)#", '', $url);
 
     ?>
     <div class="well">
@@ -114,8 +125,8 @@ try {
             <?php echo $trans->trans('Thelia is now installed. Thank you !'); ?>
         </p>
 
-<?php
-$scriptHook = <<<SCRIPT
+    <?php
+    $scriptHook = <<<SCRIPT
 <script>
     $(document).ready(function() {
         var current_site_url = "{$website_url}";
@@ -129,9 +140,9 @@ $scriptHook = <<<SCRIPT
 </script>
 SCRIPT;
 
-ob_start();
-include('footer.php');
-$footerContent = ob_get_clean();
+    ob_start();
+    include('footer.php');
+    $footerContent = ob_get_clean();
 
     // Remove the install wizard
     /*try {
@@ -161,8 +172,7 @@ $footerContent = ob_get_clean();
     <?php
 
     echo $footerContent;
-}
-catch (\Exception $ex) {
+} catch (\Exception $ex) {
     ?>
     <div class="alert alert-danger">
         <?php echo $trans->trans(
@@ -173,8 +183,8 @@ catch (\Exception $ex) {
             ]
         ); ?>
     </div>
-<?php
+    <?php
 
-include('footer.php');
+    include('footer.php');
 }
 
