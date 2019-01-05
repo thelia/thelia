@@ -145,7 +145,7 @@
                                 {$btnstyle="btn-danger"}
                             {/elseloop}
 
-                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID} btn-area-config" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} config-btn-{$ID} btn-area-config" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
 
                         {$buttons = []}
