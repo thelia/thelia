@@ -78,6 +78,8 @@ use Thelia\Type\TypeCollection;
  * @method string[] getFeatureValues()
  * @method string[] getAttributeNonStrictMatch()
  * @method int[] getTemplateId()
+ * @method int[] getTaxRuleId()
+ * @method int[] getExcludeTaxRuleId()
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -117,6 +119,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createIntTypeArgument('currency'),
             Argument::createAnyTypeArgument('title'),
             Argument::createIntListTypeArgument('template_id'),
+            Argument::createIntListTypeArgument('tax_rule_id'),
+            Argument::createIntListTypeArgument('exclude_tax_rule_id'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -732,6 +736,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     ->filterByCategoryId($exclude_category, Criteria::NOT_IN)
                 ->endUse()
             ;
+        }
+
+        if (null !== $taxRuleIdList = $this->getTaxRuleId()) {
+            $search->filterByTaxRuleId($taxRuleIdList, Criteria::IN);
+        }
+
+        if (null !== $taxRuleIdList = $this->getExcludeTaxRuleId()) {
+            $search->filterByTaxRuleId($taxRuleIdList, Criteria::NOT_IN);
         }
 
         $new        = $this->getNew();
