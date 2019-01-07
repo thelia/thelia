@@ -147,22 +147,25 @@ class Order extends BaseOrder
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
-        $orderInfo = OrderProductQuery::create()
+        $amount = OrderProductQuery::create()
             ->filterByOrderId($this->getId())
-            ->leftJoinOrderProductTax()
-            ->withColumn('SUM(
-                ' . OrderProductTableMap::COL_QUANTITY . '
-                * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')
-            )', 'total_tax')
             ->withColumn('SUM(
                 ' . OrderProductTableMap::COL_QUANTITY . '
                 * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
             )', 'total_amount')
-            ->select([ 'total_tax', 'total_amount' ])
+            ->select([ 'total_amount' ])
             ->findOne();
 
-        $tax = $orderInfo['total_tax'];
-        $amount = $orderInfo['total_amount'];
+        $tax = OrderProductTaxQuery::create()
+            ->useOrderProductQuery()
+                ->filterByOrderId($this->getId())
+            ->endUse()
+            ->withColumn('SUM(
+                ' . OrderProductTableMap::COL_QUANTITY . '
+                * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')
+            )', 'total_tax')
+            ->select([ 'total_tax' ])
+            ->findOne();
 
         $total = $amount + $tax;
 
