@@ -119,6 +119,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      * @param $searchTerm
      * @param $searchIn
      * @param $searchCriteria
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
@@ -281,12 +282,20 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         return $search;
     }
 
+    /**
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function parseResults(LoopResult $loopResult)
     {
         /**  @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
-            $tax = 0;
+            $tax = $itemsTax = 0;
+
             $amount = $order->getTotalAmount($tax);
+            $itemsAmount = $order->getTotalAmount($itemsTax, false, false);
+
             $hasVirtualDownload = $order->hasVirtualProduct();
 
             $loopResultRow = new LoopResultRow($order);
@@ -313,6 +322,9 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('STATUS_CODE', $order->getOrderStatus()->getCode())
                 ->set('LANG', $order->getLangId())
                 ->set('DISCOUNT', $order->getDiscount())
+                ->set('TOTAL_ITEMS_TAX', $itemsTax)
+                ->set('TOTAL_ITEMS_AMOUNT', $itemsAmount - $itemsTax)
+                ->set('TOTAL_TAXED_ITEMS_AMOUNT', $itemsAmount)
                 ->set('TOTAL_TAX', $tax)
                 ->set('TOTAL_AMOUNT', $amount - $tax)
                 ->set('TOTAL_TAXED_AMOUNT', $amount)
