@@ -186,7 +186,7 @@ class MailerFactory
         if (! empty($store_email)) {
             if (! empty($to)) {
                 try {
-                    $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc);
+                    $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
 
                     $sentCount = $this->send($instance, $failedRecipients);
 
