@@ -136,7 +136,7 @@ abstract class BaseLoop
         }
 
         if (!isset(self::$loopDefinitionsArgs[$class])) {
-            self::$loopDefinitionsArgs[$class] = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
+            $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
 
             $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS);
             if (null !== $eventName) {
@@ -145,6 +145,8 @@ abstract class BaseLoop
                     new LoopExtendsArgDefinitionsEvent($this)
                 );
             };
+
+            self::$loopDefinitionsArgs[$class] = $this->args;
         }
 
         $this->args = self::$loopDefinitionsArgs[$class];
@@ -536,9 +538,9 @@ abstract class BaseLoop
         }
 
         $parsedResults = $this->extendsParseResults($this->parseResults($loopResult));
-    
+
         $loopResult->finalizeRows();
-    
+
         if ($isCaching) {
             self::$cacheLoopResult[$hash] = $parsedResults;
 
