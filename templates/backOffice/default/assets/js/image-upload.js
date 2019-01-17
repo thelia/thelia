@@ -19,7 +19,7 @@ $(function($){
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
             acceptedFiles: 'image/png, image/gif, image/jpeg'
-        });    
+        });
 
         var totalFiles      = 0,
             completedFiles  = 0;
@@ -46,8 +46,8 @@ $(function($){
             $.imageUploadManager.onClickDeleteImage();
             $.imageUploadManager.onClickToggleVisibilityImage();
         });
-        
-              
+
+
 
     };
 
@@ -58,6 +58,9 @@ $(function($){
         $.ajax({
             type: "POST",
             url: imageListUrl,
+            data: {
+                success_url,
+            },
             statusCode: {
                 404: function() {
                     $imageListArea.html(
