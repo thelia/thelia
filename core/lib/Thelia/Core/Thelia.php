@@ -99,6 +99,24 @@ class Thelia extends Kernel
                         Tlog::getInstance()->addWarning("Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.");
                     }
                 }
+            } else {
+                // MariaDB 10.2.4+ compatibility
+                if (version_compare($data['version'], '10.2.4', '>=')) {
+                    // remove STRICT_TRANS_TABLES
+                    if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
+                        unset($sessionSqlMode[$key]);
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.");
+                    }
+                }
+
+                if (version_compare($data['version'], '10.1.7', '>=')) {
+                    if (!in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                        $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
+                    }
+                }
             }
 
             if (! empty($canUpdate)) {
