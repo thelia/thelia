@@ -20,6 +20,7 @@ use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\FileException;
 use Thelia\Files\FileManager;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductImageTableMap;
 use Thelia\Tools\URL;
 
@@ -46,9 +47,14 @@ abstract class BaseCachedFile extends BaseAction
      */
     protected $fileManager;
 
+    /** @var null|string */
+    protected $cdnBaseUrl;
+
     public function __construct(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
+
+        $this->cdnBaseUrl = ConfigQuery::read('cdn.documents-base-url', null);
     }
 
     /**
@@ -104,7 +110,7 @@ abstract class BaseCachedFile extends BaseAction
     {
         $path = $this->getCachePathFromWebRoot($subdir);
 
-        return URL::getInstance()->absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE);
+        return URL::getInstance()->absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE, $this->cdnBaseUrl);
     }
 
     /**
