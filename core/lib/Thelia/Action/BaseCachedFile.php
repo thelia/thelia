@@ -63,6 +63,14 @@ abstract class BaseCachedFile extends BaseAction
     abstract protected function getCacheDirFromWebRoot();
 
     /**
+     * @param string $url the fully qualified CDN URL that will be used to create doucments URL.
+     */
+    public function setCdnBaseUrl($url)
+    {
+        $this->cdnBaseUrl = $url;
+    }
+
+    /**
      * Clear the file cache. Is a subdirectory is specified, only this directory is cleared.
      * If no directory is specified, the whole cache is cleared.
      * Only files are deleted, directories will remain.
