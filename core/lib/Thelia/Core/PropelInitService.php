@@ -15,10 +15,14 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 
 /**
@@ -342,39 +346,55 @@ class PropelInitService
      * Initialize the Propel environment and connection.
      * @return bool Whether a Propel connection is available.
      * @param bool $force force cache generation
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function init($force = false)
     {
-        if ($force) {
-            (new Filesystem())->remove($this->getPropelCacheDir());
-        }
+        $flockFactory = new Factory(new FlockStore());
 
-        if (!file_exists($this->getTheliaDatabaseConfigFile())) {
-            return false;
-        }
+        $lock = $flockFactory->createLock('propel-cache-generation');
 
-        $this->buildPropelConfig();
+        // Acquire a blocking cache generation lock
+        $lock->acquire(true);
 
-        $this->buildPropelInitFile();
-        require $this->getPropelInitFile();
+        try {
+            if ($force) {
+                (new Filesystem())->remove($this->getPropelCacheDir());
+            }
 
-        $theliaDatabaseConnection = Propel::getConnection('thelia');
-        $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
+            if (!file_exists($this->getTheliaDatabaseConfigFile())) {
+                return false;
+            }
 
-        $this->buildPropelGlobalSchema();
+            $this->buildPropelConfig();
 
-        $this->buildPropelModels();
-        $this->registerPropelModelLoader();
+            $this->buildPropelInitFile();
+            require $this->getPropelInitFile();
 
-        $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+            $theliaDatabaseConnection = Propel::getConnection('thelia');
+            $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
 
-        if ($this->debug) {
-            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-            Tlog::getInstance()->setLevel(Tlog::DEBUG);
+            $this->buildPropelGlobalSchema();
 
-            Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
-            $theliaDatabaseConnection->useDebug(true);
+            $this->buildPropelModels();
+            $this->registerPropelModelLoader();
+
+            $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+
+            if ($this->debug) {
+                // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
+                Tlog::getInstance()->setLevel(Tlog::DEBUG);
+
+                Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
+                $theliaDatabaseConnection->useDebug(true);
+            }
+        } catch (\Throwable $th) {
+            Tlog::getInstance()->error("Failed to initialize Propel : " . $th->getMessage());
+
+            throw $th;
+        } finally {
+            // Release cache generation lock
+            $lock->release();
         }
 
         return true;
