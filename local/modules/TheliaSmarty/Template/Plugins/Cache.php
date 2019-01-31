@@ -16,6 +16,8 @@ use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\Customer;
+use Thelia\TaxEngine\TaxEngine;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
@@ -35,16 +37,21 @@ class Cache extends AbstractSmartyPlugin
     /** @var bool */
     protected $debug;
 
+    /** @var TaxEngine */
+    protected $taxEngine;
+
     /**
      * Cache constructor.
      * @param AdapterInterface $esiFragmentRenderer
      * @param RequestStack $requestStack
-     * @param bool $debug
+     * @param TaxEngine $taxEngine
+     * @param $debug
      */
-    public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, $debug)
+    public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, TaxEngine $taxEngine, $debug)
     {
         $this->adapter = $esiFragmentRenderer;
         $this->requestStack = $requestStack;
+        $this->taxEngine = $taxEngine;
         $this->debug = $debug;
     }
 
@@ -106,6 +113,19 @@ class Cache extends AbstractSmartyPlugin
             }
             if (!isset($params['currency'])) {
                 $params['currency'] = $session->getCurrency(true)->getId();
+            }
+
+            if (!isset($params['country'])) {
+                $params['country'] = $this->taxEngine->getDeliveryCountry()->getId();
+            }
+
+            if (!isset($params['customer_discount'])) {
+                /** @var Customer $customer */
+                if (null !== $customer = $session->getCustomerUser()) {
+                    $params['customer_discount'] = $customer->getDiscount();
+                } else {
+                    $params['customer_discount'] = 0;
+                }
             }
         }
 
