@@ -23,9 +23,11 @@ use Thelia\Tools\URL;
 
 class SmartyAssetsResolver implements AssetResolverInterface
 {
-    private $path_relative_to_web_root;
+    protected $path_relative_to_web_root;
 
-    private $assetsManager;
+    protected $assetsManager;
+
+    protected $cdnBaseUrl;
 
     /**
      * Creates a new SmartyAssetsManager instance
@@ -37,6 +39,16 @@ class SmartyAssetsResolver implements AssetResolverInterface
         $this->path_relative_to_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
         $this->assetsManager = $assetsManager;
+
+        $this->cdnBaseUrl = ConfigQuery::read('cdn.assets-base-url', null);
+    }
+
+    /**
+     * @param string $url the fully qualified CDN URL that will be used to create doucments URL.
+     */
+    public function setCdnBaseUrl($url)
+    {
+        $this->cdnBaseUrl = $url;
     }
 
     /**
@@ -70,7 +82,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
                 THELIA_WEB_DIR . $this->path_relative_to_web_root,
                 $templateDefinition->getPath(),
                 $source,
-                URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
+                URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */, $this->cdnBaseUrl),
                 $type,
                 $filters,
                 $debug

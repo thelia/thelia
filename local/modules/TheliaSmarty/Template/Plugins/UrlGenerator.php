@@ -72,7 +72,10 @@ class UrlGenerator extends AbstractSmartyPlugin
         } else {
             $defaultRouter = null;
         }
+
         $routerId = $this->getParam($params, 'router', $defaultRouter);
+
+        $baseUrl = $this->getParam($params, 'base_url', null);
 
         if ($current) {
             $path = $this->getRequest()->getPathInfo();
@@ -120,9 +123,10 @@ class UrlGenerator extends AbstractSmartyPlugin
             $url = URL::getInstance()->absoluteUrl(
                 $path,
                 $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
-                $mode
+                $mode,
+                $baseUrl
             );
-            
+
             $request = $this->getRequest();
             $requestedLangCodeOrLocale = $params["lang"];
             $view = $request->attributes->get('_view', null);
@@ -142,7 +146,7 @@ class UrlGenerator extends AbstractSmartyPlugin
                         ->filterByViewLocale($lang->getLocale())
                         ->findOneByRedirected(null)
                     ;
-                    
+
                     $path = '';
                     if (null != $urlRewrite) {
                         $path = "/".$urlRewrite->getUrl();
@@ -214,7 +218,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         $to = $this->getParam($params, 'to', null);
 
         $toMethod = $this->getNavigateToMethod($to);
-     
+
         $url = URL::getInstance()->absoluteUrl(
             $this->$toMethod(),
             $this->getArgsFromParam($params, ['noamp', 'to', 'target']),
