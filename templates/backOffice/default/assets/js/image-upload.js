@@ -59,7 +59,7 @@ $(function($){
             type: "POST",
             url: imageListUrl,
             data: {
-                success_url,
+                success_url : success_url,
             },
             statusCode: {
                 404: function() {
