@@ -80,24 +80,22 @@ class SitemapController extends BaseFrontController {
         $cacheExpire = intval(ConfigQuery::read("sitemap_ttl", '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
-        if (!($this->checkAdmin() && "" !== $flush)) {
+        if (!($this->checkAdmin() && "" !== $flush)){
             $cacheContent = $cacheDriver->fetch($cacheKey);
         } else {
             $cacheDriver->delete($cacheKey);
         }
 
         // if not in cache
-        if (false === $cacheContent) {
-            // Render the view. Compression causes problems and is deactivated.
-            $cacheContent = $this->getParser(null)->render(
-                'sitemap.html',
-                [
+        if (false === $cacheContent){
+            // render the view
+            $cacheContent = $this->renderRaw(
+                "sitemap",
+                array(
                     "_lang_" => $lang,
                     "_context_" => $context
-                ],
-                false
+                )
             );
-
             // save cache
             $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
         }
@@ -149,4 +147,4 @@ class SitemapController extends BaseFrontController {
         return (null !== $lang);
     }
 
-}
+} 
