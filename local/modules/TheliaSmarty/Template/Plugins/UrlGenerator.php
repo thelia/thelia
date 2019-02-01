@@ -103,7 +103,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
             $url = $router->generate(
                 $routeId,
-                $this->getArgsFromParam($params, ['route_id', 'router']),
+                $this->getArgsFromParam($params, ['route_id', 'router', 'base_url']),
                 Router::ABSOLUTE_URL
             );
         } else {
@@ -122,7 +122,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
             $url = URL::getInstance()->absoluteUrl(
                 $path,
-                $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
+                $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target', 'base_url'], $excludeParams)),
                 $mode,
                 $baseUrl
             );
@@ -181,7 +181,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $path = strtr($path, $placeholder);
         $keys = array_keys($placeholder);
-        array_walk($keys, function(&$item, $key) {
+        array_walk($keys, function (&$item, $key) {
             $item = str_replace('%', '', $item);
         });
 
@@ -221,7 +221,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $url = URL::getInstance()->absoluteUrl(
             $this->$toMethod(),
-            $this->getArgsFromParam($params, ['noamp', 'to', 'target']),
+            $this->getArgsFromParam($params, ['noamp', 'to', 'target', 'base_url']),
             URL::WITH_INDEX_PAGE
         );
 
@@ -233,7 +233,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         // the view name (without .html)
         $view   = $this->getParam($params, 'view');
 
-        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target'));
+        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target', 'base_url'));
 
         $url = $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
 
