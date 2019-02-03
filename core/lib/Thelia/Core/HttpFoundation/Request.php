@@ -63,7 +63,7 @@ class Request extends BaseRequest
         $pathLength = strlen($pathInfo);
 
         if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
-            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+            && !(bool) ConfigQuery::read('allow_slash_ended_uri', false)
         ) {
             if (null === $this->resolvedPathInfo) {
                 $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
