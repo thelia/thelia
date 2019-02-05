@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Propel\Schema;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Tests\Core\Propel\Schema\Fixtures\Expectation\SchemaCombineExpectation as CombineExpectation;
 
@@ -40,7 +41,13 @@ class SchemaCombinerTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/propel/propel/resources/xsd/database.xsd';
+        $fs = new Filesystem();
+
+        if ($fs->exists(THELIA_VENDOR . '/thelia/propel/resources/xsd/database.xsd')) {
+            self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/thelia/propel/resources/xsd/database.xsd';
+        } else {
+            self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/propel/propel/resources/xsd/database.xsd';
+        }
 
         $schemaProcessorReflection = new \ReflectionClass('Thelia\Core\Propel\Schema\SchemaCombiner');
         $databaseInheritableAttributesProperty
