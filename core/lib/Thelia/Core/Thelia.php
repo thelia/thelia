@@ -79,7 +79,7 @@ class Thelia extends Kernel
                 // MySQL 5.6+ compatibility
                 if (version_compare($data['version'], '5.6.0', '>=')) {
                     // add NO_ENGINE_SUBSTITUTION
-                    if (!in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
                         Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
@@ -111,7 +111,7 @@ class Thelia extends Kernel
                 }
 
                 if (version_compare($data['version'], '10.1.7', '>=')) {
-                    if (!in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
                         Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
@@ -251,7 +251,7 @@ class Thelia extends Kernel
             $loader->load($file->getBaseName());
         }
 
-        if (defined("THELIA_INSTALL_MODE") === false) {
+        if (\defined("THELIA_INSTALL_MODE") === false) {
             $modules = ModuleQuery::getActivated();
 
             $translationDirs = array();
@@ -270,10 +270,10 @@ class Thelia extends Kernel
                         $definition
                     );
 
-                    $compilers = call_user_func(array($module->getFullNamespace(), 'getCompilers'));
+                    $compilers = \call_user_func(array($module->getFullNamespace(), 'getCompilers'));
 
                     foreach ($compilers as $compiler) {
-                        if (is_array($compiler)) {
+                        if (\is_array($compiler)) {
                             $container->addCompilerPass($compiler[0], $compiler[1]);
                         } else {
                             $container->addCompilerPass($compiler);
@@ -480,7 +480,7 @@ class Thelia extends Kernel
      */
     public function getCacheDir()
     {
-        if (defined('THELIA_ROOT')) {
+        if (\defined('THELIA_ROOT')) {
             return THELIA_CACHE_DIR . $this->environment;
         } else {
             return parent::getCacheDir();
@@ -496,7 +496,7 @@ class Thelia extends Kernel
      */
     public function getLogDir()
     {
-        if (defined('THELIA_ROOT')) {
+        if (\defined('THELIA_ROOT')) {
             return THELIA_LOG_DIR;
         } else {
             return parent::getLogDir();

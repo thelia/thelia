@@ -769,7 +769,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->findById($freeTextFeatureAv->getId());
 
                 // If there are no more FeatureAvI18ns for this FeatureAv, remove the corresponding FeatureProduct & FeatureAv
-                if (count($freeTextFeatureAvI18ns) == 0) {
+                if (\count($freeTextFeatureAvI18ns) == 0) {
                     $deleteFeatureProductEvent = new FeatureProductDeleteEvent($event->getProductId(), $event->getFeatureId());
                     $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $deleteFeatureProductEvent);
 

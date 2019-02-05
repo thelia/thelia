@@ -63,7 +63,7 @@ class ModuleManagement
             }
         }
 
-        if (count($errors) > 0) {
+        if (\count($errors) > 0) {
             throw new InvalidModuleException($errors);
         }
     }
@@ -88,8 +88,8 @@ class ModuleManagement
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code = basename(dirname($reflected->getFileName()));
         $version = (string)$content->version;
-        $mandatory = intval($content->mandatory);
-        $hidden = intval($content->hidden);
+        $mandatory = \intval($content->mandatory);
+        $hidden = \intval($content->hidden);
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
 

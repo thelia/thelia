@@ -50,7 +50,7 @@ trait ModelEventDispatcherTrait
 
     protected function dispatchEvent($eventName, ActionEvent $event)
     {
-        if (!is_null($this->dispatcher)) {
+        if (!\is_null($this->dispatcher)) {
             $this->dispatcher->dispatch($eventName, $event);
         }
     }

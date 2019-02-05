@@ -196,7 +196,7 @@ class MailerFactory
                                 "Failed to send message %code. Failed recipients: %failed_addresses",
                                 [
                                     '%code' => $messageCode,
-                                    '%failed_addresses' => is_array($failedRecipients) ? implode(
+                                    '%failed_addresses' => \is_array($failedRecipients) ? implode(
                                         ',',
                                         $failedRecipients
                                     ) : 'none'

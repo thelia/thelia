@@ -59,7 +59,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
 
     protected function formatModuleName($name)
     {
-        if (in_array(strtolower($name), $this->reservedKeyWords)) {
+        if (\in_array(strtolower($name), $this->reservedKeyWords)) {
             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
         }
 

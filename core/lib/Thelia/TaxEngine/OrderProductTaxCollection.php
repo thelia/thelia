@@ -26,7 +26,7 @@ class OrderProductTaxCollection implements \Iterator
 
     public function __construct()
     {
-        foreach (func_get_args() as $tax) {
+        foreach (\func_get_args() as $tax) {
             $this->addTax($tax);
         }
     }

@@ -372,9 +372,9 @@ abstract class AbstractCrudApiController extends BaseApiController
         foreach ($eventsDefinition as $variableName => $eventValue) {
             $value = array();
 
-            if (!empty($eventValue) && !is_array($eventValue)) {
+            if (!empty($eventValue) && !\is_array($eventValue)) {
                 $value = [$eventValue];
-            } elseif (is_array($eventValue)) {
+            } elseif (\is_array($eventValue)) {
                 $value = $eventValue;
             }
 

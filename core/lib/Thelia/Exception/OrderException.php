@@ -31,7 +31,7 @@ class OrderException extends \RuntimeException
 
     public function __construct($message, $code = null, $arguments = array(), $previous = null)
     {
-        if (is_array($arguments)) {
+        if (\is_array($arguments)) {
             $this->arguments = $arguments;
         }
         if ($code === null) {

@@ -53,7 +53,7 @@ class RegisterRouterPass implements CompilerPassInterface
 
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
         }
-        if (defined("THELIA_INSTALL_MODE") === false) {
+        if (\defined("THELIA_INSTALL_MODE") === false) {
             $modules = ModuleQuery::getActivated();
 
             /** @var Module $module */

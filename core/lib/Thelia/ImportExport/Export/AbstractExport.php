@@ -149,7 +149,7 @@ abstract class AbstractExport implements \Iterator
         if ($this->data === null) {
             $data = $this->getData();
 
-            if (is_array($data)) {
+            if (\is_array($data)) {
                 $this->data = $data;
                 $this->dataIsArray = true;
                 reset($this->data);
@@ -410,7 +410,7 @@ abstract class AbstractExport implements \Iterator
         $processedData = [];
 
         foreach ($this->orderAndAliases as $key => $value) {
-            if (is_integer($key)) {
+            if (\is_integer($key)) {
                 $fieldName = $value;
                 $fieldAlias = $value;
             } else {

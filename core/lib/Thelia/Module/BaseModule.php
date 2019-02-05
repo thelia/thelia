@@ -203,7 +203,7 @@ class BaseModule implements BaseModuleInterface
      */
     public function setTitle(Module $module, $titles)
     {
-        if (is_array($titles)) {
+        if (\is_array($titles)) {
             foreach ($titles as $locale => $title) {
                 $moduleI18n = ModuleI18nQuery::create()
                     ->filterById($module->getId())->filterByLocale($locale)
@@ -376,7 +376,7 @@ class BaseModule implements BaseModuleInterface
      */
     public static function getModuleCode()
     {
-        $fullClassName = explode('\\', get_called_class());
+        $fullClassName = explode('\\', \get_called_class());
 
         return end($fullClassName);
     }
@@ -540,7 +540,7 @@ class BaseModule implements BaseModuleInterface
     {
         $moduleHooks = $this->getHooks();
 
-        if (is_array($moduleHooks) && !empty($moduleHooks)) {
+        if (\is_array($moduleHooks) && !empty($moduleHooks)) {
             $allowedTypes = (array) TemplateDefinition::getStandardTemplatesSubdirsIterator();
             $defaultLang = Lang::getDefaultLanguage();
             $defaultLocale = $defaultLang->getLocale();
@@ -551,11 +551,11 @@ class BaseModule implements BaseModuleInterface
             $dispatcher = $this->container->get("event_dispatcher");
 
             foreach ($moduleHooks as $hook) {
-                $isValid = is_array($hook) &&
+                $isValid = \is_array($hook) &&
                     isset($hook["type"]) &&
                     array_key_exists($hook["type"], $allowedTypes) &&
                     isset($hook["code"]) &&
-                    is_string($hook["code"]) &&
+                    \is_string($hook["code"]) &&
                     !empty($hook["code"])
                 ;
 
@@ -726,9 +726,9 @@ class BaseModule implements BaseModuleInterface
     {
         $returnData = array();
 
-        if (is_array($data)) {
+        if (\is_array($data)) {
             foreach ($data as $key => $value) {
-                if (!is_string($key)) {
+                if (!\is_string($key)) {
                     continue;
                 }
 

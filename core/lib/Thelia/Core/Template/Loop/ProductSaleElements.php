@@ -102,15 +102,15 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $product = $this->getProduct();
         $ref = $this->getRef();
 
-        if (! is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
-        if (! is_null($product)) {
+        if (!\is_null($product)) {
             $search->filterByProductId($product, Criteria::EQUAL);
         }
 
-        if (! is_null($ref)) {
+        if (!\is_null($ref)) {
             $search->filterByRef($ref, Criteria::EQUAL);
         }
 

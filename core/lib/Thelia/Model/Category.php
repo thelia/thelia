@@ -204,7 +204,7 @@ class Category extends BaseCategory implements FileModelParentInterface
         $subCategories = CategoryQuery::findAllChild($this->getId());
 
         foreach ($subCategories as $category) {
-            if (!is_null($this->dispatcher)) {
+            if (!\is_null($this->dispatcher)) {
                 $category->setDispatcher($this->getDispatcher());
             }
 

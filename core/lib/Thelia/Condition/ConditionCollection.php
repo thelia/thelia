@@ -107,7 +107,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      */
     public function count()
     {
-        return count($this->conditions);
+        return \count($this->conditions);
     }
 
     /**
@@ -152,7 +152,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if (\is_null($offset)) {
             $this->conditions[] = $value;
         } else {
             $this->conditions[$offset] = $value;

@@ -86,7 +86,7 @@ class Database
                 );
             }
         }
-        $size = count($sql);
+        $size = \count($sql);
         for ($i = 0; $i < $size; $i++) {
             if (!empty($sql[$i])) {
                 $this->execute($sql[$i]);
@@ -141,7 +141,7 @@ class Database
         $query = array();
 
         $tab = explode(";\n", $sql);
-        $size = count($tab);
+        $size = \count($tab);
         for ($i = 0; $i < $size; $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
             $queryTemp = str_replace("|", ";", $queryTemp);
@@ -170,7 +170,7 @@ class Database
                 $tables[] = $row[0];
             }
         } else {
-            $tables = is_array($tables) ? $tables : explode(',', $tables);
+            $tables = \is_array($tables) ? $tables : explode(',', $tables);
         }
 
         $data[] = "\n";

@@ -28,7 +28,7 @@ class TokenProvider
     {
         $data = explode("\0", base64_decode($key), 3);
 
-        if (count($data) !== 3) {
+        if (\count($data) !== 3) {
             $data = ["", "", ""];
         }
 

@@ -192,7 +192,7 @@ abstract class BaseHook
             $tags[] = '<link rel="stylesheet" type="text/css" ';
             $tags[] = ' href="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, [ "href", "rel", "type" ])) {
+                if (\is_string($name) && !\in_array($name, [ "href", "rel", "type" ])) {
                     $tags[] = $name . '="' . $val . '" ';
                 }
             }
@@ -223,7 +223,7 @@ abstract class BaseHook
             $tags[] = '<script type="text/javascript" ';
             $tags[] = ' src="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, [ "src", "type" ])) {
+                if (\is_string($name) && !\in_array($name, [ "src", "type" ])) {
                     $tags[] = $name . '="' . $val . '" ';
                 }
             }
@@ -432,7 +432,7 @@ abstract class BaseHook
     {
         $templateParams = explode(':', $template);
 
-        if (count($templateParams) > 1) {
+        if (\count($templateParams) > 1) {
             $type = $templateParams[0];
             $filepath = $templateParams[1];
         } else {

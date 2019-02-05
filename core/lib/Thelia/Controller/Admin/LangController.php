@@ -344,7 +344,7 @@ class LangController extends BaseAdminController
             $event = new LangUrlEvent();
             foreach ($data as $key => $value) {
                 if (false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
-                    $event->addUrl(substr($key, strlen(LangUrlForm::LANG_PREFIX)), $value);
+                    $event->addUrl(substr($key, \strlen(LangUrlForm::LANG_PREFIX)), $value);
                 }
             }
 

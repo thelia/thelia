@@ -91,7 +91,7 @@ class Customer extends BaseCustomer implements UserInterface
             ->setRef($ref)
         ;
 
-        if (!is_null($lang)) {
+        if (!\is_null($lang)) {
             $this->setLangId($lang);
         }
 

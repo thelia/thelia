@@ -367,7 +367,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $display_initial_price = $product->getVirtualColumn('display_initial_price');
 
-        if (is_null($display_initial_price)) {
+        if (\is_null($display_initial_price)) {
             $display_initial_price = 1;
         }
 
@@ -594,25 +594,25 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
         $ref = $this->getRef();
 
-        if (!is_null($ref)) {
+        if (!\is_null($ref)) {
             $search->filterByRef($ref, Criteria::IN);
         }
 
         $title = $this->getTitle();
 
-        if (!is_null($title)) {
+        if (!\is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $templateIdList = $this->getTemplateId();
 
-        if (!is_null($templateIdList)) {
+        if (!\is_null($templateIdList)) {
             $search->filterByTemplateId($templateIdList, Criteria::IN);
         }
 
@@ -724,13 +724,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $exclude_category = $this->getExcludeCategory();
 
-        if (!is_null($exclude_category)) {
+        if (!\is_null($exclude_category)) {
             $search
                 ->useProductCategoryQuery('ExcludeCategorySelect')
                     ->filterByCategoryId($exclude_category, Criteria::NOT_IN)

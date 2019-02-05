@@ -260,7 +260,7 @@ class FileManager
 
         $allowedType = array('image/jpeg' , 'image/png' ,'image/gif');
 
-        if (in_array($mimeType, $allowedType)) {
+        if (\in_array($mimeType, $allowedType)) {
             $isValid = true;
         }
 

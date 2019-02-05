@@ -29,7 +29,7 @@ class IntToCombinedStringsListType extends BaseType
     {
         foreach (explode(',', $values) as $intToCombinedStrings) {
             $parts = explode(':', $intToCombinedStrings);
-            if (count($parts) != 2) {
+            if (\count($parts) != 2) {
                 return false;
             }
             if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
@@ -79,7 +79,7 @@ class IntToCombinedStringsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = strlen($noSpaceString);
+        $length = \strlen($noSpaceString);
         for ($i=0; $i< $length; $i++) {
             $char = $noSpaceString[$i];
             if ($char == '(') {

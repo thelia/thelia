@@ -190,7 +190,7 @@ class AdminResources
      */
     public function addModuleResources($data, $module = 'thelia')
     {
-        if (null !== $data && is_array($data)) {
+        if (null !== $data && \is_array($data)) {
             $this->resources[$module] = $data;
         } else {
             throw new \Exception("Format pass to addModuleResources method is not valid");

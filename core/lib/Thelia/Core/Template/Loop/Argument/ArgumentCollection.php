@@ -24,7 +24,7 @@ class ArgumentCollection implements \Iterator
 
     public function __construct()
     {
-        $this->addArguments(func_get_args(), true);
+        $this->addArguments(\func_get_args(), true);
     }
 
     /**

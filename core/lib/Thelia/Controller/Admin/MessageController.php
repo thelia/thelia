@@ -205,7 +205,7 @@ class MessageController extends AbstractCrudController
 
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();
-                    if (!in_array($fileName, $list)) {
+                    if (!\in_array($fileName, $list)) {
                         $list[] = $fileName;
                     }
                 }

@@ -114,7 +114,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     {
         if ($this->resultsCollection instanceof ObjectCollection || $this->resultsCollection instanceof PropelModelPager) {
             return $this->resultsCollection->count();
-        } elseif (is_array($this->resultsCollection)) {
+        } elseif (\is_array($this->resultsCollection)) {
             return count($this->resultsCollection);
         } else {
             return 0;

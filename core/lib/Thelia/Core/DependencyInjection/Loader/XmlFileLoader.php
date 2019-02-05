@@ -110,7 +110,7 @@ class XmlFileLoader extends FileLoader
     public function propelOnlyRun(callable $method, $arg)
     {
         if (Thelia::isInstalled()) {
-            call_user_func($method, $arg);
+            \call_user_func($method, $arg);
         }
     }
 

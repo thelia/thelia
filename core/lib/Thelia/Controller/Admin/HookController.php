@@ -67,7 +67,7 @@ class HookController extends AbstractCrudController
             return $response;
         }
 
-        $templateType = intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
+        $templateType = \intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
 
         $json_data = [];
         try {

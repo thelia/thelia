@@ -185,7 +185,7 @@ class ModulePositionCommand extends ContainerAwareCommand
     {
         $isRelative = false;
         foreach (array_count_values($this->positionsList) as $value => $count) {
-            if (is_int($value) && $value[0] !== '+' && $value[0] !== '-') {
+            if (\is_int($value) && $value[0] !== '+' && $value[0] !== '-') {
                 $isAbsolute = true;
 
                 if ($count > 1) {

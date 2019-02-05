@@ -129,7 +129,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -201,19 +201,19 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $title = $this->getTitle();
 
-        if (!is_null($title)) {
+        if (!\is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $exclude_folder = $this->getExcludeFolder();
 
-        if (!is_null($exclude_folder)) {
+        if (!\is_null($exclude_folder)) {
             $search->filterByFolder(
                 FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
                 Criteria::NOT_IN
