@@ -242,7 +242,7 @@ class ProductSaleElementsController extends BaseApiController
                     $this->getRequest()->query->all(),
                     [
                         "id" => implode(",", $updatedId),
-                        "limit" => count($updatedId),
+                        "limit" => \count($updatedId),
                     ]
                 )
             ),

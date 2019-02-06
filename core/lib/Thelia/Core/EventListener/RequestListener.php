@@ -105,7 +105,7 @@ class RequestListener implements EventSubscriberInterface
     public function jsonBody(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!count($request->request->all()) && \in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
+        if (!\count($request->request->all()) && \in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
             if ('json' == $request->getFormat($request->headers->get('Content-Type'))) {
                 $content = $request->getContent();
                 if (!empty($content)) {

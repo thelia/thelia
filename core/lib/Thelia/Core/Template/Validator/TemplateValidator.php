@@ -193,7 +193,7 @@ class TemplateValidator
     {
         $authors = [];
 
-        if (0 !== count($this->xmlDescriptorContent->authors->author)) {
+        if (0 !== \count($this->xmlDescriptorContent->authors->author)) {
             foreach ($this->xmlDescriptorContent->authors->author as $author) {
                 $authors[] = [
                     (string)$author->name,

@@ -69,7 +69,7 @@ class TemplateDescriptorValidator
 
                 $errors = $this->schemaValidate($dom, $xsdFile);
 
-                if (count($errors) === 0) {
+                if (\count($errors) === 0) {
                     return $this;
                 }
             }

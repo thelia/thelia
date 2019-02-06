@@ -288,7 +288,7 @@ class ProductController extends AbstractSeoCrudController
                 $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
             }
 
-            $isDefaultPse = count($saleElement->getAttributeCombinations()) == 0;
+            $isDefaultPse = \count($saleElement->getAttributeCombinations()) == 0;
 
             // If this PSE has no combination -> this is the default one
             // affect it to the thelia.admin.product_sale_element.update form
@@ -1126,7 +1126,7 @@ class ProductController extends AbstractSeoCrudController
                     'use_exchange_rate' => $data['use_exchange_rate'],
                 );
 
-                $count = count($data['product_sale_element_id']);
+                $count = \count($data['product_sale_element_id']);
 
                 for ($idx = 0; $idx < $count; $idx++) {
                     $tmp_data['product_sale_element_id'] = $pse_id = $data['product_sale_element_id'][$idx];
@@ -1198,7 +1198,7 @@ class ProductController extends AbstractSeoCrudController
     {
         $current = array_shift($input);
 
-        if (count($input) > 0) {
+        if (\count($input) > 0) {
             foreach ($current as $element) {
                 $tmp[] = $element;
                 $this->combine($input, $output, $tmp);
@@ -1817,7 +1817,7 @@ class ProductController extends AbstractSeoCrudController
     protected function arrayHasEntries(array $data, array $entries)
     {
         $status = false;
-        $countEntries = count($entries);
+        $countEntries = \count($entries);
 
         foreach ($data as &$line) {
             $localMatch = 0;

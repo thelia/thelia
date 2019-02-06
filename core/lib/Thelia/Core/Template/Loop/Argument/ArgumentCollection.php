@@ -50,7 +50,7 @@ class ArgumentCollection implements \Iterator
      */
     public function isEmpty()
     {
-        return count($this->arguments) == 0;
+        return \count($this->arguments) == 0;
     }
 
     /**
@@ -117,7 +117,7 @@ class ArgumentCollection implements \Iterator
 
     public function getCount()
     {
-        return count($this->arguments);
+        return \count($this->arguments);
     }
 
     /**

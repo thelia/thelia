@@ -628,7 +628,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             // We can only sort by position if we have a single category ID
-            $manualOrderAllowed = (1 == count($categoryDefault));
+            $manualOrderAllowed = (1 == \count($categoryDefault));
         } elseif (null !== $categoryIdList = $this->getCategory()) {
             // Select all products which have one of the required categories as the default one, or an associated one
             $depth = $this->getDepth();
@@ -642,7 +642,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             // We can only sort by position if we have a single category ID, with a depth of 1
-            $manualOrderAllowed = (1 == $depth && 1 == count($categoryIdList));
+            $manualOrderAllowed = (1 == $depth && 1 == \count($categoryIdList));
         } else {
             $search
                 ->leftJoinProductCategory('CategorySelect')
@@ -901,7 +901,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             /* if we don't have any join yet, let's make a global one */
             if (empty($isProductPriceFirstLeftJoin)) {
-                if (count($isPSELeftJoinList) == 0) {
+                if (\count($isPSELeftJoinList) == 0) {
                     $joiningTable = "global";
                     $isPSELeftJoinList[] = $joiningTable;
                     $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);

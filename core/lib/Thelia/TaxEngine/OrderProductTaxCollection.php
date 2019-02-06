@@ -33,7 +33,7 @@ class OrderProductTaxCollection implements \Iterator
 
     public function isEmpty()
     {
-        return count($this->taxes) == 0;
+        return \count($this->taxes) == 0;
     }
 
     /**
@@ -50,7 +50,7 @@ class OrderProductTaxCollection implements \Iterator
 
     public function getCount()
     {
-        return count($this->taxes);
+        return \count($this->taxes);
     }
 
     /**
