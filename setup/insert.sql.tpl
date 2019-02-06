@@ -79,7 +79,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW()),
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW()),
 (71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
-(72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW())
+(72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
+(73, 'apply_customer_discount_on_promo_prices', '1', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2016,8 +2017,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (69, '{$locale}', {intl l='Customer account creation should be confirmed by email (1: yes, 0: no)' locale=$locale}, NULL, NULL, NULL),
     (70, '{$locale}', {intl l='Default number of coupons per page on coupon list' locale=$locale}, NULL, NULL, NULL),
     (71, '{$locale}', {intl l='The URL of the assets CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
-    (72, '{$locale}', {intl l='The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
-
+    (73, '{$locale}', {intl l='The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
+    (72, '{$locale}', {intl l='Apply customer discount to sales and products in promotion' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 

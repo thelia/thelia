@@ -77,7 +77,11 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (67, 'number_default_results_per_page.order_list', '20', 0, 0, NOW(), NOW()),
 (68, 'number_default_results_per_page.customer_list', '20', 0, 0, NOW(), NOW()),
 (69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW()),
-(70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW())
+(70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW()),
+(71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
+(72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
+(73, 'apply_customer_discount_on_promo_prices', '1', 0, 0, NOW(), NOW())
+
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
@@ -2011,7 +2015,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (68, 'de_DE', NULL, NUll, NULL, NULL),
     (69, 'de_DE', NULL, NULL, NULL, NULL),
     (70, 'de_DE', NULL, NULL, NULL, NULL),
-    (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
+    (71, 'de_DE', NULL, NULL, NULL, NULL),
+    (73, 'de_DE', NULL, NULL, NULL, NULL),
+    (72, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
     (4, 'en_US', 'Name of the active PDF template', NULL, NULL, NULL),
@@ -2067,7 +2073,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (68, 'en_US', 'Default number of customers on customer list', NUll, NULL, NULL),
     (69, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (70, 'en_US', 'Default number of coupons per page on coupon list', NULL, NULL, NULL),
-    (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
+    (71, 'en_US', NULL, NULL, NULL, NULL),
+    (73, 'en_US', NULL, NULL, NULL, NULL),
+    (72, 'en_US', NULL, NULL, NULL, NULL),    (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
     (4, 'es_ES', 'Nombre de la plantilla PDF activa', NULL, NULL, NULL),
@@ -2123,7 +2131,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (68, 'es_ES', 'Número predeterminado de resultados por página para la lista de clientes', NUll, NULL, NULL),
     (69, 'es_ES', NULL, NULL, NULL, NULL),
     (70, 'es_ES', NULL, NULL, NULL, NULL),
-    (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
+    (71, 'es_ES', NULL, NULL, NULL, NULL),
+    (73, 'es_ES', NULL, NULL, NULL, NULL),
+    (72, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
     (4, 'fr_FR', 'Nom du modèle PDF actif', NULL, NULL, NULL),
@@ -2178,8 +2188,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (67, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
     (69, 'fr_FR', 'La création d\'un compte client doit être confirmée par email (1: oui, 0: non)', NULL, NULL, NULL),
-    (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL)
-;
+    (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL),
+    (71, 'fr_FR', NULL, NULL, NULL, NULL),
+    (73, 'fr_FR', NULL, NULL, NULL, NULL),
+    (72, 'fr_FR', NULL, NULL, NULL, NULL);
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'de_DE', 'Ein Bilder-Karussel auf Ihre Startseite', NULL, NULL, NULL),
