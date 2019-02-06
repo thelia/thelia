@@ -2073,9 +2073,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (68, 'en_US', 'Default number of customers on customer list', NUll, NULL, NULL),
     (69, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (70, 'en_US', 'Default number of coupons per page on coupon list', NULL, NULL, NULL),
-    (71, 'en_US', NULL, NULL, NULL, NULL),
-    (73, 'en_US', NULL, NULL, NULL, NULL),
-    (72, 'en_US', NULL, NULL, NULL, NULL),    (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
+    (71, 'en_US', 'The URL of the assets CDN (leave empty is you\'re not using a CDN for assets).', NULL, NULL, NULL),
+    (73, 'en_US', 'The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).', NULL, NULL, NULL),
+    (72, 'en_US', 'Apply customer discount percentage to sales and products in promotion', NULL, NULL, NULL),    (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
     (4, 'es_ES', 'Nombre de la plantilla PDF activa', NULL, NULL, NULL),
@@ -2189,9 +2189,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (68, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
     (69, 'fr_FR', 'La création d\'un compte client doit être confirmée par email (1: oui, 0: non)', NULL, NULL, NULL),
     (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL),
-    (71, 'fr_FR', NULL, NULL, NULL, NULL),
-    (73, 'fr_FR', NULL, NULL, NULL, NULL),
-    (72, 'fr_FR', NULL, NULL, NULL, NULL);
+    (71, 'fr_FR', 'URL du CDN des assets (CSS, JS, images statiques, ...). Laisser cette valeur vide si vous n\'utilisez pas de CDN pour vos assets.', NULL, NULL, NULL),
+    (73, 'fr_FR', 'URL du CDN des images et des doucments des produits, contenus, dossiers, catégories, etc.. Laisser cette valeur vide si vous n\'utilisez pas de CDN pour vos images et documents', NULL, NULL, NULL),
+    (72, 'fr_FR', 'Appliquer le pourcentage de remise client aux produits en promotion (Oui = 1, non = 0)', NULL, NULL, NULL);
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'de_DE', 'Ein Bilder-Karussel auf Ihre Startseite', NULL, NULL, NULL),
@@ -7758,7 +7758,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (47, 'fr_FR', 'Fonction de recherche dans l\'administration', NULL, NULL, NULL),
     (48, 'fr_FR', 'Configuration de l\'API', NULL, NULL, NULL),
     (49, 'fr_FR', 'civilité client', NULL, NULL, NULL),
-    (50, 'fr_FR', NULL, NULL, NULL, NULL)
+    (50, 'fr_FR', 'Configurer les statuts de commande', NULL, NULL, NULL)
 ;
 
 

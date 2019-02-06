@@ -23,4 +23,22 @@ DELIMITER ;
 ALTER TABLE `ignored_module_hook` ADD `created_at` DATETIME NOT NULL;
 ALTER TABLE `ignored_module_hook` ADD `updated_at` DATETIME NOT NULL;
 
+-- Add new configuration variables
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
+(@max_id + 2, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
+(@max_id + 3, 'apply_customer_discount_on_promo_prices', '1', 0, 0, NOW(), NOW())
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+{foreach $locales as $locale}
+ (@max_id + 1, '{$locale}', {intl l='The URL of the assets CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
+ (@max_id + 2, '{$locale}', {intl l='The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
+ (@max_id + 3, '{$locale}', {intl l='Apply customer discount percentage to sales and products in promotion' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+{/foreach}
+;
+
 SET FOREIGN_KEY_CHECKS = 1;

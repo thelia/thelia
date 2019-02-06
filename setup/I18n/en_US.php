@@ -71,7 +71,7 @@ return array(
     'Api page - at bottom' => 'Api page - at bottom',
     'Api page - at top' => 'Api page - at top',
     'Api page - in deletion form' => 'Api page - in deletion form',
-    'Apply customer discount to sales and products in promotion' => 'Apply customer discount to sales and products in promotion',
+    'Apply customer discount percentage to sales and products in promotion' => 'Apply customer discount percentage to sales and products in promotion',
     'Arezzo' => 'Arezzo',
     'Argentina' => 'Argentina',
     'Arizona' => 'Arizona',

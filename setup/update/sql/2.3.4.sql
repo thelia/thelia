@@ -105,7 +105,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+1, 'de_DE', NULL),
   (@max_id+1, 'en_US', 'Configuration order status'),
   (@max_id+1, 'es_ES', NULL),
-  (@max_id+1, 'fr_FR', NULL)
+  (@max_id+1, 'fr_FR', 'Configurer les statuts de commande')
 ;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;

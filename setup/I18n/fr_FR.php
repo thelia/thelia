@@ -70,7 +70,7 @@ return array(
     'Api page - at bottom' => 'Page api - en bas',
     'Api page - at top' => 'Page api - en haut',
     'Api page - in deletion form' => 'Page api - formulaire de suppression',
-    'Apply customer discount to sales and products in promotion' => 'Appliquer la remise client aux produits en promotion (Oui = 1, non = 0)',
+    'Apply customer discount percentage to sales and products in promotion' => 'Appliquer le pourcentage de remise client aux produits en promotion (Oui = 1, non = 0)',
     'Arezzo' => 'Arezzo',
     'Argentina' => 'Argentine',
     'Arizona' => 'Arizona',
