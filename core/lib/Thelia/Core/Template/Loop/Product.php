@@ -28,6 +28,7 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\Map\FeatureAvI18nTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
@@ -491,24 +492,52 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         if (null !== $feature_values) {
             foreach ($feature_values as $feature => $feature_choice) {
+                $aliasMatches = [];
+
                 foreach ($feature_choice['values'] as $feature_value) {
                     $featureAlias = 'fv_' . $feature;
                     if ($feature_value != '*') {
-                        $featureAlias .= '_' . $feature_value;
+                        // Generate a unique alias for this value
+                        $featureAlias .= '_' . hash('crc32', $feature_value) . '_' . preg_replace("/[^[:alnum:]_]/", '_', $feature_value);
                     }
+
                     $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+
                     if ($feature_value != '*') {
-                        $search->addJoinCondition($featureAlias, "`$featureAlias`.FREE_TEXT_VALUE = ?", $feature_value, null, \PDO::PARAM_STR);
+                        $featureAliasI18n = $featureAlias . '_i18n';
+                        $featureAliasI18nJoin = $featureAlias . '_i18n_join';
+
+                        $featureAvValueJoin = new Join();
+                        $featureAvValueJoin->setJoinType(Criteria::LEFT_JOIN);
+                        $featureAvValueJoin->addExplicitCondition(
+                            $featureAlias,
+                            "FEATURE_AV_ID",
+                            null,
+                            FeatureAvI18nTableMap::TABLE_NAME,
+                            'ID',
+                            $featureAliasI18n
+                        );
+
+                        $search
+                            ->addJoinObject($featureAvValueJoin, $featureAliasI18nJoin)
+                            ->addJoinCondition($featureAliasI18nJoin, "`$featureAliasI18n`.LOCALE = ?", $this->locale, null, \PDO::PARAM_STR)
+                            ->addJoinCondition($featureAliasI18nJoin, "`$featureAliasI18n`.TITLE = ?", $feature_value, null, \PDO::PARAM_STR)
+                        ;
+
+                        $aliasMatches[$feature_value] = $featureAliasI18n;
                     }
                 }
 
                 /* format for mysql */
                 $sqlWhereString = $feature_choice['expression'];
+
                 if ($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
                 } else {
-                    $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    foreach ($aliasMatches as $value => $alias) {
+                        $sqlWhereString = str_replace($value, 'NOT ISNULL(`'.$alias.'`.ID)', $sqlWhereString);
+                    }
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
