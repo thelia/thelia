@@ -217,14 +217,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                                     $image->effects()->colorize($the_color);
                                 }
                                 break;
-                                
+
                             case 'blur':
                                 if (isset($params[1])) {
                                     $blur_level = intval($params[1]);
 
                                     $image->effects()->blur($blur_level);
                                 }
-                                break;                                      
+                                break;
                         }
                     }
 
@@ -259,8 +259,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $event->setCacheFilepath($cacheFilePath);
         $event->setCacheOriginalFilepath($originalImagePathInCache);
 
-        $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
-        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
+        $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
     }
 
     /**

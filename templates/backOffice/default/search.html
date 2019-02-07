@@ -220,7 +220,7 @@
                                     <td>{$orderInvoiceCompany}</td>
                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                     <td>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$currencySymbol}</td>
-                                    <td><span class="label label-{#$orderStatusLabel#}" style="background-color:{$orderStatusCodeColor};">{$orderStatus}</span></td>
+                                    <td><span class="label" style="background-color: {$orderStatusCodeColor};">{$orderStatus}</span></td>
 
                                     {hook name="orders.table-row" location="orders_table_row" order_id={$ID}}
                                     <td>

@@ -66,7 +66,8 @@
         "symfony/polyfill-php71": "^1.0",
         "symfony/polyfill-php72": "^1.0",
         "spipu/html2pdf": "^5.0",
-        "symfony/polyfill-php73": "^1.0"
+        "symfony/polyfill-php73": "^1.0",
+        "symfony/lock": "^3.4"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",

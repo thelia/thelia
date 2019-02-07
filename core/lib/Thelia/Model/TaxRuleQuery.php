@@ -47,9 +47,11 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             ->filterByTaxRuleId($taxRule->getId());
 
         if (null !== $state) {
-            $taxRuleCount = $taxRuleQuery
-                ->filterByStateId($state->getId(), Criteria::EQUAL)
-                ->count();
+            $taxRuleCount = clone $taxRuleQuery;
+            
+            $taxRuleCount->filterByStateId($state->getId(), Criteria::EQUAL)
+                        ->count();
+            
             if (0 === $taxRuleCount) {
                 $taxRuleQuery->filterByStateId(null, Criteria::EQUAL);
             }
