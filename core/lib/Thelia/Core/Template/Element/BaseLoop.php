@@ -410,9 +410,9 @@ abstract class BaseLoop
 
             $firstItem = ($pageNum - 1) * $limit + 1;
 
-            return array_slice($search, $firstItem, $firstItem + $limit, false);
+            return \array_slice($search, $firstItem, $firstItem + $limit, false);
         } else {
-            return array_slice($search, $offset, $limit, false);
+            return \array_slice($search, $offset, $limit, false);
         }
     }
 

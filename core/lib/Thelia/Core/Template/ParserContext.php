@@ -115,9 +115,9 @@ class ParserContext implements \IteratorAggregate
     protected function cleanFormData(array $data)
     {
         foreach ($data as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $data[$key] = $this->cleanFormData($value);
-            } elseif (is_object($value)) {
+            } elseif (\is_object($value)) {
                 unset($data[$key]);
             }
         }
@@ -142,7 +142,7 @@ class ParserContext implements \IteratorAggregate
         foreach ($form->getForm()->getIterator() as $field) {
             $errors = $field->getErrors();
 
-            if (count($errors) > 0) {
+            if (\count($errors) > 0) {
                 $formFieldErrors[$field->getName()] = [];
 
                 /** @var FormError $error */
@@ -157,10 +157,10 @@ class ParserContext implements \IteratorAggregate
             }
         }
 
-        $this->set(get_class($form) . ":" . $form->getType(), $form);
+        $this->set(\get_class($form) . ":" . $form->getType(), $form);
 
         // Set form error information
-        $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
+        $formErrorInformation[\get_class($form) . ":" . $form->getType()] = [
             'data'              => $this->cleanFormData($form->getForm()->getData()),
             'hasError'          => $form->hasError(),
             'errorMessage'      => $form->getErrorMessage(),
@@ -194,7 +194,7 @@ class ParserContext implements \IteratorAggregate
         if (isset($formErrorInformation[$formClass.":".$formType])) {
             $formInfo = $formErrorInformation[$formClass.":".$formType];
 
-            if (is_array($formInfo['data'])) {
+            if (\is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm(
                     $formId,
                     $formType,
@@ -221,7 +221,7 @@ class ParserContext implements \IteratorAggregate
                         /** @var Form $field */
                         $field = $form->getForm()->get($fieldName);
 
-                        if (null !==  $field && count($field->getErrors()) == 0) {
+                        if (null !==  $field && \count($field->getErrors()) == 0) {
                             foreach ($errors as $errorData) {
                                 $error = new FormError(
                                     $errorData['message'],
@@ -260,7 +260,7 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        $formClass = get_class($form) . ':' . $form->getType();
+        $formClass = \get_class($form) . ':' . $form->getType();
 
         if (isset($formErrorInformation[$formClass])) {
             unset($formErrorInformation[$formClass]);

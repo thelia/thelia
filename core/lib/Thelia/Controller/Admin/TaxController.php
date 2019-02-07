@@ -208,7 +208,7 @@ class TaxController extends AbstractCrudController
 
             $couple = explode(':', $data);
 
-            if (count($couple) == 2 && $couple[0] == $type) {
+            if (\count($couple) == 2 && $couple[0] == $type) {
                 $requirements[$couple[1]] = $value;
             }
         }

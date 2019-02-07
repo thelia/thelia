@@ -41,7 +41,7 @@ class FolderQuery extends BaseFolderQuery
     {
         $result = array();
 
-        if (is_array($folderId)) {
+        if (\is_array($folderId)) {
             foreach ($folderId as $folderSingleId) {
                 $result = array_merge($result, (array) self::findAllChild($folderSingleId, $depth, $currentPosition));
             }
@@ -75,7 +75,7 @@ class FolderQuery extends BaseFolderQuery
      */
     public static function getFolderTreeIds($folderId, $depth = 1)
     {
-        $result = is_array($folderId) ? $folderId : [ $folderId ];
+        $result = \is_array($folderId) ? $folderId : [ $folderId ];
 
         if ($depth > 1) {
             $folders = self::create()

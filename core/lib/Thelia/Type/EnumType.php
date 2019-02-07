@@ -24,7 +24,7 @@ class EnumType extends BaseType
 
     public function __construct($values = array())
     {
-        if (is_array($values)) {
+        if (\is_array($values)) {
             $this->values = $values;
         }
     }
@@ -36,7 +36,7 @@ class EnumType extends BaseType
 
     public function isValid($value)
     {
-        return in_array($value, $this->values);
+        return \in_array($value, $this->values);
     }
 
     public function getFormattedValue($value)

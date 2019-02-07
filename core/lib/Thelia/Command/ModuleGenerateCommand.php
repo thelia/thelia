@@ -177,11 +177,20 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             if (!$fs->exists($filename)) {
                 $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
+                $fs = new Filesystem();
+
+                // for backward compatibility
+                if ($fs->exists(THELIA_VENDOR . 'thelia/propel/resources/xsd')) {
+                    $endPath = THELIA_VENDOR . 'thelia/propel/resources/xsd';
+                } else {
+                    $endPath = THELIA_VENDOR . 'propel/propel/resources/xsd';
+                }
+
                 $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
                 $schemaContent = str_replace(
                     '%%XSD_LOCATION%%',
                     $fs->makePathRelative(
-                        THELIA_VENDOR . 'propel/propel/resources/xsd/',
+                        $endPath,
                         $this->moduleDirectory
                     ) . 'database.xsd',
                     $schemaContent

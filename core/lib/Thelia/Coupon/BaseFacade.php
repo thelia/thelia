@@ -174,7 +174,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getNbArticlesInCart()
     {
-        return count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
+        return \count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
     }
 
     public function getNbArticlesInCartIncludeQuantity()

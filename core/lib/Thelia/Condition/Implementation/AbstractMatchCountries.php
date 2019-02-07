@@ -63,14 +63,14 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         }
 
         // Be sure that the value is an array, make one if required
-        if (! is_array($values[self::COUNTRIES_LIST])) {
+        if (! \is_array($values[self::COUNTRIES_LIST])) {
             $values[self::COUNTRIES_LIST] = array($values[self::COUNTRIES_LIST]);
         }
 
         // Check that at least one category is selected
         if (empty($values[self::COUNTRIES_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(),
+                \get_class(),
                 self::COUNTRIES_LIST
             );
         }

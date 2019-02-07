@@ -46,7 +46,7 @@ class GenerateResources extends ContainerAwareCommand
 
         $constants = $class->getConstants();
 
-        if (count($constants) == 0) {
+        if (\count($constants) == 0) {
             throw new \RuntimeException('No resources found');
         }
 
@@ -62,7 +62,7 @@ class GenerateResources extends ContainerAwareCommand
                     }
                     $compteur++;
                     $output->writeln(
-                        "($compteur, '$value', NOW(), NOW())" . ($constant === key(array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        "($compteur, '$value', NOW(), NOW())" . ($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
                 break;
@@ -84,7 +84,7 @@ class GenerateResources extends ContainerAwareCommand
                         "($compteur, 'en_US', '$title'),"
                     );
                     $output->writeln(
-                        "($compteur, 'fr_FR', '$title')" . ($constant === key(array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        "($compteur, 'fr_FR', '$title')" . ($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
                 break;

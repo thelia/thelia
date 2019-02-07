@@ -35,7 +35,7 @@ class TemplateEvent extends ActionEvent
      */
     public function hasTemplate()
     {
-        return ! is_null($this->template);
+        return ! \is_null($this->template);
     }
     
     /**

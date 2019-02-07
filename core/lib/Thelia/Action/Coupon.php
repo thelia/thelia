@@ -306,7 +306,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         /** @var CouponInterface[] $consumedCoupons */
         $consumedCoupons = $this->couponManager->getCouponsKept();
 
-        if (is_array($consumedCoupons) && count($consumedCoupons) > 0) {
+        if (\is_array($consumedCoupons) && \count($consumedCoupons) > 0) {
             $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
             $con->beginTransaction();
 

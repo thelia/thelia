@@ -85,7 +85,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
         $this->attributeAvList = isset($effects[self::ATTRIBUTES_AV_LIST]) ? $effects[self::ATTRIBUTES_AV_LIST] : array();
 
-        if (! is_array($this->attributeAvList)) {
+        if (! \is_array($this->attributeAvList)) {
             $this->attributeAvList = array($this->attributeAvList);
         }
 
@@ -118,7 +118,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
                 foreach ($combinations as $combination) {
                     $attrValue = $combination->getAttributeAvId();
 
-                    if (in_array($attrValue, $this->attributeAvList)) {
+                    if (\in_array($attrValue, $this->attributeAvList)) {
                         $discount += $this->getCartItemDiscount($cartItem);
 
                         break;

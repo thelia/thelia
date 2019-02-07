@@ -368,7 +368,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $display_initial_price = $product->getVirtualColumn('display_initial_price');
 
-        if (is_null($display_initial_price)) {
+        if (\is_null($display_initial_price)) {
             $display_initial_price = 1;
         }
 
@@ -623,25 +623,25 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
         $ref = $this->getRef();
 
-        if (!is_null($ref)) {
+        if (!\is_null($ref)) {
             $search->filterByRef($ref, Criteria::IN);
         }
 
         $title = $this->getTitle();
 
-        if (!is_null($title)) {
+        if (!\is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
         $templateIdList = $this->getTemplateId();
 
-        if (!is_null($templateIdList)) {
+        if (!\is_null($templateIdList)) {
             $search->filterByTemplateId($templateIdList, Criteria::IN);
         }
 
@@ -657,7 +657,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             // We can only sort by position if we have a single category ID
-            $manualOrderAllowed = (1 == count($categoryDefault));
+            $manualOrderAllowed = (1 == \count($categoryDefault));
         } elseif (null !== $categoryIdList = $this->getCategory()) {
             // Select all products which have one of the required categories as the default one, or an associated one
             $depth = $this->getDepth();
@@ -671,7 +671,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             // We can only sort by position if we have a single category ID, with a depth of 1
-            $manualOrderAllowed = (1 == $depth && 1 == count($categoryIdList));
+            $manualOrderAllowed = (1 == $depth && 1 == \count($categoryIdList));
         } else {
             $search
                 ->leftJoinProductCategory('CategorySelect')
@@ -753,13 +753,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $exclude_category = $this->getExcludeCategory();
 
-        if (!is_null($exclude_category)) {
+        if (!\is_null($exclude_category)) {
             $search
                 ->useProductCategoryQuery('ExcludeCategorySelect')
                     ->filterByCategoryId($exclude_category, Criteria::NOT_IN)
@@ -930,7 +930,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             /* if we don't have any join yet, let's make a global one */
             if (empty($isProductPriceFirstLeftJoin)) {
-                if (count($isPSELeftJoinList) == 0) {
+                if (\count($isPSELeftJoinList) == 0) {
                     $joiningTable = "global";
                     $isPSELeftJoinList[] = $joiningTable;
                     $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);

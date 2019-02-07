@@ -36,9 +36,10 @@ class IntToCombinedStringsListType extends BaseType
         foreach (preg_split('#(?<!\\\),#', $values) as $intToCombinedStrings) {
             $parts = preg_split('#(?<!\\\):#', $intToCombinedStrings);
 
-            if (count($parts) != 2) {
+            if (\count($parts) != 2) {
                 return false;
             }
+
             if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
                 return false;
             }
@@ -124,7 +125,7 @@ class IntToCombinedStringsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = strlen($noSpaceString);
+        $length = \strlen($noSpaceString);
         for ($i=0; $i< $length; $i++) {
             $char = $noSpaceString[$i];
             if ($char == '(') {

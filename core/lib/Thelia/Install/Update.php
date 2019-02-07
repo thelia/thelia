@@ -167,7 +167,7 @@ class Update
         $version = null;
 
         try {
-            $size = count($this->version);
+            $size = \count($this->version);
 
             for ($i = ++$index; $i < $size; $i++) {
                 $version = $this->version[$i];
@@ -408,7 +408,7 @@ class Update
         );
 
         if ($stmt->rowCount()) {
-            return floatval($stmt->fetch(PDO::FETCH_OBJ)->size);
+            return \floatval($stmt->fetch(PDO::FETCH_OBJ)->size);
         }
 
         throw new \Exception('Impossible to calculate the database size');
@@ -494,7 +494,7 @@ class Update
     {
         $content = [];
 
-        if (count($this->postInstructions) == 0) {
+        if (\count($this->postInstructions) == 0) {
             return null;
         }
 
@@ -518,7 +518,7 @@ class Update
 
     public function hasPostInstructions()
     {
-        return (count($this->postInstructions) !== 0);
+        return (\count($this->postInstructions) !== 0);
     }
 
     public function getVersionList()

@@ -91,7 +91,7 @@ class TaxEngine
                                 $instance = new $fullyQualifiedClassName;
 
                                 if ($instance instanceof BaseTaxType) {
-                                    $this->addTaxType(get_class($instance));
+                                    $this->addTaxType(\get_class($instance));
                                 }
                             } catch (\Exception $ex) {
                                 // Nothing special to do

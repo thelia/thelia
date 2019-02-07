@@ -226,7 +226,7 @@ abstract class BaseCachedFile extends BaseAction
                     sprintf(
                         'File "%s" (type %s) with parent id %s failed to be saved',
                         $event->getParentName(),
-                        get_class($model),
+                        \get_class($model),
                         $event->getParentId()
                     )
                 );

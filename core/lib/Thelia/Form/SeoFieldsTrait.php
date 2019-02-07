@@ -28,7 +28,7 @@ trait SeoFieldsTrait
      */
     protected function addSeoFields($exclude = array())
     {
-        if (! in_array('url', $exclude)) {
+        if (! \in_array('url', $exclude)) {
             $this->formBuilder->add(
                 'url',
                 'text',
@@ -45,7 +45,7 @@ trait SeoFieldsTrait
             );
         }
 
-        if (! in_array('meta_title', $exclude)) {
+        if (! \in_array('meta_title', $exclude)) {
             $this->formBuilder->add(
                 'meta_title',
                 'text',
@@ -63,7 +63,7 @@ trait SeoFieldsTrait
             );
         }
 
-        if (! in_array('meta_description', $exclude)) {
+        if (! \in_array('meta_description', $exclude)) {
             $this->formBuilder->add(
                 'meta_description',
                 'textarea',
@@ -82,7 +82,7 @@ trait SeoFieldsTrait
             );
         }
 
-        if (! in_array('meta_keywords', $exclude)) {
+        if (! \in_array('meta_keywords', $exclude)) {
             $this->formBuilder->add(
                 'meta_keywords',
                 'textarea',

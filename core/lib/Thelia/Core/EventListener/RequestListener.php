@@ -105,7 +105,7 @@ class RequestListener implements EventSubscriberInterface
     public function jsonBody(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!count($request->request->all()) && in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
+        if (!\count($request->request->all()) && \in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
             if ('json' == $request->getFormat($request->headers->get('Content-Type'))) {
                 $content = $request->getContent();
                 if (!empty($content)) {
@@ -119,7 +119,7 @@ class RequestListener implements EventSubscriberInterface
                         $event->stopPropagation();
 
                         return;
-                    } elseif (!is_array($data)) {
+                    } elseif (!\is_array($data)) {
                         // This case happens for string like: "Foo", that json_decode returns as valid json
                         $data = [$data];
                     }
@@ -259,7 +259,7 @@ class RequestListener implements EventSubscriberInterface
                     if (null !== $lang) {
                         $session->setReturnToUrl($referrer);
 
-                        if (in_array($view, $catalogViews)) {
+                        if (\in_array($view, $catalogViews)) {
                             $session->setReturnToCatalogLastUrl($referrer);
                         }
                     }
@@ -267,7 +267,7 @@ class RequestListener implements EventSubscriberInterface
                     if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
                         $session->setReturnToUrl($referrer);
 
-                        if (in_array($view, $catalogViews)) {
+                        if (\in_array($view, $catalogViews)) {
                             $session->setReturnToCatalogLastUrl($referrer);
                         }
                     }

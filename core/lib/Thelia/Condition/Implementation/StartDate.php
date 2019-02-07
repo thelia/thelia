@@ -62,13 +62,13 @@ class StartDate extends ConditionAbstract
         }
 
         // Parse the entered date to get a timestamp, if we don't already have one
-        if (! is_int($values[self::START_DATE])) {
+        if (!\is_int($values[self::START_DATE])) {
             $date = \DateTime::createFromFormat($this->getDateFormat(), $values[self::START_DATE]);
 
             // Check that the date is valid
             if (false === $date) {
                 throw new InvalidConditionValueException(
-                    get_class(),
+                    \get_class(),
                     self::START_DATE
                 );
             }

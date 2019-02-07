@@ -34,7 +34,7 @@ class CurrencyEvent extends ActionEvent
      */
     public function hasCurrency()
     {
-        return ! is_null($this->currency);
+        return ! \is_null($this->currency);
     }
 
     /**

@@ -309,7 +309,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getAdminCacheHomeStatsTTL()
     {
-        return intval(static::read("admin_cache_home_stats_ttl", 600));
+        return \intval(static::read("admin_cache_home_stats_ttl", 600));
     }
 
     /**

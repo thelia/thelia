@@ -169,7 +169,7 @@ class URL
         $queryString = '';
         $anchor      = '';
 
-        if (! is_null($parameters)) {
+        if (! \is_null($parameters)) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', $base);

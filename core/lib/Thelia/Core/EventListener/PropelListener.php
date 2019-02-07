@@ -48,7 +48,7 @@ class PropelListener implements EventSubscriberInterface
     public function buildTableMaps()
     {
         foreach ($this->tableMapClasses as $tableMapClass) {
-            call_user_func([$tableMapClass, 'buildTableMap']);
+            \call_user_func([$tableMapClass, 'buildTableMap']);
         }
     }
 }

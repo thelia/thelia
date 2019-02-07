@@ -138,7 +138,7 @@ class HookHelper
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (in_array($ext, $allowed_exts)) {
+                    if (\in_array($ext, $allowed_exts)) {
                         if ($content = file_get_contents($fileInfo->getPathName())) {
                             foreach ($this->parserHelper->getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
                                 $hook['file'] = $fileInfo->getFilename();
@@ -168,7 +168,7 @@ class HookHelper
             $ret['code'] = $attributes['name'];
             $params      = explode(".", $attributes['name']);
 
-            if (count($params) != 2) {
+            if (\count($params) != 2) {
                 // the hook does not respect the convention
                 if (false === strpos($attributes['name'], "$")) {
                     $ret['context'] = $attributes['name'];

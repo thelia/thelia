@@ -34,9 +34,9 @@ class BaseApiController extends BaseController
 
     protected function checkAuth($resources, $modules, $accesses)
     {
-        $resources = is_array($resources) ? $resources : array($resources);
-        $modules = is_array($modules) ? $modules : array($modules);
-        $accesses = is_array($accesses) ? $accesses : array($accesses);
+        $resources = \is_array($resources) ? $resources : array($resources);
+        $modules = \is_array($modules) ? $modules : array($modules);
+        $accesses = \is_array($accesses) ? $accesses : array($accesses);
 
         if (true !== $this->getSecurityContext()->isUserGranted(array("API"), $resources, $modules, $accesses, $this->getApiUser())) {
             throw new AccessDeniedHttpException();
@@ -87,7 +87,7 @@ class BaseApiController extends BaseController
      */
     protected function renderRaw($content, $args = array(), $templateDir = null)
     {
-        if (is_array($content)) {
+        if (\is_array($content)) {
             $content = json_encode($content);
         }
 

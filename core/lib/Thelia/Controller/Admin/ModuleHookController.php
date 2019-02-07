@@ -348,7 +348,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $className = $moduleHook->getClassname();
-            if (null !== $className && ! in_array($className, $result)) {
+            if (null !== $className && ! \in_array($className, $result)) {
                 $result[] = $className;
             }
         }
@@ -374,7 +374,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
             $method = $moduleHook->getMethod();
-            if (! in_array($method, $result)) {
+            if (! \in_array($method, $result)) {
                 $result[] = $method;
             }
         }
@@ -387,7 +387,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $method = $moduleHook->getMethod();
-            if (! in_array($method, $result)) {
+            if (! \in_array($method, $result)) {
                 $result[] = $method;
             }
         }

@@ -328,7 +328,7 @@ class ModuleValidator
             }
         }
 
-        if (count($errors) > 0) {
+        if (\count($errors) > 0) {
             $errorsMessage = $this->trans(
                 'To activate module %name, the following modules should be activated first: %modules',
                 ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)]
@@ -367,7 +367,7 @@ class ModuleValidator
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
 
-                if (count($dependencies) > 0) {
+                if (\count($dependencies) > 0) {
                     foreach ($dependencies as $dependency) {
                         if ($dependency[0] == $code) {
                             $dependantModules[] = [
@@ -404,7 +404,7 @@ class ModuleValidator
                 "code" => (string)$dependency,
                 "version" => (string)$dependency['version'],
             ];
-            if (!in_array($dependencyArray, $dependencies)) {
+            if (!\in_array($dependencyArray, $dependencies)) {
                 $dependencies[] = $dependencyArray;
             }
 
@@ -457,7 +457,7 @@ class ModuleValidator
     protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
     {
         $dependencies = [];
-        if (is_countable($this->moduleDescriptor->required) && 0 !== count($this->moduleDescriptor->required)) {
+        if (is_countable($this->moduleDescriptor->required) && 0 !== \count($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {
                 $dependencies[] = [
                     (string)$dependency,
@@ -475,7 +475,7 @@ class ModuleValidator
     {
         $authors = [];
 
-        if (is_countable($this->moduleDescriptor->author) && 0 !== count($this->moduleDescriptor->author)) {
+        if (is_countable($this->moduleDescriptor->author) && 0 !== \count($this->moduleDescriptor->author)) {
             foreach ($this->moduleDescriptor->author as $author) {
                 $authors[] = [
                     (string)$author->name,
@@ -495,7 +495,7 @@ class ModuleValidator
         $authors = [];
 
         if (!is_countable($this->moduleDescriptor->authors->author)
-        || 0 === count($this->moduleDescriptor->authors->author)
+        || 0 === \count($this->moduleDescriptor->authors->author)
         ) {
             return $authors;
         }

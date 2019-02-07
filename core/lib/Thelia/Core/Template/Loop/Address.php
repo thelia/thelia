@@ -81,7 +81,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (null !== $id && !in_array($id, array('*', 'any'))) {
+        if (null !== $id && !\in_array($id, array('*', 'any'))) {
             $search->filterById($id, Criteria::IN);
         }
 
