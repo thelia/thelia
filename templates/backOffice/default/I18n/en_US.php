@@ -1018,6 +1018,7 @@ return array(
     'Select product category :' => 'Select product category :',
     'Select the attributes values of "%title" that should be included in this sale operation.' => 'Select the attributes values of "%title" that should be included in this sale operation.',
     'Select the products included in this sale operation. You can limit your selection to some product\'s attribute only, if required.' => 'Select the products included in this sale operation. You can limit your selection to some product\'s attribute only, if required.',
+    'Select unassigned countries' => 'Select unassigned countries',
     'Selected categories' => 'Selected categories',
     'Send' => 'Send',
     'Send a mail to this customer' => 'Send a mail to this customer',

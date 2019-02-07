@@ -10,180 +10,181 @@
 {block name="check-access"}update{/block}
 
 {block name="main-content"}
-<div class="shipping-configuration edit-shipping-configuration">
+    <div class="shipping-configuration edit-shipping-configuration">
 
-    <div id="wrapper" class="container">
-        {loop name="area-edit" type="area" id=$area_id}
-        <ul class="breadcrumb">
-            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping zone "%name"' name={$NAME}}</li>
-        </ul>
+        <div id="wrapper" class="container">
+            {loop name="area-edit" type="area" id=$area_id}
+                <ul class="breadcrumb">
+                    <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                    <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                    <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
+                    <li>{intl l='Editing shipping zone "%name"' name={$NAME}}</li>
+                </ul>
 
-        {hook name="shipping-configuration-edit.top" area_id=$area_id}
+            {hook name="shipping-configuration-edit.top" area_id=$area_id}
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="general-block-decorator">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="general-block-decorator">
 
-                    <div class="col-md-12 title title-without-tabs">
-                        {intl l='Shipping zone "%title"' title={$NAME}}
-                    </div>
-
-                    <div class="form-container">
-
-                        {include
-                            file = "includes/inner-form-toolbar.html"
-                            hide_submit_buttons = true
-                            hide_flags = true
-
-                            page_url  = {url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}
-                            close_url = {url path="/admin/configuration/shipping_configuration"}
-                        }
-
-                        <div class="row">
-                            <div class="col-md-4">
-
-                                {form name="thelia.admin.area.modification"}
-                                    <form method="POST" action="{url path="/admin/configuration/shipping_configuration/save/%id" id=$area_id}">
-                                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
-                                        {form_hidden_fields exclude="area_id"}
-
-                                        <input type="hidden" name="area_id" value="{$area_id}">
-
-                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
-                                        {render_form_field field="area_id" value=$area_id}
-
-                                        {custom_render_form_field field='name'}
-                                            <div class="input-group">
-                                                <input type="text" {form_field_attributes field="name" value={$NAME}}>
-                                                <span class="input-group-btn">
-                                                    <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
-                                                </span>
-                                            </div><!-- /input-group -->
-                                        {/custom_render_form_field}
-                                    </form>
-                                {/form}
-
-                                {form name="thelia.admin.area.country"}
-                                    <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
-                                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
-                                        {form_hidden_fields exclude="area_id"}
-
-                                        <input type="hidden" name="area_id" value="{$area_id}">
-
-                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
-                                        {render_form_field field="area_id" value=$area_id}
-
-                                        <div class="form-group">
-                                            <input id="countries-filter" class="form-control" type="text" value="" placeholder="{intl l='filter country'}" />
-                                        </div><!-- /input-group -->
-
-                                        <select multiple {form_field_attributes field="country_id"}>
-                                        </select>
-
-                                        <button type="submit" class="btn btn-default btn-block btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add selected countries"}</button>
-                                    </form>
-                                {/form}
+                            <div class="col-md-12 title title-without-tabs">
+                                {intl l='Shipping zone "%title"' title={$NAME}}
                             </div>
 
-                            <div class="col-md-8">
-                                {form name="thelia.admin.area.delete.country"}
-                                <form method="POST" action="{url path="/admin/configuration/shipping_configuration/countries/remove"}">
-                                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                            <div class="form-container">
 
-                                    {form_hidden_fields exclude="area_id"}
+                                {include
+                                file = "includes/inner-form-toolbar.html"
+                                hide_submit_buttons = true
+                                hide_flags = true
 
-                                    {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
-                                    {render_form_field field="area_id" value=$area_id}
+                                page_url  = {url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}
+                                close_url = {url path="/admin/configuration/shipping_configuration"}
+                                }
 
-                                    <script id="tpl-countries-added" type="text/html">
-                                    <%
-                                    _.each(items, function(item) {
-                                        if (!item.hasStates) { %>
-                                            <tr>
-                                                <td><%= item.title %></td>
-                                                <td class="text-center">
-                                                    {form_field field="country_id"}
-                                                        <input class="country-selection" type="checkbox" name="{$name}[]" value="<%= item.id %>-0">
-                                                    {/form_field}
-                                                </td>
-                                            </tr>
-                                        <% } else { %>
-                                            <tr>
-                                                <th colspan="2"><%- item.title %></th>
-                                            </tr>
-                                        <% if (item.allStates) { %>
-                                            <tr>
-                                                <td> &mdash; <%= i18n.states_all %></td>
-                                                <td class="text-center">
-                                                    {form_field field="country_id"}
-                                                        <input class="country-selection" type="checkbox" name="{$name}[]" value="<%= item.id %>-0">
-                                                    {/form_field}
-                                                </td>
-                                            </tr>
-                                        <% }
-                                        _.each(item.states, function(state) { %>
-                                            <tr>
-                                                <td> &mdash; <%= state.title %></td>
-                                                <td class="text-center">
-                                                    {form_field field="country_id"}
-                                                        <input class="country-selection" type="checkbox" name="{$name}[]" value="<%= item.id %>-<%= state.id %>">
-                                                    {/form_field}
-                                                </td>
-                                            </tr>
-                                        <% })
-                                        }
-                                    })
-                                    %>
-                                    </script>
+                                <div class="row">
+                                    <div class="col-md-4">
 
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-condensed">
-                                            <thead>
-                                                <tr>
-                                                    <th>{intl l="Countries assigned to this zone"}</th>
-                                                    <th class="text-center">
-                                                        {if {count type="country" area=$area_id backend_context=1 visible="*"} > 0}
-                                                            {intl l='Select'} <a id="select-all" href="#">{intl l='all'}</a> - <a id="select-none" href="#">{intl l='none'}</a> - <a id="select-reverse" href="#">{intl l='reverse'}</a>
-                                                        {/if}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="countries-added">
+                                        {form name="thelia.admin.area.modification"}
+                                            <form method="POST" action="{url path="/admin/configuration/shipping_configuration/save/%id" id=$area_id}">
+                                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                            </tbody>
-                                            {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
-                                        </table>
+                                                {form_hidden_fields exclude="area_id"}
 
-                                        <button type="submit" class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-remove"></span> {intl l="Delete selected countries"}</button>
+                                                <input type="hidden" name="area_id" value="{$area_id}">
 
+                                                {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
+                                                {render_form_field field="area_id" value=$area_id}
+
+                                                {custom_render_form_field field='name'}
+                                                    <div class="input-group">
+                                                        <input type="text" {form_field_attributes field="name" value={$NAME}}>
+                                                        <span class="input-group-btn">
+                                                    <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
+                                                </span>
+                                                    </div><!-- /input-group -->
+                                                {/custom_render_form_field}
+                                            </form>
+                                        {/form}
+
+                                        {form name="thelia.admin.area.country"}
+                                            <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
+                                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                                {form_hidden_fields exclude="area_id"}
+
+                                                <input type="hidden" name="area_id" value="{$area_id}">
+
+                                                {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
+                                                {render_form_field field="area_id" value=$area_id}
+
+                                                <div class="form-group">
+                                                    <input id="countries-filter" class="form-control" type="text" value="" placeholder="{intl l='filter country'}" />
+                                                </div><!-- /input-group -->
+
+                                                <select multiple {form_field_attributes field="country_id"}>
+                                                </select>
+
+                                                <button type="submit" class="btn btn-block btn-primary"><i class="glyphicon glyphicon-plus-sign"></i> {intl l="Add selected countries"}</button>
+                                                <button type="button" class="btn btn-block btn-info btn-select-unassigned-countries"><i class="glyphicon glyphicon-cog"></i> {intl l="Select unassigned countries"}</button>
+                                            </form>
+                                        {/form}
                                     </div>
-                                </form>
-                                {/form}
+
+                                    <div class="col-md-8">
+                                        {form name="thelia.admin.area.delete.country"}
+                                            <form method="POST" action="{url path="/admin/configuration/shipping_configuration/countries/remove"}">
+                                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                                {form_hidden_fields exclude="area_id"}
+
+                                                {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
+                                                {render_form_field field="area_id" value=$area_id}
+
+                                                <script id="tpl-countries-added" type="text/html">
+                                                    <%
+                                                    _.each(items, function(item) {
+                                                    if (!item.hasStates) { %>
+                                                    <tr>
+                                                        <td><%= item.title %></td>
+                                                        <td class="text-center">
+                                                            {form_field field="country_id"}
+                                                                <input class="country-selection" type="checkbox" name="{$name}[]" value="<%= item.id %>-0">
+                                                            {/form_field}
+                                                        </td>
+                                                    </tr>
+                                                    <% } else { %>
+                                                    <tr>
+                                                        <th colspan="2"><%- item.title %></th>
+                                                    </tr>
+                                                    <% if (item.allStates) { %>
+                                                    <tr>
+                                                        <td> &mdash; <%= i18n.states_all %></td>
+                                                        <td class="text-center">
+                                                            {form_field field="country_id"}
+                                                                <input class="country-selection" type="checkbox" name="{$name}[]" value="<%= item.id %>-0">
+                                                            {/form_field}
+                                                        </td>
+                                                    </tr>
+                                                    <% }
+                                                    _.each(item.states, function(state) { %>
+                                                    <tr>
+                                                        <td> &mdash; <%= state.title %></td>
+                                                        <td class="text-center">
+                                                            {form_field field="country_id"}
+                                                                <input class="country-selection" type="checkbox" name="{$name}[]" value="<%= item.id %>-<%= state.id %>">
+                                                            {/form_field}
+                                                        </td>
+                                                    </tr>
+                                                    <% })
+                                                    }
+                                                    })
+                                                    %>
+                                                </script>
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-condensed">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>{intl l="Countries assigned to this zone"}</th>
+                                                            <th class="text-center">
+                                                                {if {count type="country" area=$area_id backend_context=1 visible="*"} > 0}
+                                                                    {intl l='Select'} <a id="select-all" href="#">{intl l='all'}</a> - <a id="select-none" href="#">{intl l='none'}</a> - <a id="select-reverse" href="#">{intl l='reverse'}</a>
+                                                                {/if}
+                                                            </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody id="countries-added">
+
+                                                        </tbody>
+                                                        {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
+                                                    </table>
+
+                                                    <button type="submit" class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-remove"></span> {intl l="Delete selected countries"}</button>
+
+                                                </div>
+                                            </form>
+                                        {/form}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+            {hook name="shipping-configuration-edit.bottom" area_id=$area_id}
+
+            {/loop}
+
+            {elseloop rel="area-edit"}
+                <div class="row">
+                    <div class="col-md-12">
+                        {intl l="No area defined with this id"}
+                    </div>
+                </div>
+            {/elseloop}
         </div>
-
-        {hook name="shipping-configuration-edit.bottom" area_id=$area_id}
-
-        {/loop}
-
-        {elseloop rel="area-edit"}
-        <div class="row">
-            <div class="col-md-12">
-                {intl l="No area defined with this id"}
-            </div>
-        </div>
-        {/elseloop}
     </div>
-</div>
 
     {* Delete related content confirmation dialog *}
 
@@ -195,15 +196,15 @@
     {/capture}
 
     {include
-        file = "includes/generic-confirm-dialog.html"
+    file = "includes/generic-confirm-dialog.html"
 
-        dialog_id       = "delete_country_dialog"
-        dialog_title    = {intl l="Remove country"}
-        dialog_message  = {intl l="Do you really want to remove this country from this shipping zone ?"}
+    dialog_id       = "delete_country_dialog"
+    dialog_title    = {intl l="Remove country"}
+    dialog_message  = {intl l="Do you really want to remove this country from this shipping zone ?"}
 
-        form_action     = {token_url path='/admin/configuration/shipping_configuration/country/remove'}
-        form_content    = {$smarty.capture.delete_country_dialog nofilter}
-    }
+form_action     = {token_url path='/admin/configuration/shipping_configuration/country/remove'}
+form_content    = {$smarty.capture.delete_country_dialog nofilter}
+}
 {/block}
 
 {block name="javascript-initialization"}
@@ -218,19 +219,19 @@
     <script id="tpl-countries-to-add" type="text/html">
         <%
         _.each(items, function(item) {
-            if (!item.hasStates) {
-                %><option value="<%= item.id %>-0"><%- item.title %></option><%
-            } else {
-                %>
-                <optgroup label="<%- item.title %>">
-                    <% if (item.allStates) { %><option value="<%= item.id %>-0"><%- i18n.states_all %></option><% } %>
-                    <%
-                    _.each(item.states, function(state) {
-                    %><option value="<%= item.id %>-<%= state.id %>"><%- state.title %></option><%
-                    }) %>
-                </optgroup>
-                <%
-            }
+        if (!item.hasStates) {
+        %><option value="<%= item.id %>-0"><%- item.title %></option><%
+        } else {
+        %>
+        <optgroup label="<%- item.title %>">
+            <% if (item.allStates) { %><option value="<%= item.id %>-0"><%- i18n.states_all %></option><% } %>
+            <%
+            _.each(item.states, function(state) {
+            %><option value="<%= item.id %>-<%= state.id %>"><%- state.title %></option><%
+            }) %>
+        </optgroup>
+        <%
+        }
         })
         %>
     </script>
@@ -243,167 +244,176 @@
 
     {$configuration=[]}
     {loop type="country-area" name="country-area" area=$area_id}
-        {$configuration[]=['id' => $ID, 'countryId' => $COUNTRY_ID, 'stateId' => $STATE_ID]}
+    {$configuration[]=['id' => $ID, 'countryId' => $COUNTRY_ID, 'stateId' => $STATE_ID]}
     {/loop}
 
-<script type="text/javascript">
-(function($) {
+    <script type="text/javascript">
+        (function($) {
 
-    var configuration = {$configuration|json_encode nofilter};
-    var countries = {render action='Thelia\Controller\Admin\CountryController::getDataAction'};
-    var $countriesAdded = $("#countries-added");
-    var $countriesToAdd = $("#countries-add");
-    var $countriesFilter = $("#countries-filter");
+            var configuration = {$configuration|json_encode nofilter};
+            var countries = {render action='Thelia\Controller\Admin\CountryController::getDataAction'};
+            var $countriesAdded = $("#countries-added");
+            var $countriesToAdd = $("#countries-add");
+            var $countriesFilter = $("#countries-filter");
+            var unassignedCountries = [
+                {loop name="country-not-in-any-zone" type="country" with_area=false}{$ID},{/loop}0
+            ];
 
+            var i18n = {
+                'configuration': '{intl l="Configuration"}'
+                , 'states_all': '{intl l='All States'}'
+                , 'countries': '{intl l="Countries"}'
+            };
 
-    var i18n = {
-        'configuration': '{intl l="Configuration"}'
-        , 'states_all': '{intl l='All States'}'
-        , 'countries': '{intl l="Countries"}'
-    };
+            {literal}
+            var tpl = {
+                'countries-to-add': _.template($("#tpl-countries-to-add").html())
+                , 'countries-added': _.template($("#tpl-countries-added").html())
+                , 'countries-added-empty': _.template($("#tpl-countries-added-empty").html())
+            };
 
-    {literal}
-    var tpl = {
-        'countries-to-add': _.template($("#tpl-countries-to-add").html())
-        , 'countries-added': _.template($("#tpl-countries-added").html())
-        , 'countries-added-empty': _.template($("#tpl-countries-added-empty").html())
-    };
+            var initialize = function initialize() {
+                var addList = [],
+                    addedList = [];
 
-    var initialize = function initialize() {
-        var addList = [],
-                addedList = [];
+                // build list of country/state not included
+                _.each(countries, function(country) {
+                    var addStates = []
+                        , addedStates = []
+                    ;
 
-        // build list of country/state not included
-        _.each(countries, function(country) {
-            var addStates = []
-                , addedStates = []
-            ;
+                    if (country.hasStates) {
+                        _.each(country.states, function (state) {
+                            if (isSelectedCountry(country.id, state.id)) {
+                                addedStates.push(state);
+                            } else {
+                                addStates.push(state);
+                            }
+                        });
 
-            if (country.hasStates) {
-                _.each(country.states, function (state) {
-                    if (isSelectedCountry(country.id, state.id)) {
-                        addedStates.push(state);
+                        if (addedStates.length > 0 || isSelectedCountry(country.id, 0)) {
+                            addedList.push(prepareCountry(country, addedStates, isSelectedCountry(country.id, 0)));
+                        }
+
+                        if (addStates.length > 0) {
+                            addList.push(prepareCountry(country, addStates, !isSelectedCountry(country.id, 0)));
+                        }
+
                     } else {
-                        addStates.push(state);
+                        if (isSelectedCountry(country.id, 0)) {
+                            addedList.push(prepareCountry(country));
+                        } else {
+                            addList.push(prepareCountry(country));
+                        }
                     }
                 });
 
-                if (addedStates.length > 0 || isSelectedCountry(country.id, 0)) {
-                    addedList.push(prepareCountry(country, addedStates, isSelectedCountry(country.id, 0)));
-                }
+                // sort List
+                var sorter = function sorter(item) {
+                    return item.title;
+                };
+                addList = _.sortBy(addList, sorter);
+                addedList = _.sortBy(addedList, sorter);
 
-                if (addStates.length > 0) {
-                    addList.push(prepareCountry(country, addStates, !isSelectedCountry(country.id, 0)));
-                }
-
-            } else {
-                if (isSelectedCountry(country.id, 0)) {
-                    addedList.push(prepareCountry(country));
+                // render list
+                $countriesToAdd.html(render('countries-to-add', {items: addList}));
+                if (addedList.length === 0) {
+                    $countriesAdded.html(render('countries-added-empty', {}));
                 } else {
-                    addList.push(prepareCountry(country));
+                    $countriesAdded.html(render('countries-added', {items: addedList}));
                 }
-            }
-        });
+            };
 
-        // sort List
-        var sorter = function sorter(item) {
-            return item.title;
-        };
-        addList = _.sortBy(addList, sorter);
-        addedList = _.sortBy(addedList, sorter);
+            var prepareCountry = function prepareCountry(country, states, allStates) {
 
-        // render list
-        $countriesToAdd.html(render('countries-to-add', {items: addList}));
-        if (addedList.length === 0) {
-            $countriesAdded.html(render('countries-added-empty', {}));
-        } else {
-            $countriesAdded.html(render('countries-added', {items: addedList}));
-        }
-    };
+                var item = {};
 
-    var prepareCountry = function prepareCountry(country, states, allStates) {
+                item.id = country.id;
+                item.title = country.title;
+                item.hasStates = country.hasStates != 0;
+                item.states = (undefined !== states)
+                    ? _.sortBy(states, function(item) { return item.title; })
+                    : []
+                ;
+                item.allStates = (undefined !== allStates) ? allStates : false;
 
-        var item = {};
+                return item;
+            };
 
-        item.id = country.id;
-        item.title = country.title;
-        item.hasStates = country.hasStates != 0;
-        item.states = (undefined !== states)
-            ? _.sortBy(states, function(item) { return item.title; })
-            : []
-        ;
-        item.allStates = (undefined !== allStates) ? allStates : false;
+            var isSelectedCountry = function isSelectedCountry(countryId, stateId) {
+                return _.find(
+                    configuration,
+                    function(item) {
+                        return countryId === (parseInt(item.countryId) || 0)
+                            && stateId === (parseInt(item.stateId) || 0);
+                    }
+                );
+            };
 
-        return item;
-    };
+            var filterCountries = function filterCountries() {
+                var search = $countriesFilter.val().trim().toLowerCase();
 
-    var isSelectedCountry = function isSelectedCountry(countryId, stateId) {
-        return _.find(
-                configuration,
-                function(item) {
-                    return countryId === (parseInt(item.countryId) || 0)
-                        && stateId === (parseInt(item.stateId) || 0);
-                }
-        );
-    };
-
-    var filterCountries = function filterCountries() {
-        var search = $countriesFilter.val().trim().toLowerCase();
-
-        if (search == '') {
-            $countriesToAdd.find('option, optgroup').removeClass('hidden');
-        } else {
-            $countriesToAdd.find('option, optgroup').each(function() {
-                var $item = $(this);
-                var text = $item.text();
-
-                if (text.toLowerCase().indexOf(search) !== -1) {
-                    $item.removeClass('hidden');
+                if (search == '') {
+                    $countriesToAdd.find('option, optgroup').removeClass('hidden');
                 } else {
-                    $item.addClass('hidden');
+                    $countriesToAdd.find('option, optgroup').each(function() {
+                        var $item = $(this);
+                        var text = $item.text();
+
+                        if (text.toLowerCase().indexOf(search) !== -1) {
+                            $item.removeClass('hidden');
+                        } else {
+                            $item.addClass('hidden');
+                        }
+                    });
                 }
+            };
+
+            // Utils
+            var render = function render(tplName, obj) {
+                var data = $.extend({}, obj, {'i18n': i18n});
+                return tpl[tplName](data);
+            };
+
+            $(document).ready(function(){
+
+                initialize();
+
+                $countriesFilter.on('keyup', function() {
+                    filterCountries();
+                });
+
+                $('.btn-select-unassigned-countries').click(function() {
+                    $(unassignedCountries).each(function(index, element) {
+                        console.log(element);
+                        $('option[value=' + element + '-0]', '#countries-add').prop('selected', true);
+                    })
+                });
+
+                $(".btn-delete-country").click(function(e){
+                    $("#delete-country-id").val($(this).data("id"));
+                });
+
+                $('#select-all').click(function(ev) {
+                    $('.country-selection').prop("checked", true);
+                    ev.preventDefault();
+                });
+
+                $('#select-none').click(function(ev) {
+                    $('.country-selection').prop("checked", false);
+                    ev.preventDefault();
+                });
+
+                $('#select-reverse').click(function(ev) {
+                    $('.country-selection').each(function() {
+                        $(this).prop("checked", ! $(this).prop('checked'));
+                    });
+                    ev.preventDefault();
+                });
+                {/literal}
             });
-        }
-    };
-
-    // Utils
-    var render = function render(tplName, obj) {
-        var data = $.extend({}, obj, {'i18n': i18n});
-        return tpl[tplName](data);
-    };
-
-    $(document).ready(function(){
-
-        initialize();
-
-        $countriesFilter.on('keyup', function() {
-            filterCountries();
-        });
-
-        $(".btn-delete-country").click(function(e){
-            $("#delete-country-id").val($(this).data("id"));
-        });
-
-        $('#select-all').click(function(ev) {
-            $('.country-selection').prop("checked", true);
-            ev.preventDefault();
-        });
-
-        $('#select-none').click(function(ev) {
-            $('.country-selection').prop("checked", false);
-            ev.preventDefault();
-        });
-
-        $('#select-reverse').click(function(ev) {
-            $('.country-selection').each(function() {
-                $(this).prop("checked", ! $(this).prop('checked'));
-            });
-            ev.preventDefault();
-        });
-        {/literal}
-    });
-})(jQuery);
-</script>
+        })(jQuery);
+    </script>
 {/block}
 
 {block name="javascript-last-call"}
