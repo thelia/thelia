@@ -454,17 +454,42 @@
                                                         <h3 class="panel-title">{intl l='Invoice informations'}</h3>
                                                     </div>
                                                     <div class="panel-body">
-                                                        <a class="btn btn-info" title="{intl l='View invoice PDF'}" href="{url path="/admin/order/pdf/invoice/%id/%browser" browser=1 id=$ID}" target="_blank">
-                                                            <span class="glyphicon glyphicon glyphicon-eye-open"></span> {intl l='PDF | Invoice'}
-                                                        </a>
-                                                        <a class="btn btn-info" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/%id/%browser" browser=0 id=$ID}">
-                                                            <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Invoice'}
-                                                        </a>
+                                                        {include file='renderer/buttons.html' with_text=false buttons=[
+                                                            [
+                                                                'type' => 'view',
+                                                                'title' => {intl l='View invoice PDF'},
+                                                                'href' => {url path="/admin/order/pdf/invoice/%id/%browser" browser=1 id=$ID},
+                                                                'attr' => ['target' => '_blank']
+                                                            ],
+                                                            [
+                                                                'type' => 'download',
+                                                                'title' => {intl l='Download invoice as PDF'},
+                                                                'href' => {url path="/admin/order/pdf/invoice/%id/%browser" browser=0 id=$ID}
+                                                            ],
+                                                            [
+                                                                'type' => 'print',
+                                                                'class' => 'js-action-print',
+                                                                'title' => {intl l='Print invoice'},
+                                                                'href' => {url path="/admin/order/pdf/invoice/%id/%browser" browser=1 id=$ID},
+                                                                'data' => [
+                                                                    'type' => "invoice"
+                                                                ]
+                                                            ]
+                                                        ]}
 
                                                         <div class="pull-right">
-                                                            <a class="btn btn-primary js-update-order-address" data-address-id="{$INVOICE_ADDRESS}" title="{intl l='Edit invoice address'}" href="#edit_order_address_dialog" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                            </a>
+                                                            {include file='renderer/buttons.html' with_text=false buttons=[
+                                                                [
+                                                                'type' => 'edit',
+                                                                'class' => 'js-update-order-address',
+                                                                'title' => {intl l='Edit invoice address'},
+                                                                'href' => "#edit_order_address_dialog",
+                                                                'data' => [
+                                                                'address-id' => $INVOICE_ADDRESS,
+                                                                    'toggle' => 'modal'
+                                                                    ]
+                                                                ]
+                                                            ]}
                                                         </div>
                                                     </div>
 
@@ -543,6 +568,10 @@
                                                             <th>{intl l="Cellphone"}</th>
                                                             <td>{$CELLPHONE}</td>
                                                         </tr>
+                                                        <tr>
+                                                            <th>{intl l="Email"}</th>
+                                                            <td>{loop type="customer" name="customer" id=$CUSTOMER backend_context="on" current="false"}<a href="mailto:{$EMAIL}?Subject={intl l='Order %ref' ref={$REF}}">{$EMAIL}</a>{/loop}</td>
+                                                        </tr>
                                                     {/loop}
                                                     </tbody>
                                                 </table>
@@ -556,16 +585,42 @@
                                                     </div>
 
                                                     <div class="panel-body">
-                                                        <a class="btn btn-info" title="{intl l='View purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id/%browser" browser=1 id=$ID}" target="_blank">
-                                                            <span class="glyphicon glyphicon glyphicon-eye-open"></span> {intl l='PDF | Purchase order'}
-                                                        </a>
-                                                        <a class="btn btn-info" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id/%browser" browser=0 id=$ID}">
-                                                            <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Purchase order'}
-                                                        </a>
+                                                        {include file='renderer/buttons.html' with_text=false buttons=[
+                                                            [
+                                                                'type' => 'view',
+                                                                'title' => {intl l='View purchase order as PDF'},
+                                                                'href' => {url path="/admin/order/pdf/delivery/%id/%browser" browser=1 id=$ID},
+                                                                'attr' => ['target' => '_blank']
+                                                            ],
+                                                            [
+                                                                'type' => 'download',
+                                                                'title' => {intl l='Download purchase order as PDF'},
+                                                                'href' => {url path="/admin/order/pdf/delivery/%id/%browser" browser=0 id=$ID}
+                                                            ],
+                                                            [
+                                                                'type' => 'print',
+                                                                'class' => 'js-action-print',
+                                                                'title' => {intl l='Print purchase order'},
+                                                                'href' => {url path="/admin/order/pdf/delivery/%id/%browser" browser=1 id=$ID},
+                                                                'data' => [
+                                                                  'type' => "purchase"
+                                                                ]
+                                                            ]
+                                                        ]}
+
                                                         <div class="pull-right">
-                                                            <a class="btn btn-primary js-update-order-address" data-address-id="{$DELIVERY_ADDRESS}" title="{intl l='Edit delivery address'}" href="#edit_order_address_dialog" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                            </a>
+                                                            {include file='renderer/buttons.html' with_text=false buttons=[
+                                                                [
+                                                                    'type' => 'edit',
+                                                                    'class' => 'js-update-order-address',
+                                                                    'title' => {intl l='Edit delivery address'},
+                                                                    'href' => "#edit_order_address_dialog",
+                                                                    'data' => [
+                                                                    'address-id' => $DELIVERY_ADDRESS,
+                                                                        'toggle' => 'modal'
+                                                                    ]
+                                                                ]
+                                                            ]}
                                                         </div>
                                                     </div>
 
@@ -577,6 +632,12 @@
                                                         {/ifhook}
                                                         {elsehook rel="order-edit.bill-delivery-address"}
                                                             {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
+                                                                <tr>
+                                                                    <td colspan="2">&nbsp;</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td colspan="2">&nbsp;</td>
+                                                                </tr>
                                                                 <tr data-field-class="js-company">
                                                                     <th>{intl l="Company"}</th>
                                                                     <td>{$COMPANY}</td>
@@ -773,6 +834,22 @@
     <script type="text/javascript">
 
         $(function() {
+            function print(url, number) {
+                var iframeName = 'iframe-print-' + number;
+                var iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.id = iframeName;
+                iframe.name = iframeName;
+                iframe.style.display = "none";
+                $('body').append(iframe);
+                window.frames[iframeName].focus();
+                window.frames[iframeName].print();
+            }
+            $('.js-action-print').on('click', function(e) {
+                e.preventDefault();
+                print($(this).attr('href'), this.dataset.type);
+            });
+
             // Atomatic ajax tab load, if data-href is defined.
             $('.nav-tabs a[data-href]').on('shown.bs.tab', function (ev) {
                 var $this = $(this);
@@ -798,7 +875,7 @@
                         $(this).data("address-id")
                 );
 
-                $(this).parents('table').find('tr').each(function (k, v) {
+                $(this).parents('.panel').find('table tr').each(function (k, v) {
                     var $field = $(v),
                         $formField,
                         fieldValue;
