@@ -159,7 +159,7 @@
                                     <div>
                                         <label for="cart-country">{intl l="Select your country:"}</label>
                                         <select id="cart-country" name="country">
-                                        {loop type="country" name="countryLoop" with_area="true"}
+                                        {loop type="country" name="countryLoop" with_area="true" order="alpha"}
                                             <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
                                         {/loop}
                                         </select>
