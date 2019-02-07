@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7f52a348eff7764031e3b374a40e1a3c",
+    "content-hash": "6c2c36b20d1665f5c620d73b964d1b70",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -3639,12 +3639,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thelia/Propel2.git",
-                "reference": "d249703ffadcecd5320062947fde31c0fb924c36"
+                "reference": "adf5f8299a8636e3b7e15b3daa33bda5bd1e7249"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Propel2/zipball/d249703ffadcecd5320062947fde31c0fb924c36",
-                "reference": "d249703ffadcecd5320062947fde31c0fb924c36",
+                "url": "https://api.github.com/repos/thelia/Propel2/zipball/adf5f8299a8636e3b7e15b3daa33bda5bd1e7249",
+                "reference": "adf5f8299a8636e3b7e15b3daa33bda5bd1e7249",
                 "shasum": ""
             },
             "require": {
@@ -3696,7 +3696,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2018-12-05T22:13:43+00:00"
+            "time": "2019-02-08T08:46:59+00:00"
         }
     ],
     "packages-dev": [
