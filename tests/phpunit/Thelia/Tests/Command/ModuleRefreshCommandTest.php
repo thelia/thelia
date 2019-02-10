@@ -16,6 +16,7 @@ use PHPUnit_Framework_TestCase;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Kernel;
 use Thelia\Command\ModuleRefreshCommand;
 use Thelia\Core\Application;
@@ -39,7 +40,7 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
      */
     public function testModuleRefreshCommand()
     {
-        $moduleManagement = new ModuleManagement;
+        $moduleManagement = new ModuleManagement($this->getContainer());
         $moduleManagement->updateModules($this->getContainer());
 
         $module = ModuleQuery::create()->filterByType(1)->orderByPosition(Criteria::DESC)->findOne();
@@ -98,6 +99,8 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
     public function getContainer()
     {
         $container = new ContainerBuilder;
+
+        $container->set('event_dispatcher', new EventDispatcher());
 
         return $container;
     }
