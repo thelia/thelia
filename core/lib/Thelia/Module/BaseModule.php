@@ -85,11 +85,6 @@ class BaseModule implements BaseModuleInterface
             try {
                 $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
-                    if ($this->hasPropelSchema()) {
-                        // force models generation for this module
-                        $this->container->get('thelia.propel.init')->init(true);
-                    }
-
                     $this->postActivation($con);
                     $con->commit();
                 }
@@ -101,6 +96,11 @@ class BaseModule implements BaseModuleInterface
             }
 
             $this->registerHooks();
+
+            if ($this->hasPropelSchema()) {
+                $this->container->get('thelia.propel.init')->init(true);
+                $this->container->get('thelia.propel.init')->migrate();
+            }
         }
     }
 
@@ -123,6 +123,11 @@ class BaseModule implements BaseModuleInterface
             } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
+            }
+
+            if ($this->hasPropelSchema()) {
+                $this->container->get('thelia.propel.init')->init(true);
+                $this->container->get('thelia.propel.init')->migrate();
             }
         }
     }

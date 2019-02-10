@@ -3704,16 +3704,16 @@
         },
         {
             "name": "thelia/propel",
-            "version": "dev-thelia-2.4",
+            "version": "dev-test-propel-with-tablemap-resolver",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thelia/Propel2.git",
-                "reference": "6f031c59cf00720c3fb5233e053f39746ab9ff9e"
+                "reference": "0345f4fbd687fab698d6ef0ac0aa39be4232c9af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Propel2/zipball/6f031c59cf00720c3fb5233e053f39746ab9ff9e",
-                "reference": "6f031c59cf00720c3fb5233e053f39746ab9ff9e",
+                "url": "https://api.github.com/repos/thelia/Propel2/zipball/0345f4fbd687fab698d6ef0ac0aa39be4232c9af",
+                "reference": "0345f4fbd687fab698d6ef0ac0aa39be4232c9af",
                 "shasum": ""
             },
             "require": {
@@ -3765,7 +3765,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2019-02-09T13:50:51+00:00"
+            "time": "2019-02-10T15:13:24+00:00"
         }
     ],
     "packages-dev": [
