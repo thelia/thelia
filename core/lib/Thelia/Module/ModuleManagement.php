@@ -16,7 +16,10 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\InvalidModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
@@ -36,8 +39,11 @@ class ModuleManagement
     /** @var ModuleDescriptorValidator $descriptorValidator */
     protected $descriptorValidator;
 
-    public function __construct()
+    protected $container;
+
+    public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
         $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
@@ -52,6 +58,8 @@ class ModuleManagement
 
         $errors = [];
 
+        $modulesUpdated = [];
+
         foreach ($finder as $file) {
             try {
                 $this->updateModule($file, $container);
@@ -65,6 +73,10 @@ class ModuleManagement
 
         if (\count($errors) > 0) {
             throw new InvalidModuleException($errors);
+        }
+
+        if (\count($modulesUpdated)) {
+            $this->cacheClear();
         }
     }
 
@@ -169,6 +181,15 @@ class ModuleManagement
         }
 
         return $this->descriptorValidator;
+    }
+
+    protected function cacheClear()
+    {
+        $cacheEvent = new CacheEvent(
+            $this->container->getParameter('kernel.cache_dir')
+        );
+
+        $this->container->get('event_dispatcher')->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
 
     private function getModuleType(\ReflectionClass $reflected)
