@@ -61,7 +61,7 @@
         "spipu/html2pdf": "^5.0",
         "symfony/polyfill-php73": "^1.0",
         "symfony/lock": "^3.4|^4.0",
-        "thelia/propel": "dev-thelia-2.4"
+        "thelia/propel": "dev-test-propel-with-tablemap-resolver"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",

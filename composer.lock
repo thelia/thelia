@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c2c36b20d1665f5c620d73b964d1b70",
+    "content-hash": "252a9ec1ef3da30021a14717b1210e14",
     "packages": [
         {
             "name": "commerceguys/addressing",
@@ -3635,16 +3635,16 @@
         },
         {
             "name": "thelia/propel",
-            "version": "dev-thelia-2.4",
+            "version": "dev-test-propel-with-tablemap-resolver",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thelia/Propel2.git",
-                "reference": "adf5f8299a8636e3b7e15b3daa33bda5bd1e7249"
+                "reference": "0345f4fbd687fab698d6ef0ac0aa39be4232c9af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Propel2/zipball/adf5f8299a8636e3b7e15b3daa33bda5bd1e7249",
-                "reference": "adf5f8299a8636e3b7e15b3daa33bda5bd1e7249",
+                "url": "https://api.github.com/repos/thelia/Propel2/zipball/0345f4fbd687fab698d6ef0ac0aa39be4232c9af",
+                "reference": "0345f4fbd687fab698d6ef0ac0aa39be4232c9af",
                 "shasum": ""
             },
             "require": {
@@ -3696,7 +3696,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2019-02-08T08:46:59+00:00"
+            "time": "2019-02-10T15:13:24+00:00"
         }
     ],
     "packages-dev": [
