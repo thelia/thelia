@@ -19,14 +19,11 @@ use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Store\FlockStore;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
-use Thelia\Module\ModuleManagement;
 
 /**
  * Propel cache and initialization service.
@@ -260,7 +257,7 @@ class PropelInitService
             [
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--output-dir' => $this->getPropelConfigDir(),
-                '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME,
+                '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME
             ]
         );
 
