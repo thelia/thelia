@@ -42,6 +42,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\ModuleManagement;
 
 class Thelia extends Kernel
 {
@@ -158,7 +159,9 @@ class Thelia extends Kernel
             $this->getEnvParameters(),
             $propelSchemaLocator
         );
-        $propelConnectionAvailable = $propelInitService->init();
+
+        $cacheRefresh = false;
+        $propelConnectionAvailable = $propelInitService->init(false, $cacheRefresh);
 
         if ($propelConnectionAvailable) {
             $theliaDatabaseConnection = Propel::getConnection('thelia');
@@ -169,6 +172,13 @@ class Thelia extends Kernel
 
         $this->getContainer()->set('thelia.propel.schema.locator', $propelSchemaLocator);
         $this->getContainer()->set('thelia.propel.init', $propelInitService);
+
+        if ($cacheRefresh) {
+            $moduleManagement = new ModuleManagement();
+            $moduleManagement->updateModules($this->getContainer());
+
+            $propelInitService->migrate();
+        }
 
         if ($propelConnectionAvailable) {
             $theliaDatabaseConnection->setEventDispatcher($this->getContainer()->get('event_dispatcher'));

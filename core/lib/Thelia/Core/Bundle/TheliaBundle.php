@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
-use Thelia\Core\DependencyInjection\Compiler\PropelPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAssetFilterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
@@ -68,9 +67,6 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterFormExtensionPass())
             ->addCompilerPass(new CurrencyConverterProviderPass())
             ->addCompilerPass(new RegisterListenersPass())
-            ->addCompilerPass(new PropelPass(
-                THELIA_PROPEL_BUILD_PATH
-            ))
         ;
     }
 }
