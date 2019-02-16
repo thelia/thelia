@@ -48,6 +48,7 @@ use Thelia\Type\TypeCollection;
  * @method string getRef()
  * @method int[] getAttributeAvailability()
  * @method string[] getOrder()
+ * @method bool|string getVisible()
  */
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -65,6 +66,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             Argument::createBooleanTypeArgument('promo'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('default'),
+            Argument::createBooleanOrBothTypeArgument('visible', Type\BooleanOrBothType::ANY),
             Argument::createAnyTypeArgument('ref'),
             new Argument(
                 'attribute_availability',
@@ -124,6 +126,14 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
         if (null !== $new) {
             $search->filterByNewness($new);
+        }
+
+        $visible = $this->getVisible();
+
+        if (Type\BooleanOrBothType::ANY !== $visible) {
+            $search->useProductQuery()
+                ->filterByVisible($visible)
+            ->endUse();
         }
 
         $default = $this->getDefault();
