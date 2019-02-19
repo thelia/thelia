@@ -389,6 +389,9 @@ class PropelInitService
                 $theliaDatabaseConnection->useDebug(true);
             }
         } catch (\Throwable $th) {
+            $fs = new Filesystem();
+            $fs->remove(THELIA_CACHE_DIR . $this->environment);
+            $fs->remove($this->getPropelModelDir());
             throw $th;
         } finally {
             // Release cache generation lock
