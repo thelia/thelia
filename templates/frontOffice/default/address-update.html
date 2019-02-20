@@ -197,14 +197,16 @@
                     <div class="form-group group-country {if $error}has-error{/if}">
                         <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                         <div class="control-input col-sm-5">
-                            <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                <option value="">-- {intl l="Select Country"} --</option>
-                                {loop type="country" name="country.list" order="alpha"}
+                        <select name="{$name}" data-thelia-country="1" id="{$label_attr.for}" class="custom-select {if $error}is-invalid{/if}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <option value="">-- {intl l="Select Country"} --</option>
+                                {assign "isOk" false}
+                                {loop type="country" name="country.list"}
                                     <option value="{$ID}" {if $customer_country_id == $ID}selected{/if}
                                         {if $value != ""}
+                                            {assign "isOk" false}
                                             {if $value == $ID}selected{/if}
                                         {else}
-                                            {if $IS_DEFAULT}selected{/if}
+                                            {if $IS_DEFAULT && $isOk==false}selected{/if}
                                         {/if}
                                         >{$TITLE}</option>
                                 {/loop}
