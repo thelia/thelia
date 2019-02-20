@@ -389,8 +389,9 @@ class PropelInitService
                 $theliaDatabaseConnection->useDebug(true);
             }
         } catch (\Throwable $th) {
-            Tlog::getInstance()->error("Failed to initialize Propel : " . $th->getMessage());
-
+            $fs = new Filesystem();
+            $fs->remove(THELIA_CACHE_DIR . $this->environment);
+            $fs->remove($this->getPropelModelDir());
             throw $th;
         } finally {
             // Release cache generation lock
