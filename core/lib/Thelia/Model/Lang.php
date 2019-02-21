@@ -125,6 +125,6 @@ class Lang extends BaseLang
             $this->setDatetimeFormat(sprintf("%s %s", $this->getDateFormat(), $this->getTimeFormat()));
         }
 
-        return true;
+        return parent::preSave($con);
     }
 }

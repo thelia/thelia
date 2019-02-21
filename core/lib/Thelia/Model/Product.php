@@ -353,6 +353,8 @@ class Product extends BaseProduct implements FileModelParentInterface
                 }
             }
         }
+
+        parent::postSave();
     }
 
     /**
