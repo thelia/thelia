@@ -221,6 +221,8 @@ class Content extends BaseContent implements FileModelParentInterface
                 }
             }
         }
+
+        parent::postSave();
     }
 
     /**
