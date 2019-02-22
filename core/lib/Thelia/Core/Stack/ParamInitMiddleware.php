@@ -136,8 +136,7 @@ class ParamInitMiddleware implements HttpKernelInterface
                 if (! empty($domainUrl)) {
                     // if lang domain is different from current domain, redirect to the proper one
                     if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
-                        // TODO : search if http status 302 is the good one.
-                        return new RedirectResponse($domainUrl, 302);
+                        return new RedirectResponse($domainUrl, 301);
                     } else {
                         //the user is currently on the proper domain, nothing to change
                         return null;
