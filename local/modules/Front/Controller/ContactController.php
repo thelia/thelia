@@ -48,12 +48,7 @@ class ContactController extends BaseFrontController
         try {
             $form = $this->validateForm($contactForm);
 
-            $event = new ContactEvent(
-                $form->get('subject')->getData(),
-                $form->get('message')->getData(),
-                $form->get('email')->getData(),
-                $form->get('name')->getData()
-            );
+            $event = new ContactEvent($form);
 
             $this->dispatch(TheliaEvents::CONTACT_SUBMIT, $event);
 

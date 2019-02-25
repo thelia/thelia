@@ -12,10 +12,14 @@
 
 namespace Thelia\Core\Event\Contact;
 
+use Symfony\Component\Form\Form;
 use Thelia\Core\Event\ActionEvent;
 
 class ContactEvent extends ActionEvent
 {
+    /** @var Form */
+    protected $form;
+
     /** @var string */
     protected $subject;
 
@@ -28,12 +32,14 @@ class ContactEvent extends ActionEvent
     /** @var string */
     protected $name;
 
-    public function __construct($subject = "", $message = "", $email = "", $name = "")
+    public function __construct(Form $form)
     {
-        $this->subject = $subject;
-        $this->message = $message;
-        $this->email = $email;
-        $this->name = $name;
+        $this->form = $form;
+
+        $this->subject = $form->get('subject')->getData();
+        $this->message = $form->get('message')->getData();
+        $this->email = $form->get('email')->getData();
+        $this->name = $form->get('name')->getData();
     }
 
     /**
