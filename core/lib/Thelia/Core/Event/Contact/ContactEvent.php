@@ -15,6 +15,12 @@ namespace Thelia\Core\Event\Contact;
 use Symfony\Component\Form\Form;
 use Thelia\Core\Event\ActionEvent;
 
+/**
+ * Class ContactController
+ * @package Thelia\Controller\Front
+ * @author Vincent Lopes-Vicente <vlopesvicente@gmail.com>
+ * @since 2.4
+ */
 class ContactEvent extends ActionEvent
 {
     /** @var Form */

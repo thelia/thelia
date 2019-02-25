@@ -1019,6 +1019,7 @@ final class TheliaEvents
 
     /**
      * sent for submit contact form
+     * @since 2.4
      */
     const CONTACT_SUBMIT = 'thelia.contact.submit';
 
