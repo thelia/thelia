@@ -1017,6 +1017,12 @@ final class TheliaEvents
     const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
     const NEWSLETTER_CONFIRM_SUBSCRIPTION = 'thelia.newsletter.confirmSubscription';
 
+    /**
+     * sent for submit contact form
+     * @since 2.4
+     */
+    const CONTACT_SUBMIT = 'thelia.contact.submit';
+
     /************ LANG MANAGEMENT ****************************/
 
     const LANG_UPDATE                           = 'action.lang.update';
