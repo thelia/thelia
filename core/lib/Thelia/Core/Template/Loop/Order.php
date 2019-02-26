@@ -150,9 +150,17 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
                         OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find()
                     );
+                    $search->_or();
+                    $search->filterByOrderAddressRelatedByDeliveryOrderAddressId(
+                        OrderAddressQuery::create()->filterByFirstname($searchTerm, $searchCriteria)->find()
+                    );
                     break;
                 case 'customer_lastname':
                     $search->filterByOrderAddressRelatedByInvoiceOrderAddressId(
+                        OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find()
+                    );
+                    $search->_or();
+                    $search->filterByOrderAddressRelatedByDeliveryOrderAddressId(
                         OrderAddressQuery::create()->filterByLastname($searchTerm, $searchCriteria)->find()
                     );
                     break;
