@@ -28,12 +28,12 @@ class TaxRuleQuery extends BaseTaxRuleQuery
      *
      * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
      */
-    public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country, State $state = null)
+    public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country = null, State $state = null)
     {
         $key = sprintf(
             '%s-%s-%s',
             $taxRule->getId(),
-            $country->getId(),
+            ($country !== null) ? $country->getId() : 0,
             ($state !== null) ? $state->getId() : 0
         );
 
@@ -41,17 +41,19 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             return self::$caches[$key];
         }
 
-
         $taxRuleQuery = TaxRuleCountryQuery::create()
-            ->filterByCountry($country, Criteria::EQUAL)
             ->filterByTaxRuleId($taxRule->getId());
+
+        if (null !== $country) {
+            $taxRuleQuery->filterByCountry($country, Criteria::EQUAL);
+        }
 
         if (null !== $state) {
             $taxRuleCount = clone $taxRuleQuery;
-            
+
             $taxRuleCount->filterByStateId($state->getId(), Criteria::EQUAL)
-                        ->count();
-            
+                ->count();
+
             if (0 === $taxRuleCount) {
                 $taxRuleQuery->filterByStateId(null, Criteria::EQUAL);
             }

@@ -97,6 +97,26 @@ class Calculator
         return $this;
     }
 
+    public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product)
+    {
+        $this->product = null;
+        $this->taxRulesCollection = null;
+
+        if ($taxRule->getId() === null) {
+            throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
+        }
+        if ($product->getId() === null) {
+            throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
+        }
+
+        $this->product = $product;
+
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule);
+
+        return $this;
+    }
+
+    /** @since 2.4 */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
         $this->product = null;
