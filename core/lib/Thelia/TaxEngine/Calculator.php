@@ -116,6 +116,7 @@ class Calculator
         return $this;
     }
 
+    /** @since 2.4 */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
         $this->product = null;
