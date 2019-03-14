@@ -273,7 +273,7 @@ return [
     'Title *' => 'Titolo *',
     'Tools' => 'Strumenti',
     'Type' => 'Tipo',
-    'Use a N for a number, L for Letter, C for an iso code for the state.' => 'Utilizza una N per un numero, L per una lettera, C per un codice iso dello stato.',
+    'Use a N for a number, L for Letter, C for an iso code for the state. You can enter several zip code formats separated by commas.' => 'Utilizza una N per un numero, L per una lettera, C per un codice iso dello stato. È possibile inserire diversi formati di codici postali separati da virgole.',
     'Use the keyword phrase in your URL.' => 'Utilizzare la frase chiave nell\'URL.',
     'Used in your store front' => 'Utilizzate nel vostro negozio',
     'Username' => 'Nome utente',

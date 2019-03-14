@@ -33,25 +33,28 @@ class Country extends BaseCountry
      */
     public function getZipCodeRE()
     {
-        $zipCodeFormat = $this->getZipCodeFormat();
-
-        if (empty($zipCodeFormat)) {
-            return null;
-        }
-
-
-        $zipCodeRE = preg_replace("/\\s+/", ' ', $zipCodeFormat);
-
-        $trans = [
+        static $trans = [
             "N" => "\\d",
             "L" => "[a-zA-Z]",
             "C" => ".+",
             " " => " +"
         ];
 
-        $zipCodeRE = "#^" . strtr($zipCodeRE, $trans) . "$#";
+        $zipCodeFormat = $this->getZipCodeFormat();
 
-        return $zipCodeRE;
+        if (empty($zipCodeFormat)) {
+            return null;
+        }
+
+        $zipFormatList = explode(',', $zipCodeFormat);
+
+        $zipCodeRE = '';
+
+        foreach ($zipFormatList as $zipFormat) {
+            $zipCodeRE .= '(' . preg_replace("/\\s+/", ' ', trim($zipFormat)) . ')|';
+        }
+
+        return "#^" . strtr(rtrim($zipCodeRE, '|'), $trans) . "$#";
     }
 
     /**

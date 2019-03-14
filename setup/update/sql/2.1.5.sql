@@ -17,14 +17,42 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+    (@max_id+1, 'ar_SA', NULL, '', ''),
+    (@max_id+2, 'ar_SA', NULL, '', ''),
+    (@max_id+1, 'cs_CZ', NULL, '', ''),
+    (@max_id+2, 'cs_CZ', NULL, '', ''),
     (@max_id+1, 'de_DE', 'Rechnung - Weitere Produktinformationen', '', ''),
     (@max_id+2, 'de_DE', 'Lieferung - Weitere Produktinformationen', '', ''),
+    (@max_id+1, 'el_GR', NULL, '', ''),
+    (@max_id+2, 'el_GR', NULL, '', ''),
     (@max_id+1, 'en_US', 'Invoice - additional product information', '', ''),
     (@max_id+2, 'en_US', 'Delivery - additional product information', '', ''),
     (@max_id+1, 'es_ES', 'Factura - información adicional del producto', '', ''),
     (@max_id+2, 'es_ES', 'Entrega - información adicional del producto', '', ''),
+    (@max_id+1, 'fa_IR', NULL, '', ''),
+    (@max_id+2, 'fa_IR', NULL, '', ''),
     (@max_id+1, 'fr_FR', 'Facture - informations additionnelles pour un produit', '', ''),
-    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', '')
+    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', ''),
+    (@max_id+1, 'hu_HU', NULL, '', ''),
+    (@max_id+2, 'hu_HU', NULL, '', ''),
+    (@max_id+1, 'id_ID', NULL, '', ''),
+    (@max_id+2, 'id_ID', NULL, '', ''),
+    (@max_id+1, 'it_IT', NULL, '', ''),
+    (@max_id+2, 'it_IT', NULL, '', ''),
+    (@max_id+1, 'pl_PL', NULL, '', ''),
+    (@max_id+2, 'pl_PL', 'Dostawa - dodatkowe informacje o produkcie', '', ''),
+    (@max_id+1, 'pt_BR', NULL, '', ''),
+    (@max_id+2, 'pt_BR', NULL, '', ''),
+    (@max_id+1, 'pt_PT', NULL, '', ''),
+    (@max_id+2, 'pt_PT', NULL, '', ''),
+    (@max_id+1, 'ru_RU', 'Счет-фактура - дополнительная информация о товаре', '', ''),
+    (@max_id+2, 'ru_RU', 'Доставка - дополнительная информация о товаре', '', ''),
+    (@max_id+1, 'sk_SK', 'Faktúra - ďalšie informácie o produkte', '', ''),
+    (@max_id+2, 'sk_SK', NULL, '', ''),
+    (@max_id+1, 'tr_TR', 'Fatura - daha fazla ürün bilgisi', '', ''),
+    (@max_id+2, 'tr_TR', 'Dağıtım - daha fazla ürün bilgisi', '', ''),
+    (@max_id+1, 'uk_UA', NULL, '', ''),
+    (@max_id+2, 'uk_UA', NULL, '', '')
 ;
 
 UPDATE `hook` SET `by_module` = 1 WHERE `code` = 'module.config-js';

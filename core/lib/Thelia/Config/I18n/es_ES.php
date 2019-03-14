@@ -628,7 +628,7 @@ return [
     'Unsupported magic method %name. only getArgname() is supported.' => 'Método mágico %name no soportado. Solamente getArgname() es soportado.',
     'Unsupported type' => 'Tipo no compatible',
     'Update customer account' => 'Actualizar cuenta de cliente',
-    'Use a N for a number, L for Letter, C for an iso code for the state.' => 'Use N para un número, L para la letra C para un código iso para este estado.',
+    'Use a N for a number, L for Letter, C for an iso code for the state. You can enter several zip code formats separated by commas.' => 'Use N para un número, L para la letra C para un código iso para este estado. Puede introducir varios formatos de códigos postales separados por comas.',
     'Use the keyword phrase in your URL.' => 'Utilizar la frase de palabra clav en la URL.',
     'Used in your store front' => 'Utilizado en tu front end de tienda',
     'Username' => 'Nombre de usuario',
