@@ -288,7 +288,7 @@ class MailerFactory
         $instance->setSubject($subject);
 
         // If we do not have an HTML message
-        if (empty($htmlMessage)) {
+        if (empty($htmlBody)) {
             // Message body is the text message
             $instance->setBody($textBody, 'text/plain');
         } else {
@@ -296,7 +296,7 @@ class MailerFactory
             $instance->setBody($htmlBody, 'text/html');
 
             // Use the text as a message part, if we have one.
-            if (! empty($textMessage)) {
+            if (! empty($textBody)) {
                 $instance->addPart($textBody, 'text/plain');
             }
         }
