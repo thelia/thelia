@@ -151,4 +151,6 @@ class HomeController extends BaseAdminController
 
         return preg_match('/^#[a-f0-9]{6}$/i', $hexColor) ? $hexColor : $default;
     }
+
+
 }
