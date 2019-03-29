@@ -141,7 +141,13 @@ interface ParserInterface
      * @param string $variable the variable name
      * @param mixed  $value    the value of the variable
      */
-    public function assign($variable, $value);
+    /**
+     * assigns a parser variable. If $variable is an array, it is supposed to contains (variable_name => variable_value) pairs
+     *
+     * @param array|string $variable the template variable name(s)
+     * @param mixed        $value   the value to assign
+     */
+    public function assign($variable, $value = null);
 
     /**
      * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
