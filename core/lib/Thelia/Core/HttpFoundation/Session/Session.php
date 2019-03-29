@@ -47,7 +47,7 @@ class Session extends BaseSession
     /**
      * @param bool $forceDefault if true, the default language will be returned if no current language is defined.
      *
-     * @return \Thelia\Model\Lang|null
+     * @return \Thelia\Model\Lang
      */
     public function getLang($forceDefault = true)
     {

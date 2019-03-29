@@ -82,12 +82,13 @@ class Message extends BaseMessage
 
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template
-
-     * @param  ParserInterface $parser
-     * @param $message
+     * @param ParserInterface $parser
+     * @param string $message
      * @param $layout
      * @param $template
-     * @return bool
+     * @param bool $compressOutput
+     * @return bool|string
+     * @throws \SmartyException
      */
     protected function getMessageBody($parser, $message, $layout, $template, $compressOutput = true)
     {
@@ -121,6 +122,9 @@ class Message extends BaseMessage
 
     /**
      * Get the HTML message body
+     * @param ParserInterface $parser
+     * @return bool|string
+     * @throws \SmartyException
      */
     public function getHtmlMessageBody(ParserInterface $parser)
     {
@@ -133,7 +137,9 @@ class Message extends BaseMessage
     }
 
     /**
-     * Get the TEXT message body
+     * @param ParserInterface $parser
+     * @return string|string[]|null
+     * @throws \SmartyException
      */
     public function getTextMessageBody(ParserInterface $parser)
     {
