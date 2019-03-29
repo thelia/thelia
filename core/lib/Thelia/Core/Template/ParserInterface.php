@@ -12,6 +12,9 @@
 
 namespace Thelia\Core\Template;
 
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
+
 /**
  *
  * @author Manuel Raynaud <manu@raynaud.io>
@@ -24,13 +27,51 @@ interface ParserInterface
     // assets will be copied and generated in the web cache.
     const TEMPLATE_ASSETS_KEY = 'template-assets';
 
+    /**
+     * Return a rendered template file
+     *
+     * @param  string                    $realTemplateName the template name (from the template directory)
+     * @param  array                     $parameters       an associative array of names / value pairs
+     * @return string                    the rendered template text
+     * @param  bool                      $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @throws ResourceNotFoundException if the template cannot be found
+     * @throws \Exception
+     * @throws \SmartyException
+     */
     public function render($realTemplateName, array $parameters = array(), $compressOutput = true);
 
+    /**
+     * Return a rendered template text
+     *
+     * @param  string $templateText   the template text
+     * @param  array  $parameters     an associative array of names / value pairs
+     * @param  bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @return string the rendered template text
+     * @throws \Exception
+     * @throws \SmartyException
+     */
     public function renderString($templateText, array $parameters = array(), $compressOutput = true);
 
+    /**
+     * @return int the HTTP status of the response
+     */
     public function getStatus();
 
+    /**
+     * Sets the HTTP status of the response
+     *
+     * status An HTTP status (200, 404, ...)
+     *
+     * @param int $status
+     */
     public function setStatus($status);
+
+    /**
+     * Returns the request used by the parser
+     *
+     * @return Request
+     */
+    public function getRequest();
 
     /**
      * Set a new template definition, and save the current one
