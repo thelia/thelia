@@ -21,6 +21,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\MessageQuery;
 
 /**
@@ -36,7 +37,10 @@ class MailerFactory
      */
     protected $swiftMailer;
 
+    /** @var EventDispatcherInterface  */
     protected $dispatcher;
+
+    /** @var ParserInterface  */
     protected $parser;
 
     public function __construct(EventDispatcherInterface $dispatcher, ParserInterface $parser)
@@ -230,7 +234,7 @@ class MailerFactory
      * @param  array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      *
      * @return \Swift_Message the generated and built message.
-     * @throws \SmartyException
+     * @throws \Exception
      */
     public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
     {
@@ -246,13 +250,24 @@ class MailerFactory
                 $this->parser->assign($name, $value);
             }
 
-            $this->parser->assign('locale', $locale);
+            // As the parser uses the lang stored in the session, temporarly set the required language into the session.
+            // This is required in the back office when sending emails to customers, that may use a different locale than
+            // the current one.
+            $session = $this->parser->getRequest()->getSession();
+
+            $currentLang = $session->getLang();
+
+            if (null !== $requiredLang = LangQuery::create()->findOneByLocale($locale)) {
+                $session->setLang($requiredLang);
+            }
 
             $instance = $this->getMessageInstance();
 
             $this->setupMessageHeaders($instance, $from, $to, $cc, $bcc, $replyTo);
 
             $message->buildMessage($this->parser, $instance);
+
+            $session->setLang($currentLang);
 
             return $instance;
         }
