@@ -464,6 +464,25 @@ class SmartyParser extends Smarty implements ParserInterface
             $this->unregisterFilter('output', array($this, "trimWhitespaces"));
         }
 
+        // Prepare common template variables
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        $lang = $session ? $session->getLang() : Lang::getDefaultLanguage();
+
+        $parameters = array_merge($parameters, [
+            'locale' => $lang->getLocale(),
+            'lang_code' => $lang->getCode(),
+            'lang_id' => $lang->getId(),
+            'current_url' => $this->getRequest()->getUri(),
+            'app' => (object) [
+                'environment' => $this->env,
+                'request' => $this->getRequest(),
+                'session' => $session,
+                'debug' => $this->debug
+            ]
+        ]);
+
         // Assign the parserContext variables
         foreach ($this->parserContext as $var => $value) {
             $this->assign($var, $value);
@@ -496,25 +515,6 @@ class SmartyParser extends Smarty implements ParserInterface
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
-
-        // Prepare common template variables
-        /** @var Session $session */
-        $session = $this->getRequest()->getSession();
-
-        $lang = $session ? $session->getLang() : Lang::getDefaultLanguage();
-
-        $parameters = array_merge($parameters, [
-            'locale' => $lang->getLocale(),
-            'lang_code' => $lang->getCode(),
-            'lang_id' => $lang->getId(),
-            'current_url' => $this->getRequest()->getUri(),
-            'app' => (object) [
-                'environment' => $this->env,
-                'request' => $this->getRequest(),
-                'session' => $session,
-                'debug' => $this->debug
-            ]
-        ]);
 
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }
