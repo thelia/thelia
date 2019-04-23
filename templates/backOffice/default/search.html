@@ -623,6 +623,94 @@
                     </div>
                 </div>
                 {* end content search *}
+
+                {* brand search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Brand'}
+                            </caption>
+                            {ifloop rel="brand-search"}
+                                <thead>
+                                <tr>
+                                    <th>{intl l="ID"}</th>
+                                    <th></th>
+                                    <th>{intl l="Brand title"}</th>
+
+                                    {hook name="brands.table-header" }
+
+                                    <th class="text-center">
+                                        {intl l='Online'}
+                                    </th>
+                                    <th class="actions">{intl l="Actions"}</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {loop type="brand" name="brand-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
+
+                                {if $LOOP_COUNT < 26}
+                                    <tr>
+                                        <td>{$ID}</td>
+                                        <td></td>
+                                        <td class="object-title"><a href="{url path="/admin/brand/update/$ID"}">{$TITLE}</a></td>
+
+                                        {hook name="brands.table-row" brand_id=$ID}
+
+                                        <td class="text-center">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.brand" access="UPDATE"}
+                                                <div class="make-switch switch-small brandVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" class="brandVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                </div>
+                                            {/loop}
+
+                                            {elseloop rel="can_change"}
+                                                <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                </div>
+                                            {/elseloop}
+                                        </td>
+                                        <td class="actions">
+                                            {include file='renderer/buttons.html' buttons=[
+                                            [
+                                            'type' => 'edit',
+                                            'title' => {intl l='Edit this brand'},
+                                            'href' => {url path="/admin/brand/update/{$ID}"},
+                                            'auth' => ['resource' => 'admin.brand']
+                                            ],
+                                            [
+                                            'type' => 'delete',
+                                            'class' => 'brand-delete',
+                                            'title' => {intl l='Delete this brand'},
+                                            'href' => '#brand_delete_dialog',
+                                            'data' => [
+                                            'id' => $ID,
+                                            'toggle' => 'modal'
+                                            ],
+                                            'auth' => ['resource' => 'admin.brand']
+                                            ]
+                                            ]}
+                                        </td>
+                                    </tr>
+                                {else}
+                                    {$smarty.capture.more_results nofilter}
+                                {/if}
+                                {/loop}
+                                </tbody>
+                            {/ifloop}
+                        </table>
+                        {elseloop rel="brand-search"}
+                            <div class="alert alert-info">
+                                {intl l="No brand found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
+
+                    </div>
+                </div>
+                {* end brand search *}
+
+
                 {else}
                 <div class="alert alert-warning">
                     {intl l="Your search is too short"}
@@ -674,7 +762,7 @@
     form_content        = {$smarty.capture.product_delete_dialog nofilter}
 }
 
-{* -- Delete category confirmation dialog ----------------------------------- *}
+{* -- Delete folder confirmation dialog ----------------------------------- *}
 
 {capture name="folder_delete_dialog"}
     <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
@@ -693,7 +781,7 @@ form_action         = {token_url path='/admin/folders/delete'}
 form_content        = {$smarty.capture.folder_delete_dialog nofilter}
 }
 
-{* -- Delete category confirmation dialog ----------------------------------- *}
+{* -- Delete content confirmation dialog ----------------------------------- *}
 
 {capture name="content_delete_dialog"}
     <input type="hidden" name="content_id" id="content_delete_id" value="" />
@@ -730,6 +818,26 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     form_action         = {token_url path='/admin/customer/delete'}
     form_content        = {$smarty.capture.customer_delete_dialog nofilter}
     form_id             = "customer_delete_dialog"
+}
+
+
+{* -- Delete brand confirmation dialog ----------------------------------- *}
+
+{capture "brand_delete_dialog"}
+    <input type="hidden" name="brand_id" id="brand_delete_id" value="" />
+
+    {hook name="brand.delete-form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "brand_delete_dialog"
+    dialog_title    = {intl l="Delete brand"}
+    dialog_message  = {intl l="Do you really want to delete this brand ?"}
+
+    form_action         = {token_url path='/admin/brand/delete'}
+    form_content        = {$smarty.capture.brand_delete_dialog nofilter}
 }
 
 {/block}
@@ -773,6 +881,11 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
                 $('#content_delete_id').val($(this).data('id'));
             });
 
+            // Set proper brand ID in delete form
+            $('a.brand-delete').click(function(ev) {
+                $('#brand_delete_id').val($(this).data('id'));
+            });
+
             {* Toggle object visibility *}
 
             $(".categoryVisibleToggle").on('switch-change', function(event, data) {
@@ -814,6 +927,17 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
                     }
                 });
             });
+
+            $(".brandVisibleToggle").on('switch-change', function(event, data) {
+                $.ajax({
+                    url : "{url path='admin/brand/toggle-online'}",
+                    data : {
+                        brand_id : $(this).data('id'),
+                        action : 'visibilityToggle'
+                    }
+                });
+            });
+
         });
     </script>
 {/block}
