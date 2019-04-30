@@ -1,3 +1,12 @@
+# 2.3.5
+- (ISSUE #2472) add missing formError use on 2.3 branch
+- (PR #2479) disallow cart path but not words starting with cart
+- (ISSUE #2463) Fix bug code promo
+- (PR #2482) FreeOrder: round total amount to avoid problems with floats
+- (PR #2483) Fix color status in search order
+- (PR #2517) fix/choice-render-multiple
+- Fix STRICT_TRANS_TABLES for mariadb > 10.2.4 
+
 # 2.3.4
 
 **WARNING** : Minimum PHP version for Thelia 2.3.4 is now **PHP 5.5**. 

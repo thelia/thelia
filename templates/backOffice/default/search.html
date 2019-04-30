@@ -187,6 +187,7 @@
                                 {loop type="order-status" name="order-status" id=$STATUS}
                                 {assign "orderStatus" $TITLE}
                                 {assign "orderStatusLabel" "order_$CODE"}
+                                {assign "orderStatusCodeColor" $COLOR}
                                 {/loop}
 
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
@@ -203,8 +204,8 @@
                                     <td>{$orderInvoiceCompany}</td>
                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                     <td>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$currencySymbol}</td>
-                                    <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
-                                    
+                                    <td><span class="label label-{#$orderStatusLabel#}" style="background-color:{$orderStatusCodeColor};">{$orderStatus}</span></td>
+
                                     {hook name="orders.table-row" location="orders_table_row" order_id={$ID}}
                                     <td>
                                         <div class="btn-toolbar btn toolbar-primary">
