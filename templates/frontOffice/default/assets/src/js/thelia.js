@@ -122,7 +122,7 @@ var pseManager = (function($){
         if (undefined !== pse) {
             if ($pse.useFallback) {
                 $pse.fallbak.val(pse.id);
-            } else if (undefined !== pse) {
+            } else {
                 for (var i = 0; i < pse.combinations.length; i++) {
                     combinationValueId = pse.combinations[i];
                     $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i]) // jshint ignore:line
@@ -154,7 +154,8 @@ var pseManager = (function($){
                 }
             }
 
-            $pse.id.val(pseId);
+            // Trigger a change event to give the modules a change to detect PSE ID change.
+            $pse.id.val(pseId).trigger('change.pse', pseId);
             $pse.pseId = pseId;
         }
 
