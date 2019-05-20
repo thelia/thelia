@@ -30,8 +30,8 @@ use Thelia\Type\TypeCollection;
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method string[] getRef()
+ * @method null|int[] getId()
+ * @method null|string[] getRef()
  * @method string[] getOrder()
  */
 abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearchLoopInterface
