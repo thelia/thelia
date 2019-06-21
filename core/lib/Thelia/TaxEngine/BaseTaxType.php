@@ -127,4 +127,15 @@ abstract class BaseTaxType
 
         return $this->requirements[$key];
     }
+
+    /**
+     * Return true if this tax type should be re-caclulated when a discount is applied to the cart.
+     * For example, tax types such as eco-tax shoud return false. and TVA shoud return true (the default)
+     *
+     * @return bool
+     */
+    public function isDiscountFactorApplicable()
+    {
+        return true;
+    }
 }
