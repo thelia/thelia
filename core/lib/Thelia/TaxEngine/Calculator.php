@@ -13,10 +13,13 @@
 namespace Thelia\TaxEngine;
 
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
 use Thelia\Model\State;
+use Thelia\Model\Tax;
+use Thelia\Model\TaxI18n;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\I18n;
@@ -42,12 +45,64 @@ class Calculator
     protected $country = null;
     protected $state = null;
 
+    /** @var float */
+    protected $applicableDiscountTaxFactor;
 
-    public function __construct()
+    public function __construct($applicableDiscountTaxFactor = 1.0)
     {
         $this->taxRuleQuery = new TaxRuleQuery();
+
+        $this->applicableDiscountTaxFactor = $applicableDiscountTaxFactor;
     }
 
+    /**
+     * @param Cart $cart
+     * @param Country $country
+     * @param State|null $state
+     * @return Calculator
+     */
+    public static function createFromCart(Cart $cart, Country $country, State $state = null)
+    {
+        // We have to calculate the taxes on the discounted product unit prices. As the discount is global,
+        // we should apply a factor to all tax calculation, in order to dispatch discount tax on all
+        // products in the cart.
+
+        // Get the cart total without the discount
+        $cartTotal = $cart->getTaxedAmount($country, false, $state);
+        // Remove the discount (disount icludes taxes)
+        $discountedTotal = $cartTotal - $cart->getDiscount();
+        // Get the factor applicable to all tax calculation
+        $discountTaxFactor = 1 - $discountedTotal / $cartTotal;
+
+        // Get the cart total with discount
+        return new Calculator($discountTaxFactor);
+    }
+
+    /**
+     * @return float
+     */
+    public function getApplicableDiscountTaxFactor()
+    {
+        return $this->applicableDiscountTaxFactor;
+    }
+
+    /**
+     * @param int $applicableDiscountTaxFactor
+     * @return $this
+     */
+    public function setApplicableDiscountTaxFactor($applicableDiscountTaxFactor)
+    {
+        $this->applicableDiscountTaxFactor = $applicableDiscountTaxFactor;
+        return $this;
+    }
+
+    /**
+     * @param Product $product
+     * @param Country $country
+     * @param State|null $state
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function load(Product $product, Country $country, State $state = null)
     {
         $this->product = null;
@@ -72,6 +127,13 @@ class Calculator
         return $this;
     }
 
+    /**
+     * @param TaxRule $taxRule
+     * @param Country $country
+     * @param Product $product
+     * @param State|null $state
+     * @return $this
+     */
     public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null)
     {
         $this->product = null;
@@ -97,26 +159,13 @@ class Calculator
         return $this;
     }
 
-    public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product)
-    {
-        $this->product = null;
-        $this->taxRulesCollection = null;
-
-        if ($taxRule->getId() === null) {
-            throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
-        }
-        if ($product->getId() === null) {
-            throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
-        }
-
-        $this->product = $product;
-
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule);
-
-        return $this;
-    }
-
-    /** @since 2.4 */
+    /**
+     * @param TaxRule $taxRule
+     * @param Country $country
+     * @param State|null $state
+     * @return $this
+     * @since 2.4
+     */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
         $this->product = null;
@@ -139,23 +188,32 @@ class Calculator
         return $this;
     }
 
+    /**
+     * @param $untaxedPrice
+     * @param null $taxCollection
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null)
     {
         return $this->getTaxedPrice($untaxedPrice, $taxCollection) - $untaxedPrice;
     }
 
+    /**
+     * @param $taxedPrice
+     * @return float
+     */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
     {
         return $taxedPrice - $this->getUntaxedPrice($taxedPrice);
     }
 
     /**
-     * @param      $untaxedPrice
-     * @param null $taxCollection returns OrderProductTaxCollection
-     * @param null $askedLocale
-     *
-     * @return int
-     * @throws \Thelia\Exception\TaxEngineException
+     * @param float $untaxedPrice
+     * @param OrderProductTaxCollection|null $taxCollection returns OrderProductTaxCollection
+     * @param string|null $askedLocale
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
     {
@@ -178,9 +236,12 @@ class Calculator
         if (null !== $taxCollection) {
             $taxCollection = new OrderProductTaxCollection();
         }
+
+        /** @var Tax $taxRule */
         foreach ($this->taxRulesCollection as $taxRule) {
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
+            /** @var BaseTaxType $taxType */
             $taxType = $taxRule->getTypeInstance();
 
             if ($currentPosition !== $position) {
@@ -190,9 +251,18 @@ class Calculator
             }
 
             $taxAmount = $taxType->calculate($this->product, $taxedPrice);
+
+            if ($taxType->isDiscountFactorApplicable()) {
+                $taxAmount *= $this->applicableDiscountTaxFactor;
+            }
+
+            // On arrondi le montant de la taxe pour tomber juste lorsque l'on fait la somme des lignes de facture
+            $taxAmount = round($taxAmount, 2);
+
             $currentTax += $taxAmount;
 
             if (null !== $taxCollection) {
+                /** @var TaxI18n $taxI18n */
                 $taxI18n = I18n::forceI18nRetrieving($askedLocale, 'Tax', $taxRule->getId());
                 $orderProductTax = new OrderProductTax();
                 $orderProductTax->setTitle($taxI18n->getTitle());
@@ -207,6 +277,10 @@ class Calculator
         return $taxedPrice;
     }
 
+    /**
+     * @param $taxedPrice
+     * @return float|int|number
+     */
     public function getUntaxedPrice($taxedPrice)
     {
         if (null === $this->taxRulesCollection) {
@@ -235,22 +309,31 @@ class Calculator
         do {
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
+            /** @var BaseTaxType $taxType */
             $taxType = $taxRule->getTypeInstance();
 
             if ($currentPosition !== $position) {
                 $untaxedPrice -= $currentFixTax;
-                $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
+                $untaxedPrice = $untaxedPrice / (1 + $currentTaxFactor);
                 $currentFixTax = 0;
                 $currentTaxFactor = 0;
                 $currentPosition = $position;
             }
 
-            $currentFixTax += $taxType->fixAmountRetriever($this->product);
-            $currentTaxFactor += $taxType->pricePercentRetriever();
+            $fixedAmount = $taxType->fixAmountRetriever($this->product);
+            $ratioAmount = $taxType->pricePercentRetriever();
+
+            if ($taxType->isDiscountFactorApplicable()) {
+                $fixedAmount /= $this->applicableDiscountTaxFactor;
+                $ratioAmount /= $this->applicableDiscountTaxFactor;
+            }
+
+            $currentFixTax += $fixedAmount;
+            $currentTaxFactor += $ratioAmount;
         } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;
-        $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
+        $untaxedPrice = $untaxedPrice / (1 + $currentTaxFactor);
 
         return $untaxedPrice;
     }
