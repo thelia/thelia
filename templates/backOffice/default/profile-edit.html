@@ -144,13 +144,18 @@
                                 <tr>
                                     <th rowspan="2">{intl l="Resource"}</th>
                                     <th rowspan="2">{intl l="Title"}</th>
-                                    <th colspan="4" class="text-center">{intl l="Rights"}</th>
+                                    <th colspan="5" class="text-center">{intl l="Rights"}</th>
                                 </tr>
                                 <tr>
                                     <th>{intl l="View"}</th>
                                     <th>{intl l="Create"}</th>
                                     <th>{intl l="Update"}</th>
                                     <th>{intl l="Delete"}</th>
+                                    <th>
+                                        <button type="button" class="btn btn-xs btn-default toggle-all" data-set="resource" title="{intl l="Toggle all rights"}">
+                                            <i class="glyphicon glyphicon-transfer"></i>
+                                        </button>
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -163,24 +168,30 @@
                                             <td>{$CODE}</td>
                                             <td>{$TITLE}</td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_resource switch_line_r{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="VIEW" type="checkbox" {if $VIEWABLE == 1}checked="checked"{/if}>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_resource switch_line_r{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="CREATE" type="checkbox" {if $CREATABLE == 1}checked="checked"{/if}>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_resource switch_line_r{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="UPDATE" type="checkbox" {if $UPDATABLE == 1}checked="checked"{/if}>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_resource switch_line_r{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="DELETE" type="checkbox" {if $DELETABLE == 1}checked="checked"{/if}>
                                                 </div>
+                                            </td>
+
+                                            <td>
+                                                <button type="button" class="btn btn-xs btn-default toggle-line" data-id="r{$ID}" title="{intl l="Toggle line"}">
+                                                    <i class="glyphicon glyphicon-transfer"></i>
+                                                </button>
                                             </td>
                                         </tr>
 
@@ -191,7 +202,7 @@
                                 </tbody>
                                 <tfoot>
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="999">
                                         <button type="submit" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
                                     </td>
                                 </tr>
@@ -226,13 +237,18 @@
                                 <tr>
                                     <th rowspan="2">{intl l="Module"}</th>
                                     <th rowspan="2">{intl l="Title"}</th>
-                                    <th colspan="4" class="text-center">{intl l="Rights"}</th>
+                                    <th colspan="5" class="text-center">{intl l="Rights"}</th>
                                 </tr>
                                 <tr>
                                     <th>{intl l="View"}</th>
                                     <th>{intl l="Create"}</th>
                                     <th>{intl l="Update"}</th>
                                     <th>{intl l="Delete"}</th>
+                                    <th>
+                                        <button type="button" class="btn btn-xs btn-default toggle-all" data-set="module" title="{intl l="Toggle all rights"}">
+                                            <i class="glyphicon glyphicon-transfer"></i>
+                                        </button>
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -245,24 +261,29 @@
                                             <td>{$CODE}</td>
                                             <td>{$TITLE}</td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_module switch_line_m{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="VIEW" type="checkbox" {if $VIEWABLE == 1}checked="checked"{/if}>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_module switch_line_m{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="CREATE" type="checkbox" {if $CREATABLE == 1}checked="checked"{/if}>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_module switch_line_m{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="UPDATE" type="checkbox" {if $UPDATABLE == 1}checked="checked"{/if}>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="make-switch switch-mini" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <div class="make-switch switch-mini switch_set_module switch_line_m{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                     <input name="{$name}" value="DELETE" type="checkbox" {if $DELETABLE == 1}checked="checked"{/if}>
                                                 </div>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-xs btn-default toggle-line" data-id="m{$ID}" title="{intl l="Toggle line"}">
+                                                    <i class="glyphicon glyphicon-transfer"></i>
+                                                </button>
                                             </td>
                                         </tr>
 
@@ -273,7 +294,7 @@
                                 </tbody>
                                 <tfoot>
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="99">
                                         <button type="submit" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
                                     </td>
                                 </tr>
@@ -306,6 +327,20 @@
     {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    <script>
+        $(function() {
+            $('.toggle-all').click(function() {
+                var selector = ".switch_set_"  + $(this).data('set');
+                $(selector).bootstrapSwitch('toggleState');
+            });
+
+            $('.toggle-line').click(function() {
+                var selector = ".switch_line_"  + $(this).data('id');
+                $(selector).bootstrapSwitch('toggleState');
+            });
+        });
+    </script>
 
 {/block}
 

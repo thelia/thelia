@@ -1,0 +1,21 @@
+{* This page should not replace the current previous URL *}
+{set_previous_url ignore_current="1"}
+{default_translation_domain domain='fo.default'}
+
+<div class="clearfix add-to-cart-error-page">
+    <div class="alert alert-danger">
+        {form name="thelia.cart.add" }
+            {if $form_error}
+                {intl l="We're sorry, something goes wrong and the product cound not be added to your cart: %error." error=$form_error_message}
+            {else}
+                <p>{intl l="We're sorry, something goes wrong and the product cound not be added to your cart."}</p>
+            {/if}
+        {/form}
+    </div>
+
+    <p>{intl l='Please try again, or <a href="%contactUrl">contact us</a> for mor information.' contactUrl={url path="/contact"}}</p>
+
+    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">
+        <i class="fa fa-chevron-right"></i> {intl l="Continue Shopping"}
+    </button>
+</div>
