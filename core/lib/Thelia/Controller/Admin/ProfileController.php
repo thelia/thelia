@@ -363,7 +363,7 @@ class ProfileController extends AbstractCrudController
             }
 
             if ($response == null) {
-                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate();
             } else {
                 return $response;
             }
@@ -424,7 +424,7 @@ class ProfileController extends AbstractCrudController
             }
 
             if ($response == null) {
-                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate();
             } else {
                 return $response;
             }
