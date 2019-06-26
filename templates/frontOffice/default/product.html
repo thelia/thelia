@@ -230,11 +230,16 @@
                     {form_field field="append"}
                         <input type="hidden" name="{$name}" value="1">
                     {/form_field}
+
                     {form_field form=$form field="success_url"}
                         <input type="hidden" name="{$name}" value="{url path='/cart'}">
                     {/form_field}
 
-                    {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
+                    {form_field form=$form field="error_url"}
+                        <input type="hidden" name="{$name}" value="{navigate to="current"}">
+                    {/form_field}
+
+                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                     {form_field field="product"}
                         <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
