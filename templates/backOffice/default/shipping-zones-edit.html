@@ -14,7 +14,7 @@
 
     <div id="wrapper" class="container">
 
-        {loop type="module" id="$delivery_module_id" active="*" name="module.name" backend_context="1"}
+        {loop type="module" id="$delivery_module_id" active="*" name="module.name" backend_context="1" order="code"}
 
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -58,7 +58,7 @@
 
                                 {form_field field='area_id'}
                                 <label class="control-label" for="{$label_attr.for}">{$label}</label>
-                                <div class="input-group">                                    
+                                <div class="input-group">
                                     <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
                                         {loop name="area.module.not_associated" type="area" without_zone=$delivery_module_id}
                                         <option value="{$ID}">{$NAME}</option>
@@ -67,7 +67,7 @@
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add"}</button>
                                     </span>
-                                </div>                                    
+                                </div>
                                 {/form_field}
                             </form>
                             {/form}
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -122,7 +122,7 @@
 
         {/loop}
     </div>
-</div>  
+</div>
 
     {* Delete related content confirmation dialog *}
 
@@ -154,12 +154,12 @@
 
         form_action     = {url path='/admin/configuration/shipping_zones/area/remove'}
         form_content    = {$smarty.capture.delete_zone_dialog nofilter}
-    }  
+    }
 {/block}
 
 {block name="javascript-initialization"}
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
-        <script src="{$asset_url}"></script>        
+        <script src="{$asset_url}"></script>
     {/javascripts}
 
     <script>

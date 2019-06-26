@@ -58,7 +58,7 @@
                             </thead>
 
                             <tbody>
-                                {loop type="module" module_type="2" active="*" name="delivery.list" backend_context="1"}
+                                {loop type="module" module_type="2" active="*" name="delivery.list" backend_context="1" order="code"}
                                 <tr>
                                    <td><a href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$CODE} - {$TITLE}</a></td>
                                     <td>
