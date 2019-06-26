@@ -162,8 +162,7 @@
 
                                     {form_tagged_fields tag='resources'}
 
-                                        {loop type="resource" name="resource-list" code=$attr_list.resource_code profile=$ID backend_context="1"}
-
+                                        {loop type="resource" name="resource-list" code=$attr_list.resource_code profile=$ID backend_context="1" order="code"}
                                         <tr>
                                             <td>{$CODE}</td>
                                             <td>{$TITLE}</td>
@@ -255,7 +254,7 @@
 
                                     {form_tagged_fields tag='modules'}
 
-                                        {loop type="module" name="module-list" code=$attr_list.module_code profile=$ID backend_context="1"}
+                                        {loop type="module" name="module-list" code=$attr_list.module_code profile=$ID backend_context="1" order="code"}
 
                                         <tr>
                                             <td>{$CODE}</td>
