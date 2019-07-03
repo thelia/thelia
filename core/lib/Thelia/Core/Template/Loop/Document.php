@@ -15,6 +15,7 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -86,7 +87,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model')
+
         );
 
         // Add possible document sources
@@ -122,7 +125,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        if (! \is_null($object_id)) {
+        if (! is_null($object_id)) {
             $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
@@ -169,11 +172,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         // Check form source="product" source_id="123" style arguments
         $source = $this->getSource();
 
-        if (! \is_null($source)) {
+        if (! is_null($source)) {
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
-            if (\is_null($source_id) && \is_null($id)) {
+            if (is_null($source_id) && is_null($id)) {
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
@@ -184,7 +187,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
-                $argValue = \intval($this->getArgValue($source));
+                $argValue = intval($this->getArgValue($source));
 
                 if ($argValue > 0) {
                     $search = $this->createSearchQuery($source, $argValue);
@@ -217,12 +220,12 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (! \is_null($id)) {
+        if (! is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
-        if (!\is_null($exclude)) {
+        if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -281,6 +284,41 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("OBJECT_TYPE", $this->objectType)
                     ->set("OBJECT_ID", $this->objectId)
                 ;
+
+                $isBackendContext = $this->getBackendContext();
+
+                if ($this->getWithPrevNextInfo()) {
+
+                    /** @var ProductDocumentQuery $search */
+                    $previousQuery = $this->getSearchQuery($this->objectType, $this->objectId)
+                        ->filterByPosition($result->getPosition(), Criteria::LESS_THAN);
+
+                    if (! $isBackendContext) {
+                        $previousQuery->filterByVisible(true);
+                    }
+
+                    $previous = $previousQuery
+                        ->orderByPosition(Criteria::DESC)
+                        ->findOne();
+
+                    $nextQuery = $this->getSearchQuery($this->objectType, $this->objectId)
+                        ->filterByPosition($result->getPosition(), Criteria::GREATER_THAN);
+
+                    if (! $isBackendContext) {
+                        $nextQuery->filterByVisible(true);
+                    }
+
+                    $next = $nextQuery
+                        ->orderByPosition(Criteria::ASC)
+                        ->findOne();
+
+                    $loopResultRow
+                        ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                        ->set("HAS_NEXT", $next != null ? 1 : 0)
+                        ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                        ->set("NEXT", $next != null ? $next->getId() : -1);
+                }
+
                 $this->addOutputFields($loopResultRow, $result);
 
                 $loopResult->addRow($loopResultRow);

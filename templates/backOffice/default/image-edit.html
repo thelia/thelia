@@ -5,142 +5,141 @@
 {block name="check-access"}update{/block}
 
 {block name="main-content"}
-    <div class="documents edit-image">
+<div class="documents edit-image">
 
-        <div id="wrapper" class="container">
+    <div id="wrapper" class="container">
 
-            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id" visible="*"}
-                <ul class="breadcrumb">
-                    {foreach $breadcrumb as $label=>$link}
-                    <li><a href="{$link}">{$label}</a></li>
-                    {/foreach}
-                    <li>{intl l='Editing image "%name"' name={$TITLE}}</li>
-                </ul>
+        {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id" visible="*" with_prev_next_info="true"}
+        <ul class="breadcrumb">
+            {foreach $breadcrumb as $label=>$link}
+            <li><a href="{$link}">{$label}</a></li>
+            {/foreach}
+            <li>{intl l='Editing image "%name"' name={$TITLE}}</li>
+        </ul>
 
-            {hook name="image-edit.top" image_id=$imageId}
+        {hook name="image-edit.top" image_id=$imageId}
 
-        		<div class="row">
-        			<div class="col-md-12 general-block-decorator">
-        				<div class="row">
-
-        					<div class="col-md-12 title title-without-tabs">
-        					   {intl l='Edit image "%name"' name={$TITLE}}
-        					</div>
-
-                            <div class="form-container">
-                                <div class="col-md-12">
-
-        						    {form name="$formId"}
-        						    	<form method="POST" action="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" {form_enctype} class="clearfix">
-                                            {include
-                                                file = "includes/inner-form-toolbar.html"
-                                                hide_submit_buttons = false
-
-                                                page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
-                                                close_url = "{url path="{$redirectUrl}" current_tab="images" noamp=1}"
-                                            }
-
-        						        	{form_hidden_fields}
-
-                                            {render_form_field field="success_url" value="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}"}
-                                            {render_form_field field="locale" value="$edit_language_locale"}
-
-        					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
-                                            <p class="title title-without-tabs">{intl l="Image information"}</p>
-
-                                            <div class="actions">
-                                                <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous image'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                                                <a {if $HAS_NEXT != 0}href="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next image'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="control-label">{intl l="Preview"} : </label>
-                                                        <p>
-                                                            <a href="{$ORIGINAL_IMAGE_URL nofilter}" alt="{$TITLE}" target="_blank">
-                                                                {if $PROCESSING_ERROR}
-                                                                    <img src="//placehold.it/580x580&text={intl l='Image+file+not+found'}" alt="{$TITLE}" class="img-thumbnail">
-                                                                {else}
-                                                                    <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" class="img-thumbnail">
-                                                                {/if}
-                                                            </a>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    {render_form_field field="file"}
-
-                                                    {form_field field='visible'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
-
-                                                        <div class="checkbox">
-                                                            <label>
-                                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VISIBLE != 0}checked="checked"{/if}>
-                                                                {$label}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    {/form_field}
-
-                                                    {render_form_field field="title" value=$TITLE}
-                                                    {render_form_field field="chapo" value=$CHAPO}
-                                                    {render_form_field field="postscriptum" value=$POSTSCRIPTUM}
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    {render_form_field field="description" value=$DESCRIPTION extra_class="wysiwyg"}
-                                                </div>
-                                            </div>
-
-                                            {include
-                                                file = "includes/inner-form-toolbar.html"
-                                                hide_submit_buttons = false
-                                                hide_flags = true
-
-                                                page_url  = "{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}"
-                                                close_url = "{url path="{$redirectUrl}" current_tab="images"}"
-                                            }
-                                        </form>
-        							{/form}
-
-        						</div>
-        					</div>
-
-        				</div>
-        			</div>
-
-        		</div>
-
-            {hook name="image-edit.bottom" image_id=$imageId}
-
-    		{/loop}
-
-            {elseloop rel="image_edit"}
+        <div class="row">
+            <div class="col-md-12 general-block-decorator">
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="row inner-toolbar clearfix">
-                            <div class="col-md-6 inner-actions pull-right">
-                                <a href="{url path="{$redirectUrl}" current_tab="images"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                    <div class="col-md-7 title title-without-tabs">
+                        {intl l='Edit image "%name"' name={$TITLE}}
+                    </div>
+                    <div class="col-md-5 actions">
+                        <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/image/type/folder/%previous/update" previous=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous image'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                        <a {if $HAS_NEXT != 0}href="{url path="/admin/image/type/folder/%next/update" next=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next image'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                    </div>
+
+
+                    <div class="form-container">
+                        <div class="col-md-12">
+
+                            {form name="$formId"}
+                            <form method="POST" action="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}" {form_enctype} class="clearfix">
+                            {include
+                            file = "includes/inner-form-toolbar.html"
+                            hide_submit_buttons = false
+
+                            page_url  = "{url path="/admin/image/type/{$imageType}/{$ID}/update"}"
+                            close_url = "{url path="{$redirectUrl}" current_tab="images" noamp=1}"
+                            }
+
+                            {form_hidden_fields}
+
+                            {render_form_field field="success_url" value="{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}"}
+                            {render_form_field field="locale" value="$edit_language_locale"}
+
+                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                            <p class="title title-without-tabs">{intl l="Image information"}</p>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">{intl l="Preview"} : </label>
+                                        <p>
+                                            <a href="{$ORIGINAL_IMAGE_URL nofilter}" alt="{$TITLE}" target="_blank">
+                                                {if $PROCESSING_ERROR}
+                                                <img src="//placehold.it/580x580&text={intl l='Image+file+not+found'}" alt="{$TITLE}" class="img-thumbnail">
+                                                {else}
+                                                <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" class="img-thumbnail">
+                                                {/if}
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    {render_form_field field="file"}
+
+                                    {form_field field='visible'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VISIBLE != 0}checked="checked"{/if}>
+                                                {$label}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {/form_field}
+
+                                    {render_form_field field="title" value=$TITLE}
+                                    {render_form_field field="chapo" value=$CHAPO}
+                                    {render_form_field field="postscriptum" value=$POSTSCRIPTUM}
+                                </div>
                             </div>
-                        </div>
-                        <div class="alert alert-error">
-                            {intl l="Sorry, image ID=%id was not found." id={$imageId}}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {render_form_field field="description" value=$DESCRIPTION extra_class="wysiwyg"}
+                                </div>
+                            </div>
+
+                            {include
+                            file = "includes/inner-form-toolbar.html"
+                            hide_submit_buttons = false
+                            hide_flags = true
+
+                            page_url  = "{url path="/admin/image/type/%image/%id/update" image=$imageType id=$ID}"
+                            close_url = "{url path="{$redirectUrl}" current_tab="images"}"
+                            }
+                            </form>
+                            {/form}
+
                         </div>
                     </div>
+
                 </div>
-            {/elseloop}
+            </div>
 
         </div>
+
+        {hook name="image-edit.bottom" image_id=$imageId}
+
+        {/loop}
+
+        {elseloop rel="image_edit"}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row inner-toolbar clearfix">
+                    <div class="col-md-6 inner-actions pull-right">
+                        <a href="{url path="{$redirectUrl}" current_tab="images"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                    </div>
+                </div>
+                <div class="alert alert-error">
+                    {intl l="Sorry, image ID=%id was not found." id={$imageId}}
+                </div>
+            </div>
+        </div>
+        {/elseloop}
+
     </div>
+</div>
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="image.edit-js" location="image-edit-js" source="{$imageType}" image_id="{$imageId}" }
+{hook name="image.edit-js" location="image-edit-js" source="{$imageType}" image_id="{$imageId}" }
 
-    {hook name="wysiwyg.js" location="wysiwyg-image-edit-js" }
+{hook name="wysiwyg.js" location="wysiwyg-image-edit-js" }
 {/block}
