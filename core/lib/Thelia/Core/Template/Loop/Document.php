@@ -86,7 +86,8 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
-            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model')
+            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false)
         );
 
         // Add possible document sources
@@ -281,6 +282,32 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("OBJECT_TYPE", $this->objectType)
                     ->set("OBJECT_ID", $this->objectId)
                 ;
+
+                $isBackendContext = $this->getBackendContext();
+                if ($this->getWithPrevNextInfo()) {
+                    $previousQuery = $this->getSearchQuery($this->objectType, $this->objectId)
+                        ->filterByPosition($result->getPosition(), Criteria::LESS_THAN);
+                    if (! $isBackendContext) {
+                        $previousQuery->filterByVisible(true);
+                    }
+                    $previous = $previousQuery
+                        ->orderByPosition(Criteria::DESC)
+                        ->findOne();
+                    $nextQuery = $this->getSearchQuery($this->objectType, $this->objectId)
+                        ->filterByPosition($result->getPosition(), Criteria::GREATER_THAN);
+                    if (! $isBackendContext) {
+                        $nextQuery->filterByVisible(true);
+                    }
+                    $next = $nextQuery
+                        ->orderByPosition(Criteria::ASC)
+                        ->findOne();
+                    $loopResultRow
+                        ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                        ->set("HAS_NEXT", $next != null ? 1 : 0)
+                        ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                        ->set("NEXT", $next != null ? $next->getId() : -1);
+                }
+
                 $this->addOutputFields($loopResultRow, $result);
 
                 $loopResult->addRow($loopResultRow);
