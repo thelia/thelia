@@ -3,14 +3,11 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
-use Thelia\Model\Country;
-use Thelia\Model\State;
 
 class Cart extends BaseCart
 {
@@ -21,7 +18,7 @@ class Cart extends BaseCart
      * @param Customer $customer
      * @param Currency $currency
      * @param EventDispatcherInterface $dispatcher
-     * @return Cart
+     * @return Cart|bool
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -116,20 +113,21 @@ class Cart extends BaseCart
      *
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
-     * @param  Country      $country
-     * @param  bool         $discount
-     * @param  State|null   $state
-     * @return float|int
+     * @param \Thelia\Model\Country $country
+     * @param bool $withDiscount
+     * @param \Thelia\Model\State|null $state
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedAmount(Country $country, $discount = true, State $state = null)
+    public function getTaxedAmount(Country $country, $withDiscount = true, State $state = null)
     {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getTotalRealTaxedPrice($country, $state);
+            $total += $cartItem->getTotalRealTaxedPrice($country, $state, $withDiscount);
         }
 
-        if ($discount) {
+        if ($withDiscount) {
             $total -= $this->getDiscount();
 
             if ($total < 0) {
@@ -143,10 +141,12 @@ class Cart extends BaseCart
     /**
      *
      * @see getTaxedAmount same as this method but the amount is without taxes
-     * @param  bool         $discount
-     * @return float|int
+     *
+     * @param bool $withDiscount
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalAmount($discount = true)
+    public function getTotalAmount($withDiscount = true)
     {
         $total = 0;
 
@@ -158,7 +158,10 @@ class Cart extends BaseCart
             $total += $subtotal;
         }
 
-        if ($discount) {
+        if ($withDiscount) {
+            // As the discount is a taxed value, we have to remove the taxes from the discount
+            // if we want to return a correct value.
+
             // discount value is taxed see ISSUE #1476
             $total -= $this->getDiscount();
 
@@ -172,11 +175,30 @@ class Cart extends BaseCart
 
     /**
      * Return the VAT of all items
-     * @return float|int
+     *
+     * @param $taxCountry
+     * @param null $taxState
+     * @param bool $withDiscount
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalVAT($taxCountry, $taxState = null)
+    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = false)
     {
-        return ($this->getTaxedAmount($taxCountry, true, $taxState) - $this->getTotalAmount(true));
+        return ($this->getTaxedAmount($taxCountry, true, $taxState, $withDiscount) - $this->getTotalAmount(true));
+    }
+
+    /**
+     * Return the VAT of all items
+     *
+     * @param $taxCountry
+     * @param null $taxState
+     * @param bool $withDiscount
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getTotalVATWithoutDiscount($taxCountry, $taxState = null, $withDiscount = false)
+    {
+        return ($this->getTaxedAmount($taxCountry, true, $taxState, $withDiscount) - $this->getTotalAmount(true));
     }
 
     /**
@@ -220,5 +242,14 @@ class Cart extends BaseCart
 
         // An empty cart is not virtual.
         return $this->getCartItems()->count() > 0;
+    }
+
+    public function getDiscount($withTaxes = true)
+    {
+        if ($withTaxes) {
+            return parent::getDiscount();
+        } else {
+            // Apply the discount ratio
+        }
     }
 }

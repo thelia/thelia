@@ -166,16 +166,6 @@
                         <table class="table table-cart table-bordered table-cart-total">
                             <tfoot>
                             {$discount={order attr="discount"}}
-                            {if $discount}
-                            <tr>
-                                <th class="discount">{intl l="Discount"}</th>
-                                <td class="shipping">
-                                    <div class="shipping-price">
-                                        <span class="price">{format_money number=$discount}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {/if}
                             <tr>
                                 <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                                 <td class="coupon">
@@ -197,24 +187,63 @@
                                     <!-- /input-group -->
                                 </td>
                             </tr>
-                            {if {cart attr="is_virtual"} != 1}
                             <tr>
-                                <th class="shipping">{intl l="Shipping Tax"}</th>
-                                <td class="shipping">
-                                    <div class="shipping-price">
-                                        <span class="price">{format_money number={order attr="postage"}}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {/if}
-                            <tr>
-                                <th>{intl l="Total excl. taxes"}</th>
+                                <th>{intl l="Total articles HT"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_price_without_discount"}}}</span>
                                     </div>
                                 </td>
                             </tr>
+
+                            {if $discount}
+                                <tr>
+                                    <th class="discount">{intl l="Remise TTC"}</th>
+                                    <td class="shipping">
+                                        <div class="shipping-price">
+                                            <span class="price">{format_money number=$discount}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>{intl l="Total remisé TTC"}</th>
+                                    <td>
+                                        <div class="total-price">
+                                            <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}}}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/if}
+
+                            {if {cart attr="is_virtual"} != 1}
+                                <tr>
+                                    <th class="shipping">{intl l="Frais de port"}</th>
+                                    <td class="shipping">
+                                        <div class="shipping-price">
+                                            <span class="price">{format_money number={order attr="postage"}}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/if}
+
+                            <tr>
+                                <th>{intl l="Total taxes"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{format_money number={{cart attr="total_tax_amount"} + {order attr="postage_tax"}}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>{intl l="Total taxes"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{format_money number={{cart attr="total_tax_amount"} + {order attr="postage_tax"}}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+
                             <tr>
                                 <th class="total">{intl l="Total incl. taxes"}</th>
                                 <td class="total">
