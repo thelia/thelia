@@ -60,6 +60,7 @@ class Calculator
      * @param Country $country
      * @param State|null $state
      * @return Calculator
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function createFromCart(Cart $cart, Country $country, State $state = null)
     {
@@ -69,8 +70,10 @@ class Calculator
 
         // Get the cart total without the discount
         $cartTotal = $cart->getTaxedAmount($country, false, $state);
-        // Remove the discount (disount icludes taxes)
+
+        // Remove the discount (the discount id defined WITH taxes)
         $discountedTotal = $cartTotal - $cart->getDiscount();
+
         // Get the factor applicable to all tax calculation
         $discountTaxFactor = 1 - $discountedTotal / $cartTotal;
 
@@ -212,10 +215,11 @@ class Calculator
      * @param float $untaxedPrice
      * @param OrderProductTaxCollection|null $taxCollection returns OrderProductTaxCollection
      * @param string|null $askedLocale
+     * @param bool $ignoreTaxWhereDiscountIsNotApplicable
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
+    public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null, $ignoreTaxWhereDiscountIsNotApplicable = false)
     {
         if (null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
@@ -254,9 +258,12 @@ class Calculator
 
             if ($taxType->isDiscountFactorApplicable()) {
                 $taxAmount *= $this->applicableDiscountTaxFactor;
+            } elseif ($ignoreTaxWhereDiscountIsNotApplicable) {
+                continue;
             }
 
-            // On arrondi le montant de la taxe pour tomber juste lorsque l'on fait la somme des lignes de facture
+            // We have to round the tax amout here (sum of rounded values methods) to prevent the small total amount
+            // differences which may occur when rounding the sum of unrouded values.
             $taxAmount = round($taxAmount, 2);
 
             $currentTax += $taxAmount;
