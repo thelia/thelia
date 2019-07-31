@@ -23,6 +23,10 @@ class CartItem extends BaseCartItem
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @return bool
+     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -34,6 +38,10 @@ class CartItem extends BaseCartItem
         return true;
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @return bool
+     */
     public function preUpdate(ConnectionInterface $con = null)
     {
         parent::preUpdate($con);
@@ -45,6 +53,10 @@ class CartItem extends BaseCartItem
         return true;
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function postInsert(ConnectionInterface $con = null)
     {
         parent::postInsert($con);
@@ -56,6 +68,10 @@ class CartItem extends BaseCartItem
         }
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function postUpdate(ConnectionInterface $con = null)
     {
         parent::postUpdate($con);
@@ -70,6 +86,7 @@ class CartItem extends BaseCartItem
     /**
      * @param $value
      * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateQuantity($value)
     {
@@ -95,6 +112,11 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function addQuantity($value)
     {
         $currentQuantity = $this->getQuantity();
@@ -140,9 +162,12 @@ class CartItem extends BaseCartItem
 
     /**
      * @param Country $country
+     * @param State|null $state
+     * @param bool $withDiscount
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getRealTaxedPrice(Country $country, State $state = null)
+    public function getRealTaxedPrice(Country $country, State $state = null, $withDiscount = false)
     {
         return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
     }
@@ -150,11 +175,13 @@ class CartItem extends BaseCartItem
     /**
      * @param Country $country
      * @param State|null $state
+     * @param bool $withDiscount
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedPrice(Country $country, State $state = null)
+    public function getTaxedPrice(Country $country, State $state = null, $withDiscount = false)
     {
-        $taxCalculator = new Calculator();
+        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
 
         return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice());
     }
@@ -162,35 +189,41 @@ class CartItem extends BaseCartItem
     /**
      * @param Country $country
      * @param State|null $state
+     * @param bool $withDiscount
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedPromoPrice(Country $country, State $state = null)
+    public function getTaxedPromoPrice(Country $country, State $state = null, $withDiscount = false)
     {
-        $taxCalculator = new Calculator();
+        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
 
         return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice());
     }
 
     /**
-     * @since Version 2.3
      * @param Country $country
      * @param State|null $state
+     * @param bool $withDiscount
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     * @since Version 2.3
      */
-    public function getTotalRealTaxedPrice(Country $country, State $state = null)
+    public function getTotalRealTaxedPrice(Country $country, State $state = null, $withDiscount = false)
     {
-        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
+        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country, $state, $withDiscount) : $this->getTotalTaxedPrice($country, $state, $withDiscount);
     }
 
     /**
      * @since Version 2.3
      * @param Country $country
      * @param State|null $state
+     * @param bool $withDiscount
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalTaxedPrice(Country $country, State $state = null)
+    public function getTotalTaxedPrice(Country $country, State $state = null, $withDiscount = false)
     {
-        $taxCalculator = new Calculator();
+        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
 
         return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice()*$this->getQuantity());
     }
@@ -199,12 +232,24 @@ class CartItem extends BaseCartItem
      * @since Version 2.3
      * @param Country $country
      * @param State|null $state
+     * @param bool $withDiscount
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalTaxedPromoPrice(Country $country, State $state = null)
+    public function getTotalTaxedPromoPrice(Country $country, State $state = null, $withDiscount = false)
     {
-        $taxCalculator = new Calculator();
+        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
 
         return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
+    }
+
+    /**
+     * @param bool $withDiscount
+     * @return Calculator
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    protected function createCalculator($country, $state, $withDiscount)
+    {
+        return $withDiscount ? Calculator::createFromCart($this->getCart(), $country, $state) : new Calculator();
     }
 }
