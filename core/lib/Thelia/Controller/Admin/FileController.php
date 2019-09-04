@@ -310,7 +310,8 @@ class FileController extends BaseAdminController
     {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
-        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+        $successUrl = $this->getImageSuccessUrl($parentType, $parentId);
+        $args = array('imageType' => $parentType, 'parentId' => $parentId, 'success_url' => $successUrl);
 
         return $this->render('includes/image-upload-list-ajax', $args);
     }
@@ -344,7 +345,8 @@ class FileController extends BaseAdminController
     {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
-        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+        $successUrl = $this->getImageSuccessUrl($parentType, $parentId);
+        $args = array('imageType' => $parentType, 'parentId' => $parentId, 'success_url' => $successUrl);
 
         return $this->render('includes/image-upload-form', $args);
     }
@@ -364,6 +366,42 @@ class FileController extends BaseAdminController
         $args = array('documentType' => $parentType, 'parentId' => $parentId);
 
         return $this->render('includes/document-upload-form', $args);
+    }
+
+    /**
+     * Return the the url of the image tab
+     *
+     * @param string $parentType Parent Type owning images being saved
+     * @param string $parentId   Parent id owning images being saved
+     *
+     * @return null|string
+     */
+    protected function getImageSuccessUrl($parentType, $parentId)
+    {
+        switch ($parentType){
+            case "product":
+                $successUrl = URL::getInstance()->absoluteUrl("/admin/products/update", ["product_id" => $parentId, "current_tab"=> "images"]);
+                break;
+            case "category":
+                $successUrl = URL::getInstance()->absoluteUrl("/admin/categories/update", ["category_id" => $parentId, "current_tab"=> "images"]);
+                break;
+            case "content":
+                $successUrl = URL::getInstance()->absoluteUrl("/admin/content/update/".$parentId, ["current_tab"=> "images"]);
+                break;
+            case "folder":
+                $successUrl = URL::getInstance()->absoluteUrl("/admin/folders/update/".$parentId, ["current_tab"=> "images"]);
+                break;
+            case "brand":
+                $successUrl = URL::getInstance()->absoluteUrl("/admin/brand/update/".$parentId, ["current_tab"=> "images"]);
+                break;
+            case "module":
+                $successUrl = URL::getInstance()->absoluteUrl("/admin/module/update/".$parentId, ["current_tab"=> "images"]);
+                break;
+            default:
+                $successUrl = null;
+                break;
+        }
+        return $successUrl;
     }
 
     /**

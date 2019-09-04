@@ -75,7 +75,11 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="images">
-                        {include file='includes/image-upload-form.html' imageType='module' parentId=$module_id}
+                        {include file='includes/image-upload-form.html'
+                            imageType='module'
+                            parentId=$module_id
+                            success_url = {url path="/admin/module/update/$module_id" current_tab=images}
+                        }
                     </div>
                 </div>
             </div>
