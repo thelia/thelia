@@ -208,7 +208,9 @@ class Calculator
      */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
     {
-        return $taxedPrice - $this->getUntaxedPrice($taxedPrice);
+        // We have to round the tax amout here (sum of rounded values methods) to prevent the small total amount
+        // differences which may occur when rounding the sum of unrouded values.
+        return round($taxedPrice - $this->getUntaxedPrice($taxedPrice), 2);
     }
 
     /**
