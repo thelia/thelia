@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Thelia\Install\Database;
 use Thelia\Model\ConfigQuery;
 use Thelia\Module\BaseModule;
@@ -85,5 +86,20 @@ class Carousel extends BaseModule
             }
             $fileSystem->remove(__DIR__ . DS . 'media');
         }
+
+        $finder = (new Finder())->files()->name('#.*?\.sql#')->sortByName()->in(__DIR__ . DS . 'Config' . DS .'update');
+
+        if ($finder->count() === 0){
+            return;
+        }
+        $database = new Database($con);
+
+        /** @var SplFileInfo $updateSQLFile */
+        foreach ($finder as $updateSQLFile){
+            if (version_compare($currentVersion, str_replace('.sql','', $updateSQLFile->getFilename()), '<')){
+                $database->insertSql(null,[$updateSQLFile->getPathname()]);
+            }
+        }
+
     }
 }
