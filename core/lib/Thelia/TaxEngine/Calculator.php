@@ -70,8 +70,7 @@ class Calculator
 
         // Get the cart total without the discount
         $cartTotal = $cart->getTaxedAmount($country, false, $state);
-
-        // Remove the discount (the discount id defined WITH taxes)
+        // Remove the discount (disount icludes taxes)
         $discountedTotal = $cartTotal - $cart->getDiscount();
 
         // Get the factor applicable to all tax calculation
