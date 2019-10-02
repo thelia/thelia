@@ -202,6 +202,7 @@ class Cart extends BaseCart
      * Tell if the cart contains only virtual products
      *
      * @return bool
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function isVirtual()
     {
@@ -211,11 +212,13 @@ class Cart extends BaseCart
             }
 
             $product = $cartItem->getProductSaleElements()->getProduct();
-            if (!$product->getVirtual()) {
+
+            if (! $product->getVirtual()) {
                 return false;
             }
         }
 
-        return true;
+        // An empty cart is not virtual.
+        return $this->getCartItems()->count() > 0;
     }
 }
