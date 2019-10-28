@@ -67,7 +67,7 @@ Use the optionnal $field_value parameter if no value is defined
 {elseif $type == 'checkbox' || $type == 'radio'}
     id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'choice'}
-    id="{$label_attr.for}" name="{$name}{if $multiple}[]{/if}" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}{if $multiple && !strpos($name, '[]')}[]{/if}" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'collection'}
     id="{$label_attr.for}" name="{$name}[]" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
