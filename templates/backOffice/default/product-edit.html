@@ -229,6 +229,38 @@
         </div>
     </div>
     {/form}
+
+    <div class="modal fade js-modal-search-category-product" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="js-btn-dismiss-modal close">×</button>
+                    <h3></h3>
+                </div>
+                <div class="modal-body align-center">
+                    <div class="js-form-search">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">{intl l="Search"}</div>
+                                <input name="search" class="js-input-search form-control" type="text"/>
+                            </div>
+                        </div>
+                        <div class="js-loader text-center hide">{intl l="Please wait, loading"}</div>
+                        <div class="alert alert-warning text-center hide js-alert-no-result">
+                            {intl l="No results found for your search."}
+                        </div>
+                        <div class="form-group js-block-search-result hide">
+                            <select class="form-control" size="10"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="js-btn-dismiss-modal btn btn-default">{intl l="Close"}</a>
+                    <a href="#" class="js-modal-btn-select btn btn-primary">{intl l="Select"}</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block name="javascript-initialization"}
@@ -245,9 +277,9 @@
     {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-	{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-	    <script src="{$asset_url}"></script>
-	{/javascripts}
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
     {javascripts file='assets/js/jquery.typewatch.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
@@ -338,52 +370,52 @@ $(function() {
 
     // -- Product prices management tab ---------------------------------------
 
-	// Load value on attribute selection
-	$('#attribute_id').change(function(event) {
-	    var val = $(this).val();
+    // Load value on attribute selection
+    $('#attribute_id').change(function(event) {
+        var val = $(this).val();
 
-	    if (val != "") {
-	        $.ajax({
-	             url      : '{url path="/admin/product/%id/attribute-values/" id=$product_id}' + $(this).val() + '.xml',
-	             type     : 'get',
-	             dataType : 'json',
-	             success  : function(json) {
-	                 $('#attribute_value_id :not(:first-child)').remove();
+        if (val != "") {
+            $.ajax({
+                 url      : '{url path="/admin/product/%id/attribute-values/" id=$product_id}' + $(this).val() + '.xml',
+                 type     : 'get',
+                 dataType : 'json',
+                 success  : function(json) {
+                     $('#attribute_value_id :not(:first-child)').remove();
 
-	                 var have_content = false;
+                     var have_content = false;
 
-	                 $.each(json, function(idx, value) {
-	                     $('#attribute_value_id').append($('<option>').text(value.title).attr('value', value.id));
+                     $.each(json, function(idx, value) {
+                         $('#attribute_value_id').append($('<option>').text(value.title).attr('value', value.id));
 
-	                     have_content = true; // Lame...
-	                 });
+                         have_content = true; // Lame...
+                     });
 
-	                 if (have_content) {
-	                     $('#attribute_value_selector_empty').addClass('hide');
-	                     $('#attribute_value_selector').removeClass('hide');
-	                 }
-	                 else {
-	                     $('#attribute_value_selector_empty').removeClass('hide');
-	                     $('#attribute_value_selector').addClass('hide');
-	                 }
+                     if (have_content) {
+                         $('#attribute_value_selector_empty').addClass('hide');
+                         $('#attribute_value_selector').removeClass('hide');
+                     }
+                     else {
+                         $('#attribute_value_selector_empty').removeClass('hide');
+                         $('#attribute_value_selector').addClass('hide');
+                     }
 
-	             }
-	        });
-	    }
-	    else {
-	        $('#attribute_value_selector_empty').addClass('hide');
-	        $('#attribute_value_selector').addClass('hide');
-	    }
-	});
+                 }
+            });
+        }
+        else {
+            $('#attribute_value_selector_empty').addClass('hide');
+            $('#attribute_value_selector').addClass('hide');
+        }
+    });
 
     // Add selected value to the combination
     $('.add-value-to-combination').click(function(event) {
 
-    	// Hide error message
-    	$('#combination_attributes_error').text('').addClass('hide');
+        // Hide error message
+        $('#combination_attributes_error').text('').addClass('hide');
 
-    	// Select all elements
-    	$('#combination_attributes option').prop('selected', 'selected');
+        // Select all elements
+        $('#combination_attributes option').prop('selected', 'selected');
 
         $.ajax({
             url      : '{url path="/admin/product/%id/add-attribute-value-to-combination/" id=$product_id}'
@@ -399,8 +431,8 @@ $(function() {
                 var have_content = false;
 
                 $.each(json, function(idx, value) {
-                	if (idx != 'error')
-                	    $('#combination_attributes').append($('<option>').text(value.title).attr('value', value.id));
+                    if (idx != 'error')
+                        $('#combination_attributes').append($('<option>').text(value.title).attr('value', value.id));
                 });
 
                 if (json.error)
@@ -410,15 +442,15 @@ $(function() {
             }
        });
 
-    	event.preventDefault();
+        event.preventDefault();
     });
 
     // Remove selected value from combination
     $('.remove-value-from-combination').click(function() {
 
-    	$('#combination_attributes option:selected').remove();
+        $('#combination_attributes option:selected').remove();
 
-    	event.preventDefault();
+        event.preventDefault();
     });
 
     // Set proper category ID in combination delete from
@@ -428,19 +460,19 @@ $(function() {
 
     // In create combination dialog, select all element of conbination list
     $('#combination_creation_dialog_ok').click(function() {
-    	$('#combination_attributes option').prop('selected', 'selected');
+        $('#combination_attributes option').prop('selected', 'selected');
     });
 
     // In proces tab, process exchange rate usage checkbox changes
     $('.use_exchange_rate_box').change(function(ev) {
 
-    	if ($(this).is(':checked')) {
+        if ($(this).is(':checked')) {
 
-    		var pse_id = $(this).data('pse-id');
+            var pse_id = $(this).data('pse-id');
 
-    	    $('.price_field').prop('readonly', true);
+            $('.price_field').prop('readonly', true);
 
-    	    // Reload prices
+            // Reload prices
             $.ajax({
                 url      : '{url path="/admin/product/load-converted-prices"}',
                 data     : {
@@ -456,14 +488,14 @@ $(function() {
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-without-tax"]').val(json.sale_price_without_tax);
                 },
                 error : function(jqXHR, textStatus, errorThrown) {
-                	alert("{intl l='Failed to get converted prices. Please try again.'} (" +errorThrown+ ")");
+                    alert("{intl l='Failed to get converted prices. Please try again.'} (" +errorThrown+ ")");
                 }
            });
 
-    	}
-    	else {
-    	    $('.price_field').prop('readonly', false)
-    	}
+        }
+        else {
+            $('.price_field').prop('readonly', false)
+        }
     });
 
     function update_price(price, price_type, dest_field_id) {
@@ -503,8 +535,8 @@ $(function() {
 
     $('#open_combination_builder').click(function(ev) {
         if (! confirm("{intl l='Existing combinations will be deleted. Do you want to continue ?'}'")) {
-        	ev.preventDefault();
-        	ev.stopPropagation();
+            ev.preventDefault();
+            ev.stopPropagation();
         }
     });
 
@@ -517,13 +549,13 @@ $(function() {
     // Automatic update of price fields: any change in the taxed (resp. untaxed) price
     // will update the untaxed (resp. taxed) one
     $('.automatic_price_field').typeWatch({
-    	captureLength: 1,
-    	wait         : 300,
-    	callback     : function () {
+        captureLength: 1,
+        wait         : 300,
+        callback     : function () {
             var price = $(this).val();
             $(this).val(sanitizeFloat(price));
             update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
-    	}
+        }
     });
 
     function sanitizeFloat(numVal) {
@@ -535,35 +567,35 @@ $(function() {
 
         var total = 0;
 
-    	var counter = {};
+        var counter = {};
 
-    	var list = $('.attribute_av_value:checked');
+        var list = $('.attribute_av_value:checked');
 
-    	if (list.length > 0) {
+        if (list.length > 0) {
 
-	    	list.each(function() {
-	    		var attr_id = $(this).data('attribute-id');
+            list.each(function() {
+                var attr_id = $(this).data('attribute-id');
 
-	    		if (undefined != counter[attr_id])
-	    			counter[attr_id]++;
-	    		else
-	    			counter[attr_id] = 1;
-	    	});
+                if (undefined != counter[attr_id])
+                    counter[attr_id]++;
+                else
+                    counter[attr_id] = 1;
+            });
 
-	    	total = 1;
+            total = 1;
 
-	    	for(var count in counter) {
-	    		total *= counter[count];
-	    	}
-    	}
+            for(var count in counter) {
+                total *= counter[count];
+            }
+        }
 
-    	return total;
+        return total;
     }
 
     $('.attribute_av_value').change(function(ev) {
-    	var total = countGeneratedCombinations();
+        var total = countGeneratedCombinations();
 
-    	$('#number_of_generated_combinations').text(total);
+        $('#number_of_generated_combinations').text(total);
     });
 
     $(".pse-assoc-image-document").click(function() {
@@ -648,6 +680,124 @@ $(function() {
     });
 
 });
+
+    //Product and category search
+    var $modalSearch;
+
+    $(function() {
+        var idDefaultCategorySelect = '#default_category_field';
+
+        $(idDefaultCategorySelect).after('<a class="js-btn-search-default-category btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>');
+
+
+        // Search categories and products
+
+        $modalSearch = $('.js-modal-search-category-product');
+
+
+        $modalSearch.initAndShow = function(title, searchUrl, selectSelector, searchPlaceholder, categoryIdToFilter){
+            categoryIdToFilter = (typeof categoryIdToFilter !== 'undefined') ?  categoryIdToFilter : null;
+
+            $modalSearch.find('.modal-header h3').text(title);
+            $modalSearch.data('url', searchUrl);
+            $modalSearch.data('selectselector', selectSelector);
+            if(categoryIdToFilter != null){
+                $modalSearch.data('categoryid', categoryIdToFilter);
+                $modalSearch.data('filterbycategory', '1');
+            }else{
+                $modalSearch.data('filterbycategory', '0');
+            }
+
+            $modalSearch.find('.js-input-search').attr('placeholder',searchPlaceholder);
+
+            $modalSearch.modal('show');
+        };
+
+        $modalSearch.dismiss = function(){
+            $modalSearch.find('.js-block-search-result').addClass('hide');
+            $modalSearch.find('.js-alert-no-result').addClass('hide');
+            $modalSearch.find('.js-input-search').val('');
+            $modalSearch.modal('hide');
+        };
+
+        $modalSearch.on('click', '.js-modal-btn-select', function(e){
+            e.preventDefault();
+            var selectedVal = $modalSearch.find('.js-block-search-result select').val();
+            if(selectedVal != null) {
+                $($modalSearch.data('selectselector')).val(selectedVal).trigger('change');
+                $modalSearch.dismiss();
+            }
+        });
+
+        $modalSearch.on('click', '.js-btn-dismiss-modal', function(e) {
+            e.preventDefault();
+            $modalSearch.dismiss();
+        });
+
+        var searchTimer = null;
+        $modalSearch.on('keyup' ,'.js-input-search', function(){
+            var val = $(this).val();
+
+            if (searchTimer !== null) {
+                clearTimeout(searchTimer);
+            }
+
+            $modalSearch.find('.js-alert-no-result').addClass('hide');
+
+            var ajaxData = { q: val };
+            if($modalSearch.data('filterbycategory') == '1'){
+                ajaxData['category_id'] = $modalSearch.data('categoryid');
+            }
+
+            if (val.length > 2) {
+                $modalSearch.find('.js-loader').removeClass('hide');
+
+                searchTimer = setTimeout(function() {
+                    $.ajax({
+                        url: $modalSearch.data('url'),
+                        data: ajaxData,
+                        dataType: 'json',
+                        method: 'GET',
+                        success: function(data) {
+                            $modalSearch.find('.js-loader').addClass('hide');
+                            var options = [];
+                            for (var id in data) {
+                                options.push('<option value="' + id + '">' + data[id] + '</option>');
+                            }
+
+                            if (options.length > 0) {
+                                $modalSearch.find(".js-block-search-result select").html(options.join(''));
+                                $modalSearch.find('.js-block-search-result').removeClass('hide');
+                            } else {
+                                this.error();
+                            }
+                        },
+                        error: function() {
+                            $modalSearch.find('.js-loader').addClass('hide');
+
+                            $modalSearch.find('.js-block-search-result').addClass('hide');
+                            $modalSearch.find('.js-alert-no-result').removeClass('hide');
+                        }
+                    });
+                }, 350, this);
+            } else {
+                $modalSearch.find('.js-loader').addClass('hide');
+                $modalSearch.find('.js-block-search-result').addClass('hide');
+            }
+        });
+
+        $('.js-btn-search-default-category').on('click', function(event){
+            event.preventDefault();
+
+            $modalSearch.initAndShow(
+                '{intl l="Search category"}',
+                '{url path="/admin/products/related/tab/categories/search"}',
+                idDefaultCategorySelect,
+                "{intl l='Category title'}"
+            );
+        });
+    });
+
 
 </script>
 
