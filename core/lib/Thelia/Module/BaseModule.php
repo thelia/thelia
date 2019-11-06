@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
@@ -76,18 +77,26 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
+            $moduleModel->setActivate(self::IS_ACTIVATED);
+            $moduleModel->save();
+
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
                 $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
-                    $moduleModel->setActivate(self::IS_ACTIVATED);
-                    $moduleModel->save($con);
+                    if ($this->hasPropelSchema()) {
+                        // force models generation for this module
+                        $this->container->get('thelia.propel.init')->init(true);
+                    }
+
                     $this->postActivation($con);
                     $con->commit();
                 }
             } catch (\Exception $e) {
                 $con->rollBack();
+                $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
+                $moduleModel->save();
                 throw $e;
             }
 
@@ -194,7 +203,7 @@ class BaseModule implements BaseModuleInterface
      */
     public function setTitle(Module $module, $titles)
     {
-        if (is_array($titles)) {
+        if (\is_array($titles)) {
             foreach ($titles as $locale => $title) {
                 $moduleI18n = ModuleI18nQuery::create()
                     ->filterById($module->getId())->filterByLocale($locale)
@@ -367,7 +376,7 @@ class BaseModule implements BaseModuleInterface
      */
     public static function getModuleCode()
     {
-        $fullClassName = explode('\\', get_called_class());
+        $fullClassName = explode('\\', \get_called_class());
 
         return end($fullClassName);
     }
@@ -531,7 +540,7 @@ class BaseModule implements BaseModuleInterface
     {
         $moduleHooks = $this->getHooks();
 
-        if (is_array($moduleHooks) && !empty($moduleHooks)) {
+        if (\is_array($moduleHooks) && !empty($moduleHooks)) {
             $allowedTypes = (array) TemplateDefinition::getStandardTemplatesSubdirsIterator();
             $defaultLang = Lang::getDefaultLanguage();
             $defaultLocale = $defaultLang->getLocale();
@@ -542,11 +551,11 @@ class BaseModule implements BaseModuleInterface
             $dispatcher = $this->container->get("event_dispatcher");
 
             foreach ($moduleHooks as $hook) {
-                $isValid = is_array($hook) &&
+                $isValid = \is_array($hook) &&
                     isset($hook["type"]) &&
                     array_key_exists($hook["type"], $allowedTypes) &&
                     isset($hook["code"]) &&
-                    is_string($hook["code"]) &&
+                    \is_string($hook["code"]) &&
                     !empty($hook["code"])
                 ;
 
@@ -717,9 +726,9 @@ class BaseModule implements BaseModuleInterface
     {
         $returnData = array();
 
-        if (is_array($data)) {
+        if (\is_array($data)) {
             foreach ($data as $key => $value) {
-                if (!is_string($key)) {
+                if (!\is_string($key)) {
                     continue;
                 }
 
@@ -743,6 +752,24 @@ class BaseModule implements BaseModuleInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @since 2.4
+     * @return string
+     */
+    protected function getPropelSchemaDir()
+    {
+        return THELIA_MODULE_DIR . $this->getCode() . DS . 'Config' . DS . 'schema.xml';
+    }
+
+    /**
+     * @since 2.4
+     * @return bool
+     */
+    protected function hasPropelSchema()
+    {
+        return (new Filesystem())->exists($this->getPropelSchemaDir());
     }
 
     /**

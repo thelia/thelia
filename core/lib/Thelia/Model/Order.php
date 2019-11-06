@@ -90,6 +90,7 @@ class Order extends BaseOrder
 
     /**
      * {@inheritDoc}
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function preSave(ConnectionInterface $con = null)
     {
@@ -106,16 +107,21 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->setRef($this->generateRef())
             ->setDisableVersioning(true)
             ->save($con);
@@ -128,7 +134,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * Compute this order amount.
+     * Compute this order amount with taxes. The tax amount is returned in the $tax parameter.
      *
      * The order amount is only available once the order is persisted in database.
      * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
@@ -141,22 +147,29 @@ class Order extends BaseOrder
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
-        $orderInfo = OrderProductQuery::create()
-            ->filterByOrderId($this->getId())
-            ->leftJoinOrderProductTax()
-            ->withColumn('SUM(
-                ' . OrderProductTableMap::QUANTITY . '
-                * IF('.OrderProductTableMap::WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::PROMO_AMOUNT.', '.OrderProductTaxTableMap::AMOUNT.')
-            )', 'total_tax')
-            ->withColumn('SUM(
-                ' . OrderProductTableMap::QUANTITY . '
-                * IF('.OrderProductTableMap::WAS_IN_PROMO.' = 1, '.OrderProductTableMap::PROMO_PRICE.', '.OrderProductTableMap::PRICE.')
-            )', 'total_amount')
-            ->select([ 'total_tax', 'total_amount' ])
-            ->findOne();
+        $amount = floatval(
+            OrderProductQuery::create()
+                ->filterByOrderId($this->getId())
+                ->withColumn('SUM(
+                    ' . OrderProductTableMap::COL_QUANTITY . '
+                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
+                )', 'total_amount')
+                ->select([ 'total_amount' ])
+                ->findOne()
+        );
 
-        $tax = $orderInfo['total_tax'];
-        $amount = $orderInfo['total_amount'];
+        $tax = floatval(
+            OrderProductTaxQuery::create()
+                ->useOrderProductQuery()
+                    ->filterByOrderId($this->getId())
+                ->endUse()
+                ->withColumn('SUM(
+                    ' . OrderProductTableMap::COL_QUANTITY . '
+                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')
+                )', 'total_tax')
+                ->select([ 'total_tax' ])
+                ->findOne()
+        );
 
         $total = $amount + $tax;
 
@@ -164,16 +177,14 @@ class Order extends BaseOrder
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
 
-            if ($total<0) {
+            if ($total < 0) {
                 $total = 0;
-            } else {
-                $total = round($total, 2);
             }
         }
 
         if (false !== $includePostage) {
-            $total += $this->getPostage();
-            $tax += $this->getPostageTax();
+            $total += \floatval($this->getPostage());
+            $tax += \floatval($this->getPostageTax());
         }
 
         return $total;
@@ -207,7 +218,7 @@ class Order extends BaseOrder
     public function getUntaxedPostage()
     {
         if (0 < $this->getPostageTax()) {
-            $untaxedPostage =  round($this->getPostage() - $this->getPostageTax(), 2);
+            $untaxedPostage =  $this->getPostage() - $this->getPostageTax();
         } else {
             $untaxedPostage = $this->getPostage();
         }
@@ -417,7 +428,8 @@ class Order extends BaseOrder
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
                 $paymentModule->getCode()
-            )
+            ),
+            $event
         );
 
         return (null !== $event->getManageStock())

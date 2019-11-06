@@ -113,7 +113,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                 foreach ($products as $product) {
                     $tplId = $product->getTemplateId();
 
-                    if (! is_null($tplId)) {
+                    if (! \is_null($tplId)) {
                         $template[] = $tplId;
                     }
                 }
@@ -129,7 +129,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         if (! empty($template)) {
             // Join with feature_template table to get position
             $search
-                ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
+                ->withColumn(AttributeTemplateTableMap::COL_POSITION, 'position')
                 ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
             ;
 
@@ -163,14 +163,14 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::ASC);
                     } else {
-                        $search->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                        $search->addAscendingOrderByColumn(AttributeTemplateTableMap::COL_POSITION);
                     }
                     break;
                 case "manual_reverse":
                     if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::DESC);
                     } else {
-                        $search->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                        $search->addDescendingOrderByColumn(AttributeTemplateTableMap::COL_POSITION);
                     }
                     break;
             }

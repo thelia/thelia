@@ -183,9 +183,9 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder->setId(null)->setRef(null)->setNew(true);
 
         // Dates should be marked as not updated so that Propel will update them.
-        $placedOrder->resetModified(OrderTableMap::CREATED_AT);
-        $placedOrder->resetModified(OrderTableMap::UPDATED_AT);
-        $placedOrder->resetModified(OrderTableMap::VERSION_CREATED_AT);
+        $placedOrder->resetModified(OrderTableMap::COL_CREATED_AT);
+        $placedOrder->resetModified(OrderTableMap::COL_UPDATED_AT);
+        $placedOrder->resetModified(OrderTableMap::COL_VERSION_CREATED_AT);
 
         $placedOrder->setDispatcher($dispatcher);
 
@@ -297,7 +297,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             if ($useStock && $manageStock) {
                 /* decrease stock for non virtual product */
-                $allowNegativeStock = intval(ConfigQuery::read('allow_negative_stock', 0));
+                $allowNegativeStock = \intval(ConfigQuery::read('allow_negative_stock', 0));
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
                 //Forbid negative stock
                 if ($newStock < 0 && 0 === $allowNegativeStock) {
@@ -457,7 +457,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $dispatcher ->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
+        $dispatcher->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
 
         $dispatcher->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, clone $event);
     }

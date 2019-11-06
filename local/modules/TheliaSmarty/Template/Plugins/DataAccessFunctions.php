@@ -16,6 +16,8 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Thelia\Core\Event\Image\ImageEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
@@ -37,14 +39,14 @@ use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\State;
 use Thelia\Model\Tools\ModelCriteriaTools;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\DateTimeFormat;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
-use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\Event\TheliaEvents;
 
 /**
  * Implementation of data access to main Thelia objects (users, cart, etc.)
@@ -305,6 +307,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param  array $params
      * @param  \Smarty $smarty
      * @return string the value of the requested attribute
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function cartDataAccess($params, $smarty)
     {
@@ -385,7 +388,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case 'coupon_list':
                 $orderCoupons = [];
                 /** @var CouponInterface $coupon */
-                foreach($this->couponManager->getCouponsKept() as $coupon) {
+                foreach ($this->couponManager->getCouponsKept() as $coupon) {
                     $orderCoupons[] = $coupon->getCode();
                 }
                 return $orderCoupons;
@@ -427,7 +430,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 return $order->getPaymentModuleId();
             case 'has_virtual_product':
                 return $order->hasVirtualProduct();
-
         }
 
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
@@ -511,8 +513,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param  array $params
      * @param  \Smarty $smarty
      * @return string the value of the requested attribute
+     * @throws \Exception
      */
-
     public function statsAccess($params, $smarty)
     {
         if (false === array_key_exists("key", $params)) {
@@ -529,6 +531,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $includeShipping = false;
         } else {
             $includeShipping = true;
+        }
+
+        if (false !== array_key_exists("withTaxes", $params) && $params['withTaxes'] == 'false') {
+            $withTaxes = false;
+        } else {
+            $withTaxes = true;
         }
 
         if ($params['startDate'] == 'today') {
@@ -599,10 +607,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         switch ($params['key']) {
             case 'sales':
-                return OrderQuery::getSaleStats($startDate, $endDate, $includeShipping);
+                return OrderQuery::getSaleStats($startDate, $endDate, $includeShipping, $withTaxes);
                 break;
             case 'orders':
-                return OrderQuery::getOrderStats($startDate, $endDate, array(1,2,3,4));
+                return OrderQuery::getOrderStats($startDate, $endDate, OrderStatusQuery::getPaidStatusIdList());
                 break;
         }
 
@@ -787,9 +795,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return $return;
     }
 
-
-
-
     /**
      * Provides access to the uploaded store-related images (such as logo or favicon)
      *
@@ -915,9 +920,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             return null;
         }
     }
-
-
-
 
     /**
      * @inheritdoc

@@ -15,14 +15,19 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 
 /**
  * Propel cache and initialization service.
+ * @since 2.4
  */
 class PropelInitService
 {
@@ -81,9 +86,9 @@ class PropelInitService
     {
         $fs = new Filesystem();
 
-        $databaseConfigFile = THELIA_CONF_DIR . '/database_' . $this->environment . '.yml';
+        $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $this->environment . '.yml';
         if (!$fs->exists($databaseConfigFile)) {
-            $databaseConfigFile = THELIA_CONF_DIR . '/database.yml';
+            $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
         }
 
         return $databaseConfigFile;
@@ -94,7 +99,7 @@ class PropelInitService
      */
     public function getPropelCacheDir()
     {
-        return THELIA_CACHE_DIR . '/' . $this->environment . '/propel/';
+        return THELIA_CACHE_DIR . $this->environment . DS . 'propel' . DS;
     }
 
     /**
@@ -102,7 +107,7 @@ class PropelInitService
      */
     public function getPropelConfigDir()
     {
-        return $this->getPropelCacheDir() . '/config/';
+        return $this->getPropelCacheDir() . 'config' . DS;
     }
 
     /**
@@ -110,7 +115,7 @@ class PropelInitService
      */
     public function getPropelConfigFile()
     {
-        return $this->getPropelConfigDir() . '/propel.yml';
+        return $this->getPropelConfigDir() . 'propel.yml';
     }
 
     /**
@@ -118,7 +123,7 @@ class PropelInitService
      */
     public function getPropelInitFile()
     {
-        return $this->getPropelConfigDir() . '/' . static::$PROPEL_CONFIG_CACHE_FILENAME;
+        return $this->getPropelConfigDir() . static::$PROPEL_CONFIG_CACHE_FILENAME;
     }
 
     /**
@@ -126,7 +131,7 @@ class PropelInitService
      */
     public function getPropelSchemaDir()
     {
-        return $this->getPropelCacheDir() . '/schema/';
+        return $this->getPropelCacheDir() . 'schema' . DS;
     }
 
     /**
@@ -134,7 +139,7 @@ class PropelInitService
      */
     public function getPropelModelDir()
     {
-        return $this->getPropelCacheDir() . '/model/';
+        return THELIA_PROPEL_BUILD_PATH;
     }
 
     /**
@@ -142,7 +147,7 @@ class PropelInitService
      */
     public function getPropelMigrationDir()
     {
-        return $this->getPropelCacheDir() . '/migration/';
+        return $this->getPropelCacheDir() . 'migration' . DS;
     }
 
     /**
@@ -151,6 +156,7 @@ class PropelInitService
      * @param array $parameters Command parameters.
      * @param OutputInterface|null $output Command output.
      * @return int Command exit code.
+     * @throws \Exception
      */
     public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null)
     {
@@ -205,6 +211,8 @@ class PropelInitService
             => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder',
             'tablemap'
             => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
+            'event'
+            => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder',
         ];
 
         $propelConfigCache->write(
@@ -215,6 +223,7 @@ class PropelInitService
 
     /**
      * Generate the Propel initialization file.
+     * @throws \Exception
      */
     public function buildPropelInitFile()
     {
@@ -256,6 +265,8 @@ class PropelInitService
             return;
         }
 
+        $hash = '';
+
         $fs->mkdir($this->getPropelSchemaDir());
 
         $schemaCombiner = new SchemaCombiner(
@@ -264,7 +275,7 @@ class PropelInitService
 
         foreach ($schemaCombiner->getDatabases() as $database) {
             $databaseSchemaCache = new ConfigCache(
-                "{$this->getPropelSchemaDir()}/{$database}.schema.xml",
+                "{$this->getPropelSchemaDir()}{$database}.schema.xml",
                 $this->debug
             );
 
@@ -277,20 +288,28 @@ class PropelInitService
                 $schemaCombiner->getCombinedDocument($database)->saveXML(),
                 $databaseSchemaResources
             );
+
+            $hash .= md5(file_get_contents($this->getPropelSchemaDir() . $database .'.schema.xml'));
         }
+
+        $fs->dumpFile($this->getPropelCacheDir() . 'hash', $hash);
     }
 
     /**
      * Generate the base Propel models.
+     * @throws \Exception
      */
     public function buildPropelModels()
     {
         $fs = new Filesystem();
 
-        // TODO: caching rules ?
-        if ($fs->exists($this->getPropelModelDir())) {
+        // cache testing
+        if ($fs->exists($this->getPropelModelDir() . 'hash')
+            && file_get_contents($this->getPropelCacheDir() . 'hash') === file_get_contents($this->getPropelModelDir() . 'hash')) {
             return;
         }
+
+        $fs->remove($this->getPropelModelDir());
 
         $this->runCommand(
             new ModelBuildCommand(),
@@ -298,6 +317,11 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
             ]
+        );
+
+        $fs->copy(
+            $this->getPropelCacheDir() . 'hash',
+            $this->getPropelModelDir() . 'hash'
         );
     }
 
@@ -321,39 +345,57 @@ class PropelInitService
     /**
      * Initialize the Propel environment and connection.
      * @return bool Whether a Propel connection is available.
+     * @param bool $force force cache generation
+     * @throws \Throwable
      */
-    public function init()
+    public function init($force = false)
     {
-        if (!file_exists($this->getTheliaDatabaseConfigFile())) {
-            return false;
-        }
+        $flockFactory = new Factory(new FlockStore());
 
-        // this will be used in our Propel model builders
-        if (!defined('THELIA_PROPEL_BUILDER_ENVIRONMENT')) {
-            define('THELIA_PROPEL_BUILDER_ENVIRONMENT', $this->environment);
-        }
+        $lock = $flockFactory->createLock('propel-cache-generation');
 
-        $this->buildPropelConfig();
+        // Acquire a blocking cache generation lock
+        $lock->acquire(true);
 
-        $this->buildPropelInitFile();
-        require $this->getPropelInitFile();
+        try {
+            if ($force) {
+                (new Filesystem())->remove($this->getPropelCacheDir());
+            }
 
-        $theliaDatabaseConnection = Propel::getConnection('thelia');
-        $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
+            if (!file_exists($this->getTheliaDatabaseConfigFile())) {
+                return false;
+            }
 
-        $this->buildPropelGlobalSchema();
+            $this->buildPropelConfig();
 
-        $this->buildPropelModels();
-        $this->registerPropelModelLoader();
+            $this->buildPropelInitFile();
+            require $this->getPropelInitFile();
 
-        $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+            $theliaDatabaseConnection = Propel::getConnection('thelia');
+            $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
 
-        if ($this->debug) {
-            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-            Tlog::getInstance()->setLevel(Tlog::DEBUG);
+            $this->buildPropelGlobalSchema();
 
-            Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
-            $theliaDatabaseConnection->useDebug(true);
+            $this->buildPropelModels();
+            $this->registerPropelModelLoader();
+
+            $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+
+            if ($this->debug) {
+                // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
+                Tlog::getInstance()->setLevel(Tlog::DEBUG);
+
+                Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
+                $theliaDatabaseConnection->useDebug(true);
+            }
+        } catch (\Throwable $th) {
+            $fs = new Filesystem();
+            $fs->remove(THELIA_CACHE_DIR . $this->environment);
+            $fs->remove($this->getPropelModelDir());
+            throw $th;
+        } finally {
+            // Release cache generation lock
+            $lock->release();
         }
 
         return true;

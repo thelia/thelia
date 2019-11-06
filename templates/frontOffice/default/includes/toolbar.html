@@ -55,7 +55,7 @@
                     <li{if $PAGE eq $CURRENT} class="active"{/if}>
                         <a href="{url current="1" page=$PAGE }"> {$PAGE} </a>
                     </li>
-                    {if $PAGE eq $LAST}
+                    {if $PAGE eq $END}
                         {if $CURRENT eq $LAST}
                             <li class="disabled">
                                 <span class="next"><i class="fa fa-caret-right"></i></span>

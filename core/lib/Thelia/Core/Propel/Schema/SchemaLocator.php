@@ -74,7 +74,21 @@ class SchemaLocator
      */
     public function findForActiveModules()
     {
-        return $this->findForModules($this->queryActiveModuleCodes());
+        $fs = new Filesystem();
+
+        $codes = $this->queryActiveModuleCodes();
+
+        foreach ($codes as $key => $code) {
+            // test if the module exists on the file system
+            if (!$fs->exists(THELIA_MODULE_DIR . $code)) {
+                unset($codes[$key]);
+            }
+        }
+
+        // reset keys
+        $codes = array_values($codes);
+
+        return $this->findForModules($codes);
     }
 
     /**
@@ -128,7 +142,7 @@ class SchemaLocator
         }
 
         // Thelia is always a dependency
-        if (!in_array('Thelia', $modules)) {
+        if (!\in_array('Thelia', $modules)) {
             $modules[] = 'Thelia';
         }
 
@@ -141,7 +155,7 @@ class SchemaLocator
             $moduleValidator = new ModuleValidator("{$this->theliaModuleDir}/{$module}");
             $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
             foreach ($dependencies as $dependency) {
-                if (!in_array($dependency['code'], $modules)) {
+                if (!\in_array($dependency['code'], $modules)) {
                     $modules[] = $dependency['code'];
                 }
             }
@@ -228,7 +242,7 @@ class SchemaLocator
 
         foreach ($documentArrays as $documentArray) {
             foreach ($documentArray as $document) {
-                if (in_array($document->baseURI, $includedDocumentURIs)) {
+                if (\in_array($document->baseURI, $includedDocumentURIs)) {
                     continue;
                 }
 

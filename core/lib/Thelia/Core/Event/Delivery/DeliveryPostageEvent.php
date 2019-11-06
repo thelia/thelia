@@ -183,7 +183,7 @@ class DeliveryPostageEvent extends ActionEvent
      */
     public function hasAdditionalData()
     {
-        return count($this->additionalData) > 0;
+        return \count($this->additionalData) > 0;
     }
 
     /**

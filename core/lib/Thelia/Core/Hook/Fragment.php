@@ -23,7 +23,7 @@ class Fragment
 
     public function __construct($data = array())
     {
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             throw new \InvalidArgumentException("'data' argument must be an array");
         }
         $this->data = $data;

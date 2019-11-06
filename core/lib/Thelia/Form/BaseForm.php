@@ -120,7 +120,7 @@ abstract class BaseForm
         ContainerInterface $container = null
     ) {
         // Generate the form name from the complete class name
-        $this->formUniqueIdentifier = strtolower(str_replace('\\', '_', get_class($this)));
+        $this->formUniqueIdentifier = strtolower(str_replace('\\', '_', \get_class($this)));
 
         $this->request = $request;
         $this->type = $type;

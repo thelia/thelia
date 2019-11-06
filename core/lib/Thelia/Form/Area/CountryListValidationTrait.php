@@ -27,12 +27,12 @@ trait CountryListValidationTrait
 {
     public function verifyCountryList($value, ExecutionContextInterface $context)
     {
-        $countryList = is_array($value) ? $value : [$value];
+        $countryList = \is_array($value) ? $value : [$value];
 
         foreach ($countryList as $countryItem) {
             $item = explode('-', $countryItem);
 
-            if (count($item) == 2) {
+            if (\count($item) == 2) {
                 $country = CountryQuery::create()->findPk($item[0]);
                 if (null === $country) {
                     $context->addViolation(

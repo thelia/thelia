@@ -19,6 +19,7 @@ use Thelia\Model\Sale;
  * Class SaleEvent
  * @package Thelia\Core\Event\Sale
  * @author  Franck Allimant <franck@cqfdev.fr>
+ * @deprecated since 2.4, please use \Thelia\Model\Event\SaleEvent
  */
 class SaleEvent extends ActionEvent
 {

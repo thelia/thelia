@@ -32,6 +32,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEBRAND, new BrandEvent($this));
 
         // Set the current position for the new object
@@ -45,6 +47,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEBRAND, new BrandEvent($this));
     }
 
@@ -53,6 +57,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEBRAND, new BrandEvent($this));
 
         return true;
@@ -63,6 +69,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEBRAND, new BrandEvent($this));
     }
 
@@ -71,6 +79,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEBRAND, new BrandEvent($this));
 
         return true;
@@ -81,6 +91,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEBRAND, new BrandEvent($this));

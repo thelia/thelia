@@ -130,9 +130,9 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         /* check we have 2 level max */
 
         foreach ($taxList as $taxLevel1) {
-            if (is_array($taxLevel1)) {
+            if (\is_array($taxLevel1)) {
                 foreach ($taxLevel1 as $taxLevel2) {
-                    if (is_array($taxLevel2)) {
+                    if (\is_array($taxLevel2)) {
                         $context->addViolation(Translator::getInstance()->trans("Bad tax list JSON"));
                     } else {
                         $taxModel = TaxQuery::create()->findPk($taxLevel2);
@@ -161,7 +161,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         $countryList = json_decode($value, true);
 
         foreach ($countryList as $countryItem) {
-            if (is_array($countryItem)) {
+            if (\is_array($countryItem)) {
                 $country = CountryQuery::create()->findPk($countryItem[0]);
                 if (null === $country) {
                     $context->addViolation(

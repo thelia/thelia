@@ -38,6 +38,8 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;
@@ -63,6 +65,8 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->reorderBeforeDelete(
             array(
                 "product_id" => $this->getProductId(),

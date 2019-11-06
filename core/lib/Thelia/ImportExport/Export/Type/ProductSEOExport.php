@@ -31,9 +31,9 @@ class ProductSEOExport extends AbstractExport
     const FILE_NAME = 'product_seo';
 
     protected $orderAndAliases = [
-        ProductTableMap::REF => 'ref',
+        ProductTableMap::COL_REF => 'ref',
         'product_i18n_TITLE' => 'product_title',
-        ProductTableMap::VISIBLE => 'visible',
+        ProductTableMap::COL_VISIBLE => 'visible',
         'product_URL' => 'url',
         'product_seo_TITLE' => 'page_title',
         'product_seo_META_DESCRIPTION' => 'meta_description',
@@ -44,35 +44,35 @@ class ProductSEOExport extends AbstractExport
     {
         $locale = $this->language->getLocale();
 
-        $urlJoin = new Join(ProductTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
-        $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
+        $urlJoin = new Join(ProductTableMap::COL_ID, RewritingUrlTableMap::COL_VIEW_ID, Criteria::LEFT_JOIN);
+        $productJoin = new Join(ProductTableMap::COL_ID, ProductI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
 
         $query = ProductQuery::create()
             ->addSelfSelectColumns()
             ->addJoinObject($urlJoin, 'rewriting_url_join')
             ->addJoinCondition(
                 'rewriting_url_join',
-                RewritingUrlTableMap::VIEW_LOCALE . ' = ?',
+                RewritingUrlTableMap::COL_VIEW_LOCALE . ' = ?',
                 $locale,
                 null,
                 \PDO::PARAM_STR
             )
             ->addJoinCondition(
                 'rewriting_url_join',
-                RewritingUrlTableMap::VIEW . ' = ?',
+                RewritingUrlTableMap::COL_VIEW . ' = ?',
                 (new Product())->getRewrittenUrlViewName(),
                 null,
                 \PDO::PARAM_STR
             )
-            ->addJoinCondition('rewriting_url_join', 'ISNULL(' . RewritingUrlTableMap::REDIRECTED . ')')
+            ->addJoinCondition('rewriting_url_join', 'ISNULL(' . RewritingUrlTableMap::COL_REDIRECTED . ')')
             ->addJoinObject($productJoin, 'product_join')
-            ->addJoinCondition('product_join', ProductI18nTableMap::LOCALE . ' = ?', $locale, null, \PDO::PARAM_STR)
+            ->addJoinCondition('product_join', ProductI18nTableMap::COL_LOCALE . ' = ?', $locale, null, \PDO::PARAM_STR)
 
-            ->addAsColumn('product_i18n_TITLE', ProductI18nTableMap::TITLE)
-            ->addAsColumn('product_seo_TITLE', ProductI18nTableMap::META_TITLE)
-            ->addAsColumn('product_seo_META_DESCRIPTION', ProductI18nTableMap::META_DESCRIPTION)
-            ->addAsColumn('product_seo_META_KEYWORDS', ProductI18nTableMap::META_KEYWORDS)
-            ->addAsColumn('product_URL', RewritingUrlTableMap::URL)
+            ->addAsColumn('product_i18n_TITLE', ProductI18nTableMap::COL_TITLE)
+            ->addAsColumn('product_seo_TITLE', ProductI18nTableMap::COL_META_TITLE)
+            ->addAsColumn('product_seo_META_DESCRIPTION', ProductI18nTableMap::COL_META_DESCRIPTION)
+            ->addAsColumn('product_seo_META_KEYWORDS', ProductI18nTableMap::COL_META_KEYWORDS)
+            ->addAsColumn('product_URL', RewritingUrlTableMap::COL_URL)
         ;
 
         return $query;

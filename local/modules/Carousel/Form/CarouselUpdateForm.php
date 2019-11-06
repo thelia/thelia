@@ -93,12 +93,12 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Title'),
+                    'label' => $this->translator->trans('Title', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'title_field' . $id
                     ],
                     'attr' => [
-                        'placeholder' => $this->translator->trans('A descriptive title')
+                        'placeholder' => $this->translator->trans('A descriptive title', [], Carousel::DOMAIN_NAME)
                     ]
                 ]
             )->add(
@@ -107,16 +107,18 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Summary'),
+                    'label' => $this->translator->trans('Summary', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'summary_field' . $id,
                         'help' => $this->translator->trans(
-                            'A short description, used when a summary or an introduction is required'
+                            'A short description, used when a summary or an introduction is required',
+                            [],
+                            Carousel::DOMAIN_NAME
                         )
                     ],
                     'attr' => [
                         'rows' => 3,
-                        'placeholder' => $this->translator->trans('Short description text')
+                        'placeholder' => $this->translator->trans('Short description text', [], Carousel::DOMAIN_NAME)
                     ]
                 ]
             )->add(
@@ -125,10 +127,10 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Detailed description'),
+                    'label' => $this->translator->trans('Detailed description', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'detailed_description_field' . $id,
-                        'help' => $this->translator->trans('The detailed description.')
+                        'help' => $this->translator->trans('The detailed description.', [], Carousel::DOMAIN_NAME)
                     ],
                     'attr' => [
                         'rows' => 5
@@ -140,15 +142,17 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Conclusion'),
+                    'label' => $this->translator->trans('Conclusion', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'conclusion_field' . $id,
                         'help' => $this->translator->trans(
-                            'A short text, used when an additional or supplemental information is required.'
+                            'A short text, used when an additional or supplemental information is required.',
+                            [],
+                            Carousel::DOMAIN_NAME
                         )
                     ],
                     'attr' => [
-                        'placeholder' => $this->translator->trans('Short additional text'),
+                        'placeholder' => $this->translator->trans('Short additional text', [], Carousel::DOMAIN_NAME),
                         'rows' => 3,
                     ]
                 ]

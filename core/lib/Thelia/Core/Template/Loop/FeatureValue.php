@@ -84,7 +84,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $search
             ->useFeatureAvQuery('feature_av')
-                ->withColumn(FeatureAvTableMap::POSITION, 'feature_av_position')
+                ->withColumn(FeatureAvTableMap::COL_POSITION, 'feature_av_position')
             ->endUse();
 
         $feature = $this->getFeature();
@@ -145,8 +145,8 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("PRODUCT_ID", $featureValue->getProductId())
                 ->set("FEATURE_AV_ID", $featureValue->getFeatureAvId())
                 ->set("FREE_TEXT_VALUE", $featureValue->getFreeTextValue())
-                ->set("IS_FREE_TEXT", is_null($featureValue->getFeatureAvId()) ? 1 : 0)
-                ->set("IS_FEATURE_AV", is_null($featureValue->getFeatureAvId()) ? 0 : 1)
+                ->set("IS_FREE_TEXT", \is_null($featureValue->getFeatureAvId()) ? 1 : 0)
+                ->set("IS_FEATURE_AV", \is_null($featureValue->getFeatureAvId()) ? 0 : 1)
                 ->set("LOCALE", $this->locale)
                 ->set("TITLE", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))

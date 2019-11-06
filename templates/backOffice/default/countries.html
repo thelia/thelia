@@ -46,11 +46,18 @@
                                 <table class="table table-striped table-condensed">
                                     <caption class="clearfix">
                                         {intl l='Countries'}
-                                        {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.country" access="CREATE"}
-                                            <a class="btn btn-primary action-btn" title="{intl l='Add a new country'}" href="#add_country_dialog" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-plus-sign"></span>
-                                            </a>
-                                        {/loop}
+                                        {include file='renderer/buttons.html' btn_group=false buttons=[
+                                            [
+                                                'type' => 'create',
+                                                'class' => 'action-btn',
+                                                'title' => {intl l='admin.configuration.country'},
+                                                'href' => '#add_country_dialog',
+                                                'auth' => ['resource' => 'admin.configuration.country'],
+                                                'data' => [
+                                                    'toggle' => 'modal'
+                                                ]
+                                            ]
+                                        ]}
                                     </caption>
                                     <thead>
                                         <tr>
@@ -106,22 +113,26 @@
                                                 {hook name="countries.table-row" location="countries_table_row" country_id={$ID} }
 
                                                 <td class="actions">
-                                                    <div class="btn-toolbar btn toolbar-primary">
-                                                        <span class="glyphicon glyphicon-cog"></span>
-                                                    </div>
-                                                    <div class="toolbar-options hidden">
-                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.country" access="UPDATE"}
-                                                            <a class="country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/%id" id=$ID}">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                            </a>
-                                                        {/loop}
-
-                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.country" access="DELETE"}
-                                                            <a class="country-delete" title="{intl l='Delete this country'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-trash"></span>
-                                                            </a>
-                                                        {/loop}
-                                                    </div>
+                                                    {include file='renderer/buttons.html' buttons=[
+                                                        [
+                                                            'type' => 'edit',
+                                                            'class' => 'country-change',
+                                                            'title' => {intl l='Change this country'},
+                                                            'href' => {url path="/admin/configuration/country/update/%id" id=$ID},
+                                                            'auth' => ['resource' => 'admin.configuration.country']
+                                                        ],
+                                                        [
+                                                            'type' => 'delete',
+                                                            'class' => 'country-delete',
+                                                            'title' => {intl l='Delete this country'},
+                                                            'href' => '#delete_dialog',
+                                                            'data' => [
+                                                                'id' => $ID,
+                                                                'toggle' => 'modal'
+                                                            ],
+                                                            'auth' => ['resource' => 'admin.configuration.country']
+                                                        ]
+                                                    ]}
                                                 </td>
                                             </tr>
                                         {/loop}

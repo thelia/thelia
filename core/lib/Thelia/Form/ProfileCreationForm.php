@@ -27,7 +27,7 @@ class ProfileCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add("locale", "text", array(

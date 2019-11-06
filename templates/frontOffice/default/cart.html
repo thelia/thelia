@@ -159,7 +159,7 @@
                                     <div>
                                         <label for="cart-country">{intl l="Select your country:"}</label>
                                         <select id="cart-country" name="country">
-                                        {loop type="country" name="countryLoop" with_area="true"}
+                                        {loop type="country" name="countryLoop" with_area="true" order="alpha"}
                                             <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
                                         {/loop}
                                         </select>
@@ -240,7 +240,7 @@
                 </table>
             </div>
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Continue Shopping"}</a>
+            <a href="{navigate to="catalog_last"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Continue Shopping"}</a>
             <a href="{url path="/order/delivery"}" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Proceed checkout"}</a>
 
             {/ifloop}

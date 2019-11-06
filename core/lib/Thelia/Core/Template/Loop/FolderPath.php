@@ -81,7 +81,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
                 if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (in_array($currentId, $ids)) {
+                    if (\in_array($currentId, $ids)) {
                         throw new \LogicException(
                             sprintf(
                                 "Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)",

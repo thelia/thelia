@@ -67,7 +67,7 @@ class HookController extends AbstractCrudController
             return $response;
         }
 
-        $templateType = intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
+        $templateType = \intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
 
         $json_data = [];
         try {
@@ -153,7 +153,7 @@ class HookController extends AbstractCrudController
             "success" => true
         ];
 
-        if (count($errors)) {
+        if (\count($errors)) {
             $response = JsonResponse::create(["error" => $errors], 500);
         } else {
             $response = JsonResponse::create($json_data);

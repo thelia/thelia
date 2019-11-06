@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Customer;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\ActionEvent;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\CustomerEvent
+ */
 class CustomerEvent extends ActionEvent
 {
     /** @var null|Customer */

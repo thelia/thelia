@@ -209,7 +209,7 @@ class TaxRuleController extends AbstractCrudApiController
         $countries = TaxRuleCountryQuery::create()
             ->filterByTaxRuleId($taxRuleId)
             ->distinct()
-            ->select(TaxRuleCountryTableMap::COUNTRY_ID)
+            ->select(TaxRuleCountryTableMap::COL_COUNTRY_ID)
             ->find()
             ->toArray()
         ;
@@ -217,7 +217,7 @@ class TaxRuleController extends AbstractCrudApiController
         $taxes = TaxRuleCountryQuery::create()
             ->filterByTaxRuleId($taxRuleId)
             ->distinct()
-            ->select(TaxRuleCountryTableMap::TAX_ID)
+            ->select(TaxRuleCountryTableMap::COL_TAX_ID)
             ->find()
             ->toArray()
         ;

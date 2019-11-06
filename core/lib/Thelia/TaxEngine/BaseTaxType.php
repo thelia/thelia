@@ -93,7 +93,7 @@ abstract class BaseTaxType
     {
         $requirements = $this->getRequirementsDefinition();
 
-        if (!is_array($requirements)) {
+        if (!\is_array($requirements)) {
             throw new TaxEngineException('getRequirementsDefinition must return an array', TaxEngineException::TAX_TYPE_BAD_ABSTRACT_METHOD);
         }
 

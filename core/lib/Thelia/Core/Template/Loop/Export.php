@@ -26,6 +26,9 @@ class Export extends ImportExportType
         return $this->container->getParameter("export.base_url");
     }
 
+    /**
+     * @return ExportQUery
+     */
     protected function getQueryModel()
     {
         return ExportQuery::create();

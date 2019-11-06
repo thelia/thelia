@@ -30,6 +30,7 @@ use Thelia\Tools\I18n;
 
 /**
  * Class OrderExport
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class OrderExport extends AbstractExport
@@ -38,19 +39,19 @@ class OrderExport extends AbstractExport
     const USE_RANGE_DATE = true;
 
     protected $orderAndAliases = [
-        OrderTableMap::REF => 'ref',
-        OrderTableMap::CREATED_AT => 'date',
+        OrderTableMap::COL_REF => 'ref',
+        OrderTableMap::COL_CREATED_AT => 'date',
         'customer_REF' => 'customer_ref',
-        OrderTableMap::DISCOUNT => 'discount',
+        OrderTableMap::COL_DISCOUNT => 'discount',
         'coupon_COUPONS' => 'coupons',
-        OrderTableMap::POSTAGE => 'postage',
+        OrderTableMap::COL_POSTAGE => 'postage',
         'order_TOTAL_TTC' => 'total_including_taxes',
         'order_TOTAL_WITH_DISCOUNT' => 'total_with_discount',
         'order_TOTAL_WITH_DISCOUNT_AND_POSTAGE' => 'total_discount_and_postage',
         'delivery_module_TITLE' => 'delivery_module',
-        OrderTableMap::DELIVERY_REF => 'delivery_ref',
+        OrderTableMap::COL_DELIVERY_REF => 'delivery_ref',
         'payment_module_TITLE' => 'payment_module',
-        OrderTableMap::INVOICE_REF => 'invoice_ref',
+        OrderTableMap::COL_INVOICE_REF => 'invoice_ref',
         'order_status_TITLE' => 'status',
         'delivery_address_TITLE' => 'delivery_title',
         'delivery_address_COMPANY' => 'delivery_company',
@@ -74,70 +75,51 @@ class OrderExport extends AbstractExport
         'invoice_address_CITY' => 'invoice_city',
         'invoice_address_country_TITLE' => 'invoice_country',
         'invoice_address_PHONE' => 'invoice_phone',
-//        'product_TITLE' => 'product_title',
-//        'product_PRICE' => 'price',
-//        'product_TAXED_PRICE' => 'taxed_price',
         'currency_CODE' => 'currency',
-//        'product_WAS_IN_PROMO' => 'was_in_promo',
-//        'product_QUANTITY' => 'quantity',
-//        'product_TAX' => 'tax_amount',
         'tax_TITLE' => 'tax_title'
     ];
 
     public function current()
     {
-        do {
-            $order = parent::current();
-
-            $getNext = false;
-            if ($this->rangeDate !== null
-                && (
-                    $order[OrderTableMap::CREATED_AT] < $this->rangeDate['start']
-                    || $order[OrderTableMap::CREATED_AT] > $this->rangeDate['end']
-                )
-            ) {
-                $this->next();
-                $getNext = true;
-            }
-        } while ($getNext && $this->valid());
+        $order = parent::current();
 
         $locale = $this->language->getLocale();
 
         $query = OrderQuery::create()
             ->useCurrencyQuery()
-                ->addAsColumn('currency_CODE', CurrencyTableMap::CODE)
+                ->addAsColumn('currency_CODE', CurrencyTableMap::COL_CODE)
                 ->endUse()
             ->useCustomerQuery()
-                ->addAsColumn('customer_REF', CustomerTableMap::REF)
+                ->addAsColumn('customer_REF', CustomerTableMap::COL_REF)
                 ->endUse()
             ->useOrderProductQuery()
                 ->useOrderProductTaxQuery(null, Criteria::LEFT_JOIN)
                     ->addAsColumn(
                         'product_TAX',
-                        'IF('.OrderProductTableMap::WAS_IN_PROMO.','.
-                        'SUM('.OrderProductTaxTableMap::PROMO_AMOUNT.'),'.
-                        'SUM('.OrderProductTaxTableMap::AMOUNT.')'.
+                        'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.','.
+                        'SUM('.OrderProductTaxTableMap::COL_PROMO_AMOUNT.'),'.
+                        'SUM('.OrderProductTaxTableMap::COL_AMOUNT.')'.
                         ')'
                     )
-                    ->addAsColumn('tax_TITLE', OrderProductTableMap::TAX_RULE_TITLE)
+                    ->addAsColumn('tax_TITLE', OrderProductTableMap::COL_TAX_RULE_TITLE)
                     ->endUse()
-                ->addAsColumn('product_TITLE', OrderProductTableMap::TITLE)
+                ->addAsColumn('product_TITLE', OrderProductTableMap::COL_TITLE)
                 ->addAsColumn(
                     'product_PRICE',
-                    'IF('.OrderProductTableMap::WAS_IN_PROMO.','.
-                    OrderProductTableMap::PROMO_PRICE .','.
-                    OrderProductTableMap::PRICE .
+                    'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.','.
+                    OrderProductTableMap::COL_PROMO_PRICE .','.
+                    OrderProductTableMap::COL_PRICE .
                     ')'
                 )
-                ->addAsColumn('product_QUANTITY', OrderProductTableMap::QUANTITY)
-                ->addAsColumn('product_WAS_IN_PROMO', OrderProductTableMap::WAS_IN_PROMO)
+                ->addAsColumn('product_QUANTITY', OrderProductTableMap::COL_QUANTITY)
+                ->addAsColumn('product_WAS_IN_PROMO', OrderProductTableMap::COL_WAS_IN_PROMO)
                 ->groupById()
                 ->endUse()
             ->orderById()
             ->groupById()
             ->useOrderCouponQuery(null, Criteria::LEFT_JOIN)
-                ->addAsColumn('coupon_COUPONS', 'GROUP_CONCAT('.OrderCouponTableMap::TITLE.')')
-                ->groupBy(OrderCouponTableMap::ORDER_ID)
+                ->addAsColumn('coupon_COUPONS', 'GROUP_CONCAT('.OrderCouponTableMap::COL_TITLE.')')
+                ->groupBy(OrderCouponTableMap::COL_ORDER_ID)
                 ->endUse()
             ->useModuleRelatedByPaymentModuleIdQuery('payment_module')
                 ->addAsColumn('payment_module_TITLE', '`payment_module`.CODE')
@@ -189,28 +171,24 @@ class OrderExport extends AbstractExport
                 ->endUse()
             ->useOrderStatusQuery()
                 ->useOrderStatusI18nQuery()
-                    ->addAsColumn('order_status_TITLE', OrderStatusI18nTableMap::TITLE)
+                    ->addAsColumn('order_status_TITLE', OrderStatusI18nTableMap::COL_TITLE)
                     ->endUse()
                 ->endUse()
             ->select([
-                OrderTableMap::REF,
+                OrderTableMap::COL_REF,
                 'customer_REF',
                 'product_TITLE',
                 'product_PRICE',
                 'product_TAX',
                 'tax_TITLE',
-                // PRODUCT_TTC_PRICE
                 'product_QUANTITY',
                 'product_WAS_IN_PROMO',
-                // ORDER_TOTAL_TTC
-                OrderTableMap::DISCOUNT,
+                OrderTableMap::COL_DISCOUNT,
                 'coupon_COUPONS',
-                // TOTAL_WITH_DISCOUNT
-                OrderTableMap::POSTAGE,
-                // total ttc +postage
+                OrderTableMap::COL_POSTAGE,
                 'payment_module_TITLE',
-                OrderTableMap::INVOICE_REF,
-                OrderTableMap::DELIVERY_REF,
+                OrderTableMap::COL_INVOICE_REF,
+                OrderTableMap::COL_DELIVERY_REF,
                 'delivery_module_TITLE',
                 'delivery_address_TITLE',
                 'delivery_address_COMPANY',
@@ -236,7 +214,7 @@ class OrderExport extends AbstractExport
                 'invoice_address_PHONE',
                 'order_status_TITLE',
                 'currency_CODE',
-                OrderTableMap::CREATED_AT,
+                OrderTableMap::COL_CREATED_AT,
             ])
             ->orderByCreatedAt(Criteria::DESC)
         ;
@@ -245,7 +223,7 @@ class OrderExport extends AbstractExport
             $query,
             CustomerTitleI18nTableMap::TABLE_NAME,
             '`delivery_address_customer_title_join`.ID',
-            CustomerTitleI18nTableMap::ID,
+            CustomerTitleI18nTableMap::COL_ID,
             '`delivery_address_customer_title_i18n_join`.LOCALE',
             $locale
         );
@@ -254,7 +232,7 @@ class OrderExport extends AbstractExport
             $query,
             CustomerTitleI18nTableMap::TABLE_NAME,
             '`invoice_address_customer_title_join`.ID',
-            CustomerTitleI18nTableMap::ID,
+            CustomerTitleI18nTableMap::COL_ID,
             '`invoice_address_customer_title_i18n_join`.LOCALE',
             $locale
         );
@@ -263,7 +241,7 @@ class OrderExport extends AbstractExport
             $query,
             CountryI18nTableMap::TABLE_NAME,
             '`delivery_address_country_join`.ID',
-            CountryI18nTableMap::ID,
+            CountryI18nTableMap::COL_ID,
             '`delivery_address_country_i18n_join`.LOCALE',
             $locale
         );
@@ -272,7 +250,7 @@ class OrderExport extends AbstractExport
             $query,
             CountryI18nTableMap::TABLE_NAME,
             '`invoice_address_country_join`.ID',
-            CountryI18nTableMap::ID,
+            CountryI18nTableMap::COL_ID,
             '`invoice_address_country_i18n_join`.LOCALE',
             $locale
         );
@@ -280,18 +258,18 @@ class OrderExport extends AbstractExport
         I18n::addI18nCondition(
             $query,
             OrderStatusI18nTableMap::TABLE_NAME,
-            OrderStatusI18nTableMap::ID,
-            OrderStatusTableMap::ID,
-            OrderStatusI18nTableMap::LOCALE,
+            OrderStatusI18nTableMap::COL_ID,
+            OrderStatusTableMap::COL_ID,
+            OrderStatusI18nTableMap::COL_LOCALE,
             $locale
         );
 
         $data = $query
-            ->filterById($order[OrderTableMap::ID])
+            ->filterById($order[OrderTableMap::COL_ID])
             ->findOne();
 
         $order = (new Order)
-            ->setId($order[OrderTableMap::ID])
+            ->setId($order[OrderTableMap::COL_ID])
         ;
         $order->setNew(false);
 
@@ -305,6 +283,15 @@ class OrderExport extends AbstractExport
 
     protected function getData()
     {
-        return new OrderQuery;
+        $orderQuery = new OrderQuery();
+
+        if ($this->rangeDate !== null) {
+            $orderQuery
+                ->filterByCreatedAt($this->rangeDate['start'], Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt($this->rangeDate['end'], Criteria::LESS_EQUAL)
+            ;
+        }
+
+        return $orderQuery;
     }
 }

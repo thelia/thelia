@@ -67,7 +67,7 @@ class PropelPass implements CompilerPassInterface
 
         foreach (array_keys($classmap) as $class) {
             if (is_subclass_of($class, '\Propel\Runtime\Map\TableMap')
-                && !in_array($class, $tableMapClasses)
+                && !\in_array($class, $tableMapClasses)
             ) {
                 $tableMapClasses[] = $class;
             }

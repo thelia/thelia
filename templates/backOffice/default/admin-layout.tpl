@@ -4,8 +4,6 @@
     {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" module="{block name="check-module"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
 {/block}
 
-{block name="no-return-functions"}{/block}
-
 {* -- Define some stuff for Smarty ------------------------------------------ *}
 {config_load file='variables.conf'}
 
@@ -14,6 +12,8 @@
 
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='bo.default'}
+
+{block name="no-return-functions"}{/block}
 
 <!DOCTYPE html>
 <html lang="{$lang_code}">
@@ -83,7 +83,7 @@
                 </div>
                 <!-- /.navbar-header -->
 
-                <ul class="nav navbar-top-links navbar-right">                
+                <ul class="nav navbar-top-links navbar-right">
                     {hook name="main.topbar-top" }
                     
                     <li>
@@ -93,7 +93,7 @@
                         <button class="dropdown-toggle" data-toggle="dropdown">
                             <span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}
                             <span class="caret"></span>
-                        </button>                        
+                        </button>
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li><a class="profile" href="{url path='admin/configuration/administrators/view'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
                             <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
@@ -130,7 +130,7 @@
                 {hook name="main.after-topbar" location="after_topbar" }
             </nav>
 
-            <div id="page-wrapper">                        
+            <div id="page-wrapper">
                 
                 <div class="row">
                     <div class="col-lg-12">
@@ -147,7 +147,7 @@
                     {block name="main-content"}Put here the content of the template{/block}
                 </div>
                 
-                {hook name="main.after-content" location="after_content"}                
+                {hook name="main.after-content" location="after_content"}
                 
             </div>
         {/loop}

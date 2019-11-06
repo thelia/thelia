@@ -23,7 +23,7 @@ class Sale extends BaseSale
      */
     public function hasStartDate()
     {
-        return ! is_null($this->getStartDate());
+        return ! \is_null($this->getStartDate());
     }
 
     /**
@@ -31,7 +31,7 @@ class Sale extends BaseSale
      */
     public function hasEndDate()
     {
-        return ! is_null($this->getEndDate());
+        return ! \is_null($this->getEndDate());
     }
 
     /**
@@ -97,6 +97,8 @@ class Sale extends BaseSale
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATESALE, new SaleEvent($this));
 
         return true;
@@ -107,6 +109,8 @@ class Sale extends BaseSale
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATESALE, new SaleEvent($this));
     }
 
@@ -115,6 +119,8 @@ class Sale extends BaseSale
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATESALE, new SaleEvent($this));
 
         return true;
@@ -125,6 +131,8 @@ class Sale extends BaseSale
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATESALE, new SaleEvent($this));
     }
 
@@ -133,6 +141,8 @@ class Sale extends BaseSale
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETESALE, new SaleEvent($this));
 
         return true;
@@ -143,6 +153,8 @@ class Sale extends BaseSale
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETESALE, new SaleEvent($this));
     }
 }

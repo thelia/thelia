@@ -37,6 +37,8 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;
@@ -44,6 +46,8 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->reorderBeforeDelete(
             array(
                 "brand_id" => $this->getBrandId(),

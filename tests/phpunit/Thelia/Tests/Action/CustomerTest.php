@@ -60,7 +60,7 @@ class CustomerTest extends BaseAction
         $this->customerAction = new Customer(
             $this->securityContext,
             new MailerFactory($this->getMockEventDispatcher(), $this->getMockParserInterface()),
-            $this->getMockEventDispatcher()
+            $requestStack
         );
     }
 

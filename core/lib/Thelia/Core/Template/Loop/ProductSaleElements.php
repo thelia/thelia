@@ -21,8 +21,8 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Type;
@@ -48,6 +48,7 @@ use Thelia\Type\TypeCollection;
  * @method string getRef()
  * @method int[] getAttributeAvailability()
  * @method string[] getOrder()
+ * @method bool|string getVisible()
  */
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -65,6 +66,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             Argument::createBooleanTypeArgument('promo'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('default'),
+            Argument::createBooleanOrBothTypeArgument('visible', Type\BooleanOrBothType::ANY),
             Argument::createAnyTypeArgument('ref'),
             new Argument(
                 'attribute_availability',
@@ -78,10 +80,13 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     new Type\EnumListType(
                         array(
                             'id', 'id_reverse',
+                            'ref', 'ref_reverse',
                             'quantity', 'quantity_reverse',
                             'min_price', 'max_price',
                             'promo', 'new',
                             'weight', 'weight_reverse',
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
                             'random'
                         )
                     )
@@ -99,21 +104,16 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $product = $this->getProduct();
         $ref = $this->getRef();
 
-        if (! is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
-        } elseif (! is_null($product)) {
-            $search->filterByProductId($product, Criteria::EQUAL);
-        } elseif (! is_null($ref)) {
-            $search->filterByRef($ref, Criteria::EQUAL);
-        } else {
-            $searchTerm = $this->getArgValue('search_term');
-            $searchIn   = $this->getArgValue('search_in');
+        }
 
-            if (null === $searchTerm || null === $searchIn) {
-                throw new \InvalidArgumentException(
-                    "Either 'id', 'product', 'ref', 'search_term/search_in' argument should be present"
-                );
-            }
+        if (!\is_null($product)) {
+            $search->filterByProductId($product, Criteria::EQUAL);
+        }
+
+        if (!\is_null($ref)) {
+            $search->filterByRef($ref, Criteria::EQUAL);
         }
 
         $promo = $this->getPromo();
@@ -126,6 +126,14 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
         if (null !== $new) {
             $search->filterByNewness($new);
+        }
+
+        $visible = $this->getVisible();
+
+        if (Type\BooleanOrBothType::ANY !== $visible) {
+            $search->useProductQuery()
+                ->filterByVisible($visible)
+            ->endUse();
         }
 
         $default = $this->getDefault();
@@ -143,6 +151,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     break;
                 case "id_reverse":
                     $search->orderById(Criteria::DESC);
+                    break;
+                case "ref":
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case "ref_reverse":
+                    $search->orderByRef(Criteria::DESC);
                     break;
                 case "quantity":
                     $search->orderByQuantity(Criteria::ASC);
@@ -167,6 +181,18 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     break;
                 case "weight_reverse":
                     $search->orderByWeight(Criteria::DESC);
+                    break;
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
                     break;
                 case "random":
                     $search->clearOrderByColumns();
@@ -197,11 +223,11 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 6)';
-        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 6)';
+        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END';
+        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
-            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
+            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::COL_PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
 
         $search->groupById();
 

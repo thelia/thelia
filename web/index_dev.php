@@ -11,14 +11,16 @@
 /*************************************************************************************/
 
 use Thelia\Core\Thelia;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\HttpCache\HttpCache;
-
-//use Symfony\Component\DependencyInjection;
+use Symfony\Component\Dotenv\Dotenv;
 
 $env = 'dev';
 require __DIR__ . '/../core/vendor/autoload.php';
+
+if (file_exists(THELIA_ROOT.'.env')) {
+    (new Dotenv())->load(THELIA_ROOT.'.env');
+}
 
 // List of allowed IP
 $trustedIp = array(
@@ -27,12 +29,17 @@ $trustedIp = array(
 );
 
 $request = Request::createFromGlobals();
-$thelia = new Thelia("dev", true);
 
 if (false === in_array($request->getClientIp(), $trustedIp)) {
-    $response = Response::create('Forbidden', 403)->send();
-    $thelia->terminate($request, $response);
-} else {
-    $response = $thelia->handle($request)->prepare($request)->send();
-    $thelia->terminate($request, $response);
+    header('HTTP/1.0 403 Forbidden');
+    exit('You are not allowed to access this file.');
 }
+
+$thelia = new Thelia("dev", true);
+
+if (PHP_VERSION_ID < 70000) {
+    $thelia->loadClassCache();
+}
+
+$response = $thelia->handle($request)->prepare($request)->send();
+$thelia->terminate($request, $response);

@@ -69,12 +69,7 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new CurrencyConverterProviderPass())
             ->addCompilerPass(new RegisterListenersPass())
             ->addCompilerPass(new PropelPass(
-                THELIA_CACHE_DIR
-                . ($container->hasParameter("kernel.environment")
-                    ? ('/' . $container->getParameter("kernel.environment"))
-                    : ''
-                )
-                . '/propel/model/'
+                THELIA_PROPEL_BUILD_PATH
             ))
         ;
     }

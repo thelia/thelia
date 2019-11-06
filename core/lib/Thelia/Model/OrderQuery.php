@@ -21,7 +21,13 @@ use Thelia\Model\Map\OrderTableMap;
  */
 class OrderQuery extends BaseOrderQuery
 {
-    public static function getMonthlySaleStats($month, $year)
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Exception
+     */
+    public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
@@ -30,7 +36,8 @@ class OrderQuery extends BaseOrderQuery
             $dayAmount = self::getSaleStats(
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
-                true
+                $includeShipping,
+                $withTaxes
             );
             $stats[] = array($day-1, $dayAmount);
         }
@@ -57,6 +64,12 @@ class OrderQuery extends BaseOrderQuery
         return $stats;
     }
 
+    /**
+     * @param $month
+     * @param $year
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public static function getFirstOrdersStats($month, $year)
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -87,74 +100,82 @@ class OrderQuery extends BaseOrderQuery
     /**
      * @param \DateTime $startDate
      * @param \DateTime $endDate
-     * @param           $includeShipping
+     * @param bool $includeShipping
+     * @param bool $withTaxes
      *
-     * @return int
+     * @return float|int
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
+    public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {
-        $orderTaxJoin = new Join();
-        $orderTaxJoin->addExplicitCondition(OrderProductTableMap::TABLE_NAME, 'ID', null, OrderProductTaxTableMap::TABLE_NAME, 'ORDER_PRODUCT_ID', null);
-        $orderTaxJoin->setJoinType(Criteria::LEFT_JOIN);
+        $amount = floatval(
+            self::baseSaleStats($startDate, $endDate, 'o')
+                ->innerJoinOrderProduct()
+                ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))", 'TOTAL')
+                ->select(['TOTAL'])
+                ->findOne()
+        );
 
-        $query = self::baseSaleStats($startDate, $endDate, 'o')
-            ->innerJoinOrderProduct()
-            ->addJoinObject($orderTaxJoin)
-            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))", 'TOTAL')
-            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))", 'TAX')
-            ->select(['TOTAL', 'TAX'])
-        ;
-        $arrayAmount = $query->findOne();
-
-        $amount = $arrayAmount['TOTAL'] + $arrayAmount['TAX'];
-
-        if (null === $amount) {
-            $amount = 0;
+        if ($withTaxes) {
+            $amount += floatval(
+                self::baseSaleStats($startDate, $endDate, 'o')
+                    ->useOrderProductQuery()
+                        ->useOrderProductTaxQuery()
+                            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))", 'TAX')
+                        ->endUse()
+                    ->endUse()
+                    ->select(['TAX'])
+                    ->findOne()
+            );
         }
 
-        $discountQuery = self::baseSaleStats($startDate, $endDate)
-            ->withColumn("SUM(`order`.discount)", 'DISCOUNT')
-            ->select('DISCOUNT')
-        ;
-
-        $discount = $discountQuery->findOne();
-
-        if (null === $discount) {
-            $discount = 0;
-        }
-
-        $amount = $amount - $discount;
+        $amount -= floatval(
+            self::baseSaleStats($startDate, $endDate)
+                ->withColumn("SUM(`order`.discount)", 'DISCOUNT')
+                ->select('DISCOUNT')
+                ->findOne()
+        );
 
         if ($includeShipping) {
-            $query = self::baseSaleStats($startDate, $endDate)
-                ->withColumn("SUM(`order`.postage)", 'POSTAGE')
-                ->select('POSTAGE')
-            ;
-
-            $amount += $query->findOne();
+            $amount += floatval(
+                self::baseSaleStats($startDate, $endDate)
+                    ->withColumn("SUM(`order`.postage)", 'POSTAGE')
+                    ->select('POSTAGE')
+                    ->findOne()
+            );
         }
 
-        return null === $amount ? 0 : round($amount, 2);
+        return $amount;
     }
 
+    /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @param string $modelAlias
+     * @return OrderQuery
+     */
     protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
     {
         return self::create($modelAlias)
             ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
             ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
-            ->filterByStatusId([2, 3, 4], Criteria::IN);
+            ->filterByStatusId(OrderStatusQuery::getPaidStatusIdList(), Criteria::IN);
     }
 
 
     /**
      * @param \DateTime $startDate
      * @param \DateTime $endDate
-     * @param           $status
+     * @param int[]     $status
      *
      * @return int
      */
-    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = array(1, 2, 3, 4))
+    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = null)
     {
+        if ($status === null) {
+            $status = OrderStatusQuery::getPaidStatusIdList();
+        }
+
         return self::create()
             ->filterByStatusId($status, Criteria::IN)
             ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)

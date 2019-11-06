@@ -20,7 +20,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
 {
     protected function buildForm()
     {
-        parent::buildForm(true);
+        parent::buildForm();
 
         $this->formBuilder
             ->add("id", "hidden", array(

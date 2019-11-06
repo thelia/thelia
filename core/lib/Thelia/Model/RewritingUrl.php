@@ -10,6 +10,8 @@ class RewritingUrl extends BaseRewritingUrl
 {
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         if (null !== $this->getRedirected()) {
             //check if rewriting url alredy exists and put redirect to the new one
             RewritingUrlQuery::create()

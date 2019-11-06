@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CartAdd;
@@ -36,7 +37,6 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\OrderPostage;
 use Thelia\Module\Exception\DeliveryException;
 use Thelia\Tools\URL;
 
@@ -66,7 +66,6 @@ class CartController extends BaseFrontController
             } elseif (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
                 return $response;
             }
-
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
             $message = $this->getTranslator()->trans(
@@ -184,6 +183,7 @@ class CartController extends BaseFrontController
      */
     private function getAddCartForm(Request $request)
     {
+        /** @var CartAdd $cartAdd */
         if ($request->isMethod("post")) {
             $cartAdd = $this->createForm(FrontForm::CART_ADD);
         } else {
@@ -193,14 +193,16 @@ class CartController extends BaseFrontController
                 array(),
                 array(
                     'csrf_protection'   => false,
-                ),
-                $this->container
+                )
             );
         }
 
         return $cartAdd;
     }
 
+    /**
+     * @throws PropelException
+     */
     protected function afterModifyCart()
     {
         /* recalculate postage amount */
@@ -215,16 +217,25 @@ class CartController extends BaseFrontController
                 $orderEvent = new OrderEvent($order);
 
                 try {
-                    $postage = OrderPostage::loadFromPostage(
-                        $moduleInstance->getPostage($deliveryAddress->getCountry())
+                    $deliveryPostageEvent = new DeliveryPostageEvent(
+                        $moduleInstance,
+                        $this->getSession()->getSessionCart($this->getDispatcher()),
+                        $deliveryAddress
                     );
+
+                    $this->getDispatcher()->dispatch(
+                        TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                        $deliveryPostageEvent
+                    );
+
+                    $postage = $deliveryPostageEvent->getPostage();
 
                     $orderEvent->setPostage($postage->getAmount());
                     $orderEvent->setPostageTax($postage->getAmountTax());
                     $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                } catch (DeliveryException $ex) {
+                } catch (\Exception $ex) {
                     // The postage has been chosen, but changes in the cart causes an exception.
                     // Reset the postage data in the order
                     $orderEvent->setDeliveryModule(0);

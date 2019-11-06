@@ -26,10 +26,9 @@ class CustomerUpdateForm extends BaseForm
     use AddressCountryValidationTrait;
 
     /**
-     * @param bool $backendContext
      * @return null|void
      */
-    protected function buildForm($backendContext = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add(
@@ -196,6 +195,13 @@ class CustomerUpdateForm extends BaseForm
                 'label' => Translator::getInstance()->trans('Reseller'),
                 'label_attr' => array(
                     'for' => 'reseller',
+                ),
+            ))
+            ->add('lang_id', 'integer', array(
+                'required' => false,
+                'label' => Translator::getInstance()->trans('Preferred language'),
+                'label_attr' => array(
+                    'for' => 'lang_id',
                 ),
             ))
         ;

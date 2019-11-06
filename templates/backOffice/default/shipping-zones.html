@@ -77,12 +77,16 @@
                                     </td>
                                     {hook name="shipping-zones.table-row" location="shipping_zones_table_row" module_id={$ID} }
 
-                                    <td class="text-center">
-                                        <div class="btn-group">
-                                           {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-zone" access="UPDATE"}
-                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
-                                           {/loop}
-                                        </div>
+                                    <td class="actions">
+                                       {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'class' => 'shipping-zones-change',
+                                                'title' => {intl l='Change this shipping zone'},
+                                                'href' => {url path="/admin/configuration/shipping_zones/update/%id" id=$ID},
+                                                'auth' => ['resource' => 'admin.configuration.shipping-zone']
+                                            ]
+                                        ]}
                                     </td>
                                 </tr>
                                 {/loop}

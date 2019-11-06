@@ -34,9 +34,18 @@
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
                                     {intl l='Orders status'}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new order status'}" href="#creation_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
+                                    {include file='renderer/buttons.html' btn_group=false buttons=[
+                                        [
+                                            'type' => 'create',
+                                            'class' => 'action-btn',
+                                            'title' => {intl l='Add a new order status'},
+                                            'href' => '#creation_dialog',
+                                            'auth' => ['resource' => 'admin.order-status'],
+                                            'data' => [
+                                                'toggle' => 'modal'
+                                            ]
+                                        ]
+                                    ]}
                                 </caption>
 
                                 <thead>
@@ -100,17 +109,28 @@
                                         {hook name="order-status.table-row" order_status_id={$ID} }
 
                                         <td class="actions">
-                                            <div class="btn-toolbar btn toolbar-primary">
-                                                <span class="glyphicon glyphicon-cog"></span>
-                                            </div>
-                                            <div class="toolbar-options hidden">
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order-status" access="UPDATE"}
-                                                    <a title="{intl l='Edit this order status'}" href="{url path="/admin/configuration/order-status/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                {if !$DELETABLE}
-                                                    <a class="order-status-cancel" title="{intl l='Delete this order status'}" href="#cancel_order-status_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
-                                                {/if}
-                                                {/loop}
-                                            </div>
+                                            {$buttons = [
+                                                [
+                                                    'type' => 'edit',
+                                                    'title' => {intl l='Edit this order status'},
+                                                    'href' => {url path="/admin/configuration/order-status/update/%id" id=$ID},
+                                                    'auth' => ['resource' => 'admin.order-status']
+                                                ]
+                                            ]}
+                                            {if !$DELETABLE}
+                                                {$buttons[] = [
+                                                    'type' => 'delete',
+                                                    'class' => 'order-status-cancel',
+                                                    'title' => {intl l='Delete this order status'},
+                                                    'href' => '#cancel_order-status_dialog',
+                                                    'data' => [
+                                                        'id' => $ID,
+                                                        'toggle' => 'modal'
+                                                    ],
+                                                    'auth' => ['resource' => 'admin.order-status']
+                                                ]}
+                                            {/if}
+                                            {include file='renderer/buttons.html' buttons=$buttons}
                                         </td>
                                     </tr>
 
@@ -144,7 +164,7 @@
 
                 <div class="input-group">
                     <input type="text" class="form-control" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                 </div>
             {/loop}
         {/custom_render_form_field}
