@@ -21,6 +21,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -260,12 +261,14 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 $taxedPrice = null;
             }
 
-            $promoPrice = $PSEValue->getPromoPrice('price_PROMO_PRICE', $discount);
+            $promoDiscount = ConfigQuery::getApplyCustomerDiscountOnPromoPrices() ? $discount : 0;
+
+            $promoPrice = $PSEValue->getPromoPrice('price_PROMO_PRICE', $promoDiscount);
             try {
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
                     $taxCountry,
                     'price_PROMO_PRICE',
-                    $discount
+                    $promoDiscount
                 );
             } catch (TaxEngineException $e) {
                 $taxedPromoPrice = null;
