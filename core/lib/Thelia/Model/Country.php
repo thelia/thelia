@@ -27,6 +27,7 @@ class Country extends BaseCountry
      * - N : number
      * - L : letter
      * - C : iso of a state
+     * Several formats, separated by a comma, are supported (e.g. NNNN, LL-NNNN, NNNN-LL)
      *
      * @return string|null will return a regex to match the zip code, otherwise null will be return
      *                     if zip code format is not defined
@@ -34,10 +35,10 @@ class Country extends BaseCountry
     public function getZipCodeRE()
     {
         static $trans = [
-            "N" => "\\d",
-            "L" => "[a-zA-Z]",
-            "C" => ".+",
-            " " => " +"
+            'N' => '\\d',
+            'L' => '[a-zA-Z]',
+            'C' => '.+',
+            ' ' => ' +'
         ];
 
         $zipCodeFormat = $this->getZipCodeFormat();
@@ -51,10 +52,16 @@ class Country extends BaseCountry
         $zipCodeRE = '';
 
         foreach ($zipFormatList as $zipFormat) {
-            $zipCodeRE .= '(' . preg_replace("/\\s+/", ' ', trim($zipFormat)) . ')|';
+            $zipCodeRE .= '(' . preg_replace('/\\s+/', ' ', trim($zipFormat)) . ')|';
         }
 
-        return "#^" . strtr(rtrim($zipCodeRE, '|'), $trans) . "$#";
+        $zipCodeRE = rtrim($zipCodeRE, '|');
+
+        if (count($zipFormatList) > 1) {
+            $zipCodeRE = '(' . rtrim($zipCodeRE, '|') . ')';
+        }
+
+        return '#^' . strtr($zipCodeRE, $trans) . '$#';
     }
 
     /**
