@@ -89,9 +89,10 @@
                                     </a>
                                 </li>
                                 <li>
+                                    {$imageSuccessUrl ={navigate to="current"}}
                                     <a href="#images"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/image/type/product/%id/form-ajax" id=$ID}"
+                                       data-href="{url path="/admin/image/type/product/%id/form-ajax" id=$ID successUrl=$imageSuccessUrl}"
                                        data-callback="$.imageUploadManager.initImageDropZone">
                                         {intl l="Images"}
                                     </a>
