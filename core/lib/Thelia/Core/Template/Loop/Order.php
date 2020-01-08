@@ -37,6 +37,10 @@ use Thelia\Type\TypeCollection;
  *
  * {@inheritdoc}
  * @method int[] getId()
+ * @method int[] getRef()
+ * @method int[] getInvoiceRef()
+ * @method int[] getDeliveryRef()
+ * @method int[] getTransactionRef()
  * @method string getCustomer()
  * @method string[] getStatus()
  * @method int[] getExcludeStatus()
@@ -55,6 +59,10 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createAnyListTypeArgument('ref'),
+            Argument::createAnyListTypeArgument('invoice_ref'),
+            Argument::createAnyListTypeArgument('delivery_ref'),
+            Argument::createAnyListTypeArgument('transaction_ref'),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
             new Argument(
                 'customer',
@@ -177,10 +185,24 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     {
         $search = OrderQuery::create();
 
-        $id = $this->getId();
-
-        if (null !== $id) {
+        if (null !== $id = $this->getId()) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        if (null !== $ref = $this->getRef()) {
+            $search->filterByRef($ref, Criteria::IN);
+        }
+
+        if (null !== $ref = $this->getDeliveryRef()) {
+            $search->filterByDeliveryRef($ref, Criteria::IN);
+        }
+
+        if (null !== $ref = $this->getInvoiceRef()) {
+            $search->filterByInvoiceRef($ref, Criteria::IN);
+        }
+
+        if (null !== $ref = $this->getTransactionRef()) {
+            $search->filterByTransactionRef($ref, Criteria::IN);
         }
 
         $customer = $this->getCustomer();
@@ -189,16 +211,16 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return null;
-            } else {
-                $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
             }
+
+            $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
         } elseif ($customer !== '*') {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
 
         $status = $this->getStatus();
 
-        if (null !== $status && $status != '*') {
+        if (null !== $status && $status !== '*') {
             $search->filterByStatusId($status, Criteria::IN);
         }
 
@@ -208,7 +230,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
         $statusCode = $this->getStatusCode();
 
-        if (null !== $statusCode && $statusCode != '*') {
+        if (null !== $statusCode && $statusCode !== '*') {
             $search
                 ->useOrderStatusQuery()
                 ->filterByCode($statusCode, Criteria::IN)
