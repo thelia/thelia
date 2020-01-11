@@ -36,18 +36,18 @@ use Thelia\Type\TypeCollection;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getRef()
- * @method int[] getInvoiceRef()
- * @method int[] getDeliveryRef()
- * @method int[] getTransactionRef()
- * @method string getCustomer()
- * @method string[] getStatus()
- * @method int[] getExcludeStatus()
- * @method string[] getStatusCode()
- * @method string[] getExcludeStatusCode()
- * @method string[] getOrder()
- * @method bool getWithPrevNextInfo()
+ * @method null|int[] getId()
+ * @method null|int[] getRef()
+ * @method null|int[] getInvoiceRef()
+ * @method null|int[] getDeliveryRef()
+ * @method null|int[] getTransactionRef()
+ * @method null|string getCustomer()
+ * @method null|string[] getStatus()
+ * @method null|int[] getExcludeStatus()
+ * @method null|string[] getStatusCode()
+ * @method null|string[] getExcludeStatusCode()
+ * @method null|string[] getOrder()
+ * @method null|bool getWithPrevNextInfo()
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
