@@ -58,6 +58,9 @@ $(function($){
         $.ajax({
             type: "POST",
             url: imageListUrl,
+            data: {
+                successUrl: imageSuccessUrl
+            },
             statusCode: {
                 404: function() {
                     $imageListArea.html(
