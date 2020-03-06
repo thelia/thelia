@@ -109,13 +109,23 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
-            $taxedPrice = $orderProduct->getPrice() + $orderProduct->getVirtualColumn('TOTAL_TAX');
-            $taxedPromoPrice = $orderProduct->getPromoPrice() + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
+            $tax = round($orderProduct->getVirtualColumn('TOTAL_TAX'), 2);
+            $promoTax = round($orderProduct->getVirtualColumn('TOTAL_PROMO_TAX'), 2);
 
-            $totalPrice = $orderProduct->getPrice()*$orderProduct->getQuantity();
-            $totalPromoPrice = $orderProduct->getPromoPrice()*$orderProduct->getQuantity();
+            $price = round($orderProduct->getPrice(), 2);
+            $promoPrice = round($orderProduct->getPromoPrice(), 2);
 
-            $loopResultRow->set("ID", $orderProduct->getId())
+            $taxedPrice = $price + $tax;
+            $taxedPromoPrice = $promoPrice + $promoTax;
+
+            $totalPrice = $price * $orderProduct->getQuantity();
+            $totalPromoPrice = $promoPrice * $orderProduct->getQuantity();
+
+            $totalTaxedPrice = $taxedPrice * $orderProduct->getQuantity();
+            $totalTaxedPromoPrice = $taxedPromoPrice * $orderProduct->getQuantity();
+
+            $loopResultRow
+                ->set("ID", $orderProduct->getId())
                 ->set("REF", $orderProduct->getProductRef())
                 ->set("PRODUCT_ID", $orderProduct->getVirtualColumn('product_id'))
                 ->set("PRODUCT_SALE_ELEMENTS_ID", $orderProduct->getProductSaleElementsId())
@@ -130,16 +140,16 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set("VIRTUAL", $orderProduct->getVirtual())
                 ->set("VIRTUAL_DOCUMENT", $orderProduct->getVirtualDocument())
                 ->set("QUANTITY", $orderProduct->getQuantity())
-                ->set("PRICE", $orderProduct->getPrice())
-                ->set("PRICE_TAX", $orderProduct->getVirtualColumn('TOTAL_TAX'))
+                ->set("PRICE", $price)
+                ->set("PRICE_TAX", $tax)
                 ->set("TAXED_PRICE", $taxedPrice)
-                ->set("PROMO_PRICE", $orderProduct->getPromoPrice())
-                ->set("PROMO_PRICE_TAX", $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX'))
+                ->set("PROMO_PRICE", $promoPrice)
+                ->set("PROMO_PRICE_TAX", $promoTax)
                 ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
                 ->set("TOTAL_PRICE", $totalPrice)
-                ->set("TOTAL_TAXED_PRICE", $totalPrice + ($orderProduct->getVirtualColumn('TOTAL_TAX')*$orderProduct->getQuantity()))
+                ->set("TOTAL_TAXED_PRICE", $totalTaxedPrice)
                 ->set("TOTAL_PROMO_PRICE", $totalPromoPrice)
-                ->set("TOTAL_TAXED_PROMO_PRICE", $totalPromoPrice + ($orderProduct->getVirtualColumn('TOTAL_PROMO_TAX')*$orderProduct->getQuantity()))
+                ->set("TOTAL_TAXED_PROMO_PRICE", $totalTaxedPromoPrice)
                 ->set("TAX_RULE_TITLE", $orderProduct->getTaxRuleTitle())
                 ->set("TAX_RULE_DESCRIPTION", $orderProduct->getTaxRuledescription())
                 ->set("PARENT", $orderProduct->getParent())
