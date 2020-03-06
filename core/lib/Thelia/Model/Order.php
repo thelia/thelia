@@ -152,7 +152,7 @@ class Order extends BaseOrder
                 ->filterByOrderId($this->getId())
                 ->withColumn('SUM(
                     ' . OrderProductTableMap::COL_QUANTITY . '
-                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
+                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, ROUND('.OrderProductTableMap::COL_PROMO_PRICE.', 2), ROUND('.OrderProductTableMap::COL_PRICE.', 2))
                 )', 'total_amount')
                 ->select([ 'total_amount' ])
                 ->findOne()
@@ -165,7 +165,7 @@ class Order extends BaseOrder
                 ->endUse()
                 ->withColumn('SUM(
                     ' . OrderProductTableMap::COL_QUANTITY . '
-                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')
+                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, ROUND('.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', 2), ROUND('.OrderProductTaxTableMap::COL_AMOUNT.', 2))
                 )', 'total_tax')
                 ->select([ 'total_tax' ])
                 ->findOne()
