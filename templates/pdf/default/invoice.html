@@ -305,16 +305,24 @@
                 <table class="table-3">
                     <col style="width: 50%; padding: 1mm;">
                     <col style="width: 50%; padding: 1mm;">
-                    {if $DISCOUNT}
-                    <tr>
-                        <td class="table-3-1"><p>{intl l="Discount"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
-                    </tr>
-                    {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total without tax"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} currency_id=$CURRENCY}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_ITEMS_AMOUNT} currency_id=$CURRENCY}</p></td>
                     </tr>
+                    <tr>
+                        <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_TAXED_ITEMS_AMOUNT} currency_id=$CURRENCY}</p></td>
+                    </tr>
+                    {if $DISCOUNT}
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Discount with tax"}</p></td>
+                            <td class="table-3-1 align-right"><p>-{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
+                        </tr>
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Discounted total with tax"}</p></td>
+                            <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_TAXED_ITEMS_AMOUNT-$DISCOUNT} currency_id=$CURRENCY}</p></td>
+                        </tr>
+                    {/if}
                     {strip}
                         {capture name="tax"}
                             {foreach $taxes as $name=>$prices}
@@ -324,25 +332,26 @@
                                 {/foreach}
                                 {if $_price_taxe_ != 0}
                                 <tr>
-                                    <td class="table-3-2"><p>{$name}</p></td>
+                                    <td class="table-3-2 align-right"><p>{$name}</p></td>
                                     <td class="table-3-2 align-right"><p>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</p></td>
                                 </tr>
                                 {/if}
                             {/foreach}
                             {if $POSTAGE_TAX != 0}
                             <tr>
-                                <td class="table-3-2"><p>{intl l="Postage"}<br>{$POSTAGE_TAX_RULE_TITLE}</p></td>
+                                <td class="table-3-2 align-right"><p>{intl l="Postage"}<br>{$POSTAGE_TAX_RULE_TITLE}</p></td>
                                 <td class="table-3-2 align-right"><p>{format_money number=$POSTAGE_TAX currency_id=$CURRENCY}</p></td>
                             </tr>
                             {/if}
                         {/capture}
                     {/strip}
                     {if $smarty.capture.tax ne ""}
-                    <tr>
-                        <td class="table-3-1"><p>{intl l="Tax"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number=$TOTAL_TAX currency_id=$CURRENCY}</p></td>
-                    </tr>
-                    {$smarty.capture.tax nofilter}
+                        {$smarty.capture.tax nofilter}
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Total taxes"}</p></td>
+                            <td class="table-3-1 align-right"><p>{format_money number=$TOTAL_TAX currency_id=$CURRENCY}</p></td>
+                        </tr>
+
                     {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>

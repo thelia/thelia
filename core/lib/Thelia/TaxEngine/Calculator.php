@@ -45,57 +45,9 @@ class Calculator
     protected $country = null;
     protected $state = null;
 
-    /** @var float */
-    protected $applicableDiscountTaxFactor;
-
-    public function __construct($applicableDiscountTaxFactor = 1.0)
+    public function __construct()
     {
         $this->taxRuleQuery = new TaxRuleQuery();
-
-        $this->applicableDiscountTaxFactor = $applicableDiscountTaxFactor;
-    }
-
-    /**
-     * @param Cart $cart
-     * @param Country $country
-     * @param State|null $state
-     * @return Calculator
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    public static function createFromCart(Cart $cart, Country $country, State $state = null)
-    {
-        // We have to calculate the taxes on the discounted product unit prices. As the discount is global,
-        // we should apply a factor to all tax calculation, in order to dispatch discount tax on all
-        // products in the cart.
-
-        // Get the cart total without the discount
-        $cartTotal = $cart->getTaxedAmount($country, false, $state);
-        // Remove the discount (disount icludes taxes)
-        $discountedTotal = $cartTotal - $cart->getDiscount();
-
-        // Get the factor applicable to all tax calculation
-        $discountTaxFactor = 1 - $discountedTotal / $cartTotal;
-
-        // Get the cart total with discount
-        return new Calculator($discountTaxFactor);
-    }
-
-    /**
-     * @return float
-     */
-    public function getApplicableDiscountTaxFactor()
-    {
-        return $this->applicableDiscountTaxFactor;
-    }
-
-    /**
-     * @param int $applicableDiscountTaxFactor
-     * @return $this
-     */
-    public function setApplicableDiscountTaxFactor($applicableDiscountTaxFactor)
-    {
-        $this->applicableDiscountTaxFactor = $applicableDiscountTaxFactor;
-        return $this;
     }
 
     /**
@@ -207,9 +159,7 @@ class Calculator
      */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
     {
-        // We have to round the tax amout here (sum of rounded values methods) to prevent the small total amount
-        // differences which may occur when rounding the sum of unrouded values.
-        return round($taxedPrice - $this->getUntaxedPrice($taxedPrice), 2);
+        return $taxedPrice - $this->getUntaxedPrice($taxedPrice);
     }
 
     /**
@@ -220,7 +170,7 @@ class Calculator
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null, $ignoreTaxWhereDiscountIsNotApplicable = false)
+    public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
     {
         if (null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxedPrice', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
@@ -256,16 +206,6 @@ class Calculator
             }
 
             $taxAmount = $taxType->calculate($this->product, $taxedPrice);
-
-            if ($taxType->isDiscountFactorApplicable()) {
-                $taxAmount *= $this->applicableDiscountTaxFactor;
-            } elseif ($ignoreTaxWhereDiscountIsNotApplicable) {
-                continue;
-            }
-
-            // We have to round the tax amout here (sum of rounded values methods) to prevent the small total amount
-            // differences which may occur when rounding the sum of unrouded values.
-            $taxAmount = round($taxAmount, 2);
 
             $currentTax += $taxAmount;
 
@@ -331,17 +271,12 @@ class Calculator
             $fixedAmount = $taxType->fixAmountRetriever($this->product);
             $ratioAmount = $taxType->pricePercentRetriever();
 
-            if ($taxType->isDiscountFactorApplicable()) {
-                $fixedAmount /= $this->applicableDiscountTaxFactor;
-                $ratioAmount /= $this->applicableDiscountTaxFactor;
-            }
-
             $currentFixTax += $fixedAmount;
             $currentTaxFactor += $ratioAmount;
         } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;
-        $untaxedPrice = $untaxedPrice / (1 + $currentTaxFactor);
+        $untaxedPrice /= (1 + $currentTaxFactor);
 
         return $untaxedPrice;
     }
