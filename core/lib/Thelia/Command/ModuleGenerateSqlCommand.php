@@ -57,6 +57,8 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
             throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
         }
 
+        $this->checkModuleSchema();
+
         /** @var PropelInitService $propelInitService */
         $propelInitService = $this->getContainer()->get('thelia.propel.init');
 

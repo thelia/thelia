@@ -176,8 +176,6 @@ class Thelia extends Kernel
         if ($cacheRefresh) {
             $moduleManagement = new ModuleManagement($this->getContainer());
             $moduleManagement->updateModules($this->getContainer());
-
-            $propelInitService->migrate();
         }
 
         if ($propelConnectionAvailable) {
