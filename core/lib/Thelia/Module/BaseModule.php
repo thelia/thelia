@@ -96,11 +96,6 @@ class BaseModule implements BaseModuleInterface
             }
 
             $this->registerHooks();
-
-            if ($this->hasPropelSchema()) {
-                $this->container->get('thelia.propel.init')->init(true);
-                $this->container->get('thelia.propel.init')->migrate();
-            }
         }
     }
 
@@ -123,11 +118,6 @@ class BaseModule implements BaseModuleInterface
             } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
-            }
-
-            if ($this->hasPropelSchema()) {
-                $this->container->get('thelia.propel.init')->init(true);
-                $this->container->get('thelia.propel.init')->migrate();
             }
         }
     }

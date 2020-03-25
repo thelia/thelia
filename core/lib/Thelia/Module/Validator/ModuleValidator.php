@@ -13,6 +13,7 @@
 namespace Thelia\Module\Validator;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
@@ -158,6 +159,7 @@ class ModuleValidator
         }
 
         $this->checkModuleDependencies();
+        $this->checkModulePropelSchema();
     }
 
     protected function checkDirectoryStructure()
@@ -335,6 +337,22 @@ class ModuleValidator
             );
 
             throw new ModuleException($errorsMessage);
+        }
+    }
+
+    protected function checkModulePropelSchema()
+    {
+        $schemaFile = $this->getModulePath() . DS . "Config" . DS . "schema.xml";
+        $fs = new Filesystem();
+
+        if ($fs->exists($schemaFile) === false) {
+            return;
+        }
+
+        if (preg_match('/<behavior.*name="versionable".*\/>/s', file_get_contents($schemaFile))) {
+            throw new ModuleException(
+                "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
+            );
         }
     }
 
