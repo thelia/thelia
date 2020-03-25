@@ -235,8 +235,12 @@
                             {if {cart attr="is_virtual"} != 1}
                                 <tr>
                                     <th class="shipping">
-                                        {intl l="Shipping"}<br>
-                                        {intl l="Including %tax tax" tax={format_money number={order attr="postage_tax"}}}
+                                        {intl l="Shipping"}
+                                        {$postageTax = {order attr="postage_tax"}}
+                                        {if $postageTax > 0}
+                                            <br>
+                                            {intl l="Including %tax tax" tax={format_money number=postageTax}}
+                                        {/if}
                                     </th>
                                     <td class="shipping">
                                         <div class="shipping-price">

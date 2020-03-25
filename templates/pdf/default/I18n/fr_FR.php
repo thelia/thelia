@@ -1,11 +1,13 @@
 <?php
 
-return [
+return array(
+    'Combination ref : ' => 'Réf. combinaison',
     'Customer Number' => 'Numéro de client',
     'DELIVERY' => 'LIVRAISON',
     'Delivery address' => 'Adresse de livraison',
     'Delivery module' => 'Module de livraison',
-    'Discount' => 'Remise',
+    'Discount with tax' => 'Remise TTC',
+    'Discounted total with tax' => 'Total articles TTC avec remise',
     'Email: ' => 'Email :',
     'INVOICE' => 'FACTURE',
     'Invoice REF' => 'Numéro de facture',
@@ -13,19 +15,19 @@ return [
     'Invoice date' => 'Date de facturation',
     'Payment module' => 'Module de paiement',
     'Phone: ' => 'Tél.: ',
-    'Postage' => 'Frais de livraison',
+    'Postage' => 'Frais de livraison TTC',
     'Product' => 'Produit',
+    'Product ref : ' => 'Réf. Produit',
     'Quantity' => 'Quantité',
     'Ref' => 'Réf.',
     'Tax' => 'Taxe',
     'Taxed total' => 'Total TTC',
-    'Total' => 'Total',
-    'Total with tax' => 'Total TTC',
-    'Total without tax' => 'Total HT',
+    'Total' => 'Total TTC',
+    'Total taxes' => 'Total des taxes',
+    'Total with tax' => 'Total articles TTC',
+    'Total without tax' => 'Total articles HT',
     'Unit taxed price' => 'Prix unitaire TTC',
     'Unit. price' => 'Prix unitaire',
-    'delivery.imprint' => 'delivery.imprint',
-    'invoice.imprint' => 'invoice.imprint',
     'page' => 'page',
     'product' => 'Produit',
-];
+);
