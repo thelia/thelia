@@ -13,7 +13,7 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>2.4.0-alpha2</version>
+    <version>2.4.0</version>
     <author>
         <name>Julien Chanséaume</name>
         <email>jchanseaume@openstudio.fr</email>
