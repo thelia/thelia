@@ -228,11 +228,11 @@ class CartController extends BaseFrontController
                         $deliveryPostageEvent
                     );
 
-                    $postage = $deliveryPostageEvent->getPostage();
-
-                    $orderEvent->setPostage($postage->getAmount());
-                    $orderEvent->setPostageTax($postage->getAmountTax());
-                    $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
+                    if (null !== $postage = $deliveryPostageEvent->getPostage()) {
+                        $orderEvent->setPostage($postage->getAmount());
+                        $orderEvent->setPostageTax($postage->getAmountTax());
+                        $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
+                    }
 
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
                 } catch (\Exception $ex) {

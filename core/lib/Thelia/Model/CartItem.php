@@ -4,10 +4,10 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
-use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
@@ -138,11 +138,20 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    /**
+     * @return float
+     */
     public function getRealPrice()
     {
-        return $this->getPromo() == 1 ? $this->getPromoPrice() : $this->getPrice();
+        return (float) ((int) $this->getPromo() === 1 ? $this->getPromoPrice() : $this->getPrice());
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @param null $locale
+     * @return Product
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function getProduct(ConnectionInterface $con = null, $locale = null)
     {
         $product = parent::getProduct($con);
@@ -163,93 +172,70 @@ class CartItem extends BaseCartItem
     /**
      * @param Country $country
      * @param State|null $state
-     * @param bool $withDiscount
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getRealTaxedPrice(Country $country, State $state = null, $withDiscount = false)
+    public function getRealTaxedPrice(Country $country, State $state = null)
     {
-        return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
+        return (int) $this->getPromo() === 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
     }
 
     /**
      * @param Country $country
      * @param State|null $state
-     * @param bool $withDiscount
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedPrice(Country $country, State $state = null, $withDiscount = false)
+    public function getTaxedPrice(Country $country, State $state = null)
     {
-        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
+        $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice());
+        return round($taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice()), 2);
     }
 
     /**
      * @param Country $country
      * @param State|null $state
-     * @param bool $withDiscount
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedPromoPrice(Country $country, State $state = null, $withDiscount = false)
+    public function getTaxedPromoPrice(Country $country, State $state = null)
     {
-        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
+        $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice());
-    }
-
-    /**
-     * @param Country $country
-     * @param State|null $state
-     * @param bool $withDiscount
-     * @return float
-     * @throws \Propel\Runtime\Exception\PropelException
-     * @since Version 2.3
-     */
-    public function getTotalRealTaxedPrice(Country $country, State $state = null, $withDiscount = false)
-    {
-        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country, $state, $withDiscount) : $this->getTotalTaxedPrice($country, $state, $withDiscount);
+        return round($taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice()), 2);
     }
 
     /**
      * @since Version 2.3
      * @param Country $country
      * @param State|null $state
-     * @param bool $withDiscount
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalTaxedPrice(Country $country, State $state = null, $withDiscount = false)
+    public function getTotalRealTaxedPrice(Country $country, State $state = null)
     {
-        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
-
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice()*$this->getQuantity());
+        return (int) $this->getPromo() === 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
     }
 
     /**
      * @since Version 2.3
      * @param Country $country
      * @param State|null $state
-     * @param bool $withDiscount
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalTaxedPromoPrice(Country $country, State $state = null, $withDiscount = false)
+    public function getTotalTaxedPrice(Country $country, State $state = null)
     {
-        $taxCalculator = $this->createCalculator($country, $state, $withDiscount);
-
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
+        return $this->getTaxedPrice($country, $state) * $this->getQuantity();
     }
 
     /**
-     * @param bool $withDiscount
-     * @return Calculator
+     * @since Version 2.3
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function createCalculator($country, $state, $withDiscount)
+    public function getTotalTaxedPromoPrice(Country $country, State $state = null)
     {
-        return $withDiscount ? Calculator::createFromCart($this->getCart(), $country, $state) : new Calculator();
+        return $this->getTaxedPromoPrice($country, $state) * $this->getQuantity();
     }
 }

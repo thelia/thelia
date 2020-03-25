@@ -113,10 +113,10 @@ class Cart extends BaseCart
      *
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
-     * @param \Thelia\Model\Country $country
+     * @param Country $country
      * @param bool $withDiscount
-     * @param \Thelia\Model\State|null $state
-     * @return float|int|string
+     * @param State|null $state
+     * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedAmount(Country $country, $withDiscount = true, State $state = null)
@@ -124,7 +124,7 @@ class Cart extends BaseCart
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getTotalRealTaxedPrice($country, $state, $withDiscount);
+            $total += $cartItem->getTotalRealTaxedPrice($country, $state);
         }
 
         if ($withDiscount) {
@@ -135,7 +135,7 @@ class Cart extends BaseCart
             }
         }
 
-        return $total;
+        return round($total, 2);
     }
 
     /**
@@ -143,7 +143,7 @@ class Cart extends BaseCart
      * @see getTaxedAmount same as this method but the amount is without taxes
      *
      * @param bool $withDiscount
-     * @return float|int|string
+     * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalAmount($withDiscount = true)
@@ -170,41 +170,27 @@ class Cart extends BaseCart
             }
         }
 
-        return $total;
+        return round($total, 2);
     }
 
     /**
      * Return the VAT of all items
      *
-     * @param $taxCountry
+     * @param Country $taxCountry
      * @param null $taxState
-     * @param bool $withDiscount
      * @return float|int|string
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = false)
+    public function getTotalVAT($taxCountry, $taxState = null)
     {
-        return ($this->getTaxedAmount($taxCountry, true, $taxState, $withDiscount) - $this->getTotalAmount(true));
-    }
-
-    /**
-     * Return the VAT of all items
-     *
-     * @param $taxCountry
-     * @param null $taxState
-     * @param bool $withDiscount
-     * @return float|int|string
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    public function getTotalVATWithoutDiscount($taxCountry, $taxState = null, $withDiscount = false)
-    {
-        return ($this->getTaxedAmount($taxCountry, true, $taxState, $withDiscount) - $this->getTotalAmount(true));
+        return ($this->getTaxedAmount($taxCountry, true, $taxState) - $this->getTotalAmount(true));
     }
 
     /**
      * Retrieve the total weight for all products in cart
      *
-     * @return float|int
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getWeight()
     {
@@ -221,7 +207,7 @@ class Cart extends BaseCart
     }
 
     /**
-     * Tell if the cart contains only virtual products
+     * Tell if the cart contains only virtual product
      *
      * @return bool
      * @throws \Propel\Runtime\Exception\PropelException
@@ -242,14 +228,5 @@ class Cart extends BaseCart
 
         // An empty cart is not virtual.
         return $this->getCartItems()->count() > 0;
-    }
-
-    public function getDiscount($withTaxes = true)
-    {
-        if ($withTaxes) {
-            return parent::getDiscount();
-        } else {
-            // Apply the discount ratio
-        }
     }
 }
