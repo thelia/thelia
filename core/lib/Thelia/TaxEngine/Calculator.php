@@ -58,12 +58,6 @@ class Calculator
      */
     public function load(Product $product, Country $country, State $state = null)
     {
-        $this->product = null;
-        $this->country = null;
-        $this->state = null;
-
-        $this->taxRulesCollection = null;
-
         if ($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
@@ -90,10 +84,6 @@ class Calculator
      */
     public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null)
     {
-        $this->product = null;
-        $this->country = null;
-        $this->taxRulesCollection = null;
-
         if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
@@ -123,10 +113,6 @@ class Calculator
      */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
-        $this->product = null;
-        $this->country = null;
-        $this->taxRulesCollection = null;
-
         if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
