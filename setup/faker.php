@@ -25,8 +25,8 @@ if (php_sapi_name() != 'cli') {
 $bootstraped = false;
 $realTextMode = true;
 $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
-$numberCategories = 20;
-$numberProducts = 20;
+$numberCategories = 5;
+$numberProducts = 5;
 $countryStateList = [];
 
 $options = getopt("b:c:p:r:l:h");

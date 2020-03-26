@@ -30,6 +30,7 @@ Customize images with the `carousel` loop, which has the same arguments as the `
 |**quality** |The generated image quality, from 0(!) to 100%. The default value is 75% (you can hange this in the Administration panel).  example : quality="70"|
 |**resize_mode** | If 'crop', the image will have the exact specified width and height, and will be cropped if required. If 'borders', the image will have the exact specified width and height, and some borders may be added. The border color is the one specified by 'background_color'. If 'none' or missing, the image ratio is preserved, and depending od this ratio, may not have the exact width and height required. resize_mode="crop"|
 |**effects** |One or more comma separated effects definitions, that will be applied to the image in the specified order. Please see below a detailed description of available effects. Expected values :<ul><li>gamma:value : change the image Gamma to the specified value. Example: gamma:0.7.</li><li>grayscale or greyscale : switch image to grayscale.</li><li>colorize:color : apply a color mask to the image. The color format is $rgb or $rrggbb. Example: colorize:$ff2244.</li><li>negative : transform the image in its negative equivalent.</li><li>vflip or vertical_flip : flip the image vertically.</li><li>hflip or horizontal_flip : flip the image horizontally.</li></ul>example : effects="greyscale,gamma:0.7,vflip" |
+|**group** |The name of an image group. Return only images from the specified group|
 
 ### Ouput arguments
 

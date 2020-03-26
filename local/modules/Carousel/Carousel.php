@@ -16,7 +16,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\VarDumper\Cloner\Data;
 use Thelia\Install\Database;
 use Thelia\Model\ConfigQuery;
 use Thelia\Module\BaseModule;
@@ -32,12 +31,12 @@ class Carousel extends BaseModule
 
     public function preActivation(ConnectionInterface $con = null)
     {
-        if (! $this->getConfigValue('is_initialized', false)) {
+        if (! self::getConfigValue('is_initialized', false)) {
             $database = new Database($con);
 
             $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
 
-            $this->setConfigValue('is_initialized', true);
+            self::setConfigValue('is_initialized', true);
         }
 
         return true;
@@ -60,7 +59,7 @@ class Carousel extends BaseModule
             $uploadDir = THELIA_ROOT . $uploadDir;
         }
 
-        return $uploadDir . DS . Carousel::DOMAIN_NAME;
+        return $uploadDir . DS . self::DOMAIN_NAME;
     }
 
     /**
@@ -89,17 +88,17 @@ class Carousel extends BaseModule
 
         $finder = (new Finder())->files()->name('#.*?\.sql#')->sortByName()->in(__DIR__ . DS . 'Config' . DS .'update');
 
-        if ($finder->count() === 0){
+        if (0 === $finder->count()) {
             return;
         }
+
         $database = new Database($con);
 
         /** @var SplFileInfo $updateSQLFile */
-        foreach ($finder as $updateSQLFile){
-            if (version_compare($currentVersion, str_replace('.sql','', $updateSQLFile->getFilename()), '<')){
-                $database->insertSql(null,[$updateSQLFile->getPathname()]);
+        foreach ($finder as $updateSQLFile) {
+            if (version_compare($currentVersion, str_replace('.sql', '', $updateSQLFile->getFilename()), '<')) {
+                $database->insertSql(null, [$updateSQLFile->getPathname()]);
             }
         }
-
     }
 }
