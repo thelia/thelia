@@ -346,10 +346,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 break;
             case "total_price":
             case "total_price_with_discount":
-                $result = $cart->getTotalAmount(true);
+                $result = $cart->getTotalAmount(true, $taxCountry, $taxState);
                 break;
             case "total_price_without_discount":
-                $result = $cart->getTotalAmount(false);
+                $result = $cart->getTotalAmount(false, $taxCountry, $taxState);
                 break;
             case "total_taxed_price":
             case "total_taxed_price_with_discount":
