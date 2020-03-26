@@ -85,11 +85,6 @@ class BaseModule implements BaseModuleInterface
             try {
                 $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
-                    if ($this->hasPropelSchema()) {
-                        // force models generation for this module
-                        $this->container->get('thelia.propel.init')->init(true);
-                    }
-
                     $this->postActivation($con);
                     $con->commit();
                 }
