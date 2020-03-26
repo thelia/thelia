@@ -17,6 +17,7 @@ use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
+use Thelia\Log\Tlog;
 use TheliaSmarty\Template\Plugins\Module;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyParser;
@@ -108,7 +109,11 @@ class Hook extends AbstractSmartyPlugin
         $content = trim($event->dump());
 
         if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-            $content = self::showHook($hookName, $params) . $content;
+            $content = self::showHook(
+                $hookName,
+                $params,
+                $smarty->getTemplateVars()
+            ) . $content;
         }
 
         $this->hookResults[$hookName] = $content;
@@ -155,37 +160,31 @@ class Hook extends AbstractSmartyPlugin
         return $this->smartyPluginModule;
     }
 
-    protected function showHook($hookName, $params)
+    protected function showHook($hookName, $params, $templateVars)
     {
-        $content = '<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">' . $hookName;
-
-        foreach ($params as $name => $value) {
-            if ($name !== 'location' && $name !== "name") {
-                $type = '';
-                if (is_object($value)) {
-                    $value = get_class($value);
-                    $type = 'object';
-                } elseif (is_array($value)) {
-                    $value = implode(',', $value);
-                    $type = 'array';
-                } elseif (is_int($value)) {
-                    $type = 'float';
-                } elseif (is_int($value)) {
-                    $type = 'int';
-                } elseif (is_string($value)) {
-                    $value = (strlen($value) > 30) ? substr($value, 0, 30) . '...' : $value;
-                    $type = 'string';
-                }
-
-                if ($type !== '') {
-                    $type = '<span style="background-color: #FF7D00; color: #fff">' . $type . '</span> ';
-                }
-
-                $content .= '<span style="background-color: #008000; color: #fff; margin-left: 6px;">' . $name . ' = ' . $type . $value . '</span>';
-            }
+        if (!\class_exists('\Symfony\Component\VarDumper\VarDumper')) {
+            throw new \Exception('For use SHOW_HOOK, you can install dependency symfony/var-dumper');
         }
 
-        return $content . '</div>';
+        ob_start();
+
+        \Symfony\Component\VarDumper\VarDumper::dump([
+            'hook name' => $hookName,
+            'hook parameters' => $params,
+            'hook external variables' => $templateVars
+        ]);
+
+        $content = ob_get_clean();
+
+        return <<<HTML
+<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">
+{$hookName} 
+ <a onclick="this.parentNode.querySelector('.hook-details').style.display = 'block'">Show details</a>
+<div class="hook-details" style="display: none; cursor: pointer;">
+{$content}
+</div>
+</div>
+HTML;
     }
 
     /**
@@ -225,7 +224,7 @@ class Hook extends AbstractSmartyPlugin
 
         if (!$repeat) {
             if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-                $content = self::showHook($hookName, $params) . $content;
+                $content = self::showHook($hookName, $params, $smarty->getTemplateVars()) . $content;
             }
 
             return $content;
@@ -287,9 +286,17 @@ class Hook extends AbstractSmartyPlugin
         // first call
         if ($content === null) {
             if (!array_key_exists($rel, $this->hookResults)) {
-                throw new \InvalidArgumentException(
+                $exception = new \InvalidArgumentException(
                     $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $rel])
                 );
+
+                Tlog::getInstance()->error($exception->getMessage());
+
+                if ($this->debug) {
+                    throw $exception;
+                }
+
+                return '';
             }
 
             $fragments = $this->hookResults[$rel];
@@ -414,9 +421,17 @@ class Hook extends AbstractSmartyPlugin
         }
 
         if (!isset($this->hookResults[$hookName])) {
-            throw new \InvalidArgumentException(
+            $exception = new \InvalidArgumentException(
                 $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $hookName])
             );
+
+            Tlog::getInstance()->error($exception->getMessage());
+
+            if ($this->debug) {
+                throw $exception;
+            }
+
+            return true;
         }
 
         return (is_string($this->hookResults[$hookName]) && '' === $this->hookResults[$hookName]

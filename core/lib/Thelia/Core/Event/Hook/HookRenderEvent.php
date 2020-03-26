@@ -64,7 +64,7 @@ class HookRenderEvent extends BaseHookRenderEvent
     public function dump($glue = '', $before = '', $after = '')
     {
         $ret = '';
-        if (0 !== count($this->fragments)) {
+        if (0 !== \count($this->fragments)) {
             $ret = $before . implode($glue, $this->fragments) . $after;
         }
 

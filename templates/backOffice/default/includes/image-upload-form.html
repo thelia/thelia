@@ -44,11 +44,15 @@ Parameters:
         </div>
     </form>
 
+    {if !$successUrl}
+        {$successUrl = {navigate to="current"}}
+    {/if}
     <div class="existing-image">
         {include file='includes/image-upload-list-ajax.html'
             imageType=$imageType
             parentId=$parentId
             resource=$resource
+            successUrl=$successUrl
         }
     </div>
 
@@ -59,6 +63,7 @@ Parameters:
 <script>
     var imageDropZoneUrl = "{url path="/admin/image/type/%image/%id/save-ajax" image=$imageType id=$parentId}";
     var imageListUrl = "{url path="/admin/image/type/%image/%id/list-ajax" image=$imageType id=$parentId}";
+    var imageSuccessUrl = "{$successUrl nofilter}";
     var imageReorder = "{url path="/admin/image/type/%image/%id/update-position" image=$imageType id=$parentId}";
     var imageListErrorMessage = "{intl l='Can\'t load images, please refresh this page.'}";
     var imageReorderErrorMessage = "{intl l='Can\'t reorder images, please refresh this page.'}";

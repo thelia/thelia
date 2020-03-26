@@ -13,12 +13,6 @@
         "forum": "http://thelia.net/forum",
         "wiki": "http://doc.thelia.net"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/thelia/Propel2"
-        }
-    ],
     "require": {
         "php": "^5.6|^7.0",
         "ircmaxell/password-compat": "1.0.*",
@@ -46,8 +40,7 @@
         "symfony/http-foundation": "2.8.*",
         "symfony/form": "2.8.*",
         "symfony/class-loader": "2.8.*",
-        "symfony/icu": "1.2.*",
-        "symfony/dotenv": "^3.4",
+        "symfony/dotenv": "^3.4|^4.0",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
         "doctrine/cache": "1.5.*",
@@ -59,23 +52,23 @@
         "oyejorge/less.php": "1.7.*",
         "michelf/php-markdown": "1.6.*",
         "smarty/smarty": "3.1.33",
-        "ramsey/array_column": "~1.1",
-        "propel/propel": "dev-thelia-2.4",
         "commerceguys/addressing": "0.8.*",
-        "symfony/cache": "3.4.*",
+        "symfony/cache": "^3.4|^4.0",
         "symfony/polyfill-php56": "^1.0",
         "symfony/polyfill-php70": "^1.0",
         "symfony/polyfill-php71": "^1.0",
         "symfony/polyfill-php72": "^1.0",
         "spipu/html2pdf": "^5.0",
-        "symfony/polyfill-php73": "^1.0"
+        "symfony/polyfill-php73": "^1.0",
+        "symfony/lock": "^3.4|^4.0",
+        "thelia/propel": "dev-thelia-2.4",
+        "symfony/var-dumper": "^2.0|^3.0|^4.0"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",
         "thelia/hooktest-module": "~1.1",
         "thelia/hooktest-template": "~1.1",
-        "phpunit/phpunit": "^5.0",
-        "symfony/var-dumper": "^2.0|^3.0|^4.0"
+        "phpunit/phpunit": "^5.0"
     },
     "minimum-stability": "stable",
     "config": {

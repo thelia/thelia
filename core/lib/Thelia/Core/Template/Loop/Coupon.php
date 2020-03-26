@@ -40,6 +40,7 @@ use Thelia\Type\TypeCollection;
  * @method int[] getId()
  * @method bool|string  getIsEnabled()
  * @method bool getInUse()
+ * @method string getCode()
  * @method string[] getOrder()
  */
 class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -55,6 +56,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('id'),
             Argument::createBooleanOrBothTypeArgument('is_enabled'),
             Argument::createBooleanTypeArgument('in_use'),
+            Argument::createAnyListTypeArgument('code'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -88,6 +90,10 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        if (null !== $code = $this->getCode()) {
+            $search->filterByCode($code, Criteria::IN);
         }
 
         if (isset($isEnabled)) {
@@ -173,6 +179,11 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
         return $search;
     }
 
+    /**
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function parseResults(LoopResult $loopResult)
     {
         /** @var ConditionFactory $conditionFactory */

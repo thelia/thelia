@@ -90,7 +90,7 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $exclude = $this->getExclude();
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 

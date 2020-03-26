@@ -69,7 +69,7 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     protected function isSourceFile(\SplFileInfo $fileInfo)
     {
-        return in_array($fileInfo->getExtension(), $this->source_file_extensions);
+        return \in_array($fileInfo->getExtension(), $this->source_file_extensions);
     }
 
     /**
@@ -198,7 +198,7 @@ class AsseticAssetManager implements AssetManagerInterface
     protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
     {
         if (! empty($filters)) {
-            $filter_list = is_array($filters) ? $filters : explode(',', $filters);
+            $filter_list = \is_array($filters) ? $filters : explode(',', $filters);
 
             foreach ($filter_list as $filter_name) {
                 $filter_name = trim($filter_name);

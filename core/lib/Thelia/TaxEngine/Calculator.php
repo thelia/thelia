@@ -13,6 +13,8 @@
 namespace Thelia\TaxEngine;
 
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
 use Thelia\Model\Country;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
@@ -46,6 +48,43 @@ class Calculator
     public function __construct()
     {
         $this->taxRuleQuery = new TaxRuleQuery();
+    }
+
+    /**
+     * @param Cart $cart
+     * @param Country $country
+     * @param State|null $state
+     *
+     * @return float|int
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public static function getUntaxedDiscount(Cart $cart, Country $country, State $state = null)
+    {
+        if ((int)$cart->getDiscount() === 0) {
+            return 0.0;
+        }
+
+        $cartItems = $cart->getCartItems();
+
+        // Get the average of tax factor to apply it to the discount
+        $cartTaxFactors = [];
+        /** @var CartItem $cartItem */
+        foreach ($cartItems as $cartItem) {
+            $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($cartItem->getProduct()->getTaxRule(), $country, $state);
+
+            $cartItemsTaxFactors = [];
+            foreach ($taxRulesCollection as $taxRule) {
+                /** @var BaseTaxType $taxType */
+                $taxType = $taxRule->getTypeInstance();
+                $cartItemsTaxFactors[] = 1 + $taxType->pricePercentRetriever();
+            }
+
+            $cartTaxFactors[] = array_sum($cartItemsTaxFactors) / count($cartItemsTaxFactors);
+        }
+
+        $cartTaxFactor = array_sum($cartTaxFactors) / count($cartTaxFactors);
+
+        return (1 / $cartTaxFactor) * $cart->getDiscount();
     }
 
     public function load(Product $product, Country $country, State $state = null)
@@ -97,6 +136,26 @@ class Calculator
         return $this;
     }
 
+    public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product)
+    {
+        $this->product = null;
+        $this->taxRulesCollection = null;
+
+        if ($taxRule->getId() === null) {
+            throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
+        }
+        if ($product->getId() === null) {
+            throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
+        }
+
+        $this->product = $product;
+
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule);
+
+        return $this;
+    }
+
+    /** @since 2.4 */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
         $this->product = null;

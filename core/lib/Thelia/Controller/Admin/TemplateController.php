@@ -209,7 +209,7 @@ class TemplateController extends AbstractCrudController
             return $response;
         }
         
-        $template_id = intval($this->getRequest()->get('template_id'));
+        $template_id = \intval($this->getRequest()->get('template_id'));
         
         if ($template_id > 0) {
             try {
@@ -252,7 +252,7 @@ class TemplateController extends AbstractCrudController
             return $response;
         }
 
-        $attribute_id = intval($this->getRequest()->get('attribute_id'));
+        $attribute_id = \intval($this->getRequest()->get('attribute_id'));
 
         if ($attribute_id > 0) {
             $event = new TemplateAddAttributeEvent(
@@ -280,7 +280,7 @@ class TemplateController extends AbstractCrudController
 
         $event = new TemplateDeleteAttributeEvent(
             $this->getExistingObject(),
-            intval($this->getRequest()->get('attribute_id'))
+            \intval($this->getRequest()->get('attribute_id'))
         );
 
         try {
@@ -315,7 +315,7 @@ class TemplateController extends AbstractCrudController
             return $response;
         }
 
-        $feature_id = intval($this->getRequest()->get('feature_id'));
+        $feature_id = \intval($this->getRequest()->get('feature_id'));
 
         if ($feature_id > 0) {
             $event = new TemplateAddFeatureEvent(
@@ -343,7 +343,7 @@ class TemplateController extends AbstractCrudController
 
         $event = new TemplateDeleteFeatureEvent(
             $this->getExistingObject(),
-            intval($this->getRequest()->get('feature_id'))
+            \intval($this->getRequest()->get('feature_id'))
         );
 
         try {

@@ -104,6 +104,25 @@ class URLTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/thelia/index.php/path/to/action', $url);
     }
 
+    public function testAbsoluteUrlAlternateBase()
+    {
+        $this->context->setBaseUrl('/');
+        $url = URL::getInstance()->absoluteUrl('/path/to/action', null, URL::WITH_INDEX_PAGE, 'https://mycdn.myshop.tld/');
+        $this->assertEquals('https://mycdn.myshop.tld/path/to/action', $url);
+
+        $this->context->setBaseUrl('/thelia/');
+        $url = URL::getInstance()->absoluteUrl('/path/to/action',null, URL::WITH_INDEX_PAGE, 'https://mycdn.myshop.tld/');
+        $this->assertEquals('https://mycdn.myshop.tld/path/to/action', $url);
+
+        $this->context->setBaseUrl('/thelia');
+        $url = URL::getInstance()->absoluteUrl('/path/to/action',null, URL::WITH_INDEX_PAGE, 'https://mycdn.myshop.tld/');
+        $this->assertEquals('https://mycdn.myshop.tld/path/to/action', $url);
+
+        $this->context->setBaseUrl('/thelia/index.php');
+        $url = URL::getInstance()->absoluteUrl('/path/to/action', null, URL::WITH_INDEX_PAGE, 'https://mycdn.myshop.tld/');
+        $this->assertEquals('https://mycdn.myshop.tld/path/to/action', $url);
+    }
+
     public function testAbsoluteUrlOnAbsolutePath()
     {
         $this->context->setBaseUrl('/thelia/index.php');

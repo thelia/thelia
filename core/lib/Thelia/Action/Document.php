@@ -102,7 +102,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
         // Update the event with file path and file URL
         $event->setDocumentPath($documentUrl);
-        $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE));
+        $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
     }
 
     /**

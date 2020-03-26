@@ -259,12 +259,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="propel.listener" class="Thelia\Core\EventListener\PropelListener">
-            <argument type="service" id="thelia.propel.init"/>
-            <argument>%thelia.propel.table_map_classes%</argument>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <!-- Serializers -->
         <service id="thelia.serializer.manager" class="Thelia\Core\Serializer\SerializerManager" />
 

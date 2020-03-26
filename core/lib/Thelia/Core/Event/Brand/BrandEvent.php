@@ -19,6 +19,7 @@ use Thelia\Model\Brand;
  * Class BrandEvent
  * @package Thelia\Core\Event\Brand
  * @author  Franck Allimant <franck@cqfdev.fr>
+ * @deprecated since 2.4, please use \Thelia\Model\Event\BrandEvent
  */
 class BrandEvent extends ActionEvent
 {

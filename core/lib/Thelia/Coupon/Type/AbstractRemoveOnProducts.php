@@ -85,7 +85,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
         $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : array();
 
-        if (! is_array($this->product_list)) {
+        if (! \is_array($this->product_list)) {
             $this->product_list = array($this->product_list);
         }
 
@@ -109,7 +109,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            if (in_array($cartItem->getProduct()->getId(), $this->product_list)) {
+            if (\in_array($cartItem->getProduct()->getId(), $this->product_list)) {
                 if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                     $discount += $this->getCartItemDiscount($cartItem);
                 }

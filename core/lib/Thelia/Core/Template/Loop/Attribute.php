@@ -113,7 +113,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                 foreach ($products as $product) {
                     $tplId = $product->getTemplateId();
 
-                    if (! is_null($tplId)) {
+                    if (! \is_null($tplId)) {
                         $template[] = $tplId;
                     }
                 }

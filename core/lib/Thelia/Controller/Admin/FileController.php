@@ -310,7 +310,14 @@ class FileController extends BaseAdminController
     {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
-        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+
+        $successUrl = $this->getRequest()->get('successUrl');
+
+        $args = [
+            'imageType'   => $parentType,
+            'parentId'    => $parentId,
+            'successUrl' => $successUrl
+        ];
 
         return $this->render('includes/image-upload-list-ajax', $args);
     }
@@ -344,7 +351,13 @@ class FileController extends BaseAdminController
     {
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
-        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+        $successUrl = $this->getRequest()->get('successUrl');
+
+        $args = [
+            'imageType'   => $parentType,
+            'parentId'    => $parentId,
+            'successUrl' => $successUrl
+        ];
 
         return $this->render('includes/image-upload-form', $args);
     }

@@ -47,7 +47,7 @@ class MoneyFormat extends NumberFormat
         
         if ($remove_zero_decimal === true) {
             if($number == (int)$number) {
-                $number = intval($number);
+                $number = \intval($number);
             }
         }
 
@@ -80,7 +80,7 @@ class MoneyFormat extends NumberFormat
         
         if ($remove_zero_decimal === true) {
             if($number == (int)$number) {
-                $number = intval($number);
+                $number = \intval($number);
             }
         }
 

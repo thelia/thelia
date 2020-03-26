@@ -127,31 +127,29 @@ class URL
      * @param string  $path       the relative path
      * @param array   $parameters An array of parameters
      * @param boolean $path_only  if true (PATH_TO_FILE), getIndexPage() will  not be added
+     * @param string $alternateBaseUrl  if not null, this URL is unsed instead of the base URL. Useful for creating CDN URLs
      *
      * @return string The generated URL
      */
-    public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE)
+    public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE, $alternateBaseUrl = null)
     {
         // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
-            // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
-            // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
-            // starting at web server root. For example, if Thelia is installed in /thelia2, we got something like /thelia2/my/path
-            // As base URL also contains /thelia2 (e.g. http://some.server.com/thelia2), we end up with
-            // http://some.server.com/thelia2/thelia2/my/path, instead of http://some.server.com/thelia2/my/path
-            // We have to compensate for this.
-            $rcbu = $this->requestContext->getBaseUrl();
+            if (empty($alternateBaseUrl)) {
+                // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
+                // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
+                // starting at web server root. For example, if Thelia is installed in /thelia2, we got something like /thelia2/my/path
+                // As base URL also contains /thelia2 (e.g. http://some.server.com/thelia2), we end up with
+                // http://some.server.com/thelia2/thelia2/my/path, instead of http://some.server.com/thelia2/my/path
+                // We have to compensate for this.
+                $rcbu = $this->requestContext->getBaseUrl();
 
-            $hasSubdirectory = ! empty($rcbu) && (0 === strpos($path, $rcbu));
+                $hasSubdirectory = !empty($rcbu) && (0 === strpos($path, $rcbu));
 
-            $base_url = $this->getBaseUrl($hasSubdirectory);
-
-            /* Seems no longer required
-            // TODO fix this ugly patch
-            if (strpos($path, "index_dev.php")) {
-                $path = str_replace('index_dev.php', '', $path);
+                $base_url = $this->getBaseUrl($hasSubdirectory);
+            } else {
+                $base_url = $alternateBaseUrl;
             }
-            */
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
@@ -171,7 +169,7 @@ class URL
         $queryString = '';
         $anchor      = '';
 
-        if (! is_null($parameters)) {
+        if (! \is_null($parameters)) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', $base);

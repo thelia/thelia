@@ -78,7 +78,7 @@ class ModuleInstallForm extends BaseForm
             try {
                 // get the first directory
                 $moduleFiles = $this->getDirContents($modulePath);
-                if (count($moduleFiles['directories']) !== 1) {
+                if (\count($moduleFiles['directories']) !== 1) {
                     throw new Exception(
                         Translator::getInstance()->trans(
                             "Your zip must contain 1 root directory which is the root folder directory of your module"

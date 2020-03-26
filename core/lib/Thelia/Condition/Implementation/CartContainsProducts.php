@@ -68,14 +68,14 @@ class CartContainsProducts extends ConditionAbstract
         }
 
         // Be sure that the value is an array, make one if required
-        if (! is_array($values[self::PRODUCTS_LIST])) {
+        if (! \is_array($values[self::PRODUCTS_LIST])) {
             $values[self::PRODUCTS_LIST] = array($values[self::PRODUCTS_LIST]);
         }
 
         // Check that at least one product is selected
         if (empty($values[self::PRODUCTS_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(),
+                \get_class(),
                 self::PRODUCTS_LIST
             );
         }

@@ -99,7 +99,7 @@ class CouponFactory
 
         if ($couponInterface && $couponInterface->getConditions()->count() == 0) {
             throw new InvalidConditionException(
-                get_class($couponInterface)
+                \get_class($couponInterface)
             );
         }
 

@@ -23,7 +23,7 @@ class Sale extends BaseSale
      */
     public function hasStartDate()
     {
-        return ! is_null($this->getStartDate());
+        return ! \is_null($this->getStartDate());
     }
 
     /**
@@ -31,7 +31,7 @@ class Sale extends BaseSale
      */
     public function hasEndDate()
     {
-        return ! is_null($this->getEndDate());
+        return ! \is_null($this->getEndDate());
     }
 
     /**

@@ -42,7 +42,7 @@
             {$button['title'] = {intl l='View'}}
         {/if}
         {if !$button['icon']['class']}
-            {$button['icon']['class'] = 'glyphicon glyphicon-eye'}
+            {$button['icon']['class'] = 'glyphicon glyphicon-eye-open'}
         {/if}
         {if $button['auth'] && !$button['auth']['access']}
             {$button['auth']['access'] = 'VIEW'}
@@ -144,7 +144,7 @@
             {$button['title'] = {intl l='Duplicate'}}
         {/if}
         {if !$button['icon']['class']}
-            {$button['icon']['class'] = 'glyphicon glyphicon-duplicate'}
+            {$button['icon']['class'] = 'glyphicon glyphicon-plus-sign'}
         {/if}
         {if $button['auth'] && !$button['auth']['access']}
             {$button['auth']['access'] = 'CREATE'}
@@ -201,6 +201,32 @@
         {if $button['auth'] && !$button['auth']['access']}
             {$button['auth']['access'] = 'VIEW'}
         {/if}
+    {elseif $button['type'] == 'print'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-default'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Print'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-print'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {elseif $button['type'] == 'download'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-default'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Download'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-download-alt'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
     {/if}
 
     {if $button['auth'] && $button['auth']['resource']}
@@ -226,6 +252,11 @@
     {foreach from=$button['data'] key=name item=data}
         data-{$name}="{$data}"
     {/foreach}
+    {/if}
+    {if $button['attr'] && $button['attr']|is_array}
+        {foreach from=$button['attr'] key=name item=data}
+            {$name}="{$data}"
+        {/foreach}
     {/if}
     >
     {if $button['icon']['class']}

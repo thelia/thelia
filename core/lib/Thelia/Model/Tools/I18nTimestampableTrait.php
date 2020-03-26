@@ -23,12 +23,12 @@ trait I18nTimestampableTrait
 {
     public function postSave(ConnectionInterface $con = null)
     {
-        parent::postSave($con);
-
         $this->getBaseQueryObject()
             ->filterById($this->getId())
             ->update([$this->getUpdatedAtColumnName() => new \DateTime()], $con)
         ;
+
+        parent::postSave($con);
     }
 
     /**

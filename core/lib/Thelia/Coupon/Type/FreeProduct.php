@@ -121,7 +121,7 @@ class FreeProduct extends AbstractRemoveOnProducts
             array()
         );
 
-        if (! is_array($cartItemIdList)) {
+        if (! \is_array($cartItemIdList)) {
             $cartItemIdList = array();
         }
 
@@ -186,7 +186,7 @@ class FreeProduct extends AbstractRemoveOnProducts
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            if (in_array($cartItem->getProduct()->getId(), $this->product_list)) {
+            if (\in_array($cartItem->getProduct()->getId(), $this->product_list)) {
                 if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                     $eligibleProduct = $cartItem;
                     break;
@@ -258,7 +258,7 @@ class FreeProduct extends AbstractRemoveOnProducts
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === self::OFFERED_PRODUCT_ID) {
-            if (floatval($fieldValue) < 0) {
+            if (\floatval($fieldValue) < 0) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select the offered product'

@@ -42,7 +42,7 @@ class CategoryQuery extends BaseCategoryQuery
     {
         $result = [];
 
-        if (is_array($categoryId)) {
+        if (\is_array($categoryId)) {
             foreach ($categoryId as $categorySingleId) {
                 $result = array_merge($result, (array) self::findAllChild($categorySingleId, $depth, $currentPos));
             }
@@ -76,7 +76,7 @@ class CategoryQuery extends BaseCategoryQuery
      */
     public static function getCategoryTreeIds($categoryId, $depth = 1)
     {
-        $result = is_array($categoryId) ? $categoryId : [ $categoryId ];
+        $result = \is_array($categoryId) ? $categoryId : [ $categoryId ];
 
         if ($depth > 1) {
             $categories = self::create()
