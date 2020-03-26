@@ -24,5 +24,4 @@ return array(
     'Summary' => 'Résumé',
     'The detailed description.' => 'La description détaillée.',
     'Title' => 'Titre',
-    'YYYY-MM-DD' => 'AAAA-MM-JJ',
 );
