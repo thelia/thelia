@@ -121,7 +121,9 @@ class ProductSaleElements extends BaseProductSaleElements
 
         if ($discount > 0) {
             $price = $price * (1-($discount/100));
-            $promoPrice = $promoPrice * (1-($discount/100));
+            if (ConfigQuery::getApplyCustomerDiscountOnPromoPrices()) {
+                $promoPrice = $promoPrice * (1 - ($discount / 100));
+            }
         }
 
         $productPriceTools = new ProductPriceTools($price, $promoPrice);

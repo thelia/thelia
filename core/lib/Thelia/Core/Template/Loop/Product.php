@@ -265,7 +265,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if (!$this->getBackendContext()
                 && $securityContext->hasCustomerUser()
-                && $securityContext->getCustomerUser()->getDiscount() > 0) {
+                && $securityContext->getCustomerUser()->getDiscount() > 0
+                && ConfigQuery::getApplyCustomerDiscountOnPromoPrices()) {
                 $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
             }
             try {
@@ -323,9 +324,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         foreach ($loopResult->getResultDataCollection() as $product) {
             $loopResultRow = new LoopResultRow($product);
 
+            $isPromo = $product->getVirtualColumn('main_product_is_promo');
+
             $price = $product->getRealLowestPrice();
 
-            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
+            if ($securityContext->hasCustomerUser()
+                && $securityContext->getCustomerUser()->getDiscount() > 0
+                && (! $isPromo || ConfigQuery::getApplyCustomerDiscountOnPromoPrices())) {
                 $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
             }
 
@@ -344,7 +349,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("BEST_PRICE", $price)
                 ->set("BEST_PRICE_TAX", $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE", $taxedPrice)
-                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_PROMO", $isPromo)
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
@@ -589,7 +594,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->addJoinObject($priceJoin, 'price_join')
                 ->addJoinCondition('price_join', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-            if ($defaultCurrency->getId() != $currency->getId()) {
+            if ($defaultCurrency->getId() !== $currency->getId()) {
                 $priceJoinDefaultCurrency = new Join();
                 $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price' . $defaultCurrencySuffix);
                 $priceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);

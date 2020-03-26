@@ -326,5 +326,15 @@ class ConfigQuery extends BaseConfigQuery
     {
         return self::read("minimum_admin_password_length", 4);
     }
+
+    /**
+     * Return true if customer discount is applicable to promo prices
+     *
+     * @return mixed
+     */
+    public static function getApplyCustomerDiscountOnPromoPrices()
+    {
+        return self::read('apply_customer_discount_on_promo_prices', true);
+    }
 }
 // ConfigQuery
