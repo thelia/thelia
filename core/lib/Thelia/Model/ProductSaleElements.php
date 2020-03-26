@@ -41,7 +41,7 @@ class ProductSaleElements extends BaseProductSaleElements
         try {
             $amount = $this->getVirtualColumn($virtualColumnName);
 
-            if ($discount > 0) {
+            if ($discount > 0 && ConfigQuery::read('apply_customer_discount_on_promo_prices', true)) {
                 $amount = $amount * (1-($discount/100));
             }
         } catch (PropelException $e) {
@@ -119,7 +119,7 @@ class ProductSaleElements extends BaseProductSaleElements
             $promoPrice = $productPrice->getPromoPrice();
         }
 
-        if ($discount > 0) {
+        if ($discount > 0 && ConfigQuery::read('apply_customer_discount_on_promo_prices', true)) {
             $price = $price * (1-($discount/100));
             $promoPrice = $promoPrice * (1-($discount/100));
         }
