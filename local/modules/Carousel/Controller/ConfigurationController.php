@@ -128,6 +128,7 @@ class ConfigurationController extends BaseAdminController
 
                 $carousel
                     ->setPosition($this->getFormFieldValue($updateForm, 'position', $id))
+                    ->setDisable($this->getFormFieldValue($updateForm, 'disable', $id))
                     ->setUrl($this->getFormFieldValue($updateForm, 'url', $id))
                     ->setLocale($locale)
                     ->setTitle($this->getFormFieldValue($updateForm, 'title', $id))
@@ -135,7 +136,11 @@ class ConfigurationController extends BaseAdminController
                     ->setChapo($this->getFormFieldValue($updateForm, 'chapo', $id))
                     ->setDescription($this->getFormFieldValue($updateForm, 'description', $id))
                     ->setPostscriptum($this->getFormFieldValue($updateForm, 'postscriptum', $id))
-                ->save();
+                    ->setGroup($this->getFormFieldValue($updateForm, 'group', $id))
+                    ->setLimited($this->getFormFieldValue($updateForm, 'limited', $id))
+                    ->setStartDate($this->getFormFieldValue($updateForm, 'start_date', $id))
+                    ->setEndDate($this->getFormFieldValue($updateForm, 'end_date', $id))
+                    ->save();
             }
 
             $response =  $this->redirectToConfigurationPage();
