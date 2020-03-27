@@ -11,6 +11,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
 use Thelia\Model\Country;
 use Thelia\Model\State;
+use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
 {
@@ -141,12 +142,16 @@ class Cart extends BaseCart
     }
 
     /**
-     *
      * @see getTaxedAmount same as this method but the amount is without taxes
-     * @param  bool         $discount
-     * @return float|int
+     *
+     * @param bool $discount
+     * @param \Thelia\Model\Country|null $country
+     * @param \Thelia\Model\State|null $state
+     *
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalAmount($discount = true)
+    public function getTotalAmount($discount = true, Country $country = null, State $state = null)
     {
         $total = 0;
 
@@ -159,8 +164,7 @@ class Cart extends BaseCart
         }
 
         if ($discount) {
-            // discount value is taxed see ISSUE #1476
-            $total -= $this->getDiscount();
+            $total -= $this->getDiscount(false, $country, $state);
 
             if ($total < 0) {
                 $total = 0;
@@ -176,7 +180,7 @@ class Cart extends BaseCart
      */
     public function getTotalVAT($taxCountry, $taxState = null)
     {
-        return ($this->getTaxedAmount($taxCountry, true, $taxState) - $this->getTotalAmount(true));
+        return ($this->getTaxedAmount($taxCountry, true, $taxState) - $this->getTotalAmount(true, $taxCountry, $taxState));
     }
 
     /**
@@ -220,5 +224,22 @@ class Cart extends BaseCart
 
         // An empty cart is not virtual.
         return $this->getCartItems()->count() > 0;
+    }
+
+    /**
+     * @param bool $withTaxes
+     * @param \Thelia\Model\Country|null $country
+     * @param \Thelia\Model\State|null $state
+     *
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getDiscount($withTaxes = true, Country $country = null, State $state = null)
+    {
+        if ($withTaxes || null === $country) {
+            return parent::getDiscount();
+        }
+
+        return Calculator::getUntaxedDiscount($this, $country, $state);
     }
 }

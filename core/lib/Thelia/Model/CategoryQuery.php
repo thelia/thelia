@@ -66,6 +66,52 @@ class CategoryQuery extends BaseCategoryQuery
         return $result;
     }
 
+    /**
+     * Find all IDs of child categories of a given category
+     *
+     * @param int|int[] $categoryId
+     * @param int $depth
+     * @param int $currentPos
+     * @return array
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public static function findAllChildId($categoryId, $depth = 0, $currentPos = 0)
+    {
+        static $cache = [];
+
+        $result = [];
+
+        if (is_array($categoryId)) {
+            foreach ($categoryId as $categorySingleId) {
+                $result = array_merge($result, self::findAllChildId($categorySingleId, $depth, $currentPos));
+            }
+        } else {
+            if (! isset($cache[$categoryId])) {
+                $currentPos++;
+
+                if ($depth == $currentPos && $depth != 0) {
+                    return [];
+                }
+
+                $subCategories = self::create()
+                    ->filterByParent($categoryId)
+                    ->select(['id'])
+                    ->find()
+                    ->getData();
+
+                foreach ($subCategories as $subCategoryId) {
+                    array_push($result, $subCategoryId);
+                    $result = array_merge($result, self::findAllChildId($subCategoryId, $depth, $currentPos));
+                }
+
+                $cache[$categoryId] = $result;
+            } else {
+                $result = $cache[$categoryId];
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Return all category IDs of a category tree, starting at $categoryId, up to a depth of $depth

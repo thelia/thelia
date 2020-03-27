@@ -18,4 +18,5 @@ return array(
     'Summary' => 'Summary',
     'The detailed description.' => 'The detailed description.',
     'Title' => 'Title',
+    'YYYY-MM-DD' => 'AAAA-MM-JJ',
 );

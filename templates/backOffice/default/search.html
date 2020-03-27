@@ -590,7 +590,7 @@
                                             [
                                                 'type' => 'edit',
                                                 'title' => {intl l='Edit this content'},
-                                                'href' => {url path='/admin/products/update' product_id=$ID page=$page},
+                                                'href' => {url path="/admin/content/update/{$ID}"},
                                                 'auth' => ['resource' => 'admin.content']
                                             ],
                                             [
