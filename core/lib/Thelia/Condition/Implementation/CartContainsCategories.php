@@ -99,17 +99,14 @@ class CartContainsCategories extends ConditionAbstract
 
             /** @var Category $category */
             foreach ($categories as $category) {
-                if (! $this->conditionValidator->variableOpComparison(
+                if ($this->conditionValidator->variableOpComparison(
                     $category->getId(),
                     $this->operators[self::CATEGORIES_LIST],
                     $this->values[self::CATEGORIES_LIST]
                 )) {
-                    // cart item doesn't match go to next cart item
-                    continue 2;
+                    return true;
                 }
             }
-            // cart item match
-            return true;
         }
         return false;
     }

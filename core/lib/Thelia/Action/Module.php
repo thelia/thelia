@@ -376,7 +376,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         // Update the module
         $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
-        $moduleManagement = new ModuleManagement();
+        $moduleManagement = new ModuleManagement($this->container);
         $file = new SplFileInfo($moduleDescriptorFile);
         $module = $moduleManagement->updateModule($file, $this->container);
 

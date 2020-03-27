@@ -12,10 +12,14 @@
 
 namespace Thelia\Command;
 
+use Propel\Generator\Builder\Util\SchemaReader;
+use Propel\Generator\Exception\SchemaException;
+use Propel\Generator\Model\Schema;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\PropelInitService;
+use Thelia\Module\Validator\ModuleValidator;
 
 /**
  * base class for module commands
@@ -73,6 +77,12 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
                 sprintf("%s module name is not a valid name, it must be in CamelCase. (ex: MyModuleName)", $name)
             );
         }
+    }
+
+    protected function checkModuleSchema()
+    {
+        $moduleValidator = new ModuleValidator($this->moduleDirectory);
+        $moduleValidator->validate();
     }
 
     protected function generateGlobalSchemaForModule()
