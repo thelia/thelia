@@ -30,6 +30,7 @@ use Thelia\Tools\I18n;
 
 /**
  * Class OrderExport
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class OrderExport extends AbstractExport
@@ -74,32 +75,13 @@ class OrderExport extends AbstractExport
         'invoice_address_CITY' => 'invoice_city',
         'invoice_address_country_TITLE' => 'invoice_country',
         'invoice_address_PHONE' => 'invoice_phone',
-//        'product_TITLE' => 'product_title',
-//        'product_PRICE' => 'price',
-//        'product_TAXED_PRICE' => 'taxed_price',
         'currency_CODE' => 'currency',
-//        'product_WAS_IN_PROMO' => 'was_in_promo',
-//        'product_QUANTITY' => 'quantity',
-//        'product_TAX' => 'tax_amount',
         'tax_TITLE' => 'tax_title'
     ];
 
     public function current()
     {
-        do {
-            $order = parent::current();
-
-            $getNext = false;
-            if ($this->rangeDate !== null
-                && (
-                    $order[OrderTableMap::COL_CREATED_AT] < $this->rangeDate['start']
-                    || $order[OrderTableMap::COL_CREATED_AT] > $this->rangeDate['end']
-                )
-            ) {
-                $this->next();
-                $getNext = true;
-            }
-        } while ($getNext && $this->valid());
+        $order = parent::current();
 
         $locale = $this->language->getLocale();
 
@@ -199,15 +181,11 @@ class OrderExport extends AbstractExport
                 'product_PRICE',
                 'product_TAX',
                 'tax_TITLE',
-                // PRODUCT_TTC_PRICE
                 'product_QUANTITY',
                 'product_WAS_IN_PROMO',
-                // ORDER_TOTAL_TTC
                 OrderTableMap::COL_DISCOUNT,
                 'coupon_COUPONS',
-                // TOTAL_WITH_DISCOUNT
                 OrderTableMap::COL_POSTAGE,
-                // total ttc +postage
                 'payment_module_TITLE',
                 OrderTableMap::COL_INVOICE_REF,
                 OrderTableMap::COL_DELIVERY_REF,
@@ -305,6 +283,15 @@ class OrderExport extends AbstractExport
 
     protected function getData()
     {
-        return new OrderQuery;
+        $orderQuery = new OrderQuery();
+
+        if ($this->rangeDate !== null) {
+            $orderQuery
+                ->filterByCreatedAt($this->rangeDate['start'], Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt($this->rangeDate['end'], Criteria::LESS_EQUAL)
+            ;
+        }
+
+        return $orderQuery;
     }
 }

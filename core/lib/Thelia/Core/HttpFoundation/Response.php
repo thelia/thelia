@@ -14,6 +14,8 @@ namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
+
 
 /**
  * extends Thelia\Core\HttpFoundation\Response for adding some helpers
@@ -31,7 +33,10 @@ class Response extends BaseResponse
      */
     public function sendContent()
     {
-        Tlog::getInstance()->write($this->content);
+	//ConfigQuery can be not already generated in cache so we must check it
+        if (class_exists('ConfigQuery')) {
+            Tlog::getInstance()->write($this->content);
+        }
 
         parent::sendContent();
     }

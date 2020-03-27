@@ -43,7 +43,7 @@
                                 ]}
                             </caption>
                             <thead>
-    	                        <tr>	                           
+    	                        <tr>
                                    <th>{intl l="Zone name"}</th>
                                    <th>{intl l="Included countries"}</th>
                                    <th>{intl l="Assigned modules"}</th>
@@ -78,7 +78,7 @@
                                         {/elseloop}
                                     </td>
                                     <td>
-                                        {loop name="module-area" type="module" area=$ID backend_context="1"}
+                                        {loop name="module-area" type="module" area=$ID backend_context="1" order="code"}
                                             {$CODE} - {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL}<br />{/if}
                                         {/loop}
                                         {elseloop rel="module-area"}
@@ -123,7 +123,7 @@
 
     </div>
 </div>
-    
+
     {* Adding a new Shipping zone *}
 
     {* Capture the dialog body, to pass it to the generic dialog *}

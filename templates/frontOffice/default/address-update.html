@@ -198,6 +198,7 @@
                         <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                         <div class="control-input col-sm-5">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                               {loop type="country" name="country.list" order="alpha"}
                                 <option value="{$ID}"
                                     {if $value}
                                         {if $value == $ID}

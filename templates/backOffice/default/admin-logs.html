@@ -110,7 +110,7 @@
                                 <p class="form-control-static"><strong>{intl l='Modules'} :</strong></p>
 
 	                            <div class="row">
-	                            {loop type="module" name="modules-list" backend_context="1"}
+	                            {loop type="module" name="modules-list" backend_context="1" order="code"}
 	                                <div class="col-md-3">
                                         <label class="checkbox-inline">
 	                                        <input id="module_{$ID}" data-id="{$CODE}" class="js-module" type="checkbox" checked> {$CODE} - {$TITLE}
