@@ -14,12 +14,15 @@ namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
+use SplFileObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
 /**
  * Class AbstractExport
+ *
+ * @deprecated since 2.4, please use a specific AbstractExport (like JsonFileAbstractExport).
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 abstract class AbstractExport implements \Iterator
@@ -45,7 +48,7 @@ abstract class AbstractExport implements \Iterator
     const USE_RANGE_DATE = false;
 
     /**
-     * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
+     * @var SplFileObject|\Propel\Runtime\Util\PropelModelPager Data to export
      */
     private $data;
 
@@ -53,6 +56,11 @@ abstract class AbstractExport implements \Iterator
      * @var boolean True if data is array, false otherwise
      */
     private $dataIsArray;
+
+    /**
+     *  @var boolean True if data is a path to a JSON file, false otherwise
+     */
+    private $dataIsJSONFile;
 
     /**
      * @var ContainerInterface
@@ -101,6 +109,17 @@ abstract class AbstractExport implements \Iterator
 
     public function current()
     {
+        if ($this->dataIsJSONFile) {
+            /** @var resource $file */
+            $result = json_decode($this->data->current(), true);
+
+            if($result != null){
+                return $result;
+            }
+
+            return [];
+        }
+
         if ($this->dataIsArray) {
             return current($this->data);
         }
@@ -117,6 +136,10 @@ abstract class AbstractExport implements \Iterator
 
     public function key()
     {
+        if ($this->dataIsJSONFile) {
+            return $this->data->key();
+        }
+
         if ($this->dataIsArray) {
             return key($this->data);
         }
@@ -130,7 +153,9 @@ abstract class AbstractExport implements \Iterator
 
     public function next()
     {
-        if ($this->dataIsArray) {
+        if ($this->dataIsJSONFile) {
+            $this->data->next();
+        } else if ($this->dataIsArray) {
             next($this->data);
         } else {
             $this->data->getIterator()->next();
@@ -148,6 +173,20 @@ abstract class AbstractExport implements \Iterator
 
         if ($this->data === null) {
             $data = $this->getData();
+
+            // Check if $data is a path to a json file
+            if (\is_string($data)
+                && ".json" === substr($data, -5)
+                && file_exists($data))
+            {
+                $this->data = new \SplFileObject($data, 'r');
+                $this->data->setFlags(SPLFileObject::READ_AHEAD);
+                $this->dataIsJSONFile = true;
+
+                $this->data->rewind();
+
+                return;
+            }
 
             if (\is_array($data)) {
                 $this->data = $data;
@@ -174,6 +213,10 @@ abstract class AbstractExport implements \Iterator
 
     public function valid()
     {
+        if($this->dataIsJSONFile) {
+            return $this->data->valid();
+        }
+
         if ($this->dataIsArray) {
             return key($this->data) !== null;
         }
@@ -418,6 +461,12 @@ abstract class AbstractExport implements \Iterator
                 $fieldAlias = $value;
             }
 
+            if($this->dataIsJSONFile){
+                $fieldName = substr($fieldName, strripos($fieldName,'.'));
+                $fieldName = str_replace('.', '', $fieldName);
+                $fieldName = strtolower($fieldName);
+            }
+
             $processedData[$fieldAlias] = null;
             if (array_key_exists($fieldName, $data)) {
                 $processedData[$fieldAlias] = $data[$fieldName];
@@ -476,7 +525,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Get data to export
      *
-     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
+     * @return string|array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
      */
     abstract protected function getData();
 }

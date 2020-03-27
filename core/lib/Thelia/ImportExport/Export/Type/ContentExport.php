@@ -12,17 +12,15 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
-use Thelia\ImportExport\Export\AbstractExport;
+use PDO;
+use Propel\Runtime\Propel;
+use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
-use Thelia\Model\ContentQuery;
 use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentI18nTableMap;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Map\FolderI18nTableMap;
-use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Map\RewritingUrlTableMap;
 
 /**
@@ -30,7 +28,7 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ContentExport extends AbstractExport
+class ContentExport extends JsonFileAbstractExport
 {
     const FILE_NAME = 'content';
 
@@ -42,18 +40,18 @@ class ContentExport extends AbstractExport
 
     protected $orderAndAliases = [
         ContentTableMap::COL_ID => 'id',
-        'content_TITLE' => 'title',
-        'content_CHAPO' => 'chapo',
-        'content_DESCRIPTION' => 'description',
-        'content_CONCLUSION' => 'conclusion',
+        ContentI18nTableMap::COL_TITLE => 'title',
+        ContentI18nTableMap::COL_CHAPO => 'chapo',
+        ContentI18nTableMap::COL_DESCRIPTION => 'description',
+        ContentI18nTableMap::COL_POSTSCRIPTUM => 'conclusion',
         ContentTableMap::COL_VISIBLE => 'visible',
-        'content_seo_TITLE' => 'seo_title',
-        'content_seo_DESCRIPTION' => 'seo_description',
-        'content_seo_KEYWORDS' => 'seo_keywords',
-        'url_URL' => 'url',
-        'folder_ID' => 'folder_id',
-        'folder_IS_DEFAULT' => 'is_default_folder',
-        'folder_TITLE' => 'folder_title'
+        ContentI18nTableMap::COL_META_TITLE => 'seo_title',
+        ContentI18nTableMap::COL_META_DESCRIPTION => 'seo_description',
+        ContentI18nTableMap::COL_META_KEYWORDS => 'seo_keywords',
+        RewritingUrlTableMap::COL_URL => 'url',
+        ContentFolderTableMap::COL_FOLDER_ID => 'folder_id',
+        ContentFolderTableMap::COL_DEFAULT_FOLDER => 'is_default_folder',
+        FolderI18nTableMap::COL_TITLE=> 'folder_title'
     ];
 
     /**
@@ -74,51 +72,42 @@ class ContentExport extends AbstractExport
     {
         $locale = $this->language->getLocale();
 
-        $contentI18nJoin = new Join(ContentTableMap::COL_ID, ContentI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
-        $folderI18nJoin = new Join(FolderTableMap::COL_ID, FolderI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
-        $urlJoin = new Join(ContentTableMap::COL_ID, RewritingUrlTableMap::COL_VIEW_ID, Criteria::LEFT_JOIN);
-
-        $query = ContentQuery::create()
-            ->addSelfSelectColumns()
-            ->useContentFolderQuery(null, Criteria::LEFT_JOIN)
-                ->useFolderQuery(null, Criteria::LEFT_JOIN)
-                    ->addJoinObject($folderI18nJoin, "folder_i18n_join")
-                    ->addJoinCondition("folder_i18n_join", FolderI18nTableMap::COL_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
-                    ->addAsColumn("folder_TITLE", FolderI18nTableMap::COL_TITLE)
-                    ->addAsColumn("folder_ID", FolderTableMap::COL_ID)
-                ->endUse()
-                ->addAsColumn("folder_IS_DEFAULT", ContentFolderTableMap::COL_DEFAULT_FOLDER)
-            ->endUse()
-            ->addJoinObject($contentI18nJoin, "content_i18n_join")
-            ->addJoinCondition("content_i18n_join", ContentI18nTableMap::COL_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
-            ->addAsColumn("content_TITLE", ContentI18nTableMap::COL_TITLE)
-            ->addAsColumn("content_CHAPO", ContentI18nTableMap::COL_CHAPO)
-            ->addAsColumn("content_DESCRIPTION", ContentI18nTableMap::COL_DESCRIPTION)
-            ->addAsColumn("content_CONCLUSION", ContentI18nTableMap::COL_POSTSCRIPTUM)
-            ->addAsColumn("content_seo_TITLE", ContentI18nTableMap::COL_META_TITLE)
-            ->addAsColumn("content_seo_DESCRIPTION", ContentI18nTableMap::COL_META_DESCRIPTION)
-            ->addAsColumn("content_seo_KEYWORDS", ContentI18nTableMap::COL_META_KEYWORDS)
-            ->addJoinObject($urlJoin, "url_rewriting_join")
-            ->addJoinCondition(
-                "url_rewriting_join",
-                RewritingUrlTableMap::COL_VIEW . " = ?",
-                (new Content())->getRewrittenUrlViewName(),
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addJoinCondition(
-                "url_rewriting_join",
-                RewritingUrlTableMap::COL_VIEW_LOCALE . " = ?",
-                $locale,
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addAsColumn("url_URL", RewritingUrlTableMap::COL_URL)
-            ->groupBy(ContentTableMap::COL_ID)
-            ->groupBy("folder_ID")
-            ->orderById()
+        $con = Propel::getConnection();
+        $query = 'SELECT 
+                        content.id as "content.id", 
+                        content_i18n.title as "content_i18n.title",
+                        content_i18n.chapo as "content_i18n.chapo",
+                        content_i18n.description as "content_i18n.description",
+                        content_i18n.postscriptum as "content_i18n.postscriptum",
+                        content.visible as "content.visible",
+                        content_i18n.meta_title as "content_i18n.meta_title",
+                        content_i18n.meta_description as "content_i18n.meta_description",
+                        content_i18n.meta_keywords as "content_i18n.meta_keywords",
+                        rewriting_url.url as "rewriting_url.url",
+                        content_folder.folder_id as "content_folder.folder_id",
+                        content_folder.default_folder as "content_folder.default_folder",
+                        folder_i18n.title as "folder_i18n.title"
+                    FROM content
+                    LEFT JOIN content_i18n ON content_i18n.id = content.id AND content_i18n.locale = :locale
+                    LEFT JOIN content_folder ON content_folder.content_id = content.id
+                    LEFT JOIN folder_i18n ON folder_i18n.id = content_folder.folder_id AND folder_i18n.locale = :locale
+                    LEFT JOIN rewriting_url ON rewriting_url.view = "'.(new Content())->getRewrittenUrlViewName().'" AND rewriting_url.view_id = content.id
+                    GROUP BY content.id'
         ;
+        $stmt = $con->prepare($query);
+        $stmt->bindValue('locale', $locale);
+        $res = $stmt->execute();
 
-        return $query;
+        $filename = THELIA_CACHE_DIR . '/export/' . 'content.json';
+
+        if(file_exists($filename)){
+            unlink($filename);
+        }
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }

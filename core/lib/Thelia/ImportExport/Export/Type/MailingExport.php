@@ -12,15 +12,16 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use Thelia\ImportExport\Export\AbstractExport;
+use PDO;
+use Propel\Runtime\Propel;
+use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\Map\NewsletterTableMap;
-use Thelia\Model\NewsletterQuery;
 
 /**
  * Class MailingExport
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class MailingExport extends AbstractExport
+class MailingExport extends JsonFileAbstractExport
 {
     const FILE_NAME = 'mailing';
 
@@ -33,6 +34,28 @@ class MailingExport extends AbstractExport
 
     protected function getData()
     {
-        return (new NewsletterQuery)->filterByUnsubscribed(false);
+        $con = Propel::getConnection();
+        $query = 'SELECT 
+                        newsletter.id as "newsletter.id",
+                        newsletter.email as "newsletter.email", 
+                        newsletter.firstname as "newsletter.firstname", 
+                        newsletter.lastname as "newsletter.lastname"
+                    FROM newsletter
+                    WHERE newsletter.unsubscribed = 0'
+        ;
+        $stmt = $con->prepare($query);
+        $res = $stmt->execute();
+
+        $filename = THELIA_CACHE_DIR . '/export/' . 'mailing.json';
+
+        if(file_exists($filename)){
+            unlink($filename);
+        }
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }

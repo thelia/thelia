@@ -12,9 +12,12 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
+use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\AbstractExport;
+use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\Map\AttributeAvI18nTableMap;
 use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\CurrencyTableMap;
@@ -31,19 +34,19 @@ use Thelia\Model\ProductSaleElementsQuery;
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @contributor Thomas Arnaud <tarnaud@openstudio.fr>
  */
-class ProductPricesExport extends AbstractExport
+class ProductPricesExport extends JsonFileAbstractExport
 {
     const FILE_NAME = 'product_price';
 
     protected $orderAndAliases = [
         ProductSaleElementsTableMap::COL_ID => 'id',
-        'productID' => 'product_id',
-        'product_i18nTITLE' => 'title',
-        'attribute_av_i18n_ATTRIBUTES' => 'attributes',
+        ProductI18nTableMap::COL_ID => 'product_id',
+        ProductI18nTableMap::COL_TITLE => 'product_title',
+        AttributeAvI18nTableMap::COL_TITLE => 'attributes',
         ProductSaleElementsTableMap::COL_EAN_CODE => 'ean',
-        'product_pricePRICE' => 'price',
-        'product_pricePROMO_PRICE' => 'promo_price',
-        'currencyCODE' => 'currency',
+        ProductPriceTableMap::COL_PRICE => 'price',
+        ProductPriceTableMap::COL_PROMO_PRICE => 'promo_price',
+        CurrencyTableMap::COL_CODE => 'currency',
         ProductSaleElementsTableMap::COL_PROMO => 'promo'
     ];
 
@@ -51,50 +54,38 @@ class ProductPricesExport extends AbstractExport
     {
         $locale = $this->language->getLocale();
 
-        $productJoin = new Join(ProductTableMap::COL_ID, ProductI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
-        $attributeAvJoin = new Join(AttributeAvTableMap::COL_ID, AttributeAvI18nTableMap::COL_ID, Criteria::LEFT_JOIN);
-
-        $query = ProductSaleElementsQuery::create()
-            ->addSelfSelectColumns()
-            ->useProductPriceQuery()
-                ->useCurrencyQuery()
-                    ->withColumn(CurrencyTableMap::COL_CODE)
-                    ->endUse()
-                ->withColumn(ProductPriceTableMap::COL_PRICE)
-                ->withColumn(ProductPriceTableMap::COL_PROMO_PRICE)
-                ->endUse()
-            ->useProductQuery()
-                ->addJoinObject($productJoin, 'product_join')
-                ->addJoinCondition(
-                    'product_join',
-                    ProductI18nTableMap::COL_LOCALE . ' = ?',
-                    $locale,
-                    null,
-                    \PDO::PARAM_STR
-                )
-                ->withColumn(ProductI18nTableMap::COL_TITLE)
-                ->withColumn(ProductTableMap::COL_ID)
-                ->endUse()
-            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
-                ->useAttributeAvQuery(null, Criteria::LEFT_JOIN)
-                    ->addJoinObject($attributeAvJoin, 'attribute_av_join')
-                    ->addJoinCondition(
-                        'attribute_av_join',
-                        AttributeAvI18nTableMap::COL_LOCALE . ' = ?',
-                        $locale,
-                        null,
-                        \PDO::PARAM_STR
-                    )
-                    ->addAsColumn(
-                        'attribute_av_i18n_ATTRIBUTES',
-                        'GROUP_CONCAT(DISTINCT ' . AttributeAvI18nTableMap::COL_TITLE . ')'
-                    )
-                    ->endUse()
-                ->endUse()
-            ->orderBy(ProductSaleElementsTableMap::COL_ID)
-            ->groupBy(ProductSaleElementsTableMap::COL_ID)
+        $con = Propel::getConnection();
+        $query = 'SELECT 
+                        product_sale_elements.id as "product_sale_elements.id",
+                        product_i18n.id as "product_i18n.id",
+                        product_i18n.title as "product_i18n.title",
+                        attribute_av_i18n.title as "attribute_av_i18n.title",
+                        product_sale_elements.ean_code as "product_sale_elements.ean_code",
+                        ROUND(product_price.price, 2) as "product_price.price",
+                        ROUND(product_price.promo_price, 2) as "product_price.promo_price",
+                        currency.code as "currency.code",
+                        product_sale_elements.promo as "product_sale_elements.promo"
+                    FROM product_sale_elements
+                    LEFT JOIN product_i18n ON product_i18n.id = product_sale_elements.product_id
+                    LEFT JOIN attribute_combination ON attribute_combination.product_sale_elements_id = product_sale_elements.id
+                    LEFT JOIN attribute_av_i18n ON attribute_av_i18n.id = attribute_combination.attribute_av_id AND attribute_av_i18n.locale = :locale
+                    LEFT JOIN product_price ON product_price.product_sale_elements_id = product_sale_elements.id
+                    LEFT JOIN currency ON currency.id = product_price.currency_id'
         ;
+        $stmt = $con->prepare($query);
+        $stmt->bindValue('locale', $locale);
+        $res = $stmt->execute();
 
-        return $query;
+        $filename = THELIA_CACHE_DIR . '/export/' . 'product_price.json';
+
+        if(file_exists($filename)){
+            unlink($filename);
+        }
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }
