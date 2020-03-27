@@ -50,6 +50,7 @@ use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
@@ -67,6 +68,7 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
@@ -1890,5 +1892,60 @@ class ProductController extends AbstractSeoCrudController
     protected function formatPrice($price)
     {
         return \floatval(number_format($price, 6, '.', ''));
+    }
+
+    /**
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function searchCategoryAction()
+    {
+        $search = '%'.$this->getRequest()->query->get('q').'%';
+
+        $resultArray = array();
+
+        $categoriesI18n = CategoryI18nQuery::create()->filterByTitle($search, Criteria::LIKE)->limit(100);
+
+
+        /** @var \Thelia\Model\CategoryI18n $categoryI18n */
+        foreach ($categoriesI18n as $categoryI18n) {
+            $category = $categoryI18n->getCategory();
+            $resultArray[$category->getId()] = $categoryI18n->getTitle();
+        }
+
+        return $this->jsonResponse(json_encode($resultArray));
+    }
+
+    /**
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function searchProductAction()
+    {
+        $search = '%'.$this->getRequest()->query->get('q').'%';
+
+        $resultArray = array();
+
+        $productsI18nQuery = ProductI18nQuery::create()->filterByTitle($search, Criteria::LIKE);
+
+
+        $category_id = $this->getRequest()->query->get('category_id');
+        if($category_id != null){
+            $productsI18nQuery
+                ->useProductQuery()
+                ->useProductCategoryQuery()
+                ->filterByCategoryId($category_id)
+                ->endUse()
+                ->endUse();
+        }
+
+        $products = $productsI18nQuery->limit(100);
+
+        /** @var \Thelia\Model\ProductI18n $product */
+        foreach ($products as $product) {
+            $resultArray[$product->getId()] = $product->getTitle();
+        }
+
+        return $this->jsonResponse(json_encode($resultArray));
     }
 }

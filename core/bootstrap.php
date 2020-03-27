@@ -76,8 +76,13 @@ if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
 }
 
 // this will be used in our Propel model builders
-if (!defined('THELIA_PROPEL_BUILD_PATH')) {
-    define('THELIA_PROPEL_BUILD_PATH', THELIA_CACHE_DIR .  'propel' . DS . 'model' . DS);
+if (!defined('THELIA_PROPEL_BUILD_MODEL_PATH')) {
+    define('THELIA_PROPEL_BUILD_MODEL_PATH', THELIA_CACHE_DIR .  'propel' . DS . 'model' . DS);
+}
+
+// this will be used in our Propel model builders
+if (!defined('THELIA_PROPEL_BUILD_DATABASE_PATH')) {
+    define('THELIA_PROPEL_BUILD_DATABASE_PATH', THELIA_CACHE_DIR .  'propel' . DS . 'database' . DS);
 }
 
 if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_MODE')) {

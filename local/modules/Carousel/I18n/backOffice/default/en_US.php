@@ -11,4 +11,5 @@ return array(
     'Remove this image' => 'Remove this image',
     'Your carousel contains no image. Please add one using the form above.' => 'Your carousel contains no image. Please add one using the form above.',
     'Position' => 'Position',
+    'YYYY-MM-DD' => 'YYYY-MM-DD',
 );

@@ -428,7 +428,8 @@ class Order extends BaseOrder
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
                 $paymentModule->getCode()
-            )
+            ),
+            $event
         );
 
         return (null !== $event->getManageStock())

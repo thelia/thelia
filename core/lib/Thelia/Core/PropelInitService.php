@@ -3,6 +3,8 @@
 namespace Thelia\Core;
 
 use Propel\Generator\Command\ConfigConvertCommand;
+use Propel\Generator\Command\MigrationDiffCommand;
+use Propel\Generator\Command\MigrationUpCommand;
 use Propel\Generator\Command\ModelBuildCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
@@ -17,12 +19,10 @@ use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Store\FlockStore;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 
 /**
@@ -139,7 +139,15 @@ class PropelInitService
      */
     public function getPropelModelDir()
     {
-        return THELIA_PROPEL_BUILD_PATH;
+        return THELIA_PROPEL_BUILD_MODEL_PATH;
+    }
+
+    /**
+     * @return string Generated Propel models directory.
+     */
+    public function getPropelDatabaseDir()
+    {
+        return THELIA_PROPEL_BUILD_DATABASE_PATH;
     }
 
     /**
@@ -212,8 +220,15 @@ class PropelInitService
             'tablemap'
             => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
             'event'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder',
+            => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder'
         ];
+
+        $propelConfig['propel']['generator']['builders'] = [
+            'resolver'
+            => '\Thelia\Core\Propel\Generator\Builder\ResolverBuilder'
+        ];
+
+        $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
 
         $propelConfigCache->write(
             Yaml::dump($propelConfig),
@@ -232,6 +247,7 @@ class PropelInitService
             $this->debug
         );
 
+
         if ($propelInitCache->isFresh()) {
             return;
         }
@@ -241,7 +257,7 @@ class PropelInitService
             [
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--output-dir' => $this->getPropelConfigDir(),
-                '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME,
+                '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME
             ]
         );
 
@@ -262,7 +278,7 @@ class PropelInitService
 
         // TODO: caching rules ?
         if ($fs->exists($this->getPropelSchemaDir())) {
-            return;
+            return false;
         }
 
         $hash = '';
@@ -293,6 +309,8 @@ class PropelInitService
         }
 
         $fs->dumpFile($this->getPropelCacheDir() . 'hash', $hash);
+
+        return true;
     }
 
     /**
@@ -306,7 +324,7 @@ class PropelInitService
         // cache testing
         if ($fs->exists($this->getPropelModelDir() . 'hash')
             && file_get_contents($this->getPropelCacheDir() . 'hash') === file_get_contents($this->getPropelModelDir() . 'hash')) {
-            return;
+            return false;
         }
 
         $fs->remove($this->getPropelModelDir());
@@ -323,6 +341,37 @@ class PropelInitService
             $this->getPropelCacheDir() . 'hash',
             $this->getPropelModelDir() . 'hash'
         );
+
+        return true;
+    }
+
+    public function migrate()
+    {
+        $this->runCommand(
+            new MigrationUpCommand(),
+            [
+                '--config-dir' => $this->getPropelConfigDir(),
+                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS
+            ]
+        );
+
+        $this->runCommand(
+            new MigrationDiffCommand(),
+            [
+                '--config-dir' => $this->getPropelConfigDir(),
+                '--schema-dir' => $this->getPropelSchemaDir(),
+                '--skip-removed-table' => true,
+                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS
+            ]
+        );
+
+        $this->runCommand(
+            new MigrationUpCommand(),
+            [
+                '--config-dir' => $this->getPropelConfigDir(),
+                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS
+            ]
+        );
     }
 
     /**
@@ -337,6 +386,11 @@ class PropelInitService
             $this->getPropelModelDir()
         );
 
+        $loader->addPrefix(
+            '', // no prefix, models already define their full namespace
+            $this->getPropelDatabaseDir()
+        );
+
         $loader->register(
             true // prepend the autoloader to use cached models first
         );
@@ -346,9 +400,11 @@ class PropelInitService
      * Initialize the Propel environment and connection.
      * @return bool Whether a Propel connection is available.
      * @param bool $force force cache generation
+     * @param bool $cacheRefresh
      * @throws \Throwable
+     * @internal
      */
-    public function init($force = false)
+    public function init($force = false, &$cacheRefresh = false)
     {
         $flockFactory = new Factory(new FlockStore());
 
@@ -369,14 +425,19 @@ class PropelInitService
             $this->buildPropelConfig();
 
             $this->buildPropelInitFile();
+
             require $this->getPropelInitFile();
 
             $theliaDatabaseConnection = Propel::getConnection('thelia');
             $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
 
-            $this->buildPropelGlobalSchema();
+            $buildPropelGlobalSchema = $this->buildPropelGlobalSchema();
+            $buildPropelModels = $this->buildPropelModels();
 
-            $this->buildPropelModels();
+            if ($buildPropelGlobalSchema || $buildPropelModels) {
+                $cacheRefresh = true;
+            }
+
             $this->registerPropelModelLoader();
 
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
