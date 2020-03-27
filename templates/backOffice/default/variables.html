@@ -121,9 +121,19 @@
   	                                <td>
   	                                    {if $SECURED}
   	                                        {$VALUE}
+                                            {$editAllowed = true}
   	                                    {else}
-  	                                        <input id="cancelable_edit_{$ID}" class="js-edit form-control" data-id="{$ID}" type="text" name="variable[{$ID}]" value="{$VALUE}" />
-  	                                    {/if}
+                                            {if preg_match('/^(active-)([a-z]{3,5})(-template)$/',$NAME, $typeTemplate) }
+                                                {$editAllowed = false}
+                                                <select id="cancelable_edit_{$ID}" name="variable[{$ID}]" data-id="{$ID}" class="js-edit form-control">
+                                                    {loop type="template" name="list_template" template-type=$typeTemplate[2]}
+                                                        <option {if $VALUE == $NAME}selected{/if} value="{$NAME}">{$NAME}</option>
+                                                    {/loop}
+                                                </select>
+                                            {else}
+                                                <input id="cancelable_edit_{$ID}" class="js-edit form-control" data-id="{$ID}" type="text" name="variable[{$ID}]" value="{$VALUE}" />
+  	                                        {/if}
+                                        {/if}
   	                                </td>
 
   	                                {hook name="variables.table-row" location="variables_table_row" config_id={$ID} }
@@ -319,6 +329,10 @@
         })
 
         $('.js-edit').keyup(function() {
+            $('#cancel_edit_btn_' + $(this).data('id')).removeClass('disabled');
+        });
+
+        $('select.js-edit').change(function() {
             $('#cancel_edit_btn_' + $(this).data('id')).removeClass('disabled');
         });
 
