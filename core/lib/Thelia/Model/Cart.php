@@ -3,14 +3,11 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Cart as BaseCart;
-use Thelia\Model\Country;
-use Thelia\Model\State;
 use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
@@ -22,7 +19,7 @@ class Cart extends BaseCart
      * @param Customer $customer
      * @param Currency $currency
      * @param EventDispatcherInterface $dispatcher
-     * @return Cart
+     * @return Cart|bool
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -60,13 +57,19 @@ class Cart extends BaseCart
         }
 
         $cart->save();
+
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
             $productSaleElements = $cartItem->getProductSaleElements();
-            if ($product &&
-                $productSaleElements &&
-                $product->getVisible() == 1 &&
-                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock())) {
+
+            if ($product
+                &&
+                $productSaleElements
+                &&
+                (int)$product->getVisible() === 1
+                &&
+                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || !ConfigQuery::checkAvailableStock())
+            ) {
                 $item = new CartItem();
                 $item->setCart($cart);
                 $item->setProductId($cartItem->getProductId());
@@ -118,11 +121,12 @@ class Cart extends BaseCart
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
      * @param  Country      $country
-     * @param  bool         $discount
+     * @param bool $withDiscount
      * @param  State|null   $state
-     * @return float|int
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxedAmount(Country $country, $discount = true, State $state = null)
+    public function getTaxedAmount(Country $country, $withDiscount = true, State $state = null)
     {
         $total = 0;
 
@@ -130,7 +134,7 @@ class Cart extends BaseCart
             $total += $cartItem->getTotalRealTaxedPrice($country, $state);
         }
 
-        if ($discount) {
+        if ($withDiscount) {
             $total -= $this->getDiscount();
 
             if ($total < 0) {
@@ -138,32 +142,27 @@ class Cart extends BaseCart
             }
         }
 
-        return $total;
+        return round($total, 2);
     }
 
     /**
+     * @param bool $withDiscount
+     * @param Country|null $country
+     * @param State|null $state
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      * @see getTaxedAmount same as this method but the amount is without taxes
      *
-     * @param bool $discount
-     * @param \Thelia\Model\Country|null $country
-     * @param \Thelia\Model\State|null $state
-     *
-     * @return float|int|string
-     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalAmount($discount = true, Country $country = null, State $state = null)
+    public function getTotalAmount($withDiscount = true, Country $country = null, State $state = null)
     {
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
-            $subtotal = $cartItem->getRealPrice();
-
-            $subtotal *= $cartItem->getQuantity();
-
-            $total += $subtotal;
+            $total += $cartItem->getTotalRealPrice();
         }
 
-        if ($discount) {
+        if ($withDiscount) {
             $total -= $this->getDiscount(false, $country, $state);
 
             if ($total < 0) {
@@ -171,22 +170,39 @@ class Cart extends BaseCart
             }
         }
 
-        return $total;
+        return round($total, 2);
     }
 
     /**
      * Return the VAT of all items
-     * @return float|int
+     *
+     * @param Country $taxCountry
+     * @param null $taxState
+     * @param bool $withDiscount
+     * @return float|int|string
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTotalVAT($taxCountry, $taxState = null)
+    public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
     {
-        return ($this->getTaxedAmount($taxCountry, true, $taxState) - $this->getTotalAmount(true, $taxCountry, $taxState));
+        return $this->getTaxedAmount($taxCountry, $withDiscount, $taxState) - $this->getTotalAmount($withDiscount, $taxCountry, $taxState);
+    }
+
+    /**
+     * @param $taxCountry
+     * @param null $taxState
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getDiscountVAT($taxCountry, $taxState = null)
+    {
+        return $this->getDiscount(true, $taxCountry, $taxState) - $this->getDiscount(false, $taxCountry, $taxState);
     }
 
     /**
      * Retrieve the total weight for all products in cart
      *
-     * @return float|int
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getWeight()
     {
@@ -227,6 +243,15 @@ class Cart extends BaseCart
     }
 
     /**
+     * @param string $discount
+     * @return BaseCart|Cart
+     */
+    public function setDiscount($discount)
+    {
+        return parent::setDiscount(round($discount, 2));
+    }
+
+    /**
      * @param bool $withTaxes
      * @param \Thelia\Model\Country|null $country
      * @param \Thelia\Model\State|null $state
@@ -240,6 +265,6 @@ class Cart extends BaseCart
             return parent::getDiscount();
         }
 
-        return Calculator::getUntaxedDiscount($this, $country, $state);
+        return round(Calculator::getUntaxedCartDiscount($this, $country, $state), 2);
     }
 }

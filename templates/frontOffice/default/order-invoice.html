@@ -72,8 +72,8 @@
                             <span class="visible-xs">{intl l="Qty"}</span>
                         </th>
                         <th class="subprice">
-                            <span class="hidden-xs">{intl l="Total"}</span>
-                            <span class="visible-xs">{intl l="Total"}</span>
+                            <span class="hidden-xs">{intl l="Total incl. tax"}</span>
+                            <span class="visible-xs">{intl l="Total incl.tax"}</span>
                         </th>
                     </tr>
                     </thead>
@@ -129,33 +129,26 @@
                         </td>
                         <td class="unitprice">
                             <div class="secondary-price">
-                            {if $IS_PROMO == 1}
-                                <small><span class="price">{format_money number=$PROMO_PRICE}</span></small>
-                            {else}
-                                <small><span class="price">{format_money number=$PRICE}</span></small>
-                            {/if}
+                                <span class="price">{format_money number=$REAL_PRICE}</span>
                             </div>
                         </td>
                         <td class="unitprice">
-                            {if $IS_PROMO == 1}
-                                {assign "real_price" $PROMO_TAXED_PRICE}
-                                {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
-                            {else}
-                                {assign "real_price" $TAXED_PRICE}
-                                {assign "real_total_price" $TOTAL_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
-                            {/if}
+                            <div class="secondary-price">
+                                <div class="special-price"><span class="price">{format_money number=$REAL_TAXED_PRICE}</span>
+                                {if $IS_PROMO == 1}
+                                    <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
+                                {/if}
+                            </div>
                         </td>
                         <td class="qty">
                             <span class="price">{$QUANTITY}</span>
                         </td>
                         <td class="subprice">
-                            <span class="price">{format_money number=$real_total_price}</span>
+                            <span class="price">
+                                {format_money number=$REAL_TOTAL_TAXED_PRICE}
+                            </span>
                         </td>
                     </tr>
-
                     {/loop}
 
                     </tbody>
@@ -166,16 +159,6 @@
                         <table class="table table-cart table-bordered table-cart-total">
                             <tfoot>
                             {$discount={order attr="discount"}}
-                            {if $discount}
-                            <tr>
-                                <th class="discount">{intl l="Discount"}</th>
-                                <td class="shipping">
-                                    <div class="shipping-price">
-                                        <span class="price">{format_money number=$discount}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {/if}
                             <tr>
                                 <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                                 <td class="coupon">
@@ -197,24 +180,65 @@
                                     <!-- /input-group -->
                                 </td>
                             </tr>
-                            {if {cart attr="is_virtual"} != 1}
                             <tr>
-                                <th class="shipping">{intl l="Shipping Tax"}</th>
-                                <td class="shipping">
-                                    <div class="shipping-price">
-                                        <span class="price">{format_money number={order attr="postage"}}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {/if}
-                            <tr>
-                                <th>{intl l="Total excl. taxes"}</th>
+                                <th>{intl l="Cart total excl. taxes"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}}}</span>
+                                        <span class="price">{format_money number={cart attr="total_price_without_discount"}}</span>
                                     </div>
                                 </td>
                             </tr>
+
+                            <tr>
+                                <th>{intl l="Taxes total"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{format_money number={cart attr="total_tax_amount_without_discount"}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>{intl l="Cart total incl. taxes"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{format_money number={cart attr="total_taxed_price_without_discount"}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {if $discount}
+                                <tr>
+                                    <th class="discount">
+                                        {intl l="Discount incl. taxes"}
+                                        <br>{intl l="Tax: %tax" tax={format_money number={cart attr="discount_tax_amount"} currency_id=$CURRENCY}}
+                                    </th>
+                                    <td class="shipping">
+                                        <div class="total-price">
+                                            <span class="price">-{format_money number=$discount}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/if}
+
+                            {if {cart attr="is_virtual"} != 1}
+                                <tr>
+                                    <th class="shipping">
+                                        {intl l="Shipping"}
+                                        {$postageTax = {order attr="postage_tax"}}
+                                        {if $postageTax > 0}
+                                            <br>
+                                            {intl l="Including %tax tax" tax={format_money number=$postageTax}}
+                                        {/if}
+                                    </th>
+                                    <td class="shipping">
+                                        <div class="shipping-price">
+                                            <span class="price">{format_money number={order attr="postage"}}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/if}
+
                             <tr>
                                 <th class="total">{intl l="Total incl. taxes"}</th>
                                 <td class="total">

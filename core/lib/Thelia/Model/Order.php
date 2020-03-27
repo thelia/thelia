@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
@@ -13,6 +14,7 @@ use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
@@ -147,44 +149,81 @@ class Order extends BaseOrder
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
-        $amount = floatval(
-            OrderProductQuery::create()
-                ->filterByOrderId($this->getId())
-                ->withColumn('SUM(
-                    ' . OrderProductTableMap::COL_QUANTITY . '
-                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
-                )', 'total_amount')
-                ->select([ 'total_amount' ])
-                ->findOne()
-        );
+        // Cache the query result
+        static $queryResult;
 
-        $tax = floatval(
-            OrderProductTaxQuery::create()
-                ->useOrderProductQuery()
-                    ->filterByOrderId($this->getId())
-                ->endUse()
-                ->withColumn('SUM(
-                    ' . OrderProductTableMap::COL_QUANTITY . '
-                    * IF('.OrderProductTableMap::COL_WAS_IN_PROMO.' = 1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')
-                )', 'total_tax')
-                ->select([ 'total_tax' ])
-                ->findOne()
-        );
+        if (null === $queryResult) {
+            // Shoud be the same rounding method as in CartItem::getTotalTaxedPrice()
+            // For each order line, we round quantity x taxed price.
+            $query = '
+                SELECT 
+                    SUM(
+                        ROUND(
+                            '.OrderProductTableMap::COL_QUANTITY.'
+                            *
+                            ( 
+                                IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
+                                +
+                                (
+                                    SELECT COALESCE(SUM(IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')), 0)
+                                    FROM '.OrderProductTaxTableMap::TABLE_NAME.'
+                                    WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
+                                )
+                            ), 2
+                        )
+                    ) as total_taxed_price,
+                    SUM(
+                        ROUND(
+                            '.OrderProductTableMap::COL_QUANTITY.'
+                            *
+                            IF(
+                                '.OrderProductTableMap::COL_WAS_IN_PROMO.'=1,
+                                '.OrderProductTableMap::COL_PROMO_PRICE.',
+                                '.OrderProductTableMap::COL_PRICE.'
+                            ), 2
+                        )
+                    ) as total_untaxed_price
+                from 
+                    '.OrderProductTableMap::TABLE_NAME.'
+                where
+                    '.OrderProductTableMap::COL_ORDER_ID.'=:order_id
+            ';
 
-        $total = $amount + $tax;
+            $con = Propel::getConnection();
+            $stmt = $con->prepare($query);
 
-        // @todo : manage discount : free postage ?
+            if (false === $stmt->execute([':order_id' => $this->getId()])) {
+                throw new TheliaProcessException(
+                    sprintf(
+                        'Failed to get order total and order tax: %s (%s)',
+                        $stmt->errorInfo(),
+                        $stmt->errorCode()
+                    )
+                );
+            }
+
+            $queryResult = $stmt->fetch(\PDO::FETCH_OBJ);
+        }
+
+        $total = (float) $queryResult->total_taxed_price;
+        $tax = $total - (float) $queryResult->total_untaxed_price;
+
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
+            $tax -= $this->getDiscount() - Calculator::getUntaxedOrderDiscount($this);
 
             if ($total < 0) {
                 $total = 0;
             }
+
+            if ($tax < 0) {
+                $tax = 0;
+            }
         }
 
         if (false !== $includePostage) {
-            $total += \floatval($this->getPostage());
-            $tax += \floatval($this->getPostageTax());
+            $total += (float)$this->getPostage();
+            $tax += (float)$this->getPostageTax();
         }
 
         return $total;

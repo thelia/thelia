@@ -105,15 +105,9 @@
                                 <a href="{token_url path="/cart/delete/%item_id" item_id=$ITEM_ID success_url={url path='/cart'}}" class="btn btn-link"><i class="fa fa-trash"></i> {intl l="Remove"}</a>
                             </td>
                             <td class="unitprice">
+                                <div class="special-price"><span class="price">{format_money number=$REAL_TAXED_PRICE}</span></div>
                                 {if $IS_PROMO == 1}
-                                    {assign "real_price" $PROMO_TAXED_PRICE}
-                                    {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
-                                    <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
                                     <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
-                                {else}
-                                    {assign "real_price" $TAXED_PRICE}
-                                    {assign "real_total_price" $TOTAL_TAXED_PRICE}
-                                    <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
                                 {/if}
                             </td>
                             <td class="qty">
@@ -137,7 +131,7 @@
                                 </div>
                             </td>
                             <td class="subprice">
-                                <span class="price">{format_money number=$real_total_price}</span>
+                                <span class="price">{format_money number=$REAL_TOTAL_TAXED_PRICE}</span>
                             </td>
                         </tr>
                         {/loop}
@@ -222,8 +216,8 @@
                     {if $discount}
                         <tr>
                             <td colspan="3" class="empty">&nbsp;</td>
-                            <th class="discount">{intl l="Discount"}</th>
-                            <td><span class="price">{format_money number=$discount}</span></td>
+                            <th class="discount">{intl l="Discount incl. taxes"}</th>
+                            <td><span class="price">-{format_money number=$discount}</span></td>
                         </tr>
                     {/if}
                     <tr>
@@ -231,8 +225,7 @@
                         <th class="total">{intl l="Total incl. taxes"}</th>
                         <td class="total">
                             <div class="total-price">
-                                {assign var="totalAmount" value={cart attr='total_taxed_price'} + $postageAmount }
-                                <span class="price">{format_money number=$totalAmount}</span>
+                                <span class="price">{format_money number={cart attr='total_taxed_price'} + $postageAmount}</span>
                             </div>
                         </td>
                     </tr>
