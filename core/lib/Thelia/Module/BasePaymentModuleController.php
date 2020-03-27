@@ -252,10 +252,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
     /**
      * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
      *
-     * @param int         $order_id the order ID
+     * @param int         $orderId the order ID
      * @param string|null $message  an error message.
      */
-    public function redirectToFailurePage($order_id, $message)
+    public function redirectToFailurePage($orderId, $message)
     {
         $this->getLog()->addInfo("Redirecting customer to payment failure page");
 
@@ -263,7 +263,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $this->retrieveUrlFromRouteId(
                 'order.failed_message_as_parameter',
                 [ 'message' => $message ],
-                [ 'order_id' => $order_id ],
+                [ 'order_id' => $orderId ],
                 Router::ABSOLUTE_PATH
             )
         );
