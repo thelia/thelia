@@ -25,6 +25,7 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\TaxEngine\Calculator;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -325,6 +326,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
             $amount = $order->getTotalAmount($tax);
             $itemsAmount = $order->getTotalAmount($itemsTax, false, false);
+            $discountWithoutTax = Calculator::getUntaxedOrderDiscount($order);
 
             $hasVirtualDownload = $order->hasVirtualProduct();
 
@@ -352,6 +354,8 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('STATUS_CODE', $order->getOrderStatus()->getCode())
                 ->set('LANG', $order->getLangId())
                 ->set('DISCOUNT', $order->getDiscount())
+                ->set('DISCOUNT_WITHOUT_TAX', $discountWithoutTax)
+                ->set('DISCOUNT_TAX', $order->getDiscount() - $discountWithoutTax)
                 ->set('TOTAL_ITEMS_TAX', $itemsTax)
                 ->set('TOTAL_ITEMS_AMOUNT', $itemsAmount - $itemsTax)
                 ->set('TOTAL_TAXED_ITEMS_AMOUNT', $itemsAmount)
@@ -385,10 +389,10 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     ->findOne();
 
                 $loopResultRow
-                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT", $next != null ? 1 : 0)
-                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', $previous !== null ? 1 : 0)
+                    ->set('HAS_NEXT', $next !== null ? 1 : 0)
+                    ->set('PREVIOUS', $previous !== null ? $previous->getId() : -1)
+                    ->set('NEXT', $next !== null ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $order);

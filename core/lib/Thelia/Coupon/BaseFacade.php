@@ -126,13 +126,18 @@ class BaseFacade implements FacadeInterface
 
         foreach ($cartItems as $cartItem) {
             if ($withItemsInPromo || ! $cartItem->getPromo()) {
-                $total += $cartItem->getRealPrice() * $cartItem->getQuantity();
+                $total += $cartItem->getTotalRealPrice();
             }
         }
 
         return $total;
     }
 
+    /**
+     * @param bool $withItemsInPromo
+     * @return float|int
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function getCartTotalTaxPrice($withItemsInPromo = true)
     {
         $taxCountry = $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
@@ -142,7 +147,7 @@ class BaseFacade implements FacadeInterface
 
         foreach ($cartItems as $cartItem) {
             if ($withItemsInPromo || ! $cartItem->getPromo()) {
-                $total += $cartItem->getRealTaxedPrice($taxCountry) * $cartItem->getQuantity();
+                $total += $cartItem->getTotalRealTaxedPrice($taxCountry);
             }
         }
 

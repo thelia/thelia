@@ -168,19 +168,7 @@
             {/ifhook}
 
             {loop type="order_product" name="order-products" order=$ID}
-                {if $WAS_IN_PROMO == 1}
-                    {assign "realPrice" $PROMO_PRICE}
-                    {assign "realTax" $PROMO_PRICE_TAX}
-                    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
-                    {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
-                {else}
-                    {assign "realPrice" $PRICE}
-                    {assign "realTax" $PRICE_TAX}
-                    {assign "realTaxedPrice" $TAXED_PRICE}
-                    {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
-                {/if}
-
-                {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
+                {$taxes[{$TAX_RULE_TITLE}][] = $REAL_PRICE_TAX * $QUANTITY}
 
                 <tr data-id={$ID}  data-product-id={$PRODUCT_ID} data-pse-id={$PRODUCT_SALE_ELEMENTS_ID}>
                     <td class="product" >
@@ -194,10 +182,10 @@
                         {/ifloop}
                         {hook name="account-order.product-list" order_id={$order_id} order_product_id={$ID} product={$PRODUCT_ID}}
                     </td>
-                    <td class="unitprice"><p>{format_money number=$realPrice currency_id=$CURRENCY}</p></td>
-                    <td class="unitprice"><p>{format_money number=$realTaxedPrice currency_id=$CURRENCY}</p></td>
+                    <td class="unitprice"><p>{format_money number=$REAL_PRICE currency_id=$CURRENCY}</p></td>
+                    <td class="unitprice"><p>{format_money number=$REAL_TAXED_PRICE currency_id=$CURRENCY}</p></td>
                     <td class="qty"><p>{$QUANTITY}</p></td>
-                    <td class="subprice"><p>{format_money number=$realTotalPrice currency_id=$CURRENCY}</p></td>
+                    <td class="subprice"><p>{format_money number=$REAL_TOTAL_TAXED_PRICE currency_id=$CURRENCY}</p></td>
                 </tr>
                 {ifhook rel="account-order.product-extra"}
                 <tr>
@@ -225,41 +213,49 @@
             <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
                 <table class="table order-total table-order table-bordered table-order-total">
                     <tfoot>
-                        {if $DISCOUNT}
-                        <tr>
-                            <td><p>{intl l="Discount"}</p></td>
-                            <td><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
-                        </tr>
-                        {/if}
                         <tr>
                             <td><p>{intl l="Total without tax"}</p></td>
-                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} currency_id=$CURRENCY}</p></td>
+                            <td><p>{format_money number={$TOTAL_ITEMS_AMOUNT} currency_id=$CURRENCY}</p></td>
                         </tr>
-                        {strip}
-                            {capture name="tax"}
-                                {foreach $taxes as $name=>$prices}
-                                    {assign var="_price_taxe_" value="0"}
-                                    {foreach $prices as $price}
-                                        {$_price_taxe_= $_price_taxe_ + $price}
-                                    {/foreach}
-                                    {if $_price_taxe_ != 0}
-                                    <tr>
-                                        <td><p>{$name}</p></td>
-                                        <td><P>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</P></td>
-                                    </tr>
-                                    {/if}
+
+                        {capture name="tax"}{strip}
+                            {foreach $taxes as $name=>$prices}
+                                {assign var="_price_taxe_" value="0"}
+                                {foreach $prices as $price}
+                                    {$_price_taxe_= $_price_taxe_ + $price}
                                 {/foreach}
-                            {/capture}
-                        {/strip}
+                                {if $_price_taxe_ != 0}
+                                <tr>
+                                    <td><p>{$name}</p></td>
+                                    <td><P>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</P></td>
+                                </tr>
+                                {/if}
+                            {/foreach}
+                        {/strip}{/capture}
+
                         {if $smarty.capture.tax ne ""}
                             {$smarty.capture.tax nofilter}
                         {/if}
                         <tr>
                             <td><p>{intl l="Total with tax"}</p></td>
-                            <td><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}</P></td>
+                            <td><P>{format_money number={$TOTAL_TAXED_ITEMS_AMOUNT} currency_id=$CURRENCY}</P></td>
                         </tr>
+                        {if $DISCOUNT}
+                            <tr>
+                                <td>
+                                    <p>{intl l="Discount with tax"}</p>
+                                    <p>{intl l="Tax: %tax" tax={format_money number=$DISCOUNT_TAX currency_id=$CURRENCY}}</p>
+                                </td>
+                                <td><p>-{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
+                            </tr>
+                        {/if}
                         <tr>
-                            <td><p>{intl l="Postage"}</p></td>
+                            <td>
+                                <p>{intl l="Postage"}</p>
+                                {if $POSTAGE_TAX != 0}
+                                    <p>{intl l="Tax %name: %tax" name=$POSTAGE_TAX_RULE_TITLE tax={format_money number=$POSTAGE_TAX currency_id=$CURRENCY}}</p>
+                                {/if}
+                            </td>
                             <td><p>{format_money number=$POSTAGE curency_id=$CURRENCY}</p></td>
                         </tr>
                         <tr>

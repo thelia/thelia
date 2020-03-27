@@ -4,10 +4,10 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
-use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
@@ -23,6 +23,10 @@ class CartItem extends BaseCartItem
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @return bool
+     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -34,6 +38,10 @@ class CartItem extends BaseCartItem
         return true;
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @return bool
+     */
     public function preUpdate(ConnectionInterface $con = null)
     {
         parent::preUpdate($con);
@@ -45,6 +53,10 @@ class CartItem extends BaseCartItem
         return true;
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function postInsert(ConnectionInterface $con = null)
     {
         parent::postInsert($con);
@@ -56,6 +68,10 @@ class CartItem extends BaseCartItem
         }
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function postUpdate(ConnectionInterface $con = null)
     {
         parent::postUpdate($con);
@@ -70,6 +86,7 @@ class CartItem extends BaseCartItem
     /**
      * @param $value
      * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateQuantity($value)
     {
@@ -95,6 +112,11 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function addQuantity($value)
     {
         $currentQuantity = $this->getQuantity();
@@ -116,11 +138,20 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    /**
+     * @return float
+     */
     public function getRealPrice()
     {
-        return $this->getPromo() == 1 ? $this->getPromoPrice() : $this->getPrice();
+        return (float) ((int) $this->getPromo() === 1 ? $this->getPromoPrice() : $this->getPrice());
     }
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @param null $locale
+     * @return Product
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function getProduct(ConnectionInterface $con = null, $locale = null)
     {
         $product = parent::getProduct($con);
@@ -140,17 +171,20 @@ class CartItem extends BaseCartItem
 
     /**
      * @param Country $country
+     * @param State|null $state
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getRealTaxedPrice(Country $country, State $state = null)
     {
-        return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
+        return (int) $this->getPromo() === 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
     }
 
     /**
      * @param Country $country
      * @param State|null $state
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPrice(Country $country, State $state = null)
     {
@@ -163,6 +197,7 @@ class CartItem extends BaseCartItem
      * @param Country $country
      * @param State|null $state
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPromoPrice(Country $country, State $state = null)
     {
@@ -176,10 +211,11 @@ class CartItem extends BaseCartItem
      * @param Country $country
      * @param State|null $state
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalRealTaxedPrice(Country $country, State $state = null)
     {
-        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
+        return (int) $this->getPromo() === 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
     }
 
     /**
@@ -187,24 +223,46 @@ class CartItem extends BaseCartItem
      * @param Country $country
      * @param State|null $state
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalTaxedPrice(Country $country, State $state = null)
     {
-        $taxCalculator = new Calculator();
-
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice()*$this->getQuantity());
+        return round($this->getTaxedPrice($country, $state) * $this->getQuantity(), 2);
     }
 
     /**
      * @since Version 2.3
-     * @param Country $country
-     * @param State|null $state
-     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalTaxedPromoPrice(Country $country, State $state = null)
     {
-        $taxCalculator = new Calculator();
+        return round($this->getTaxedPromoPrice($country, $state) * $this->getQuantity(), 2);
+    }
 
-        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
+    /**
+     * @since Version 2.4
+     * @return float
+     */
+    public function getTotalPrice()
+    {
+        return round($this->getPrice() * $this->getQuantity(), 2);
+    }
+
+    /**
+     * @since Version 2.4
+     * @return float
+     */
+    public function getTotalPromoPrice()
+    {
+        return round($this->getPromoPrice() * $this->getQuantity(), 2);
+    }
+
+    /**
+     * @since Version 2.4
+     * @return float
+     */
+    public function getTotalRealPrice()
+    {
+        return round($this->getRealPrice() * $this->getQuantity(), 2);
     }
 }

@@ -81,7 +81,7 @@ class CouponManager
             }
         }
 
-        return $discount;
+        return round($discount, 2);
     }
 
     /**

@@ -139,7 +139,9 @@
                                                        <th class="text-right">{intl l="Tax"}</th>
                                                        <th class="text-right">{intl l="Unit taxed price"}</th>
                                                        <th class="text-right">{intl l="Quantity"}</th>
-                                                       <th class="text-right">{intl l="Taxed total"}</th>
+                                                        <th class="text-right">{intl l="Untaxed total"}</th>
+                                                        <th class="text-right">{intl l="Tax total"}</th>
+                                                        <th class="text-right">{intl l="Taxed total"}</th>
                                                     </tr>
                                                 </thead>
 
@@ -147,23 +149,11 @@
                                                 {$taxes = []}
 
                                                 {loop type="order_product" name="order-products" order=$ID}
-                                                    {if $WAS_IN_PROMO == 1}
-                                                        {assign "realPrice" $PROMO_PRICE}
-                                                        {assign "realTax" $PROMO_PRICE_TAX}
-                                                        {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
-                                                        {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
-                                                    {else}
-                                                        {assign "realPrice" $PRICE}
-                                                        {assign "realTax" $PRICE_TAX}
-                                                        {assign "realTaxedPrice" $TAXED_PRICE}
-                                                        {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
-                                                    {/if}
-
                                                     {if ! isset($taxes[{$TAX_RULE_TITLE}])}
                                                         {$taxes[{$TAX_RULE_TITLE}] = 0}
                                                     {/if}
 
-                                                    {$taxes[{$TAX_RULE_TITLE}] = $taxes[{$TAX_RULE_TITLE}] + floatval($realTax) * $QUANTITY}
+                                                    {$taxes[{$TAX_RULE_TITLE}] = $taxes[{$TAX_RULE_TITLE}] + floatval($REAL_PRICE_TAX) * $QUANTITY}
 
                                                     {hook name="order-edit.before-order-product-row" location="before-order-product-row" order_id=$order_id order_product_id=$ID}
                                                     <tr>
@@ -194,11 +184,13 @@
                                                             {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
                                                         {hook name="order-edit.order-product-table-row" location="order_edit_table_row" order_product_id={$ID} }
-                                                        <td class="text-right">{format_money number=$realPrice currency_id=$CURRENCY}</td>
-                                                        <td class="text-right">{format_money number=$realTax currency_id=$CURRENCY}</td>
-                                                        <td class="text-right">{format_money number=$realTaxedPrice currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$REAL_PRICE currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$REAL_PRICE_TAX currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$REAL_TAXED_PRICE currency_id=$CURRENCY}</td>
                                                         <td class="text-right">{$QUANTITY}</td>
-                                                        <td class="text-right">{format_money number=$realTotalPrice currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$REAL_TOTAL_PRICE currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$REAL_TOTAL_PRICE_TAX currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$REAL_TOTAL_TAXED_PRICE currency_id=$CURRENCY}</td>
                                                     </tr>
                                                     {hook name="order-edit.after-order-product-row" location="after-order-product-row" order_id=$order_id order_product_id=$ID}
                                                 {/loop}
@@ -216,11 +208,6 @@
                                                                 <td class="text-right">{format_money number=$TOTAL_ITEMS_AMOUNT currency_id=$CURRENCY}</td>
                                                             </tr>
                                                             <tr>
-                                                                <th>{intl l="Items taxes total"}</th>
-                                                                <td class="text-right">{format_money number=$TOTAL_ITEMS_TAX currency_id=$CURRENCY}</td>
-                                                            </tr>
-
-                                                            <tr>
                                                                 <th>{intl l="Total with taxes before discount"}</th>
                                                                 <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT currency_id=$CURRENCY}</td>
                                                             </tr>
@@ -232,12 +219,10 @@
                                                                 <th>{intl l="Total with taxes after discount"}</th>
                                                                 <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE currency_id=$CURRENCY}</td>
                                                             </tr>
-
                                                             <tr>
                                                                 <th>{intl l="Shipping with taxes"}</th>
                                                                 <td class="text-right">{format_money number=$POSTAGE currency_id=$CURRENCY}</td>
                                                             </tr>
-
                                                             <tr class="info">
                                                                 <th>{intl l="ORDER TOTAL WITH TAXES"}</th>
                                                                 <td class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</strong></td>
@@ -250,16 +235,20 @@
                                             <div class="col-lg-5 col-lg-pull-5 col-md-6 col-md-pull-6">
                                                 <div class="panel panel-default">
                                                     <div class="panel-heading">
-                                                        <h3 class="panel-title">{intl l='Items taxes'}</h3>
+                                                        <h3 class="panel-title">{intl l='Taxes'}</h3>
                                                     </div>
 
                                                     <table class="table table-condensed table-left-aligned">
                                                         <tbody class="table-condensed">
+                                                            <tr>
+                                                                <th colspan="2">{intl l='Items taxes'}</th>
+                                                            </tr>
+
                                                             {$tmp = 0}
                                                             {foreach $taxes as $name => $amount}
                                                                 {if $amount != 0}
                                                                     <tr>
-                                                                        <th>{$name}</th>
+                                                                        <td>{$name}</td>
                                                                         <td class="text-right">
                                                                             {format_money number=$amount currency_id=$CURRENCY}
                                                                         </td>
@@ -272,27 +261,39 @@
                                                                     <td>{intl l="None"}</td>
                                                                 </tr>
                                                             {/if}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
 
-                                                <div class="panel panel-default">
-                                                    <div class="panel-heading">
-                                                        <h3 class="panel-title">
-                                                            {intl l='Shipping taxes'}
-                                                        </h3>
-                                                    </div>
-                                                    <table class="table table-condensed table-left-aligned">
-                                                        <tbody>
+                                                            <tr>
+                                                                <th colspan="2">{intl l='Shipping taxes'}</th>
+                                                            </tr>
                                                             <tr>
                                                                 {if $POSTAGE_TAX != 0}
-                                                                    <th>{$POSTAGE_TAX_RULE_TITLE}</th>
+                                                                    <td>{$POSTAGE_TAX_RULE_TITLE}</td>
                                                                     <td class="text-right">
                                                                         {format_money number=$POSTAGE_TAX currency_id=$CURRENCY}
                                                                     </td>
                                                                 {else}
                                                                     <td>{intl l="None"}</td>
                                                                 {/if}
+                                                            </tr>
+
+
+                                                            <tr>
+                                                                <th colspan="2">{intl l='Discount tax'}</th>
+                                                            </tr>
+                                                            <tr>
+                                                                {if $DISCOUNT_TAX != 0}
+                                                                    <td>{intl l='Average rate'}</td>
+                                                                    <td class="text-right">
+                                                                        -{format_money number=$DISCOUNT_TAX currency_id=$CURRENCY}
+                                                                    </td>
+                                                                {else}
+                                                                    <td>{intl l="None"}</td>
+                                                                {/if}
+                                                            </tr>
+
+                                                            <tr class="info">
+                                                                <th>{intl l="Taxes total"}</th>
+                                                                <td class="text-right"><strong>{format_money number=$TOTAL_TAX currency_id=$CURRENCY}</strong></td>
                                                             </tr>
                                                         </tbody>
                                                     </table>

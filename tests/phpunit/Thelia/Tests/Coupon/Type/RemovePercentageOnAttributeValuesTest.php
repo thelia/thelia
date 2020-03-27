@@ -152,6 +152,10 @@ class RemovePercentageOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(100))
+        ;$cartItem1Stub
+            ->expects($this->any())
+            ->method('getTotalRealTaxedPrice')
+            ->will($this->returnValue(100))
         ;
 
         $cartItem2Stub = $this->getMockBuilder('\Thelia\Model\CartItem')
@@ -172,6 +176,10 @@ class RemovePercentageOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(150))
+        ;$cartItem2Stub
+            ->expects($this->any())
+            ->method('getTotalRealTaxedPrice')
+            ->will($this->returnValue(300))
         ;
 
         $cartStub = $this->getMockBuilder('\Thelia\Model\Cart')
@@ -234,6 +242,10 @@ class RemovePercentageOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
         $cartItem1Stub
             ->expects($this->any())
             ->method('getRealTaxedPrice')
+            ->will($this->returnValue(100))
+        ;$cartItem1Stub
+            ->expects($this->any())
+            ->method('getTotalRealTaxedPrice')
             ->will($this->returnValue(100))
         ;
 

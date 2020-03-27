@@ -364,7 +364,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 break;
             case "total_vat":
             case 'total_tax_amount':
-                $result = $cart->getTotalVAT($taxCountry);
+                $result = $cart->getTotalVAT($taxCountry, $taxState);
+                break;
+            case 'total_tax_amount_without_discount':
+                $result = $cart->getTotalVAT($taxCountry, $taxState, false);
+                break;
+            case 'discount_tax_amount':
+                $result = $cart->getDiscountVAT($taxCountry, $taxState);
                 break;
             case "weight":
                 $result = $cart->getWeight();
