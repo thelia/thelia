@@ -36,7 +36,7 @@ class ModuleRefreshCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $moduleManagement = new ModuleManagement;
+            $moduleManagement = new ModuleManagement($this->getContainer());
             $moduleManagement->updateModules($this->getContainer());
         } catch (InvalidModuleException $ime) {
             throw new \RuntimeException(

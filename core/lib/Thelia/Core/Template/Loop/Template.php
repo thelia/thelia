@@ -44,9 +44,12 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
                 new Type\TypeCollection(
                     new Type\EnumType(array(
                         'front-office',
+                        'front',
                         'back-office',
+                        'admin',
                         'pdf',
-                        'email'
+                        'email',
+                        'mail'
                     ))
                 )
             )
@@ -57,13 +60,13 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     {
         $type = $this->getArg('template-type')->getValue();
 
-        if ($type == 'front-office') {
+        if ($type == 'front-office' || $type == 'front') {
             $templateType = TemplateDefinition::FRONT_OFFICE;
-        } elseif ($type == 'back-office') {
+        } elseif ($type == 'back-office' || $type == 'admin') {
             $templateType = TemplateDefinition::BACK_OFFICE;
         } elseif ($type == 'pdf') {
             $templateType = TemplateDefinition::PDF;
-        } elseif ($type == 'email') {
+        } elseif ($type == 'email' || $type == 'mail') {
             $templateType = TemplateDefinition::EMAIL;
         }
 
