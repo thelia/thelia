@@ -110,7 +110,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('ignore_processing_errors', true),
             Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
             Argument::createBooleanTypeArgument('allow_zoom', false),
-            Argument::createBooleanTypeArgument('base64', false)
+            Argument::createBooleanTypeArgument('base64', false),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false)
         );
 
         // Add possible image sources
@@ -146,7 +147,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        if (! is_null($object_id)) {
+        if (! \is_null($object_id)) {
             $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
@@ -193,11 +194,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         // Check form source="product" source_id="123" style arguments
         $source = $this->getSource();
 
-        if (! is_null($source)) {
+        if (! \is_null($source)) {
             $sourceId = $this->getSourceId();
             $id = $this->getId();
 
-            if (is_null($sourceId) && is_null($id)) {
+            if (\is_null($sourceId) && \is_null($id)) {
                 throw new \InvalidArgumentException(
                     "If 'source' argument is specified, 'id' or 'source_id' argument should be specified"
                 );
@@ -213,7 +214,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $argValue = $this->getArgValue($source);
 
                 if (! empty($argValue)) {
-                    $argValue = intval($argValue);
+                    $argValue = \intval($argValue);
 
                     $search = $this->createSearchQuery($source, $argValue);
 
@@ -247,12 +248,12 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (! is_null($id)) {
+        if (! \is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -279,7 +280,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $event->setAllowZoom($this->getAllowZoom());
 
-        if (! is_null($effects)) {
+        if (! \is_null($effects)) {
             $effects = explode(',', $effects);
         }
 
@@ -307,23 +308,23 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var ProductImage $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Setup required transformations
-            if (! is_null($width)) {
+            if (! \is_null($width)) {
                 $event->setWidth($width);
             }
-            if (! is_null($height)) {
+            if (! \is_null($height)) {
                 $event->setHeight($height);
             }
             $event->setResizeMode($resizeMode);
-            if (! is_null($rotation)) {
+            if (! \is_null($rotation)) {
                 $event->setRotation($rotation);
             }
-            if (! is_null($background_color)) {
+            if (! \is_null($background_color)) {
                 $event->setBackgroundColor($background_color);
             }
-            if (! is_null($quality)) {
+            if (! \is_null($quality)) {
                 $event->setQuality($quality);
             }
-            if (! is_null($effects)) {
+            if (! \is_null($effects)) {
                 $event->setEffects($effects);
             }
 
@@ -353,8 +354,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("OBJECT_TYPE", $this->objectType)
                 ->set("OBJECT_ID", $this->objectId)
             ;
-
-            $this->findNextPrev($loopResultRow, $result->getId(), $this->objectType, $result->getPosition());
 
             $addRow = true;
 
@@ -390,6 +389,30 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     $addRow = false;
                 }
             }
+            $isBackendContext = $this->getBackendContext();
+            if ($this->getWithPrevNextInfo()) {
+                $previousQuery = $this->getSearchQuery($this->objectType, $this->objectId)
+                    ->filterByPosition($result->getPosition(), Criteria::LESS_THAN);
+                if (! $isBackendContext) {
+                    $previousQuery->filterByVisible(true);
+                }
+                $previous = $previousQuery
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne();
+                $nextQuery = $this->getSearchQuery($this->objectType, $this->objectId)
+                    ->filterByPosition($result->getPosition(), Criteria::GREATER_THAN);
+                if (! $isBackendContext) {
+                    $nextQuery->filterByVisible(true);
+                }
+                $next = $nextQuery
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne();
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1);
+            }
 
             if ($addRow) {
                 $this->addOutputFields($loopResultRow, $result);
@@ -399,63 +422,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-    }
-
-    /**
-     * Set the fields HAS_PREVIOUS, HAS_NEXT, PREVIOUS, NEXT for the image loop
-     *
-     * @param LoopResultRow $loopResultRow
-     * @param int $imageId Image id
-     * @param string $imageType Type of the image. Only 'product' is currently supported to get the NEXT and PREVIOUS values
-     * @param int $currentPosition The position of the image
-     */
-    private function findNextPrev(LoopResultRow $loopResultRow, $imageId, $imageType, $currentPosition)
-    {
-        if ($imageType == 'product') {
-            $imageRow = ProductImageQuery::create()
-                ->filterById($imageId)
-                ->findOne();
-
-            if ($imageRow != null) {
-                $previousQuery = ProductImageQuery::create()
-                    ->filterByProductId($imageRow->getProductId())
-                    ->filterByPosition($currentPosition, Criteria::LESS_THAN);
-
-                $nextQuery = ProductImageQuery::create()
-                    ->filterByProductId($imageRow->getProductId())
-                    ->filterByPosition($currentPosition, Criteria::GREATER_THAN);
-
-                if (!$this->getBackendContext()) {
-                    $previousQuery->useProductQuery()
-                        ->filterByVisible(true)
-                        ->endUse();
-
-                    $previousQuery->useProductQuery()
-                        ->filterByVisible(true)
-                        ->endUse();
-                }
-
-                $previous = $previousQuery
-                    ->orderByPosition(Criteria::DESC)
-                    ->findOne();
-
-                $next = $nextQuery
-                    ->orderByPosition(Criteria::ASC)
-                    ->findOne();
-
-                $loopResultRow
-                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT", $next != null ? 1 : 0)
-                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1);
-
-                return;
-            }
-        }
-
-        $loopResultRow
-            ->set("HAS_PREVIOUS", 0)
-            ->set("HAS_NEXT", 0);
     }
     
     private function toBase64($path) 

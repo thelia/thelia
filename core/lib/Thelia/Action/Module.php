@@ -139,10 +139,10 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $modules = $moduleValidator->getModulesDependOf();
 
-        if (count($modules) > 0) {
+        if (\count($modules) > 0) {
             $moduleList = implode(', ', array_column($modules, 'code'));
 
-            $message = (count($modules) == 1)
+            $message = (\count($modules) == 1)
                 ? Translator::getInstance()->trans(
                     '%s has dependency to module %s. You have to deactivate this module before.'
                 )
@@ -376,7 +376,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         // Update the module
         $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
-        $moduleManagement = new ModuleManagement();
+        $moduleManagement = new ModuleManagement($this->container);
         $file = new SplFileInfo($moduleDescriptorFile);
         $module = $moduleManagement->updateModule($file, $this->container);
 

@@ -124,7 +124,7 @@ class I18n
         $str = trim($str, "\"'");
 
         $return = "CONCAT(";
-        $len = strlen($str);
+        $len = \strlen($str);
 
         for ($i = 0; $i < $len; ++$i) {
             $return .= "CHAR(".ord($str[$i])."),";

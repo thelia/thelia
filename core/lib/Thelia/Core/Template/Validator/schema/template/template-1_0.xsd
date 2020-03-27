@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<xs:schema
+        xmlns="http://thelia.net/schema/dic/template"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://thelia.net/schema/dic/template"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        >
+
+    <xs:element name="template">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="descriptive" minOccurs="1" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>Template description,</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="title" minOccurs="1" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="subtitle" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="description" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="postscriptum" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute type="xs:string" name="locale">
+                            <xs:annotation>
+                                <xs:documentation>An ISO 639 locale code</xs:documentation>
+                            </xs:annotation>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="parent" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>The template extended by this template. Missing html files and assets will be searched in this template</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+
+                <xs:element name="languages">
+                    <xs:annotation>
+                        <xs:documentation>Languages supported by this template : fr_FR, en_US, ...</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="language" minOccurs="1" maxOccurs="unbounded">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:pattern value="[a-z]{2}_[A-Z]{2}"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element type="xs:string" name="version">
+                    <xs:annotation>
+                        <xs:documentation>Template version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+
+                <xs:element name="authors" maxOccurs="1" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>Template authors</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="author" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" name="name" minOccurs="1" maxOccurs="1"/>
+                                        <xs:element type="xs:string" name="company" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element type="xs:string" name="email" minOccurs="1" maxOccurs="1"/>
+                                        <xs:element type="xs:anyURI" name="website" minOccurs="0" maxOccurs="1"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="tags" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Template tags</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="tag" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="thelia" minOccurs="0" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+
+                <xs:element name="stability">
+                    <xs:annotation>
+                        <xs:documentation>current template stability: alpha, beta, rc, prod</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="alpha"/>
+                            <xs:enumeration value="beta"/>
+                            <xs:enumeration value="rc"/>
+                            <xs:enumeration value="prod"/>
+                            <xs:enumeration value="other"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+                <xs:element type="xs:string" name="documentation" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>The name of the directory containing te documentation, relative to this template directory.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+
+                <xs:element type="xs:anyURI" name="urlmiseajour" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>URL to test if a new version of the template exists. Will be called with two get parameters : template name, current version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+
+                <xs:element type="xs:anyURI" name="updateurl" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>URL to download the new version of the template. Will be called with two get parameters : template name, current version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

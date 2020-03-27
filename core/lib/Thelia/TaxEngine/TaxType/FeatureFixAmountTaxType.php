@@ -47,7 +47,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
             ->findOne();
 
         if (null !== $query) {
-            if (is_null($query->getFeatureAvId())) {
+            if (\is_null($query->getFeatureAvId())) {
                 $taxAmount = $query->getFreeTextValue(); //BC for old behavior
             } else {
                 $locale = LangQuery::create()->findPk($this->getRequirement('lang'))->getLocale();

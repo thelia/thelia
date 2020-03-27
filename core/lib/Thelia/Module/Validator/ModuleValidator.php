@@ -13,6 +13,7 @@
 namespace Thelia\Module\Validator;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
@@ -158,6 +159,7 @@ class ModuleValidator
         }
 
         $this->checkModuleDependencies();
+        $this->checkModulePropelSchema();
     }
 
     protected function checkDirectoryStructure()
@@ -328,13 +330,29 @@ class ModuleValidator
             }
         }
 
-        if (count($errors) > 0) {
+        if (\count($errors) > 0) {
             $errorsMessage = $this->trans(
                 'To activate module %name, the following modules should be activated first: %modules',
                 ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)]
             );
 
             throw new ModuleException($errorsMessage);
+        }
+    }
+
+    protected function checkModulePropelSchema()
+    {
+        $schemaFile = $this->getModulePath() . DS . "Config" . DS . "schema.xml";
+        $fs = new Filesystem();
+
+        if ($fs->exists($schemaFile) === false) {
+            return;
+        }
+
+        if (preg_match('/<behavior.*name="versionable".*\/>/s', file_get_contents($schemaFile))) {
+            throw new ModuleException(
+                "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
+            );
         }
     }
 
@@ -367,7 +385,7 @@ class ModuleValidator
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
 
-                if (count($dependencies) > 0) {
+                if (\count($dependencies) > 0) {
                     foreach ($dependencies as $dependency) {
                         if ($dependency[0] == $code) {
                             $dependantModules[] = [
@@ -404,7 +422,7 @@ class ModuleValidator
                 "code" => (string)$dependency,
                 "version" => (string)$dependency['version'],
             ];
-            if (!in_array($dependencyArray, $dependencies)) {
+            if (!\in_array($dependencyArray, $dependencies)) {
                 $dependencies[] = $dependencyArray;
             }
 
@@ -457,7 +475,7 @@ class ModuleValidator
     protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
     {
         $dependencies = [];
-        if (0 !== count($this->moduleDescriptor->required)) {
+        if (is_countable($this->moduleDescriptor->required) && 0 !== \count($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {
                 $dependencies[] = [
                     (string)$dependency,
@@ -474,7 +492,8 @@ class ModuleValidator
     protected function getModuleAuthors(ModuleDefinition $moduleDefinition)
     {
         $authors = [];
-        if (0 !== count($this->moduleDescriptor->author)) {
+
+        if (is_countable($this->moduleDescriptor->author) && 0 !== \count($this->moduleDescriptor->author)) {
             foreach ($this->moduleDescriptor->author as $author) {
                 $authors[] = [
                     (string)$author->name,
@@ -493,15 +512,19 @@ class ModuleValidator
     {
         $authors = [];
 
-        if (0 !== count($this->moduleDescriptor->authors->author)) {
-            foreach ($this->moduleDescriptor->authors->author as $author) {
-                $authors[] = [
-                    (string)$author->name,
-                    (string)$author->company,
-                    (string)$author->email,
-                    (string)$author->website
-                ];
-            }
+        if (!is_countable($this->moduleDescriptor->authors->author)
+        || 0 === \count($this->moduleDescriptor->authors->author)
+        ) {
+            return $authors;
+        }
+
+        foreach ($this->moduleDescriptor->authors->author as $author) {
+            $authors[] = [
+                (string)$author->name,
+                (string)$author->company,
+                (string)$author->email,
+                (string)$author->website
+            ];
         }
 
         return $authors;

@@ -114,8 +114,8 @@ class OrderStatus extends BaseOrderStatus
      */
     public function hasStatusHelper($statusCode)
     {
-        if (is_array($statusCode)) {
-            return in_array($this->getCode(), $statusCode);
+        if (\is_array($statusCode)) {
+            return \in_array($this->getCode(), $statusCode);
         } else {
             return $this->getCode() == $statusCode;
         }

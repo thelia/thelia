@@ -84,7 +84,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
         $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
 
-        if (! is_array($this->category_list)) {
+        if (! \is_array($this->category_list)) {
             $this->category_list = array($this->category_list);
         }
 
@@ -110,7 +110,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
                 /** @var Category $category */
                 foreach ($categories as $category) {
-                    if (in_array($category->getId(), $this->category_list)) {
+                    if (\in_array($category->getId(), $this->category_list)) {
                         $discount += $this->getCartItemDiscount($cartItem);
 
                         break;

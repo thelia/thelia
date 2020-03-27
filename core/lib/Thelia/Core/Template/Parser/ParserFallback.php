@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Parser;
 
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
@@ -45,7 +46,7 @@ class ParserFallback implements ParserInterface
      *
      * @param TemplateDefinition $templateDefinition
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition)
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
         $this->throwException();
     }
@@ -96,7 +97,7 @@ class ParserFallback implements ParserInterface
      * @param string $variable the variable name
      * @param mixed $value the value of the variable
      */
-    public function assign($variable, $value)
+    public function assign($variable, $value = null)
     {
         $this->throwException();
     }
@@ -112,5 +113,47 @@ class ParserFallback implements ParserInterface
     private function throwException()
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
+    }
+
+    /**
+     * Returns the request used by the parser
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        $this->throwException();
+    }
+
+    /**
+     * Set a new template definition, and save the current one
+     *
+     * @param TemplateDefinition $templateDefinition
+     * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
+     * @throws \SmartyException
+     */
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    {
+        $this->throwException();
+    }
+
+    /**
+     * Restore the previous stored template definition, if one exists.
+     *
+     * @throws \SmartyException
+     */
+    public function popTemplateDefinition()
+    {
+        $this->throwException();
+    }
+
+    /**
+     * Get the current status of the fallback to "default" feature
+     *
+     * @return bool
+     */
+    public function getFallbackToDefaultTemplate()
+    {
+        $this->throwException();
     }
 }

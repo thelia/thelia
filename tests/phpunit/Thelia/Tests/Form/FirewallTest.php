@@ -97,7 +97,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
             }
 
             $attempts = FormFirewallQuery::create()
-                ->select(FormFirewallTableMap::ATTEMPTS)
+                ->select(FormFirewallTableMap::COL_ATTEMPTS)
                 ->findOne()
             ;
 

@@ -30,6 +30,8 @@ class Admin extends BaseAdmin implements UserInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 

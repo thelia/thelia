@@ -1,0 +1,274 @@
+{strip}
+{if !isset($btn_group)}
+    {$btn_group = true}
+{/if}
+{if !isset($btn_small)}
+    {$btn_small = false}
+{/if}
+{if !isset($btn_big)}
+    {$btn_big = false}
+{/if}
+{if !isset($btn_responsive)}
+    {$btn_responsive = true}
+{/if}
+{if !isset($with_text)}
+    {$with_text = false}
+{/if}
+{if $btn_group == true}
+<div class="btn-group" role="group">
+{/if}
+{foreach from=$buttons item=button}
+    {if !$button['tag']}
+        {$button['tag'] = 'a'}
+    {/if}
+
+    {if !$button['with_text']}
+        {$button['with_text'] = $with_text}
+    {/if}
+
+    {if !$button['icon']['tag']}
+        {$button['icon']['tag'] = 'i'}
+    {/if}
+
+    {if $button['auth'] && !$button['auth']['role']}
+       {$button['auth']['role'] = 'ADMIN'}
+    {/if}
+
+    {if $button['type'] == 'view'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-primary'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='View'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-eye-open'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {elseif $button['type'] == 'create'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-primary'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Create'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-plus-sign'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'CREATE'}
+        {/if}
+    {elseif $button['type'] == 'edit'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-info'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Edit'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-edit'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'UPDATE'}
+        {/if}
+    {elseif $button['type'] == 'delete'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-danger'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Delete'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-trash'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'DELETE'}
+        {/if}
+    {elseif $button['type'] == 'save'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-success'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Save'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-ok'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'UPDATE'}
+        {/if}
+    {elseif $button['type'] == 'default'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-default'}
+        {/if}
+    {elseif $button['type'] == 'secondary'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-secondary'}
+        {/if}
+    {elseif $button['type'] == 'danger'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-danger'}
+        {/if}
+    {elseif $button['type'] == 'warning'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-warning'}
+        {/if}
+    {elseif $button['type'] == 'success'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-success'}
+        {/if}
+    {elseif $button['type'] == 'info'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-info'}
+        {/if}
+    {elseif $button['type'] == 'folder-open'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-primary'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Open'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-folder-open'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {elseif $button['type'] == 'duplicate'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-warning'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Duplicate'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-plus-sign'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'CREATE'}
+        {/if}
+    {elseif $button['type'] == 'add'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-success'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Add'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-plus'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'CREATE'}
+        {/if}
+    {elseif $button['type'] == 'remove'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-danger'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Remove'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-minus'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'DELETE'}
+        {/if}
+    {elseif $button['type'] == 'config'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-primary'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Config'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-wrench'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {elseif $button['type'] == 'hook'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-warning'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Hook'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-indent-left'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {elseif $button['type'] == 'print'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-default'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Print'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-print'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {elseif $button['type'] == 'download'}
+        {if !$button['baseClass']}
+            {$button['baseClass'] = 'btn btn-default'}
+        {/if}
+        {if !$button['title']}
+            {$button['title'] = {intl l='Download'}}
+        {/if}
+        {if !$button['icon']['class']}
+            {$button['icon']['class'] = 'glyphicon glyphicon-download-alt'}
+        {/if}
+        {if $button['auth'] && !$button['auth']['access']}
+            {$button['auth']['access'] = 'VIEW'}
+        {/if}
+    {/if}
+
+    {if $button['auth'] && $button['auth']['resource']}
+        {$ok = false}
+        {loop type="auth" name="auth" role=$button['auth']['role'] resource=$button['auth']['resource'] access=$button['auth']['access']}
+            {$ok = true}
+        {/loop}
+        {if !$ok}
+            {continue}
+        {/if}
+    {/if}
+
+    {if !$button['baseClass']}
+        {$button['baseClass'] = 'btn btn-primary'}
+    {/if}
+
+    <{$button['tag']}
+    {if $button['id']} id="{$button['id']}"{/if}
+    {if $button['title']} title="{$button['title']}"{/if}
+    {if $button['href']} href="{$button['href'] nofilter}"{/if}
+     class="{$button['baseClass']}{if $btn_small} btn-xs{/if}{if $btn_big} btn-lg{/if}{if $btn_responsive} btn-responsive{/if}{if $button['class']} {$button['class']}{/if}"
+    {if $button['data'] && $button['data']|is_array}
+    {foreach from=$button['data'] key=name item=data}
+        data-{$name}="{$data}"
+    {/foreach}
+    {/if}
+    {if $button['attr'] && $button['attr']|is_array}
+        {foreach from=$button['attr'] key=name item=data}
+            {$name}="{$data}"
+        {/foreach}
+    {/if}
+    >
+    {if $button['icon']['class']}
+        <{$button['icon']['tag']} class="{$button['icon']['class']}"></{$button['icon']['tag']}>
+    {/if}
+    {if $button['with_text'] || !isset($button['icon']['class'])}
+        <span> {if isset($button['text'])}{$button['text']}{else}{$button['title']}{/if}</span>
+    {/if}
+    </{$button['tag']}>
+
+{/foreach}
+{if $btn_group == true}
+</div>
+{/if}
+{/strip}

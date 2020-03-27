@@ -144,6 +144,7 @@
         <service id="smarty.plugin.cache" class="TheliaSmarty\Template\Plugins\Cache">
             <argument type="service" id="thelia.cache"/>
             <argument type="service" id="request_stack"/>
+            <argument type="service" id="thelia.taxEngine"/>
             <argument>%kernel.debug%</argument>
             <tag name="thelia.parser.register_plugin"/>
         </service>

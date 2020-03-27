@@ -138,7 +138,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -153,7 +153,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     
         $excludeParent = $this->getExcludeParent();
 
-        if (!is_null($excludeParent)) {
+        if (!\is_null($excludeParent)) {
             $search->filterByParent($excludeParent, Criteria::NOT_IN);
         }
 
@@ -167,7 +167,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -207,7 +207,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         }
         $templateIdList = $this->getTemplateId();
     
-        if (!is_null($templateIdList)) {
+        if (!\is_null($templateIdList)) {
             $search->filterByDefaultTemplateId($templateIdList, Criteria::IN);
         }
 

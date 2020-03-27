@@ -26,6 +26,9 @@ class Import extends ImportExportType
         return $this->container->getParameter("import.base_url");
     }
 
+    /**
+     * @return ImportQuery
+     */
     protected function getQueryModel()
     {
         return ImportQuery::create();

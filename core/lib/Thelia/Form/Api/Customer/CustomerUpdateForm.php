@@ -21,9 +21,9 @@ use Thelia\Form\CustomerUpdateForm as BaseCustomerUpdateForm;
  */
 class CustomerUpdateForm extends BaseCustomerUpdateForm
 {
-    public function buildForm($backendContext = false)
+    public function buildForm()
     {
-        parent::buildForm($backendContext);
+        parent::buildForm();
 
         $this->formBuilder
             ->add('lang_id', 'lang_id')

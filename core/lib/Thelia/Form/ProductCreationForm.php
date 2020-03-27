@@ -20,7 +20,12 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProductCreationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
+    {
+        $this->doBuildForm(false);
+    }
+
+    protected function doBuildForm($change_mode)
     {
         $this->formBuilder
             ->add("ref", "text", array(

@@ -152,13 +152,13 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (! empty($template)) {
             // Join with feature_template table to get position, if a manual order position is required
-            if (in_array(['manual_reverse', 'manual'], $this->getOrder())) {
+            if (\count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
                 $search
                     ->filterByTemplate(
                         TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
                         Criteria::IN
                     )
-                    ->withColumn(FeatureTemplateTableMap::POSITION, 'position');
+                    ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
 
                 $this->useFeaturePosition = false;
             }
@@ -210,14 +210,14 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::ASC);
                     } else {
-                        $search->addAscendingOrderByColumn(FeatureTemplateTableMap::POSITION);
+                        $search->addAscendingOrderByColumn(FeatureTemplateTableMap::COL_POSITION);
                     }
                     break;
                 case "manual_reverse":
                     if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::DESC);
                     } else {
-                        $search->addDescendingOrderByColumn(FeatureTemplateTableMap::POSITION);
+                        $search->addDescendingOrderByColumn(FeatureTemplateTableMap::COL_POSITION);
                     }
                     break;
             }

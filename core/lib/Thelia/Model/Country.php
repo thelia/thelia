@@ -106,6 +106,8 @@ class Country extends BaseCountry
 
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECOUNTRY, new CountryEvent($this));
 
         return true;
@@ -113,11 +115,15 @@ class Country extends BaseCountry
 
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECOUNTRY, new CountryEvent($this));
     }
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECOUNTRY, new CountryEvent($this));
 
         return true;
@@ -125,11 +131,15 @@ class Country extends BaseCountry
 
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECOUNTRY, new CountryEvent($this));
     }
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         if ($this->getByDefault()) {
             return false;
         }
@@ -141,6 +151,8 @@ class Country extends BaseCountry
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECOUNTRY, new CountryEvent($this));
     }
 

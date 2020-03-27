@@ -43,7 +43,7 @@ class Area extends BaseAction implements EventSubscriberInterface
             $countryArea = new CountryArea();
 
             $country = explode('-', $countryId);
-            if (count($country) === 1) {
+            if (\count($country) === 1) {
                 $country[1] = null;
             }
             if ($country[1] == 0) {

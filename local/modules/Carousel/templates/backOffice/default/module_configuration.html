@@ -51,7 +51,7 @@
 
                         {form_hidden_fields}
 
-                        {loop name="carousel.image" type="carousel" width="550" height="200" resize_mode="borders" backend_context="1" lang="$edit_language_id"}
+                        {loop name="carousel.image" type="carousel" width="550" height="200" resize_mode="borders" backend_context="1" lang="$edit_language_id" filter_disable_slides=false}
 
                         <div class="well well-sm">
                             <div class="row">
@@ -78,6 +78,48 @@
                                             {/form_field}
                                         </div>
                                     </div>
+                                    <div style="padding-top: 10px">
+                                        <div class="row col-md-12">
+                                            {form_field field="disable{$ID}"}
+                                                <input id="disable{$ID}" type="checkbox" name="{$name}" {if $DISABLE}checked{/if}>
+                                                <label for="disable{$ID}">{$label}</label>
+                                            {/form_field}
+                                        </div>
+                                        <div class="row col-md-12">
+                                            {form_field field="limited{$ID}"}
+                                                <input id="limited{$ID}" type="checkbox" name="{$name}" {if $LIMITED}checked{/if}>
+                                                <label for="limited{$ID}">{$label}</label>
+                                            {/form_field}
+                                        </div>
+
+                                        <div class="row col-md-6">
+                                            {form_field field="start_date{$ID}"}
+                                                <label class="row col-md-12" for="{$name}">{$label}</label>
+                                                <div class="col-md-10" style="padding: 0">
+                                                    <input name="{$name}"
+                                                           placeholder="{intl l='YYYY-MM-DD' d='carousel.bo.default'}"
+                                                           id="start_date{$ID}"
+                                                           type="datetime-local"
+                                                           class="form-control datetime-picker"
+                                                           value="{$START_DATE}"/>
+                                                </div>
+                                            {/form_field}
+                                        </div>
+
+                                        <div class="row col-md-6">
+                                            {form_field field="end_date{$ID}"}
+                                                <label class="row col-md-12" for="{$name}">{$label}</label>
+                                                <div class="col-md-10" style="padding: 0">
+                                                    <input name="{$name}"
+                                                           placeholder="{intl l='YYYY-MM-DD' d='carousel.bo.default'}"
+                                                           id="end_date{$ID}"
+                                                           type="datetime-local"
+                                                           class="form-control datetime-picker"
+                                                           value="{$END_DATE}"/>
+                                                </div>
+                                            {/form_field}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -88,6 +130,7 @@
                                     {render_form_field field="alt{$ID}" value=$ALT}
                                     {render_form_field field="url{$ID}" value=$URL}
                                     {render_form_field field="description{$ID}" extra_class="wysiwyg" value=$DESCRIPTION}
+                                    {render_form_field field="group{$ID}" value=$GROUP}
                                     {* Not yet implemented
                                     {render_form_field field="postscriptum{$ID}" value=$POSTSCRIPTUM}
                                     *}

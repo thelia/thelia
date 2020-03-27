@@ -88,11 +88,19 @@ class ProfileController extends AbstractCrudController
         return $event;
     }
 
+    /**
+     * @param ProfileEvent $event
+     * @return boolean
+     */
     protected function eventContainsObject($event)
     {
         return $event->hasProfile();
     }
 
+    /**
+     * @param Profile $object
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateObjectForm($object)
     {
         $data = array(
@@ -172,7 +180,7 @@ class ProfileController extends AbstractCrudController
 
     protected function getViewArguments()
     {
-        return array();
+        return (null !== $tab = $this->getRequest()->get('tab')) ? [ 'tab' => $tab ] : [];
     }
 
     protected function getRouteArguments($profile_id = null)
@@ -197,12 +205,12 @@ class ProfileController extends AbstractCrudController
         return $this->render('profile-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
-    protected function redirectToEditionTemplate($request = null, $country = null)
+    protected function redirectToEditionTemplate()
     {
         // We always return to the feature edition form
         return $this->generateRedirectFromRoute(
             "admin.configuration.profiles.update",
-            $this->getViewArguments($country),
+            $this->getViewArguments(),
             $this->getRouteArguments()
         );
     }
@@ -211,7 +219,7 @@ class ProfileController extends AbstractCrudController
      * Put in this method post object creation processing if required.
      *
      * @param  ProfileEvent $createEvent the create event
-     * @return Response     a response, or null to continue normal processing
+     * @return \Symfony\Component\HttpFoundation\Response|Response
      */
     protected function performAdditionalCreateAction($createEvent)
     {
@@ -319,8 +327,6 @@ class ProfileController extends AbstractCrudController
             return $response;
         }
 
-        $error_msg = false;
-
         // Create the form from the request
         $changeForm = $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS);
 
@@ -357,7 +363,7 @@ class ProfileController extends AbstractCrudController
             }
 
             if ($response == null) {
-                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate();
             } else {
                 return $response;
             }
@@ -381,8 +387,6 @@ class ProfileController extends AbstractCrudController
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
             return $response;
         }
-
-        $error_msg = false;
 
         // Create the form from the request
         $changeForm = $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS);
@@ -420,7 +424,7 @@ class ProfileController extends AbstractCrudController
             }
 
             if ($response == null) {
-                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate();
             } else {
                 return $response;
             }

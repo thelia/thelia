@@ -83,12 +83,12 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->filterByRedirected(null)
             ->orderById(Criteria::DESC);
 
-        $otherParametersCount = count($viewOtherParameters);
+        $otherParametersCount = \count($viewOtherParameters);
         if ($otherParametersCount > 0) {
             $parameterConditions = array();
 
             foreach ($viewOtherParameters as $parameter => $value) {
-                $conditionName = 'other_parameter_condition_' . count($parameterConditions);
+                $conditionName = 'other_parameter_condition_' . \count($parameterConditions);
                 $urlQuery->condition('parameter_condition', '`ra`.PARAMETER= ?', $parameter, \PDO::PARAM_STR)
                     ->condition('value_condition', '`ra`.VALUE = ?', $value, \PDO::PARAM_STR)
                     ->combine(array('parameter_condition', 'value_condition'), Criteria::LOGICAL_AND, $conditionName);
@@ -97,10 +97,10 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
             $urlQuery->where($parameterConditions, Criteria::LOGICAL_OR);
 
-            $urlQuery->groupBy(RewritingUrlTableMap::ID);
+            $urlQuery->groupBy(RewritingUrlTableMap::COL_ID);
 
-            $urlQuery->condition('count_condition_1', 'COUNT(' . RewritingUrlTableMap::ID . ') = ?', $otherParametersCount, \PDO::PARAM_INT) // ensure we got all the asked parameters (provided by the query)
-                ->condition('count_condition_2', 'COUNT(' . RewritingUrlTableMap::ID . ') = (SELECT COUNT(*) FROM rewriting_argument WHERE rewriting_argument.REWRITING_URL_ID = ra_REWRITING_URL_ID)'); // ensure we don't miss any parameters (needed to match the rewritten url)
+            $urlQuery->condition('count_condition_1', 'COUNT(' . RewritingUrlTableMap::COL_ID . ') = ?', $otherParametersCount, \PDO::PARAM_INT) // ensure we got all the asked parameters (provided by the query)
+                ->condition('count_condition_2', 'COUNT(' . RewritingUrlTableMap::COL_ID . ') = (SELECT COUNT(*) FROM rewriting_argument WHERE rewriting_argument.REWRITING_URL_ID = ra_REWRITING_URL_ID)'); // ensure we don't miss any parameters (needed to match the rewritten url)
 
             $urlQuery->having(array('count_condition_1', 'count_condition_2'), Criteria::LOGICAL_AND);
         } else {
@@ -112,7 +112,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
     protected function retrieveLocale($viewLocale)
     {
-        if (strlen($viewLocale) == 2) {
+        if (\strlen($viewLocale) == 2) {
             if (null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
                 $viewLocale = $lang->getLocale();
             }

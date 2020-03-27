@@ -30,6 +30,8 @@ class Address extends BaseAddress
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEADDRESS, new AddressEvent($this));
 
         return true;
@@ -41,6 +43,8 @@ class Address extends BaseAddress
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEADDRESS, new AddressEvent($this));
     }
 
@@ -51,6 +55,8 @@ class Address extends BaseAddress
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEADDRESS, new AddressEvent($this));
 
         return true;
@@ -62,6 +68,8 @@ class Address extends BaseAddress
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEADDRESS, new AddressEvent($this));
     }
 
@@ -72,6 +80,8 @@ class Address extends BaseAddress
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         if ($this->getIsDefault()) {
             return false;
         }
@@ -87,6 +97,8 @@ class Address extends BaseAddress
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEADDRESS, new AddressEvent($this));
     }
 }

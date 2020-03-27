@@ -13,13 +13,14 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ExportCategoryQuery;
+use Thelia\Model\ImportCategoryQuery;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
@@ -29,7 +30,8 @@ use Thelia\Type\TypeCollection;
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
+ * @method null|int[] getId()
+ * @method null|string[] getRef()
  * @method string[] getOrder()
  */
 abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -38,16 +40,18 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
 
     /**
      * @param LoopResult $loopResult
-     *
      * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\ExportCategory|\Thelia\Model\ImportCategory $category */
         foreach ($loopResult->getResultDataCollection() as $category) {
             $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
                 ->set("ID", $category->getId())
+                ->set("REF", $category->getRef())
                 ->set("TITLE", $category->getVirtualColumn("i18n_TITLE"))
                 ->set("POSITION", $category->getPosition())
             ;
@@ -66,13 +70,17 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
      */
     public function buildModelCriteria()
     {
-        /** @var ModelCriteria $query */
+        /** @var ImportCategoryQuery|ExportCategoryQuery $query */
         $query = $this->getQueryModel();
 
         $this->configureI18nProcessing($query, array('TITLE'));
 
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids, Criteria::IN);
+        }
+
+        if (null !== $refs = $this->getRef()) {
+            $query->filterByRef($refs, Criteria::IN);
         }
 
         if (null !== $orders = $this->getOrder()) {
@@ -83,6 +91,12 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
                         break;
                     case "id_reverse":
                         $query->orderById(Criteria::DESC);
+                        break;
+                    case "ref":
+                        $query->orderByRef();
+                        break;
+                    case "ref_reverse":
+                        $query->orderByRef(Criteria::DESC);
                         break;
                     case "alpha":
                         $query->addAscendingOrderByColumn("i18n_TITLE");
@@ -110,15 +124,19 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createAnyListTypeArgument('ref'),
             new Argument(
                 "order",
                 new TypeCollection(
-                    new EnumListType(["id", "id_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"])
+                    new EnumListType(["id", "id_reverse", "ref", "ref_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"])
                 ),
                 "manual"
             )
         );
     }
 
+    /**
+     * @return ImportCategoryQuery|ExportCategoryQuery
+     */
     abstract protected function getQueryModel();
 }

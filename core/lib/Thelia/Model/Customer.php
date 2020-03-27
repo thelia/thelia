@@ -45,7 +45,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param  int                                       $countryId        customer country id (from Country table)
      * @param  string                                    $email            customer email, must be unique
      * @param  string                                    $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param  string                                    $lang
+     * @param  int                                       $lang
      * @param  int                                       $reseller
      * @param  null                                      $sponsor
      * @param  int                                       $discount
@@ -91,7 +91,7 @@ class Customer extends BaseCustomer implements UserInterface
             ->setRef($ref)
         ;
 
-        if (!is_null($lang)) {
+        if (!\is_null($lang)) {
             $this->setLangId($lang);
         }
 
@@ -120,7 +120,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ;
 
                 $this->addAddress($address);
-                
+
                 if (ConfigQuery::isCustomerEmailConfirmationEnable()) {
                     $this->setConfirmationToken(bin2hex(random_bytes(32)));
                 }
@@ -344,6 +344,15 @@ class Customer extends BaseCustomer implements UserInterface
         return $this->getRememberMeSerial();
     }
 
+    /**
+     * @return string
+     * @throws PropelException
+     */
+    public function getLocale()
+    {
+        return $this->getLangModel()->getLocale();
+    }
+
     public function hasOrder()
     {
         $order = OrderQuery::create()
@@ -366,6 +375,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 
@@ -383,6 +394,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
     }
 
@@ -391,6 +404,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -401,6 +416,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECUSTOMER, new CustomerEvent($this));
     }
 
@@ -409,6 +426,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -419,6 +438,8 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECUSTOMER, new CustomerEvent($this));
     }
 }

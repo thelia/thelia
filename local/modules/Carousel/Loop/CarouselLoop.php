@@ -61,7 +61,9 @@ class CarouselLoop extends Image
                 'manual'
             ),
             Argument::createAnyTypeArgument('effects'),
-            Argument::createBooleanTypeArgument('allow_zoom', false)
+            Argument::createBooleanTypeArgument('allow_zoom', false),
+            Argument::createBooleanTypeArgument('filter_disable_slides', true),
+            Argument::createAlphaNumStringTypeArgument('group')
         );
     }
 
@@ -69,6 +71,7 @@ class CarouselLoop extends Image
      * @param LoopResult $loopResult
      *
      * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
     {
@@ -76,7 +79,31 @@ class CarouselLoop extends Image
         foreach ($loopResult->getResultDataCollection() as $carousel) {
             $imgSourcePath = $carousel->getUploadDir() . DS . $carousel->getFile();
             if (!file_exists($imgSourcePath)) {
-                Tlog::getInstance()->error( sprintf('Carousel source image file %s does not exists.', $imgSourcePath) );
+                Tlog::getInstance()->error(sprintf('Carousel source image file %s does not exists.', $imgSourcePath));
+                continue;
+            }
+
+            $startDate = $carousel->getStartDate();
+            $endDate = $carousel->getEndDate();
+
+            if ($carousel->getLimited()) {
+                $now = new \DateTime();
+                if ($carousel->getDisable()) {
+                    if ($now > $startDate && $now < $endDate) {
+                        $carousel
+                            ->setDisable(0)
+                            ->save();
+                    }
+                } else {
+                    if ($now < $startDate || $now > $endDate) {
+                        $carousel
+                            ->setDisable(1)
+                            ->save();
+                    }
+                }
+            }
+
+            if ($this->getFilterDisableSlides() && $carousel->getDisable()) {
                 continue;
             }
 
@@ -134,20 +161,33 @@ class CarouselLoop extends Image
             // Dispatch image processing event
             $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
+
+            if ($startDate) {
+                $startDate = $startDate->format('Y-m-d').'T'.$startDate->format('H:i');
+            }
+            if ($endDate) {
+                $endDate = $endDate->format('Y-m-d').'T'.$endDate->format('H:i');
+            }
+
             $loopResultRow
                 ->set('ID', $carousel->getId())
-                ->set("LOCALE", $this->locale)
-                ->set("IMAGE_URL", $event->getFileUrl())
-                ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
-                ->set("IMAGE_PATH", $event->getCacheFilepath())
-                ->set("ORIGINAL_IMAGE_PATH", $event->getSourceFilepath())
-                ->set("TITLE", $carousel->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $carousel->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $carousel->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $carousel->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("ALT", $carousel->getVirtualColumn('i18n_ALT'))
-                ->set("URL", $carousel->getUrl())
+                ->set('LOCALE', $this->locale)
+                ->set('IMAGE_URL', $event->getFileUrl())
+                ->set('ORIGINAL_IMAGE_URL', $event->getOriginalFileUrl())
+                ->set('IMAGE_PATH', $event->getCacheFilepath())
+                ->set('ORIGINAL_IMAGE_PATH', $event->getSourceFilepath())
+                ->set('TITLE', $carousel->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $carousel->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $carousel->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $carousel->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('ALT', $carousel->getVirtualColumn('i18n_ALT'))
+                ->set('URL', $carousel->getUrl())
                 ->set('POSITION', $carousel->getPosition())
+                ->set('DISABLE', $carousel->getDisable())
+                ->set('GROUP', $carousel->getGroup())
+                ->set('LIMITED', $carousel->getLimited())
+                ->set('START_DATE', $startDate)
+                ->set('END_DATE', $endDate)
             ;
 
             $loopResult->addRow($loopResultRow);
@@ -164,6 +204,7 @@ class CarouselLoop extends Image
     public function buildModelCriteria()
     {
         $search = CarouselQuery::create();
+        $group = $this->getGroup();
 
         $this->configureI18nProcessing($search, [ 'ALT', 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM' ]);
 
@@ -190,6 +231,10 @@ class CarouselLoop extends Image
                     break(2);
                     break;
             }
+        }
+
+        if ($group){
+            $search->filterByGroup($group);
         }
 
         return $search;

@@ -587,12 +587,12 @@ class Product extends BaseAction implements EventSubscriberInterface
             
             $currentFeatures = FeatureTemplateQuery::create()
                 ->filterByTemplateId($currentTemplateId)
-                ->select([ FeatureTemplateTableMap::FEATURE_ID ])
+                ->select([ FeatureTemplateTableMap::COL_FEATURE_ID ])
                 ->find($con);
     
             $nextFeatures = FeatureTemplateQuery::create()
                 ->filterByTemplateId($nextTemplateId)
-                ->select([ FeatureTemplateTableMap::FEATURE_ID ])
+                ->select([ FeatureTemplateTableMap::COL_FEATURE_ID ])
                 ->find($con);
             
             // Find features values we shoud delete. To do this, we have to
@@ -611,12 +611,12 @@ class Product extends BaseAction implements EventSubscriberInterface
             
             $currentAttributes = AttributeTemplateQuery::create()
                 ->filterByTemplateId($currentTemplateId)
-                ->select([ AttributeTemplateTableMap::ATTRIBUTE_ID ])
+                ->select([ AttributeTemplateTableMap::COL_ATTRIBUTE_ID ])
                 ->find($con);
     
             $nextAttributes = AttributeTemplateQuery::create()
                 ->filterByTemplateId($nextTemplateId)
-                ->select([ AttributeTemplateTableMap::ATTRIBUTE_ID ])
+                ->select([ AttributeTemplateTableMap::COL_ATTRIBUTE_ID ])
                 ->find($con);
             
             // Find attributes values we shoud delete. To do this, we have to
@@ -629,7 +629,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->useAttributeCombinationQuery()
                     ->filterByAttributeId($attributesToDelete, Criteria::IN)
                 ->endUse()
-                ->select([ ProductSaleElementsTableMap::ID ])
+                ->select([ ProductSaleElementsTableMap::COL_ID ])
                 ->find();
     
             // Delete obsolete PSEs
@@ -769,7 +769,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->findById($freeTextFeatureAv->getId());
 
                 // If there are no more FeatureAvI18ns for this FeatureAv, remove the corresponding FeatureProduct & FeatureAv
-                if (count($freeTextFeatureAvI18ns) == 0) {
+                if (\count($freeTextFeatureAvI18ns) == 0) {
                     $deleteFeatureProductEvent = new FeatureProductDeleteEvent($event->getProductId(), $event->getFeatureId());
                     $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $deleteFeatureProductEvent);
 
@@ -869,7 +869,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->useAttributeCombinationQuery()
                 ->filterByAttributeId($event->getAttributeId())
             ->endUse()
-            ->select([ ProductSaleElementsTableMap::ID ])
+            ->select([ ProductSaleElementsTableMap::COL_ID ])
             ->find();
     
         $currencyId = CurrencyModel::getDefaultCurrency()->getId();

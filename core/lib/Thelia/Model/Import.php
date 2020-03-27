@@ -17,6 +17,8 @@ class Import extends BaseImport
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;

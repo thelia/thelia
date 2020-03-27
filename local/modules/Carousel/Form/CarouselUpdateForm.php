@@ -14,6 +14,10 @@ namespace Carousel\Form;
 
 use Carousel\Carousel;
 use Carousel\Model\CarouselQuery;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -65,6 +69,23 @@ class CarouselUpdateForm extends BaseForm
                     'attr' => [
                         'placeholder' => $this->translator->trans(
                             'Displayed when image is not visible',
+                            [],
+                            Carousel::DOMAIN_NAME
+                        )
+                    ]
+                ]
+            )->add(
+                'group' . $id,
+                'text',
+                [
+                    'label' => $this->translator->trans('Group image', [], Carousel::DOMAIN_NAME),
+                    'label_attr' => [
+                        'for' => 'group' . $id
+                    ],
+                    'required' => false,
+                    'attr' => [
+                        'placeholder' => $this->translator->trans(
+                            'Group of images',
                             [],
                             Carousel::DOMAIN_NAME
                         )
@@ -135,6 +156,43 @@ class CarouselUpdateForm extends BaseForm
                     'attr' => [
                         'rows' => 5
                     ]
+                ]
+            )->add(
+                'disable' . $id,
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => $this->translator->trans('Disable image', [], Carousel::DOMAIN_NAME),
+                    'label_attr' => [
+                        'for' => 'enable' . $id,
+                    ],
+                ]
+            )->add(
+                'limited' . $id,
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => $this->translator->trans('Limited', [], Carousel::DOMAIN_NAME),
+                    'label_attr' => [
+                        'for' => 'limited' . $id,
+                    ],
+                ]
+            )->add(
+                'start_date' . $id,
+                DateTimeType::class,
+                [
+                    'label' => $this->translator->trans('Start date', [], Carousel::DOMAIN_NAME),
+                    'widget' => "single_text",
+                    'required' => false,
+                ]
+            )->add(
+                'end_date' . $id,
+                DateTimeType::class,
+                [
+                    'label' => $this->translator->trans('End date', [], Carousel::DOMAIN_NAME),
+                    'widget' => "single_text",
+                    'required' => false,
+
                 ]
             )->add(
                 'postscriptum' . $id,

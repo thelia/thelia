@@ -92,7 +92,7 @@ class CacheClear extends ContainerAwareCommand
         $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $dir));
 
         try {
-            $cacheEvent = new CacheEvent($dir);
+            $cacheEvent = new CacheEvent($dir, false);
             $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...

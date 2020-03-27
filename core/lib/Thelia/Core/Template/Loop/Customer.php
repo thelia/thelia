@@ -144,15 +144,15 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         // if newsletter === "*" or false, it'll be a left join
         $join = new Join(
-            CustomerTableMap::EMAIL,
-            NewsletterTableMap::EMAIL,
+            CustomerTableMap::COL_EMAIL,
+            NewsletterTableMap::COL_EMAIL,
             true === $newsletter ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN
         );
 
         $search
             ->addJoinObject($join, 'newsletter_join')
-            ->addJoinCondition('newsletter_join', NewsletterTableMap::UNSUBSCRIBED . ' = ?', false, null, \PDO::PARAM_BOOL)
-            ->withColumn("IF(ISNULL(".NewsletterTableMap::EMAIL."), 0, 1)", "is_registered_to_newsletter");
+            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED . ' = ?', false, null, \PDO::PARAM_BOOL)
+            ->withColumn("IF(ISNULL(".NewsletterTableMap::COL_EMAIL."), 0, 1)", "is_registered_to_newsletter");
 
         // If "*" === $newsletter, no filter will be applied, so it won't change anything
         if (false === $newsletter) {

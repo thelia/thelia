@@ -124,14 +124,14 @@ class TaxRuleControllerTest extends ApiTestCase
 
         $taxes = TaxQuery::create()
             ->limit(2)
-            ->select(TaxTableMap::ID)
+            ->select(TaxTableMap::COL_ID)
             ->find()
             ->toArray()
         ;
 
         $countries = CountryQuery::create()
             ->limit(2)
-            ->select(CountryTableMap::ID)
+            ->select(CountryTableMap::COL_ID)
             ->find()
             ->toArray()
         ;
@@ -258,7 +258,7 @@ class TaxRuleControllerTest extends ApiTestCase
 
         $countries = CountryQuery::create()
             ->limit(2)
-            ->select(CountryTableMap::ID)
+            ->select(CountryTableMap::COL_ID)
             ->find()
             ->toArray()
         ;

@@ -172,7 +172,7 @@ class Coupon extends BaseCoupon
         $this->setSerializedConditions($serializableConditions);
 
         // Set object language (i18n)
-        if (!is_null($locale)) {
+        if (!\is_null($locale)) {
             $this->setLocale($locale);
         }
 
@@ -189,7 +189,7 @@ class Coupon extends BaseCoupon
     public function setAmount($amount)
     {
         $effects = $this->unserializeEffects($this->getSerializedEffects());
-        $effects['amount'] = floatval($amount);
+        $effects['amount'] = \floatval($amount);
         $this->setEffects($effects);
 
         return $this;
@@ -205,7 +205,7 @@ class Coupon extends BaseCoupon
         // Amount is now optional
         $amount = isset($this->getEffects()['amount']) ? $this->getEffects()['amount'] : 0;
 
-        return floatval($amount);
+        return \floatval($amount);
     }
 
     /**

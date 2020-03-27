@@ -30,6 +30,8 @@ Customize images with the `carousel` loop, which has the same arguments as the `
 |**quality** |The generated image quality, from 0(!) to 100%. The default value is 75% (you can hange this in the Administration panel).  example : quality="70"|
 |**resize_mode** | If 'crop', the image will have the exact specified width and height, and will be cropped if required. If 'borders', the image will have the exact specified width and height, and some borders may be added. The border color is the one specified by 'background_color'. If 'none' or missing, the image ratio is preserved, and depending od this ratio, may not have the exact width and height required. resize_mode="crop"|
 |**effects** |One or more comma separated effects definitions, that will be applied to the image in the specified order. Please see below a detailed description of available effects. Expected values :<ul><li>gamma:value : change the image Gamma to the specified value. Example: gamma:0.7.</li><li>grayscale or greyscale : switch image to grayscale.</li><li>colorize:color : apply a color mask to the image. The color format is $rgb or $rrggbb. Example: colorize:$ff2244.</li><li>negative : transform the image in its negative equivalent.</li><li>vflip or vertical_flip : flip the image vertically.</li><li>hflip or horizontal_flip : flip the image horizontally.</li></ul>example : effects="greyscale,gamma:0.7,vflip" |
+|**group** |The name of an image group. Return only images from the specified group|
+|**filter_disable_slides** |if true (the default), the disabled slides will not be displayed|
 
 ### Ouput arguments
 
@@ -41,13 +43,18 @@ Customize images with the `carousel` loop, which has the same arguments as the `
 |$IMAGE_PATH    |The absolute path to the generated image file  |
 |$ORIGINAL_IMAGE_PATH   |The absolute path to the original image file  |
 |$ALT   |alt text |
-|$TITLE   |the image title |
-|$CHAPO   |the image summary |
-|$DESCRIPTION   |the image description |
-|$POSTSCRIPTUM   |the image conclusion |
+|$TITLE   |the slide title |
+|$CHAPO   |the slide summary |
+|$DESCRIPTION   |the slide description |
+|$POSTSCRIPTUM   |the slide conclusion |
 |$LOCALE   |the textual elements locale |
-|$POSITION   |the image position in the carousel |
+|$POSITION   |the slide position in the carousel |
 |$URL   |the related URL |
+|$LIMITED| true if slide is disabled, false otherwise |
+|$START_DATE| limited slide display start date |
+|$END_DATE| limited slide display end date |
+|$DISABLE| true if slide display is limited |
+|$GROUP| name of the group the slide belong to |
 
 ### Exemple
 

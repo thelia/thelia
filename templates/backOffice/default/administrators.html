@@ -32,11 +32,18 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption class="clearfix">
                                 {intl l="Administrators"}
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.administrator" access="CREATE"}
-                                    <a class="btn btn-primary pull-right" title="{intl l='Create a new administrator'}" href="#administrator_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Create a new administrator'},
+                                        'href' => '#administrator_create_dialog',
+                                        'auth' => ['resource' => 'admin.administrator'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
                                 <tr>
@@ -90,24 +97,37 @@
                                     </td>
                                     {hook name="administrators.row" location="administrator_list_row" admin_id={$ID}}
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {* if admin is current admin :
-                                                - can UPDATE anyway
-                                                - cannot delete himself
-                                            *}
-                                            {if $can_update}
-                                                <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/if}
+                                       {$buttons = []}
 
-                                            {if $ID != {admin attr="id"}}
-                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
-                                                    <a class="js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                                {/loop}
-                                            {/if}
-                                        </div>
+                                        {if $can_update}
+                                            {$buttons[] = [
+                                                'type' => 'edit',
+                                                'class' => 'js-update-administrator',
+                                                'title' => {intl l='Change this administrator'},
+                                                'href' => '#administrator_update_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ]
+                                            ]}
+                                        {/if}
+
+                                        {if $ID != {admin attr="id"}}
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
+                                            {$buttons[] = [
+                                                'type' => 'delete',
+                                                'class' => 'js-delete-administrator',
+                                                'title' => {intl l='Delete this administrator'},
+                                                'href' => '#administrator_delete_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ]
+                                            ]}
+                                        {/loop}
+                                        {/if}
+
+                                        {include file='renderer/buttons.html' buttons=$buttons}
                                     </td>
                                 </tr>
 
