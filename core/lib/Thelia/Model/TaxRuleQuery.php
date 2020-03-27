@@ -24,16 +24,17 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 
     /**
      * @param TaxRule $taxRule
-     * @param Country $country
-     *
-     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     * @param Country|null $country
+     * @param State|null $state
+     * @return array|mixed|\Propel\Runtime\ActiveRecord\ActiveRecordInterface[]|\Propel\Runtime\Collection\ObjectCollection|Tax[]
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country, State $state = null)
+    public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country = null, State $state = null)
     {
         $key = sprintf(
             '%s-%s-%s',
             $taxRule->getId(),
-            $country->getId(),
+            ($country !== null) ? $country->getId() : 0,
             ($state !== null) ? $state->getId() : 0
         );
 
@@ -41,19 +42,24 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             return self::$caches[$key];
         }
 
-
         $taxRuleQuery = TaxRuleCountryQuery::create()
-            ->filterByCountry($country, Criteria::EQUAL)
             ->filterByTaxRuleId($taxRule->getId());
 
+        if (null !== $country) {
+            $taxRuleQuery->filterByCountry($country, Criteria::EQUAL);
+        }
+
+        $synthetizedSateId = $state;
+
         if (null !== $state) {
-            $taxRuleCount = $taxRuleQuery
-                ->filterByStateId($state->getId(), Criteria::EQUAL)
-                ->count();
-            if (0 === $taxRuleCount) {
-                $taxRuleQuery->filterByStateId(null, Criteria::EQUAL);
+            $taxRuleCount = clone $taxRuleQuery;
+
+            if (0 === $taxRuleCount->filterByStateId($state->getId(), Criteria::EQUAL)->count()) {
+                $synthetizedSateId = null;
             }
         }
+
+        $taxRuleQuery->filterByStateId($synthetizedSateId, Criteria::EQUAL);
 
         $search = TaxQuery::create()
             ->filterByTaxRuleCountry($taxRuleQuery->find())

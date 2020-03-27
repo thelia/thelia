@@ -26,9 +26,9 @@ class Accessory extends BaseAccessory
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        parent::preInsert($con);
-
         $this->setPosition($this->getNextPosition());
+
+        parent::preInsert($con);
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEACCESSORY, new AccessoryEvent($this));
 

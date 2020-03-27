@@ -148,6 +148,5 @@ class Api extends BaseApi implements UserInterface
     public function getLocale()
     {
         throw new \RuntimeException("getLocale is not implemented");
-
     }
 }

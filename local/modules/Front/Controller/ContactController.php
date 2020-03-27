@@ -24,6 +24,8 @@
 namespace Front\Controller;
 
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\Event\Contact\ContactEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -45,18 +47,22 @@ class ContactController extends BaseFrontController
         
         try {
             $form = $this->validateForm($contactForm);
-            
+
+            $event = new ContactEvent($form);
+
+            $this->dispatch(TheliaEvents::CONTACT_SUBMIT, $event);
+
             $this->getMailer()->sendSimpleEmailMessage(
-                [ ConfigQuery::getStoreEmail() => $form->get('name')->getData() ],
+                [ ConfigQuery::getStoreEmail() => $event->getName() ],
                 [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
-                $form->get('subject')->getData(),
+                $event->getSubject(),
                 '',
-                $form->get('message')->getData(),
+                $event->getMessage(),
                 [],
                 [],
-                [ $form->get('email')->getData() => $form->get('name')->getData() ]
+                [ $event->getEmail() => $event->getName() ]
             );
-            
+
             if ($contactForm->hasSuccessUrl()) {
                 return $this->generateSuccessRedirect($contactForm);
             }

@@ -68,7 +68,7 @@ class CouponManager
 
         $coupons = $this->facade->getCurrentCoupons();
 
-        if (count($coupons) > 0) {
+        if (\count($coupons) > 0) {
             $couponsKept = $this->sortCoupons($coupons);
 
             $discount = $this->getEffect($couponsKept);
@@ -104,7 +104,7 @@ class CouponManager
     {
         $coupons = $this->facade->getCurrentCoupons();
 
-        if (count($coupons) == 0) {
+        if (\count($coupons) == 0) {
             return false;
         }
 

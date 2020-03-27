@@ -21,8 +21,8 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Type;
@@ -48,6 +48,7 @@ use Thelia\Type\TypeCollection;
  * @method string getRef()
  * @method int[] getAttributeAvailability()
  * @method string[] getOrder()
+ * @method bool|string getVisible()
  */
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -65,6 +66,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             Argument::createBooleanTypeArgument('promo'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('default'),
+            Argument::createBooleanOrBothTypeArgument('visible', Type\BooleanOrBothType::ANY),
             Argument::createAnyTypeArgument('ref'),
             new Argument(
                 'attribute_availability',
@@ -83,6 +85,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'min_price', 'max_price',
                             'promo', 'new',
                             'weight', 'weight_reverse',
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
                             'random'
                         )
                     )
@@ -100,21 +104,16 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $product = $this->getProduct();
         $ref = $this->getRef();
 
-        if (! is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
-        } elseif (! is_null($product)) {
-            $search->filterByProductId($product, Criteria::EQUAL);
-        } elseif (! is_null($ref)) {
-            $search->filterByRef($ref, Criteria::EQUAL);
-        } else {
-            $searchTerm = $this->getArgValue('search_term');
-            $searchIn   = $this->getArgValue('search_in');
+        }
 
-            if (null === $searchTerm || null === $searchIn) {
-                throw new \InvalidArgumentException(
-                    "Either 'id', 'product', 'ref', 'search_term/search_in' argument should be present"
-                );
-            }
+        if (!\is_null($product)) {
+            $search->filterByProductId($product, Criteria::EQUAL);
+        }
+
+        if (!\is_null($ref)) {
+            $search->filterByRef($ref, Criteria::EQUAL);
         }
 
         $promo = $this->getPromo();
@@ -127,6 +126,14 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
         if (null !== $new) {
             $search->filterByNewness($new);
+        }
+
+        $visible = $this->getVisible();
+
+        if (Type\BooleanOrBothType::ANY !== $visible) {
+            $search->useProductQuery()
+                ->filterByVisible($visible)
+            ->endUse();
         }
 
         $default = $this->getDefault();
@@ -174,6 +181,18 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     break;
                 case "weight_reverse":
                     $search->orderByWeight(Criteria::DESC);
+                    break;
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
                     break;
                 case "random":
                     $search->clearOrderByColumns();

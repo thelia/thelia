@@ -119,7 +119,7 @@
                                         <dt class="refView">{intl l="No."}</dt>
                                         <dd>{$REF}</dd>
                                     {/loop}
-                                    
+
                                     {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
                                         <dt class="attributeView">{$ATTRIBUTE_TITLE}</dt>
                                         <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
@@ -230,12 +230,16 @@
                 {hook name="order-invoice.coupon-form"}
                 </form>
             {/form}
-            
+
             {form name="thelia.order.payment"}
             {assign var="isPost" value=$smarty.post|count}
             <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype}>
 
                 {form_hidden_fields}
+
+                {form_field field="error_url"}
+                    <input type="hidden" name="{$name}" value="{url path="/order/invoice"}">
+                {/form_field}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -334,7 +338,7 @@
                                 {assign "paymentModuleId" $ID}
                                 <li class="list-group-item text-left">
                                     <label for="payment_{$paymentModuleId}">
-                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
+                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if ($LOOP_TOTAL ==1 && $LOOP_COUNT == 1) || ($value == $paymentModuleId)}checked{/if}>
                                         {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
                                             <img src="{$IMAGE_URL nofilter}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                         {/loop}

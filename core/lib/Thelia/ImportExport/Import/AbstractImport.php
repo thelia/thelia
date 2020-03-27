@@ -161,7 +161,7 @@ abstract class AbstractImport implements \Iterator
     {
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
-        if (count($diff) > 0) {
+        if (\count($diff) > 0) {
             throw new \UnexpectedValueException(
                 Translator::getInstance()->trans(
                     'The following columns are missing: %columns',

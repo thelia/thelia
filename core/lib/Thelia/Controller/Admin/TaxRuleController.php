@@ -376,12 +376,12 @@ class TaxRuleController extends AbstractCrudController
         if (!$taxRuleCountries->isEmpty()) {
             $taxRuleCountry = $taxRuleCountries->getFirst();
             $currentCountryId = $taxRuleCountry->getCountryId();
-            $currentStateId = intval($taxRuleCountry->getStateId());
+            $currentStateId = \intval($taxRuleCountry->getStateId());
 
             while (true) {
                 $hasChanged = $taxRuleCountry === null
                     || $taxRuleCountry->getCountryId() != $currentCountryId
-                    || intval($taxRuleCountry->getStateId()) != $currentStateId
+                    || \intval($taxRuleCountry->getStateId()) != $currentStateId
                 ;
 
                 if ($hasChanged) {
@@ -393,7 +393,7 @@ class TaxRuleController extends AbstractCrudController
                         'specification' => $specification
                     ];
 
-                    if (!in_array($specification, $taxRules)) {
+                    if (!\in_array($specification, $taxRules)) {
                         $taxRules[] = $specification;
                     }
 
@@ -402,7 +402,7 @@ class TaxRuleController extends AbstractCrudController
                     }
 
                     $currentCountryId = $taxRuleCountry->getCountryId();
-                    $currentStateId = intval($taxRuleCountry->getStateId());
+                    $currentStateId = \intval($taxRuleCountry->getStateId());
                     $specKey = [];
                 }
 

@@ -97,7 +97,7 @@ class SchemaCombiner
      */
     protected function assertDatabase($database)
     {
-        if (!in_array($database, $this->databases)) {
+        if (!\in_array($database, $this->databases)) {
             throw new \InvalidArgumentException("Database '{$database}' is not in the combined databases.");
         }
     }
@@ -325,7 +325,7 @@ class SchemaCombiner
      */
     protected function initGlobalDatabaseElement($database)
     {
-        if (in_array($database, $this->databases)) {
+        if (\in_array($database, $this->databases)) {
             return;
         }
 

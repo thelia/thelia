@@ -145,9 +145,9 @@ class BaseAdminController extends BaseController
      */
     protected function checkAuth($resources, $modules, $accesses)
     {
-        $resources = is_array($resources) ? $resources : array($resources);
-        $modules = is_array($modules) ? $modules : array($modules);
-        $accesses = is_array($accesses) ? $accesses : array($accesses);
+        $resources = \is_array($resources) ? $resources : array($resources);
+        $modules = \is_array($modules) ? $modules : array($modules);
+        $accesses = \is_array($accesses) ? $accesses : array($accesses);
 
         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
             // Okay !

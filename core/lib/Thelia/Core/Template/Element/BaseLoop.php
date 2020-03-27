@@ -57,6 +57,9 @@ abstract class BaseLoop
     /** @var array|null array of loop definitions (class => id) */
     protected static $loopDefinitions = null;
 
+    /** @var ArgumentCollection[] cache for loop arguments (class => ArgumentCollection) */
+    protected static $loopDefinitionsArgs = [];
+
     /**
      * @var Request
      * @deprecated since 2.3, please use getCurrentRequest()
@@ -122,23 +125,31 @@ abstract class BaseLoop
      */
     protected function initialize()
     {
+        $class = \get_class($this);
+
         if (null === self::$loopDefinitions) {
-            self::$loopDefinitions = array_flip($this->container->getParameter('thelia.parser.loops'));
+            self::$loopDefinitions = \array_flip($this->container->getParameter('thelia.parser.loops'));
         }
 
-        if (isset(self::$loopDefinitions[get_class($this)])) {
-            $this->loopName = self::$loopDefinitions[get_class($this)];
+        if (isset(self::$loopDefinitions[$class])) {
+            $this->loopName = self::$loopDefinitions[$class];
         }
 
-        $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
+        if (!isset(self::$loopDefinitionsArgs[$class])) {
+            $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
 
-        $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS);
-        if (null !== $eventName) {
-            $this->dispatcher->dispatch(
-                $eventName,
-                new LoopExtendsArgDefinitionsEvent($this)
-            );
+            $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS);
+            if (null !== $eventName) {
+                $this->dispatcher->dispatch(
+                    $eventName,
+                    new LoopExtendsArgDefinitionsEvent($this)
+                );
+            };
+
+            self::$loopDefinitionsArgs[$class] = $this->args;
         }
+
+        $this->args = self::$loopDefinitionsArgs[$class];
     }
 
     /**
@@ -152,49 +163,38 @@ abstract class BaseLoop
             Argument::createBooleanTypeArgument('backend_context', false),
             Argument::createBooleanTypeArgument('force_return', false),
             Argument::createAnyTypeArgument('type'),
-            Argument::createBooleanTypeArgument('no-cache', false)
+            Argument::createBooleanTypeArgument('no-cache', false),
+            Argument::createBooleanTypeArgument('return_url', true)
         ];
 
         if (true === $this->countable) {
-            $defaultArgs = array_merge(
-                $defaultArgs,
-                [
-                    Argument::createIntTypeArgument('offset', 0),
-                    Argument::createIntTypeArgument('page'),
-                    Argument::createIntTypeArgument('limit', PHP_INT_MAX),
-                ]
-            );
+            $defaultArgs[] = Argument::createIntTypeArgument('offset', 0);
+            $defaultArgs[] = Argument::createIntTypeArgument('page');
+            $defaultArgs[] = Argument::createIntTypeArgument('limit', PHP_INT_MAX);
         }
 
         if ($this instanceof SearchLoopInterface) {
-            $defaultArgs = array_merge(
-                $defaultArgs,
-                [
-                    Argument::createAnyTypeArgument('search_term'),
-                    new Argument(
-                        'search_in',
-                        new TypeCollection(
-                            new EnumListType($this->getSearchIn())
-                        )
-                    ),
-                    new Argument(
-                        'search_mode',
-                        new TypeCollection(
-                            new EnumType(
-                                [
-                                    SearchLoopInterface::MODE_ANY_WORD,
-                                    SearchLoopInterface::MODE_SENTENCE,
-                                    SearchLoopInterface::MODE_STRICT_SENTENCE,
-                                ]
-                            )
-                        ),
-                        SearchLoopInterface::MODE_STRICT_SENTENCE
+            $defaultArgs[] = Argument::createAnyTypeArgument('search_term');
+            $defaultArgs[] = new Argument(
+                'search_in',
+                new TypeCollection(
+                    new EnumListType($this->getSearchIn())
+                )
+            );
+            $defaultArgs[] = new Argument(
+                'search_mode',
+                new TypeCollection(
+                    new EnumType(
+                        [
+                            SearchLoopInterface::MODE_ANY_WORD,
+                            SearchLoopInterface::MODE_SENTENCE,
+                            SearchLoopInterface::MODE_STRICT_SENTENCE,
+                        ]
                     )
-                ]
+                ),
+                SearchLoopInterface::MODE_STRICT_SENTENCE
             );
         }
-
-        $defaultArgs[] = Argument::createBooleanTypeArgument('return_url', true);
 
         return $defaultArgs;
     }
@@ -396,13 +396,13 @@ abstract class BaseLoop
             return $search;
         }
 
-        $limit  = intval($this->getArgValue('limit'));
-        $offset = intval($this->getArgValue('offset'));
+        $limit  = (int) $this->getArgValue('limit');
+        $offset = (int) $this->getArgValue('offset');
 
         if ($this->getArgValue('page') !== null) {
-            $pageNum = intval($this->getArgValue('page'));
+            $pageNum = (int) $this->getArgValue('page');
 
-            $totalPageCount = ceil(count($search) / $limit);
+            $totalPageCount = ceil(\count($search) / $limit);
 
             if ($pageNum > $totalPageCount || $pageNum <= 0) {
                 return [];
@@ -410,9 +410,9 @@ abstract class BaseLoop
 
             $firstItem = ($pageNum - 1) * $limit + 1;
 
-            return array_slice($search, $firstItem, $firstItem + $limit, false);
+            return \array_slice($search, $firstItem, $firstItem + $limit, false);
         } else {
-            return array_slice($search, $offset, $limit, false);
+            return \array_slice($search, $offset, $limit, false);
         }
     }
 
@@ -423,13 +423,13 @@ abstract class BaseLoop
      */
     protected function searchWithOffset(ModelCriteria $search)
     {
-        $limit = intval($this->getArgValue('limit'));
+        $limit = (int) $this->getArgValue('limit');
 
         if ($limit >= 0) {
             $search->limit($limit);
         }
 
-        $search->offset(intval($this->getArgValue('offset')));
+        $search->offset((int) $this->getArgValue('offset'));
 
         return $search->find();
     }
@@ -442,8 +442,8 @@ abstract class BaseLoop
      */
     protected function searchWithPagination(ModelCriteria $search, &$pagination)
     {
-        $page  = intval($this->getArgValue('page'));
-        $limit = intval($this->getArgValue('limit'));
+        $page  = (int) $this->getArgValue('page');
+        $limit = (int) $this->getArgValue('limit');
 
         $pagination = $search->paginate($page, $limit);
 
@@ -478,7 +478,7 @@ abstract class BaseLoop
             if (null === $searchArray) {
                 $count = 0;
             } else {
-                $count = count($searchArray);
+                $count = \count($searchArray);
             }
         }
 
@@ -538,9 +538,9 @@ abstract class BaseLoop
         }
 
         $parsedResults = $this->extendsParseResults($this->parseResults($loopResult));
-    
+
         $loopResult->finalizeRows();
-    
+
         if ($isCaching) {
             self::$cacheLoopResult[$hash] = $parsedResults;
 

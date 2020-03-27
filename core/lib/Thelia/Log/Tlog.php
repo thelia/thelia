@@ -205,7 +205,7 @@ class Tlog implements LoggerInterface
     {
         $this->files = explode(";", $files);
 
-        $this->all_files = in_array('*', $this->files);
+        $this->all_files = \in_array('*', $this->files);
 
         return $this;
     }
@@ -213,7 +213,7 @@ class Tlog implements LoggerInterface
     public function setIp($ips)
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
-        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) {
+        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! \in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) {
             $this->level = self::MUET;
         }
         return $this;
@@ -270,7 +270,7 @@ class Tlog implements LoggerInterface
      */
     public function addDebug()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::DEBUG, $arg);
@@ -300,7 +300,7 @@ class Tlog implements LoggerInterface
      */
     public function addInfo()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::INFO, $arg);
@@ -328,7 +328,7 @@ class Tlog implements LoggerInterface
      */
     public function addNotice()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::NOTICE, $arg);
@@ -359,7 +359,7 @@ class Tlog implements LoggerInterface
      */
     public function addWarning()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::WARNING, $arg);
@@ -388,7 +388,7 @@ class Tlog implements LoggerInterface
      */
     public function addError()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::ERROR, $arg);
@@ -427,7 +427,7 @@ class Tlog implements LoggerInterface
      */
     public function addCritical()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::CRITICAL, $arg);
@@ -467,7 +467,7 @@ class Tlog implements LoggerInterface
      */
     public function addAlert()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::ALERT, $arg);
@@ -495,7 +495,7 @@ class Tlog implements LoggerInterface
      */
     public function addEmergency()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         foreach ($args as $arg) {
             $this->log(self::EMERGENCY, $arg);
@@ -604,7 +604,7 @@ class Tlog implements LoggerInterface
      */
     public function isActivedFile($file)
     {
-        return ($this->all_files || in_array($file, $this->files)) && ! in_array("!$file", $this->files);
+        return ($this->all_files || \in_array($file, $this->files)) && ! \in_array("!$file", $this->files);
     }
 
     /* -- Methodes privees ---------------------------------------- */

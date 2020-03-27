@@ -23,6 +23,8 @@ class Module extends BaseModule
     public function postSave(ConnectionInterface $con = null)
     {
         ModuleQuery::resetActivated();
+
+        parent::postSave();
     }
 
     public function getTranslationDomain()

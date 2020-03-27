@@ -193,7 +193,7 @@
         {/forhook}
         {/hookblock}
     </table>
-	
+
 	{hook name="delivery.after-information" order=$order_id}
 
     <table class="table-address">
@@ -206,7 +206,7 @@
                 {* delivery module can customize the delivery address *}
                 {hook name="delivery.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                 {/ifhook}
-                {elsehook rel="delivery.delivery-address"}                
+                {elsehook rel="delivery.delivery-address"}
 				    {format_address order_address=$DELIVERY_ADDRESS locale=$locale}
                 {/elsehook}
             </td>
@@ -254,7 +254,7 @@
             </td>
         </tr>
 
-            {hook name="delivery.order-product" order="{$order_id}" order_product="{$ID}"}
+            {hook name="delivery.order-product" order={$order_id} order_product={$ID}}
         {/loop}
     </table>
 

@@ -206,7 +206,7 @@ trait PositionManagementTrait
 
         $data[':position'] = $this->getPosition();
 
-        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE " . (count($whereCriteria)>0 ? implode(" AND ", $whereCriteria) : '1') . " AND position>:position", $mapClassName::TABLE_NAME);
+        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE " . (\count($whereCriteria)>0 ? implode(" AND ", $whereCriteria) : '1') . " AND position>:position", $mapClassName::TABLE_NAME);
 
         $con = Propel::getConnection($mapClassName::DATABASE_NAME);
         $statement = $con->prepare($sql);

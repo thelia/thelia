@@ -102,7 +102,7 @@ abstract class BaseController
                 'Content-type' => "application/pdf",
                 'Content-Disposition' =>sprintf(
                     '%s; filename=%s.pdf',
-                    boolval($browser) === false ? 'attachment' : 'inline',
+                    \boolval($browser) === false ? 'attachment' : 'inline',
                     $fileName
                 )
             )

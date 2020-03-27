@@ -30,14 +30,17 @@ class MailingSystemModificationForm extends BaseForm
                 "label_attr" => array("for" => "enabled_field"),
             ))
             ->add("host", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Host"),
                 "label_attr" => array("for" => "host_field"),
             ))
             ->add("port", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Port"),
                 "label_attr" => array("for" => "port_field"),
             ))
             ->add("encryption", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Encryption"),
                 "label_attr" => array(
                     "for" => "encryption_field",
@@ -45,14 +48,17 @@ class MailingSystemModificationForm extends BaseForm
                 ),
             ))
             ->add("username", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Username"),
                 "label_attr" => array("for" => "username_field"),
             ))
             ->add("password", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array("for" => "password_field"),
             ))
             ->add("authmode", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Auth mode"),
                 "label_attr" => array(
                     "for" => "authmode_field",
@@ -60,10 +66,12 @@ class MailingSystemModificationForm extends BaseForm
                 ),
             ))
             ->add("timeout", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Timeout"),
                 "label_attr" => array("for" => "timeout_field"),
             ))
             ->add("sourceip", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Source IP"),
                 "label_attr" => array("for" => "sourceip_field"),
             ))

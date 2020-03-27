@@ -55,7 +55,7 @@ class MetaDataQuery extends BaseMetaDataQuery
     {
         $out = array();
 
-        if (is_int($elementId)) {
+        if (\is_int($elementId)) {
             $datas = self::create()
                 ->filterByElementKey($elementKey)
                 ->filterByElementId($elementId)

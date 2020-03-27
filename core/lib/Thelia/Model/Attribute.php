@@ -17,12 +17,12 @@ class Attribute extends BaseAttribute
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        parent::preInsert($con);
-
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEATTRIBUTE, new AttributeEvent($this));
 
         // Set the current position for the new object
         $this->setPosition($this->getNextPosition());
+
+        parent::preInsert($con);
 
         return true;
     }

@@ -148,7 +148,7 @@ class CustomerExport extends AbstractExport
          */
         $orders->rewind();
 
-        $arrayLength = count($results);
+        $arrayLength = \count($results);
 
         $previousCustomerId = null;
 

@@ -31,7 +31,7 @@ class ModuleHookEvent extends ActionEvent
 
     public function hasModuleHook()
     {
-        return ! is_null($this->moduleHook);
+        return ! \is_null($this->moduleHook);
     }
 
     public function getModuleHook()

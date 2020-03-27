@@ -13,7 +13,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\ClassNotFoundException;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -21,6 +20,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Log\Tlog;
 use Thelia\Model\Import as ImportModel;
 use Thelia\Tools\URL;
 use Thelia\Type\EnumListType;
@@ -32,8 +32,9 @@ use Thelia\Type\TypeCollection;
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getCategory()
+ * @method null|int[] getId()
+ * @method null|string[] getRef()
+ * @method null|int[] getCategory()
  * @method string[] getOrder()
  */
 abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -44,12 +45,12 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
     /**
      * @param LoopResult $loopResult
-     *
      * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
     {
-        /** @var ImportModel $type */
+        /** @var ImportModel|\Thelia\Model\Export $type */
         foreach ($loopResult->getResultDataCollection() as $type) {
             $loopResultRow = new LoopResultRow($type);
 
@@ -61,14 +62,15 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                 $loopResultRow
                     ->set("HANDLE_CLASS", $type->getHandleClass())
                     ->set("ID", $type->getId())
+                    ->set("REF", $type->getRef())
                     ->set("TITLE", $type->getVirtualColumn("i18n_TITLE"))
                     ->set("DESCRIPTION", $type->getVirtualColumn("i18n_DESCRIPTION"))
                     ->set("URL", $url)
                     ->set("POSITION", $type->getPosition())
                     ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
                 ;
-            } catch (ClassNotFoundException $e) {
-            } catch (\ErrorException $e) {
+            } catch (\Exception $e) {
+                Tlog::getInstance()->error($e->getMessage());
             }
 
             $this->addOutputFields($loopResultRow, $type);
@@ -85,13 +87,17 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
      */
     public function buildModelCriteria()
     {
-        /** @var ModelCriteria $query */
+        /** @var \Thelia\Model\ImportQuery|\Thelia\Model\ExportQUery $query */
         $query = $this->getQueryModel();
 
         $this->configureI18nProcessing($query, array('TITLE', 'DESCRIPTION'));
 
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids);
+        }
+
+        if (null !== $refs = $this->getRef()) {
+            $query->filterByRef($refs);
         }
 
         if (null !== $categories = $this->getCategory()) {
@@ -106,6 +112,12 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                         break;
                     case "id_reverse":
                         $query->orderById(Criteria::DESC);
+                        break;
+                    case "ref":
+                        $query->orderByRef();
+                        break;
+                    case "ref_reverse":
+                        $query->orderByRef(Criteria::DESC);
                         break;
                     case "alpha":
                         $query->addAscendingOrderByColumn("i18n_TITLE");
@@ -155,6 +167,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('category'),
+            Argument::createAnyListTypeArgument('ref'),
             new Argument(
                 "order",
                 new TypeCollection(
@@ -167,12 +180,21 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
     public static function getAllowedOrders()
     {
-        return ["id", "id_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"];
+        return ["id", "id_reverse", "ref", "ref_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"];
     }
 
+    /**
+     * @return string
+     */
     abstract protected function getBaseUrl();
 
+    /**
+     * @return \Thelia\Model\ImportQuery|\Thelia\Model\ExportQUery
+     */
     abstract protected function getQueryModel();
 
+    /**
+     * @return string
+     */
     abstract protected function getCategoryName();
 }

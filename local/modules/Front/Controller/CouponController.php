@@ -26,6 +26,7 @@ use Front\Front;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
+use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\UnmatchableConditionException;
@@ -96,16 +97,25 @@ class CouponController extends BaseFrontController
                     $orderEvent = new OrderEvent($order);
 
                     try {
-                        $postage = OrderPostage::loadFromPostage(
-                            $moduleInstance->getPostage($deliveryAddress->getCountry())
+                        $deliveryPostageEvent = new DeliveryPostageEvent(
+                            $moduleInstance,
+                            $this->getSession()->getSessionCart($this->getDispatcher()),
+                            $deliveryAddress
                         );
+
+                        $this->getDispatcher()->dispatch(
+                            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
+                            $deliveryPostageEvent
+                        );
+
+                        $postage = $deliveryPostageEvent->getPostage();
 
                         $orderEvent->setPostage($postage->getAmount());
                         $orderEvent->setPostageTax($postage->getAmountTax());
                         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
                         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                    } catch (DeliveryException $ex) {
+                    } catch (\Exception $ex) {
                         // The postage has been chosen, but changes dues to coupon causes an exception.
                         // Reset the postage data in the order
                         $orderEvent->setDeliveryModule(0);
@@ -116,7 +126,6 @@ class CouponController extends BaseFrontController
             }
 
             return $this->generateSuccessRedirect($couponCodeForm);
-
         } catch (FormValidationException $e) {
             $message = $this->getTranslator()->trans(
                 'Please check your coupon code: %message',

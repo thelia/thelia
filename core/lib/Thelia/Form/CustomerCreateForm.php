@@ -95,7 +95,7 @@ class CustomerCreateForm extends AddressCreateForm
         ;
 
         //confirm email
-        if (intval(ConfigQuery::read("customer_confirm_email", 0))) {
+        if (\intval(ConfigQuery::read("customer_confirm_email", 0))) {
             $this->formBuilder->add("email_confirm", "email", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),

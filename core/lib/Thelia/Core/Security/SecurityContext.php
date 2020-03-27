@@ -109,7 +109,7 @@ class SecurityContext
             $userRoles = $user->getRoles();
 
             foreach ($userRoles as $role) {
-                if (in_array($role, $roles)) {
+                if (\in_array($role, $roles)) {
                     return true;
                 }
             }

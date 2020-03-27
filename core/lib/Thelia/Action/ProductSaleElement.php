@@ -82,7 +82,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             // Attach combination, if defined.
             $combinationAttributes = $event->getAttributeAvList();
 
-            if (count($combinationAttributes) > 0) {
+            if (\count($combinationAttributes) > 0) {
                 foreach ($combinationAttributes as $attributeAvId) {
                     $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
 

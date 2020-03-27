@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Category;
 use Thelia\Model\Category;
 use Thelia\Core\Event\ActionEvent;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\CategoryEvent
+ */
 class CategoryEvent extends ActionEvent
 {
     public $category = null;
@@ -26,7 +29,7 @@ class CategoryEvent extends ActionEvent
 
     public function hasCategory()
     {
-        return ! is_null($this->category);
+        return ! \is_null($this->category);
     }
 
     public function getCategory()

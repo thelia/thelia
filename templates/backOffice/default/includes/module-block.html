@@ -83,7 +83,18 @@
                         <a href="#" class="module-information text-info" data-id="{$ID}" title="{intl l='Get more information about this module'}"><span class="glyphicon glyphicon-question-sign"></span></a>
                         <a href="#" class="module-documentation text-primary" data-id="{$ID}" title="{intl l='Read module documentation'}"><span class="glyphicon glyphicon-book"></span></a>
                     </td>
-                    <td>{$TITLE}</td>
+                    <td>
+                        {$allowed = false}
+                        {loop type="auth" name="auth" role='ADMIN' resource=$CODE access='VIEW'}
+                            {$allowed = true}
+                        {/loop}
+
+                        {if $allowed && $CONFIGURABLE == 1 && $ACTIVE}
+                            <a href="{url path="/admin/module/%code" code=$CODE}" title="{intl l='Configure this module'}">{$TITLE}</a>
+                        {else}
+                            {$TITLE}
+                        {/if}
+                    </td>
                     <td>{$CODE}</td>
                     <td>{$VERSION}</td>
 
@@ -145,13 +156,12 @@
                                 {$btnstyle="btn-danger"}
                             {/elseloop}
 
-                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID} btn-area-config" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} config-btn-{$ID} btn-area-config" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
 
                         {$buttons = []}
 
                         {if $EXISTS}
-
                             {if $CONFIGURABLE == 1 && $ACTIVE}
                                 {$buttons[] = [
                                     'type' => 'config',

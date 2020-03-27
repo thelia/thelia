@@ -82,11 +82,11 @@ class ConditionEvaluator
 
             case Operators::IN:
                 // in
-                return (in_array($v1, $v2));
+                return (\in_array($v1, $v2));
 
             case Operators::OUT:
                 // not in
-                return (!in_array($v1, $v2));
+                return (!\in_array($v1, $v2));
 
             default:
                 throw new \Exception('Unrecognized operator ' . $o);

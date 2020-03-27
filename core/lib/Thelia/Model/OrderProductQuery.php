@@ -30,7 +30,7 @@ class OrderProductQuery extends BaseOrderProductQuery
             $orderStatusIdList = OrderStatusQuery::getPaidStatusIdList();
         }
 
-        if (null !== $customerId || null !== $startDate || null !== $endDate || count($orderStatusIdList) > 0) {
+        if (null !== $customerId || null !== $startDate || null !== $endDate || \count($orderStatusIdList) > 0) {
             $subQuery = $query->useOrderQuery();
 
             if (null !== $customerId) {
@@ -51,7 +51,7 @@ class OrderProductQuery extends BaseOrderProductQuery
                 );
             }
 
-            if (count($orderStatusIdList) > 0) {
+            if (\count($orderStatusIdList) > 0) {
                 $subQuery->filterByStatusId($orderStatusIdList, Criteria::IN);
             }
 

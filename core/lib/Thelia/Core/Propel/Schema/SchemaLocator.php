@@ -142,7 +142,7 @@ class SchemaLocator
         }
 
         // Thelia is always a dependency
-        if (!in_array('Thelia', $modules)) {
+        if (!\in_array('Thelia', $modules)) {
             $modules[] = 'Thelia';
         }
 
@@ -155,7 +155,7 @@ class SchemaLocator
             $moduleValidator = new ModuleValidator("{$this->theliaModuleDir}/{$module}");
             $dependencies = $moduleValidator->getCurrentModuleDependencies(true);
             foreach ($dependencies as $dependency) {
-                if (!in_array($dependency['code'], $modules)) {
+                if (!\in_array($dependency['code'], $modules)) {
                     $modules[] = $dependency['code'];
                 }
             }
@@ -242,7 +242,7 @@ class SchemaLocator
 
         foreach ($documentArrays as $documentArray) {
             foreach ($documentArray as $document) {
-                if (in_array($document->baseURI, $includedDocumentURIs)) {
+                if (\in_array($document->baseURI, $includedDocumentURIs)) {
                     continue;
                 }
 

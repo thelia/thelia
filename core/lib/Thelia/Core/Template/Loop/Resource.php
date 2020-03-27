@@ -23,19 +23,21 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\ResourceQuery;
 use Thelia\Type;
 use Thelia\Model\Resource as ResourceModel;
+use Thelia\Type\TypeCollection;
 
 /**
  *
  * Resource loop
  *
- *
  * Class Resource
+ *
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
  * @method int getProfile()
  * @method string[] getCode()
+ * @method string[] getOrder()
  */
 class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -53,10 +55,28 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
                 new Type\TypeCollection(
                     new Type\AlphaNumStringListType()
                 )
+            ),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType([
+                        'id',
+                        'id_reverse',
+                        'code',
+                        'code_reverse',
+                        'title',
+                        'title_reverse',
+                    ])
+                ),
+                'id'
             )
         );
     }
 
+    /**
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ResourceQuery
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function buildModelCriteria()
     {
         $search = ResourceQuery::create();
@@ -78,11 +98,39 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByCode($code, Criteria::IN);
         }
 
-        $search->orderById(Criteria::ASC);
+        $orders = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "title":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "title_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "code":
+                    $search->orderByCode(Criteria::ASC);
+                    break;
+                case "code_reverse":
+                    $search->orderByCode(Criteria::DESC);
+                    break;
+            }
+        }
 
         return $search;
     }
 
+    /**
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function parseResults(LoopResult $loopResult)
     {
         /** @var ResourceModel $resource */

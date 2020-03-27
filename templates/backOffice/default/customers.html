@@ -361,6 +361,15 @@
                 {/if}
             </div>
 
+            <div class="row">
+                <div class="col-sm-6">
+                    {render_form_field field='phone'}
+                </div>
+                <div class="col-sm-6">
+                    {render_form_field field='cellphone'}
+                </div>
+            </div>
+
             {hook name="customer.create-form" location="customer_create_form" }
         {/capture}
 

@@ -114,9 +114,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
             throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
         }
 
-        $active = isset($attributes['active']) ? intval($attributes['active']) : 1;
+        $active = isset($attributes['active']) ? \intval($attributes['active']) : 1;
         $attributes['active'] = (1 === $active);
-        $attributes['templates'] = isset($attributes['templates']) ? strval($attributes['templates']) : '';
+        $attributes['templates'] = isset($attributes['templates']) ? \strval($attributes['templates']) : '';
         $attributes['type'] = (isset($attributes['type'])) ? $this->getHookType($attributes['type']) : TemplateDefinition::FRONT_OFFICE;
 
         if (null === $hook = $this->getHook($attributes['event'], $attributes['type'])) {
@@ -310,13 +310,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
     {
         $type = TemplateDefinition::FRONT_OFFICE;
 
-        if (null !== $name && is_string($name)) {
+        if (null !== $name && \is_string($name)) {
             $name = preg_replace("[^a-z]", "", strtolower(trim($name)));
-            if (in_array($name, array('bo', 'back', 'backoffice'))) {
+            if (\in_array($name, array('bo', 'back', 'backoffice'))) {
                 $type = TemplateDefinition::BACK_OFFICE;
-            } elseif (in_array($name, array('email'))) {
+            } elseif (\in_array($name, array('email'))) {
                 $type = TemplateDefinition::EMAIL;
-            } elseif (in_array($name, array('pdf'))) {
+            } elseif (\in_array($name, array('pdf'))) {
                 $type = TemplateDefinition::PDF;
             }
         }

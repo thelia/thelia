@@ -47,15 +47,15 @@ abstract class BaseConstraint implements ConstraintInterface
         $version = preg_replace('/\-.*$/', '', $version);
         $versionElements = preg_split('/\./', $version);
 
-        if (count($expressionElements) < count($versionElements)) {
+        if (\count($expressionElements) < \count($versionElements)) {
             if (true === $changeExpression) {
                 $this->expression = implode(
                     '.',
                     array_merge(
                         $expressionElements,
                         array_fill(
-                            count($expressionElements) - 1,
-                            count($versionElements) - count($expressionElements),
+                            \count($expressionElements) - 1,
+                            \count($versionElements) - \count($expressionElements),
                             '0'
                         )
                     )
@@ -63,7 +63,7 @@ abstract class BaseConstraint implements ConstraintInterface
             } else {
                 $version = implode(
                     '.',
-                    array_slice($versionElements, 0, count($expressionElements))
+                    \array_slice($versionElements, 0, \count($expressionElements))
                 );
             }
         }

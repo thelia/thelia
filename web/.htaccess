@@ -2,6 +2,11 @@ Options +FollowSymlinks -Indexes
 
 AddDefaultCharset UTF-8
 
+# If you defined a CDN that is an alias of your shop domaine, be sure to uncomment this line, and change "*" by your
+# shop hostname. For example, if your shop hostname is www.theshop.tld, use : Header set Access-Control-Allow-Origin "www.theshop.tld".
+# You may also use Access-Control-Allow-Origin "*" to allow all origins.
+#Header set Access-Control-Allow-Origin "*"
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

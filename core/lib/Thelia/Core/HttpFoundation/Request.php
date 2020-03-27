@@ -60,7 +60,7 @@ class Request extends BaseRequest
     public function getPathInfo()
     {
         $pathInfo = parent::getPathInfo();
-        $pathLength = strlen($pathInfo);
+        $pathLength = \strlen($pathInfo);
 
         if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
             && (bool) ConfigQuery::read('allow_slash_ended_uri', false)

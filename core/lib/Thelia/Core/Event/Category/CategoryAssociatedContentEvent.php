@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Category;
 use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Core\Event\ActionEvent;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\CategoryAssociatedContentEvent
+ */
 class CategoryAssociatedContentEvent extends ActionEvent
 {
     public $content = null;
@@ -26,7 +29,7 @@ class CategoryAssociatedContentEvent extends ActionEvent
 
     public function hasCategoryAssociatedContent()
     {
-        return ! is_null($this->content);
+        return ! \is_null($this->content);
     }
 
     public function getCategoryAssociatedContent()

@@ -131,13 +131,13 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
         $product = $this->getProduct();
 
-        if (!is_null($product) && null !== $productObj = ProductQuery::create()->findPk($product)) {
+        if (!\is_null($product) && null !== $productObj = ProductQuery::create()->findPk($product)) {
             $search->filterByProduct($productObj);
         }
 
@@ -149,7 +149,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
         $title = $this->getTitle();
 
-        if (!is_null($title)) {
+        if (!\is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
@@ -210,7 +210,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
