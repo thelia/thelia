@@ -37,7 +37,6 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Module\Exception\DeliveryException;
 use Thelia\Tools\URL;
 
 class CartController extends BaseFrontController
@@ -60,11 +59,10 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
 
-
-            if ($this->getRequest()->isXmlHttpRequest()) {
-                $this->changeViewForAjax();
-            } elseif (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
-                return $response;
+            if (! $this->changeViewForAjax()) {
+                if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
+                    return $response;
+                }
             }
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
@@ -98,8 +96,10 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
 
-            if ($this->getRequest()->isXmlHttpRequest()) {
-                $this->changeViewForAjax();
+            if (! $this->changeViewForAjax()) {
+                if (null !== $successUrl = $this->getRequest()->get("success_url")) {
+                    return $this->generateRedirect(URL::getInstance()->absoluteUrl($successUrl));
+                }
             }
         } catch (\Exception $e) {
             Tlog::getInstance()->error(sprintf("Failed to change cart item quantity: %s", $e->getMessage()));
@@ -126,27 +126,27 @@ class CartController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
-        $this->changeViewForAjax();
-
-        if (null != $successUrl = $this->getRequest()->query->get('success_url')) {
-            $response = $this->generateRedirect(
-                URL::getInstance()->absoluteUrl($successUrl)
-            );
-
-            return $response;
+        if (! $this->changeViewForAjax()) {
+            if (null !== $successUrl = $this->getRequest()->get("success_url")) {
+                return $this->generateRedirect(URL::getInstance()->absoluteUrl($successUrl));
+            }
         }
     }
 
     protected function changeViewForAjax()
     {
-        // If Ajax Request
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        // If this is an ajax request, and if the template allow us to return an ajax result
+        if ($this->getRequest()->isXmlHttpRequest() && (0 === intval($this->getRequest()->get('no_ajax_check', 0)))) {
             $request = $this->getRequest();
 
             $view = $request->get('ajax-view', "includes/mini-cart");
 
             $request->attributes->set('_view', $view);
+
+            return true;
         }
+
+        return false;
     }
 
     public function changeCountry()

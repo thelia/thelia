@@ -382,6 +382,14 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadRelatedAjaxTabAction</default>
     </route>
 
+    <route id="admin.products.related.tab.categories.search" path="/admin/products/related/tab/categories/search">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::searchCategoryAction</default>
+    </route>
+
+    <route id="admin.products.related.tab.products.search" path="/admin/products/related/tab/products/search">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::searchProductAction</default>
+    </route>
+
     <!-- categories -->
 
     <route id="admin.products.additional-category.add" path="/admin/products/category/add">

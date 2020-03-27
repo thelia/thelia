@@ -9,7 +9,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id" visible="*"}
+            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id" visible="*" with_prev_next_info="true"}
                 <ul class="breadcrumb">
                     {foreach $breadcrumb as $label=>$link}
                     <li><a href="{$link}">{$label}</a></li>

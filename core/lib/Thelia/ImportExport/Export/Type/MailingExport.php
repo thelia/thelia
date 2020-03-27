@@ -13,6 +13,7 @@
 namespace Thelia\ImportExport\Export\Type;
 
 use Thelia\ImportExport\Export\AbstractExport;
+use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Model\NewsletterQuery;
 
 /**
@@ -24,10 +25,10 @@ class MailingExport extends AbstractExport
     const FILE_NAME = 'mailing';
 
     protected $orderAndAliases = [
-        'newsletter.ID' => 'Identifier',
-        'newsletter.EMAIL' => 'Email',
-        'newsletter.FIRSTNAME' => 'FirstName',
-        'newsletter.LASTNAME' => 'LastName'
+        NewsletterTableMap::COL_ID => 'Identifier',
+        NewsletterTableMap::COL_EMAIL => 'Email',
+        NewsletterTableMap::COL_FIRSTNAME => 'FirstName',
+        NewsletterTableMap::COL_LASTNAME => 'LastName'
     ];
 
     protected function getData()

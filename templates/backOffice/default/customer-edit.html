@@ -161,6 +161,7 @@
                                                                 <td>
                                                                     {$LABEL}
                                                                     <address>
+                                                                        {if $COMPANY}<strong>{$COMPANY}</strong><br />{/if}
                                                                         <strong>{loop name="address.title" type="title" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</strong><br>
                                                                         {$ADDRESS1}
                                                                         {if $ADDRESS2}<br />{$ADDRESS2}{/if}

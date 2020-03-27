@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Michelf\Markdown;
+use Michelf\MarkdownExtra;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
@@ -210,7 +211,7 @@ class ModuleController extends AbstractCrudController
         }
 
         try {
-            $moduleManagement = new ModuleManagement();
+            $moduleManagement = new ModuleManagement($this->getContainer());
             $moduleManagement->updateModules($this->getContainer());
         } catch (InvalidModuleException $ex) {
             $this->moduleErrors = $ex->getErrors();
@@ -459,7 +460,7 @@ class ModuleController extends AbstractCrudController
                         if ($content == null) {
                             $content = '';
                         }
-                        $content .= Markdown::defaultTransform($mdDocumentation);
+                        $content .= MarkdownExtra::defaultTransform($mdDocumentation);
                     }
                 }
             }
