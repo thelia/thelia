@@ -25,6 +25,7 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
  * Class CustomerExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class CustomerExport extends JsonFileAbstractExport
 {
@@ -82,11 +83,11 @@ class CustomerExport extends JsonFileAbstractExport
         ;
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $res = $stmt->execute();
+        $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'customer.json';
 
-        if(file_exists($filename)){
+        if (file_exists($filename)) {
             unlink($filename);
         }
 

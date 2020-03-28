@@ -20,6 +20,7 @@ use Thelia\Model\Map\NewsletterTableMap;
 /**
  * Class MailingExport
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class MailingExport extends JsonFileAbstractExport
 {
@@ -44,11 +45,11 @@ class MailingExport extends JsonFileAbstractExport
                     WHERE newsletter.unsubscribed = 0'
         ;
         $stmt = $con->prepare($query);
-        $res = $stmt->execute();
+        $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'mailing.json';
 
-        if(file_exists($filename)){
+        if (file_exists($filename)) {
             unlink($filename);
         }
 

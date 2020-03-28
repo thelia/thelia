@@ -107,13 +107,17 @@ abstract class AbstractExport implements \Iterator
      */
     protected $rangeDate;
 
+    /**
+     * @return array|false|mixed|string
+     * @throws \Exception
+     */
     public function current()
     {
         if ($this->dataIsJSONFile) {
             /** @var resource $file */
             $result = json_decode($this->data->current(), true);
 
-            if($result != null){
+            if ($result !== null) {
                 return $result;
             }
 
@@ -134,6 +138,10 @@ abstract class AbstractExport implements \Iterator
         return $data;
     }
 
+    /**
+     * @return bool|float|int|string|null
+     * @throws \Exception
+     */
     public function key()
     {
         if ($this->dataIsJSONFile) {
@@ -151,6 +159,9 @@ abstract class AbstractExport implements \Iterator
         return null;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function next()
     {
         if ($this->dataIsJSONFile) {
@@ -166,6 +177,9 @@ abstract class AbstractExport implements \Iterator
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function rewind()
     {
         // Since it's first method call on traversable, we get raw data here
@@ -176,9 +190,9 @@ abstract class AbstractExport implements \Iterator
 
             // Check if $data is a path to a json file
             if (\is_string($data)
-                && ".json" === substr($data, -5)
-                && file_exists($data))
-            {
+                && '.json' === substr($data, -5)
+                && file_exists($data)
+            ) {
                 $this->data = new \SplFileObject($data, 'r');
                 $this->data->setFlags(SPLFileObject::READ_AHEAD);
                 $this->dataIsJSONFile = true;
@@ -204,16 +218,20 @@ abstract class AbstractExport implements \Iterator
             }
 
             throw new \DomainException(
-                'Data must an array or an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria'
+                'Data must an array, an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria or a JSON file ending with.json'
             );
         }
 
         throw new \LogicException('Export data can\'t be rewinded');
     }
 
+    /**
+     * @return bool
+     * @throws \Exception
+     */
     public function valid()
     {
-        if($this->dataIsJSONFile) {
+        if ($this->dataIsJSONFile) {
             return $this->data->valid();
         }
 
@@ -453,7 +471,7 @@ abstract class AbstractExport implements \Iterator
         $processedData = [];
 
         foreach ($this->orderAndAliases as $key => $value) {
-            if (\is_integer($key)) {
+            if (\is_int($key)) {
                 $fieldName = $value;
                 $fieldAlias = $value;
             } else {
@@ -461,8 +479,8 @@ abstract class AbstractExport implements \Iterator
                 $fieldAlias = $value;
             }
 
-            if($this->dataIsJSONFile){
-                $fieldName = substr($fieldName, strripos($fieldName,'.'));
+            if ($this->dataIsJSONFile) {
+                $fieldName = substr($fieldName, strripos($fieldName, '.'));
                 $fieldName = str_replace('.', '', $fieldName);
                 $fieldName = strtolower($fieldName);
             }
