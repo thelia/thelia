@@ -28,6 +28,7 @@ use Thelia\Model\ProductQuery;
  * Class ProductSEOExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class ProductSEOExport extends JsonFileAbstractExport
 {
@@ -63,11 +64,11 @@ class ProductSEOExport extends JsonFileAbstractExport
         ;
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $res = $stmt->execute();
+        $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'product_seo.json';
 
-        if(file_exists($filename)){
+        if (file_exists($filename)) {
             unlink($filename);
         }
 

@@ -33,6 +33,7 @@ use Thelia\Model\ProductSaleElementsQuery;
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @contributor Thomas Arnaud <tarnaud@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class ProductPricesExport extends JsonFileAbstractExport
 {
@@ -72,13 +73,14 @@ class ProductPricesExport extends JsonFileAbstractExport
                     LEFT JOIN product_price ON product_price.product_sale_elements_id = product_sale_elements.id
                     LEFT JOIN currency ON currency.id = product_price.currency_id'
         ;
+
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $res = $stmt->execute();
+        $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'product_price.json';
 
-        if(file_exists($filename)){
+        if (file_exists($filename)) {
             unlink($filename);
         }
 

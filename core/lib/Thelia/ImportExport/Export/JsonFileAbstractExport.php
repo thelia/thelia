@@ -1,16 +1,24 @@
 <?php
-
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
 
-
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Map\TableMap;
 use SplFileObject;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Translation\Translator;
-use Thelia\Model\Lang;
 
+/**
+ * Class JsonFileAbstractExport
+ * @package Thelia\ImportExport\Export
+ * @author Florian Bernard <fbernard@openstudio.fr>
+ */
 abstract class JsonFileAbstractExport extends AbstractExport
 {
     /**
@@ -23,7 +31,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         /** @var resource $file */
         $result = json_decode($this->data->current(), true);
 
-        if($result != null){
+        if ($result !== null) {
             return $result;
         }
 
@@ -47,9 +55,9 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
             // Check if $data is a path to a json file
             if (\is_string($data)
-                && ".json" === substr($data, -5)
-                && file_exists($data))
-            {
+                && '.json' === substr($data, -5)
+                && file_exists($data)
+            ) {
                 $this->data = new \SplFileObject($data, 'r');
                 $this->data->setFlags(SPLFileObject::READ_AHEAD);
 
@@ -59,7 +67,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
             }
 
             throw new \DomainException(
-                'Data must an array or an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria'
+                'Data shoul de a JSON file, ending with .json'
             );
         }
 
@@ -87,7 +95,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         $processedData = [];
 
         foreach ($this->orderAndAliases as $key => $value) {
-            if (\is_integer($key)) {
+            if (\is_int($key)) {
                 $fieldName = $value;
                 $fieldAlias = $value;
             } else {

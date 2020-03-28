@@ -33,6 +33,7 @@ use Thelia\Model\ProductSaleElementsQuery;
  * Class ProductTaxedPricesExport
  * @author Thomas Arnaud <tarnaud@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class ProductTaxedPricesExport extends JsonFileAbstractExport
 {
@@ -79,13 +80,14 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
                     LEFT JOIN tax_rule_i18n ON tax_rule_i18n.id = product.tax_rule_id AND tax_rule_i18n.locale = :locale
                     ORDER BY product.id'
         ;
+
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $res = $stmt->execute();
+        $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'product_seo.json';
 
-        if(file_exists($filename)){
+        if (file_exists($filename)) {
             unlink($filename);
         }
 

@@ -1,14 +1,19 @@
 <?php
-
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
 
-
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Translation\Translator;
-use Thelia\Model\Lang;
 
 abstract class PropelCollectionAbstractExport extends AbstractExport
 {
@@ -17,6 +22,10 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
      */
     private $data;
 
+    /**
+     * @return array|false|mixed|string
+     * @throws \Exception
+     */
     public function current()
     {
         $data = $this->data->getIterator()->current()->toArray(TableMap::TYPE_COLNAME, true, [], true);
@@ -29,6 +38,10 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
         return $data;
     }
 
+    /**
+     * @return bool|float|int|string|null
+     * @throws \Exception
+     */
     public function key()
     {
         if ($this->data->getIterator()->key() !== null) {
@@ -38,6 +51,9 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
         return null;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function next()
     {
         $this->data->getIterator()->next();
@@ -47,6 +63,9 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function rewind()
     {
         if ($this->data === null) {
@@ -67,6 +86,10 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
         throw new \LogicException('Export data can\'t be rewinded');
     }
 
+    /**
+     * @return bool
+     * @throws \Exception
+     */
     public function valid()
     {
         return $this->data->getIterator()->valid();

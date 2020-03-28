@@ -27,6 +27,7 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  * Class ContentExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class ContentExport extends JsonFileAbstractExport
 {
@@ -96,11 +97,11 @@ class ContentExport extends JsonFileAbstractExport
         ;
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $res = $stmt->execute();
+        $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'content.json';
 
-        if(file_exists($filename)){
+        if (file_exists($filename)) {
             unlink($filename);
         }
 
