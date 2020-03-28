@@ -83,7 +83,6 @@ class OrderExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
 
-        //Todo: TOTAL WITH TAX + TOTAL WITH TAX AND DISCOUNT + TOTAL WITH TAX AND DISCOUNT AND POSTAGE
         $query = '
             SELECT
                 *,
@@ -98,7 +97,7 @@ class OrderExport extends JsonFileAbstractExport
                     order_coupon.code as order_coupon_code,
                     ROUND(`order`.postage, 2) as order_postage,
                     `order`.postage_tax as "order.postage_tax",
-                    `order`.postage_tax_rule_title as "order.postage_tax_rule_title",
+                    ROUND(`order`.postage_tax_rule_title,2) as "order.postage_tax_rule_title",
                     SUM(ROUND(order_product.quantity * IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price), 2) ) as order_total_price, 
                     SUM(
                         ROUND(
