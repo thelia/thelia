@@ -332,7 +332,7 @@
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
                         <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_TAXED_ITEMS_AMOUNT} currency_id=$CURRENCY}</p></td>
                     </tr>
-                    {if $DISCOUNT}
+                    {if $DISCOUNT > 0}
                         <tr>
                             <td class="table-3-1">
                                 <p>

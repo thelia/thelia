@@ -213,7 +213,7 @@
                         </td>
                     </tr>
                     {$discount={order attr="discount"}}
-                    {if $discount}
+                    {if $discount > 0}
                         <tr>
                             <td colspan="3" class="empty">&nbsp;</td>
                             <th class="discount">{intl l="Discount incl. taxes"}</th>
