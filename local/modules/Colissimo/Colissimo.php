@@ -18,7 +18,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Install\Database;
 use Thelia\Model\Country;
-use Thelia\Model\OrderPostage;
 use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\Exception\DeliveryException;
 
@@ -149,18 +148,12 @@ class Colissimo extends AbstractDeliveryModule
     {
         $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
-        $postage = (float) self::getPostageAmount(
+        $postage = self::getPostageAmount(
             $this->getAreaForCountry($country)->getId(),
             $cartWeight
         );
 
-        $pst = new OrderPostage();
-
-        $pst->setAmount($postage);
-        $pst->setAmountTax(0.2 * $postage);
-        $pst->setTaxRuleTitle("TVA 20%");
-
-        return $pst;
+        return $postage;
     }
 
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
