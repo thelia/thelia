@@ -149,6 +149,11 @@ class Order extends BaseOrder
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
+        // To prevent price changes in pre-2.4 orders, use the legacy calculation method
+        if ($this->getId() <= ConfigQuery::read('last_legacy_order_id', 0)) {
+            return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
+        }
+
         // Cache the query result
         static $queryResult;
 
@@ -224,6 +229,59 @@ class Order extends BaseOrder
         if (false !== $includePostage) {
             $total += (float)$this->getPostage();
             $tax += (float)$this->getPostageTax();
+        }
+
+        return $total;
+    }
+
+    /**
+     * This is thge legacy way of computing this order amount with taxes. The tax amount is returned in the $tax parameter.
+     *
+     * The order amount is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @param  float|int $tax             (output only) returns the tax amount for this order
+     * @param  bool      $includePostage  if true, the postage cost is included to the total
+     * @param  bool      $includeDiscount if true, the discount will be included to the total
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getTotalAmountLegacy(&$tax = 0, $includePostage = true, $includeDiscount = true)
+    {
+        $amount = (float)OrderProductQuery::create()
+            ->filterByOrderId($this->getId())
+            ->withColumn('SUM(
+                    ' . OrderProductTableMap::COL_QUANTITY . '
+                    * IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . ' = 1, ' . OrderProductTableMap::COL_PROMO_PRICE . ', ' . OrderProductTableMap::COL_PRICE . ')
+                )', 'total_amount')
+            ->select(['total_amount'])
+            ->findOne();
+
+        $tax = (float)OrderProductTaxQuery::create()
+            ->useOrderProductQuery()
+            ->filterByOrderId($this->getId())
+            ->endUse()
+            ->withColumn('SUM(
+                    ' . OrderProductTableMap::COL_QUANTITY . '
+                    * IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . ' = 1, ' . OrderProductTaxTableMap::COL_PROMO_AMOUNT . ', ' . OrderProductTaxTableMap::COL_AMOUNT . ')
+                )', 'total_tax')
+            ->select(['total_tax'])
+            ->findOne();
+
+        $total = $amount + $tax;
+
+        // @todo : manage discount : free postage ?
+        if (true === $includeDiscount) {
+            $total -= $this->getDiscount();
+
+            if ($total < 0) {
+                $total = 0;
+            }
+        }
+
+        if (false !== $includePostage) {
+            $total += \floatval($this->getPostage());
+            $tax += \floatval($this->getPostageTax());
         }
 
         return $total;
