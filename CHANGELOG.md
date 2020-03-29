@@ -1,10 +1,21 @@
 # 2.4.0
+- #2734 Use select instead of input fields to choose template in B.O configuration parameter
+- #2733 Carousel module improvements
+- #2732 Sales are now considered done a invoice date
+- #2731 Fix #2693 contents url on search page
+- #2730 Fix issue #2698 bug on sales management
+- #2729 Discount field is no longer require in CustomUpdateForm
+- #2728 Fixed casperjs path
+- #2724 Better discount calculation for untaxed prices
 - #2721 Fix template delete issue
+- #2718 Bump symfony/security from 2.8.47 to 2.8.50
 - #2717 Fix coupon condition matching
+- #2716 New reference related parameters to order loop
 - #2715 Fix bad success url for image form
 - #2713 Bump symfony/http-foundation from 2.8.47 to 2.8.52
 - #2712 Bump symfony/cache from 3.4.18 to 3.4.35
 - #2710 Bump symfony/dependency-injection from 2.8.47 to 2.8.50
+- #2707 Improve product edit
 - #2706 Fix mailing export col names
 - #2705 Move date filtering to query initialization
 - #2704 Fix double "[]" on choice render multiple
@@ -12,9 +23,12 @@
 - #2696 Add ID and ORDER_PRODUCT_ID to order_product_attribute_combination loop
 - #2695 An empty cart is not a virtual cart
 - #2691 Modules documentation display improvements
+- #2687 Added a findAllChildId() method
+- #2685 Added arrow navigation to documents and images management
 - #2683 Fix tax rule collection query build when a state ID is passed to getTaxCalculatorCollection()
 - #2681 Fix I18n when strictly mode is enable and only one I18n is present
 - #2676 Fix Tlog on reponse when ConfigQuery is not generated on cache
+- #2677 Profile management improvement
 - #2673 Added quantity parameter to "Added to cart" popup url
 - #2672 Improved import/export loops
 - #2671 A 'change.pse' event is triggered on PSE value change
@@ -23,6 +37,8 @@
 - #2664 Add BO brand search
 - #2663 Improve SHOW_HOOK
 - #2661 Fix issue #2660 
+- #2659 Improved ajax management in CartController
+- #2658 Customer email language fix when sent from the BO
 - #2657 Add option to show/Hide stats bloc
 - #2655 Update var name error MailerFactory.php 
 - #2651 Allow to load tax rule without country
@@ -70,6 +86,7 @@
 - #2587 Add cache for loop ArgDefinitions
 - #2586 Fix for #2505 BackOffice dashboard refresh button
 - #2585 Improve propel cache
+- #2584 Fix for getting choices options in forms
 - #2582 Fix loop feature, filter template
 - #2581 Composer remove useless dependency ramsey/array_column
 - #2580 Fix module postActivation with new propel integration
@@ -115,6 +132,7 @@
 - #2528 Patch for PRODUCT page
 - #2524 wrong class name on Contact subject field
 - #2522 Add email with mailto directly on order
+- #2521 Add a new export "product I18n"
 - #2519 Added ordering by PSE reference in PSE loop
 - #2518 Fixed multiple times the same line in results
 - #2517 fix/choice-render-multiple
