@@ -20,6 +20,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
@@ -320,13 +321,21 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      */
     public function parseResults(LoopResult $loopResult)
     {
+        $lastLegacyOrderId = ConfigQuery::read('last_legacy_order_id', 0);
+
         /**  @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
             $tax = $itemsTax = 0;
 
             $amount = $order->getTotalAmount($tax);
             $itemsAmount = $order->getTotalAmount($itemsTax, false, false);
-            $discountWithoutTax = Calculator::getUntaxedOrderDiscount($order);
+
+            // Legacy orders have no discount tax calculation
+            if ($order->getId() <= $lastLegacyOrderId) {
+                $discountWithoutTax = $order->getDiscount();
+            } else {
+                $discountWithoutTax = Calculator::getUntaxedOrderDiscount($order);
+            }
 
             $hasVirtualDownload = $order->hasVirtualProduct();
 
