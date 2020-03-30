@@ -1,4 +1,7 @@
 # 2.4.0
+- #2737 Add php < 7.4 requirements
+- #2736 Optimized exports with JSON cache file and SQL request
+- #2735 Tax calculation fixes, revamped 
 - #2734 Use select instead of input fields to choose template in B.O configuration parameter
 - #2733 Carousel module improvements
 - #2732 Sales are now considered done a invoice date
