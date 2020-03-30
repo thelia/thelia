@@ -12,286 +12,169 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\ImportExport\Export\AbstractExport;
-use Thelia\Model\Map\CountryI18nTableMap;
-use Thelia\Model\Map\CurrencyTableMap;
-use Thelia\Model\Map\CustomerTableMap;
-use Thelia\Model\Map\CustomerTitleI18nTableMap;
-use Thelia\Model\Map\OrderCouponTableMap;
-use Thelia\Model\Map\OrderProductTableMap;
-use Thelia\Model\Map\OrderProductTaxTableMap;
-use Thelia\Model\Map\OrderStatusI18nTableMap;
-use Thelia\Model\Map\OrderStatusTableMap;
-use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\Order;
-use Thelia\Model\OrderQuery;
-use Thelia\Tools\I18n;
+use PDO;
+use Propel\Runtime\Propel;
+use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
  * Class OrderExport
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
-class OrderExport extends AbstractExport
+class OrderExport extends JsonFileAbstractExport
 {
     const FILE_NAME = 'order';
     const USE_RANGE_DATE = true;
 
     protected $orderAndAliases = [
-        OrderTableMap::COL_REF => 'ref',
-        OrderTableMap::COL_CREATED_AT => 'date',
-        'customer_REF' => 'customer_ref',
-        OrderTableMap::COL_DISCOUNT => 'discount',
-        'coupon_COUPONS' => 'coupons',
-        OrderTableMap::COL_POSTAGE => 'postage',
-        'order_TOTAL_TTC' => 'total_including_taxes',
-        'order_TOTAL_WITH_DISCOUNT' => 'total_with_discount',
-        'order_TOTAL_WITH_DISCOUNT_AND_POSTAGE' => 'total_discount_and_postage',
-        'delivery_module_TITLE' => 'delivery_module',
-        OrderTableMap::COL_DELIVERY_REF => 'delivery_ref',
-        'payment_module_TITLE' => 'payment_module',
-        OrderTableMap::COL_INVOICE_REF => 'invoice_ref',
-        'order_status_TITLE' => 'status',
-        'delivery_address_TITLE' => 'delivery_title',
-        'delivery_address_COMPANY' => 'delivery_company',
-        'delivery_address_FIRSTNAME' => 'delivery_first_name',
-        'delivery_address_LASTNAME' => 'delivery_last_name',
-        'delivery_address_ADDRESS1' => 'delivery_address1',
-        'delivery_address_ADDRESS2' => 'delivery_address2',
-        'delivery_address_ADDRESS3' => 'delivery_address3',
-        'delivery_address_ZIPCODE' => 'delivery_zip_code',
-        'delivery_address_CITY' => 'delivery_city',
-        'delivery_address_country_TITLE' => 'delivery_country',
-        'delivery_address_PHONE' => 'delivery_phone',
-        'invoice_address_TITLE' => 'invoice_title',
-        'invoice_address_COMPANY' => 'invoice_company',
-        'invoice_address_FIRSTNAME' => 'invoice_first_name',
-        'invoice_address_LASTNAME' => 'invoice_last_name',
-        'invoice_address_ADDRESS1' => 'invoice_address1',
-        'invoice_address_ADDRESS2' => 'invoice_address2',
-        'invoice_address_ADDRESS3' => 'invoice_address3',
-        'invoice_address_ZIPCODE' => 'invoice_zip_code',
-        'invoice_address_CITY' => 'invoice_city',
-        'invoice_address_country_TITLE' => 'invoice_country',
-        'invoice_address_PHONE' => 'invoice_phone',
-        'currency_CODE' => 'currency',
-        'tax_TITLE' => 'tax_title'
+        'order_ref' => 'ref',
+        'order_created_at' => 'date',
+        'customer_ref' => 'customer_ref',
+        'order_coupon_code' => 'coupons',
+        'order_total_price' => 'total_excluding_taxes',
+        'order_total_tax' => 'total_taxes',
+        'order_total_taxed_price' => 'total_taxed_price',
+        'order_discount' => 'discount',
+        'order_postage' => 'shipping_cost',
+        'order_total_with_taxes_shipping_discount' => 'total_including_taxes',
+        'delivery_module_title' => 'delivery_module',
+        'order_delivery_ref' => 'delivery_ref',
+        'payment_module_title' => 'payment_module',
+        'order_invoice_ref' => 'invoice_ref',
+        'order_status_i18n_title' => 'status',
+        'delivery_address_customer_title_long' => 'delivery_title',
+        'delivery_address_company' => 'delivery_company',
+        'delivery_address_firstname' => 'delivery_first_name',
+        'delivery_address_lastname' => 'delivery_last_name',
+        'delivery_address_address1' => 'delivery_address_1',
+        'delivery_address_address2' => 'delivery_address_2',
+        'delivery_address_address3' => 'delivery_address_3',
+        'delivery_address_zipcode' => 'delivery_zip_code',
+        'delivery_address_city' => 'delivery_city',
+        'delivery_country_i18n_title' => 'invoice_country',
+        'delivery_address_phone' => 'delivery_phone',
+        'invoice_address_customer_title_long' => 'invoice_title',
+        'invoice_address_company' => 'invoice_company',
+        'invoice_address_firstname' => 'invoice_first_name',
+        'invoice_address_lastname' => 'invoice_last_name',
+        'invoice_address_address1' => 'invoice_address_1',
+        'invoice_address_address2' => 'invoice_address_2',
+        'invoice_address_address3' => 'invoice_address_3',
+        'invoice_address_zipcode' => 'invoice_zip_code',
+        'invoice_address_city' => 'invoice_city',
+        'invoice_country_i18n_title' => 'invoice_country',
+        'invoice_address_phone' => 'invoice_phone',
+        'currency_code' => 'currency',
+        'order_postage_tax' => 'shipping_tax',
+        'order_postage_tax_rule_title' => 'shipping_tax_rule_title',
+        'order_product_tax_title' => 'tax',
     ];
-
-    public function current()
-    {
-        $order = parent::current();
-
-        $locale = $this->language->getLocale();
-
-        $query = OrderQuery::create()
-            ->useCurrencyQuery()
-                ->addAsColumn('currency_CODE', CurrencyTableMap::COL_CODE)
-                ->endUse()
-            ->useCustomerQuery()
-                ->addAsColumn('customer_REF', CustomerTableMap::COL_REF)
-                ->endUse()
-            ->useOrderProductQuery()
-                ->useOrderProductTaxQuery(null, Criteria::LEFT_JOIN)
-                    ->addAsColumn(
-                        'product_TAX',
-                        'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.','.
-                        'SUM('.OrderProductTaxTableMap::COL_PROMO_AMOUNT.'),'.
-                        'SUM('.OrderProductTaxTableMap::COL_AMOUNT.')'.
-                        ')'
-                    )
-                    ->addAsColumn('tax_TITLE', OrderProductTableMap::COL_TAX_RULE_TITLE)
-                    ->endUse()
-                ->addAsColumn('product_TITLE', OrderProductTableMap::COL_TITLE)
-                ->addAsColumn(
-                    'product_PRICE',
-                    'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.','.
-                    OrderProductTableMap::COL_PROMO_PRICE .','.
-                    OrderProductTableMap::COL_PRICE .
-                    ')'
-                )
-                ->addAsColumn('product_QUANTITY', OrderProductTableMap::COL_QUANTITY)
-                ->addAsColumn('product_WAS_IN_PROMO', OrderProductTableMap::COL_WAS_IN_PROMO)
-                ->groupById()
-                ->endUse()
-            ->orderById()
-            ->groupById()
-            ->useOrderCouponQuery(null, Criteria::LEFT_JOIN)
-                ->addAsColumn('coupon_COUPONS', 'GROUP_CONCAT('.OrderCouponTableMap::COL_TITLE.')')
-                ->groupBy(OrderCouponTableMap::COL_ORDER_ID)
-                ->endUse()
-            ->useModuleRelatedByPaymentModuleIdQuery('payment_module')
-                ->addAsColumn('payment_module_TITLE', '`payment_module`.CODE')
-                ->endUse()
-            ->useModuleRelatedByDeliveryModuleIdQuery('delivery_module')
-                ->addAsColumn('delivery_module_TITLE', '`delivery_module`.CODE')
-                ->endUse()
-            ->useOrderAddressRelatedByDeliveryOrderAddressIdQuery('delivery_address_join')
-                ->useCustomerTitleQuery('delivery_address_customer_title_join')
-                    ->useCustomerTitleI18nQuery('delivery_address_customer_title_i18n_join')
-                        ->addAsColumn('delivery_address_TITLE', '`delivery_address_customer_title_i18n_join`.SHORT')
-                        ->endUse()
-                    ->endUse()
-                ->useCountryQuery('delivery_address_country_join')
-                    ->useCountryI18nQuery('delivery_address_country_i18n_join')
-                        ->addAsColumn('delivery_address_country_TITLE', '`delivery_address_country_i18n_join`.TITLE')
-                        ->endUse()
-                    ->addAsColumn('delivery_address_COMPANY', '`delivery_address_join`.COMPANY')
-                    ->addAsColumn('delivery_address_FIRSTNAME', '`delivery_address_join`.FIRSTNAME')
-                    ->addAsColumn('delivery_address_LASTNAME', '`delivery_address_join`.LASTNAME')
-                    ->addAsColumn('delivery_address_ADDRESS1', '`delivery_address_join`.ADDRESS1')
-                    ->addAsColumn('delivery_address_ADDRESS2', '`delivery_address_join`.ADDRESS2')
-                    ->addAsColumn('delivery_address_ADDRESS3', '`delivery_address_join`.ADDRESS3')
-                    ->addAsColumn('delivery_address_ZIPCODE', '`delivery_address_join`.ZIPCODE')
-                    ->addAsColumn('delivery_address_CITY', '`delivery_address_join`.CITY')
-                    ->addAsColumn('delivery_address_PHONE', '`delivery_address_join`.PHONE')
-                    ->endUse()
-                ->endUse()
-            ->useOrderAddressRelatedByInvoiceOrderAddressIdQuery('invoice_address_join')
-                ->useCustomerTitleQuery('invoice_address_customer_title_join')
-                    ->useCustomerTitleI18nQuery('invoice_address_customer_title_i18n_join')
-                        ->addAsColumn('invoice_address_TITLE', '`invoice_address_customer_title_i18n_join`.SHORT')
-                        ->endUse()
-                    ->endUse()
-                ->useCountryQuery('invoice_address_country_join')
-                    ->useCountryI18nQuery('invoice_address_country_i18n_join')
-                        ->addAsColumn('invoice_address_country_TITLE', '`invoice_address_country_i18n_join`.TITLE')
-                        ->endUse()
-                    ->endUse()
-                ->addAsColumn('invoice_address_COMPANY', '`invoice_address_join`.COMPANY')
-                ->addAsColumn('invoice_address_FIRSTNAME', '`invoice_address_join`.FIRSTNAME')
-                ->addAsColumn('invoice_address_LASTNAME', '`invoice_address_join`.LASTNAME')
-                ->addAsColumn('invoice_address_ADDRESS1', '`invoice_address_join`.ADDRESS1')
-                ->addAsColumn('invoice_address_ADDRESS2', '`invoice_address_join`.ADDRESS2')
-                ->addAsColumn('invoice_address_ADDRESS3', '`invoice_address_join`.ADDRESS3')
-                ->addAsColumn('invoice_address_ZIPCODE', '`invoice_address_join`.ZIPCODE')
-                ->addAsColumn('invoice_address_CITY', '`invoice_address_join`.CITY')
-                ->addAsColumn('invoice_address_PHONE', '`invoice_address_join`.PHONE')
-                ->endUse()
-            ->useOrderStatusQuery()
-                ->useOrderStatusI18nQuery()
-                    ->addAsColumn('order_status_TITLE', OrderStatusI18nTableMap::COL_TITLE)
-                    ->endUse()
-                ->endUse()
-            ->select([
-                OrderTableMap::COL_REF,
-                'customer_REF',
-                'product_TITLE',
-                'product_PRICE',
-                'product_TAX',
-                'tax_TITLE',
-                'product_QUANTITY',
-                'product_WAS_IN_PROMO',
-                OrderTableMap::COL_DISCOUNT,
-                'coupon_COUPONS',
-                OrderTableMap::COL_POSTAGE,
-                'payment_module_TITLE',
-                OrderTableMap::COL_INVOICE_REF,
-                OrderTableMap::COL_DELIVERY_REF,
-                'delivery_module_TITLE',
-                'delivery_address_TITLE',
-                'delivery_address_COMPANY',
-                'delivery_address_FIRSTNAME',
-                'delivery_address_LASTNAME',
-                'delivery_address_ADDRESS1',
-                'delivery_address_ADDRESS2',
-                'delivery_address_ADDRESS3',
-                'delivery_address_ZIPCODE',
-                'delivery_address_CITY',
-                'delivery_address_country_TITLE',
-                'delivery_address_PHONE',
-                'invoice_address_TITLE',
-                'invoice_address_COMPANY',
-                'invoice_address_FIRSTNAME',
-                'invoice_address_LASTNAME',
-                'invoice_address_ADDRESS1',
-                'invoice_address_ADDRESS2',
-                'invoice_address_ADDRESS3',
-                'invoice_address_ZIPCODE',
-                'invoice_address_CITY',
-                'invoice_address_country_TITLE',
-                'invoice_address_PHONE',
-                'order_status_TITLE',
-                'currency_CODE',
-                OrderTableMap::COL_CREATED_AT,
-            ])
-            ->orderByCreatedAt(Criteria::DESC)
-        ;
-
-        I18n::addI18nCondition(
-            $query,
-            CustomerTitleI18nTableMap::TABLE_NAME,
-            '`delivery_address_customer_title_join`.ID',
-            CustomerTitleI18nTableMap::COL_ID,
-            '`delivery_address_customer_title_i18n_join`.LOCALE',
-            $locale
-        );
-
-        I18n::addI18nCondition(
-            $query,
-            CustomerTitleI18nTableMap::TABLE_NAME,
-            '`invoice_address_customer_title_join`.ID',
-            CustomerTitleI18nTableMap::COL_ID,
-            '`invoice_address_customer_title_i18n_join`.LOCALE',
-            $locale
-        );
-
-        I18n::addI18nCondition(
-            $query,
-            CountryI18nTableMap::TABLE_NAME,
-            '`delivery_address_country_join`.ID',
-            CountryI18nTableMap::COL_ID,
-            '`delivery_address_country_i18n_join`.LOCALE',
-            $locale
-        );
-
-        I18n::addI18nCondition(
-            $query,
-            CountryI18nTableMap::TABLE_NAME,
-            '`invoice_address_country_join`.ID',
-            CountryI18nTableMap::COL_ID,
-            '`invoice_address_country_i18n_join`.LOCALE',
-            $locale
-        );
-
-        I18n::addI18nCondition(
-            $query,
-            OrderStatusI18nTableMap::TABLE_NAME,
-            OrderStatusI18nTableMap::COL_ID,
-            OrderStatusTableMap::COL_ID,
-            OrderStatusI18nTableMap::COL_LOCALE,
-            $locale
-        );
-
-        $data = $query
-            ->filterById($order[OrderTableMap::COL_ID])
-            ->findOne();
-
-        $order = (new Order)
-            ->setId($order[OrderTableMap::COL_ID])
-        ;
-        $order->setNew(false);
-
-        $tax = 0;
-        $data['order_TOTAL_TTC'] = $order->getTotalAmount($tax, false, false);
-        $data['order_TOTAL_WITH_DISCOUNT'] = $order->getTotalAmount($tax, false, true);
-        $data['order_TOTAL_WITH_DISCOUNT_AND_POSTAGE'] = $order->getTotalAmount($tax, true, true);
-
-        return $data;
-    }
 
     protected function getData()
     {
-        $orderQuery = new OrderQuery();
+        $locale = $this->language->getLocale();
 
-        if ($this->rangeDate !== null) {
-            $orderQuery
-                ->filterByCreatedAt($this->rangeDate['start'], Criteria::GREATER_EQUAL)
-                ->filterByCreatedAt($this->rangeDate['end'], Criteria::LESS_EQUAL)
-            ;
+        $con = Propel::getConnection();
+
+        $query = '
+            SELECT
+                *,
+                (order_total_taxed_price - order_total_price) as order_total_tax,
+                (order_total_taxed_price + order_postage - order_discount) as order_total_with_taxes_shipping_discount
+            FROM (
+                SELECT 
+                    `order`.ref as "order_ref", 
+                    `order`.created_at as "order_created_at",
+                    customer.ref as "customer_ref",
+                    ROUND(`order`.discount, 2) as order_discount,
+                    order_coupon.code as order_coupon_code,
+                    ROUND(`order`.postage, 2) as order_postage,
+                    `order`.postage_tax as "order_postage_tax",
+                    ROUND(`order`.postage_tax_rule_title,2) as "order_postage_tax_rule_title",
+                    SUM(ROUND(order_product.quantity * IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price), 2) ) as order_total_price, 
+                    SUM(
+                        ROUND(
+                            order_product.quantity * (
+                                IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)
+                                +
+                                (
+                                    SELECT 
+                                        COALESCE(SUM(IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)), 0)
+                                    FROM    
+                                        order_product_tax
+                                    WHERE 
+                                        order_product_tax.order_product_id = order_product.id
+                                )
+                            ), 2
+                        )
+                    ) as order_total_taxed_price,
+                    delivery_module.title as "delivery_module_title",
+                    `order`.delivery_ref as "order_delivery_ref",
+                    payment_module.title as "payment_module_title",
+                    `order`.invoice_ref as "order_invoice_ref",
+                    order_status_i18n.title as "order_status_i18n_title",
+                    delivery_address_customer_title.long as "delivery_address_customer_title_long",
+                    delivery_address.company as "delivery_address_company",
+                    delivery_address.firstname as "delivery_address_firstname",
+                    delivery_address.lastname as "delivery_address_lastname",
+                    delivery_address.address1 as "delivery_address_address1",
+                    delivery_address.address2 as "delivery_address_address2",
+                    delivery_address.address3 as "delivery_address_address3",
+                    delivery_address.zipcode as "delivery_address_zipcode",
+                    delivery_address.city as "delivery_address_city",
+                    delivery_country_i18n.title as "delivery_country_i18n_title",
+                    delivery_address.phone as "delivery_address_phone",
+                    invoice_address_customer_title.long as "invoice_address_customer_title_long",
+                    invoice_address.company as "invoice_address_company",
+                    invoice_address.firstname as "invoice_address_firstname",
+                    invoice_address.lastname as "invoice_address_lastname",
+                    invoice_address.address1 as "invoice_address_address1",
+                    invoice_address.address2 as "invoice_address_address2",
+                    invoice_address.address3 as "invoice_address_address3",
+                    invoice_address.zipcode as "invoice_address_zipcode",
+                    invoice_address.city as "invoice_address_city",
+                    invoice_country_i18n.title as "invoice_country_i18n_title",
+                    invoice_address.phone as "invoice_address_phone",
+                    currency.code as "currency_code",
+                    order_product_tax.title as "order_product_tax_title"
+                FROM `order`
+                LEFT JOIN customer ON customer.id = `order`.customer_id
+                LEFT JOIN order_product ON order_product.order_id = `order`.id
+                LEFT JOIN order_product_tax ON order_product_tax.order_product_id = order_product.id
+                LEFT JOIN order_coupon ON order_coupon.order_id = `order`.id
+                LEFT JOIN `module_i18n` as delivery_module ON delivery_module.id = `order`.delivery_module_id AND delivery_module.locale = :locale
+                LEFT JOIN `module_i18n` as payment_module ON payment_module.id = `order`.payment_module_id AND payment_module.locale = :locale
+                LEFT JOIN order_status_i18n ON order_status_i18n.id = `order`.status_id AND order_status_i18n.locale = :locale
+                LEFT JOIN order_address as delivery_address ON delivery_address.id = `order`.delivery_order_address_id
+                LEFT JOIN order_address as invoice_address ON invoice_address.id = `order`.invoice_order_address_id
+                LEFT JOIN customer_title_i18n as delivery_address_customer_title ON delivery_address_customer_title.id = delivery_address.customer_title_id AND delivery_address_customer_title.locale = :locale
+                LEFT JOIN customer_title_i18n as invoice_address_customer_title ON invoice_address_customer_title.id = invoice_address.customer_title_id AND invoice_address_customer_title.locale = :locale
+                LEFT JOIN country_i18n as delivery_country_i18n ON delivery_country_i18n.id = delivery_address.country_id AND delivery_country_i18n.locale = :locale
+                LEFT JOIN country_i18n as invoice_country_i18n ON invoice_country_i18n.id = invoice_address.country_id AND invoice_country_i18n.locale = :locale
+                LEFT JOIN currency ON currency.id = order.currency_id
+                WHERE `order`.created_at >= :start AND `order`.created_at <= :end
+                GROUP BY `order`.id
+                ORDER BY `order`.created_at DESC
+            ) as tmp
+        ';
+
+        $stmt = $con->prepare($query);
+        $stmt->bindValue('locale', $locale);
+        $stmt->bindValue('start', $this->rangeDate['start']->format('Y-m-d'));
+        $stmt->bindValue('end', $this->rangeDate['end']->format('Y-m-d'));
+        $stmt->execute();
+
+        $filename = THELIA_CACHE_DIR . '/export/' . 'order.json';
+
+        if (file_exists($filename)) {
+            unlink($filename);
         }
 
-        return $orderQuery;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }
