@@ -111,7 +111,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult)
     {
-        $lastLegacyOrderId = ConfigQuery::read('last_legacy_order_id', 0);
+        $lastLegacyRoundingOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
 
         /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
@@ -124,7 +124,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
 
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
-            if ($orderProduct->getOrderId() <= $lastLegacyOrderId) {
+            if ($orderProduct->getOrderId() <= $lastLegacyRoundingOrderId) {
                 $taxedPrice = $orderProduct->getPrice() + $orderProduct->getVirtualColumn('TOTAL_TAX');
                 $taxedPromoPrice = $orderProduct->getPromoPrice() + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
