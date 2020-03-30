@@ -16,16 +16,7 @@ use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\Propel;
-use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
-use Thelia\Model\Map\AttributeAvI18nTableMap;
-use Thelia\Model\Map\AttributeAvTableMap;
-use Thelia\Model\Map\CurrencyTableMap;
-use Thelia\Model\Map\ProductI18nTableMap;
-use Thelia\Model\Map\ProductPriceTableMap;
-use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Class ProductPricesExport
@@ -40,15 +31,15 @@ class ProductPricesExport extends JsonFileAbstractExport
     const FILE_NAME = 'product_price';
 
     protected $orderAndAliases = [
-        ProductSaleElementsTableMap::COL_ID => 'id',
-        ProductI18nTableMap::COL_ID => 'product_id',
-        ProductI18nTableMap::COL_TITLE => 'product_title',
-        AttributeAvI18nTableMap::COL_TITLE => 'attributes',
-        ProductSaleElementsTableMap::COL_EAN_CODE => 'ean',
-        ProductPriceTableMap::COL_PRICE => 'price',
-        ProductPriceTableMap::COL_PROMO_PRICE => 'promo_price',
-        CurrencyTableMap::COL_CODE => 'currency',
-        ProductSaleElementsTableMap::COL_PROMO => 'promo'
+        'product_sale_elements_id' => 'id',
+        'product_i18n_id' => 'product_id',
+        'product_i18n_title' => 'product_title',
+        'attribute_av_i18n_title' => 'attributes',
+        'product_sale_elements_ean_code' => 'ean',
+        'product_price_price' => 'price',
+        'product_price_promo_price' => 'promo_price',
+        'currency_code' => 'currency',
+        'product_sale_elements_promo' => 'promo'
     ];
 
     protected function getData()
@@ -57,15 +48,15 @@ class ProductPricesExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
         $query = 'SELECT 
-                        product_sale_elements.id as "product_sale_elements.id",
-                        product_i18n.id as "product_i18n.id",
-                        product_i18n.title as "product_i18n.title",
-                        attribute_av_i18n.title as "attribute_av_i18n.title",
-                        product_sale_elements.ean_code as "product_sale_elements.ean_code",
-                        ROUND(product_price.price, 2) as "product_price.price",
-                        ROUND(product_price.promo_price, 2) as "product_price.promo_price",
-                        currency.code as "currency.code",
-                        product_sale_elements.promo as "product_sale_elements.promo"
+                        product_sale_elements.id as "product_sale_elements_id",
+                        product_i18n.id as "product_i18n_id",
+                        product_i18n.title as "product_i18n_title",
+                        attribute_av_i18n.title as "attribute_av_i18n_title",
+                        product_sale_elements.ean_code as "product_sale_elements_ean_code",
+                        ROUND(product_price.price, 2) as "product_price_price",
+                        ROUND(product_price.promo_price, 2) as "product_price_promo_price",
+                        currency.code as "currency_code",
+                        product_sale_elements.promo as "product_sale_elements_promo"
                     FROM product_sale_elements
                     LEFT JOIN product_i18n ON product_i18n.id = product_sale_elements.product_id
                     LEFT JOIN attribute_combination ON attribute_combination.product_sale_elements_id = product_sale_elements.id
