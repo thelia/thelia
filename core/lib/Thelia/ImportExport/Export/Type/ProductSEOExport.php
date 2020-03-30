@@ -17,12 +17,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
-use Thelia\Model\Content;
-use Thelia\Model\Map\ProductI18nTableMap;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\Map\RewritingUrlTableMap;
 use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
 
 /**
  * Class ProductSEOExport
@@ -35,13 +30,13 @@ class ProductSEOExport extends JsonFileAbstractExport
     const FILE_NAME = 'product_seo';
 
     protected $orderAndAliases = [
-        ProductTableMap::COL_REF => 'ref',
-        ProductI18nTableMap::COL_TITLE => 'product_title',
-        ProductTableMap::COL_VISIBLE => 'visible',
-        RewritingUrlTableMap::COL_URL  => 'url',
-        ProductI18nTableMap::COL_META_TITLE => 'page_title',
-        ProductI18nTableMap::COL_META_DESCRIPTION => 'meta_description',
-        ProductI18nTableMap::COL_META_KEYWORDS => 'meta_keywords',
+        'product_ref' => 'ref',
+        'product_i18n_title' => 'product_title',
+        'product_visible' => 'visible',
+        'rewriting_url_url'  => 'url',
+        'product_i18n_meta_title' => 'page_title',
+        'product_i18n_meta_description' => 'meta_description',
+        'product_i18n_meta_keywords' => 'meta_keywords',
     ];
 
     public function getData()
@@ -50,13 +45,13 @@ class ProductSEOExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
         $query = 'SELECT 
-                        product.ref as "product.ref",
-                        product_i18n.title as "product_i18n.title",
-                        product.visible as "product.visible",
-                        rewriting_url.url as "rewriting_url.url",
-                        product_i18n.meta_title as "product_i18n.meta_title",
-                        product_i18n.meta_description as "product_i18n.meta_description",
-                        product_i18n.meta_keywords as "product_i18n.meta_keywords"
+                        product.ref as "product_ref",
+                        product_i18n.title as "product_i18n_title",
+                        product.visible as "product_visible",
+                        rewriting_url.url as "rewriting_url_url",
+                        product_i18n.meta_title as "product_i18n_meta_title",
+                        product_i18n.meta_description as "product_i18n_meta_description",
+                        product_i18n.meta_keywords as "product_i18n_meta_keywords"
                     FROM product
                     LEFT JOIN product_i18n ON product_i18n.id = product.id AND product_i18n.locale = :locale
                     LEFT JOIN rewriting_url ON rewriting_url.view = "'.(new Product())->getRewrittenUrlViewName().'" AND rewriting_url.view_id = product.id

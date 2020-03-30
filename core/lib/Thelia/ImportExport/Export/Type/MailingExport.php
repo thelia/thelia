@@ -15,7 +15,6 @@ namespace Thelia\ImportExport\Export\Type;
 use PDO;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
-use Thelia\Model\Map\NewsletterTableMap;
 
 /**
  * Class MailingExport
@@ -27,20 +26,20 @@ class MailingExport extends JsonFileAbstractExport
     const FILE_NAME = 'mailing';
 
     protected $orderAndAliases = [
-        NewsletterTableMap::COL_ID => 'Identifier',
-        NewsletterTableMap::COL_EMAIL => 'Email',
-        NewsletterTableMap::COL_FIRSTNAME => 'FirstName',
-        NewsletterTableMap::COL_LASTNAME => 'LastName'
+        'newsletter_id' => 'Identifier',
+        'newsletter_email' => 'Email',
+        'newsletter_firstname' => 'FirstName',
+        'newsletter_lastname' => 'LastName'
     ];
 
     protected function getData()
     {
         $con = Propel::getConnection();
         $query = 'SELECT 
-                        newsletter.id as "newsletter.id",
-                        newsletter.email as "newsletter.email", 
-                        newsletter.firstname as "newsletter.firstname", 
-                        newsletter.lastname as "newsletter.lastname"
+                        newsletter.id as "newsletter_id",
+                        newsletter.email as "newsletter_email", 
+                        newsletter.firstname as "newsletter_firstname", 
+                        newsletter.lastname as "newsletter_lastname"
                     FROM newsletter
                     WHERE newsletter.unsubscribed = 0'
         ;

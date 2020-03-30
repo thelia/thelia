@@ -14,11 +14,6 @@ namespace Thelia\ImportExport\Export\Type;
 
 use PDO;
 use Propel\Runtime\Propel;
-use Thelia\Model\Map\AddressTableMap;
-use Thelia\Model\Map\CountryI18nTableMap;
-use Thelia\Model\Map\CustomerTableMap;
-use Thelia\Model\Map\CustomerTitleI18nTableMap;
-use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
@@ -32,23 +27,23 @@ class CustomerExport extends JsonFileAbstractExport
     const FILE_NAME = 'customer';
 
     protected $orderAndAliases = [
-        CustomerTableMap::COL_REF => 'ref',
-        CustomerTitleI18nTableMap::COL_LONG => 'title',
-        CustomerTableMap::COL_LASTNAME => 'last_name',
-        CustomerTableMap::COL_FIRSTNAME => 'first_name',
-        CustomerTableMap::COL_EMAIL => 'email',
-        CustomerTableMap::COL_DISCOUNT => 'discount',
-        NewsletterTableMap::COL_ID => 'is_registered_to_newsletter',
-        CustomerTableMap::COL_CREATED_AT => 'sign_up_date',
-        AddressTableMap::COL_COMPANY => 'company',
-        AddressTableMap::COL_ADDRESS1 => 'address1',
-        AddressTableMap::COL_ADDRESS2 => 'address2',
-        AddressTableMap::COL_ADDRESS3 => 'address3',
-        AddressTableMap::COL_ZIPCODE => 'zipcode',
-        AddressTableMap::COL_CITY => 'city',
-        CountryI18nTableMap::COL_TITLE => 'country',
-        AddressTableMap::COL_PHONE => 'phone',
-        AddressTableMap::COL_CELLPHONE => 'cellphone'
+        'customer_ref' => 'ref',
+        'customer_title_i18n_long' => 'title',
+        'customer_firstname' => 'last_name',
+        'customer_lastname' => 'first_name',
+        'customer_email' => 'email',
+        'customer_discount' => 'discount',
+        'newsletter_id' => 'is_registered_to_newsletter',
+        'customer_created_at' => 'sign_up_date',
+        'address_company' => 'company',
+        'address_address1' => 'address1',
+        'address_address2' => 'address2',
+        'address_address3' => 'address3',
+        'address_zipcode' => 'zipcode',
+        'address_city' => 'city',
+        'country_i18n_title' => 'country',
+        'address_phone' => 'phone',
+        'address_cellphone' => 'cellphone'
     ];
 
     protected function getData()
@@ -57,23 +52,23 @@ class CustomerExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
         $query = 'SELECT 
-                        customer.ref as "customer.ref", 
-                        customer_title_i18n.long as "customer_title_i18n.long", 
-                        customer.firstname as "customer.firstname", 
-                        customer.lastname as "customer.lastname", 
-                        customer.email as "customer.email", 
-                        customer.discount as "customer.discount",
-                        address.company as "address.company",
-                        address.address1 as "address.address1", 
-                        address.address2 as "address.address2",
-                        address.address3 as "address.address3",
-                        address.zipcode as "address.zipcode",
-                        address.city as "address.city",
-                        country_i18n.title as "country_i18n.title",
-                        newsletter.id as "newsletter.id",
-                        address.phone as "address.phone",
-                        address.cellphone as "address.cellphone",
-                        customer.created_at as "customer.created_at"
+                        customer.ref as "customer_ref", 
+                        customer_title_i18n.long as "customer_title_i18n_long", 
+                        customer.firstname as "customer_firstname", 
+                        customer.lastname as "customer_lastname", 
+                        customer.email as "customer_email", 
+                        customer.discount as "customer_discount",
+                        address.company as "address_company",
+                        address.address1 as "address_address1", 
+                        address.address2 as "address_address2",
+                        address.address3 as "address_address3",
+                        address.zipcode as "address_zipcode",
+                        address.city as "address_city",
+                        country_i18n.title as "country_i18n_title",
+                        newsletter.id as "newsletter_id",
+                        address.phone as "address_phone",
+                        address.cellphone as "address_cellphone",
+                        customer.created_at as "customer_created_at"
                     FROM customer
                     LEFT JOIN customer_title_i18n ON customer.title_id = customer_title_i18n.id AND customer_title_i18n.locale = :locale
                     LEFT JOIN address ON address.customer_id = customer.id AND address.is_default = 1

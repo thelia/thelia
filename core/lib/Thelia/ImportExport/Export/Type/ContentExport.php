@@ -17,11 +17,6 @@ use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
-use Thelia\Model\Map\ContentFolderTableMap;
-use Thelia\Model\Map\ContentI18nTableMap;
-use Thelia\Model\Map\ContentTableMap;
-use Thelia\Model\Map\FolderI18nTableMap;
-use Thelia\Model\Map\RewritingUrlTableMap;
 
 /**
  * Class ContentExport
@@ -40,19 +35,19 @@ class ContentExport extends JsonFileAbstractExport
     const DIRECTORY_NAME = "content";
 
     protected $orderAndAliases = [
-        ContentTableMap::COL_ID => 'id',
-        ContentI18nTableMap::COL_TITLE => 'title',
-        ContentI18nTableMap::COL_CHAPO => 'chapo',
-        ContentI18nTableMap::COL_DESCRIPTION => 'description',
-        ContentI18nTableMap::COL_POSTSCRIPTUM => 'conclusion',
-        ContentTableMap::COL_VISIBLE => 'visible',
-        ContentI18nTableMap::COL_META_TITLE => 'seo_title',
-        ContentI18nTableMap::COL_META_DESCRIPTION => 'seo_description',
-        ContentI18nTableMap::COL_META_KEYWORDS => 'seo_keywords',
-        RewritingUrlTableMap::COL_URL => 'url',
-        ContentFolderTableMap::COL_FOLDER_ID => 'folder_id',
-        ContentFolderTableMap::COL_DEFAULT_FOLDER => 'is_default_folder',
-        FolderI18nTableMap::COL_TITLE=> 'folder_title'
+        'content_id' => 'id',
+        'content_i18n_title' => 'title',
+        'content_i18n_chapo' => 'chapo',
+        'content_i18n_description' => 'description',
+        'content_i18n_postscriptum' => 'conclusion',
+        'content_visible' => 'visible',
+        'content_i18n_meta_title' => 'seo_title',
+        'content_i18n_meta_description' => 'seo_description',
+        'content_i18n_meta_keywords' => 'seo_keywords',
+        'rewriting_url_url' => 'url',
+        'content_folder_folder_id' => 'folder_id',
+        'content_folder_default_folder' => 'is_default_folder',
+        'folder_i18n_title' => 'folder_title'
     ];
 
     /**
@@ -75,19 +70,19 @@ class ContentExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
         $query = 'SELECT 
-                        content.id as "content.id", 
-                        content_i18n.title as "content_i18n.title",
-                        content_i18n.chapo as "content_i18n.chapo",
-                        content_i18n.description as "content_i18n.description",
-                        content_i18n.postscriptum as "content_i18n.postscriptum",
-                        content.visible as "content.visible",
-                        content_i18n.meta_title as "content_i18n.meta_title",
-                        content_i18n.meta_description as "content_i18n.meta_description",
-                        content_i18n.meta_keywords as "content_i18n.meta_keywords",
-                        rewriting_url.url as "rewriting_url.url",
-                        content_folder.folder_id as "content_folder.folder_id",
-                        content_folder.default_folder as "content_folder.default_folder",
-                        folder_i18n.title as "folder_i18n.title"
+                        content.id as "content_id", 
+                        content_i18n.title as "content_i18n_title",
+                        content_i18n.chapo as "content_i18n_chapo",
+                        content_i18n.description as "content_i18n_description",
+                        content_i18n.postscriptum as "content_i18n_postscriptum",
+                        content.visible as "content_visible",
+                        content_i18n.meta_title as "content_i18n_meta_title",
+                        content_i18n.meta_description as "content_i18n_meta_description",
+                        content_i18n.meta_keywords as "content_i18n_meta_keywords",
+                        rewriting_url.url as "rewriting_url_url",
+                        content_folder.folder_id as "content_folder_folder_id",
+                        content_folder.default_folder as "content_folder_default_folder",
+                        folder_i18n.title as "folder_i18n_title"
                     FROM content
                     LEFT JOIN content_i18n ON content_i18n.id = content.id AND content_i18n.locale = :locale
                     LEFT JOIN content_folder ON content_folder.content_id = content.id
