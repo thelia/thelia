@@ -110,7 +110,7 @@
     <column name="isoalpha3" size="4" type="VARCHAR" />
     <column defaultValue="0" name="has_states" type="TINYINT" />
     <column defaultValue="0" name="need_zip_code" type="TINYINT" />
-    <column name="zip_code_format" size="20" type="VARCHAR" />
+    <column name="zip_code_format" size="255" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />

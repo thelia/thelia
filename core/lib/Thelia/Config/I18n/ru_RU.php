@@ -633,7 +633,7 @@ return array(
     'Unsupported magic method %name. only getArgname() is supported.' => 'Не поддерживаемый магический метод %name. Только getArgname() поддерживается.',
     'Unsupported type' => 'Неподдерживаемый тип',
     'Update customer account' => 'Обновить аккаунт клиента',
-    'Use a N for a number, L for Letter, C for an iso code for the state.' => 'Используйте N для цифры, L для буквы, C для iso кода для штатов.',
+    'Use a N for a number, L for Letter, C for an iso code for the state. You can enter several zip code formats separated by commas.' => 'Используйте N для числа, L для Буквы, C для ISO-кода для государства. Вы можете ввести несколько форматов почтовых индексов, разделенных запятыми.',
     'Use the keyword phrase in your URL.' => 'Используйте ключевую фразу в вашем URL.',
     'Used in your store front' => 'Используется на страницах магазина',
     'Username' => 'Имя пользователя',

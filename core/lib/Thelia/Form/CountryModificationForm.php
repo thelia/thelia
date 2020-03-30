@@ -44,7 +44,7 @@ class CountryModificationForm extends CountryCreationForm
                     'label' => $this->translator->trans('The zip code format'),
                     'label_attr' => [
                         'help' => $this->translator->trans(
-                            'Use a N for a number, L for Letter, C for an iso code for the state.'
+                            'Use a N for a number, L for Letter, C for an iso code for the state. You can enter several zip code formats separated by commas.'
                         )
                     ],
                 ]

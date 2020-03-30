@@ -113,7 +113,7 @@ CREATE TABLE `country`
     `isoalpha3` VARCHAR(4),
     `has_states` TINYINT DEFAULT 0,
     `need_zip_code` TINYINT DEFAULT 0,
-    `zip_code_format` VARCHAR(20),
+    `zip_code_format` VARCHAR(255),
     `by_default` TINYINT DEFAULT 0,
     `shop_country` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
@@ -247,8 +247,8 @@ CREATE TABLE `feature_product`
     `product_id` INTEGER NOT NULL,
     `feature_id` INTEGER NOT NULL,
     `feature_av_id` INTEGER,
-    `free_text_value` TEXT COMMENT 'deprecated',
-    `is_free_text` TINYINT(1) NOT NULL DEFAULT '0',
+    `free_text_value` TEXT,
+    `is_free_text` TINYINT(1) DEFAULT 0 NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -273,16 +273,6 @@ CREATE TABLE `feature_product`
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
-
-DROP TRIGGER IF EXISTS `remove_free_text_feature_av`;
-
-DELIMITER $$
-CREATE TRIGGER `remove_free_text_feature_av` AFTER DELETE ON `feature_product`
- FOR EACH ROW IF OLD.`is_free_text` = 1 THEN
-  DELETE FROM `feature_av` WHERE `id` = OLD.`feature_av_id`;
-END IF
-$$
-DELIMITER ;
 
 -- ---------------------------------------------------------------------
 -- feature_template
@@ -2400,7 +2390,7 @@ CREATE TABLE `category_i18n`
     `meta_description` TEXT,
     `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `category_i18n_FK_1`
+    CONSTRAINT `category_i18n_fk_50f2f6`
         FOREIGN KEY (`id`)
         REFERENCES `category` (`id`)
         ON DELETE CASCADE
@@ -2424,7 +2414,7 @@ CREATE TABLE `product_i18n`
     `meta_description` TEXT,
     `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `product_i18n_FK_1`
+    CONSTRAINT `product_i18n_fk_b10f02`
         FOREIGN KEY (`id`)
         REFERENCES `product` (`id`)
         ON DELETE CASCADE
@@ -2445,7 +2435,7 @@ CREATE TABLE `country_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `country_i18n_FK_1`
+    CONSTRAINT `country_i18n_fk_81bfb9`
         FOREIGN KEY (`id`)
         REFERENCES `country` (`id`)
         ON DELETE CASCADE
@@ -2464,7 +2454,7 @@ CREATE TABLE `tax_i18n`
     `title` VARCHAR(255),
     `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `tax_i18n_FK_1`
+    CONSTRAINT `tax_i18n_fk_8d84c5`
         FOREIGN KEY (`id`)
         REFERENCES `tax` (`id`)
         ON DELETE CASCADE
@@ -2483,7 +2473,7 @@ CREATE TABLE `tax_rule_i18n`
     `title` VARCHAR(255),
     `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `tax_rule_i18n_FK_1`
+    CONSTRAINT `tax_rule_i18n_fk_101de5`
         FOREIGN KEY (`id`)
         REFERENCES `tax_rule` (`id`)
         ON DELETE CASCADE
@@ -2504,7 +2494,7 @@ CREATE TABLE `feature_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `feature_i18n_FK_1`
+    CONSTRAINT `feature_i18n_fk_ff581d`
         FOREIGN KEY (`id`)
         REFERENCES `feature` (`id`)
         ON DELETE CASCADE
@@ -2525,7 +2515,7 @@ CREATE TABLE `feature_av_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `feature_av_i18n_FK_1`
+    CONSTRAINT `feature_av_i18n_fk_3f0830`
         FOREIGN KEY (`id`)
         REFERENCES `feature_av` (`id`)
         ON DELETE CASCADE
@@ -2546,7 +2536,7 @@ CREATE TABLE `attribute_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `attribute_i18n_FK_1`
+    CONSTRAINT `attribute_i18n_fk_89599d`
         FOREIGN KEY (`id`)
         REFERENCES `attribute` (`id`)
         ON DELETE CASCADE
@@ -2567,7 +2557,7 @@ CREATE TABLE `attribute_av_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `attribute_av_i18n_FK_1`
+    CONSTRAINT `attribute_av_i18n_fk_8c06f1`
         FOREIGN KEY (`id`)
         REFERENCES `attribute_av` (`id`)
         ON DELETE CASCADE
@@ -2588,7 +2578,7 @@ CREATE TABLE `config_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `config_i18n_FK_1`
+    CONSTRAINT `config_i18n_fk_c7beee`
         FOREIGN KEY (`id`)
         REFERENCES `config` (`id`)
         ON DELETE CASCADE
@@ -2607,7 +2597,7 @@ CREATE TABLE `customer_title_i18n`
     `short` VARCHAR(10),
     `long` VARCHAR(45),
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `customer_title_i18n_FK_1`
+    CONSTRAINT `customer_title_i18n_fk_b2dda4`
         FOREIGN KEY (`id`)
         REFERENCES `customer_title` (`id`)
         ON DELETE CASCADE
@@ -2631,7 +2621,7 @@ CREATE TABLE `folder_i18n`
     `meta_description` TEXT,
     `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `folder_i18n_FK_1`
+    CONSTRAINT `folder_i18n_fk_76aef4`
         FOREIGN KEY (`id`)
         REFERENCES `folder` (`id`)
         ON DELETE CASCADE
@@ -2655,7 +2645,7 @@ CREATE TABLE `content_i18n`
     `meta_description` TEXT,
     `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `content_i18n_FK_1`
+    CONSTRAINT `content_i18n_fk_3e8e68`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
         ON DELETE CASCADE
@@ -2676,7 +2666,7 @@ CREATE TABLE `product_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `product_image_i18n_FK_1`
+    CONSTRAINT `product_image_i18n_fk_5d109e`
         FOREIGN KEY (`id`)
         REFERENCES `product_image` (`id`)
         ON DELETE CASCADE
@@ -2697,7 +2687,7 @@ CREATE TABLE `product_document_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `product_document_i18n_FK_1`
+    CONSTRAINT `product_document_i18n_fk_8e7bdf`
         FOREIGN KEY (`id`)
         REFERENCES `product_document` (`id`)
         ON DELETE CASCADE
@@ -2715,7 +2705,7 @@ CREATE TABLE `currency_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `name` VARCHAR(45),
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `currency_i18n_FK_1`
+    CONSTRAINT `currency_i18n_fk_a45ca6`
         FOREIGN KEY (`id`)
         REFERENCES `currency` (`id`)
         ON DELETE CASCADE
@@ -2736,7 +2726,7 @@ CREATE TABLE `order_status_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `order_status_i18n_FK_1`
+    CONSTRAINT `order_status_i18n_fk_5b6bb6`
         FOREIGN KEY (`id`)
         REFERENCES `order_status` (`id`)
         ON DELETE CASCADE
@@ -2757,7 +2747,7 @@ CREATE TABLE `module_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `module_i18n_FK_1`
+    CONSTRAINT `module_i18n_fk_73731c`
         FOREIGN KEY (`id`)
         REFERENCES `module` (`id`)
         ON DELETE CASCADE
@@ -2778,7 +2768,7 @@ CREATE TABLE `profile_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `profile_i18n_FK_1`
+    CONSTRAINT `profile_i18n_fk_1e47a3`
         FOREIGN KEY (`id`)
         REFERENCES `profile` (`id`)
         ON DELETE CASCADE
@@ -2799,7 +2789,7 @@ CREATE TABLE `resource_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `resource_i18n_FK_1`
+    CONSTRAINT `resource_i18n_fk_3c977b`
         FOREIGN KEY (`id`)
         REFERENCES `resource` (`id`)
         ON DELETE CASCADE
@@ -2820,7 +2810,7 @@ CREATE TABLE `message_i18n`
     `text_message` LONGTEXT,
     `html_message` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `message_i18n_FK_1`
+    CONSTRAINT `message_i18n_fk_70b474`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
         ON DELETE CASCADE
@@ -2840,7 +2830,7 @@ CREATE TABLE `coupon_i18n`
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `coupon_i18n_FK_1`
+    CONSTRAINT `coupon_i18n_fk_934812`
         FOREIGN KEY (`id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
@@ -2861,7 +2851,7 @@ CREATE TABLE `category_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `category_image_i18n_FK_1`
+    CONSTRAINT `category_image_i18n_fk_2904d2`
         FOREIGN KEY (`id`)
         REFERENCES `category_image` (`id`)
         ON DELETE CASCADE
@@ -2882,7 +2872,7 @@ CREATE TABLE `folder_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `folder_image_i18n_FK_1`
+    CONSTRAINT `folder_image_i18n_fk_667bf4`
         FOREIGN KEY (`id`)
         REFERENCES `folder_image` (`id`)
         ON DELETE CASCADE
@@ -2903,7 +2893,7 @@ CREATE TABLE `content_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `content_image_i18n_FK_1`
+    CONSTRAINT `content_image_i18n_fk_182449`
         FOREIGN KEY (`id`)
         REFERENCES `content_image` (`id`)
         ON DELETE CASCADE
@@ -2924,7 +2914,7 @@ CREATE TABLE `category_document_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `category_document_i18n_FK_1`
+    CONSTRAINT `category_document_i18n_fk_667be0`
         FOREIGN KEY (`id`)
         REFERENCES `category_document` (`id`)
         ON DELETE CASCADE
@@ -2945,7 +2935,7 @@ CREATE TABLE `content_document_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `content_document_i18n_FK_1`
+    CONSTRAINT `content_document_i18n_fk_70b65c`
         FOREIGN KEY (`id`)
         REFERENCES `content_document` (`id`)
         ON DELETE CASCADE
@@ -2966,7 +2956,7 @@ CREATE TABLE `folder_document_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `folder_document_i18n_FK_1`
+    CONSTRAINT `folder_document_i18n_fk_341a4d`
         FOREIGN KEY (`id`)
         REFERENCES `folder_document` (`id`)
         ON DELETE CASCADE
@@ -2984,7 +2974,7 @@ CREATE TABLE `template_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `name` VARCHAR(255),
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `template_i18n_FK_1`
+    CONSTRAINT `template_i18n_fk_ec5d08`
         FOREIGN KEY (`id`)
         REFERENCES `template` (`id`)
         ON DELETE CASCADE
@@ -3005,7 +2995,7 @@ CREATE TABLE `module_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `module_image_i18n_FK_1`
+    CONSTRAINT `module_image_i18n_fk_5962c5`
         FOREIGN KEY (`id`)
         REFERENCES `module_image` (`id`)
         ON DELETE CASCADE
@@ -3029,7 +3019,7 @@ CREATE TABLE `brand_i18n`
     `meta_description` TEXT,
     `meta_keywords` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `brand_i18n_FK_1`
+    CONSTRAINT `brand_i18n_fk_f1ff5b`
         FOREIGN KEY (`id`)
         REFERENCES `brand` (`id`)
         ON DELETE CASCADE
@@ -3050,7 +3040,7 @@ CREATE TABLE `brand_document_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `brand_document_i18n_FK_1`
+    CONSTRAINT `brand_document_i18n_fk_651873`
         FOREIGN KEY (`id`)
         REFERENCES `brand_document` (`id`)
         ON DELETE CASCADE
@@ -3071,7 +3061,7 @@ CREATE TABLE `brand_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `brand_image_i18n_FK_1`
+    CONSTRAINT `brand_image_i18n_fk_caf721`
         FOREIGN KEY (`id`)
         REFERENCES `brand_image` (`id`)
         ON DELETE CASCADE
@@ -3093,7 +3083,7 @@ CREATE TABLE `sale_i18n`
     `postscriptum` TEXT,
     `sale_label` VARCHAR(255),
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `sale_i18n_FK_1`
+    CONSTRAINT `sale_i18n_fk_ca388b`
         FOREIGN KEY (`id`)
         REFERENCES `sale` (`id`)
         ON DELETE CASCADE
@@ -3111,7 +3101,7 @@ CREATE TABLE `export_category_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `export_category_i18n_FK_1`
+    CONSTRAINT `export_category_i18n_fk_91e3ed`
         FOREIGN KEY (`id`)
         REFERENCES `export_category` (`id`)
         ON DELETE CASCADE
@@ -3130,7 +3120,7 @@ CREATE TABLE `export_i18n`
     `title` VARCHAR(255) NOT NULL,
     `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `export_i18n_FK_1`
+    CONSTRAINT `export_i18n_fk_f6cb38`
         FOREIGN KEY (`id`)
         REFERENCES `export` (`id`)
         ON DELETE CASCADE
@@ -3148,7 +3138,7 @@ CREATE TABLE `import_category_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `import_category_i18n_FK_1`
+    CONSTRAINT `import_category_i18n_fk_97d8a9`
         FOREIGN KEY (`id`)
         REFERENCES `import_category` (`id`)
         ON DELETE CASCADE
@@ -3167,7 +3157,7 @@ CREATE TABLE `import_i18n`
     `title` VARCHAR(255) NOT NULL,
     `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `import_i18n_FK_1`
+    CONSTRAINT `import_i18n_fk_945a72`
         FOREIGN KEY (`id`)
         REFERENCES `import` (`id`)
         ON DELETE CASCADE
@@ -3187,7 +3177,7 @@ CREATE TABLE `hook_i18n`
     `description` LONGTEXT,
     `chapo` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `hook_i18n_FK_1`
+    CONSTRAINT `hook_i18n_fk_9cae18`
         FOREIGN KEY (`id`)
         REFERENCES `hook` (`id`)
         ON DELETE CASCADE
@@ -3205,7 +3195,7 @@ CREATE TABLE `module_config_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `value` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `module_config_i18n_FK_1`
+    CONSTRAINT `module_config_i18n_fk_152eaa`
         FOREIGN KEY (`id`)
         REFERENCES `module_config` (`id`)
         ON DELETE CASCADE
@@ -3223,7 +3213,7 @@ CREATE TABLE `state_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `state_i18n_FK_1`
+    CONSTRAINT `state_i18n_fk_ce25f6`
         FOREIGN KEY (`id`)
         REFERENCES `state` (`id`)
         ON DELETE CASCADE
@@ -3248,7 +3238,7 @@ CREATE TABLE `category_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `category_version_FK_1`
+    CONSTRAINT `category_version_fk_50f2f6`
         FOREIGN KEY (`id`)
         REFERENCES `category` (`id`)
         ON DELETE CASCADE
@@ -3276,7 +3266,7 @@ CREATE TABLE `product_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `product_version_FK_1`
+    CONSTRAINT `product_version_fk_b10f02`
         FOREIGN KEY (`id`)
         REFERENCES `product` (`id`)
         ON DELETE CASCADE
@@ -3314,7 +3304,7 @@ CREATE TABLE `customer_version`
     `order_ids` TEXT,
     `order_versions` TEXT,
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `customer_version_FK_1`
+    CONSTRAINT `customer_version_fk_b91976`
         FOREIGN KEY (`id`)
         REFERENCES `customer` (`id`)
         ON DELETE CASCADE
@@ -3338,7 +3328,7 @@ CREATE TABLE `folder_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `folder_version_FK_1`
+    CONSTRAINT `folder_version_fk_76aef4`
         FOREIGN KEY (`id`)
         REFERENCES `folder` (`id`)
         ON DELETE CASCADE
@@ -3361,7 +3351,7 @@ CREATE TABLE `content_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `content_version_FK_1`
+    CONSTRAINT `content_version_fk_3e8e68`
         FOREIGN KEY (`id`)
         REFERENCES `content` (`id`)
         ON DELETE CASCADE
@@ -3402,7 +3392,7 @@ CREATE TABLE `order_version`
     `version_created_by` VARCHAR(100),
     `customer_id_version` INTEGER DEFAULT 0,
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `order_version_FK_1`
+    CONSTRAINT `order_version_fk_19ea48`
         FOREIGN KEY (`id`)
         REFERENCES `order` (`id`)
         ON DELETE CASCADE
@@ -3429,7 +3419,7 @@ CREATE TABLE `message_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `message_version_FK_1`
+    CONSTRAINT `message_version_fk_70b474`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
         ON DELETE CASCADE
@@ -3463,7 +3453,7 @@ CREATE TABLE `coupon_version`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `coupon_version_FK_1`
+    CONSTRAINT `coupon_version_fk_934812`
         FOREIGN KEY (`id`)
         REFERENCES `coupon` (`id`)
         ON DELETE CASCADE

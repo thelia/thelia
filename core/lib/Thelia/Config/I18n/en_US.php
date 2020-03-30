@@ -667,7 +667,7 @@ return array(
     'Unsupported magic method %name. only getArgname() is supported.' => 'Unsupported magic method %name. only getArgname() is supported.',
     'Unsupported type' => 'Unsupported type',
     'Update customer account' => 'Update customer account',
-    'Use a N for a number, L for Letter, C for an iso code for the state.' => 'Use a N for a number, L for Letter, C for an iso code for the state.',
+    'Use a N for a number, L for Letter, C for an iso code for the state. You can enter several zip code formats separated by commas.' => 'Use a N for a number, L for Letter, C for an iso code for the state. You can enter several zip code formats separated by commas.',
     'Use the keyword phrase in your URL.' => 'Use the keyword phrase in your URL.',
     'Used in your store front' => 'Used in your store front',
     'Username' => 'Username',

@@ -23,4 +23,8 @@ DELIMITER ;
 ALTER TABLE `ignored_module_hook` ADD `created_at` DATETIME NOT NULL;
 ALTER TABLE `ignored_module_hook` ADD `updated_at` DATETIME NOT NULL;
 
+-- Enlarge zip_code_format column size
+
+ALTER TABLE `country` CHANGE `zip_code_format` `zip_code_format` VARCHAR(255);
+
 SET FOREIGN_KEY_CHECKS = 1;

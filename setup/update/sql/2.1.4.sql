@@ -14,14 +14,42 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+    (@max_id+1, 'ar_SA', NULL, '', ''),
+    (@max_id+2, 'ar_SA', NULL, '', ''),
+    (@max_id+1, 'cs_CZ', NULL, '', ''),
+    (@max_id+2, 'cs_CZ', NULL, '', ''),
     (@max_id+1, 'de_DE', 'Export modal or page - oben', '', ''),
     (@max_id+2, 'de_DE', 'Export modal or page - unten', '', ''),
+    (@max_id+1, 'el_GR', NULL, '', ''),
+    (@max_id+2, 'el_GR', NULL, '', ''),
     (@max_id+1, 'en_US', 'Export modal or page - top', '', ''),
     (@max_id+2, 'en_US', 'Export modal or page - bottom', '', ''),
     (@max_id+1, 'es_ES', 'Modal o página de exportación - superior', '', ''),
     (@max_id+2, 'es_ES', 'Modal o página de exportación - inferior', '', ''),
+    (@max_id+1, 'fa_IR', NULL, '', ''),
+    (@max_id+2, 'fa_IR', NULL, '', ''),
     (@max_id+1, 'fr_FR', 'Modal ou page d\'export - en haut', '', ''),
-    (@max_id+2, 'fr_FR', 'Modal ou page d\'export - en bas', '', '')
+    (@max_id+2, 'fr_FR', 'Modal ou page d\'export - en bas', '', ''),
+    (@max_id+1, 'hu_HU', NULL, '', ''),
+    (@max_id+2, 'hu_HU', NULL, '', ''),
+    (@max_id+1, 'id_ID', NULL, '', ''),
+    (@max_id+2, 'id_ID', NULL, '', ''),
+    (@max_id+1, 'it_IT', NULL, '', ''),
+    (@max_id+2, 'it_IT', NULL, '', ''),
+    (@max_id+1, 'pl_PL', 'Eksport modal lub strona - góra', '', ''),
+    (@max_id+2, 'pl_PL', 'Eksport modal lub strona - dół', '', ''),
+    (@max_id+1, 'pt_BR', NULL, '', ''),
+    (@max_id+2, 'pt_BR', NULL, '', ''),
+    (@max_id+1, 'pt_PT', NULL, '', ''),
+    (@max_id+2, 'pt_PT', NULL, '', ''),
+    (@max_id+1, 'ru_RU', 'Страница или модальное окно экспорта - вверху', '', ''),
+    (@max_id+2, 'ru_RU', 'Страница или модальное окно экспорта - внизу', '', ''),
+    (@max_id+1, 'sk_SK', NULL, '', ''),
+    (@max_id+2, 'sk_SK', NULL, '', ''),
+    (@max_id+1, 'tr_TR', 'İhracat kalıcı veya sayfa - üst', '', ''),
+    (@max_id+2, 'tr_TR', 'Kalıcı ihracat veya sayfa - alt', '', ''),
+    (@max_id+1, 'uk_UA', NULL, '', ''),
+    (@max_id+2, 'uk_UA', NULL, '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;
