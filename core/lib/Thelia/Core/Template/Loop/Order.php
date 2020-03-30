@@ -321,7 +321,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      */
     public function parseResults(LoopResult $loopResult)
     {
-        $lastLegacyOrderId = ConfigQuery::read('last_legacy_order_id', 0);
+        $lastLegacyOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
 
         /**  @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {

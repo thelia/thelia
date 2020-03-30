@@ -150,7 +150,7 @@ class Order extends BaseOrder
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
         // To prevent price changes in pre-2.4 orders, use the legacy calculation method
-        if ($this->getId() <= ConfigQuery::read('last_legacy_order_id', 0)) {
+        if ($this->getId() <= ConfigQuery::read('last_legacy_rounding_order_id', 0)) {
             return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
         }
 

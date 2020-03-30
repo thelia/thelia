@@ -14,7 +14,7 @@ $queryResult = $stmt->fetch(\PDO::FETCH_OBJ);
 $lastOrderId = isset($queryResult->id) ? $queryResult->id : 0;
 
 // Store it in an hidden configuration variable
-$sql = "INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES ('last_legacy_order_id', ?, 1, 1, ?, ?)";
+$sql = "INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES ('last_legacy_rounding_order_id', ?, 1, 1, ?, ?)";
 
 $now = (new \DateTime())->format('Y-m-d H:i:s');
 
