@@ -1,4 +1,7 @@
 # 2.4.0
+- #2740 Fix defaultErrorFallback templateDfinition replacement
+- #2739 Fix ignored_module_hook table update
+- #2738 removed versionnable from schema example 
 - #2737 Add php < 7.4 requirements
 - #2736 Optimized exports with JSON cache file and SQL request
 - #2735 Tax calculation fixes, revamped 
