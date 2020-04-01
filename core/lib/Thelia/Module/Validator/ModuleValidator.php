@@ -349,7 +349,7 @@ class ModuleValidator
             return;
         }
 
-        if (preg_match('/<behavior.*name="versionable".*\/>/s', file_get_contents($schemaFile))) {
+        if (preg_match('/<behavior.*name="versionable".*\/>/s', preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
             throw new ModuleException(
                 "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
             );
