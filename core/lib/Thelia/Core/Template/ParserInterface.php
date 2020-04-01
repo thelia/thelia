@@ -108,6 +108,13 @@ interface ParserInterface
     public function getTemplateDefinition($webAssetTemplateName = false);
 
     /**
+     * Check if template definition is not null
+     *
+     * @return boolean
+     */
+    public function hasTemplateDefinition();
+
+    /**
      * Get the current status of the fallback to "default" feature
      *
      * @return bool

@@ -65,6 +65,16 @@ class ParserFallback implements ParserInterface
     }
 
     /**
+     * Check if template definition is not null
+     *
+     * @return boolean
+     */
+    public function hasTemplateDefinition()
+    {
+        $this->throwException();
+    }
+
+    /**
      * Add a template directory to the current template list
      *
      * @param int $templateType the template type (
