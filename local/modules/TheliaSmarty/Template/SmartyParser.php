@@ -428,6 +428,16 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
+     * Check if template definition is not null
+     *
+     * @return boolean
+     */
+    public function hasTemplateDefinition()
+    {
+        return $this->templateDefinition !== null;
+    }
+
+    /**
      * Get the current status of the fallback to "default" feature
      *
      * @return bool
