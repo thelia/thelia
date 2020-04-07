@@ -154,10 +154,13 @@ class Order extends BaseOrder
             return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
         }
 
-        // Cache the query result
-        static $queryResult;
+        // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
+        // and may cache results for several orders, for example in the order list in the back-office.
+        static $queryResult = [];
 
-        if (null === $queryResult) {
+        $id = $this->getId();
+
+        if (null === $queryResult[$id]) {
             // Shoud be the same rounding method as in CartItem::getTotalTaxedPrice()
             // For each order line, we round quantity x taxed price.
             $query = '
@@ -207,11 +210,11 @@ class Order extends BaseOrder
                 );
             }
 
-            $queryResult = $stmt->fetch(\PDO::FETCH_OBJ);
+            $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
-        $total = (float) $queryResult->total_taxed_price;
-        $tax = $total - (float) $queryResult->total_untaxed_price;
+        $total = (float) $queryResult[$id]->total_taxed_price;
+        $tax = $total - (float) $queryResult[$id]->total_untaxed_price;
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
