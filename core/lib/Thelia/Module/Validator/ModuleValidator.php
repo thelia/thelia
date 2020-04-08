@@ -263,6 +263,22 @@ class ModuleValidator
         $this->moduleDefinition = $moduleDefinition;
     }
 
+    public function checkModulePropelSchema()
+    {
+        $schemaFile = $this->getModulePath() . DS . "Config" . DS . "schema.xml";
+        $fs = new Filesystem();
+
+        if ($fs->exists($schemaFile) === false) {
+            return;
+        }
+
+        if (preg_match('/<behavior.*name="versionable".*\/>/s', preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
+            throw new ModuleException(
+                "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
+            );
+        }
+    }
+
     protected function checkVersion()
     {
         if ($this->moduleDefinition->getTheliaVersion()) {
@@ -337,22 +353,6 @@ class ModuleValidator
             );
 
             throw new ModuleException($errorsMessage);
-        }
-    }
-
-    protected function checkModulePropelSchema()
-    {
-        $schemaFile = $this->getModulePath() . DS . "Config" . DS . "schema.xml";
-        $fs = new Filesystem();
-
-        if ($fs->exists($schemaFile) === false) {
-            return;
-        }
-
-        if (preg_match('/<behavior.*name="versionable".*\/>/s', preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
-            throw new ModuleException(
-                "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
-            );
         }
     }
 

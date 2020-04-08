@@ -82,7 +82,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
     protected function checkModuleSchema()
     {
         $moduleValidator = new ModuleValidator($this->moduleDirectory);
-        $moduleValidator->validate();
+        $moduleValidator->checkModulePropelSchema();
     }
 
     protected function generateGlobalSchemaForModule()
