@@ -43,6 +43,16 @@ matrix:
       addons:
         mariadb: 10.3
       env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
+    - name: "PHP 7.3 MariaDB 10.4"
+      php: "7.3"
+      addons:
+        mariadb: 10.4
+      env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
+    - name: "PHP 7.3 MariaDB 10.5"
+      php: "7.3"
+      addons:
+        mariadb: 10.5
+      env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=0 DISABLE_XDEBUG=1
     - name: "PHP 7.3 Composer full update"
       php: "7.3"
       env: DB_USER=root DB_HOST=127.0.0.1 COMPOSIER_FULL_UPDATE=1 DISABLE_XDEBUG=1
