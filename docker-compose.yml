@@ -1,37 +1,36 @@
-version: '3'
+version: "3.1"
 
 services:
-  web:
-    build: ./docker/php
+  mariadb:
+    image: mariadb:10.1
+    container_name: docker-thelia-mariadb
+    working_dir: /application
+    volumes:
+      - .:/application
+      - .docker/mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=thelia
+      - MYSQL_USER=thelia
+      - MYSQL_PASSWORD=thelia
+    ports:
+      - "8086:3306"
+
+  webserver:
+    image: nginx:alpine
+    container_name: docker-thelia-webserver
+    working_dir: /application
+    volumes:
+      - .:/application
+      - .docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8080:80"
-    links:
-      - mariaDB # thus database.yml has host=mariaDB
-    environment:
-      SYMFONY_ENV: dev
-      # see https://registry.hub.docker.com/u/jderusse/dns-gen/
-      #- DOMAIN_NAME=thelia.docker
-    command: /usr/sbin/apache2ctl -D FOREGROUND
+
+  php-fpm:
+    build: .docker/php-fpm
+    container_name: docker-thelia-php-fpm
+    working_dir: /application
     volumes:
-      - .:/var/www/html
-
-  phpmyadmin:
-    image: corbinu/docker-phpmyadmin
-    ports:
-      - "8081:80"
-    environment:
-      MYSQL_ROOT_UNSERNAME: root
-      MYSQL_ROOT_PASSWORD: toor
-      MYSQL_PORT_3306_TCP_ADDR: mariaDB
-      MYSQL_PORT_3306_TCP_PORT: 3306
-    links:
-      - mariaDB
-
-
-  mariaDB:
-    image: mariadb
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: thelia
-      MYSQL_ROOT_PASSWORD: toor
+      - .:/application
+      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/cli/conf.d/99-overrides.ini
