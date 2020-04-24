@@ -160,7 +160,7 @@ class Order extends BaseOrder
 
         $id = $this->getId();
 
-        if (null === $queryResult[$id]) {
+        if (!isset($queryResult[$id]) || null === $queryResult[$id]) {
             // Shoud be the same rounding method as in CartItem::getTotalTaxedPrice()
             // For each order line, we round quantity x taxed price.
             $query = '
