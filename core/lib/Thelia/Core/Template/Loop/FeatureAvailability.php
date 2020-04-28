@@ -57,7 +57,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
@@ -93,9 +93,16 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
 
         foreach ($orders as $order) {
             switch ($order) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id_reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
+                case "alpha_reverse":
                 case "alpha-reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
