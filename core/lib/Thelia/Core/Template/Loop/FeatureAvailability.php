@@ -57,7 +57,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
