@@ -76,13 +76,13 @@ class MoneyFormat extends NumberFormat
         $currencyId = null, 
         $remove_zero_decimal = false
     ) {
-        $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
-        
         if ($remove_zero_decimal === true) {
             if($number == (int)$number) {
                 $number = \intval($number);
             }
         }
+        
+        $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
 
         $currency = $currencyId !== null ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
 
