@@ -160,7 +160,6 @@ class Thelia extends Kernel
             $propelSchemaLocator
         );
 
-        $cacheRefresh = false;
         $propelConnectionAvailable = $this->initializePropelService(false, $cacheRefresh);
 
         if ($propelConnectionAvailable) {
@@ -209,8 +208,6 @@ class Thelia extends Kernel
             $this->getEnvParameters(),
             $propelSchemaLocator
         );
-
-        $cacheRefresh = false;
 
         return $propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
     }

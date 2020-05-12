@@ -22,8 +22,6 @@ use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Core\PropelInitService;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
