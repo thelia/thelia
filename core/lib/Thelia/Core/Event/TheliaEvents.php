@@ -982,6 +982,7 @@ final class TheliaEvents
 
     /* Delivery module */
     const MODULE_DELIVERY_GET_POSTAGE = 'thelia.module.delivery.postage';
+    const MODULE_DELIVERY_GET_PICKUP_LOCATIONS = 'thelia.module.delivery.pickupLocations';
 
     /**
      * Hook
