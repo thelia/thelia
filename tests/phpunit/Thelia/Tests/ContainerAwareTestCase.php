@@ -65,6 +65,8 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
         $container->set("request_stack", $requestStack);
 
+        $container->set("kernel", $this->getKernel());
+
         new Translator($container);
         $container->set("thelia.securitycontext", new SecurityContext($requestStack));
 
@@ -113,7 +115,13 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getKernel()
     {
-        $kernel = $this->createMock("Symfony\Component\HttpKernel\KernelInterface");
+        $kernel = $this->createMock("\Thelia\Core\Thelia");
+
+        // Stub propel initialization service
+        $kernel
+            ->expects($this->any())
+            ->method('initializePropelService')
+        ;
 
         return $kernel;
     }
