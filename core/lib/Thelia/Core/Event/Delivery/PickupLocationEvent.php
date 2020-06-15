@@ -16,6 +16,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
 use Thelia\Model\PickupLocation;
 use Thelia\Model\State;
+use Thelia\Model\Country;
 
 /**
  * Class PickupLocationEvent
@@ -28,7 +29,7 @@ class PickupLocationEvent extends ActionEvent
     protected $locations = [];
 
     /** @var int address id */
-    protected $address_id = null;
+    protected $addressId = null;
 
     /** @var Address */
     protected $address;
@@ -41,18 +42,18 @@ class PickupLocationEvent extends ActionEvent
 
     /**
      * PickupLocationEvent constructor.
-     * @param  int address id
+     * @param int $addressId
      * @param Address $address
      * @param State $state
      * @param Country $country
      */
     public function __construct(
-        $address_id,
-        $address = null,
-        $state = null,
-        $country = null
+        $addressId,
+        Address $address = null,
+        State $state = null,
+        Country $country = null
     ) {
-        $this->address_id = $address_id;
+        $this->addressId = $addressId;
         $this->address = $address;
         $this->state = $state;
         $this->country = $country;
@@ -61,7 +62,7 @@ class PickupLocationEvent extends ActionEvent
     /** @return int */
     public function getAdrressId()
     {
-        return $this->address_id;
+        return $this->addressId;
     }
     
     /** @return Address */
