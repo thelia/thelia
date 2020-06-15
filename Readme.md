@@ -145,7 +145,8 @@ You just have to follow all instructions.
 
 ### Docker and docker compose
 
-This repo contains all the configuration needed to run Thelia with docker and docker-compose.
+This repo contains all the configuration needed to run Thelia with docker and docker-compose.    
+Warning, this docker configuration is not ready for production.
 
 It requires obviously [docker](https://docker.com/) and [docker-compose](http://docs.docker.com/compose/)
 
@@ -153,34 +154,40 @@ To install Thelia within Docker, run :
 
 ```
 docker-compose up -d
-docker-compose exec web composer install
-docker-compose exec web php Thelia thelia:install
+docker-compose exec php-fpm composer install
+docker-compose exec php-fpm php Thelia thelia:install
 ```
 
-This will prompt you for database information. Enter the following :
+By default if you haven't changed the `docker-compose.yml` you'll have to answer these questions like this
 
-* host : mariaDB
-* port : 3306 (default)
-* name : thelia
-* login : root
-* password : toor
+``` 
+Database host [default: localhost] : mariadb
+``` 
+``` 
+Database port [default: 3306] : 3306
+```
+``` 
+Database name (if database does not exist, Thelia will try to create it) : thelia
+```
+
+``` 
+Database username : thelia
+```
+
+``` 
+Database pasword : thelia
+```
+
+Next just go to http://localhost:8080 and you should see your Thelia installed !
 
 tip : create an alias for docker-compose, it's boring to write it all the time
 
-All the scripts can be launched through docker (or the corresponding `docker-compose exec web ...` command. For example :
-
-```
-docker exec -it thelia_web_1 composer install
-docker exec -it thelia_web_1 php Thelia cache:clear
-docker exec -it thelia_web_1 php setup/faker.php
-docker exec -it thelia_web_1 unit-tests.sh
+If you want add some sample data just execute this command (still in your container)
+``` bash
+docker-compose exec php-fpm php setup/import.php
 ```
 
-Once started, you can open your local Thelia website at [127.0.0.1:8080](http://127.0.0.1:8080) and your phpMyAdmin installation at [127.0.0.1:8081](http://127.0.0.1:8081).
-
-What is missing :
-
-* confguration for export compression (zip, gzip, etc)
+If you want to access your database from your computer (with DBeaver, Sequel Pro or anything else) by default the host is `localhost` and the port is `8086` 
 
 Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it :
 

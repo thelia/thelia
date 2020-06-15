@@ -23,6 +23,7 @@ use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
@@ -70,15 +71,28 @@ class BaseModule implements BaseModuleInterface
     // Do no use this attribute directly, use getModuleModel() instead.
     private $moduleModel = null;
 
+    /**
+     * @param Module $moduleModel
+     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws \Throwable
+     */
     public function activate($moduleModel = null)
     {
         if (null === $moduleModel) {
             $moduleModel = $this->getModuleModel();
         }
 
-        if ($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
+        if ($moduleModel->getActivate() === self::IS_NOT_ACTIVATED) {
             $moduleModel->setActivate(self::IS_ACTIVATED);
             $moduleModel->save();
+
+            // Refresh propel cache to be sure that module's model is created
+            // when the module's initialization methods will be called.
+
+            /** @var Thelia $theliaKernel */
+            $theliaKernel = $this->container->get('kernel');
+
+            $theliaKernel->initializePropelService(true, $cacheRefresh);
 
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();

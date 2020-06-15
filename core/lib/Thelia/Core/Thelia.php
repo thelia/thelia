@@ -160,8 +160,7 @@ class Thelia extends Kernel
             $propelSchemaLocator
         );
 
-        $cacheRefresh = false;
-        $propelConnectionAvailable = $propelInitService->init(false, $cacheRefresh);
+        $propelConnectionAvailable = $this->initializePropelService(false, $cacheRefresh);
 
         if ($propelConnectionAvailable) {
             $theliaDatabaseConnection = Propel::getConnection('thelia');
@@ -185,6 +184,32 @@ class Thelia extends Kernel
         if (self::isInstalled()) {
             $this->getContainer()->get('event_dispatcher')->dispatch(TheliaEvents::BOOT);
         }
+    }
+
+    /**
+     * @param $forcePropelCacheGeneration
+     * @param $cacheRefresh
+     * @return bool
+     * @throws \Throwable
+     */
+    public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
+    {
+        $cacheRefresh = false;
+
+        // initialize Propel, building its cache if necessary
+        $propelSchemaLocator = new SchemaLocator(
+            THELIA_CONF_DIR,
+            THELIA_MODULE_DIR
+        );
+
+        $propelInitService = new PropelInitService(
+            $this->getEnvironment(),
+            $this->isDebug(),
+            $this->getEnvParameters(),
+            $propelSchemaLocator
+        );
+
+        return $propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
     }
 
     /**
