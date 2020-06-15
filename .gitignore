@@ -32,6 +32,8 @@ phpmyadmin
 composer.phar
 web/.htaccess
 local/I18n/*.php
+.docker/mysql-data/*
+!.docker/mysql-data/.gitkeep
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
