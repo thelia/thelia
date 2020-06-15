@@ -111,6 +111,10 @@ class Calculator
                 }
             }
 
+            if (0 === $orderTaxfactorCount = count($orderTaxFactors)) {
+                return 1;
+            }
+
             $orderTaxFactor = array_sum($orderTaxFactors) / count($orderTaxFactors);
         }
 
