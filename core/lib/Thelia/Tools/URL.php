@@ -347,6 +347,10 @@ class URL
             // fallback for old parameter
             $viewLocale = $request->query->get('locale', null);
         }
+        if (null === $viewLocale) {
+            // fallback to session or default language
+            $viewLocale = $request->getSession()->getLang()->getLocale();
+        }
 
         return $viewLocale;
     }
