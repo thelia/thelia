@@ -14,9 +14,9 @@ namespace Thelia\Core\Event\Delivery;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
+use Thelia\Model\Country;
 use Thelia\Model\PickupLocation;
 use Thelia\Model\State;
-use Thelia\Model\Country;
 
 /**
  * Class PickupLocationEvent
@@ -25,74 +25,205 @@ use Thelia\Model\Country;
  */
 class PickupLocationEvent extends ActionEvent
 {
-
-    protected $locations = [];
-
-    /** @var int address id */
-    protected $addressId = null;
-
-    /** @var Address */
+    /**
+     * @var string|null
+     */
     protected $address;
-    
-    /** @var State */
+    /**
+     * @var string|null
+     */
+    protected $city;
+    /**
+     * @var string|null
+     */
+    protected $zipCode;
+    /**
+     * @var State|null
+     */
     protected $state;
-    
-    /** @var Country */
+    /**
+     * @var Country|null
+     */
     protected $country;
+    /**
+     * @var integer|null
+     */
+    protected $radius;
+    /**
+     * @var array|null
+     */
+    protected $moduleIds;
+
+    /**
+     * @var array
+     */
+    protected $locations = [];
 
     /**
      * PickupLocationEvent constructor.
-     * @param int $addressId
-     * @param Address $address
-     * @param State $state
-     * @param Country $country
+     *
+     * @param Address|null $addressModel
+     * @param integer|null $radius
+     * @param string|null $address
+     * @param string|null $city
+     * @param string|null $zipCode
+     * @param State|null $state
+     * @param Country|null $country
+     * @param array|null $moduleIds
      */
     public function __construct(
-        $addressId,
-        Address $address = null,
+        Address $addressModel = null,
+        $radius = null,
+        $address = null,
+        $city = null,
+        $zipCode = null,
         State $state = null,
-        Country $country = null
+        Country $country = null,
+        array $moduleIds = null
     ) {
-        $this->addressId = $addressId;
+        $this->radius = $radius !== null ? $radius : 20;
         $this->address = $address;
+        $this->city = $city;
+        $this->zipCode = $zipCode;
         $this->state = $state;
         $this->country = $country;
+        $this->moduleIds = $moduleIds;
+
+        if (null !== $addressModel) {
+            $this->address = $addressModel->getAddress1();
+            $this->city = $addressModel->getCity();
+            $this->zipCode = $addressModel->getZipcode();
+            $this->state = $addressModel->getState();
+            $this->country = $addressModel->getCountry();
+        }
+
+        if ($this->address === null && $this->city === null && $this->zipCode) {
+            throw new \Exception("Not enough informations to retrieve pickup locations");
+        }
     }
 
-    /** @return int */
-    public function getAdrressId()
-    {
-        return $this->addressId;
-    }
-    
-    /** @return Address */
-    public function getAdrress()
+    /**
+     * @return string|null
+     */
+    public function getAddress()
     {
         return $this->address;
     }
 
-    /** @return State */
-    public function getState()
+    /**
+     * @param string|null $address
+     */
+    public function setAddress($address)
     {
-        return $this->getAddress() !== null ? $this->getAddress()->getState() : $this->state;
+        $this->address = $address;
     }
 
-    /** @return Country */
+    /**
+     * @return string|null
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * @param string|null $city
+     */
+    public function setCity($city)
+    {
+        $this->city = $city;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getZipCode()
+    {
+        return $this->zipCode;
+    }
+
+    /**
+     * @param string|null $zipCode
+     */
+    public function setZipCode($zipCode)
+    {
+        $this->zipCode = $zipCode;
+    }
+
+    /**
+     * @return State|null
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param State|null $state
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return Country|null
+     */
     public function getCountry()
     {
-        return $this->getAddress() !== null ? $this->getAddress()->getCountry() : $this->country;
+        return $this->country;
     }
-    
+
+    /**
+     * @param Country|null $country
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRadius()
+    {
+        return $this->radius;
+    }
+
+    /**
+     * @param int|null $radius
+     */
+    public function setRadius($radius)
+    {
+        $this->radius = $radius;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getModuleIds()
+    {
+        return $this->moduleIds;
+    }
+
+    /**
+     * @param array|null $moduleIds
+     */
+    public function setModuleIds($moduleIds)
+    {
+        $this->moduleIds = $moduleIds;
+    }
+
     /** @return array */
     public function getLocations()
-    {   
+    {
         return $this->locations;
     }
 
-    /** 
-     * @param $locations PickupLocationEvent[]
-     * @return Thelia\Core\Event\Delivery\PickupLocationEvent
-    */
+    /**
+     * @param $locations PickupLocation[]
+     * @return PickupLocationEvent
+     */
     public function setLocations($locations)
     {
         $this->locations = $locations;
@@ -105,5 +236,4 @@ class PickupLocationEvent extends ActionEvent
         $this->locations[] = $location;
         return $this;
     }
-    
 }
