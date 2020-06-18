@@ -14,6 +14,7 @@
 namespace Thelia\Core\Event\Delivery;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
@@ -28,7 +29,7 @@ use Thelia\Module\DeliveryModuleInterface;
  */
 class DeliveryPostageEvent extends ActionEvent
 {
-    /** @var DeliveryModuleInterface */
+    /** @var AbstractDeliveryModule */
     protected $module = null;
 
     /** @var Cart */
@@ -49,8 +50,26 @@ class DeliveryPostageEvent extends ActionEvent
     /** @var OrderPostage|null */
     protected $postage = null;
 
-    /** @var \DateTime|null */
+    /**
+     * @deprecated deprecated since version 2.4.1 use min and max deliver date instead
+     * @var \DateTime|null
+     */
     protected $deliveryDate = null;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $minimumDeliveryDate = null;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $maximumDeliveryDate = null;
+
+    /**
+     * @var string
+     */
+    protected $deliveryMode = null;
 
     /** @var array */
     protected $additionalData = [];
@@ -111,6 +130,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
+     * @deprecated deprecated since version 2.4.1 use min and max deliver date instead
      * @return \DateTime|null
      */
     public function getDeliveryDate()
@@ -119,6 +139,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
+     * @deprecated deprecated since version 2.4.1 use min and max deliver date instead
      * @param \DateTime|null $deliveryDate
      */
     public function setDeliveryDate($deliveryDate)
@@ -128,7 +149,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return DeliveryModuleInterface
+     * @return AbstractDeliveryModule
      */
     public function getModule()
     {
@@ -136,7 +157,7 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @param DeliveryModuleInterface $module
+     * @param AbstractDeliveryModule $module
      */
     public function setModule($module)
     {
@@ -230,5 +251,67 @@ class DeliveryPostageEvent extends ActionEvent
     public function getState()
     {
         return $this->getAddress() !== null ? $this->getAddress()->getState() : $this->state;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeliveryMode()
+    {
+        return $this->deliveryMode;
+    }
+
+    /**
+     * @param mixed $deliveryMode
+     *
+     * @return DeliveryPostageEvent
+     * @throws \Exception
+     */
+    public function setDeliveryMode($deliveryMode)
+    {
+        if (!in_array($deliveryMode, ['pickup', 'delivery'])) {
+            throw new \Exception(Translator::getInstance()->trans('A delivery module can only de of type pickup or delivery'));
+        }
+
+        $this->deliveryMode = $deliveryMode;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getMinimumDeliveryDate()
+    {
+        return $this->minimumDeliveryDate;
+    }
+
+    /**
+     * @param \DateTime|null $minimumDeliveryDate
+     *
+     * @return DeliveryPostageEvent
+     */
+    public function setMinimumDeliveryDate($minimumDeliveryDate)
+    {
+        $this->minimumDeliveryDate = $minimumDeliveryDate;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getMaximumDeliveryDate()
+    {
+        return $this->maximumDeliveryDate;
+    }
+
+    /**
+     * @param \DateTime|null $maximumDeliveryDate
+     *
+     * @return DeliveryPostageEvent
+     */
+    public function setMaximumDeliveryDate($maximumDeliveryDate)
+    {
+        $this->maximumDeliveryDate = $maximumDeliveryDate;
+        return $this;
     }
 }
