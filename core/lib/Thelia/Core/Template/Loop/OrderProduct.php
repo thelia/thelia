@@ -120,28 +120,31 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             $tax = $orderProduct->getVirtualColumn('TOTAL_TAX');
             $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
-            $totalTax = round($tax * $orderProduct->getQuantity(), 2);
-            $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
-
             // To prevent price changes in pre-2.4 orders, use the legacy calculation method
             if ($orderProduct->getOrderId() <= $lastLegacyRoundingOrderId) {
+                $totalTax = round($tax * $orderProduct->getQuantity(), 2);
+                $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
+
                 $taxedPrice = $orderProduct->getPrice() + $orderProduct->getVirtualColumn('TOTAL_TAX');
                 $taxedPromoPrice = $orderProduct->getPromoPrice() + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
-                $totalPrice = $orderProduct->getPrice()*$orderProduct->getQuantity();
-                $totalPromoPrice = $orderProduct->getPromoPrice()*$orderProduct->getQuantity();
+                $totalPrice = $orderProduct->getPrice() * $orderProduct->getQuantity();
+                $totalPromoPrice = $orderProduct->getPromoPrice() * $orderProduct->getQuantity();
             } else {
+                $totalTax = round($tax, 2) * $orderProduct->getQuantity();
+                $totalPromoTax = round($promoTax, 2) * $orderProduct->getQuantity();
+
                 $taxedPrice = $orderProduct->getPrice() + $tax;
                 $taxedPromoPrice = $orderProduct->getPromoPrice() + $promoTax;
 
                 // Price calculation should use the same rounding method as in CartItem::getTotalTaxedPromoPrice()
                 // For each order line, we first round the taxed price, then we multiply by the quantity.
-                $totalPrice = round($orderProduct->getPrice() * $orderProduct->getQuantity(), 2);
-                $totalPromoPrice = round($orderProduct->getPromoPrice() * $orderProduct->getQuantity(), 2);
+                $totalPrice = round($orderProduct->getPrice(), 2) * $orderProduct->getQuantity();
+                $totalPromoPrice = round($orderProduct->getPromoPrice(), 2) * $orderProduct->getQuantity();
             }
 
-            $totalTaxedPrice = round($taxedPrice * $orderProduct->getQuantity(), 2);
-            $totalTaxedPromoPrice = round($taxedPromoPrice * $orderProduct->getQuantity(), 2);
+            $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
+            $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
 
             $loopResultRow->set('ID', $orderProduct->getId())
                 ->set('REF', $orderProduct->getProductRef())
