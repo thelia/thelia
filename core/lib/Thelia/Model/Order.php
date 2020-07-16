@@ -166,9 +166,9 @@ class Order extends BaseOrder
             $query = '
                 SELECT 
                     SUM(
+                        '.OrderProductTableMap::COL_QUANTITY.'
+                        *
                         ROUND(
-                            '.OrderProductTableMap::COL_QUANTITY.'
-                            *
                             ( 
                                 IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
                                 +
@@ -181,9 +181,9 @@ class Order extends BaseOrder
                         )
                     ) as total_taxed_price,
                     SUM(
+                        '.OrderProductTableMap::COL_QUANTITY.'
+                        *
                         ROUND(
-                            '.OrderProductTableMap::COL_QUANTITY.'
-                            *
                             IF(
                                 '.OrderProductTableMap::COL_WAS_IN_PROMO.'=1,
                                 '.OrderProductTableMap::COL_PROMO_PRICE.',
