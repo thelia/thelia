@@ -20,6 +20,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
+use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\DeliveryModuleInterface;
 
 /**
@@ -51,20 +52,9 @@ class DeliveryPostageEvent extends ActionEvent
     protected $postage = null;
 
     /**
-     * @deprecated deprecated since version 2.4.1 use min and max deliver date instead
      * @var \DateTime|null
      */
     protected $deliveryDate = null;
-
-    /**
-     * @var \DateTime|null
-     */
-    protected $minimumDeliveryDate = null;
-
-    /**
-     * @var \DateTime|null
-     */
-    protected $maximumDeliveryDate = null;
 
     /**
      * @var string
@@ -77,8 +67,9 @@ class DeliveryPostageEvent extends ActionEvent
     /**
      * DeliveryPostageEvent constructor.
      * @param DeliveryModuleInterface $module
-     * @param Country $country
      * @param Cart $cart
+     * @param Address|null $address
+     * @param Country $country
      * @param State $state
      */
     public function __construct(
@@ -105,6 +96,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param Cart $cart
+     * @return DeliveryPostageEvent
      */
     public function setCart($cart)
     {
@@ -122,6 +114,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param Address $address
+     * @return DeliveryPostageEvent
      */
     public function setAddress($address)
     {
@@ -130,7 +123,6 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @deprecated deprecated since version 2.4.1 use min and max deliver date instead
      * @return \DateTime|null
      */
     public function getDeliveryDate()
@@ -139,8 +131,8 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @deprecated deprecated since version 2.4.1 use min and max deliver date instead
      * @param \DateTime|null $deliveryDate
+     * @return DeliveryPostageEvent
      */
     public function setDeliveryDate($deliveryDate)
     {
@@ -158,6 +150,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param AbstractDeliveryModule $module
+     * @return DeliveryPostageEvent
      */
     public function setModule($module)
     {
@@ -175,6 +168,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param null|double|OrderPostage $postage
+     * @return DeliveryPostageEvent
      */
     public function setPostage($postage)
     {
@@ -192,6 +186,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param boolean $validModule
+     * @return DeliveryPostageEvent
      */
     public function setValidModule($validModule)
     {
@@ -217,6 +212,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @param array $additionalData
+     * @return DeliveryPostageEvent
      */
     public function setAdditionalData($additionalData)
     {
@@ -228,7 +224,7 @@ class DeliveryPostageEvent extends ActionEvent
      * @param string $key the key of the additional data
      * @param mixed $value the value of the additional data
      *
-     * return $this
+     * @return DeliveryPostageEvent
      */
     public function addAdditionalData($key, $value)
     {
@@ -239,6 +235,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @return Country|null
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getCountry()
     {
@@ -247,6 +244,7 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * @return State|null
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getState()
     {
@@ -274,44 +272,6 @@ class DeliveryPostageEvent extends ActionEvent
         }
 
         $this->deliveryMode = $deliveryMode;
-        return $this;
-    }
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getMinimumDeliveryDate()
-    {
-        return $this->minimumDeliveryDate;
-    }
-
-    /**
-     * @param \DateTime|null $minimumDeliveryDate
-     *
-     * @return DeliveryPostageEvent
-     */
-    public function setMinimumDeliveryDate($minimumDeliveryDate)
-    {
-        $this->minimumDeliveryDate = $minimumDeliveryDate;
-        return $this;
-    }
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getMaximumDeliveryDate()
-    {
-        return $this->maximumDeliveryDate;
-    }
-
-    /**
-     * @param \DateTime|null $maximumDeliveryDate
-     *
-     * @return DeliveryPostageEvent
-     */
-    public function setMaximumDeliveryDate($maximumDeliveryDate)
-    {
-        $this->maximumDeliveryDate = $maximumDeliveryDate;
         return $this;
     }
 }

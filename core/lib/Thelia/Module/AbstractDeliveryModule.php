@@ -54,15 +54,4 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
     {
         return "delivery";
     }
-
-    public function getMinimumDeliveryDate(Country $country, State $state = null)
-    {
-        return null;
-    }
-
-    public function getMaximumDeliveryDate(Country $country, State $state = null)
-    {
-        return null;
-    }
-
 }
