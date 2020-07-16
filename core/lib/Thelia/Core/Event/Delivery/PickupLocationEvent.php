@@ -50,10 +50,17 @@ class PickupLocationEvent extends ActionEvent
      */
     protected $radius;
     /**
+     * @var integer|null
+     */
+    protected $maxRelays;
+    /**
+     * @var integer|null
+     */
+    protected $orderWeight;
+    /**
      * @var array|null
      */
     protected $moduleIds;
-
     /**
      * @var array
      */
@@ -64,24 +71,31 @@ class PickupLocationEvent extends ActionEvent
      *
      * @param Address|null $addressModel
      * @param integer|null $radius
+     * @param integer|null $maxRelays
      * @param string|null $address
      * @param string|null $city
      * @param string|null $zipCode
+     * @param integer|null $orderWeight
      * @param State|null $state
      * @param Country|null $country
      * @param array|null $moduleIds
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function __construct(
         Address $addressModel = null,
         $radius = null,
+        $maxRelays = null,
         $address = null,
         $city = null,
         $zipCode = null,
+        $orderWeight = null,
         State $state = null,
         Country $country = null,
         array $moduleIds = null
     ) {
-        $this->radius = $radius !== null ? $radius : 20;
+        $this->radius = $radius !== null ? $radius : 20000;
+        $this->maxRelays = $maxRelays !== null ? $maxRelays : 15;
+        $this->orderWeight = $orderWeight;
         $this->address = $address;
         $this->city = $city;
         $this->zipCode = $zipCode;
@@ -97,7 +111,7 @@ class PickupLocationEvent extends ActionEvent
             $this->country = $addressModel->getCountry();
         }
 
-        if ($this->address === null && $this->city === null && $this->zipCode) {
+        if ($this->address === null && $this->city === null && $this->zipCode === null) {
             throw new \Exception("Not enough informations to retrieve pickup locations");
         }
     }
@@ -230,10 +244,50 @@ class PickupLocationEvent extends ActionEvent
         return $this;
     }
 
-    /** @param $location PickupLocation */
+    /** @param $location PickupLocation
+     * @return PickupLocationEvent
+     */
     public function appendLocation($location)
     {
         $this->locations[] = $location;
+        return $this;
+    }
+
+    /**
+     * @return integer|null
+     */
+    public function getOrderWeight()
+    {
+        return $this->orderWeight;
+    }
+
+    /**
+     * @param integer|null $orderWeight
+     * @return PickupLocationEvent
+     */
+    public function setOrderWeight($orderWeight)
+    {
+        $this->orderWeight = $orderWeight;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMaxRelays()
+    {
+        return $this->maxRelays;
+    }
+
+    /**
+     * @param int|null $maxRelays
+     * @return PickupLocationEvent
+     */
+    public function setMaxRelays($maxRelays)
+    {
+        $this->maxRelays = $maxRelays;
+
         return $this;
     }
 }
