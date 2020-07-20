@@ -40,16 +40,10 @@ class MoneyFormat extends NumberFormat
         $decimals = null,
         $decPoint = null,
         $thousandsSep = null,
-        $symbol = null, 
-        $remove_zero_decimal = false
+        $symbol = null,
+        $removeZeroDecimal = false
     ) {
-        $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
-        
-        if ($remove_zero_decimal === true) {
-            if($number == (int)$number) {
-                $number = \intval($number);
-            }
-        }
+        $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
         if ($symbol !== null) {
             return $number . ' ' . $symbol;
@@ -65,7 +59,7 @@ class MoneyFormat extends NumberFormat
      * @param string $decPoint
      * @param string $thousandsSep
      * @param int|null $currencyId
-     * @param boolean $remove_zero_decimal
+     * @param boolean $removeZeroDecimal
      * @return string
      */
     public function formatByCurrency(
@@ -73,16 +67,10 @@ class MoneyFormat extends NumberFormat
         $decimals = null,
         $decPoint = null,
         $thousandsSep = null,
-        $currencyId = null, 
-        $remove_zero_decimal = false
+        $currencyId = null,
+        $removeZeroDecimal = false
     ) {
-        if ($remove_zero_decimal === true) {
-            if($number == (int)$number) {
-                $number = \intval($number);
-            }
-        }
-        
-        $number = parent::format($number, $decimals, $decPoint, $thousandsSep);
+        $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
         $currency = $currencyId !== null ? CurrencyQuery::create()->findPk($currencyId) : $this->request->getSession()->getCurrency();
 
@@ -95,5 +83,33 @@ class MoneyFormat extends NumberFormat
         }
 
         return $number;
+    }
+
+    /**
+     * @param $number
+     * @param null $decimals
+     * @param null $decPoint
+     * @param null $thousandsSep
+     * @param bool $removeZeroDecimal
+     *
+     * @return string
+     */
+    protected function preFormat(
+        $number,
+        $decimals = null,
+        $decPoint = null,
+        $thousandsSep = null,
+        $removeZeroDecimal = false
+    )
+    {
+        $number = preg_replace('/\s+/', '', $number);
+
+        if ($removeZeroDecimal === true) {
+            if($number == (int)$number) {
+                $number = \intval($number);
+            }
+        }
+
+        return parent::format($number, $decimals, $decPoint, $thousandsSep);
     }
 }
