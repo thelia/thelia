@@ -1,3 +1,16 @@
+# 2.4.1
+- #2765 Tax and Taxed price variables are now rounded in OrderProduct loop
+- #2764 Fix MoneyFormat when have space in number
+- #2763 Improvement on delivery events
+- #2762 Fix total prices and taxes in order edit page
+- #2761 Improve DeliveryPostage event to get more data
+- #2760 Improve Pickup locations
+- #2758 add a new event MODULE_DELIVERY_GET_PICKUP_LOCATION
+- #2757 Fix model generation at module activation
+- #2756 Fix Url are not rewritten if no locale in url
+- #2754 Fix remove zero decimal on number > 1000
+- #2752 Order by alpha_reverse returns an error in feature-availability loops
+- #2748 Upgrade docker compose to a more mordern stack
 # 2.4.0
 - #2740 Fix defaultErrorFallback templateDfinition replacement
 - #2739 Fix ignored_module_hook table update
