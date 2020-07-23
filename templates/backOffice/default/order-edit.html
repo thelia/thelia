@@ -153,7 +153,7 @@
                                                         {$taxes[{$TAX_RULE_TITLE}] = 0}
                                                     {/if}
 
-                                                    {$taxes[{$TAX_RULE_TITLE}] = $taxes[{$TAX_RULE_TITLE}] + ($REAL_PRICE_TAX|round:2) * $QUANTITY}
+                                                    {$taxes[{$TAX_RULE_TITLE}] = $taxes[{$TAX_RULE_TITLE}] + $REAL_PRICE_TAX * $QUANTITY}
 
                                                     {hook name="order-edit.before-order-product-row" location="before-order-product-row" order_id=$order_id order_product_id=$ID}
                                                     <tr>

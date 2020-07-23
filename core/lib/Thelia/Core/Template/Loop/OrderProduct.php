@@ -18,8 +18,8 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -27,14 +27,12 @@ use Thelia\Model\OrderProductQuery;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- *
  * OrderProduct loop
  *
  * Class OrderProduct
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
  * @method int getOrder()
  * @method int[] getId()
  * @method bool|string getVirtual()
@@ -125,26 +123,32 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $totalTax = round($tax * $orderProduct->getQuantity(), 2);
                 $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
 
-                $taxedPrice = $orderProduct->getPrice() + $orderProduct->getVirtualColumn('TOTAL_TAX');
-                $taxedPromoPrice = $orderProduct->getPromoPrice() + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
+                $taxedPrice = (float) $orderProduct->getPrice() + (float) $orderProduct->getVirtualColumn('TOTAL_TAX');
+                $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + (float) $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
                 $totalPrice = $orderProduct->getPrice() * $orderProduct->getQuantity();
                 $totalPromoPrice = $orderProduct->getPromoPrice() * $orderProduct->getQuantity();
-            } else {
-                $totalTax = round($tax, 2) * $orderProduct->getQuantity();
-                $totalPromoTax = round($promoTax, 2) * $orderProduct->getQuantity();
 
-                $taxedPrice = $orderProduct->getPrice() + $tax;
-                $taxedPromoPrice = $orderProduct->getPromoPrice() + $promoTax;
+                $totalTaxedPrice =  round($taxedPrice, 2) * $orderProduct->getQuantity();
+                $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
+            } else {
+                $tax = round($tax, 2);
+                $promoTax = round($promoTax, 2);
+
+                $totalTax = $tax * $orderProduct->getQuantity();
+                $totalPromoTax = $promoTax * $orderProduct->getQuantity();
+
+                $taxedPrice = round((float) $orderProduct->getPrice() + $tax, 2);
+                $taxedPromoPrice = round((float) $orderProduct->getPromoPrice() + $promoTax, 2);
 
                 // Price calculation should use the same rounding method as in CartItem::getTotalTaxedPromoPrice()
                 // For each order line, we first round the taxed price, then we multiply by the quantity.
                 $totalPrice = round($orderProduct->getPrice(), 2) * $orderProduct->getQuantity();
                 $totalPromoPrice = round($orderProduct->getPromoPrice(), 2) * $orderProduct->getQuantity();
-            }
 
-            $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
-            $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
+                $totalTaxedPrice = $taxedPrice * $orderProduct->getQuantity();
+                $totalTaxedPromoPrice = $taxedPromoPrice * $orderProduct->getQuantity();
+            }
 
             $loopResultRow->set('ID', $orderProduct->getId())
                 ->set('REF', $orderProduct->getProductRef())
