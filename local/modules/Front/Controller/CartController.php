@@ -230,7 +230,7 @@ class CartController extends BaseFrontController
 
                     $postage = $deliveryPostageEvent->getPostage();
 
-                    if ( ! is_null($postage = $deliveryPostageEvent->getPostage()))  {
+                    if (null !== $postage)  {
                         $orderEvent->setPostage($postage->getAmount());
                         $orderEvent->setPostageTax($postage->getAmountTax());
                         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
