@@ -1,5 +1,6 @@
 {
   "name": "your-vendor/%%COMPOSERNAME%%-module",
+  "description": "%%MODULENAME%% module for Thelia",
   "license": "LGPL-3.0-or-later",
   "type": "thelia-module",
   "require": {
