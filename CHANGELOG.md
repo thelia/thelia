@@ -1,3 +1,8 @@
+# 2.4.2
+- #2773 Add description to module composer skeleton
+- #2772 Update default config values
+- #2771 Better default tax rules names
+- #2770 Add shared option for services (from SF 2.8)
 # 2.4.1
 - #2765 Tax and Taxed price variables are now rounded in OrderProduct loop
 - #2764 Fix MoneyFormat when have space in number
