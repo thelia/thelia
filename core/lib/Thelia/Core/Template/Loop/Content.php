@@ -117,7 +117,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $search->_and();
 
-        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
     public function buildModelCriteria()

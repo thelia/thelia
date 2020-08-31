@@ -119,7 +119,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             }
         }
     
-        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
     public function buildModelCriteria()

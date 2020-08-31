@@ -36,14 +36,18 @@ trait StandardI18nFieldsSearchTrait
      * @param $searchTerm
      * @param $searchCriteria
      */
-    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria)
+    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = ["title","chapo","description","postscriptum"])
     {
         foreach (self::$standardI18nSearchFields as $index => $searchInElement) {
             if ($index > 0) {
                 $search->_or();
             }
 
-            $this->addSearchInI18nColumn($search, strtoupper($searchInElement), $searchCriteria, $searchTerm);
+            foreach ( $searchIn as $searchInTerm) {
+                if($searchInTerm == $searchInElement) {
+                    $this->addSearchInI18nColumn($search, strtoupper($searchInElement), $searchCriteria, $searchTerm);
+                }
+            }
         }
     }
 }
