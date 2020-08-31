@@ -370,6 +370,7 @@ abstract class BaseLoop
                 switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
                         $searchCriteria = ' REGEXP ';
+                        $searchTerm = quotemeta($searchTerm);
                         $searchTerm = str_replace(' ','|', rtrim($searchTerm));
                         break;
                     case SearchLoopInterface::MODE_SENTENCE:
