@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -53,7 +54,10 @@ class CouponCode extends BaseForm
 
     public function verifyExistingCode($value, ExecutionContextInterface $context)
     {
-        $coupon = CouponQuery::create()->findOneByCode($value);
+        $coupon = CouponQuery::create()
+            ->filterByCode($value, Criteria::EQUAL)
+            ->findOne();
+
         if (null === $coupon) {
             $context->addViolation(Translator::getInstance()->trans("This coupon does not exists"));
         }

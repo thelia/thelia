@@ -83,14 +83,12 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
             }
 
             if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer) {
-
-                // Customer (confirmation_token & enable) introduces since Thelia 2.4
-                // this test prevent backward compatibility and if option is enable when customer has been created
+                // Customer email confirmation feature is available since Thelia 2.3.4
                 if ($user->getConfirmationToken() !== null && ! $user->getEnable()) {
                     throw (new CustomerNotConfirmedException())->setUser($user);
                 }
             }
-            
+
             return $user;
         }
 

@@ -18,6 +18,8 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tax;
+use Thelia\Model\Lang;
+use Thelia\Model\FeatureProductQuery;
 use Thelia\TaxEngine\Calculator;
 
 /**
@@ -72,14 +74,14 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $taxRuleQuery = $this->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
+        $taxRuleQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
             ->with($productQuery->getTaxRule(), $countryQuery)
             ->will($this->returnValue('foo'));
 
-        $rewritingUrlQuery = $this->getProperty('taxRuleQuery');
-        $rewritingUrlQuery->setValue($calculator, $taxRuleQuery);
+        $taxRuleQueryReflectedProperty = $this->getProperty('taxRuleQuery');
+        $taxRuleQueryReflectedProperty->setValue($calculator, $taxRuleQuery);
 
         $calculator->load($productQuery, $countryQuery);
 
@@ -122,8 +124,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
@@ -142,8 +144,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
@@ -164,8 +166,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
@@ -209,8 +211,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
@@ -258,18 +260,18 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 
-        $aProduct = ProductQuery::create()->findOne();
-        if (null === $aProduct) {
+        $product = ProductQuery::create()->findOne();
+        if (null === $product) {
             return;
         }
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+        $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
+        $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
-        $product = $this->getProperty('product');
-        $product->setValue($calculator, $aProduct);
+        $productReflectedProperty = $this->getProperty('product');
+        $productReflectedProperty->setValue($calculator, $product);
 
         $taxAmount = $calculator->getTaxAmountFromTaxedPrice(600.95);
         $untaxedPrice = $calculator->getUntaxedPrice(600.95);
@@ -283,5 +285,40 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
          */
         $this->assertEquals(100.95, $taxAmount);
         $this->assertEquals(500, $untaxedPrice);
+    }
+
+    public function testGetFeatureFixAmountTaxTypeTaxedPrice()
+    {
+        $defaultLang = Lang::getDefaultLanguage();
+
+        $featureProduct = FeatureProductQuery::create()->findOneByIsFreeText(true);
+        $aProduct = $featureProduct->getProduct();
+        $featureAv = $featureProduct->getFeatureAv();
+
+        $featureAv->setLocale($defaultLang->getLocale())->setTitle(123);
+
+        $taxRulesCollection = new ObjectCollection();
+        $taxRulesCollection->setModel('\Thelia\Model\Tax');
+
+        $tax = new Tax();
+        $tax->setType('\Thelia\TaxEngine\TaxType\FeatureFixAmountTaxType')
+            ->setRequirements([
+                'feature' => $featureProduct->getFeatureId(),
+                'lang' => $defaultLang->getId(),
+            ])
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
+        $taxRulesCollection->append($tax);
+
+        $calculator = new Calculator();
+
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $product = $this->getProperty('product');
+        $product->setValue($calculator, $aProduct);
+
+        $taxedPrice = $calculator->getTaxedPrice(500);
+
+        $this->assertEquals(623, $taxedPrice);
     }
 }

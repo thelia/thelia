@@ -50,14 +50,20 @@ class CheckPermission extends BaseInstall
         'upload_max_filesize' => 2097152
     );
 
+    protected $phpExpectedVerions = array(
+        'min' => '5.5',
+        'max' => '7.4'
+    );
+
     protected $extensions = array(
         'curl',
         'fileinfo',
         'gd',
         'intl',
-        'mcrypt',
+        'openssl',
         'pdo_mysql',
         'dom',
+        'zip'
     );
 
     protected $validationMessages = array();
@@ -80,7 +86,7 @@ class CheckPermission extends BaseInstall
         $this->translator = $translator;
 
         $this->validationMessages['php_version'] =  array(
-            'text' => $this->getI18nPhpVersionText('5.5', phpversion(), true),
+            'text' => $this->getI18nPhpVersionText(phpversion(), true),
             'hint' =>  $this->getI18nPhpVersionHint(),
             'status' => true
         );
@@ -118,8 +124,9 @@ class CheckPermission extends BaseInstall
      */
     public function exec()
     {
-        if (version_compare(phpversion(), '5.5', '<')) {
-            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText('5.5', phpversion(), false);
+        if (version_compare(phpversion(), $this->phpExpectedVerions['min'], '<') || version_compare(phpversion(), $this->phpExpectedVerions['max'], '>=')) {
+            $this->isValid = false;
+            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(phpversion(), false);
             $this->validationMessages['php_version']['status'] = false;
             $this->validationMessages['php_version']['hint'] = $this->getI18nPhpVersionHint();
         }
@@ -284,24 +291,25 @@ class CheckPermission extends BaseInstall
      *
      * @return string
      */
-    protected function getI18nPhpVersionText($expectedValue, $currentValue, $isValid)
+    protected function getI18nPhpVersionText($currentValue, $isValid)
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'PHP version %currentValue% matches the minimum required (PHP %expectedValue%).';
+                $sentence = 'PHP version %currentValue% matches the version required (> %minExpectedValue% < %maxExpectedValue%).';
             } else {
-                $sentence = 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP %expectedValue% or newer.';
+                $sentence = 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
             }
 
             $translatedText = $this->translator->trans(
                 $sentence,
                 array(
-                    '%expectedValue%' => $expectedValue,
+                    '%minExpectedValue%' => $this->phpExpectedVerions['min'],
+                    '%maxExpectedValue%' => $this->phpExpectedVerions['max'],
                     '%currentValue%' => $currentValue,
                 )
             );
         } else {
-            $translatedText = sprintf('Thelia requires PHP %s or newer (%s currently).', $expectedValue, $currentValue);
+            $translatedText = sprintf('Thelia requires PHP between %s and %s (%s currently).', $this->phpExpectedVerions['min'], $this->phpExpectedVerions['max'], $currentValue);
         }
 
         return $translatedText;
@@ -314,7 +322,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionHint()
     {
-        $sentence = 'You should upgrade the installed PHP version to continue Thelia 2 installation.';
+        $sentence = 'You should change the installed PHP version to continue Thelia 2 installation.';
         $translatedText = $this->translator->trans(
             $sentence,
             array()
@@ -357,13 +365,13 @@ class CheckPermission extends BaseInstall
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
-                $val *= 1024;
+                $val = (int)$val*1024;
                 // no break
             case 'm':
-                $val *= 1024;
+                $val = (int)$val*1024;
                 // no break
             case 'k':
-                $val *= 1024;
+                $val = (int)$val*1024;
         }
 
         return $val;

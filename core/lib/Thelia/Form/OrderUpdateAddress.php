@@ -85,12 +85,14 @@ class OrderUpdateAddress extends BaseForm
                 ),
             ))
             ->add("address2", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address2_update",
                 ),
             ))
             ->add("address3", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address3_update",
@@ -134,6 +136,7 @@ class OrderUpdateAddress extends BaseForm
                 ),
             ))
             ->add("state", "text", array(
+                "required" => false,
                 "constraints" => array(
                     new Callback(array(
                         "methods" => array(
@@ -141,24 +144,27 @@ class OrderUpdateAddress extends BaseForm
                         ),
                     )),
                 ),
-                "label" => Translator::getInstance()->trans("State"),
+                "label" => Translator::getInstance()->trans("State *"),
                 "label_attr" => array(
                     "for" => "state",
                 ),
             ))
             ->add("phone", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Phone"),
                 "label_attr" => array(
                     "for" => "phone_update",
                 ),
             ))
             ->add("cellphone", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Cellphone"),
                 "label_attr" => array(
                     "for" => "cellphone_update",
                 ),
             ))
             ->add("company", "text", array(
+                "required" => false,
                 "label" => Translator::getInstance()->trans("Compagny"),
                 "label_attr" => array(
                     "for" => "company_update",

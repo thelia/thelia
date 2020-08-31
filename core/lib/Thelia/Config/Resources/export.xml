@@ -117,5 +117,20 @@
                 </description>
             </export_descriptive>
         </export>
+
+        <export id="thelia.export.product_i18n" class="Thelia\ImportExport\Export\Type\ProductI18nExport" category_id="thelia.export.products">
+            <export_descriptive locale="en_US">
+                <title>Product I18n information</title>
+                <description>
+                    Export the I18n information (title, chapo, description, postscriptum) of your products
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations I18n des produits</title>
+                <description>
+                    Exporter les informations I18n de vos produits (titre produit, résumé, description, conclusion)
+                </description>
+            </export_descriptive>
+        </export>
     </exports>
 </config>

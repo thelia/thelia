@@ -25,6 +25,8 @@ class IntToCombinedStringsListTypeTest extends \PHPUnit_Framework_TestCase
     {
         $type = new IntToCombinedStringsListType();
         $this->assertTrue($type->isValid('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'));
+        $this->assertTrue($type->isValid('9:royal \:enfield,10:500\, continental\, gt,11:(abc & def\&ghi\|ttt)'));
+
         $this->assertFalse($type->isValid('1,2,3'));
     }
 
@@ -36,7 +38,7 @@ class IntToCombinedStringsListTypeTest extends \PHPUnit_Framework_TestCase
             array(
                 1 => array(
                     "values" => array('foo', 'bar', 'fooo', 'baar'),
-                    "expression" => 'foo&bar|(fooo&baar)',
+                    "expression" => 'foo & bar | (fooo &baar)',
                 ),
                 4 => array(
                     "values" => array('*'),
@@ -44,10 +46,47 @@ class IntToCombinedStringsListTypeTest extends \PHPUnit_Framework_TestCase
                 ),
                 67 => array(
                     "values" => array('foooo', 'baaar'),
-                    "expression" => '(foooo&baaar)',
+                    "expression" => '(foooo & baaar)',
                 ),
             )
         );
+
+        $this->assertEquals(
+            $type->getFormattedValue('9:royal \:enfield,10:500\, continental\, gt,11:(abc & def\&ghi\|ttt)'),
+            array(
+                9 => array(
+                    "values" => array('royal :enfield'),
+                    "expression" => 'royal :enfield',
+                ),
+                10 => array(
+                    "values" => array('500, continental, gt'),
+                    "expression" => '500, continental, gt',
+                ),
+                11 => array(
+                    "values" => array('abc', 'def&ghi|ttt'),
+                    "expression" => '(abc & def&ghi|ttt)',
+                ),
+
+            )
+        );
+
         $this->assertNull($type->getFormattedValue('foo'));
     }
+
+    public function testEscape()
+    {
+        $this->assertEquals(
+            IntToCombinedStringsListType::escape('def&ghi|jkl,mno(pqr)stu:vwx'),
+            'def\&ghi\|jkl\,mno\(pqr\)stu\:vwx'
+        );
+    }
+
+    public function testUnescape()
+    {
+        $this->assertEquals(
+            IntToCombinedStringsListType::unescape('def\&ghi\|jkl\,mno\(pqr\)stu\:vwx'),
+            'def&ghi|jkl,mno(pqr)stu:vwx'
+        );
+    }
+
 }

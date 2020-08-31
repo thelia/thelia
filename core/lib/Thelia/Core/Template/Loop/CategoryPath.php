@@ -59,37 +59,38 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $originalId = $currentId = $this->getCategory();
         $visible = $this->getVisible();
         $depth = $this->getDepth();
-    
+
         $results = array();
-    
+
         $ids = array();
-    
+
         do {
             $search = CategoryQuery::create();
-        
+
             $this->configureI18nProcessing($search, array('TITLE'));
-        
+
             $search->filterById($currentId);
-        
+
             if ($visible !== BooleanOrBothType::ANY) {
                 $search->filterByVisible($visible);
             }
-        
+
             $category = $search->findOne();
-        
+
             if ($category != null) {
                 $results[] = array(
                     "ID" => $category->getId(),
                     "TITLE" => $category->getVirtualColumn('i18n_TITLE'),
+                    "PARENT" => $category->getParent(),
                     "URL" => $category->getUrl($this->locale),
                     "LOCALE" => $this->locale,
                 );
-            
+
                 $currentId = $category->getParent();
-            
+
                 if ($currentId > 0) {
                     // Prevent circular refererences
-                    if (in_array($currentId, $ids)) {
+                    if (\in_array($currentId, $ids)) {
                         throw new \LogicException(
                             sprintf(
                                 "Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)",
@@ -98,12 +99,12 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
                             )
                         );
                     }
-                
+
                     $ids[] = $currentId;
                 }
             }
         } while ($category != null && $currentId > 0 && --$depth > 0);
-    
+
         // Reverse list and build the final result
         return array_reverse($results);
     }

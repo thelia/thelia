@@ -82,7 +82,8 @@ class OrderPostage
      */
     public function setAmountTax($amountTax)
     {
-        $this->amountTax = $amountTax;
+        // We have to round the postage tax to prevent small delta amounts in tax calculations.
+        $this->amountTax = round($amountTax, 2);
     }
 
     /**

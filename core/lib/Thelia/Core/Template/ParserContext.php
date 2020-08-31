@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\TheliaFormValidatorInterface;
@@ -113,9 +115,9 @@ class ParserContext implements \IteratorAggregate
     protected function cleanFormData(array $data)
     {
         foreach ($data as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $data[$key] = $this->cleanFormData($value);
-            } elseif (is_object($value)) {
+            } elseif (\is_object($value)) {
                 unset($data[$key]);
             }
         }
@@ -133,16 +135,39 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        $this->set(get_class($form) . ":" . $form->getType(), $form);
+        // Get form field error details
+        $formFieldErrors = [];
+
+        /** @var Form $field */
+        foreach ($form->getForm()->getIterator() as $field) {
+            $errors = $field->getErrors();
+
+            if (\count($errors) > 0) {
+                $formFieldErrors[$field->getName()] = [];
+
+                /** @var FormError $error */
+                foreach ($errors as $error) {
+                    $formFieldErrors[$field->getName()][] = [
+                        'message' => $error->getMessage(),
+                        'template' => $error->getMessageTemplate(),
+                        'parameters' => $error->getMessageParameters(),
+                        'pluralization' => $error->getMessagePluralization()
+                    ];
+                }
+            }
+        }
+
+        $this->set(\get_class($form) . ":" . $form->getType(), $form);
 
         // Set form error information
-        $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
+        $formErrorInformation[\get_class($form) . ":" . $form->getType()] = [
             'data'              => $this->cleanFormData($form->getForm()->getData()),
             'hasError'          => $form->hasError(),
             'errorMessage'      => $form->getErrorMessage(),
             'method'            => $this->requestStack->getCurrentRequest()->getMethod(),
             'timestamp'         => time(),
-            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
+            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups'),
+            'field_errors'      => $formFieldErrors
         ];
 
         $this->getSession()->setFormErrorInformation($formErrorInformation);
@@ -169,7 +194,7 @@ class ParserContext implements \IteratorAggregate
         if (isset($formErrorInformation[$formClass.":".$formType])) {
             $formInfo = $formErrorInformation[$formClass.":".$formType];
 
-            if (is_array($formInfo['data'])) {
+            if (\is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm(
                     $formId,
                     $formType,
@@ -188,6 +213,26 @@ class ParserContext implements \IteratorAggregate
                         $this->formValidator->validateForm($form, $formInfo['method']);
                     } catch (\Exception $ex) {
                         // Ignore the exception.
+                    }
+
+                    // Manually set the form fields error information, if validateForm() did not the job,
+                    // which is the case when the user has been redirected.
+                    foreach ($formInfo['field_errors'] as $fieldName => $errors) {
+                        /** @var Form $field */
+                        $field = $form->getForm()->get($fieldName);
+
+                        if (null !==  $field && \count($field->getErrors()) == 0) {
+                            foreach ($errors as $errorData) {
+                                $error = new FormError(
+                                    $errorData['message'],
+                                    $errorData['template'],
+                                    $errorData['parameters'],
+                                    $errorData['pluralization']
+                                );
+
+                                $field->addError($error);
+                            }
+                        }
                     }
                 }
 
@@ -215,7 +260,7 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        $formClass = get_class($form) . ':' . $form->getType();
+        $formClass = \get_class($form) . ':' . $form->getType();
 
         if (isset($formErrorInformation[$formClass])) {
             unset($formErrorInformation[$formClass]);

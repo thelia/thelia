@@ -74,23 +74,19 @@ class CountryArea extends BaseLoop implements PropelSearchLoopInterface
     {
         $search = CountryAreaQuery::create();
 
-        $id = $this->getId();
-        if (count($id)) {
+        if (null !== $id = $this->getId()) {
             $search->filterById($id, Criteria::IN);
         }
 
-        $areas = $this->getArea();
-        if (count($areas)) {
+        if (null !== $areas = $this->getArea()) {
             $search->filterByAreaId($areas, Criteria::IN);
         }
 
-        $countries = $this->getCountry();
-        if (count($countries)) {
+        if (null !== $countries = $this->getCountry()) {
             $search->filterByCountryId($countries, Criteria::IN);
         }
 
-        $states = $this->getState();
-        if (count($states)) {
+        if (null !== $states = $this->getState()) {
             $search->filterByStateId($states, Criteria::IN);
         }
 

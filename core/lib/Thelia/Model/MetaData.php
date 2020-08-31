@@ -46,7 +46,7 @@ class MetaData extends BaseMetaData
         $isSerialized = false;
         $data         = $v;
         if (null !== $data) {
-            if (is_array($data) || is_object($data)) {
+            if (\is_array($data) || \is_object($data)) {
                 $data         = serialize($data);
                 $isSerialized = true;
             }

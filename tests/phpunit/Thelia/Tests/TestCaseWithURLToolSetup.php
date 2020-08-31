@@ -30,7 +30,7 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
     {
         $this->container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $this->dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $this->container->set("event_dispatcher", $this->dispatcher);
 
@@ -77,6 +77,6 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
      */
     protected function getMockEventDispatcher()
     {
-        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 }

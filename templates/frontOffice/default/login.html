@@ -23,7 +23,12 @@
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
             {form name="thelia.front.customer.login"}
             <form id="form-login" action="{url path="/login"}" method="post" {form_enctype} novalidate>
-                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                {if {$smarty.get.validation_done}}
+                    <div class="alert alert-success">{intl l="Your customer account was successfully activated, you can now login."}</div>
+                {else}
+                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                {/if}
+    
                 {form_field field='success_url'}
                     <input type="hidden" name="{$name}" value="{navigate to="previous"}"> {* the url the user is redirected to on login success *}
                 {/form_field}

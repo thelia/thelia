@@ -12,69 +12,65 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
+use PDO;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\ImportExport\Export\AbstractExport;
-use Thelia\Model\Map\ProductI18nTableMap;
-use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\Map\RewritingUrlTableMap;
+use Propel\Runtime\Propel;
+use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
 
 /**
  * Class ProductSEOExport
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
-class ProductSEOExport extends AbstractExport
+class ProductSEOExport extends JsonFileAbstractExport
 {
     const FILE_NAME = 'product_seo';
 
     protected $orderAndAliases = [
-        ProductTableMap::REF => 'ref',
-        'product_i18n_TITLE' => 'product_title',
-        ProductTableMap::VISIBLE => 'visible',
-        'product_URL' => 'url',
-        'product_seo_TITLE' => 'page_title',
-        'product_seo_META_DESCRIPTION' => 'meta_description',
-        'product_seo_META_KEYWORDS' => 'meta_keywords',
+        'product_ref' => 'ref',
+        'product_i18n_title' => 'product_title',
+        'product_visible' => 'visible',
+        'rewriting_url_url'  => 'url',
+        'product_i18n_meta_title' => 'page_title',
+        'product_i18n_meta_description' => 'meta_description',
+        'product_i18n_meta_keywords' => 'meta_keywords',
     ];
 
     public function getData()
     {
         $locale = $this->language->getLocale();
 
-        $urlJoin = new Join(ProductTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
-        $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
-
-        $query = ProductQuery::create()
-            ->addSelfSelectColumns()
-            ->addJoinObject($urlJoin, 'rewriting_url_join')
-            ->addJoinCondition(
-                'rewriting_url_join',
-                RewritingUrlTableMap::VIEW_LOCALE . ' = ?',
-                $locale,
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addJoinCondition(
-                'rewriting_url_join',
-                RewritingUrlTableMap::VIEW . ' = ?',
-                (new Product())->getRewrittenUrlViewName(),
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addJoinCondition('rewriting_url_join', 'ISNULL(' . RewritingUrlTableMap::REDIRECTED . ')')
-            ->addJoinObject($productJoin, 'product_join')
-            ->addJoinCondition('product_join', ProductI18nTableMap::LOCALE . ' = ?', $locale, null, \PDO::PARAM_STR)
-
-            ->addAsColumn('product_i18n_TITLE', ProductI18nTableMap::TITLE)
-            ->addAsColumn('product_seo_TITLE', ProductI18nTableMap::META_TITLE)
-            ->addAsColumn('product_seo_META_DESCRIPTION', ProductI18nTableMap::META_DESCRIPTION)
-            ->addAsColumn('product_seo_META_KEYWORDS', ProductI18nTableMap::META_KEYWORDS)
-            ->addAsColumn('product_URL', RewritingUrlTableMap::URL)
+        $con = Propel::getConnection();
+        $query = 'SELECT 
+                        product.ref as "product_ref",
+                        product_i18n.title as "product_i18n_title",
+                        product.visible as "product_visible",
+                        rewriting_url.url as "rewriting_url_url",
+                        product_i18n.meta_title as "product_i18n_meta_title",
+                        product_i18n.meta_description as "product_i18n_meta_description",
+                        product_i18n.meta_keywords as "product_i18n_meta_keywords"
+                    FROM product
+                    LEFT JOIN product_i18n ON product_i18n.id = product.id AND product_i18n.locale = :locale
+                    LEFT JOIN rewriting_url ON rewriting_url.view = "'.(new Product())->getRewrittenUrlViewName().'" AND rewriting_url.view_id = product.id
+                    ORDER BY product.id'
         ;
+        $stmt = $con->prepare($query);
+        $stmt->bindValue('locale', $locale);
+        $stmt->execute();
 
-        return $query;
+        $filename = THELIA_CACHE_DIR . '/export/' . 'product_seo.json';
+
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }

@@ -136,7 +136,7 @@ class ProductSaleElementsControllerTest extends ApiTestCase
 
         $attributeAvs = AttributeAvQuery::create()
             ->limit(2)
-            ->select(AttributeAvTableMap::ID)
+            ->select(AttributeAvTableMap::COL_ID)
             ->find()
             ->toArray()
         ;
@@ -181,7 +181,23 @@ class ProductSaleElementsControllerTest extends ApiTestCase
 
         $content = json_decode($client->getResponse()->getContent(), true);
 
-        $this->assertEquals('3.99', $content[0]['PRICE']);
+        // Find the item we've juste created in the result list
+        $pse = null;
+
+        if (count($content) > 1) {
+            foreach ($content as $item) {
+                if ($item['REF'] == 'foo') {
+                    $pse = $item;
+                    break;
+                }
+            }
+        } elseif (count($content) == 1) {
+            $pse = $content[0];
+        }
+
+        $this->assertNotNull($pse);
+
+        $this->assertEquals('3.99', $pse['PRICE']);
 
         return $content['0']['ID'];
     }
@@ -265,7 +281,7 @@ class ProductSaleElementsControllerTest extends ApiTestCase
 
         $attributeAvs = AttributeAvQuery::create()
             ->limit(2)
-            ->select(AttributeAvTableMap::ID)
+            ->select(AttributeAvTableMap::COL_ID)
             ->find()
             ->toArray();
 

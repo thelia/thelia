@@ -10,8 +10,14 @@ class BrandI18n extends BaseBrandI18n
 {
     use I18nTimestampableTrait;
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $brand = $this->getBrand();
 
         $brand->generateRewrittenUrl($this->getLocale());

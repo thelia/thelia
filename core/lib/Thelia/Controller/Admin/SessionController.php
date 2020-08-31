@@ -51,7 +51,7 @@ class SessionController extends BaseAdminController
     protected function checkPasswordRecoveryEnabled()
     {
         // Check if user is already authenticate
-        if (! boolval(ConfigQuery::read('enable_lost_admin_password_recovery', false))) {
+        if (!\boolval(ConfigQuery::read('enable_lost_admin_password_recovery', false))) {
             AdminLog::append(
                 "admin",
                 "ADMIN_CREATE_PASSWORD",
@@ -185,7 +185,6 @@ class SessionController extends BaseAdminController
             $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, null);
 
             return $this->generateSuccessRedirect($adminCreatePasswordForm);
-
         } catch (FormValidationException $ex) {
             // Validation problem
             $message = $this->createStandardFormValidationErrorMessage($ex);
@@ -245,7 +244,7 @@ class SessionController extends BaseAdminController
 
             $this->applyUserLocale($user);
 
-            if (intval($form->get('remember_me')->getData()) > 0) {
+            if (\intval($form->get('remember_me')->getData()) > 0) {
                 // If a remember me field if present and set in the form, create
                 // the cookie thant store "remember me" information
                 $this->createRememberMeCookie(

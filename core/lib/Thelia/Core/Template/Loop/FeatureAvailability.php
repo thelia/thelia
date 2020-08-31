@@ -57,7 +57,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
@@ -93,9 +93,16 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
 
         foreach ($orders as $order) {
             switch ($order) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id_reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
+                case "alpha_reverse":
                 case "alpha-reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
@@ -108,23 +115,17 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             }
         }
 
-        // We do not consider here Free Text values, so be sure that the features values we will get
-        // are not free text ones, e.g. are not defined as free-text feature values in the
-        // feature_product table.
-        // We are doig here something like
-        //    SELECT * FROM `feature_av`
-        //    WHERE feature_av.FEATURE_ID IN ('7')
-        //    AND feature_av.ID not in (
-        //        select feature_av_id from feature_product
-        //        where feature_id = `feature_av`.feature_id
-        //        and feature_av_id = `feature_av`.id
-        //        and free_text_value = 1
-        //    )
-        $search->where(FeatureAvTableMap::ID . ' NOT IN (
-             SELECT '.  FeatureProductTableMap::FEATURE_AV_ID . ' 
-             FROM ' .FeatureProductTableMap::TABLE_NAME. '
-             WHERE ' . FeatureProductTableMap::FREE_TEXT_VALUE . ' = 1
-        )');
+        // Search only non-freetext feature values.
+        $search
+            ->useFeatureProductQuery()
+                ->filterByIsFreeText(false)
+                ->_or()
+                ->filterByIsFreeText(null) //does not belong to any product
+            ->endUse()
+        ;
+
+        // Joining with FeatureProduct may result in multiple occurences of the same FeatureAv. Juste get one.
+        $search->distinct();
 
         return $search;
     }

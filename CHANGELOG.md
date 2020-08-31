@@ -1,3 +1,192 @@
+# 2.4.2
+- #2773 Add description to module composer skeleton
+- #2772 Update default config values
+- #2771 Better default tax rules names
+- #2770 Add shared option for services (from SF 2.8)
+# 2.4.1
+- #2765 Tax and Taxed price variables are now rounded in OrderProduct loop
+- #2764 Fix MoneyFormat when have space in number
+- #2763 Improvement on delivery events
+- #2762 Fix total prices and taxes in order edit page
+- #2761 Improve DeliveryPostage event to get more data
+- #2760 Improve Pickup locations
+- #2758 add a new event MODULE_DELIVERY_GET_PICKUP_LOCATION
+- #2757 Fix model generation at module activation
+- #2756 Fix Url are not rewritten if no locale in url
+- #2754 Fix remove zero decimal on number > 1000
+- #2752 Order by alpha_reverse returns an error in feature-availability loops
+- #2748 Upgrade docker compose to a more mordern stack
+# 2.4.0
+- #2740 Fix defaultErrorFallback templateDfinition replacement
+- #2739 Fix ignored_module_hook table update
+- #2738 removed versionnable from schema example 
+- #2737 Add php < 7.4 requirements
+- #2736 Optimized exports with JSON cache file and SQL request
+- #2735 Tax calculation fixes, revamped 
+- #2734 Use select instead of input fields to choose template in B.O configuration parameter
+- #2733 Carousel module improvements
+- #2732 Sales are now considered done a invoice date
+- #2731 Fix #2693 contents url on search page
+- #2730 Fix issue #2698 bug on sales management
+- #2729 Discount field is no longer require in CustomUpdateForm
+- #2728 Fixed casperjs path
+- #2724 Better discount calculation for untaxed prices
+- #2721 Fix template delete issue
+- #2718 Bump symfony/security from 2.8.47 to 2.8.50
+- #2717 Fix coupon condition matching
+- #2716 New reference related parameters to order loop
+- #2715 Fix bad success url for image form
+- #2713 Bump symfony/http-foundation from 2.8.47 to 2.8.52
+- #2712 Bump symfony/cache from 3.4.18 to 3.4.35
+- #2710 Bump symfony/dependency-injection from 2.8.47 to 2.8.50
+- #2707 Improve product edit
+- #2706 Fix mailing export col names
+- #2705 Move date filtering to query initialization
+- #2704 Fix double "[]" on choice render multiple
+- #2697 Fix missing event in isStockManagedOnOrderCreation
+- #2696 Add ID and ORDER_PRODUCT_ID to order_product_attribute_combination loop
+- #2695 An empty cart is not a virtual cart
+- #2691 Modules documentation display improvements
+- #2687 Added a findAllChildId() method
+- #2685 Added arrow navigation to documents and images management
+- #2683 Fix tax rule collection query build when a state ID is passed to getTaxCalculatorCollection()
+- #2681 Fix I18n when strictly mode is enable and only one I18n is present
+- #2676 Fix Tlog on reponse when ConfigQuery is not generated on cache
+- #2677 Profile management improvement
+- #2673 Added quantity parameter to "Added to cart" popup url
+- #2672 Improved import/export loops
+- #2671 A 'change.pse' event is triggered on PSE value change
+- #2670 Add company on BO customer address information
+- #2665 Fix bad translation key
+- #2664 Add BO brand search
+- #2663 Improve SHOW_HOOK
+- #2661 Fix issue #2660 
+- #2659 Improved ajax management in CartController
+- #2658 Customer email language fix when sent from the BO
+- #2657 Add option to show/Hide stats bloc
+- #2655 Update var name error MailerFactory.php 
+- #2651 Allow to load tax rule without country
+- #2650 Fix attribute-edit.html smarty error
+- #2649 Docker & Docker compose update 
+- #2648 Fix #2647 Wrong edition URL in message template 
+- #2646 Fix #2592 Add Delivery address in order loop search in
+- #2645 Add new event on contact submit
+- #2644 Change two redirection from 302 to 301
+- #2642 Fix missing parent preSave and postSave in Models 
+- #2640 Update address-update.html
+- #2638 Remove Tlog in Propel init
+- #2637 New "visible" parameter to pse loop
+- #2634 Add phone on create customer modal 
+- #2633 Update propel dependency
+- #2630 Change travis configuration, composer propel repo, root-namespace special compiled PHP functions
+- #2629 Improve invoice and delivery interface
+- #2628 Fix bo search order status color
+- #2626 Front template improvements
+- #2625 Disabled output compression when generating site map
+- #2624 Exclude base_url from URL parameters
+- #2623 Fix Tax calculator on country with state
+- #2622 Propel schema generation is now protected from concurrency
+- #2621 Add sort options to PSE loop, and allow to return all PSE
+- #2618 Fix smarty cache default value, add country and customer_discount
+- #2617 Added missing argument 'code' to the Coupon loop
+- #2616 Allow use of CDN (e.g. alternate URL) on assets and documents
+- #2615 feature_values filter is now working in Product loop
+- #2614 Shipping zone configuration improvement 
+- #2613 Pagination fix
+- #2611 Fixed loop arguments cache initialisation
+- #2610 MailerFactory::send() is now wrapped in an exception handler
+- #2609 Order details improvements
+- #2608 Fix required fields for form smtp configuration
+- #2607 Fix postage update when cart or coupon changes
+- #2606 Added 3 new outputs to order loop
+- #2605 Fix wrong order total (issue #2604)
+- #2603 Added tax rule ID parameters to product loop
+- #2602 Shipping zones button is no longer extra small in module list
+- #2600 Check if symlink() is working when installing Thelia
+- #2595 Fix Issue #2504
+- #2593 Add css class "pse_id_field"
+- #2590 Fix non-numeric values in PDF templates
+- #2589 Added invoice-date order criteria
+- #2587 Add cache for loop ArgDefinitions
+- #2586 Fix for #2505 BackOffice dashboard refresh button
+- #2585 Improve propel cache
+- #2584 Fix for getting choices options in forms
+- #2582 Fix loop feature, filter template
+- #2581 Composer remove useless dependency ramsey/array_column
+- #2580 Fix module postActivation with new propel integration
+- #2579 Composer remove symfony/icu on thelia core
+- #2577 Set the error URL of the payment form
+- #2576 Add deprecated model event
+- #2575 Remove symfony/icu
+- #2574 A missing hook will throw an error in dev mode only
+- #2573 BO UI Fix btn edit content
+- #2571 Fix thelia migration 2.3.4 -> 2.4.0-alpha2
+- #2570 Fix count null value php7.2
+- #2569 Prepare version 2.4.0-alpha2
+- #2568 Implementation symfony dotenv
+- #2567 fix invalid exception
+- #2566 Update composer file core
+- #2565 Change Thelia dev ip protection
+- #2564 Added call to parent method in model's event dispatching methods
+- #2563 Removed all round() from the code
+- #2561 Order status management improvement
+- #2560 Lang should be active and currency visible to be used in front office
+- #2558 BO UI renderer btn create
+- #2557 BO UI Add possibility to remove btn text
+- #2556 Update propel with event dispatcher
+- #2555 The 'zip' extension is required to install modules
+- #2553 PHP 7.2 forms buildForm() signature fix
+- #2552 Minor back-office UI improvements
+- #2551 Fix #2525 microdata
+- #2547 BO new buttons integration
+- #2546 Undefined loop should be in the loop stack
+- #2545 Customer preferred language selection
+- #2544 Fix constants propel deprecated
+- #2543 Changed Travis CI config to use trusty distribution
+- #2542 Smarty upgrade to version 3.1.33
+- #2541 add remove_zero_decimal parameter
+- #2540 Add gitignore .DS_Store
+- #2538 Minor code style fixes
+- #2537 test if the module exists on the file system before generation cache
+- #2536 Propel generation path fix
+- #2535 Fix not countable args
+- #2534 Composer update dependencies, fix symfony/var-sumper required version and add polyfill php7.3
+- #2533 Fix an infinite loop when the cache is cleared
+- #2532 Add url sitemap.xml
+- #2528 Patch for PRODUCT page
+- #2524 wrong class name on Contact subject field
+- #2522 Add email with mailto directly on order
+- #2521 Add a new export "product I18n"
+- #2519 Added ordering by PSE reference in PSE loop
+- #2518 Fixed multiple times the same line in results
+- #2517 fix/choice-render-multiple
+- #2512 add missing formError use on 2.3 branch
+- #2509 A "tinymce-editor-setup" event is sent when TinyMCE is ready
+- #2507 Fix sale activation after sale update
+- #2503 Added an explanatory message to disconnected exception
+- #2502 Added category and brand ID in sidebar hooks
+- #2501 PHP 7.1 compatibility fix in ExportHandler
+- #2500 Fix newsletter unsubscribe/subscribe
+- #2499 Using better headers to generate PDF response
+- #2498 Fix for PHP 7.1 warning A non-numeric value encountered 
+- #2497 Remove unnecessary openssl extension install step
+- #2495 Prevent setting the only default PSE to non-default
+- #2494 Fixed Carousel module translations
+- #2493 Keep product price & information when deleting the last PSE of a product
+- #2492 Removed useless notice log
+- #2489 fix order color issue in customer edit form
+- #2487 Update composer.json of Thelia core
+
+# 2.4.0-alpha2
+
+- #2486 Add compatibility with php 7.2
+- #2486 Update to Symfony 2.8.35
+- #2486 Add Symfony VarDumper for dev environment
+- #2486 Update to Propel Alpha 8, special thanks to @bcbrr
+- #2486 Update to Html2Pdf 5.2
+- #2483 Fix color status in search order
+- #2482 Fix FreeOrder: round total amount to avoid problems with floats
+
 # 2.4.0-alpha1
 
 - (related to #2266) Fix #2226 : Bad parsing of web version in db update script

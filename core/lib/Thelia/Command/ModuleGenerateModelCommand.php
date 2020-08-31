@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\PropelInitService;
 
 /**
  * generate class model for a specific module
@@ -64,6 +65,8 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
             throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
         }
 
+        $this->checkModuleSchema();
+
         $this->generateModel($output);
 
         /** @var FormatterHelper $formatter */
@@ -95,28 +98,18 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
     protected function generateModel(OutputInterface $output)
     {
-        $fs = new Filesystem();
-        $moduleBuildPropel = new ModelBuildCommand();
-        $moduleBuildPropel->setApplication($this->getApplication());
+        $schemaDir = $this->generateGlobalSchemaForModule();
 
-        $moduleBuildPropel->run(
-            new ArrayInput(array(
-                "command" => $moduleBuildPropel->getName(),
-                "--output-dir" => THELIA_MODULE_DIR,
-                "--input-dir" => $this->moduleDirectory . DS ."Config"
-            )),
+        /** @var PropelInitService $propelInitService */
+        $propelInitService = $this->getContainer()->get('thelia.propel.init');
+
+        $propelInitService->runCommand(
+            new ModelBuildCommand(),
+            [
+                "--config-dir" => $propelInitService->getPropelConfigDir(),
+                "--schema-dir" => $schemaDir,
+            ],
             $output
         );
-
-        $verifyDirectories = array(
-            THELIA_MODULE_DIR . "Thelia",
-            $this->moduleDirectory . DS . "Model" . DS . "Thelia"
-        );
-
-        foreach ($verifyDirectories as $directory) {
-            if ($fs->exists($directory)) {
-                $fs->remove($directory);
-            }
-        }
     }
 }

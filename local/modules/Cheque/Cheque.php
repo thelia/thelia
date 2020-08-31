@@ -16,10 +16,11 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Install\Database;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Order;
+use Thelia\Module\AbstractPaymentModule;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
 
-class Cheque extends BaseModule implements PaymentModuleInterface
+class Cheque extends AbstractPaymentModule
 {
     const MESSAGE_DOMAIN = "Cheque";
 

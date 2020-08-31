@@ -18,6 +18,7 @@ use Thelia\Core\Event\ActionEvent;
  * Class CacheEvent
  * @package Thelia\Core\Event\Cache
  * @author Manuel Raynaud <manu@raynaud.io>
+ * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
 class CacheEvent extends ActionEvent
 {
@@ -26,13 +27,20 @@ class CacheEvent extends ActionEvent
      */
     protected $dir;
 
-    public function __construct($dir)
+    /**
+     * @since 2.4.0
+     * @var bool
+     */
+    protected $onKernelTerminate = true;
+
+    public function __construct($dir, $onKernelTerminate = true)
     {
         $this->dir = $dir;
+        $this->onKernelTerminate = $onKernelTerminate;
     }
 
     /**
-     * @param mixed $dir
+     * @param string $dir
      *
      * @return $this
      */
@@ -44,10 +52,30 @@ class CacheEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDir()
     {
         return $this->dir;
+    }
+
+    /**
+     * @since 2.4.0
+     * @return bool
+     */
+    public function isOnKernelTerminate()
+    {
+        return $this->onKernelTerminate;
+    }
+
+    /**
+     * @since 2.4.0
+     * @param bool $onKernelTerminate
+     * @return CacheEvent
+     */
+    public function setOnKernelTerminate($onKernelTerminate)
+    {
+        $this->onKernelTerminate = $onKernelTerminate;
+        return $this;
     }
 }

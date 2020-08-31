@@ -119,13 +119,13 @@ class ParamInitMiddleware implements HttpKernelInterface
         // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
         // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
         if (null !== $requestedLangCodeOrLocale) {
-            if (strlen($requestedLangCodeOrLocale) > 2) {
+            if (\strlen($requestedLangCodeOrLocale) > 2) {
                 $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
             } else {
                 $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
             }
 
-            if (is_null($lang)) {
+            if (\is_null($lang)) {
                 return Lang::getDefaultLanguage();
             }
 
@@ -136,8 +136,7 @@ class ParamInitMiddleware implements HttpKernelInterface
                 if (! empty($domainUrl)) {
                     // if lang domain is different from current domain, redirect to the proper one
                     if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
-                        // TODO : search if http status 302 is the good one.
-                        return new RedirectResponse($domainUrl, 302);
+                        return new RedirectResponse($domainUrl, 301);
                     } else {
                         //the user is currently on the proper domain, nothing to change
                         return null;
@@ -147,7 +146,6 @@ class ParamInitMiddleware implements HttpKernelInterface
                 Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
 
                 return Lang::getDefaultLanguage();
-
             } else {
                 // one domain for all languages, the lang has to be set into session
                 return $lang;

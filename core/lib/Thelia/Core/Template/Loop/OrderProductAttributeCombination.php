@@ -70,10 +70,10 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
+                case 'alpha':
                     $search->orderByAttributeTitle(Criteria::ASC);
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->orderByAttributeTitle(Criteria::DESC);
                     break;
             }
@@ -89,14 +89,16 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
             $loopResultRow = new LoopResultRow($orderAttributeCombination);
 
             $loopResultRow
-                ->set("ATTRIBUTE_TITLE", $orderAttributeCombination->getAttributeTitle())
-                ->set("ATTRIBUTE_CHAPO", $orderAttributeCombination->getAttributeChapo())
-                ->set("ATTRIBUTE_DESCRIPTION", $orderAttributeCombination->getAttributeDescription())
-                ->set("ATTRIBUTE_POSTSCRIPTUM", $orderAttributeCombination->getAttributePostscriptum())
-                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $orderAttributeCombination->getAttributeAvTitle())
-                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $orderAttributeCombination->getAttributeAvChapo())
-                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $orderAttributeCombination->getAttributeAvDescription())
-                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $orderAttributeCombination->getAttributeAvPostscriptum())
+                ->set('ID', $orderAttributeCombination->getId())
+                ->set('ORDER_PRODUCT_ID', $orderAttributeCombination->getOrderProductId())
+                ->set('ATTRIBUTE_TITLE', $orderAttributeCombination->getAttributeTitle())
+                ->set('ATTRIBUTE_CHAPO', $orderAttributeCombination->getAttributeChapo())
+                ->set('ATTRIBUTE_DESCRIPTION', $orderAttributeCombination->getAttributeDescription())
+                ->set('ATTRIBUTE_POSTSCRIPTUM', $orderAttributeCombination->getAttributePostscriptum())
+                ->set('ATTRIBUTE_AVAILABILITY_TITLE', $orderAttributeCombination->getAttributeAvTitle())
+                ->set('ATTRIBUTE_AVAILABILITY_CHAPO', $orderAttributeCombination->getAttributeAvChapo())
+                ->set('ATTRIBUTE_AVAILABILITY_DESCRIPTION', $orderAttributeCombination->getAttributeAvDescription())
+                ->set('ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM', $orderAttributeCombination->getAttributeAvPostscriptum())
             ;
             $this->addOutputFields($loopResultRow, $orderAttributeCombination);
 

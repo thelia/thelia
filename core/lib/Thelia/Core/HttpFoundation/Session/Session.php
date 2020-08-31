@@ -47,7 +47,7 @@ class Session extends BaseSession
     /**
      * @param bool $forceDefault if true, the default language will be returned if no current language is defined.
      *
-     * @return \Thelia\Model\Lang|null
+     * @return \Thelia\Model\Lang
      */
     public function getLang($forceDefault = true)
     {
@@ -191,6 +191,24 @@ class Session extends BaseSession
     public function getReturnToUrl()
     {
         return $this->get('thelia.return_to_url', URL::getInstance()->getIndexPage());
+    }
+
+    // -- Return catalog last page ----------------------------------------------------------
+
+    public function setReturnToCatalogLastUrl($url)
+    {
+        $this->set('thelia.return_to_catalog_last_url', $url);
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return string the return-to catalog last URL, or the index page if none is defined.
+     */
+    public function getReturnToCatalogLastUrl()
+    {
+        return $this->get('thelia.return_to_catalog_last_url', URL::getInstance()->getIndexPage());
     }
 
     // -- Cart ------------------------------------------------------------------

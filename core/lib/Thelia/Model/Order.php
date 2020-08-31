@@ -4,10 +4,15 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\Order as BaseOrder;
+use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\TaxEngine\Calculator;
 
@@ -85,6 +90,10 @@ class Order extends BaseOrder
         return $this->choosenInvoiceAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function preSave(ConnectionInterface $con = null)
     {
         if ($this->isPaid(false) && null === $this->getInvoiceDate()) {
@@ -100,16 +109,21 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->setRef($this->generateRef())
             ->setDisableVersioning(true)
             ->save($con);
@@ -122,7 +136,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * Compute this order amount.
+     * Compute this order amount with taxes. The tax amount is returned in the $tax parameter.
      *
      * The order amount is only available once the order is persisted in database.
      * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
@@ -131,28 +145,131 @@ class Order extends BaseOrder
      * @param  bool      $includePostage  if true, the postage cost is included to the total
      * @param  bool      $includeDiscount if true, the discount will be included to the total
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
-        $amount = 0;
-        $tax = 0;
+        // To prevent price changes in pre-2.4 orders, use the legacy calculation method
+        if ($this->getId() <= ConfigQuery::read('last_legacy_rounding_order_id', 0)) {
+            return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
+        }
 
-        /* browse all products */
-        foreach ($this->getOrderProducts() as $orderProduct) {
-            $taxAmountQuery = OrderProductTaxQuery::create();
+        // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
+        // and may cache results for several orders, for example in the order list in the back-office.
+        static $queryResult = [];
 
-            if ($orderProduct->getWasInPromo() == 1) {
-                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::PROMO_AMOUNT . ')', 'total_tax');
-            } else {
-                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax');
+        $id = $this->getId();
+
+        if (!isset($queryResult[$id]) || null === $queryResult[$id]) {
+            // Shoud be the same rounding method as in CartItem::getTotalTaxedPrice()
+            // For each order line, we round quantity x taxed price.
+            $query = '
+                SELECT 
+                    SUM(
+                        '.OrderProductTableMap::COL_QUANTITY.'
+                        *
+                        ROUND(
+                            ( 
+                                IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
+                                +
+                                (
+                                    SELECT COALESCE(SUM(IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')), 0)
+                                    FROM '.OrderProductTaxTableMap::TABLE_NAME.'
+                                    WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
+                                )
+                            ), 2
+                        )
+                    ) as total_taxed_price,
+                    SUM(
+                        '.OrderProductTableMap::COL_QUANTITY.'
+                        *
+                        ROUND(
+                            IF(
+                                '.OrderProductTableMap::COL_WAS_IN_PROMO.'=1,
+                                '.OrderProductTableMap::COL_PROMO_PRICE.',
+                                '.OrderProductTableMap::COL_PRICE.'
+                            ), 2
+                        )
+                    ) as total_untaxed_price
+                from 
+                    '.OrderProductTableMap::TABLE_NAME.'
+                where
+                    '.OrderProductTableMap::COL_ORDER_ID.'=:order_id
+            ';
+
+            $con = Propel::getConnection();
+            $stmt = $con->prepare($query);
+
+            if (false === $stmt->execute([':order_id' => $this->getId()])) {
+                throw new TheliaProcessException(
+                    sprintf(
+                        'Failed to get order total and order tax: %s (%s)',
+                        $stmt->errorInfo(),
+                        $stmt->errorCode()
+                    )
+                );
             }
 
-            $taxAmount = $taxAmountQuery->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
-                ->findOne();
-            $price = ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice());
-            $amount += $price * $orderProduct->getQuantity();
-            $tax += $taxAmount->getVirtualColumn('total_tax') * $orderProduct->getQuantity();
+            $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
+
+        $total = (float) $queryResult[$id]->total_taxed_price;
+        $tax = $total - (float) $queryResult[$id]->total_untaxed_price;
+
+        if (true === $includeDiscount) {
+            $total -= $this->getDiscount();
+            $tax -= $this->getDiscount() - Calculator::getUntaxedOrderDiscount($this);
+
+            if ($total < 0) {
+                $total = 0;
+            }
+
+            if ($tax < 0) {
+                $tax = 0;
+            }
+        }
+
+        if (false !== $includePostage) {
+            $total += (float)$this->getPostage();
+            $tax += (float)$this->getPostageTax();
+        }
+
+        return $total;
+    }
+
+    /**
+     * This is thge legacy way of computing this order amount with taxes. The tax amount is returned in the $tax parameter.
+     *
+     * The order amount is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @param  float|int $tax             (output only) returns the tax amount for this order
+     * @param  bool      $includePostage  if true, the postage cost is included to the total
+     * @param  bool      $includeDiscount if true, the discount will be included to the total
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getTotalAmountLegacy(&$tax = 0, $includePostage = true, $includeDiscount = true)
+    {
+        $amount = (float)OrderProductQuery::create()
+            ->filterByOrderId($this->getId())
+            ->withColumn('SUM(
+                    ' . OrderProductTableMap::COL_QUANTITY . '
+                    * IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . ' = 1, ' . OrderProductTableMap::COL_PROMO_PRICE . ', ' . OrderProductTableMap::COL_PRICE . ')
+                )', 'total_amount')
+            ->select(['total_amount'])
+            ->findOne();
+
+        $tax = (float)OrderProductTaxQuery::create()
+            ->useOrderProductQuery()
+            ->filterByOrderId($this->getId())
+            ->endUse()
+            ->withColumn('SUM(
+                    ' . OrderProductTableMap::COL_QUANTITY . '
+                    * IF(' . OrderProductTableMap::COL_WAS_IN_PROMO . ' = 1, ' . OrderProductTaxTableMap::COL_PROMO_AMOUNT . ', ' . OrderProductTaxTableMap::COL_AMOUNT . ')
+                )', 'total_tax')
+            ->select(['total_tax'])
+            ->findOne();
 
         $total = $amount + $tax;
 
@@ -160,16 +277,14 @@ class Order extends BaseOrder
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
 
-            if ($total<0) {
+            if ($total < 0) {
                 $total = 0;
-            } else {
-                $total = round($total, 2);
             }
         }
 
         if (false !== $includePostage) {
-            $total += $this->getPostage();
-            $tax += $this->getPostageTax();
+            $total += \floatval($this->getPostage());
+            $tax += \floatval($this->getPostageTax());
         }
 
         return $total;
@@ -182,6 +297,7 @@ class Order extends BaseOrder
      * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
      *
      * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getWeight()
     {
@@ -202,11 +318,11 @@ class Order extends BaseOrder
     public function getUntaxedPostage()
     {
         if (0 < $this->getPostageTax()) {
-            $untaxedPostage =  round($this->getPostage() - $this->getPostageTax(), 2);
+            $untaxedPostage =  $this->getPostage() - $this->getPostageTax();
         } else {
             $untaxedPostage = $this->getPostage();
         }
-        
+
         return $untaxedPostage;
     }
 
@@ -228,6 +344,7 @@ class Order extends BaseOrder
 
     /**
      * Set the status of the current order to NOT PAID
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setNotPaid()
     {
@@ -237,15 +354,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is NOT PAID
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is NOT PAID, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isNotPaid()
+    public function isNotPaid($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
+        return $this->getOrderStatus()->isNotPaid($exact);
     }
 
     /**
      * Set the status of the current order to PAID
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setPaid()
     {
@@ -255,21 +375,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PAID
      *
-     * @param bool $exact if true, the method will check if the current status is exactly OrderStatus::CODE_PAID.
-     * if false, it will check if the order has been paid, whatever the current status is. The default is true.
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is PAID, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function isPaid($exact = true)
     {
-        return $this->hasStatusHelper(
-            $exact ?
-            OrderStatus::CODE_PAID :
-            [ OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
-        );
+        return $this->getOrderStatus()->isPaid($exact);
     }
 
     /**
      * Set the status of the current order to PROCESSING
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setProcessing()
     {
@@ -279,15 +396,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PROCESSING
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is PROCESSING, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isProcessing()
+    public function isProcessing($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_PROCESSING);
+        return $this->getOrderStatus()->isProcessing($exact);
     }
 
     /**
      * Set the status of the current order to SENT
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setSent()
     {
@@ -297,15 +417,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is SENT
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is SENT, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isSent()
+    public function isSent($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_SENT);
+        return $this->getOrderStatus()->isSent($exact);
     }
 
     /**
      * Set the status of the current order to CANCELED
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setCancelled()
     {
@@ -315,15 +438,18 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is CANCELED
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is CANCELED, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isCancelled()
+    public function isCancelled($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_CANCELED);
+        return $this->getOrderStatus()->isCancelled($exact);
     }
 
     /**
      * Set the status of the current order to REFUNDED
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setRefunded()
     {
@@ -333,17 +459,20 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is REFUNDED
      *
+     * @param bool $exact if true, the status should be the exact required status, not a derived one.
      * @return bool true if this order is REFUNDED, false otherwise.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function isRefunded()
+    public function isRefunded($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_REFUNDED);
+        return $this->getOrderStatus()->isRefunded($exact);
     }
 
     /**
      * Set the status of the current order to the provided status
      *
      * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setStatusHelper($statusCode)
     {
@@ -353,18 +482,58 @@ class Order extends BaseOrder
     }
 
     /**
-     * Check if the current status of this order is $statusCode or, if $statusCode is an array, if the current
-     * status is in the $statusCode array.
+     * Get an instance of the payment module
      *
-     * @param  string|array $statusCode the status code, one of OrderStatus::CODE_xxx constants.
-     * @return bool   true if this order have the provided status, false otherwise.
+     * @return \Thelia\Module\PaymentModuleInterface
+     * @throws TheliaProcessException
      */
-    public function hasStatusHelper($statusCode)
+    public function getPaymentModuleInstance()
     {
-        if (is_array($statusCode)) {
-            return in_array($this->getOrderStatus()->getCode(), $statusCode);
-        } else {
-            return $this->getOrderStatus()->getCode() == $statusCode;
+        if (null === $paymentModule = ModuleQuery::create()->findPk($this->getPaymentModuleId())) {
+            throw new TheliaProcessException("Payment module ID=" . $this->getPaymentModuleId() . " was not found.");
         }
+
+        return $paymentModule->createInstance();
+    }
+
+    /**
+     * Get an instance of the delivery module
+     *
+     * @return \Thelia\Module\DeliveryModuleInterface
+     * @throws TheliaProcessException
+     */
+    public function getDeliveryModuleInstance()
+    {
+        if (null === $deliveryModule = ModuleQuery::create()->findPk($this->getDeliveryModuleId())) {
+            throw new TheliaProcessException("Delivery module ID=" . $this->getDeliveryModuleId() . " was not found.");
+        }
+
+        return $deliveryModule->createInstance();
+    }
+
+    /**
+     * Check if stock was decreased at stock creation for this order.
+     * TODO : we definitely have to store modules in an order_modules table juste like order_product and other order related information.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @return bool true if the stock was decreased at order creation, false otherwise
+     */
+    public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher)
+    {
+        $paymentModule = $this->getPaymentModuleInstance();
+
+        $event = new ManageStockOnCreationEvent($paymentModule);
+
+        $dispatcher->dispatch(
+            TheliaEvents::getModuleEvent(
+                TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
+                $paymentModule->getCode()
+            ),
+            $event
+        );
+
+        return (null !== $event->getManageStock())
+            ? $event->getManageStock()
+            : $paymentModule->manageStockOnCreation();
     }
 }

@@ -30,7 +30,6 @@ class ResponseListener implements EventSubscriberInterface
         $session = $event->getRequest()->getSession();
 
         if (null !== $id = $session->get("cart_use_cookie")) {
-
             $response = $event->getResponse();
             $cookieName = ConfigQuery::read("cart.cookie_name", 'thelia_cart');
 

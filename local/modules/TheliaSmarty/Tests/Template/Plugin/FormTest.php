@@ -57,7 +57,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.empty"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -76,7 +76,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.empty"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -103,7 +103,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.empty"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -115,7 +115,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.api.empty"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -127,7 +127,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.empty.2"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -139,7 +139,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.empty.2"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -151,7 +151,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.api.empty"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 
@@ -163,7 +163,7 @@ class FormTest extends SmartyPluginTestCase
         $this->plugin->generateForm(
             ["name" => "thelia.empty"],
             "",
-            $this->getMock("\\Smarty_Internal_Template", [], [], '', false),
+            $this->createMock("\\Smarty_Internal_Template", [], [], '', false),
             $repeat
         );
 

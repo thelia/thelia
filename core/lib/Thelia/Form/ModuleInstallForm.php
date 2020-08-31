@@ -33,7 +33,7 @@ class ModuleInstallForm extends BaseForm
 
     protected $modulePath = null;
 
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add(
@@ -78,7 +78,7 @@ class ModuleInstallForm extends BaseForm
             try {
                 // get the first directory
                 $moduleFiles = $this->getDirContents($modulePath);
-                if (count($moduleFiles['directories']) !== 1) {
+                if (\count($moduleFiles['directories']) !== 1) {
                     throw new Exception(
                         Translator::getInstance()->trans(
                             "Your zip must contain 1 root directory which is the root folder directory of your module"
@@ -129,9 +129,9 @@ class ModuleInstallForm extends BaseForm
     protected function unzipModule(UploadedFile $file)
     {
         $extractPath = false;
-        $zip = new ZipArchiver();
+        $zip = new ZipArchiver(true);
         if (!$zip->open($file->getRealPath())) {
-          throw new \Exception("unable to open zipfile");
+            throw new \Exception("unable to open zipfile");
         }
 
         $extractPath = $this->tempdir();

@@ -20,14 +20,14 @@ class TheliaConsoleOutput extends ConsoleOutput
     {
         $strlen = function ($string) {
             if (!function_exists('mb_strlen')) {
-                return strlen($string);
+                return \strlen($string);
             }
 
             if (false === $encoding = mb_detect_encoding($string)) {
-                return strlen($string);
+                return \strlen($string);
             }
 
-            return mb_strlen($string, $encoding);
+            return \mb_strlen($string, $encoding);
         };
         $length = 0;
         foreach ($messages as $message) {

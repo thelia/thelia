@@ -12,7 +12,6 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -20,7 +19,7 @@ use Thelia\Model\CurrencyQuery;
 
 class CurrencyCreationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true);
 

@@ -12,6 +12,15 @@
 
 namespace Thelia\Command;
 
+use Propel\Generator\Builder\Util\SchemaReader;
+use Propel\Generator\Exception\SchemaException;
+use Propel\Generator\Model\Schema;
+use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Propel\Schema\SchemaCombiner;
+use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Core\PropelInitService;
+use Thelia\Module\Validator\ModuleValidator;
+
 /**
  * base class for module commands
  *
@@ -54,7 +63,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
 
     protected function formatModuleName($name)
     {
-        if (in_array(strtolower($name), $this->reservedKeyWords)) {
+        if (\in_array(strtolower($name), $this->reservedKeyWords)) {
             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
         }
 
@@ -68,5 +77,36 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
                 sprintf("%s module name is not a valid name, it must be in CamelCase. (ex: MyModuleName)", $name)
             );
         }
+    }
+
+    protected function checkModuleSchema()
+    {
+        $moduleValidator = new ModuleValidator($this->moduleDirectory);
+        $moduleValidator->checkModulePropelSchema();
+    }
+
+    protected function generateGlobalSchemaForModule()
+    {
+        /** @var SchemaLocator $schemaLocator */
+        $schemaLocator = $this->getContainer()->get('thelia.propel.schema.locator');
+        /** @var PropelInitService $propelInitService */
+        $propelInitService = $this->getContainer()->get('thelia.propel.init');
+
+        $schemaCombiner = new SchemaCombiner(
+            $schemaLocator->findForModules([$this->module])
+        );
+
+        $fs = new Filesystem();
+        $schemasDir = "{$propelInitService->getPropelCacheDir()}/schema-{$this->module}";
+        $fs->mkdir($schemasDir);
+
+        foreach ($schemaCombiner->getDatabases() as $database) {
+            file_put_contents(
+                "{$schemasDir}/{$database}.schema.xml",
+                $schemaCombiner->getCombinedDocument($database)->saveXML()
+            );
+        }
+
+        return $schemasDir;
     }
 }

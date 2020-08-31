@@ -18,3 +18,4 @@ require_once __DIR__ . '/../../../../core/vendor/autoload.php';
 use Thelia\Core\Thelia;
 
 $thelia = new Thelia("test", true);
+$thelia->boot();

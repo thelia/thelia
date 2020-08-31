@@ -76,20 +76,20 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
             foreach ($deletes as $item) {
                 TaxRuleCountryQuery::create()
                     ->filterByTaxRule($taxRule)
-                    ->filterByCountryId(intval($item[0]), Criteria::EQUAL)
-                    ->filterByStateId(intval($item[1]) !== 0 ? $item[1] : null, Criteria::EQUAL)
+                    ->filterByCountryId(\intval($item[0]), Criteria::EQUAL)
+                    ->filterByStateId(\intval($item[1]) !== 0 ? $item[1] : null, Criteria::EQUAL)
                     ->delete();
             }
 
             /* for each country */
             foreach ($countryList as $item) {
                 $position = 1;
-                $countryId = intval($item[0]);
-                $stateId = intval($item[1]);
+                $countryId = \intval($item[0]);
+                $stateId = \intval($item[1]);
 
                 /* on applique les nouvelles regles */
                 foreach ($taxList as $tax) {
-                    if (is_array($tax)) {
+                    if (\is_array($tax)) {
                         foreach ($tax as $samePositionTax) {
                             $taxModel = new TaxRuleCountry();
                             $taxModel->setTaxRule($taxRule)
@@ -118,10 +118,10 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
 
     protected function getArrayFromJson($obj)
     {
-        if (is_null($obj)) {
+        if (\is_null($obj)) {
             $obj = [];
         } else {
-            $obj = is_array($obj)
+            $obj = \is_array($obj)
                 ? $obj
                 : json_decode($obj, true);
         }
@@ -147,7 +147,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     {
         $obj = $this->getArrayFromJson($obj);
 
-        if (isset($obj[0]) && ! is_array($obj[0])) {
+        if (isset($obj[0]) && ! \is_array($obj[0])) {
             $objEx = [];
             foreach ($obj as $item) {
                 $objEx[] = [$item, 0];

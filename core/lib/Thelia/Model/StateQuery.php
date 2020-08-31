@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\StateQuery as BaseStateQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'state' table.
  *
@@ -17,5 +16,4 @@ use Thelia\Model\Base\StateQuery as BaseStateQuery;
  */
 class StateQuery extends BaseStateQuery
 {
-
 } // StateQuery

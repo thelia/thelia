@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Assets;
 
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateDefinition;
 
 interface AssetResolverInterface
 {
@@ -53,4 +54,29 @@ interface AssetResolverInterface
      * @return mixed the path to directory containing the file, or null if the file doesn't exists.
      */
     public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface);
+
+    /**
+     * Return an asset source file path, and the template in which it was found
+     *
+     * A system of fallback enables file overriding. It will look for the template :
+     *      - in the current template in directory /modules/{module code}/
+     *      - in the module in the current template if it exists
+     *      - in the module in the default template
+     *
+     * @param  string $source a module code, or ParserInterface::TEMPLATE_ASSETS_KEY
+     * @param  string $templateName a template name, or false to use the current template
+     * @param  string $fileName the filename
+     * @param  ParserInterface $parserInterface the current template parser
+     * @param  TemplateDefinition &$templateDefinition the template where to start search.
+     *         This parameter will contain the template where the asset was found.
+     *
+     * @return mixed the path to directory containing the file, or null if the file doesn't exists.
+     */
+    public function resolveAssetSourcePathAndTemplate(
+        $source,
+        $templateName,
+        $fileName,
+        ParserInterface $parserInterface,
+        TemplateDefinition &$templateDefinition
+    );
 }

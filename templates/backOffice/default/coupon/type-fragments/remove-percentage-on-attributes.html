@@ -6,7 +6,7 @@
         <label for="coupon-percentage" class="control-label">{intl l="Discount percentage"}</label>
 
         <div class="input-group">
-            <input id="coupon-percentage" type="number" class="form-control" name="{$percentage_field_name}" value="{$percentage_value}" placeholder="5">
+            <input id="coupon-percentage" type="number" step="any" min="0" class="form-control" name="{$percentage_field_name}" value="{$percentage_value}" placeholder="5">
 
             <div class="input-group-addon">%</div>
         </div>

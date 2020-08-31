@@ -14,6 +14,9 @@ namespace Thelia\Core\Event;
 
 use Thelia\Model\Accessory;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\AccessoryEvent
+ */
 class AccessoryEvent extends ActionEvent
 {
     public $accessory = null;
@@ -25,7 +28,7 @@ class AccessoryEvent extends ActionEvent
 
     public function hasAccessory()
     {
-        return ! is_null($this->accessory);
+        return ! \is_null($this->accessory);
     }
 
     public function getAccessory()

@@ -22,6 +22,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Module;
@@ -68,7 +69,7 @@ class MessageController extends AbstractCrudController
             ->setLocale($formData["locale"])
             ->setTitle($formData['title'])
             ->setSecured($formData['secured'] ? true : false)
-            ;
+        ;
 
         return $createEvent;
     }
@@ -136,7 +137,7 @@ class MessageController extends AbstractCrudController
     protected function getExistingObject()
     {
         $message = MessageQuery::create()
-        ->findOneById($this->getRequest()->get('message_id', 0));
+            ->findOneById($this->getRequest()->get('message_id', 0));
 
         if (null !== $message) {
             $message->setLocale($this->getCurrentEditionLocale());
@@ -172,9 +173,17 @@ class MessageController extends AbstractCrudController
     {
         $list = array();
 
-        $dir = $this->getTemplateHelper()->getActiveMailTemplate()->getAbsolutePath();
+        $mailTemplate = $this->getTemplateHelper()->getActiveMailTemplate();
 
-        $finder = Finder::create()->files()->in($dir)->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
+        $finder = Finder::create()->files()->in($mailTemplate->getAbsolutePath());
+
+        // Also add parent template files, if any.
+        /** @var TemplateDefinition $parentTemplate */
+        foreach ($mailTemplate->getParentList() as $parentTemplate) {
+            $finder->in($parentTemplate->getAbsolutePath());
+        }
+
+        $finder->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
 
         foreach ($finder as $file) {
             $list[] = $file->getBasename();
@@ -196,7 +205,7 @@ class MessageController extends AbstractCrudController
 
                 foreach ($finder as $file) {
                     $fileName = $file->getBasename();
-                    if (!in_array($fileName, $list)) {
+                    if (!\in_array($fileName, $list)) {
                         $list[] = $fileName;
                     }
                 }
@@ -209,10 +218,10 @@ class MessageController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render('message-edit', array(
-                'message_id'         => $this->getRequest()->get('message_id'),
-                'layout_list'        => $this->listDirectoryContent('tpl'),
-                'html_template_list' =>  $this->listDirectoryContent('html'),
-                'text_template_list' =>  $this->listDirectoryContent('txt'),
+            'message_id'         => $this->getRequest()->get('message_id'),
+            'layout_list'        => $this->listDirectoryContent('tpl'),
+            'html_template_list' =>  $this->listDirectoryContent('html'),
+            'text_template_list' =>  $this->listDirectoryContent('txt'),
         ));
     }
 
@@ -267,5 +276,53 @@ class MessageController extends AbstractCrudController
         $response->headers->add(["Content-Type" => "text/plain"]);
 
         return $response;
+    }
+
+    public function sendSampleByEmailAction($messageId)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+            return $response;
+        }
+
+        if (null !== $message = MessageQuery::create()->findPk($messageId)) {
+            // Ajax submission: prevent CRSF control, as page is not refreshed
+            $baseForm = $this->createForm(AdminForm::MESSAGE_SEND_SAMPLE, 'form', [], ['csrf_protection' => false]);
+
+            try {
+                $form = $this->validateForm($baseForm, "POST");
+
+                $data = $form->getData();
+
+                $messageParameters = [];
+
+                foreach ($this->getRequest()->request->all() as $key => $value) {
+                    $messageParameters[$key] = $value;
+                }
+
+                $this->getMailer()->sendEmailMessage(
+                    $message->getName(),
+                    [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                    [ $data['recipient_email'] => $data['recipient_email'] ],
+                    $messageParameters,
+                    $this->getCurrentEditionLocale()
+                );
+
+                return new Response(
+                    $this->getTranslator()->trans(
+                        "The message has been successfully sent to %recipient.",
+                        [ '%recipient' => $data['recipient_email'] ]
+                    )
+                );
+            } catch (\Exception $ex) {
+                return new Response(
+                    $this->getTranslator()->trans(
+                        "Something goes wrong, the message was not sent to recipient. Error is : %err",
+                        [ '%err' => $ex->getMessage() ]
+                    )
+                );
+            }
+        } else {
+            return $this->pageNotFound();
+        }
     }
 }

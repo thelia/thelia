@@ -106,8 +106,8 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
 
             $pseJoin = new Join();
             $pseJoin->addCondition(
-                AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID,
-                ProductSaleElementsTableMap::ID,
+                AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID,
+                ProductSaleElementsTableMap::COL_ID,
                 Criteria::EQUAL
             );
             $pseJoin->setJoinType(Criteria::LEFT_JOIN);
@@ -116,7 +116,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->leftJoinAttributeCombination('attribute_combination')
                 ->groupById()
                 ->addJoinObject($pseJoin)
-                ->where(ProductSaleElementsTableMap::PRODUCT_ID."=?", $product, \PDO::PARAM_INT)
+                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID."=?", $product, \PDO::PARAM_INT)
             ;
         }
 

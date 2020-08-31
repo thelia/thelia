@@ -13,11 +13,16 @@
 namespace Thelia\Type;
 
 /**
+ * This class manages boolea expression, in the form:
+ * number:expr, number:expr, ...
+ * expr: string|(expr oper expr)
+ * oper: | or &
+ * Special characters , : ( ) & | should be escaped in strings, for example a\(b\).
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * Sample expression : 1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar), 11:(abc & def\&ghi\|ttt)
  *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
  */
-
 class IntToCombinedStringsListType extends BaseType
 {
     public function getType()
@@ -27,11 +32,14 @@ class IntToCombinedStringsListType extends BaseType
 
     public function isValid($values)
     {
-        foreach (explode(',', $values) as $intToCombinedStrings) {
-            $parts = explode(':', $intToCombinedStrings);
-            if (count($parts) != 2) {
+        // Explode expession parts, ignoring escaped characters, (\, and \:)
+        foreach (preg_split('#(?<!\\\),#', $values) as $intToCombinedStrings) {
+            $parts = preg_split('#(?<!\\\):#', $intToCombinedStrings);
+
+            if (\count($parts) != 2) {
                 return false;
             }
+
             if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
                 return false;
             }
@@ -47,15 +55,26 @@ class IntToCombinedStringsListType extends BaseType
     public function getFormattedValue($values)
     {
         if ($this->isValid($values)) {
-            $return = '';
+            $return = [];
 
-            $values = preg_replace('#[\s]#', '', $values);
-            foreach (explode(',', $values) as $intToCombinedStrings) {
-                $parts = explode(':', $intToCombinedStrings);
+            foreach (preg_split('/(?<!\\\),/', $values) as $intToCombinedStrings) {
+                $parts = preg_split('/(?<!\\\):/', $intToCombinedStrings);
 
                 $return[trim($parts[0])] = array(
-                    "values"        =>  preg_split("#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
-                    "expression"    =>  $parts[1],
+                    "values" =>  array_map(
+                        function ($item) {
+                            return trim(self::unescape($item));
+                        },
+                        preg_split(
+                            '#(?<!\\\)[&|]#',
+                            preg_replace(
+                                '#(?<!\\\)[\(\)]#',
+                                '',
+                                $parts[1]
+                            )
+                        )
+                    ),
+                    "expression" =>  trim(self::unescape($parts[1])),
                 );
             }
 
@@ -65,8 +84,35 @@ class IntToCombinedStringsListType extends BaseType
         }
     }
 
+
+    /**
+     * Escape a string to use it safely in an expression. abc:def => abc\:def.
+     * Escapes characters are , : ( ) | &
+     *
+     * @param $string
+     * @return string
+     */
+    public static function escape($string)
+    {
+        return preg_replace('/([,\:\(\)\|\&])/', '\\\$1', $string);
+    }
+
+    /**
+     * Unescape a string and remove avai escape symbols. abc\:def => abc:def.
+     *
+     * @param $string
+     * @return string
+     */
+    public static function unescape($string)
+    {
+        return preg_replace('/\\\([,\:\(\)\|\&])/', '\1', $string);
+    }
+
     protected function checkLogicalFormat($string)
     {
+        // Delete escaped characters
+        $string = preg_replace('/\\\[,\:\(\)\|\&]/', '', $string);
+
         /* delete  all spaces and parentheses */
         $noSpaceString = preg_replace('#[\s]#', '', $string);
         $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
@@ -79,7 +125,7 @@ class IntToCombinedStringsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = strlen($noSpaceString);
+        $length = \strlen($noSpaceString);
         for ($i=0; $i< $length; $i++) {
             $char = $noSpaceString[$i];
             if ($char == '(') {

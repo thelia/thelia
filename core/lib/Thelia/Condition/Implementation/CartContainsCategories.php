@@ -68,14 +68,14 @@ class CartContainsCategories extends ConditionAbstract
         }
 
         // Be sure that the value is an array, make one if required
-        if (! is_array($values[self::CATEGORIES_LIST])) {
+        if (! \is_array($values[self::CATEGORIES_LIST])) {
             $values[self::CATEGORIES_LIST] = array($values[self::CATEGORIES_LIST]);
         }
 
         // Check that at least one category is selected
         if (empty($values[self::CATEGORIES_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(),
+                \get_class(),
                 self::CATEGORIES_LIST
             );
         }
@@ -99,18 +99,14 @@ class CartContainsCategories extends ConditionAbstract
 
             /** @var Category $category */
             foreach ($categories as $category) {
-
-                if (! $this->conditionValidator->variableOpComparison(
+                if ($this->conditionValidator->variableOpComparison(
                     $category->getId(),
                     $this->operators[self::CATEGORIES_LIST],
                     $this->values[self::CATEGORIES_LIST]
                 )) {
-                    // cart item doesn't match go to next cart item
-                    continue 2;
+                    return true;
                 }
             }
-            // cart item match
-            return true;
         }
         return false;
     }

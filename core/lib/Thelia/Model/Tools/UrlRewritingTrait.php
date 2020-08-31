@@ -171,7 +171,7 @@ trait UrlRewritingTrait
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
-                    if (count($resolver->otherParameters) > 0) {
+                    if (\count($resolver->otherParameters) > 0) {
                         /* it is an url related to this product but with more arguments */
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }

@@ -98,11 +98,19 @@
                                                 </td>
                                                 {hook name="import.table-row" import_id=$ID}
                                                 <td>
-                                                    <div class="btn-group">
-                                                        <a class="btn btn-default btn-xs btn-show-import-modal" href="#category_{$category_title}" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this import"}">
-                                                            <span class="glyphicon glyphicon-open"></span>
-                                                        </a>
-                                                    </div>
+                                                    {include file='renderer/buttons.html' buttons=[
+                                                        [
+                                                            'type' => 'default',
+                                                            'class' => 'btn-show-import-modal',
+                                                            'title' => {intl l="Do this import"},
+                                                            'href' => "#category_$category_title",
+                                                            'data' => [
+                                                                'id' => $ID,
+                                                                'url' => {$URL nofilter}
+                                                            ],
+                                                            'icon' => ['class' => 'glyphicon glyphicon-open']
+                                                        ]
+                                                    ]}
                                                 </td>
                                             </tr>
                                         {/loop}

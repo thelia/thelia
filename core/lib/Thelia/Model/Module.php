@@ -23,6 +23,8 @@ class Module extends BaseModule
     public function postSave(ConnectionInterface $con = null)
     {
         ModuleQuery::resetActivated();
+
+        parent::postSave();
     }
 
     public function getTranslationDomain()
@@ -213,7 +215,7 @@ class Module extends BaseModule
     /**
      * Return the absolute path to one of the module's template directories
      *
-     * @param  int    $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
+     * @param  string    $templateSubdirName the name of the, probably one of TemplateDefinition::xxx_SUBDIR constants
      * @return string a path
      */
     public function getAbsoluteTemplateDirectoryPath($templateSubdirName)
@@ -321,6 +323,8 @@ class Module extends BaseModule
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         return true;

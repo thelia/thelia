@@ -9,7 +9,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop type="document" name="document_edit" source="{$documentType}" id="{$documentId}" backend_context="1" lang="$edit_language_id" visible="*"}
+            {loop type="document" name="document_edit" source="{$documentType}" id="{$documentId}" backend_context="1" lang="$edit_language_id" visible="*" with_prev_next_info="true"}
                 <ul class="breadcrumb">
                     {foreach $breadcrumb as $label=>$link}
                         <li><a href="{$link}">{$label}</a></li>
@@ -48,6 +48,11 @@
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                                             <p class="title title-without-tabs">{intl l="Document informations"}</p>
+
+                                            <div class="actions">
+                                                <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous image'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                                <a {if $HAS_NEXT != 0}href="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next image'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                            </div>
 
                                             <div class="row">
 

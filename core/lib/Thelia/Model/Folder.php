@@ -3,19 +3,23 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\ObjectCollection;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
-use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\Model\Tools\PositionManagementTrait;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Folder extends BaseFolder implements FileModelParentInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    use ModelEventDispatcherTrait;
 
-    use \Thelia\Model\Tools\PositionManagementTrait;
+    use PositionManagementTrait;
 
-    use \Thelia\Model\Tools\UrlRewritingTrait;
+    use UrlRewritingTrait;
 
     /**
      * {@inheritDoc}
@@ -34,25 +38,25 @@ class Folder extends BaseFolder implements FileModelParentInterface
     }
 
     /**
-     *
      * count all products for current category and sub categories
      *
+     * @param bool|string $contentVisibility: true (default) to count only visible products, false to count only hidden
+     *                    products, or * to count all products.
      * @return int
      */
-    public function countAllContents()
+    public function countAllContents($contentVisibility = true)
     {
         $children = FolderQuery::findAllChild($this->getId());
         array_push($children, $this);
 
-        $contentsCount = 0;
 
-        foreach ($children as $child) {
-            $contentsCount += ContentQuery::create()
-                ->filterByFolder($child)
-                ->count();
+        $query = ContentQuery::create()->filterByFolder(new ObjectCollection($children), Criteria::IN);
+
+        if ($contentVisibility !== '*') {
+            $query->filterByVisible($contentVisibility);
         }
 
-        return $contentsCount;
+        return $query->count();
     }
 
     /**
@@ -77,6 +81,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our parent
+
+     * @param FolderQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
     {
@@ -88,6 +94,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFOLDER, new FolderEvent($this));
@@ -97,11 +105,15 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEFOLDER, new FolderEvent($this));
     }
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFOLDER, new FolderEvent($this));
 
         return true;
@@ -109,11 +121,15 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFOLDER, new FolderEvent($this));
     }
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFOLDER, new FolderEvent($this));
         $this->reorderBeforeDelete(
             array(
@@ -126,6 +142,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));

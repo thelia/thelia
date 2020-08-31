@@ -43,28 +43,40 @@ class CacheClearTest extends ContainerAwareTestCase
         $fs->mkdir(THELIA_WEB_DIR . "/assets");
     }
 
+    public function tearDown()
+    {
+        $fs = new Filesystem();
+
+        if ($fs->exists($this->cache_dir)) {
+            $fs->chmod($this->cache_dir, 0700);
+            $fs->remove($this->cache_dir);
+        }
+    }
+
     public function testCacheClear()
     {
         // Fails on windows - do not execute this test on windows
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            $application = new Application($this->getKernel());
-
-            $cacheClear = new CacheClear();
-            $cacheClear->setContainer($this->getContainer());
-
-            $application->add($cacheClear);
-
-            $command = $application->find("cache:clear");
-            $commandTester = new CommandTester($command);
-            $commandTester->execute(array(
-                "command" => $command->getName(),
-                "--env" => "test"
-            ));
-
-            $fs = new Filesystem();
-
-            $this->assertFalse($fs->exists($this->cache_dir));
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped('Fails on windows');
         }
+
+        $application = new Application($this->getKernel());
+
+        $cacheClear = new CacheClear();
+        $cacheClear->setContainer($this->getContainer());
+
+        $application->add($cacheClear);
+
+        $command = $application->find("cache:clear");
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array(
+            "command" => $command->getName(),
+            "--env" => "test"
+        ));
+
+        $fs = new Filesystem();
+
+        $this->assertFalse($fs->exists($this->cache_dir));
     }
 
     /**
@@ -73,26 +85,26 @@ class CacheClearTest extends ContainerAwareTestCase
     public function testCacheClearWithoutWritePermission()
     {
         // Fails on windows - mock this test on windows
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            $fs = new Filesystem();
-            $fs->chmod($this->cache_dir, 0100);
-
-            $application = new Application($this->getKernel());
-
-            $cacheClear = new CacheClear();
-            $cacheClear->setContainer($this->getContainer());
-
-            $application->add($cacheClear);
-
-            $command = $application->find("cache:clear");
-            $commandTester = new CommandTester($command);
-            $commandTester->execute(array(
-                "command" => $command->getName(),
-                "--env" => "test"
-            ));
-        } else {
-            throw new \RuntimeException("");
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped('Fails on windows');
         }
+
+        $fs = new Filesystem();
+        $fs->chmod($this->cache_dir, 0100);
+
+        $application = new Application($this->getKernel());
+
+        $cacheClear = new CacheClear();
+        $cacheClear->setContainer($this->getContainer());
+
+        $application->add($cacheClear);
+
+        $command = $application->find("cache:clear");
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array(
+            "command" => $command->getName(),
+            "--env" => "test"
+        ));
     }
 
     /**

@@ -17,16 +17,13 @@
 
 {* Content  *}
 {block name="email-content"}
-    {intl l="Welcome to %store," store={config key="store_name"}}<br /><br />
-    {intl l="Confirm your email to complete your account"}<br />
-    {intl l="just click the button below : "}<br /><br />
-    {include
-        file="includes/btn_email.html"
-        link={url path='/customer/confirm/%token'
-        token=$customer->getConfirmationToken()}
-        btnText={intl l='Confirm now'}
-        backgroundColor="#f49a17"
-        fontColor="#ffffff"
-    }
-backgroundColor}
+    {loop type="customer" name="confirmation" current=false id=$customer_id}
+        <p>{intl l="Welcome to %store," store={config key="store_name"}}</p>
+        <p>{intl l="To complete your customer account creation, please confirm your email address by clicking the link below, or copying it in your browser address bar."}</p>
+        <p><a href="{url path='/customer/confirm/%token' token=$CONFIRMATION_TOKEN}">{url path='/customer/confirm/%token' token=$CONFIRMATION_TOKEN}</a></p>
+        <p>
+            {intl l='Kind regards'},<br>
+            {intl l="The %store team." store={config key="store_name"}}
+        </p>
+    {/loop}
 {/block}

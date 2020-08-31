@@ -21,13 +21,11 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
-use Propel\Runtime\Connection\ConnectionManagerSingle;
-use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
-use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -35,22 +33,20 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Yaml\Yaml;
-use Thelia\Config\DatabaseConfiguration;
-use Thelia\Config\DefinePropel;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
-use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\ModuleManagement;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.4.0-alpha1';
+    const THELIA_VERSION = '2.4.2';
 
     public function __construct($environment, $debug)
     {
@@ -59,8 +55,6 @@ class Thelia extends Kernel
         if ($debug) {
             Debug::enable();
         }
-
-        $this->initPropel();
     }
 
     public static function isInstalled()
@@ -68,41 +62,10 @@ class Thelia extends Kernel
         return file_exists(THELIA_CONF_DIR . 'database.yml');
     }
 
-    protected function initPropel()
+    protected function checkMySQLConfigurations(ConnectionInterface $con)
     {
-        if (self::isInstalled() === false) {
-            return ;
-        }
-
-        /** @var \Propel\Runtime\ServiceContainer\StandardServiceContainer $serviceContainer */
-        $serviceContainer = Propel::getServiceContainer();
-        $serviceContainer->setDefaultDatasource('thelia');
-
-        $manager = new ConnectionManagerSingle();
-        $manager->setConfiguration($this->getPropelConfig());
-        $manager->setName('thelia');
-
-        $serviceContainer->setConnectionManager('thelia', $manager);
-        $serviceContainer->setAdapterClass('thelia', 'mysql');
-
-        /** @var ConnectionWrapper $con */
-        $con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
-        $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
-
-        if ($this->isDebug()) {
-            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-            Tlog::getInstance()->setLevel(Tlog::DEBUG);
-
-            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
-            $con->useDebug(true);
-        }
-
-        $this->checkMySQLConfigurations($con);
-    }
-
-    protected function checkMySQLConfigurations(ConnectionWrapper $con)
-    {
-        // todo add cache for this test
+        // TODO : add cache for this test
+        /** @var  PDODataFetcher $result */
         $result = $con->query("SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode");
 
         if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
@@ -117,7 +80,7 @@ class Thelia extends Kernel
                 // MySQL 5.6+ compatibility
                 if (version_compare($data['version'], '5.6.0', '>=')) {
                     // add NO_ENGINE_SUBSTITUTION
-                    if (!in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
                         Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
@@ -135,6 +98,24 @@ class Thelia extends Kernel
                         unset($sessionSqlMode[$key]);
                         $canUpdate = true;
                         Tlog::getInstance()->addWarning("Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.");
+                    }
+                }
+            } else {
+                // MariaDB 10.2.4+ compatibility
+                if (version_compare($data['version'], '10.2.4', '>=')) {
+                    // remove STRICT_TRANS_TABLES
+                    if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
+                        unset($sessionSqlMode[$key]);
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.");
+                    }
+                }
+
+                if (version_compare($data['version'], '10.1.7', '>=')) {
+                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                        $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                        $canUpdate = true;
+                        Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
                     }
                 }
             }
@@ -162,63 +143,80 @@ class Thelia extends Kernel
     }
 
     /**
-     *
-     * process the configuration and create a cache.
-     *
-     * @return array configuration for propel
-     */
-    protected function getPropelConfig()
-    {
-        $cachePath = $this->getCacheDir() . DS . 'PropelConfig.php';
-
-        $cache = new ConfigCache($cachePath, $this->debug);
-
-        if (!$cache->isFresh()) {
-            if (file_exists(THELIA_CONF_DIR."database_".$this->environment.".yml")) {
-                $file = THELIA_CONF_DIR."database_".$this->environment.".yml";
-            } else {
-                $file = THELIA_CONF_DIR . 'database.yml';
-            }
-
-            $definePropel = new DefinePropel(
-                new DatabaseConfiguration(),
-                Yaml::parse(file_get_contents($file)),
-                $this->getEnvParameters()
-            );
-
-            $resource = [
-                new FileResource($file)
-            ];
-
-            $config = $definePropel->getConfig();
-
-            $code = sprintf("<?php return %s;", var_export($config, true));
-
-            $cache->write($code, $resource);
-        }
-
-        $config = require $cachePath;
-
-        return $config;
-    }
-
-    /**
-     * dispatch an event when application is boot
+     * @inheritDoc
+     * @throws \Exception
      */
     public function boot()
     {
+        // initialize Propel, building its cache if necessary
+        $propelSchemaLocator = new SchemaLocator(
+            THELIA_CONF_DIR,
+            THELIA_MODULE_DIR
+        );
+        $propelInitService = new PropelInitService(
+            $this->getEnvironment(),
+            $this->isDebug(),
+            $this->getEnvParameters(),
+            $propelSchemaLocator
+        );
+
+        $propelConnectionAvailable = $this->initializePropelService(false, $cacheRefresh);
+
+        if ($propelConnectionAvailable) {
+            $theliaDatabaseConnection = Propel::getConnection('thelia');
+            $this->checkMySQLConfigurations($theliaDatabaseConnection);
+        }
+
         parent::boot();
 
-        if (self::isInstalled()) {
-            $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
+        $this->getContainer()->set('thelia.propel.schema.locator', $propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $propelInitService);
+
+        if ($cacheRefresh) {
+            $moduleManagement = new ModuleManagement($this->getContainer());
+            $moduleManagement->updateModules($this->getContainer());
         }
+
+        if ($propelConnectionAvailable) {
+            $theliaDatabaseConnection->setEventDispatcher($this->getContainer()->get('event_dispatcher'));
+        }
+
+        if (self::isInstalled()) {
+            $this->getContainer()->get('event_dispatcher')->dispatch(TheliaEvents::BOOT);
+        }
+    }
+
+    /**
+     * @param $forcePropelCacheGeneration
+     * @param $cacheRefresh
+     * @return bool
+     * @throws \Throwable
+     */
+    public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
+    {
+        $cacheRefresh = false;
+
+        // initialize Propel, building its cache if necessary
+        $propelSchemaLocator = new SchemaLocator(
+            THELIA_CONF_DIR,
+            THELIA_MODULE_DIR
+        );
+
+        $propelInitService = new PropelInitService(
+            $this->getEnvironment(),
+            $this->isDebug(),
+            $this->getEnvParameters(),
+            $propelSchemaLocator
+        );
+
+        return $propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
     }
 
     /**
      * Add all module's standard templates to the parser environment
      *
-     * @param ParserInterface $parser the parser
-     * @param Module          $module the Module.
+     * @param Definition $parser the parser
+     * @param Module     $module the Module.
      */
     protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
     {
@@ -232,10 +230,10 @@ class Thelia extends Kernel
     /**
      * Add a module template directory to the parser environment
      *
-     * @param ParserInterface $parser             the parser
-     * @param Module          $module             the Module.
-     * @param string          $templateType       the template type (one of the TemplateDefinition type constants)
-     * @param string          $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
+     * @param Definition $parser             the parser
+     * @param Module     $module             the Module.
+     * @param string     $templateType       the template type (one of the TemplateDefinition type constants)
+     * @param string     $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
     protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName)
     {
@@ -267,10 +265,11 @@ class Thelia extends Kernel
     }
 
     /**
-     *
      * Load some configuration
      * Initialize all plugins
      *
+     * @param ContainerBuilder $container
+     * @throws \Exception
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
@@ -285,7 +284,7 @@ class Thelia extends Kernel
             $loader->load($file->getBaseName());
         }
 
-        if (defined("THELIA_INSTALL_MODE") === false) {
+        if (\defined("THELIA_INSTALL_MODE") === false) {
             $modules = ModuleQuery::getActivated();
 
             $translationDirs = array();
@@ -304,10 +303,10 @@ class Thelia extends Kernel
                         $definition
                     );
 
-                    $compilers = call_user_func(array($module->getFullNamespace(), 'getCompilers'));
+                    $compilers = \call_user_func(array($module->getFullNamespace(), 'getCompilers'));
 
                     foreach ($compilers as $compiler) {
-                        if (is_array($compiler)) {
+                        if (\is_array($compiler)) {
                             $container->addCompilerPass($compiler[0], $compiler[1]);
                         } else {
                             $container->addCompilerPass($compiler);
@@ -331,7 +330,6 @@ class Thelia extends Kernel
                 }
             }
 
-            /** @var ParserInterface $parser */
             $parser = $container->getDefinition('thelia.parser');
 
             /** @var \Thelia\Core\Template\TemplateHelperInterface $templateHelper */
@@ -358,11 +356,19 @@ class Thelia extends Kernel
             $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR . 'I18n';
 
             // Standard templates (front, back, pdf, mail)
-
             /** @var TemplateDefinition $templateDefinition */
             foreach ($templateHelper->getStandardTemplateDefinitions() as $templateDefinition) {
-                if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
-                    $translationDirs[$templateDefinition->getTranslationDomain()] = $dir;
+                // Load parent templates transaltions, the current template translations.
+                $templateList = array_merge(
+                    $templateDefinition->getParentList(),
+                    [ $templateDefinition ]
+                );
+
+                /** @var TemplateDefinition $tplDef */
+                foreach ($templateList as $tplDef) {
+                    if (is_dir($dir = $tplDef->getAbsoluteI18nPath())) {
+                        $translationDirs[$tplDef->getTranslationDomain()] = $dir;
+                    }
                 }
             }
 
@@ -372,6 +378,11 @@ class Thelia extends Kernel
         }
     }
 
+    /**
+     * @param Module $module
+     * @param array $translationDirs
+     * @param TemplateHelperInterface $templateHelper
+     */
     private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper)
     {
         // Core module translation
@@ -480,11 +491,11 @@ class Thelia extends Kernel
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
-     *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function buildContainer()
     {
+        /** @var TheliaContainerBuilder $container */
         $container = parent::buildContainer();
 
         $this->loadConfiguration($container);
@@ -502,7 +513,7 @@ class Thelia extends Kernel
      */
     public function getCacheDir()
     {
-        if (defined('THELIA_ROOT')) {
+        if (\defined('THELIA_ROOT')) {
             return THELIA_CACHE_DIR . $this->environment;
         } else {
             return parent::getCacheDir();
@@ -518,7 +529,7 @@ class Thelia extends Kernel
      */
     public function getLogDir()
     {
-        if (defined('THELIA_ROOT')) {
+        if (\defined('THELIA_ROOT')) {
             return THELIA_LOG_DIR;
         } else {
             return parent::getLogDir();
@@ -546,8 +557,7 @@ class Thelia extends Kernel
      *
      * Part of Symfony\Component\HttpKernel\KernelInterface
      *
-     * @return array An array of bundle instances.
-     *
+     * @return Bundle\TheliaBundle[] An array of bundle instances.
      */
     public function registerBundles()
     {
@@ -576,7 +586,7 @@ class Thelia extends Kernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        //Nothing is load here but it's possible to load container configuration here.
-        //exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
+        // Nothing is load here but it's possible to load container configuration here.
+        // exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
 }

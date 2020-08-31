@@ -80,8 +80,9 @@ class TaxEngine
                     foreach ($directoryIterator as $fileinfo) {
                         if ($fileinfo->isFile()) {
                             $extension = $fileinfo->getExtension();
-                            if (strtolower($extension) !== 'php')
+                            if (strtolower($extension) !== 'php') {
                                 continue;
+                            }
                             $className  = $fileinfo->getBaseName('.php');
 
                             try {
@@ -90,7 +91,7 @@ class TaxEngine
                                 $instance = new $fullyQualifiedClassName;
 
                                 if ($instance instanceof BaseTaxType) {
-                                    $this->addTaxType(get_class($instance));
+                                    $this->addTaxType(\get_class($instance));
                                 }
                             } catch (\Exception $ex) {
                                 // Nothing special to do
@@ -127,8 +128,10 @@ class TaxEngine
                     $this->taxState = $currentDeliveryAddress->getState();
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();
-                    $this->taxCountry = $customerDefaultAddress->getCountry();
-                    $this->taxState = $customerDefaultAddress->getState();
+                    if (isset($customerDefaultAddress)) {
+                      $this->taxCountry = $customerDefaultAddress->getCountry();
+                      $this->taxState = $customerDefaultAddress->getState();
+                    }
                 }
             }
 

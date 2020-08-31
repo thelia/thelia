@@ -204,7 +204,7 @@ class ImportController extends BaseAdminController
 
             $importEvent = $importHandler->import($import, $file, $lang);
 
-            if (count($importEvent->getErrors()) > 0) {
+            if (\count($importEvent->getErrors()) > 0) {
                 $this->getSession()->getFlashBag()->add(
                     'thelia.import.error',
                     $this->getTranslator()->trans(

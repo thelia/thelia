@@ -687,7 +687,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                 ->filterByProductId($event->getClonedProduct()->getId())
                 ->filterByFeatureId($originalProductFeature->getFeatureId());
 
-            if ($originalProductFeature->getFreeTextValue() != 1) {
+            if (!$originalProductFeature->getIsFreeText()) {
                 $cloneProductFeatureQuery->filterByFeatureAvId($originalProductFeature->getFeatureAvId());
             }
 
@@ -702,13 +702,13 @@ class ProductTest extends TestCaseWithURLToolSetup
             $this->assertEquals($event->getClonedProduct()->getId(), $cloneProductFeature->getProductId(), 'ProductID must be equal');
             $this->assertEquals($originalProductFeature->getFeatureId(), $cloneProductFeature->getFeatureId(), 'FeatureID must be equal');
 
-            if ($originalProductFeature->getFreeTextValue() == 1) {
+            if ($originalProductFeature->getIsFreeText()) {
                 $this->assertNotEquals($originalProductFeature->getFeatureAvId(), $cloneProductFeature->getFeatureAvId(), 'FeatureAvID can\'t be equal');
             } else {
                 $this->assertEquals($originalProductFeature->getFeatureAvId(), $cloneProductFeature->getFeatureAvId(), 'FeatureAvID must be equal');
             }
 
-            $this->assertEquals($originalProductFeature->getFreeTextValue(), $cloneProductFeature->getFreeTextValue(), 'Free text value must be equal');
+            $this->assertEquals($originalProductFeature->getIsFreeText(), $cloneProductFeature->getIsFreeText(), 'Free text value must be equal');
             $this->assertEquals($originalProductFeature->getPosition(), $cloneProductFeature->getPosition(), 'Position must be equal');
         }
 
@@ -970,10 +970,10 @@ class ProductTest extends TestCaseWithURLToolSetup
         // Get attribute combination
         $originalAttributeCombination = AttributeCombinationQuery::create()
             ->findOneByProductSaleElementsId($originalProductPSE->getId());
-        
+
         $cloneAttributeCombination = AttributeCombinationQuery::create()
             ->findOneByProductSaleElementsId($clonedProductPSEId);
-        
+
         // Check clone PSE's attribute combination if exist
         if ($cloneAttributeCombination != null) {
             $this->assertInstanceOf(

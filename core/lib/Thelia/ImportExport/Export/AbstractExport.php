@@ -14,12 +14,15 @@ namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
+use SplFileObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
 /**
  * Class AbstractExport
+ *
+ * @deprecated since 2.4, please use a specific AbstractExport (like JsonFileAbstractExport).
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 abstract class AbstractExport implements \Iterator
@@ -45,7 +48,7 @@ abstract class AbstractExport implements \Iterator
     const USE_RANGE_DATE = false;
 
     /**
-     * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
+     * @var SplFileObject|\Propel\Runtime\Util\PropelModelPager Data to export
      */
     private $data;
 
@@ -53,6 +56,11 @@ abstract class AbstractExport implements \Iterator
      * @var boolean True if data is array, false otherwise
      */
     private $dataIsArray;
+
+    /**
+     *  @var boolean True if data is a path to a JSON file, false otherwise
+     */
+    private $dataIsJSONFile;
 
     /**
      * @var ContainerInterface
@@ -99,8 +107,23 @@ abstract class AbstractExport implements \Iterator
      */
     protected $rangeDate;
 
+    /**
+     * @return array|false|mixed|string
+     * @throws \Exception
+     */
     public function current()
     {
+        if ($this->dataIsJSONFile) {
+            /** @var resource $file */
+            $result = json_decode($this->data->current(), true);
+
+            if ($result !== null) {
+                return $result;
+            }
+
+            return [];
+        }
+
         if ($this->dataIsArray) {
             return current($this->data);
         }
@@ -115,8 +138,16 @@ abstract class AbstractExport implements \Iterator
         return $data;
     }
 
+    /**
+     * @return bool|float|int|string|null
+     * @throws \Exception
+     */
     public function key()
     {
+        if ($this->dataIsJSONFile) {
+            return $this->data->key();
+        }
+
         if ($this->dataIsArray) {
             return key($this->data);
         }
@@ -128,9 +159,14 @@ abstract class AbstractExport implements \Iterator
         return null;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function next()
     {
-        if ($this->dataIsArray) {
+        if ($this->dataIsJSONFile) {
+            $this->data->next();
+        } else if ($this->dataIsArray) {
             next($this->data);
         } else {
             $this->data->getIterator()->next();
@@ -141,6 +177,9 @@ abstract class AbstractExport implements \Iterator
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function rewind()
     {
         // Since it's first method call on traversable, we get raw data here
@@ -149,10 +188,24 @@ abstract class AbstractExport implements \Iterator
         if ($this->data === null) {
             $data = $this->getData();
 
-            if (is_array($data)) {
+            // Check if $data is a path to a json file
+            if (\is_string($data)
+                && '.json' === substr($data, -5)
+                && file_exists($data)
+            ) {
+                $this->data = new \SplFileObject($data, 'r');
+                $this->data->setFlags(SPLFileObject::READ_AHEAD);
+                $this->dataIsJSONFile = true;
+
+                $this->data->rewind();
+
+                return;
+            }
+
+            if (\is_array($data)) {
                 $this->data = $data;
                 $this->dataIsArray = true;
-                reset($this->getData());
+                reset($this->data);
 
                 return;
             }
@@ -165,15 +218,23 @@ abstract class AbstractExport implements \Iterator
             }
 
             throw new \DomainException(
-                'Data must an array or an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria'
+                'Data must an array, an instance of \\Propel\\Runtime\\ActiveQuery\\ModelCriteria or a JSON file ending with.json'
             );
         }
 
         throw new \LogicException('Export data can\'t be rewinded');
     }
 
+    /**
+     * @return bool
+     * @throws \Exception
+     */
     public function valid()
     {
+        if ($this->dataIsJSONFile) {
+            return $this->data->valid();
+        }
+
         if ($this->dataIsArray) {
             return key($this->data) !== null;
         }
@@ -410,12 +471,18 @@ abstract class AbstractExport implements \Iterator
         $processedData = [];
 
         foreach ($this->orderAndAliases as $key => $value) {
-            if (is_integer($key)) {
+            if (\is_int($key)) {
                 $fieldName = $value;
                 $fieldAlias = $value;
             } else {
                 $fieldName = $key;
                 $fieldAlias = $value;
+            }
+
+            if ($this->dataIsJSONFile) {
+                $fieldName = substr($fieldName, strripos($fieldName, '.'));
+                $fieldName = str_replace('.', '', $fieldName);
+                $fieldName = strtolower($fieldName);
             }
 
             $processedData[$fieldAlias] = null;
@@ -476,7 +543,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * Get data to export
      *
-     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
+     * @return string|array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
      */
     abstract protected function getData();
 }

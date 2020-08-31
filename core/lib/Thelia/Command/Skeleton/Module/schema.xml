@@ -20,11 +20,6 @@
         <behavior name="i18n">
             <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
         </behavior>
-        <behavior name="versionable">
-            <parameter name="log_created_at" value="true" />
-            <parameter name="log_created_by" value="true" />
-        </behavior>
     </table>
     -->
-    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

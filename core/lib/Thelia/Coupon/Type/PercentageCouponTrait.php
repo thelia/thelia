@@ -47,7 +47,7 @@ trait PercentageCouponTrait
      */
     public function getCartItemDiscount(CartItem $cartItem)
     {
-        return $cartItem->getQuantity() * $cartItem->getRealTaxedPrice($this->facade->getDeliveryCountry()) * ($this->percentage / 100);
+        return $cartItem->getTotalRealTaxedPrice($this->facade->getDeliveryCountry()) * ($this->percentage / 100);
     }
 
     /**
@@ -77,7 +77,7 @@ trait PercentageCouponTrait
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === $this->getPercentageFieldName()) {
-            $pcent = floatval($fieldValue);
+            $pcent = \floatval($fieldValue);
 
             if ($pcent <= 0 || $pcent > 100) {
                 throw new \InvalidArgumentException(

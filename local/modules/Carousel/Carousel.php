@@ -31,12 +31,12 @@ class Carousel extends BaseModule
 
     public function preActivation(ConnectionInterface $con = null)
     {
-        if (! $this->getConfigValue('is_initialized', false)) {
+        if (! self::getConfigValue('is_initialized', false)) {
             $database = new Database($con);
 
             $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
 
-            $this->setConfigValue('is_initialized', true);
+            self::setConfigValue('is_initialized', true);
         }
 
         return true;
@@ -59,7 +59,7 @@ class Carousel extends BaseModule
             $uploadDir = THELIA_ROOT . $uploadDir;
         }
 
-        return $uploadDir . DS . Carousel::DOMAIN_NAME;
+        return $uploadDir . DS . self::DOMAIN_NAME;
     }
 
     /**
@@ -84,6 +84,26 @@ class Carousel extends BaseModule
                 copy($file, $uploadDir . DS . $file->getRelativePathname());
             }
             $fileSystem->remove(__DIR__ . DS . 'media');
+        }
+
+        $finder = (new Finder())->files()->name('#.*?\.sql#')->sortByName()->in(__DIR__ . DS . 'Config' . DS .'update');
+
+        if (0 === $finder->count()) {
+            return;
+        }
+
+        $database = new Database($con);
+
+        // apply update only if table exists
+        if ($database->execute("SHOW TABLES LIKE 'carousel'")->rowCount() === 0) {
+            return;
+        }
+
+        /** @var SplFileInfo $updateSQLFile */
+        foreach ($finder as $updateSQLFile) {
+            if (version_compare($currentVersion, str_replace('.sql', '', $updateSQLFile->getFilename()), '<')) {
+                $database->insertSql(null, [$updateSQLFile->getPathname()]);
+            }
         }
     }
 }

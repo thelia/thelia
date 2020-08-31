@@ -134,7 +134,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface
                         }
 
                         // Ignore reserved directory names
-                        if (in_array($file->getFilename(), $exclude)) {
+                        if (\in_array($file->getFilename(), $exclude)) {
                             continue;
                         }
 

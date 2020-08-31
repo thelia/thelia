@@ -13,13 +13,12 @@
 namespace Thelia\Core\Template\Assets;
 
 use Assetic\AssetManager;
-use Assetic\FilterManager;
-use Assetic\Filter;
-use Assetic\Factory\AssetFactory;
 use Assetic\AssetWriter;
-use Thelia\Model\ConfigQuery;
-use Thelia\Log\Tlog;
+use Assetic\Factory\AssetFactory;
+use Assetic\FilterManager;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 
 /**
  * This class is a simple helper for generating assets using Assetic.
@@ -70,7 +69,7 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     protected function isSourceFile(\SplFileInfo $fileInfo)
     {
-        return in_array($fileInfo->getExtension(), $this->source_file_extensions);
+        return \in_array($fileInfo->getExtension(), $this->source_file_extensions);
     }
 
     /**
@@ -192,14 +191,14 @@ class AsseticAssetManager implements AssetManagerInterface
      * Decode the filters names, and initialize the Assetic FilterManager
      *
      * @param  FilterManager             $filterManager the Assetic filter manager
-     * @param  string                    $filters       a comma separated list of filter names
+     * @param  string|array              $filters       a comma separated list of filter names
      * @throws \InvalidArgumentException if a wrong filter is passed
      * @return array                     an array of filter names
      */
     protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
     {
-        if (!empty($filters)) {
-            $filter_list = explode(',', $filters);
+        if (! empty($filters)) {
+            $filter_list = \is_array($filters) ? $filters : explode(',', $filters);
 
             foreach ($filter_list as $filter_name) {
                 $filter_name = trim($filter_name);

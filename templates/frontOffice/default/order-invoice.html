@@ -72,8 +72,8 @@
                             <span class="visible-xs">{intl l="Qty"}</span>
                         </th>
                         <th class="subprice">
-                            <span class="hidden-xs">{intl l="Total"}</span>
-                            <span class="visible-xs">{intl l="Total"}</span>
+                            <span class="hidden-xs">{intl l="Total incl. tax"}</span>
+                            <span class="visible-xs">{intl l="Total incl.tax"}</span>
                         </th>
                     </tr>
                     </thead>
@@ -82,16 +82,25 @@
                     {loop type="cart" name="cartloop"}
                     <tr>
                         <td class="image">
-                            {assign "cart_count" $LOOP_COUNT}
                             <a href="{$PRODUCT_URL nofilter}">
-                            {ifloop rel='product-image'}
-                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
+                            {assign var="product_image_url" value=null}
+                            {ifloop rel="pse-first-image"}
+                                {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                    {loop type="image" name="product-image" id=$PRODUCT_IMAGE_ID product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                        {assign var="product_image_url" value=$IMAGE_URL}
+                                    {/loop}
                                 {/loop}
                             {/ifloop}
-                            {elseloop rel="product-image"}
-                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$cart_count}">
+                            {elseloop rel="pse-first-image"}
+                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    {assign var="product_image_url" value=$IMAGE_URL}
+                                {/loop}
                             {/elseloop}
+                            {if $product_image_url}
+                                <img itemprop="image" src="{$product_image_url nofilter}" alt="Product #{$LOOP_COUNT}">
+                            {else}
+                                <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$LOOP_COUNT}">
+                            {/if}
                             </a>
                         </td>
                         <td class="product" >
@@ -100,16 +109,19 @@
                             </h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
-                                    <dt>{intl l="Available"} :</dt>
+                                    <dt class="stockView">{intl l="Available"} :</dt>
                                     {if $STOCK > 0}
                                         <dd>{intl l="In Stock"}</dd>
                                     {else}
                                         <dd>{intl l="Out of Stock"}</dd>
                                     {/if}
-                                    <dt>{intl l="No."}</dt>
-                                    <dd>{$REF}</dd>
+                                    {loop type="product_sale_elements" name="ref" id=$PRODUCT_SALE_ELEMENTS_ID}
+                                        <dt class="refView">{intl l="No."}</dt>
+                                        <dd>{$REF}</dd>
+                                    {/loop}
+
                                     {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
-                                        <dt>{$ATTRIBUTE_TITLE}</dt>
+                                        <dt class="attributeView">{$ATTRIBUTE_TITLE}</dt>
                                         <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                     {/loop}
                                 </dl>
@@ -117,33 +129,26 @@
                         </td>
                         <td class="unitprice">
                             <div class="secondary-price">
-                            {if $IS_PROMO == 1}
-                                <small><span class="price">{format_money number=$PROMO_PRICE}</span></small>
-                            {else}
-                                <small><span class="price">{format_money number=$PRICE}</span></small>
-                            {/if}
+                                <span class="price">{format_money number=$REAL_PRICE}</span>
                             </div>
                         </td>
                         <td class="unitprice">
-                            {if $IS_PROMO == 1}
-                                {assign "real_price" $PROMO_TAXED_PRICE}
-                                {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
-                            {else}
-                                {assign "real_price" $TAXED_PRICE}
-                                {assign "real_total_price" $TOTAL_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
-                            {/if}
+                            <div class="secondary-price">
+                                <div class="special-price"><span class="price">{format_money number=$REAL_TAXED_PRICE}</span>
+                                {if $IS_PROMO == 1}
+                                    <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
+                                {/if}
+                            </div>
                         </td>
                         <td class="qty">
                             <span class="price">{$QUANTITY}</span>
                         </td>
                         <td class="subprice">
-                            <span class="price">{format_money number=$real_total_price}</span>
+                            <span class="price">
+                                {format_money number=$REAL_TOTAL_TAXED_PRICE}
+                            </span>
                         </td>
                     </tr>
-
                     {/loop}
 
                     </tbody>
@@ -154,16 +159,6 @@
                         <table class="table table-cart table-bordered table-cart-total">
                             <tfoot>
                             {$discount={order attr="discount"}}
-                            {if $discount}
-                            <tr>
-                                <th class="discount">{intl l="Discount"}</th>
-                                <td class="shipping">
-                                    <div class="shipping-price">
-                                        <span class="price">{format_money number=$discount}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {/if}
                             <tr>
                                 <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                                 <td class="coupon">
@@ -185,24 +180,65 @@
                                     <!-- /input-group -->
                                 </td>
                             </tr>
-                            {if {cart attr="is_virtual"} != 1}
                             <tr>
-                                <th class="shipping">{intl l="Shipping Tax"}</th>
-                                <td class="shipping">
-                                    <div class="shipping-price">
-                                        <span class="price">{format_money number={order attr="postage"}}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {/if}
-                            <tr>
-                                <th>{intl l="Total excl. taxes"}</th>
+                                <th>{intl l="Cart total excl. taxes"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}}}</span>
+                                        <span class="price">{format_money number={cart attr="total_price_without_discount"}}</span>
                                     </div>
                                 </td>
                             </tr>
+
+                            <tr>
+                                <th>{intl l="Taxes total"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{format_money number={cart attr="total_tax_amount_without_discount"}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>{intl l="Cart total incl. taxes"}</th>
+                                <td>
+                                    <div>
+                                        <span class="price">{format_money number={cart attr="total_taxed_price_without_discount"}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {if $discount > 0}
+                                <tr>
+                                    <th class="discount">
+                                        {intl l="Discount incl. taxes"}
+                                        <br>{intl l="Tax: %tax" tax={format_money number={cart attr="discount_tax_amount"} currency_id=$CURRENCY}}
+                                    </th>
+                                    <td class="shipping">
+                                        <div class="total-price">
+                                            <span class="price">-{format_money number=$discount}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/if}
+
+                            {if {cart attr="is_virtual"} != 1}
+                                <tr>
+                                    <th class="shipping">
+                                        {intl l="Shipping"}
+                                        {$postageTax = {order attr="postage_tax"}}
+                                        {if $postageTax > 0}
+                                            <br>
+                                            {intl l="Including %tax tax" tax={format_money number=$postageTax}}
+                                        {/if}
+                                    </th>
+                                    <td class="shipping">
+                                        <div class="shipping-price">
+                                            <span class="price">{format_money number={order attr="postage"}}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/if}
+
                             <tr>
                                 <th class="total">{intl l="Total incl. taxes"}</th>
                                 <td class="total">
@@ -218,12 +254,16 @@
                 {hook name="order-invoice.coupon-form"}
                 </form>
             {/form}
-            
+
             {form name="thelia.order.payment"}
             {assign var="isPost" value=$smarty.post|count}
             <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype}>
 
                 {form_hidden_fields}
+
+                {form_field field="error_url"}
+                    <input type="hidden" name="{$name}" value="{url path="/order/invoice"}">
+                {/form_field}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -322,7 +362,7 @@
                                 {assign "paymentModuleId" $ID}
                                 <li class="list-group-item text-left">
                                     <label for="payment_{$paymentModuleId}">
-                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
+                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if ($LOOP_TOTAL ==1 && $LOOP_COUNT == 1) || ($value == $paymentModuleId)}checked{/if}>
                                         {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
                                             <img src="{$IMAGE_URL nofilter}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                         {/loop}

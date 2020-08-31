@@ -22,6 +22,9 @@ use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\RewritingUrlQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\ConfigQuery;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
@@ -69,7 +72,10 @@ class UrlGenerator extends AbstractSmartyPlugin
         } else {
             $defaultRouter = null;
         }
+
         $routerId = $this->getParam($params, 'router', $defaultRouter);
+
+        $baseUrl = $this->getParam($params, 'base_url', null);
 
         if ($current) {
             $path = $this->getRequest()->getPathInfo();
@@ -97,7 +103,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
             $url = $router->generate(
                 $routeId,
-                $this->getArgsFromParam($params, ['route_id', 'router']),
+                $this->getArgsFromParam($params, ['route_id', 'router', 'base_url']),
                 Router::ABSOLUTE_URL
             );
         } else {
@@ -116,9 +122,39 @@ class UrlGenerator extends AbstractSmartyPlugin
 
             $url = URL::getInstance()->absoluteUrl(
                 $path,
-                $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
-                $mode
+                $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target', 'base_url'], $excludeParams)),
+                $mode,
+                $baseUrl
             );
+
+            $request = $this->getRequest();
+            $requestedLangCodeOrLocale = $params["lang"];
+            $view = $request->attributes->get('_view', null);
+            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+
+            if (null !== $requestedLangCodeOrLocale) {
+                if (strlen($requestedLangCodeOrLocale) > 2) {
+                    $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
+                } else {
+                    $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+                }
+
+                if (ConfigQuery::isMultiDomainActivated()) {
+                    $urlRewrite = RewritingUrlQuery::create()
+                        ->filterByView($view)
+                        ->filterByViewId($viewId)
+                        ->filterByViewLocale($lang->getLocale())
+                        ->findOneByRedirected(null)
+                    ;
+
+                    $path = '';
+                    if (null != $urlRewrite) {
+                        $path = "/".$urlRewrite->getUrl();
+                    }
+                    $url = rtrim($lang->getUrl(), "/").$request->getBaseUrl().$path;
+                }
+
+            }
         }
         return $this->applyNoAmpAndTarget($params, $url);
     }
@@ -145,7 +181,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $path = strtr($path, $placeholder);
         $keys = array_keys($placeholder);
-        array_walk($keys, function(&$item, $key) {
+        array_walk($keys, function (&$item, $key) {
             $item = str_replace('%', '', $item);
         });
 
@@ -182,10 +218,10 @@ class UrlGenerator extends AbstractSmartyPlugin
         $to = $this->getParam($params, 'to', null);
 
         $toMethod = $this->getNavigateToMethod($to);
-     
+
         $url = URL::getInstance()->absoluteUrl(
             $this->$toMethod(),
-            $this->getArgsFromParam($params, ['noamp', 'to', 'target']),
+            $this->getArgsFromParam($params, ['noamp', 'to', 'target', 'base_url']),
             URL::WITH_INDEX_PAGE
         );
 
@@ -197,7 +233,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         // the view name (without .html)
         $view   = $this->getParam($params, 'view');
 
-        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target'));
+        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target', 'base_url'));
 
         $url = $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
 
@@ -307,9 +343,10 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function getNavigateToValues()
     {
         return array(
-            "current"  => "getCurrentUrl",
-            "previous" => "getPreviousUrl",
-            "index"    => "getIndexUrl",
+            "current"       => "getCurrentUrl",
+            "previous"      => "getPreviousUrl",
+            "catalog_last"  => "getCatalogLastUrl",
+            "index"         => "getIndexUrl",
         );
     }
 
@@ -338,6 +375,11 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function getPreviousUrl()
     {
         return URL::getInstance()->absoluteUrl($this->getSession()->getReturnToUrl());
+    }
+
+    protected function getCatalogLastUrl()
+    {
+        return URL::getInstance()->absoluteUrl($this->getSession()->getReturnToCatalogLastUrl());
     }
 
     protected function getIndexUrl()

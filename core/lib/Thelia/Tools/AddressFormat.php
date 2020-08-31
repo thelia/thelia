@@ -198,7 +198,7 @@ class AddressFormat
         ;
 
 
-        if ($country->getHasStates() && intval($address->getStateId()) !== 0) {
+        if ($country->getHasStates() && \intval($address->getStateId()) !== 0) {
             $addressModel = $addressModel->withAdministrativeArea(
                 sprintf(
                     '%s-%s',

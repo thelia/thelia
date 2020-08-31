@@ -9,7 +9,7 @@
 			{if $ID == $category_id && $editing_product == false}
 				<li class="active">
 				   {if $editing_category == true}
-                       {intl l='Editing %cat' cat="{$TITLE}"}
+                       {intl l='Editing %cat' cat="{$TITLE}"} <a href="{url path='/admin/categories' category_id=$ID}" title="{intl l='Browse this category'}">{intl l="(browse)"}</a>
 				   {else}
                        {$TITLE} <a href="{url path='/admin/categories/update' category_id=$ID}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
 			        {/if}

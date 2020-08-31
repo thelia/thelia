@@ -18,8 +18,10 @@ use Thelia\Core\Event\Template\TemplateCreateEvent;
 use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
 use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
+use Thelia\Core\Event\Template\TemplateDuplicateEvent;
 use Thelia\Core\Event\Template\TemplateUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -157,13 +159,18 @@ class TemplateController extends AbstractCrudController
             )
         );
     }
-
-    protected function redirectToEditionTemplate()
+    
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function redirectToEditionTemplate($request = null, $id = null)
     {
         return $this->generateRedirectFromRoute(
             "admin.configuration.templates.update",
             [
-                'template_id' => $this->getRequest()->get('template_id'),
+                'template_id' => $id ?: $this->getRequest()->get('template_id'),
             ]
         );
     }
@@ -195,6 +202,33 @@ class TemplateController extends AbstractCrudController
         return null;
     }
 
+    public function duplicateAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::CREATE)) {
+            return $response;
+        }
+        
+        $template_id = \intval($this->getRequest()->get('template_id'));
+        
+        if ($template_id > 0) {
+            try {
+                $event = new TemplateDuplicateEvent($template_id, $this->getCurrentEditionLocale());
+                
+                $this->dispatch(TheliaEvents::TEMPLATE_DUPLICATE, $event);
+    
+                if ($event->hasTemplate()) {
+                    $template_id = $event->getTemplate()->getId();
+                }
+            } catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+        
+        return $this->redirectToEditionTemplate(null, $template_id);
+    }
+
     public function getAjaxFeaturesAction()
     {
         return $this->render(
@@ -218,7 +252,7 @@ class TemplateController extends AbstractCrudController
             return $response;
         }
 
-        $attribute_id = intval($this->getRequest()->get('attribute_id'));
+        $attribute_id = \intval($this->getRequest()->get('attribute_id'));
 
         if ($attribute_id > 0) {
             $event = new TemplateAddAttributeEvent(
@@ -246,7 +280,7 @@ class TemplateController extends AbstractCrudController
 
         $event = new TemplateDeleteAttributeEvent(
             $this->getExistingObject(),
-            intval($this->getRequest()->get('attribute_id'))
+            \intval($this->getRequest()->get('attribute_id'))
         );
 
         try {
@@ -281,7 +315,7 @@ class TemplateController extends AbstractCrudController
             return $response;
         }
 
-        $feature_id = intval($this->getRequest()->get('feature_id'));
+        $feature_id = \intval($this->getRequest()->get('feature_id'));
 
         if ($feature_id > 0) {
             $event = new TemplateAddFeatureEvent(
@@ -309,7 +343,7 @@ class TemplateController extends AbstractCrudController
 
         $event = new TemplateDeleteFeatureEvent(
             $this->getExistingObject(),
-            intval($this->getRequest()->get('feature_id'))
+            \intval($this->getRequest()->get('feature_id'))
         );
 
         try {

@@ -26,37 +26,40 @@ final class TheliaEvents
      * sent at the beginning
      */
     const BOOT = "thelia.boot";
+    /**
+     * Kernel View Check Handle
+     */
+    const VIEW_CHECK = "thelia.view_check";
     // -- END CORE EVENTS ---------------------------------------------------------
     // -- ADDRESS EVENTS ---------------------------------------------------------
-    /**
-     * sent once the address creation form has been successfully validated, and before address insertion in the database.
-     */
-    const BEFORE_CREATEADDRESS = "action.before_createAddress";
+
     /**
      * sent for address creation
      */
     const ADDRESS_CREATE = "action.createAddress";
-    /**
-     * Sent just after a successful insert of a new address in the database.
-     */
-    const AFTER_CREATEADDRESS  = "action.after_createAddress";
-    const BEFORE_UPDATEADDRESS = "action.before_updateAddress";
-    /**
-     * sent for address modification
-     */
     const ADDRESS_UPDATE = "action.updateAddress";
-    const AFTER_UPDATEADDRESS = "action.after_updateAddress";
-
-    const BEFORE_DELETEADDRESS = "action.before_deleteAddress";
-    /**
-     * sent on address removal
-     */
     const ADDRESS_DELETE = "action.deleteAddress";
-    const AFTER_DELETEADDRESS = "action.after_deleteAddress";
+    
     /**
      * sent when an address is tag as default
      */
     const ADDRESS_DEFAULT = "action.defaultAddress";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AddressEvent::PRE_INSERT */
+    const BEFORE_CREATEADDRESS = "action.before_createAddress";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AddressEvent::POST_INSERT */
+    const AFTER_CREATEADDRESS  = "action.after_createAddress";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AddressEvent::PRE_DELETE */
+    const BEFORE_DELETEADDRESS = "action.before_deleteAddress";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AddressEvent::POST_DELETE */
+    const AFTER_DELETEADDRESS  = "action.after_deleteAddress";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AddressEvent::PRE_UPDATE */
+    const BEFORE_UPDATEADDRESS = "action.before_updateAddress";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AddressEvent::POST_UPDATE */
+    const AFTER_UPDATEADDRESS  = "action.after_updateAddress";
+    
     // -- END ADDRESS EVENTS ---------------------------------------------------------
 
 
@@ -76,37 +79,53 @@ final class TheliaEvents
 
 
     // -- AREA EVENTS ---------------------------------------------------------
-    const BEFORE_CREATEAREA = 'action.before_createArea';
+
     const AREA_CREATE = 'action.createArea';
-    const AFTER_CREATEAREA = 'action.after_createArea';
-
-    const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
-
-    const BEFORE_UPDATEAREA = 'action.before_updateArea';
     const AREA_UPDATE = 'action.updateArea';
-    const AFTER_UPDATEAREA = 'action.after_updateArea';
-
-    const AREA_ADD_COUNTRY = 'action.area.addCountry';
-    const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
-
-    const BEFORE_DELETEAREA = 'action.before_deleteArea';
     const AREA_DELETE = 'action.deleteArea';
-    const AFTER_DELETEAREA = 'action.after_deleteArea';
+
+    const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
+    const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
+    const AREA_ADD_COUNTRY = 'action.area.addCountry';
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AreaEvent::PRE_INSERT */
+    const BEFORE_CREATEAREA = "action.before_createArea";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AreaEvent::POST_INSERT */
+    const AFTER_CREATEAREA  = "action.after_createArea";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AreaEvent::PRE_DELETE */
+    const BEFORE_DELETEAREA = "action.before_deleteArea";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AreaEvent::POST_DELETE */
+    const AFTER_DELETEAREA  = "action.after_deleteArea";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AreaEvent::PRE_UPDATE */
+    const BEFORE_UPDATEAREA = "action.before_updateArea";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AreaEvent::POST_UPDATE */
+    const AFTER_UPDATEAREA  = "action.after_updateArea";
+    
     // -- END AREA EVENTS ---------------------------------------------------------
 
 
     // -- CATEGORIES EVENTS -----------------------------------------------
-    const BEFORE_CREATECATEGORY = "action.before_createcategory";
+
     const CATEGORY_CREATE            = "action.createCategory";
-    const AFTER_CREATECATEGORY    = "action.after_createcategory";
-
-    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const CATEGORY_UPDATE            = "action.updateCategory";
-    const AFTER_UPDATECATEGORY    = "action.after_updateCategory";
-
-    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
     const CATEGORY_DELETE            = "action.deleteCategory";
-    const AFTER_DELETECATEGORY    = "action.after_deletecategory";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryEvent::PRE_INSERT */
+    const BEFORE_CREATECATEGORY = "action.before_createCategory";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryEvent::POST_INSERT */
+    const AFTER_CREATECATEGORY  = "action.after_createCategory";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryEvent::PRE_DELETE */
+    const BEFORE_DELETECATEGORY = "action.before_deleteCategory";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryEvent::POST_DELETE */
+    const AFTER_DELETECATEGORY  = "action.after_deleteCategory";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryEvent::PRE_UPDATE */
+    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryEvent::POST_UPDATE */
+    const AFTER_UPDATECATEGORY  = "action.after_updateCategory";
 
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
@@ -115,62 +134,90 @@ final class TheliaEvents
     const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
     const CATEGORY_UPDATE_SEO        = "action.updateCategorySeo";
+
+    const VIEW_CATEGORY_ID_NOT_VISIBLE = "action.viewCategoryIdNotVisible";
     // -- END CATEGORIES EVENTS -----------------------------------------------
 
 
     // -- CONTENT EVENTS -----------------------------------------------
-    const BEFORE_CREATECONTENT = "action.before_createContent";
+
     const CONTENT_CREATE            = "action.createContent";
-    const AFTER_CREATECONTENT    = "action.after_createContent";
-
-    const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const CONTENT_UPDATE            = "action.updateContent";
-    const AFTER_UPDATECONTENT    = "action.after_updateContent";
-
-    const BEFORE_DELETECONTENT = "action.before_deleteContent";
     const CONTENT_DELETE            = "action.deleteContent";
-    const AFTER_DELETECONTENT    = "action.after_deleteContent";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\ContentEvent::PRE_INSERT */
+    const BEFORE_CREATECONTENT = "action.before_createContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ContentEvent::POST_INSERT */
+    const AFTER_CREATECONTENT  = "action.after_createContent";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\ContentEvent::PRE_DELETE */
+    const BEFORE_DELETECONTENT = "action.before_deleteContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ContentEvent::POST_DELETE */
+    const AFTER_DELETECONTENT  = "action.after_deleteContent";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\ContentEvent::PRE_UPDATE */
+    const BEFORE_UPDATECONTENT = "action.before_updateContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ContentEvent::POST_UPDATE */
+    const AFTER_UPDATECONTENT  = "action.after_updateContent";
+    
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
     const CONTENT_UPDATE_SEO        = "action.updateContentSeo";
 
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
+
+    const VIEW_CONTENT_ID_NOT_VISIBLE = "action.viewContentIdNotVisible";
     // -- END CONTENT EVENTS ---------------------------------------------------------
 
 
     // -- COUNTRY EVENTS -----------------------------------------------
-    const BEFORE_CREATECOUNTRY = "action.state.before_create";
+
     const COUNTRY_CREATE            = "action.state.create";
-    const AFTER_CREATECOUNTRY    = "action.state.after_create";
-
-    const BEFORE_UPDATECOUNTRY = "action.state.before_update";
     const COUNTRY_UPDATE            = "action.state.update";
-    const AFTER_UPDATECOUNTRY    = "action.state.after_update";
-
-    const BEFORE_DELETECOUNTRY = "action.state.before_delete";
     const COUNTRY_DELETE            = "action.state.delete";
-    const AFTER_DELETECOUNTRY    = "action.state.after_delete";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::PRE_INSERT */
+    const BEFORE_CREATECOUNTRY = "action.before_createCountry";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::POST_INSERT */
+    const AFTER_CREATECOUNTRY  = "action.after_createCountry";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::PRE_DELETE */
+    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::POST_DELETE */
+    const AFTER_DELETECOUNTRY  = "action.after_deleteCountry";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::PRE_UPDATE */
+    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::POST_UPDATE */
+    const AFTER_UPDATECOUNTRY  = "action.after_updateCountry";
+    
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
     const COUNTRY_TOGGLE_VISIBILITY = "action.state.toggleVisibility";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
 
 
     // -- STATE EVENTS -----------------------------------------------
+
+    const STATE_CREATE            = "action.createState";
+    const STATE_UPDATE            = "action.updateState";
+    const STATE_DELETE            = "action.deleteState";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::PRE_INSERT */
     const BEFORE_CREATESTATE = "action.before_createCountry";
-    const STATE_CREATE            = "action.createCountry";
-    const AFTER_CREATESTATE    = "action.after_createCountry";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::POST_INSERT */
+    const AFTER_CREATESTATE  = "action.after_createCountry";
 
-    const BEFORE_UPDATESTATE = "action.before_updateCountry";
-    const STATE_UPDATE            = "action.updateCountry";
-    const AFTER_UPDATESTATE    = "action.after_updateCountry";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::PRE_DELETE */
     const BEFORE_DELETESTATE = "action.before_deleteCountry";
-    const STATE_DELETE            = "action.deleteCountry";
-    const AFTER_DELETESTATE    = "action.after_deleteCountry";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::POST_DELETE */
+    const AFTER_DELETESTATE  = "action.after_deleteCountry";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::PRE_UPDATE */
+    const BEFORE_UPDATESTATE = "action.before_updateCountry";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CountryEvent::POST_UPDATE */
+    const AFTER_UPDATESTATE  = "action.after_updateCountry";
+    
     const STATE_TOGGLE_VISIBILITY = "action.toggleCountryVisibility";
     // -- END STATE EVENTS ---------------------------------------------------------
 
@@ -187,37 +234,17 @@ final class TheliaEvents
      */
     const CUSTOMER_LOGIN  = "action.customer_login";
     /**
-     * Sent once the customer creation form has been successfully validated, and before customer insertion in the database.
-     */
-    const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
-    /**
      * sent on customer account creation
      */
     const CUSTOMER_CREATEACCOUNT = "action.createCustomer";
-    /**
-     * Sent just after a successful insert of a new customer in the database.
-     */
-    const AFTER_CREATECUSTOMER    = "action.after_createcustomer";
     /**
      * sent on customer account update
      */
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
     /**
-     * Sent once the customer change form has been successfully validated, and before customer update in the database.
-     */
-    const BEFORE_UPDATECUSTOMER = "action.before_updateCustomer";
-    /**
      * sent on customer account update profile
      */
     const CUSTOMER_UPDATEPROFILE = "action.updateProfileCustomer";
-    /**
-     * Sent just after a successful update of a customer in the database.
-     */
-    const AFTER_UPDATECUSTOMER    = "action.after_updateCustomer";
-    /**
-     * sent just before customer removal
-     */
-    const BEFORE_DELETECUSTOMER = "action.before_deleteCustomer";
     /**
      * sent on customer removal
      */
@@ -227,49 +254,84 @@ final class TheliaEvents
      */
     const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
     /**
-     * sent just after customer removal
-     */
-    const AFTER_DELETECUSTOMER = "action.after_deleteCustomer";
-    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerEvent::PRE_INSERT */
+    const BEFORE_CREATECUSTOMER = "action.before_createCustomer";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerEvent::POST_INSERT */
+    const AFTER_CREATECUSTOMER  = "action.after_createCustomer";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerEvent::PRE_DELETE */
+    const BEFORE_DELETECUSTOMER = "action.before_deleteCustomer";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerEvent::POST_DELETE */
+    const AFTER_DELETECUSTOMER  = "action.after_deleteCustomer";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerEvent::PRE_UPDATE */
+    const BEFORE_UPDATECUSTOMER = "action.before_updateCustomer";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerEvent::POST_UPDATE */
+    const AFTER_UPDATECUSTOMER  = "action.after_updateCustomer";
+    
+    /**
+     * Send the account ccreation confirmation email
+     */
+    const SEND_ACCOUNT_CONFIRMATION_EMAIL = "action.customer.sendAccountConfirmationEmail";
+
     // -- END CUSTOMER EVENTS ---------------------------------------------------------
 
 
     // -- FOLDER EVENTS -----------------------------------------------
-    const BEFORE_CREATEFOLDER = "action.before_createFolder";
+
+
     const FOLDER_CREATE            = "action.createFolder";
-    const AFTER_CREATEFOLDER    = "action.after_createFolder";
-
-    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
     const FOLDER_UPDATE            = "action.updateFolder";
-    const AFTER_UPDATEFOLDER    = "action.after_updateFolder";
-
-    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
     const FOLDER_DELETE            = "action.deleteFolder";
-    const AFTER_DELETEFOLDER    = "action.after_deleteFolder";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FolderEvent::PRE_INSERT */
+    const BEFORE_CREATEFOLDER = "action.before_createFolder";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FolderEvent::POST_INSERT */
+    const AFTER_CREATEFOLDER  = "action.after_createFolder";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\FolderEvent::PRE_DELETE */
+    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FolderEvent::POST_DELETE */
+    const AFTER_DELETEFOLDER  = "action.after_deleteFolder";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\FolderEvent::PRE_UPDATE */
+    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FolderEvent::POST_UPDATE */
+    const AFTER_UPDATEFOLDER  = "action.after_updateFolder";
+    
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
     const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
+
+    const VIEW_FOLDER_ID_NOT_VISIBLE = "action.viewFolderIdNotVisible";
     // -- END FOLDER EVENTS ---------------------------------------------------------
 
 
     // -- PRODUCT EVENTS -----------------------------------------------
 
-    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const PRODUCT_CREATE            = "action.createProduct";
+    const PRODUCT_UPDATE            = "action.updateProduct";
+    const PRODUCT_DELETE            = "action.deleteProduct";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductEvent::PRE_INSERT */
+    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductEvent::POST_INSERT */
     const AFTER_CREATEPRODUCT  = "action.after_createproduct";
 
-    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
-    const PRODUCT_UPDATE            = "action.updateProduct";
-    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductEvent::PRE_DELETE */
+    const BEFORE_DELETEPRODUCT = "action.before_deleteProduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductEvent::POST_DELETE */
+    const AFTER_DELETEPRODUCT  = "action.after_deleteProduct";
 
-    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
-    const PRODUCT_DELETE            = "action.deleteProduct";
-    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductEvent::PRE_UPDATE */
+    const BEFORE_UPDATEPRODUCT = "action.before_deleteproduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductEvent::POST_UPDATE */
+    const AFTER_UPDATEPRODUCT  = "action.after_deleteproduct";
+    
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
     const PRODUCT_UPDATE_SEO        = "action.updateProductSeo";
@@ -299,6 +361,7 @@ final class TheliaEvents
     const VIRTUAL_PRODUCT_ORDER_HANDLE = "action.virtualProduct.handleOrder";
     const VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE = "action.virtualProduct.downloadResponse";
 
+    const VIEW_PRODUCT_ID_NOT_VISIBLE = "action.viewProductIdNotVisible";
     // -- END PRODUCT EVENTS ---------------------------------------------------------
 
 
@@ -322,47 +385,70 @@ final class TheliaEvents
 
     // -- Categories Associated Content ----------------------------------------
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryAssociatedContentEvent::PRE_INSERT */
     const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT = "action.before_createCategoryAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryAssociatedContentEvent::POST_INSERT */
     const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT  = "action.after_createCategoryAssociatedContent";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryAssociatedContentEvent::PRE_DELETE */
     const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT = "action.before_deleteCategoryAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryAssociatedContentEvent::POST_DELETE */
     const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT  = "action.after_deleteCategoryAssociatedContent";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryAssociatedContentEvent::PRE_UPDATE */
     const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT = "action.before_updateCategoryAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CategoryAssociatedContentEvent::POST_UPDATE */
     const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT  = "action.after_updateCategoryAssociatedContent";
-
-
+    
     // -- Product Accessories --------------------------------------------------
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AccessoryEvent::PRE_INSERT */
     const BEFORE_CREATEACCESSORY = "action.before_createAccessory";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AccessoryEvent::POST_INSERT */
     const AFTER_CREATEACCESSORY  = "action.after_createAccessory";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AccessoryEvent::PRE_DELETE */
     const BEFORE_DELETEACCESSORY = "action.before_deleteAccessory";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AccessoryEvent::POST_DELETE */
     const AFTER_DELETEACCESSORY  = "action.after_deleteAccessory";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AccessoryEvent::PRE_UPDATE */
     const BEFORE_UPDATEACCESSORY = "action.before_updateAccessory";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AccessoryEvent::POST_UPDATE */
     const AFTER_UPDATEACCESSORY  = "action.after_updateAccessory";
 
     // -- Product Associated Content -------------------------------------------
 
-    const BEFORE_CREATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_createProductAssociatedContent";
-    const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT    = "action.after_createProductAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductAssociatedContentEvent::PRE_INSERT */
+    const BEFORE_CREATEPRODUCT_ASSOCIATED_CONTENT = "action.before_createProductAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductAssociatedContentEvent::POST_INSERT */
+    const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT  = "action.after_createProductAssociatedContent";
 
-    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContent";
-    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT    = "action.after_deleteProductAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductAssociatedContentEvent::PRE_DELETE */
+    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT = "action.before_deleteProductAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductAssociatedContentEvent::POST_DELETE */
+    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT  = "action.after_deleteProductAssociatedContent";
 
-    const BEFORE_UPDATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_updateProductAssociatedContent";
-    const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT    = "action.after_updateProductAssociatedContent";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductAssociatedContentEvent::PRE_UPDATE */
+    const BEFORE_UPDATEPRODUCT_ASSOCIATED_CONTENT = "action.before_updateProductAssociatedContent";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ProductAssociatedContentEvent::POST_UPDATE */
+    const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT  = "action.after_updateProductAssociatedContent";
+    
     // -- Feature product ------------------------------------------------------
-
+    
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureProductEvent::PRE_INSERT */
     const BEFORE_CREATEFEATURE_PRODUCT = "action.before_createFeatureProduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureProductEvent::POST_INSERT */
     const AFTER_CREATEFEATURE_PRODUCT  = "action.after_createFeatureProduct";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureProductEvent::PRE_DELETE */
     const BEFORE_DELETEFEATURE_PRODUCT = "action.before_deleteFeatureProduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureProductEvent::POST_DELETE */
     const AFTER_DELETEFEATURE_PRODUCT  = "action.after_deleteFeatureProduct";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureProductEvent::PRE_UPDATE */
     const BEFORE_UPDATEFEATURE_PRODUCT = "action.before_updateFeatureProduct";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureProductEvent::POST_UPDATE */
     const AFTER_UPDATEFEATURE_PRODUCT  = "action.after_updateFeatureProduct";
 
     /** Persist a cart */
@@ -376,9 +462,18 @@ final class TheliaEvents
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
+     * The old cart is already deleted from the database when this event is dispatched.
      */
     const CART_DUPLICATE = "cart.duplicate";
 
+    /**
+     * Sent when the cart is duplicated, but not yet deleted from the database.
+     */
+    const CART_DUPLICATED = "cart.duplicated";
+
+    /**
+     * Sent when a cart item is duplicated
+     */
     const CART_ITEM_DUPLICATE = "cart.item.duplicate";
 
     /**
@@ -423,7 +518,9 @@ final class TheliaEvents
     const ORDER_SET_INVOICE_ADDRESS = "action.order.setInvoiceAddress";
     const ORDER_SET_PAYMENT_MODULE = "action.order.setPaymentModule";
     const ORDER_PAY = "action.order.pay";
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderEvent::PRE_INSERT */
     const ORDER_BEFORE_CREATE = "action.order.beforeCreate";
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderEvent::POST_INSERT */
     const ORDER_AFTER_CREATE = "action.order.afterCreate";
     const ORDER_BEFORE_PAYMENT = "action.order.beforePayment";
     const ORDER_CART_CLEAR = "action.order.cartClear";
@@ -431,6 +528,8 @@ final class TheliaEvents
     const ORDER_CREATE_MANUAL = "action.order.createManual";
 
     const ORDER_UPDATE_STATUS = "action.order.updateStatus";
+
+    const ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE = "action.order.getStockUpdateOperationOnOrderStatusChange";
 
     const ORDER_SEND_CONFIRMATION_EMAIL = "action.order.sendOrderConfirmationEmail";
 
@@ -605,30 +704,42 @@ final class TheliaEvents
     const CONFIG_UPDATE   = "action.updateConfig";
     const CONFIG_DELETE   = "action.deleteConfig";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\ConfigEvent::PRE_INSERT */
     const BEFORE_CREATECONFIG = "action.before_createConfig";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ConfigEvent::POST_INSERT */
     const AFTER_CREATECONFIG  = "action.after_createConfig";
 
-    const BEFORE_UPDATECONFIG = "action.before_updateConfig";
-    const AFTER_UPDATECONFIG  = "action.after_updateConfig";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\ConfigEvent::PRE_DELETE */
     const BEFORE_DELETECONFIG = "action.before_deleteConfig";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ConfigEvent::POST_DELETE */
     const AFTER_DELETECONFIG  = "action.after_deleteConfig";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\ConfigEvent::PRE_UPDATE */
+    const BEFORE_UPDATECONFIG = "action.before_updateConfig";
+    /** @deprecated since 2.4, \Thelia\Model\Event\ConfigEvent::POST_UPDATE */
+    const AFTER_UPDATECONFIG  = "action.after_updateConfig";
+    
     // -- Messages management ---------------------------------------------
 
     const MESSAGE_CREATE   = "action.createMessage";
     const MESSAGE_UPDATE   = "action.updateMessage";
     const MESSAGE_DELETE   = "action.deleteMessage";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\MessageEvent::PRE_INSERT */
     const BEFORE_CREATEMESSAGE = "action.before_createMessage";
+    /** @deprecated since 2.4, \Thelia\Model\Event\MessageEvent::POST_INSERT */
     const AFTER_CREATEMESSAGE  = "action.after_createMessage";
 
-    const BEFORE_UPDATEMESSAGE = "action.before_updateMessage";
-    const AFTER_UPDATEMESSAGE  = "action.after_updateMessage";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\MessageEvent::PRE_DELETE */
     const BEFORE_DELETEMESSAGE = "action.before_deleteMessage";
+    /** @deprecated since 2.4, \Thelia\Model\Event\MessageEvent::POST_DELETE */
     const AFTER_DELETEMESSAGE  = "action.after_deleteMessage";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\MessageEvent::PRE_UPDATE */
+    const BEFORE_UPDATEMESSAGE = "action.before_updateMessage";
+    /** @deprecated since 2.4, \Thelia\Model\Event\MessageEvent::POST_UPDATE */
+    const AFTER_UPDATEMESSAGE  = "action.after_updateMessage";
+    
     // -- Currencies management ---------------------------------------------
 
     const CURRENCY_CREATE          = "action.createCurrency";
@@ -639,15 +750,21 @@ final class TheliaEvents
     const CURRENCY_UPDATE_RATES    = "action.updateCurrencyRates";
     const CURRENCY_UPDATE_POSITION = "action.updateCurrencyPosition";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CurrencyEvent::PRE_INSERT */
     const BEFORE_CREATECURRENCY = "action.before_createCurrency";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CurrencyEvent::POST_INSERT */
     const AFTER_CREATECURRENCY  = "action.after_createCurrency";
 
-    const BEFORE_UPDATECURRENCY = "action.before_updateCurrency";
-    const AFTER_UPDATECURRENCY  = "action.after_updateCurrency";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\CurrencyEvent::PRE_DELETE */
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CurrencyEvent::POST_DELETE */
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\CurrencyEvent::PRE_UPDATE */
+    const BEFORE_UPDATECURRENCY = "action.before_updateCurrency";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CurrencyEvent::POST_UPDATE */
+    const AFTER_UPDATECURRENCY  = "action.after_updateCurrency";
+    
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
 
     // -- Tax management ---------------------------------------------
@@ -695,6 +812,7 @@ final class TheliaEvents
     const TEMPLATE_CREATE          = "action.createTemplate";
     const TEMPLATE_UPDATE          = "action.updateTemplate";
     const TEMPLATE_DELETE          = "action.deleteTemplate";
+    const TEMPLATE_DUPLICATE       = "action.duplicateTemplate";
 
     const TEMPLATE_ADD_ATTRIBUTE    = "action.templateAddAttribute";
     const TEMPLATE_DELETE_ATTRIBUTE = "action.templateDeleteAttribute";
@@ -705,14 +823,20 @@ final class TheliaEvents
     const TEMPLATE_CHANGE_FEATURE_POSITION   = "action.templateChangeAttributePosition";
     const TEMPLATE_CHANGE_ATTRIBUTE_POSITION = "action.templateChangeFeaturePosition";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\TemplateEvent::PRE_INSERT */
     const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
+    /** @deprecated since 2.4, \Thelia\Model\Event\TemplateEvent::POST_INSERT */
     const AFTER_CREATETEMPLATE  = "action.after_createTemplate";
 
-    const BEFORE_UPDATETEMPLATE = "action.before_updateTemplate";
-    const AFTER_UPDATETEMPLATE  = "action.after_updateTemplate";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\TemplateEvent::PRE_DELETE */
     const BEFORE_DELETETEMPLATE = "action.before_deleteTemplate";
+    /** @deprecated since 2.4, \Thelia\Model\Event\TemplateEvent::POST_DELETE */
     const AFTER_DELETETEMPLATE  = "action.after_deleteTemplate";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\TemplateEvent::PRE_UPDATE */
+    const BEFORE_UPDATETEMPLATE = "action.before_updateTemplate";
+    /** @deprecated since 2.4, \Thelia\Model\Event\TemplateEvent::POST_UPDATE */
+    const AFTER_UPDATETEMPLATE  = "action.after_updateTemplate";
 
     // -- Attributes management ---------------------------------------------
 
@@ -724,14 +848,20 @@ final class TheliaEvents
     const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = "action.addAttributeToAllTemplate";
     const ATTRIBUTE_ADD_TO_ALL_TEMPLATES      = "action.removeAttributeFromAllTemplate";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeEvent::PRE_INSERT */
     const BEFORE_CREATEATTRIBUTE = "action.before_createAttribute";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeEvent::POST_INSERT */
     const AFTER_CREATEATTRIBUTE  = "action.after_createAttribute";
 
-    const BEFORE_UPDATEATTRIBUTE = "action.before_updateAttribute";
-    const AFTER_UPDATEATTRIBUTE  = "action.after_updateAttribute";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeEvent::PRE_DELETE */
     const BEFORE_DELETEATTRIBUTE = "action.before_deleteAttribute";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeEvent::POST_DELETE */
     const AFTER_DELETEATTRIBUTE  = "action.after_deleteAttribute";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeEvent::PRE_UPDATE */
+    const BEFORE_UPDATEATTRIBUTE = "action.before_updateAttribute";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeEvent::POST_UPDATE */
+    const AFTER_UPDATEATTRIBUTE  = "action.after_updateAttribute";
 
     // -- Features management ---------------------------------------------
 
@@ -743,14 +873,20 @@ final class TheliaEvents
     const FEATURE_REMOVE_FROM_ALL_TEMPLATES = "action.addFeatureToAllTemplate";
     const FEATURE_ADD_TO_ALL_TEMPLATES      = "action.removeFeatureFromAllTemplate";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureEvent::PRE_INSERT */
     const BEFORE_CREATEFEATURE = "action.before_createFeature";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureEvent::POST_INSERT */
     const AFTER_CREATEFEATURE  = "action.after_createFeature";
 
-    const BEFORE_UPDATEFEATURE = "action.before_updateFeature";
-    const AFTER_UPDATEFEATURE  = "action.after_updateFeature";
-
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureEvent::PRE_DELETE */
     const BEFORE_DELETEFEATURE = "action.before_deleteFeature";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureEvent::POST_DELETE */
     const AFTER_DELETEFEATURE  = "action.after_deleteFeature";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureEvent::PRE_UPDATE */
+    const BEFORE_UPDATEFEATURE = "action.before_updateFeature";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureEvent::POST_UPDATE */
+    const AFTER_UPDATEFEATURE  = "action.after_updateFeature";
 
     // -- Attributes values management ----------------------------------------
 
@@ -759,15 +895,21 @@ final class TheliaEvents
     const ATTRIBUTE_AV_DELETE          = "action.deleteAttributeAv";
     const ATTRIBUTE_AV_UPDATE_POSITION = "action.updateAttributeAvPosition";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeAvEvent::PRE_INSERT */
     const BEFORE_CREATEATTRIBUTE_AV = "action.before_createAttributeAv";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeAvEvent::POST_INSERT */
     const AFTER_CREATEATTRIBUTE_AV  = "action.after_createAttributeAv";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeAvEvent::PRE_DELETE */
     const BEFORE_UPDATEATTRIBUTE_AV = "action.before_updateAttributeAv";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeAvEvent::POST_DELETE */
     const AFTER_UPDATEATTRIBUTE_AV  = "action.after_updateAttributeAv";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeAvEvent::PRE_UPDATE */
     const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
+    /** @deprecated since 2.4, \Thelia\Model\Event\AttributeAvEvent::POST_UPDATE */
     const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
-
+    
     // -- Features values management ----------------------------------------
 
     const FEATURE_AV_CREATE          = "action.createFeatureAv";
@@ -775,13 +917,19 @@ final class TheliaEvents
     const FEATURE_AV_DELETE          = "action.deleteFeatureAv";
     const FEATURE_AV_UPDATE_POSITION = "action.updateFeatureAvPosition";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureAvEvent::PRE_INSERT */
     const BEFORE_CREATEFEATURE_AV = "action.before_createFeatureAv";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureAvEvent::POST_INSERT */
     const AFTER_CREATEFEATURE_AV  = "action.after_createFeatureAv";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureAvEvent::PRE_DELETE */
     const BEFORE_UPDATEFEATURE_AV = "action.before_updateFeatureAv";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureAvEvent::POST_DELETE */
     const AFTER_UPDATEFEATURE_AV  = "action.after_updateFeatureAv";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureAvEvent::PRE_UPDATE */
     const BEFORE_DELETEFEATURE_AV = "action.before_deleteFeatureAv";
+    /** @deprecated since 2.4, \Thelia\Model\Event\FeatureAvEvent::POST_UPDATE */
     const AFTER_DELETEFEATURE_AV  = "action.after_deleteFeatureAv";
 
     /**
@@ -834,6 +982,7 @@ final class TheliaEvents
 
     /* Delivery module */
     const MODULE_DELIVERY_GET_POSTAGE = 'thelia.module.delivery.postage';
+    const MODULE_DELIVERY_GET_PICKUP_LOCATIONS = 'thelia.module.delivery.pickupLocations';
 
     /**
      * Hook
@@ -869,6 +1018,12 @@ final class TheliaEvents
     const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
     const NEWSLETTER_CONFIRM_SUBSCRIPTION = 'thelia.newsletter.confirmSubscription';
 
+    /**
+     * sent for submit contact form
+     * @since 2.4
+     */
+    const CONTACT_SUBMIT = 'thelia.contact.submit';
+
     /************ LANG MANAGEMENT ****************************/
 
     const LANG_UPDATE                           = 'action.lang.update';
@@ -884,14 +1039,20 @@ final class TheliaEvents
     const LANG_TOGGLEACTIVE                    = 'action.lang.toggleActive';
     const LANG_TOGGLEVISIBLE                    = 'action.lang.toggleVisible';
 
-    const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
-    const AFTER_UPDATELANG                      = 'action.lang.afterUpdate';
+    /** @deprecated since 2.4, \Thelia\Model\Event\LangEvent::PRE_INSERT */
+    const BEFORE_CREATELANG = "action.before_createLang";
+    /** @deprecated since 2.4, \Thelia\Model\Event\LangEvent::POST_INSERT */
+    const AFTER_CREATELANG  = "action.after_createLang";
 
-    const BEFORE_CREATELANG                     = 'action.lang.beforeCreate';
-    const AFTER_CREATELANG                      = 'action.lang.afterCreate';
+    /** @deprecated since 2.4, \Thelia\Model\Event\LangEvent::PRE_DELETE */
+    const BEFORE_DELETELANG = "action.before_deleteLang";
+    /** @deprecated since 2.4, \Thelia\Model\Event\LangEvent::POST_DELETE */
+    const AFTER_DELETELANG  = "action.after_deleteLang";
 
-    const BEFORE_DELETELANG                     = 'action.lang.beforeDelete';
-    const AFTER_DELETELANG                      = 'action.lang.afterDelete';
+    /** @deprecated since 2.4, \Thelia\Model\Event\LangEvent::PRE_UPDATE */
+    const BEFORE_UPDATELANG = "action.before_updateLang";
+    /** @deprecated since 2.4, \Thelia\Model\Event\LangEvent::POST_UPDATE */
+    const AFTER_UPDATELANG  = "action.after_updateLang";
 
     // -- Brands management -----------------------------------------------
 
@@ -904,14 +1065,22 @@ final class TheliaEvents
 
     const BRAND_UPDATE_SEO = "action.updateBrandSeo";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\BrandEvent::PRE_INSERT */
     const BEFORE_CREATEBRAND = "action.before_createBrand";
-    const AFTER_CREATEBRAND     = "action.after_createBrand";
+    /** @deprecated since 2.4, \Thelia\Model\Event\BrandEvent::POST_INSERT */
+    const AFTER_CREATEBRAND  = "action.after_createBrand";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\BrandEvent::PRE_DELETE */
     const BEFORE_DELETEBRAND = "action.before_deleteBrand";
+    /** @deprecated since 2.4, \Thelia\Model\Event\BrandEvent::POST_DELETE */
     const AFTER_DELETEBRAND  = "action.after_deleteBrand";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\BrandEvent::PRE_UPDATE */
     const BEFORE_UPDATEBRAND = "action.before_updateBrand";
+    /** @deprecated since 2.4, \Thelia\Model\Event\BrandEvent::POST_UPDATE */
     const AFTER_UPDATEBRAND  = "action.after_updateBrand";
+
+    const VIEW_BRAND_ID_NOT_VISIBLE = "action.viewBrandIdNotVisible";
 
     // -- Import ----------------------------------------------
 
@@ -945,13 +1114,19 @@ final class TheliaEvents
 
     const CHECK_SALE_ACTIVATION_EVENT = "action.checkSaleActivationEvent";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\SaleEvent::PRE_INSERT */
     const BEFORE_CREATESALE = "action.before_createSale";
-    const AFTER_CREATESALE    = "action.after_createSale";
+    /** @deprecated since 2.4, \Thelia\Model\Event\SaleEvent::POST_INSERT */
+    const AFTER_CREATESALE  = "action.after_createSale";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\SaleEvent::PRE_DELETE */
     const BEFORE_DELETESALE = "action.before_deleteSale";
+    /** @deprecated since 2.4, \Thelia\Model\Event\SaleEvent::POST_DELETE */
     const AFTER_DELETESALE  = "action.after_deleteSale";
 
+    /** @deprecated since 2.4, \Thelia\Model\Event\SaleEvent::PRE_UPDATE */
     const BEFORE_UPDATESALE = "action.before_updateSale";
+    /** @deprecated since 2.4, \Thelia\Model\Event\SaleEvent::POST_UPDATE */
     const AFTER_UPDATESALE  = "action.after_updateSale";
 
     // -- Meta Data ---------------------------------------------
@@ -967,12 +1142,16 @@ final class TheliaEvents
 
     // -- Customer Title ----------------------------------------
 
-    const CUSTOMER_TITLE_BEFORE_CREATE = "action.title.before_create";
     const CUSTOMER_TITLE_CREATE = "action.title.create";
-    const CUSTOMER_TITLE_AFTER_CREATE = "action.title.after_create";
-
-    const CUSTOMER_TITLE_BEFORE_UPDATE = "action.title.before_update";
     const CUSTOMER_TITLE_UPDATE = "action.title.update";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerTitleEvent::PRE_INSERT */
+    const CUSTOMER_TITLE_BEFORE_CREATE = "action.title.before_create";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerTitleEvent::PRE_INSERT */
+    const CUSTOMER_TITLE_AFTER_CREATE = "action.title.after_create";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerTitleEvent::PRE_INSERT */
+    const CUSTOMER_TITLE_BEFORE_UPDATE = "action.title.before_update";
+    /** @deprecated since 2.4, \Thelia\Model\Event\CustomerTitleEvent::PRE_INSERT */
     const CUSTOMER_TITLE_AFTER_UPDATE = "action.title.after_update";
 
     const CUSTOMER_TITLE_DELETE = "action.title.delete";
@@ -983,17 +1162,25 @@ final class TheliaEvents
     const TRANSLATION_WRITE_FILE = 'action.translation.write_file';
 
     // -- ORDER STATUS EVENTS -----------------------------------------------
-    const BEFORE_CREATE_ORDER_STATUS    = "action.before_createOrderStatus";
+
     const ORDER_STATUS_CREATE           = "action.createOrderStatus";
-    const AFTER_CREATE_ORDER_STATUS     = "action.after_createOrderStatus";
-
-    const BEFORE_UPDATE_ORDER_STATUS    = "action.before_updateOrderStatus";
     const ORDER_STATUS_UPDATE           = "action.updateOrderStatus";
-    const AFTER_UPDATE_ORDER_STATUS     = "action.after_updateOrderStatus";
-
-    const BEFORE_DELETE_ORDER_STATUS    = "action.before_deleteOrderStatus";
     const ORDER_STATUS_DELETE           = "action.deleteOrderStatus";
-    const AFTER_DELETE_ORDER_STATUS     = "action.after_deleteOrderStatus";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderStatusEvent::PRE_INSERT */
+    const BEFORE_CREATE_ORDER_STATUS = "action.before_createOrderStatus";
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderStatusEvent::POST_INSERT */
+    const AFTER_CREATE_ORDER_STATUS  = "action.after_createOrderStatus";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderStatusEvent::PRE_DELETE */
+    const BEFORE_DELETE_ORDER_STATUS = "action.before_deleteOrderStatus";
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderStatusEvent::POST_DELETE */
+    const AFTER_DELETE_ORDER_STATUS  = "action.after_deleteOrderStatus";
+
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderStatusEvent::PRE_UPDATE */
+    const BEFORE_UPDATE_ORDER_STATUS = "action.before_updateOrderStatus";
+    /** @deprecated since 2.4, \Thelia\Model\Event\OrderStatusEvent::POST_UPDATE */
+    const AFTER_UPDATE_ORDER_STATUS  = "action.after_updateOrderStatus";
 
     const ORDER_STATUS_UPDATE_POSITION  = "action.updateOrderStatusPosition";
     // -- END ORDER STATUS EVENTS -----------------------------------------------

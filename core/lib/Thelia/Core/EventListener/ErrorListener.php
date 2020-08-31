@@ -64,11 +64,13 @@ class ErrorListener implements EventSubscriberInterface
         $this->parser->assign("status_code", 500);
         $this->parser->assign("exception_message", $event->getException()->getMessage());
 
-        $this->parser->setTemplateDefinition(
-            $this->securityContext->hasAdminUser() ?
-            $this->parser->getTemplateHelper()->getActiveAdminTemplate() :
-            $this->parser->getTemplateHelper()->getActiveFrontTemplate()
-        );
+        if (!$this->parser->hasTemplateDefinition()) {
+            $this->parser->setTemplateDefinition(
+                $this->securityContext->hasAdminUser() ?
+                    $this->parser->getTemplateHelper()->getActiveAdminTemplate() :
+                    $this->parser->getTemplateHelper()->getActiveFrontTemplate()
+            );
+        }
 
         $response = new Response(
             $this->parser->render(ConfigQuery::getErrorMessagePageName()),

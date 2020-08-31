@@ -77,12 +77,17 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         return $returnArray;
     }
 
+    /**
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function parseResults(LoopResult $loopResult)
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
-        $defaultAvailability = intval(ConfigQuery::read('default-available-stock', 100));
+        $defaultAvailability = \intval(ConfigQuery::read('default-available-stock', 100));
 
         /** @var CartItemModel $cartItem */
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
@@ -102,15 +107,28 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             } else {
                 $loopResultRow->set("STOCK", $productSaleElement->getQuantity());
             }
-            $loopResultRow->set("PRICE", $cartItem->getPrice())
+            $loopResultRow
+                ->set("PRICE", $cartItem->getPrice())
                 ->set("PROMO_PRICE", $cartItem->getPromoPrice())
                 ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
                 ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
-                ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
-            $loopResultRow->set("TOTAL_PRICE", $cartItem->getPrice()*$cartItem->getQuantity())
-                ->set("TOTAL_PROMO_PRICE", $cartItem->getPromoPrice()*$cartItem->getQuantity())
+                ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0)
+            ;
+
+            $loopResultRow
+                ->set("TOTAL_PRICE", $cartItem->getTotalPrice())
+                ->set("TOTAL_PROMO_PRICE", $cartItem->getTotalPromoPrice())
                 ->set("TOTAL_TAXED_PRICE", $cartItem->getTotalTaxedPrice($taxCountry))
-                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry));
+                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry))
+            ;
+
+            $loopResultRow
+                ->set("REAL_PRICE", $cartItem->getRealPrice())
+                ->set("REAL_TAXED_PRICE", $cartItem->getRealTaxedPrice($taxCountry))
+                ->set("REAL_TOTAL_PRICE", $cartItem->getTotalRealPrice($taxCountry))
+                ->set("REAL_TOTAL_TAXED_PRICE", $cartItem->getTotalRealTaxedPrice($taxCountry))
+            ;
+
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
             $this->addOutputFields($loopResultRow, $cartItem);

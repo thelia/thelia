@@ -29,7 +29,7 @@ trait StandardDescriptionFieldsTrait
      */
     protected function addStandardDescFields($exclude = array())
     {
-        if (! in_array('locale', $exclude)) {
+        if (! \in_array('locale', $exclude)) {
             $this->formBuilder->add(
                 'locale',
                 'hidden',
@@ -40,7 +40,7 @@ trait StandardDescriptionFieldsTrait
             );
         }
 
-        if (! in_array('title', $exclude)) {
+        if (! \in_array('title', $exclude)) {
             $this->formBuilder->add(
                 'title',
                 'text',
@@ -58,7 +58,7 @@ trait StandardDescriptionFieldsTrait
             );
         }
 
-        if (! in_array('chapo', $exclude)) {
+        if (! \in_array('chapo', $exclude)) {
             $this->formBuilder->add(
                 'chapo',
                 'textarea',
@@ -78,7 +78,7 @@ trait StandardDescriptionFieldsTrait
             );
         }
 
-        if (! in_array('description', $exclude)) {
+        if (! \in_array('description', $exclude)) {
             $this->formBuilder->add(
                 'description',
                 'textarea',
@@ -97,7 +97,7 @@ trait StandardDescriptionFieldsTrait
             );
         }
 
-        if (! in_array('postscriptum', $exclude)) {
+        if (! \in_array('postscriptum', $exclude)) {
             $this->formBuilder->add(
                 'postscriptum',
                 'textarea',

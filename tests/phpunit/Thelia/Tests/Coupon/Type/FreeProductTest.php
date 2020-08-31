@@ -19,6 +19,7 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Coupon\Type\FreeProduct;
 use Thelia\Model\CartItem;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;

@@ -86,7 +86,7 @@ class Database
                 );
             }
         }
-        $size = count($sql);
+        $size = \count($sql);
         for ($i = 0; $i < $size; $i++) {
             if (!empty($sql[$i])) {
                 $this->execute($sql[$i]);
@@ -129,10 +129,19 @@ class Database
     {
         $sql = str_replace(";',", "-CODE-", $sql);
         $sql = trim($sql);
+        preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
+        foreach ($m[0] as $k => $v) {
+            if ($m[1][$k] == '|') {
+                throw new \RuntimeException('You can not use "|" as delimiter: '.$v);
+            }
+            $stored = str_replace(';', '|', $m[2][$k]);
+            $stored = str_replace($m[1][$k], ";\n", $stored);
+            $sql = str_replace($v, $stored, $sql);
+        }
         $query = array();
 
         $tab = explode(";\n", $sql);
-        $size = count($tab);
+        $size = \count($tab);
         for ($i = 0; $i < $size; $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
             $queryTemp = str_replace("|", ";", $queryTemp);
@@ -161,7 +170,7 @@ class Database
                 $tables[] = $row[0];
             }
         } else {
-            $tables = is_array($tables) ? $tables : explode(',', $tables);
+            $tables = \is_array($tables) ? $tables : explode(',', $tables);
         }
 
         $data[] = "\n";

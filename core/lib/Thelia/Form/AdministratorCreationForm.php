@@ -155,7 +155,7 @@ class AdministratorCreationForm extends BaseForm
 
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
-        if (strlen($data["password"]) < $minLength) {
+        if (\strlen($data["password"]) < $minLength) {
             $context->addViolation("password must be composed of at least $minLength characters");
         }
     }

@@ -47,12 +47,12 @@ class FlashMessage implements \Iterator
 
     public function isEmpty()
     {
-        return count($this->collection) == 0;
+        return \count($this->collection) == 0;
     }
 
     public function getCount()
     {
-        return count($this->collection);
+        return \count($this->collection);
     }
 
     /**

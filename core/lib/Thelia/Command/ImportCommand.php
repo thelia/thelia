@@ -98,7 +98,7 @@ class ImportCommand extends ContainerAwareCommand
         );
         $output->writeln($formattedLine);
 
-        if (count($importEvent->getErrors()) > 0) {
+        if (\count($importEvent->getErrors()) > 0) {
             $formattedLine = $this->getHelper('formatter')->formatBlock(
                 'With error',
                 'fg=black;bg=yellow',

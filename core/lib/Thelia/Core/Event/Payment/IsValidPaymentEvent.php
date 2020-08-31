@@ -14,7 +14,7 @@
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Model\Cart;
-use Thelia\Module\PaymentModuleInterface;
+use Thelia\Module\AbstractPaymentModule;
 
 /**
  * Class IsValidPaymentEvent
@@ -29,13 +29,19 @@ class IsValidPaymentEvent extends BasePaymentEvent
     /** @var bool */
     protected $validModule = false;
 
+    /** @var float */
+    protected $minimumAmount = null;
+
+    /** @var float */
+    protected $maximumAmount = null;
+
     /**
      * IsValidPaymentEvent constructor.
      *
-     * @param PaymentModuleInterface $module
+     * @param AbstractPaymentModule $module
      * @param Cart $cart
      */
-    public function __construct(PaymentModuleInterface $module, Cart $cart)
+    public function __construct(AbstractPaymentModule $module, Cart $cart)
     {
         parent::__construct($module);
         $this->cart = $cart;
@@ -72,6 +78,40 @@ class IsValidPaymentEvent extends BasePaymentEvent
     public function setValidModule($validModule)
     {
         $this->validModule = $validModule;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMinimumAmount()
+    {
+        return $this->minimumAmount;
+    }
+
+    /**
+     * @param float $minimumAmount
+     */
+    public function setMinimumAmount($minimumAmount)
+    {
+        $this->minimumAmount = $minimumAmount;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaximumAmount()
+    {
+        return $this->maximumAmount;
+    }
+
+    /**
+     * @param float $maximumAmount
+     */
+    public function setMaximumAmount($maximumAmount)
+    {
+        $this->maximumAmount = $maximumAmount;
         return $this;
     }
 }

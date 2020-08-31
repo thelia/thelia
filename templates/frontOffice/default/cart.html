@@ -58,32 +58,46 @@
                     </thead>
                     <tbody>
                         {loop type="cart" name="cartloop"}
-                        <tr>
+                        <tr id="cart_item_id_{$ITEM_ID}">
                             <td class="image">
-                                {ifloop rel='product-image'}
                                 <a href="{$PRODUCT_URL nofilter}" class="thumbnail">
-                                    {assign "cart_count" $LOOP_COUNT}
-                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                        <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
+                                {assign var="product_image_url" value=null}
+                                {ifloop rel="pse-first-image"}
+                                    {loop type="product-sale-elements-image" name="pse-first-image" product_sale_elements_id=$PRODUCT_SALE_ELEMENTS_ID limit="1"}
+                                        {loop type="image" name="product-image" id=$PRODUCT_IMAGE_ID product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                            {assign var="product_image_url" value=$IMAGE_URL}
+                                        {/loop}
                                     {/loop}
-                                </a>
                                 {/ifloop}
+                                {elseloop rel="pse-first-image"}
+                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                        {assign var="product_image_url" value=$IMAGE_URL}
+                                    {/loop}
+                                {/elseloop}
+                                {if $product_image_url}
+                                    <img itemprop="image" src="{$product_image_url nofilter}" alt="Product #{$LOOP_COUNT}">
+                                {else}
+                                    <img itemprop="image" src="{image file='assets/dist/img/product/1/118x85.png'}" alt="Product #{$LOOP_COUNT}">
+                                {/if}
+                                </a>
                             </td>
                             <td class="product" >
                                 <h3 class="name"><a href="{$PRODUCT_URL nofilter}">{$TITLE}</a></h3>
                                 <div class="product-options">
                                     <dl class="dl-horizontal">
-                                        <dt>{intl l="Available"} :</dt>
+                                        <dt class="stockView">{intl l="Available"} :</dt>
                                         {if $STOCK > 0}
                                             <dd>{intl l="In Stock"}</dd>
                                         {else}
                                             {$errorStock="TRUE"}
                                             <dd>{intl l="Out of Stock"}</dd>
                                         {/if}
-                                        <dt>{intl l="No."}</dt>
-                                        <dd>{$REF}</dd>
+                                        {loop type="product_sale_elements" name="ref" id=$PRODUCT_SALE_ELEMENTS_ID}
+                                            <dt class="refView">{intl l="No."}</dt>
+                                            <dd>{$REF}</dd>
+                                        {/loop}
                                         {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID" order="manual"}
-                                            <dt>{$ATTRIBUTE_TITLE}</dt>
+                                            <dt class="attributeView">{$ATTRIBUTE_TITLE}</dt>
                                             <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                         {/loop}
                                     </dl>
@@ -91,15 +105,9 @@
                                 <a href="{token_url path="/cart/delete/%item_id" item_id=$ITEM_ID success_url={url path='/cart'}}" class="btn btn-link"><i class="fa fa-trash"></i> {intl l="Remove"}</a>
                             </td>
                             <td class="unitprice">
+                                <div class="special-price"><span class="price">{format_money number=$REAL_TAXED_PRICE}</span></div>
                                 {if $IS_PROMO == 1}
-                                    {assign "real_price" $PROMO_TAXED_PRICE}
-                                    {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
-                                    <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE}</span></div>
                                     <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE}</span></small>
-                                {else}
-                                    {assign "real_price" $TAXED_PRICE}
-                                    {assign "real_total_price" $TOTAL_TAXED_PRICE}
-                                    <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE}</span></div>
                                 {/if}
                             </td>
                             <td class="qty">
@@ -123,7 +131,7 @@
                                 </div>
                             </td>
                             <td class="subprice">
-                                <span class="price">{format_money number=$real_total_price}</span>
+                                <span class="price">{format_money number=$REAL_TOTAL_TAXED_PRICE}</span>
                             </td>
                         </tr>
                         {/loop}
@@ -145,7 +153,7 @@
                                     <div>
                                         <label for="cart-country">{intl l="Select your country:"}</label>
                                         <select id="cart-country" name="country">
-                                        {loop type="country" name="countryLoop" with_area="true"}
+                                        {loop type="country" name="countryLoop" with_area="true" order="alpha"}
                                             <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
                                         {/loop}
                                         </select>
@@ -205,11 +213,11 @@
                         </td>
                     </tr>
                     {$discount={order attr="discount"}}
-                    {if $discount}
+                    {if $discount > 0}
                         <tr>
                             <td colspan="3" class="empty">&nbsp;</td>
-                            <th class="discount">{intl l="Discount"}</th>
-                            <td><span class="price">{format_money number=$discount}</span></td>
+                            <th class="discount">{intl l="Discount incl. taxes"}</th>
+                            <td><span class="price">-{format_money number=$discount}</span></td>
                         </tr>
                     {/if}
                     <tr>
@@ -217,8 +225,7 @@
                         <th class="total">{intl l="Total incl. taxes"}</th>
                         <td class="total">
                             <div class="total-price">
-                                {assign var="totalAmount" value={cart attr='total_taxed_price'} + $postageAmount }
-                                <span class="price">{format_money number=$totalAmount}</span>
+                                <span class="price">{format_money number={cart attr='total_taxed_price'} + $postageAmount}</span>
                             </div>
                         </td>
                     </tr>
@@ -226,7 +233,7 @@
                 </table>
             </div>
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Continue Shopping"}</a>
+            <a href="{navigate to="catalog_last"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Continue Shopping"}</a>
             <a href="{url path="/order/delivery"}" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Proceed checkout"}</a>
 
             {/ifloop}

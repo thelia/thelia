@@ -110,7 +110,7 @@ class XmlFileLoader extends FileLoader
     public function propelOnlyRun(callable $method, $arg)
     {
         if (Thelia::isInstalled()) {
-            call_user_func($method, $arg);
+            \call_user_func($method, $arg);
         }
     }
 
@@ -322,7 +322,7 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'abstract') as $key) {
+        foreach (array('class', 'shared', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'abstract') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $this->getAttributeAsPhp($service, $key));
