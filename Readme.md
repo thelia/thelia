@@ -210,7 +210,7 @@ The Roadmap is available at http://thelia.net/community/roadmap
 Contribute
 ----------
 
-see the documentation : http://doc.thelia.net/en/documentation/contribute.html
+See the documentation : http://doc.thelia.net/en/documentation/contribute.html
 
 If you submit modifications that adds new data or change the structure of the database, take a look to http://doc.thelia.net/en/documentation/contribute.html#sql-scripts-modification
 
@@ -219,7 +219,7 @@ Usage
 
 Consult the page : http://localhost/thelia/web/index_dev.php
 
-You can create a virtual host and choose web folder for root directory.
+You can create a virtual host and choose the web folder for root directory.
 
 To run tests (phpunit required) :
 
@@ -227,4 +227,4 @@ To run tests (phpunit required) :
 $ phpunit
 ```
 
-We still have lot of work to achieve but enjoy this part.
+We still have a lot of work to achieve but enjoy this part.
