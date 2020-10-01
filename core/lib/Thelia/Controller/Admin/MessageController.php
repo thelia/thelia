@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\Message\MessageUpdateEvent;
@@ -185,8 +186,9 @@ class MessageController extends AbstractCrudController
 
         $finder->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
 
+        /** @var SplFileInfo $file */
         foreach ($finder as $file) {
-            $list[] = $file->getBasename();
+            $list[] = $file->getRelativePathname();
         }
 
         // Add modules templates
