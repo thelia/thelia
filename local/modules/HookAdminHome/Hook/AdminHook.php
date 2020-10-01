@@ -62,6 +62,7 @@ class AdminHook extends BaseHook
             if (!empty($content)) {
                 $event->add([
                     "id" => "block-news",
+                    "title" => $this->trans("Thelia Github activity", [], HookAdminHome::DOMAIN_NAME),
                     "content" => $content
                 ]);
             }
@@ -75,7 +76,7 @@ class AdminHook extends BaseHook
             if (!empty($content)) {
                 $event->add([
                     "id" => "block-thelia-information",
-                    "title" => $this->trans("Thelia informations", [], HookAdminHome::DOMAIN_NAME),
+                    "title" => $this->trans("Thelia news", [], HookAdminHome::DOMAIN_NAME),
                     "content" => $content
                 ]);
             }
