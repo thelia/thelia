@@ -25,6 +25,11 @@ trait StandardI18nFieldsSearchTrait
         "description",
         "postscriptum"
     ];
+    
+    protected function getStandardI18nSearchFields()
+    {	
+        return self::$standardI18nSearchFields;	
+    }
 
      /**
      * @param ModelCriteria $search
