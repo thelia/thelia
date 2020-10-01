@@ -166,7 +166,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     );
 
                     // Rotate if required
-                    $rotation = intval($event->getRotation());
+                    $rotation = \intval($event->getRotation());
 
                     if ($rotation != 0) {
                         $image->rotate($rotation, $bg_color);
@@ -203,7 +203,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                             case 'gamma':
                                 // Syntax: gamma:value. Exemple: gamma:0.7
                                 if (isset($params[1])) {
-                                    $gamma = floatval($params[1]);
+                                    $gamma = \floatval($params[1]);
 
                                     $image->effects()->gamma($gamma);
                                 }
@@ -217,12 +217,20 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                                     $image->effects()->colorize($the_color);
                                 }
                                 break;
+
+                            case 'blur':
+                                if (isset($params[1])) {
+                                    $blur_level = \intval($params[1]);
+
+                                    $image->effects()->blur($blur_level);
+                                }
+                                break;
                         }
                     }
 
                     $quality = $event->getQuality();
 
-                    if (is_null($quality)) {
+                    if (\is_null($quality)) {
                         $quality = ConfigQuery::read('default_images_quality_percent', 75);
                     }
 
@@ -251,8 +259,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $event->setCacheFilepath($cacheFilePath);
         $event->setCacheOriginalFilepath($originalImagePathInCache);
 
-        $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
-        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
+        $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
     }
 
     /**
@@ -277,21 +285,21 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $bg_color,
         $allow_zoom = false
     ) {
-        if (! (is_null($dest_width) && is_null($dest_height))) {
+        if (! (\is_null($dest_width) && \is_null($dest_height))) {
             $width_orig = $image->getSize()->getWidth();
             $height_orig = $image->getSize()->getHeight();
 
             $ratio = $width_orig / $height_orig;
 
-            if (is_null($dest_width)) {
+            if (\is_null($dest_width)) {
                 $dest_width = $dest_height * $ratio;
             }
 
-            if (is_null($dest_height)) {
+            if (\is_null($dest_height)) {
                 $dest_height = $dest_width / $ratio;
             }
 
-            if (is_null($resize_mode)) {
+            if (\is_null($resize_mode)) {
                 $resize_mode = self::KEEP_IMAGE_RATIO;
             }
 
@@ -301,20 +309,27 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $delta_x = $delta_y = $border_width = $border_height = 0;
 
             if ($width_diff > 1 && $height_diff > 1) {
-                $resize_width = $width_orig;
-                $resize_height = $height_orig;
+                // Set the default final size. If zoom is allowed, we will get the required
+                // image dimension. Otherwise, the final image may be smaller than required.
+                if ($allow_zoom) {
+                    $resize_width = $dest_width;
+                    $resize_height = $dest_height;
+                } else {
+                    $resize_width = $width_orig;
+                    $resize_height = $height_orig;
+                }
 
                 // When cropping, be sure to always generate an image which is
-                //  no smaller than the required size, zooming it if required.
+                // not smaller than the required size, zooming it if required.
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                     if ($allow_zoom) {
                         if ($width_diff > $height_diff) {
                             $resize_width = $dest_width;
-                            $resize_height = intval($height_orig * $dest_width / $width_orig);
+                            $resize_height = \intval($height_orig * $dest_width / $width_orig);
                             $delta_y = ($resize_height - $dest_height) / 2;
                         } else {
                             $resize_height = $dest_height;
-                            $resize_width = intval(($width_orig * $resize_height) / $height_orig);
+                            $resize_width = \intval(($width_orig * $resize_height) / $height_orig);
                             $delta_x = ($resize_width - $dest_width) / 2;
                         }
                     } else {
@@ -326,11 +341,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             } elseif ($width_diff > $height_diff) {
                 // Image height > image width
                 $resize_height = $dest_height;
-                $resize_width = intval(($width_orig * $resize_height) / $height_orig);
+                $resize_width = \intval(($width_orig * $resize_height) / $height_orig);
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                     $resize_width = $dest_width;
-                    $resize_height = intval($height_orig * $dest_width / $width_orig);
+                    $resize_height = \intval($height_orig * $dest_width / $width_orig);
                     $delta_y = ($resize_height - $dest_height) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
                     $dest_width = $resize_width;
@@ -338,11 +353,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             } else {
                 // Image width > image height
                 $resize_width = $dest_width;
-                $resize_height = intval($height_orig * $dest_width / $width_orig);
+                $resize_height = \intval($height_orig * $dest_width / $width_orig);
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                     $resize_height = $dest_height;
-                    $resize_width  = intval(($width_orig * $resize_height) / $height_orig);
+                    $resize_width  = \intval(($width_orig * $resize_height) / $height_orig);
                     $delta_x = ($resize_width - $dest_width) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
                     $dest_height = $resize_height;
@@ -352,8 +367,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $image->resize(new Box($resize_width, $resize_height));
 
             if ($resize_mode == self::EXACT_RATIO_WITH_BORDERS) {
-                $border_width = intval(($dest_width - $resize_width) / 2);
-                $border_height = intval(($dest_height - $resize_height) / 2);
+                $border_width = \intval(($dest_width - $resize_width) / 2);
+                $border_height = \intval(($dest_height - $resize_height) / 2);
 
                 $canvas = new Box($dest_width, $dest_height);
 

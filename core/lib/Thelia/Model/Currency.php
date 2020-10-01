@@ -34,6 +34,8 @@ class Currency extends BaseCurrency
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECURRENCY, new CurrencyEvent($this));
 
         // Set the current position for the new object
@@ -47,6 +49,8 @@ class Currency extends BaseCurrency
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECURRENCY, new CurrencyEvent($this));
     }
 
@@ -55,6 +59,8 @@ class Currency extends BaseCurrency
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECURRENCY, new CurrencyEvent($this));
 
         return true;
@@ -65,6 +71,8 @@ class Currency extends BaseCurrency
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECURRENCY, new CurrencyEvent($this));
     }
 
@@ -73,6 +81,8 @@ class Currency extends BaseCurrency
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECURRENCY, new CurrencyEvent($this));
 
         return true;
@@ -83,6 +93,8 @@ class Currency extends BaseCurrency
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECURRENCY, new CurrencyEvent($this));
     }
 

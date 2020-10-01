@@ -112,7 +112,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (in_array($ext, $allowedExts)) {
+                    if (\in_array($ext, $allowedExts)) {
                         if ($content = file_get_contents($fileInfo->getPathName())) {
                             $short_path = $this->normalizePath($fileInfo->getPathName());
 
@@ -133,7 +133,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                     $hash = md5($match);
 
                                     if (isset($strings[$hash])) {
-                                        if (! in_array($short_path, $strings[$hash]['files'])) {
+                                        if (! \in_array($short_path, $strings[$hash]['files'])) {
                                             $strings[$hash]['files'][] = $short_path;
                                         }
                                     } else {
@@ -147,7 +147,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                         $match = str_replace("\\$quote", $quote, $match);
 
                                         // Ignore empty strings
-                                        if (strlen($match) == 0) {
+                                        if (\strlen($match) == 0) {
                                             continue;
                                         }
 
@@ -278,7 +278,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             */
             $translations = require $file;
 
-            if (! is_array($translations)) {
+            if (! \is_array($translations)) {
                 $translations = [];
             }
         }
@@ -312,7 +312,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             foreach ($translations as $key => $text) {
                 // Write only defined (not empty) translations
                 if (!empty($translations[$key])) {
-                    if (is_array($translations[$key])) {
+                    if (\is_array($translations[$key])) {
                         $key = str_replace("'", "\'", $key);
                         fwrite($fp, sprintf("    '%s' => [\n", $key));
                         ksort($translations[$key]);

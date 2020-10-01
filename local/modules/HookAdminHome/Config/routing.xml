@@ -20,4 +20,9 @@
         <default key="not-logged">1</default>
     </route>
 
+
+
+    <route id="admin.home.config" path="/admin/module/HookAdminHome/configure" methods="post">
+        <default key="_controller">HookAdminHome\Controller\ConfigurationController::editConfiguration</default>
+    </route>
 </routes>

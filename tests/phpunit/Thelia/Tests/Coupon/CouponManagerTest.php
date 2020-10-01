@@ -121,7 +121,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testGetDiscountCumulativeRemovingPostage()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -187,7 +187,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testGetDiscountNonCumulativeNotRemovingPostage()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -248,7 +248,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->method('getCheckoutPostagePrice')
             ->will($this->returnValue(8.30));
 
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -297,7 +297,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testGetAvailableCoupons()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -342,7 +342,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testGetAvailableConditions()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
@@ -393,7 +393,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testDecrementeQuantity()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
@@ -474,7 +474,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testIncrementeQuantity()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
@@ -555,7 +555,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testDecrementeQuantityIllimited()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
@@ -639,7 +639,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     public function testIncrementQuantityIllimited()
     {
         $stubFacade = $this->generateFacadeStub();
-        $stubContainer = $this->getMock('\Symfony\Component\DependencyInjection\Container');
+        $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();

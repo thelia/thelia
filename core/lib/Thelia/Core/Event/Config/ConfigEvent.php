@@ -15,6 +15,9 @@ namespace Thelia\Core\Event\Config;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Config;
 
+/**
+ * @deprecated since 2.4, please use \Thelia\Model\Event\ConfigEvent
+ */
 class ConfigEvent extends ActionEvent
 {
     protected $config = null;
@@ -26,7 +29,7 @@ class ConfigEvent extends ActionEvent
 
     public function hasConfig()
     {
-        return ! is_null($this->config);
+        return ! \is_null($this->config);
     }
 
     public function getConfig()

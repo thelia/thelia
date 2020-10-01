@@ -101,12 +101,12 @@ class FragmentBag implements Iterator
 
     public function isEmpty()
     {
-        return count($this->fragments) == 0;
+        return \count($this->fragments) == 0;
     }
 
     public function getCount()
     {
-        return count($this->fragments);
+        return \count($this->fragments);
     }
 
     public function add($data)

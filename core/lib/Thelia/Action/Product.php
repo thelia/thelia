@@ -14,17 +14,53 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
+use Thelia\Core\Event\Product\ProductAddCategoryEvent;
+use Thelia\Core\Event\Product\ProductAddContentEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
-use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteContentEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductSetTemplateEvent;
+use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Model\Accessory;
+use Thelia\Model\AccessoryQuery;
+use Thelia\Model\AttributeTemplateQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\FeatureAvI18n;
 use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\FeatureProduct;
+use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\Map\AttributeTemplateTableMap;
+use Thelia\Model\Map\FeatureTemplateTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Product as ProductModel;
+use Thelia\Model\ProductAssociatedContent;
+use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\ProductCategory;
+use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductI18n;
@@ -34,34 +70,8 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Model\Product as ProductModel;
-use Thelia\Model\ProductAssociatedContent;
-use Thelia\Model\ProductAssociatedContentQuery;
-use Thelia\Model\ProductCategory;
-use Thelia\Model\TaxRuleQuery;
-use Thelia\Model\AccessoryQuery;
-use Thelia\Model\Accessory;
-use Thelia\Model\FeatureProduct;
-use Thelia\Model\FeatureProductQuery;
-use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Product\ProductUpdateEvent;
-use Thelia\Core\Event\Product\ProductCreateEvent;
-use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
-use Thelia\Core\Event\Product\ProductAddContentEvent;
-use Thelia\Core\Event\Product\ProductDeleteContentEvent;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\UpdateSeoEvent;
-use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
-use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
-use Thelia\Core\Event\Product\ProductSetTemplateEvent;
-use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
-use Thelia\Core\Event\Product\ProductAddCategoryEvent;
-use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
-use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
-use Propel\Runtime\Propel;
+use Thelia\Model\TaxRuleQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -152,6 +162,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             $this->cloneAssociatedContent($event);
 
             $this->cloneAccessories($event);
+
+            $this->cloneAdditionalCategories($event);
 
             // Dispatch event for file cloning
             $this->eventDispatcher->dispatch(TheliaEvents::FILE_CLONE, $event);
@@ -263,7 +275,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $clonedProductCreateFeatureEvent->setLocale($originalProductFeatureAvI18n->getLocale());
 
                 // If it's a free text value, pass the FeatureAvI18n's title as featureValue to the event
-                if ($originalProductFeature->getFreeTextValue() !== null) {
+                if ($originalProductFeature->getIsFreeText()) {
                     $clonedProductCreateFeatureEvent->setFeatureValue($originalProductFeatureAvI18n->getTitle());
                     $clonedProductCreateFeatureEvent->setIsTextValue(true);
                 }
@@ -280,6 +292,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->findByProductId($event->getOriginalProduct()->getId());
 
         // Set clone product associated contents
+        /** @var  ProductAssociatedContent $originalProductAssocCont */
         foreach ($originalProductAssocConts as $originalProductAssocCont) {
             $clonedProductCreatePAC = new ProductAddContentEvent($event->getClonedProduct(), $originalProductAssocCont->getContentId());
             $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $clonedProductCreatePAC);
@@ -293,9 +306,26 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->findByProductId($event->getOriginalProduct()->getId());
 
         // Set clone product accessories
+        /** @var Accessory $originalProductAccessory */
         foreach ($originalProductAccessoryList as $originalProductAccessory) {
             $clonedProductAddAccessoryEvent = new ProductAddAccessoryEvent($event->getClonedProduct(), $originalProductAccessory->getAccessory());
             $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $clonedProductAddAccessoryEvent);
+        }
+    }
+
+    public function cloneAdditionalCategories(ProductCloneEvent $event)
+    {
+        // Get original product additional categories
+        $originalProductAdditionalCategoryList = ProductCategoryQuery::create()
+            ->filterByProductId($event->getOriginalProduct()->getId())
+            ->filterByDefaultCategory(false)
+            ->find();
+
+        // Set clone product additional categories
+        /** @var ProductCategory $originalProductCategory */
+        foreach ($originalProductAdditionalCategoryList as $originalProductCategory) {
+            $clonedProductAddCategoryEvent = new ProductAddCategoryEvent($event->getClonedProduct(), $originalProductCategory->getCategoryId());
+            $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_CATEGORY, $clonedProductAddCategoryEvent);
         }
     }
 
@@ -549,28 +579,69 @@ class Product extends BaseAction implements EventSubscriberInterface
         try {
             $product = $event->getProduct();
 
-            // Delete all product feature relations
-            if (null !== $featureProducts = FeatureProductQuery::create()->findByProductId($product->getId())) {
-                /** @var \Thelia\Model\FeatureProduct $featureProduct */
-                foreach ($featureProducts as $featureProduct) {
-                    $eventDelete = new FeatureProductDeleteEvent($product->getId(), $featureProduct->getFeatureId());
-
-                    $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $eventDelete);
-                }
+            // Check differences between current coobination and the next one, and clear obsoletes values.
+            $nextTemplateId = $event->getTemplateId();
+            $currentTemplateId = $product->getTemplateId();
+                
+            // 1. Process product features.
+            
+            $currentFeatures = FeatureTemplateQuery::create()
+                ->filterByTemplateId($currentTemplateId)
+                ->select([ FeatureTemplateTableMap::COL_FEATURE_ID ])
+                ->find($con);
+    
+            $nextFeatures = FeatureTemplateQuery::create()
+                ->filterByTemplateId($nextTemplateId)
+                ->select([ FeatureTemplateTableMap::COL_FEATURE_ID ])
+                ->find($con);
+            
+            // Find features values we shoud delete. To do this, we have to
+            // find all features in $currentFeatures that are not present in $nextFeatures
+            $featuresToDelete = array_diff($currentFeatures->getData(), $nextFeatures->getData());
+    
+            // Delete obsolete features values
+            foreach ($featuresToDelete as $featureId) {
+                $this->eventDispatcher->dispatch(
+                    TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE,
+                    new FeatureProductDeleteEvent($product->getId(), $featureId)
+                );
             }
+            
+            // 2. Process product Attributes
+            
+            $currentAttributes = AttributeTemplateQuery::create()
+                ->filterByTemplateId($currentTemplateId)
+                ->select([ AttributeTemplateTableMap::COL_ATTRIBUTE_ID ])
+                ->find($con);
+    
+            $nextAttributes = AttributeTemplateQuery::create()
+                ->filterByTemplateId($nextTemplateId)
+                ->select([ AttributeTemplateTableMap::COL_ATTRIBUTE_ID ])
+                ->find($con);
+            
+            // Find attributes values we shoud delete. To do this, we have to
+            // find all attributes in $currentAttributes that are not present in $nextAttributes
+            $attributesToDelete = array_diff($currentAttributes->getData(), $nextAttributes->getData());
 
-            // Delete all product attributes sale elements
-            AttributeCombinationQuery::create()
-                ->filterByProductSaleElements($product->getProductSaleElementss())
-                ->delete($con)
-            ;
-
-            //Delete all productSaleElements except the default one (to keep price, weight, ean, etc...)
-            ProductSaleElementsQuery::create()
-                ->filterByProduct($product)
-                ->filterByIsDefault(1, Criteria::NOT_EQUAL)
-                ->delete($con)
-            ;
+            // Find PSE which includes $attributesToDelete for the current product/
+            $pseToDelete = ProductSaleElementsQuery::create()
+                ->filterByProductId($product->getId())
+                ->useAttributeCombinationQuery()
+                    ->filterByAttributeId($attributesToDelete, Criteria::IN)
+                ->endUse()
+                ->select([ ProductSaleElementsTableMap::COL_ID ])
+                ->find();
+    
+            // Delete obsolete PSEs
+            foreach ($pseToDelete->getData() as $pseId) {
+                $this->eventDispatcher->dispatch(
+                    TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT,
+                    new ProductSaleElementDeleteEvent(
+                        $pseId,
+                        CurrencyModel::getDefaultCurrency()->getId()
+                    )
+                );
+            }
 
             // Update the product template
             $template_id = $event->getTemplateId();
@@ -581,16 +652,6 @@ class Product extends BaseAction implements EventSubscriberInterface
             }
 
             $product->setTemplateId($template_id)->save($con);
-
-            //Be sure that the product has a default productSaleElements
-            /** @var \Thelia\Model\ProductSaleElements $defaultPse */
-            if (null == $defaultPse = ProductSaleElementsQuery::create()
-                    ->filterByProduct($product)
-                    ->filterByIsDefault(1)
-                    ->findOne()) {
-                // Create a new default product sale element
-                $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
-            }
 
             $product->clearProductSaleElementss();
 
@@ -604,7 +665,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             throw $ex;
         }
     }
-
+    
     /**
      * Changes accessry position, selecting absolute ou relative change.
      *
@@ -666,7 +727,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // If it's a free text value, create a FeatureAv to handle i18n
             if ($event->getIsTextValue() === true) {
-                $featureProduct->setFreeTextValue(true);
+                $featureProduct->setIsFreeText(true);
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
                 $createFeatureAvEvent
@@ -708,25 +769,24 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->findById($freeTextFeatureAv->getId());
 
                 // If there are no more FeatureAvI18ns for this FeatureAv, remove the corresponding FeatureProduct & FeatureAv
-                if (count($freeTextFeatureAvI18ns) == 0) {
+                if (\count($freeTextFeatureAvI18ns) == 0) {
                     $deleteFeatureProductEvent = new FeatureProductDeleteEvent($event->getProductId(), $event->getFeatureId());
                     $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $deleteFeatureProductEvent);
 
                     $deleteFeatureAvEvent = new FeatureAvDeleteEvent($freeTextFeatureAv->getId());
                     $this->eventDispatcher->dispatch(TheliaEvents::FEATURE_AV_DELETE, $deleteFeatureAvEvent);
-
-                    return;
                 }
+                return;
             } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
             elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
                 $freeTextFeatureAvI18n->setTitle($featureAvId);
                 $freeTextFeatureAvI18n->save();
 
                 $featureAvId = $freeTextFeatureAvI18n->getId();
+            } //To prevent Integrity constraint violation
+            elseif (empty($featureAvId)) {
+                return;
             }
-        } // Else the FeatureProduct exists and is not a free text value
-        else {
-            $featureAvId = $event->getFeatureValue();
         }
 
         $featureProduct->setFeatureAvId($featureAvId);
@@ -767,6 +827,93 @@ class Product extends BaseAction implements EventSubscriberInterface
             $model->getProductSaleElementsProductDocuments()->delete();
         }
     }
+    
+    /**
+     * When a feature is removed from a template, the products which are using this feature should be updated.
+     *
+     * @param TemplateDeleteFeatureEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function deleteTemplateFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        // Detete the removed feature in all products which are using this template
+        $products = ProductQuery::create()
+            ->filterByTemplateId($event->getTemplate()->getId())
+            ->find()
+        ;
+        
+        foreach ($products as $product) {
+            $dispatcher->dispatch(
+                TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE,
+                new FeatureProductDeleteEvent($product->getId(), $event->getFeatureId())
+            );
+        }
+    }
+    
+    /**
+     * When an attribute is removed from a template, the conbinations and PSE of products which are using this template
+     * should be updated.
+     *
+     * @param TemplateDeleteAttributeEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        // Detete the removed attribute in all products which are using this template
+        $pseToDelete = ProductSaleElementsQuery::create()
+            ->useProductQuery()
+                ->filterByTemplateId($event->getTemplate()->getId())
+            ->endUse()
+            ->useAttributeCombinationQuery()
+                ->filterByAttributeId($event->getAttributeId())
+            ->endUse()
+            ->select([ ProductSaleElementsTableMap::COL_ID ])
+            ->find();
+    
+        $currencyId = CurrencyModel::getDefaultCurrency()->getId();
+        
+        foreach ($pseToDelete->getData() as $pseId) {
+            $dispatcher->dispatch(
+                TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT,
+                new ProductSaleElementDeleteEvent(
+                    $pseId,
+                    $currencyId
+                )
+            );
+        }
+    }
+
+    /**
+     * Check if is a product view and if product_id is visible
+     *
+     * @param ViewCheckEvent $event
+     * @param string $eventName
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        if ($event->getView() == 'product') {
+            $product = ProductQuery::create()
+                ->filterById($event->getViewId())
+                ->filterByVisible(1)
+                ->count();
+
+            if ($product == 0) {
+                $dispatcher->dispatch(TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE, $event);
+            }
+        }
+    }
+
+    /**
+     * @param ViewCheckEvent $event
+     * @throws NotFoundHttpException
+     */
+    public function viewProductIdNotVisible(ViewCheckEvent $event)
+    {
+        throw new NotFoundHttpException();
+    }
 
     /**
      * {@inheritDoc}
@@ -798,10 +945,16 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
-
+            
+            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => array("deleteTemplateAttribute", 128),
+            TheliaEvents::TEMPLATE_DELETE_FEATURE           => array("deleteTemplateFeature", 128),
+    
             // Those two have to be executed before
             TheliaEvents::IMAGE_DELETE                      => array("deleteImagePSEAssociations", 192),
             TheliaEvents::DOCUMENT_DELETE                   => array("deleteDocumentPSEAssociations", 192),
+
+            TheliaEvents::VIEW_CHECK                        => array('viewCheck', 128),
+            TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE       => array('viewProductIdNotVisible', 128),
         );
     }
 }

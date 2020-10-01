@@ -1,77 +1,122 @@
 <?php
-define('lang_Select','Seleccionar');
-define('lang_Erase','Eliminar');
-define('lang_Open','Obrir');
-define('lang_Confirm_del','Segur que desitges eliminar aquest arxiu?');
-define('lang_All','Tots');
-define('lang_Files','Arxius');
-define('lang_Images','Imatges');
-define('lang_Archives','Fitxers');
-define('lang_Error_Upload','L\'arxiu que intenta pujar excedeix el màxim permès.');
-define('lang_Error_extension','L\'extensió de l\'arxiu no està permesa.');
-define('lang_Upload_file','Pujar');
-define('lang_Filters','Filtres');
-define('lang_Videos','Vídeos');
-define('lang_Music','Musica');
-define('lang_New_Folder','Nova carpeta');
-define('lang_Folder_Created','La carpeta ha estat creada exitosament.');
-define('lang_Existing_Folder','Carpeta existent');
-define('lang_Confirm_Folder_del','Segur que desitges eliminar la carpeta i tots els elements que conté?');
-define('lang_Return_Files_List','Tornar a la llista d\'arxius');
-define('lang_Preview','Vista prèvia');
-define('lang_Download','Descarregar');
-define('lang_Insert_Folder_Name','Nom de la carpeta:');
-define('lang_Root','arrel');
-define('lang_Rename','Renombrar');
-define('lang_Back','enrere');
-define('lang_View','Vista');
-define('lang_View_list','Vista de llista');
-define('lang_View_columns_list','Vista de columnes');
-define('lang_View_boxes','Vista de miniatures');
-define('lang_Toolbar','Barra d\'eines');
-define('lang_Actions','Accions');
-define('lang_Rename_existing_file','L\'arxiu ja existeix');
-define('lang_Rename_existing_folder','La carpeta ja existeix');
-define('lang_Empty_name','El nom es troba buit');
-define('lang_Text_filter','filtre de text');
-define('lang_Swipe_help','Deslize el nom de l\'arxiu/carpeta per mostrar les opcions');
-define('lang_Upload_base','Pujada d\'arxius SIMPLE');
-define('lang_Upload_java','Pujada d\'arxius JAVA (para arxius pesats)');
-define('lang_Upload_java_help',"Si el applet no carrega: 1. Assegura't de tenir Java instal·lat; sinó descarrega-ho i instal·la-ho <a href='http://java.com/en/download/'>des d'aquí</a> 2. Assegura't que el teu firewall no estigui bloquejant res.");
-define('lang_Upload_base_help',"Arrossega i deixa anar els arxius dins d'aquesta àrea o faci clic en ella (per a navegadors moderns) en cas contrari, seleccioni l'arxiu i faci clic en el botó. Quan finalitzi la pujada, faci clic en el botó superior per tornar.");
-define('lang_Type_dir','Carpeta');
-define('lang_Type','Tipus');
-define('lang_Dimension','Dimensions');
-define('lang_Size','Pes');
-define('lang_Date','Data');
-define('lang_Filename','Nom');
-define('lang_Operations','Operacions');
-define('lang_Date_type','d-m-y');
-define('lang_OK','OK');
-define('lang_Cancel','Cancel·lar');
-define('lang_Sorting','Ordenar');
-define('lang_Show_url','Mostrar URL');
-define('lang_Extract','Extreure aquí');
-define('lang_File_info','Informació');
-define('lang_Edit_image','Editar imatge');
-define('lang_Duplicate','Duplicar');
-define('lang_Folders', 'Folders');
-define('lang_Copy','Copy');
-define('lang_Cut','Cut');
-define('lang_Paste','Paste');
-define('lang_CB', 'CB'); // clipboard
-define('lang_Paste_Here','Paste to this directory');
-define('lang_Paste_Confirm','Are you sure you want to paste to this directory? This will overwrite existing files/folders if encountered any.');
-define('lang_Paste_Failed','Failed to paste file(s)');
-define('lang_Clear_Clipboard','Clear clipboard');
-define('lang_Clear_Clipboard_Confirm','Are you sure you want to clear the clipboard?');
-define('lang_Files_ON_Clipboard','There are files on the clipboard.');
-define('lang_Copy_Cut_Size_Limit','The selected files/folders are too big to %s. Limit: %d MB/operation'); // %s = cut or copy
-define('lang_Copy_Cut_Count_Limit','You selected too many files/folders to %s. Limit: %d files/operation'); // %s = cut or copy
-define('lang_Copy_Cut_Not_Allowed','You are not allowed to %s files.'); // %s(1) = cut or copy, %s(2) = files or folders
-define('lang_Aviary_No_Save', 'Could not save image');
-define('lang_Zip_No_Extract', 'Could not extract. File might be corrupt.');
-define('lang_Zip_Invalid', 'This extension is not supported. Valid: zip, gz, tar.');
-define('lang_Dir_No_Write', 'The directory you selected is not writable.');
-define('lang_Function_Disabled', 'The %s function has been disabled by the server.'); // %s = cut or copy
-?>
+
+return array(
+	'Select' => 'Seleccionar',
+	'Erase' => 'Eliminar',
+	'Open' => 'Obrir',
+	'Confirm_del' => 'Segur que desitges eliminar aquest arxiu?',
+	'All' => 'Tots',
+	'Files' => 'Arxius',
+	'Images' => 'Imatges',
+	'Archives' => 'Fitxers',
+	'Error_Upload' => 'L\'arxiu que intenta pujar excedeix el màxim permès.',
+	'Error_extension' => 'L\'extensió de l\'arxiu no està permesa.',
+	'Upload_file' => 'Pujar',
+	'Filters' => 'Filtres',
+	'Videos' => 'Vídeos',
+	'Music' => 'Musica',
+	'New_Folder' => 'Nova carpeta',
+	'Folder_Created' => 'La carpeta ha estat creada exitosament.',
+	'Existing_Folder' => 'Carpeta existent',
+	'Confirm_Folder_del' => 'Segur que desitges eliminar la carpeta i tots els elements que conté?',
+	'Return_Files_List' => 'Tornar a la llista d\'arxius',
+	'Preview' => 'Vista prèvia',
+	'Download' => 'Descarregar',
+	'Insert_Folder_Name' => 'Nom de la carpeta:',
+	'Root' => 'arrel',
+	'Rename' => 'Renombrar',
+	'Back' => 'enrere',
+	'View' => 'Vista',
+	'View_list' => 'Vista de llista',
+	'View_columns_list' => 'Vista de columnes',
+	'View_boxes' => 'Vista de miniatures',
+	'Toolbar' => 'Barra d\'eines',
+	'Actions' => 'Accions',
+	'Rename_existing_file' => 'L\'arxiu ja existeix',
+	'Rename_existing_folder' => 'La carpeta ja existeix',
+	'Empty_name' => 'El nom es troba buit',
+	'Text_filter' => 'filtre de text',
+	'Swipe_help' => 'Deslize el nom de l\'arxiu/carpeta per mostrar les opcions',
+	'Upload_base' => 'Pujada d\'arxius SIMPLE',
+	'Upload_java' => 'Pujada d\'arxius JAVA (para arxius pesats)',
+	'Upload_url' => 'URL',
+	'Upload_java_help' => "Si el applet no carrega: 1. Assegura't de tenir Java instal·lat; sinó descarrega-ho i instal·la-ho <a href='http://java.com/en/download/'>des d'aquí</a> 2. Assegura't que el teu firewall no estigui bloquejant res.",
+	'Upload_base_help' => "Arrossega i deixa anar els arxius dins d'aquesta àrea o faci clic en ella (per a navegadors moderns) en cas contrari, seleccioni l'arxiu i faci clic en el botó. Quan finalitzi la pujada, faci clic en el botó superior per tornar.",
+	'Type_dir' => 'Carpeta',
+	'Type' => 'Tipus',
+	'Dimension' => 'Dimensions',
+	'Size' => 'Pes',
+	'Date' => 'Data',
+	'Filename' => 'Nom',
+	'Operations' => 'Operacions',
+	'Date_type' => 'd-m-y',
+	'OK' => 'OK',
+	'Cancel' => 'Cancel·lar',
+	'Sorting' => 'Ordenar',
+	'Show_url' => 'Mostrar URL',
+	'Extract' => 'Extreure aquí',
+	'File_info' => 'Informació',
+	'Edit_image' => 'Editar imatge',
+	'Duplicate' => 'Duplicar',
+	'Folders' => 'Folders',
+	'Copy' => 'Copy',
+	'Cut' => 'Cut',
+	'Paste' => 'Paste',
+	'CB' => 'CB', // clipboard
+	'Paste_Here' => 'Paste to this directory',
+	'Paste_Confirm' => 'Are you sure you want to paste to this directory? This will overwrite existing files/folders if encountered any.',
+	'Paste_Failed' => 'Failed to paste file(s)',
+	'Clear_Clipboard' => 'Clear clipboard',
+	'Clear_Clipboard_Confirm' => 'Are you sure you want to clear the clipboard?',
+	'Files_ON_Clipboard' => 'There are files on the clipboard.',
+	'Copy_Cut_Size_Limit' => 'The selected files/folders are too big to %s. Limit: %d MB/operation', // %s = cut or copy
+	'Copy_Cut_Count_Limit' => 'You selected too many files/folders to %s. Limit: %d files/operation', // %s = cut or copy
+	'Copy_Cut_Not_Allowed' => 'You are not allowed to %s files.', // %s(1) = cut or copy, %s(2) = files or folders
+	'Aviary_No_Save' => 'Could not save image',
+	'Zip_No_Extract' => 'Could not extract. File might be corrupt.',
+	'Zip_Invalid' => 'This extension is not supported. Valid: zip, gz, tar.',
+	'Dir_No_Write' => 'The directory you selected is not writable.',
+	'Function_Disabled' => 'The %s function has been disabled by the server.', // %s = cut or copy
+	'File_Permission' => 'File permission',
+	'File_Permission_Not_Allowed' => 'Changing %s permissions are not allowed.', // %s = files or folders
+	'File_Permission_Recursive' => 'Apply recursively?',
+	'File_Permission_Wrong_Mode' => "The supplied permission mode is incorrect.",
+	'User' => 'User',
+	'Group' => 'Group',
+	'Yes' => 'Yes',
+	'No' => 'No',
+	'Lang_Not_Found' => 'Could not find language.',
+	'Lang_Change' => 'Change the language',
+	'File_Not_Found' => 'Could not find the file.',
+	'File_Open_Edit_Not_Allowed' => 'You are not allowed to %s this file.', // %s = open or edit
+	'Edit' => 'Edit',
+	'Edit_File' => "Edit file's content",
+	'File_Save_OK' => "File successfully saved.",
+	'File_Save_Error' => "There was an error while saving the file.",
+	'New_File' => 'New File',
+	'No_Extension' => 'You have to add a file extension.',
+	'Valid_Extensions' => 'Valid extensions: %s', // %s = txt,log etc.
+	'Upload_message' => "Drop file here to upload",
+
+	'SERVER ERROR' => "SERVER ERROR",
+	'forbiden' => "Forbiden",
+	'wrong path' => "Wrong path",
+	'wrong name' => "Wrong name",
+	'wrong extension' => "Wrong extension",
+	'wrong option' => "Wrong option",
+	'wrong data' => "Wrong data",
+	'wrong action' => "Wrong action",
+	'wrong sub-action' => "Wrong sub-actio",
+	'no action passed' => "No action passed",
+	'no path' => "No path",
+	'no file' => "No file",
+	'view type number missing' => "View type number missing",
+	'Not enought Memory' => "Not enought Memory",
+	'max_size_reached' => "Your image folder has reach its maximale size of %d MB.", //%d = max overall size
+	'B' => "B",
+	'KB' => "KB",
+	'MB' => "MB",
+	'GB' => "GB",
+	'TB' => "TB",
+	'total size' => "Total size",
+);

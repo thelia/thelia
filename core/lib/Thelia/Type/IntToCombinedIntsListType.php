@@ -29,7 +29,7 @@ class IntToCombinedIntsListType extends BaseType
     {
         foreach (explode(',', $values) as $intToCombinedInts) {
             $parts = explode(':', $intToCombinedInts);
-            if (count($parts) != 2) {
+            if (\count($parts) != 2) {
                 return false;
             }
             if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
@@ -47,7 +47,7 @@ class IntToCombinedIntsListType extends BaseType
     public function getFormattedValue($values)
     {
         if ($this->isValid($values)) {
-            $return = '';
+            $return = [];
 
             $values = preg_replace('#[\s]#', '', $values);
             foreach (explode(',', $values) as $intToCombinedInts) {
@@ -79,7 +79,7 @@ class IntToCombinedIntsListType extends BaseType
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        $length = strlen($noSpaceString);
+        $length = \strlen($noSpaceString);
         for ($i=0; $i< $length; $i++) {
             $char = $noSpaceString[$i];
             if ($char == '(') {

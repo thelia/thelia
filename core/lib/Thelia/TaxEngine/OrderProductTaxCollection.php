@@ -26,14 +26,14 @@ class OrderProductTaxCollection implements \Iterator
 
     public function __construct()
     {
-        foreach (func_get_args() as $tax) {
+        foreach (\func_get_args() as $tax) {
             $this->addTax($tax);
         }
     }
 
     public function isEmpty()
     {
-        return count($this->taxes) == 0;
+        return \count($this->taxes) == 0;
     }
 
     /**
@@ -50,7 +50,7 @@ class OrderProductTaxCollection implements \Iterator
 
     public function getCount()
     {
-        return count($this->taxes);
+        return \count($this->taxes);
     }
 
     /**

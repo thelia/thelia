@@ -127,7 +127,6 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             if (!$helper->ask($input, $output, $question)) {
                 return false;
             }
-
         }
 
         return true;

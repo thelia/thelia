@@ -16,14 +16,15 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Module\AbstractPaymentModule;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
 
-class FreeOrder extends BaseModule implements PaymentModuleInterface
+class FreeOrder extends AbstractPaymentModule
 {
     public function isValidPayment()
     {
-        return $this->getCurrentOrderTotalAmount() == 0;
+        return round($this->getCurrentOrderTotalAmount(), 4) == 0;
     }
 
     public function pay(Order $order)

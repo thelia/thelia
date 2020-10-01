@@ -103,7 +103,7 @@ class Version
      */
     public static function parse($version = null)
     {
-        if (is_null($version)) {
+        if (\is_null($version)) {
             $version = \Thelia\Core\Thelia::THELIA_VERSION;
         }
 

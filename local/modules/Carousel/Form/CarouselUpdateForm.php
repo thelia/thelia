@@ -14,6 +14,10 @@ namespace Carousel\Form;
 
 use Carousel\Carousel;
 use Carousel\Model\CarouselQuery;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -71,6 +75,23 @@ class CarouselUpdateForm extends BaseForm
                     ]
                 ]
             )->add(
+                'group' . $id,
+                'text',
+                [
+                    'label' => $this->translator->trans('Group image', [], Carousel::DOMAIN_NAME),
+                    'label_attr' => [
+                        'for' => 'group' . $id
+                    ],
+                    'required' => false,
+                    'attr' => [
+                        'placeholder' => $this->translator->trans(
+                            'Group of images',
+                            [],
+                            Carousel::DOMAIN_NAME
+                        )
+                    ]
+                ]
+            )->add(
                 'url' . $id,
                 'url',
                 [
@@ -93,12 +114,12 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Title'),
+                    'label' => $this->translator->trans('Title', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'title_field' . $id
                     ],
                     'attr' => [
-                        'placeholder' => $this->translator->trans('A descriptive title')
+                        'placeholder' => $this->translator->trans('A descriptive title', [], Carousel::DOMAIN_NAME)
                     ]
                 ]
             )->add(
@@ -107,16 +128,18 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Summary'),
+                    'label' => $this->translator->trans('Summary', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'summary_field' . $id,
                         'help' => $this->translator->trans(
-                            'A short description, used when a summary or an introduction is required'
+                            'A short description, used when a summary or an introduction is required',
+                            [],
+                            Carousel::DOMAIN_NAME
                         )
                     ],
                     'attr' => [
                         'rows' => 3,
-                        'placeholder' => $this->translator->trans('Short description text')
+                        'placeholder' => $this->translator->trans('Short description text', [], Carousel::DOMAIN_NAME)
                     ]
                 ]
             )->add(
@@ -125,14 +148,51 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Detailed description'),
+                    'label' => $this->translator->trans('Detailed description', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'detailed_description_field' . $id,
-                        'help' => $this->translator->trans('The detailed description.')
+                        'help' => $this->translator->trans('The detailed description.', [], Carousel::DOMAIN_NAME)
                     ],
                     'attr' => [
                         'rows' => 5
                     ]
+                ]
+            )->add(
+                'disable' . $id,
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => $this->translator->trans('Disable image', [], Carousel::DOMAIN_NAME),
+                    'label_attr' => [
+                        'for' => 'enable' . $id,
+                    ],
+                ]
+            )->add(
+                'limited' . $id,
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => $this->translator->trans('Limited', [], Carousel::DOMAIN_NAME),
+                    'label_attr' => [
+                        'for' => 'limited' . $id,
+                    ],
+                ]
+            )->add(
+                'start_date' . $id,
+                DateTimeType::class,
+                [
+                    'label' => $this->translator->trans('Start date', [], Carousel::DOMAIN_NAME),
+                    'widget' => "single_text",
+                    'required' => false,
+                ]
+            )->add(
+                'end_date' . $id,
+                DateTimeType::class,
+                [
+                    'label' => $this->translator->trans('End date', [], Carousel::DOMAIN_NAME),
+                    'widget' => "single_text",
+                    'required' => false,
+
                 ]
             )->add(
                 'postscriptum' . $id,
@@ -140,15 +200,17 @@ class CarouselUpdateForm extends BaseForm
                 [
                     'constraints' => [],
                     'required' => false,
-                    'label' => $this->translator->trans('Conclusion'),
+                    'label' => $this->translator->trans('Conclusion', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'conclusion_field' . $id,
                         'help' => $this->translator->trans(
-                            'A short text, used when an additional or supplemental information is required.'
+                            'A short text, used when an additional or supplemental information is required.',
+                            [],
+                            Carousel::DOMAIN_NAME
                         )
                     ],
                     'attr' => [
-                        'placeholder' => $this->translator->trans('Short additional text'),
+                        'placeholder' => $this->translator->trans('Short additional text', [], Carousel::DOMAIN_NAME),
                         'rows' => 3,
                     ]
                 ]

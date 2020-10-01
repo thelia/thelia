@@ -27,11 +27,18 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption class="clearfix">
                                 {intl l="Api"}
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.api" access="CREATE"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new API access'}" href="#api_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Create a new API access'},
+                                        'href' => '#api_create_dialog',
+                                        'auth' => ['resource' => 'admin.configuration.api'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
                             <thead>
                             <tr>
@@ -43,11 +50,7 @@
                             </tr>
                             </thead>
                             <tbody>
-
                             {foreach $api_list as $api}
-
-
-
                                 <tr>
                                     <td >{$api.Label}</td>
                                     <td >{$api.ApiKey}</td>
@@ -64,23 +67,39 @@
                                         {/if}
                                     </td>
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
-                                                <a title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
+                                       {$buttons = []}
 
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}
-                                                <a class="js-delete-api" title="{intl l='Delete this api access'}" href="#api_delete_dialog" data-id="{$api.Id}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
+                                        {$buttons[] = [
+                                            'type' => 'edit',
+                                            'title' => {intl l='Change this api access'},
+                                            'href' => {url path="/admin/configuration/api/update/%id" id=$api.Id},
+                                            'auth' => ['resource' => 'admin.configuration.api']
+                                        ]}
+
+                                        {$buttons[] = [
+                                            'type' => 'delete',
+                                            'class' => 'js-delete-api',
+                                            'title' => {intl l='Delete this api access'},
+                                            'href' => '#api_delete_dialog',
+                                            'data' => [
+                                                'id' => $api.Id,
+                                                'toggle' => 'modal'
+                                            ],
+                                            'auth' => ['resource' => 'admin.configuration.api']
+                                        ]}
+
+                                        {include file='renderer/buttons.html' buttons=$buttons}
+                                    </td>
+                                </tr>
+                            {foreachelse}
+                                <tr>
+                                    <td colspan="99">
+                                        <div class="alert alert-info">
+                                            {intl l="No API key has been created yet. Click the [+} button to create one."}
                                         </div>
                                     </td>
                                 </tr>
-
                             {/foreach}
-
                             </tbody>
                         </table>
                     </div>

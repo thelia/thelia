@@ -118,6 +118,11 @@ class RemovePercentageOnProductsTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(100))
+        ;
+        $cartItem1Stub
+            ->expects($this->any())
+            ->method('getTotalRealTaxedPrice')
+            ->will($this->returnValue(100))
 
         ;
 
@@ -139,6 +144,12 @@ class RemovePercentageOnProductsTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(150))
+
+        ;
+        $cartItem2Stub
+            ->expects($this->any())
+            ->method('getTotalRealTaxedPrice')
+            ->will($this->returnValue(300))
 
         ;
 
@@ -183,6 +194,11 @@ class RemovePercentageOnProductsTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(11000))
+        ;
+        $cartItem2Stub
+            ->expects($this->any())
+            ->method('getTotalRealTaxedPrice')
+            ->will($this->returnValue(22000))
         ;
 
         $cartStub = $this->getMockBuilder('\Thelia\Model\Cart')

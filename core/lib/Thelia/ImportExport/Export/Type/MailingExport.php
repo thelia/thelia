@@ -12,26 +12,50 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use Thelia\ImportExport\Export\AbstractExport;
-use Thelia\Model\NewsletterQuery;
+use PDO;
+use Propel\Runtime\Propel;
+use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
  * Class MailingExport
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ * @author Florian Bernard <fbernard@openstudio.fr>
  */
-class MailingExport extends AbstractExport
+class MailingExport extends JsonFileAbstractExport
 {
     const FILE_NAME = 'mailing';
 
     protected $orderAndAliases = [
-        'newsletter.ID' => 'Identifier',
-        'newsletter.EMAIL' => 'Email',
-        'newsletter.FISTNAME' => 'FirstName',
-        'newsletter.LASTNAME' => 'LastName'
+        'newsletter_id' => 'Identifier',
+        'newsletter_email' => 'Email',
+        'newsletter_firstname' => 'FirstName',
+        'newsletter_lastname' => 'LastName'
     ];
 
     protected function getData()
     {
-        return (new NewsletterQuery)->filterByUnsubscribed(false);
+        $con = Propel::getConnection();
+        $query = 'SELECT 
+                        newsletter.id as "newsletter_id",
+                        newsletter.email as "newsletter_email", 
+                        newsletter.firstname as "newsletter_firstname", 
+                        newsletter.lastname as "newsletter_lastname"
+                    FROM newsletter
+                    WHERE newsletter.unsubscribed = 0'
+        ;
+        $stmt = $con->prepare($query);
+        $stmt->execute();
+
+        $filename = THELIA_CACHE_DIR . '/export/' . 'mailing.json';
+
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }

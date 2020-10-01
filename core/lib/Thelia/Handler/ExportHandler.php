@@ -184,7 +184,7 @@ class ExportHandler
         if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $rangeDate['end']['year'] . '-' . ($rangeDate['end']['month'] + 1) . '-0 23:59:59'
+                $rangeDate['end']['year'] . '-' . (\intval($rangeDate['end']['month']) + 1) . '-0 23:59:59'
             );
         }
         $instance->setRangeDate($rangeDate);

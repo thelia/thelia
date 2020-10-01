@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="bar"
+          tablePrefix="cute_"
+          baseClass="Acme\Model"
+          defaultPhpNamingMethod="underscore">
+    <table name="monster"
+           heavyIndexing="true">
+        <column name="nickname"/>
+    </table>
+</database>

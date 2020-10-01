@@ -21,6 +21,7 @@ use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Api\BaseApiController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ApiQuery;
 
@@ -44,7 +45,11 @@ class ControllerListener implements EventSubscriberInterface
         //check if an admin is logged in
         if ($controller[0] instanceof BaseAdminController) {
             if (false === $this->securityContext->hasAdminUser() && $event->getRequest()->attributes->get('not-logged') != 1) {
-                throw new AdminAccessDenied();
+                throw new AdminAccessDenied(
+                    Translator::getInstance()->trans(
+                        "You're not currently connected to the administration panel. Please log in to access this page"
+                    )
+                );
             }
         }
     }

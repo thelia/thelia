@@ -20,6 +20,7 @@ use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\FileException;
 use Thelia\Files\FileManager;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductImageTableMap;
 use Thelia\Tools\URL;
 
@@ -46,15 +47,28 @@ abstract class BaseCachedFile extends BaseAction
      */
     protected $fileManager;
 
+    /** @var null|string */
+    protected $cdnBaseUrl;
+
     public function __construct(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
+
+        $this->cdnBaseUrl = ConfigQuery::read('cdn.documents-base-url', null);
     }
 
     /**
      * @return string root of the file cache directory in web space
      */
     abstract protected function getCacheDirFromWebRoot();
+
+    /**
+     * @param string $url the fully qualified CDN URL that will be used to create doucments URL.
+     */
+    public function setCdnBaseUrl($url)
+    {
+        $this->cdnBaseUrl = $url;
+    }
 
     /**
      * Clear the file cache. Is a subdirectory is specified, only this directory is cleared.
@@ -104,7 +118,7 @@ abstract class BaseCachedFile extends BaseAction
     {
         $path = $this->getCachePathFromWebRoot($subdir);
 
-        return URL::getInstance()->absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE);
+        return URL::getInstance()->absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE, $this->cdnBaseUrl);
     }
 
     /**
@@ -212,7 +226,7 @@ abstract class BaseCachedFile extends BaseAction
                     sprintf(
                         'File "%s" (type %s) with parent id %s failed to be saved',
                         $event->getParentName(),
-                        get_class($model),
+                        \get_class($model),
                         $event->getParentId()
                     )
                 );

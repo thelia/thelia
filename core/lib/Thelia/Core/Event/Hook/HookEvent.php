@@ -31,7 +31,7 @@ class HookEvent extends ActionEvent
 
     public function hasHook()
     {
-        return ! is_null($this->hook);
+        return ! \is_null($this->hook);
     }
 
     public function getHook()

@@ -99,4 +99,13 @@ interface UserInterface
      * @param string $serial
      */
     public function setSerial($serial);
+
+
+    /**
+     * Get the user preferred locale
+     *
+     * @return string the locale
+     */
+    public function getLocale();
+
 }

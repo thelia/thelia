@@ -332,7 +332,6 @@ class TaxRuleController extends AbstractCrudController
             );
 
             return $this->jsonResponse(json_encode($responseData));
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -377,12 +376,12 @@ class TaxRuleController extends AbstractCrudController
         if (!$taxRuleCountries->isEmpty()) {
             $taxRuleCountry = $taxRuleCountries->getFirst();
             $currentCountryId = $taxRuleCountry->getCountryId();
-            $currentStateId = intval($taxRuleCountry->getStateId());
+            $currentStateId = \intval($taxRuleCountry->getStateId());
 
             while (true) {
                 $hasChanged = $taxRuleCountry === null
                     || $taxRuleCountry->getCountryId() != $currentCountryId
-                    || intval($taxRuleCountry->getStateId()) != $currentStateId
+                    || \intval($taxRuleCountry->getStateId()) != $currentStateId
                 ;
 
                 if ($hasChanged) {
@@ -394,7 +393,7 @@ class TaxRuleController extends AbstractCrudController
                         'specification' => $specification
                     ];
 
-                    if (!in_array($specification, $taxRules)) {
+                    if (!\in_array($specification, $taxRules)) {
                         $taxRules[] = $specification;
                     }
 
@@ -403,7 +402,7 @@ class TaxRuleController extends AbstractCrudController
                     }
 
                     $currentCountryId = $taxRuleCountry->getCountryId();
-                    $currentStateId = intval($taxRuleCountry->getStateId());
+                    $currentStateId = \intval($taxRuleCountry->getStateId());
                     $specKey = [];
                 }
 
@@ -411,7 +410,6 @@ class TaxRuleController extends AbstractCrudController
 
                 $taxRuleCountry = $taxRuleCountries->getNext();
             }
-
         }
 
         $data = [

@@ -120,7 +120,7 @@
     .clear-none {
         padding: 0.5%;
     }
-	
+
 	{hook name="invoice.css"}
 
 </style>
@@ -195,7 +195,7 @@
         {/forhook}
         {/hookblock}
     </table>
-	
+
 	{hook name="invoice.after-information" order=$order_id}
 
     <table class="table-address">
@@ -208,7 +208,7 @@
                     {* delivery module can customize the delivery address *}
                     {hook name="invoice.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                 {/ifhook}
-                {elsehook rel="invoice.delivery-address"}                
+                {elsehook rel="invoice.delivery-address"}
 				    {format_address order_address=$DELIVERY_ADDRESS locale=$locale}
                	{/elsehook}
             </td>
@@ -250,7 +250,7 @@
                 {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
             {/if}
 
-            {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
+            {$taxes[{$TAX_RULE_TITLE}][] = floatval($realTax) * $QUANTITY}
 
             <tr class="table-2">
                 <td>
@@ -273,7 +273,7 @@
                 <td><p class="align-right">{format_money number=$realTotalPrice currency_id=$CURRENCY}</p></td>
             </tr>
 
-            {hook name="invoice.order-product" order="{$order_id}" order_product="{$ID}"}
+            {hook name="invoice.order-product" order={$order_id} order_product={$ID}}
         {/loop}
     </table>
 
@@ -305,51 +305,53 @@
                 <table class="table-3">
                     <col style="width: 50%; padding: 1mm;">
                     <col style="width: 50%; padding: 1mm;">
-                    {if $DISCOUNT}
-                    <tr>
-                        <td class="table-3-1"><p>{intl l="Discount"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
-                    </tr>
-                    {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total without tax"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} currency_id=$CURRENCY}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_ITEMS_AMOUNT} currency_id=$CURRENCY}</p></td>
                     </tr>
-                    {strip}
-                        {capture name="tax"}
-                            {foreach $taxes as $name=>$prices}
-                                {assign var="_price_taxe_" value="0"}
-                                {foreach $prices as $price}
-                                    {$_price_taxe_= $_price_taxe_ + $price}
-                                {/foreach}
-                                {if $_price_taxe_ != 0}
-                                <tr>
-                                    <td class="table-3-2"><p>{$name}</p></td>
-                                    <td class="table-3-2 align-right"><p>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</p></td>
-                                </tr>
-                                {/if}
+
+                    {capture name="tax"}{strip}
+                        {foreach $taxes as $name=>$prices}
+                            {assign var="_price_taxe_" value="0"}
+                            {foreach $prices as $price}
+                                {$_price_taxe_= $_price_taxe_ + $price}
                             {/foreach}
-                            {if $POSTAGE_TAX != 0}
+                            {if $_price_taxe_ != 0}
                             <tr>
-                                <td class="table-3-2"><p>{intl l="Postage"}<br>{$POSTAGE_TAX_RULE_TITLE}</p></td>
-                                <td class="table-3-2 align-right"><p>{format_money number=$POSTAGE_TAX currency_id=$CURRENCY}</p></td>
+                                <td class="table-3-2"><p>{$name}</p></td>
+                                <td class="table-3-2 align-right"><p>{format_money number=$_price_taxe_ currency_id=$CURRENCY}</p></td>
                             </tr>
                             {/if}
-                        {/capture}
-                    {/strip}
+                        {/foreach}
+                    {/strip}{/capture}
+
                     {if $smarty.capture.tax ne ""}
-                    <tr>
-                        <td class="table-3-1"><p>{intl l="Tax"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number=$TOTAL_TAX currency_id=$CURRENCY}</p></td>
-                    </tr>
-                    {$smarty.capture.tax nofilter}
+                        {$smarty.capture.tax nofilter}
                     {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
-                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}</p></td>
+                        <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_TAXED_ITEMS_AMOUNT} currency_id=$CURRENCY}</p></td>
                     </tr>
+                    {if $DISCOUNT > 0}
+                        <tr>
+                            <td class="table-3-1">
+                                <p>
+                                    {intl l="Discount with tax"}
+                                    <br>{intl l="Tax: %tax" tax={format_money number=$DISCOUNT_TAX currency_id=$CURRENCY}}
+                                </p>
+                            </td>
+                            <td class="table-3-1 align-right"><p>-{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>
+                        </tr>
+                    {/if}
                     <tr>
-                        <td class="table-3-1"><p>{intl l="Postage"}</p></td>
+                        <td class="table-3-1">
+                            <p>
+                                {intl l="Postage"}
+                                {if $POSTAGE_TAX != 0}
+                                    <br>{intl l="Tax %name: %tax" name=$POSTAGE_TAX_RULE_TITLE tax={format_money number=$POSTAGE_TAX currency_id=$CURRENCY}}
+                                {/if}
+                            </p>
+                        </td>
                         <td class="table-3-1 align-right"><p>{format_money number=$POSTAGE currency_id=$CURRENCY}</p></td>
                     </tr>
                     <tr>

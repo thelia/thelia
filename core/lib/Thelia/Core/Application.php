@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Thelia\Command\Install;
 
 /**
  * cli application for Thelia
@@ -63,6 +64,11 @@ class Application extends BaseApplication
 
     protected function registerCommands()
     {
+        if (!Thelia::isInstalled()) {
+            $this->add(new Install());
+            return;
+        }
+
         $container = $this->kernel->getContainer();
 
         foreach ($container->getParameter("command.definition") as $command) {

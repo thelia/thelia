@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\PropelInitService;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -49,6 +50,10 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
         $container->set("event_dispatcher", $dispatcher);
 
+        $propelInitService = $this->getMockPropelInitService();
+
+        $container->set('thelia.propel.init', $propelInitService);
+
         $request = new Request();
         $request->setSession($this->getSession());
 
@@ -59,6 +64,8 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
         $requestStack->push($request);
 
         $container->set("request_stack", $requestStack);
+
+        $container->set("kernel", $this->getKernel());
 
         new Translator($container);
         $container->set("thelia.securitycontext", new SecurityContext($requestStack));
@@ -92,7 +99,15 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getMockEventDispatcher()
     {
-        return $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        return $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+    }
+
+    /**
+     * @return PropelInitService
+     */
+    protected function getMockPropelInitService()
+    {
+        return $this->createMock(PropelInitService::class);
     }
 
     /**
@@ -100,7 +115,13 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getKernel()
     {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+        $kernel = $this->createMock("\Thelia\Core\Thelia");
+
+        // Stub propel initialization service
+        $kernel
+            ->expects($this->any())
+            ->method('initializePropelService')
+        ;
 
         return $kernel;
     }

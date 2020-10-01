@@ -13,6 +13,7 @@
 namespace Thelia\Form\Api\Customer;
 
 use Thelia\Form\CustomerLogin as BaseCustomerLogin;
+use Symfony\Component\Validator\Constraints;
 
 /**
  * Customer login form for the API.
@@ -28,8 +29,22 @@ class CustomerLogin extends BaseCustomerLogin
         parent::buildForm();
 
         $this->formBuilder->remove('remember_me');
-        // "I am an existing customer"
-        $this->formBuilder->get('account')->setEmptyData(1)->setDataLocked(true);
+        $this->formBuilder->remove('account');
+
+        $this->formBuilder->add("account", "text", array(
+            "constraints" => array(
+                new Constraints\Callback(array(
+                    "methods" => array(
+                        array($this, "verifyAccount"),
+                    ),
+                )),
+            ),
+            "label_attr" => array(
+                "for" => "account",
+            ),
+            "empty_data" => 1,
+            "required"    => false,
+        ));
     }
 
     public function getName()

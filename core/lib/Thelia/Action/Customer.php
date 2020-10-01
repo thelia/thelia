@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
@@ -27,6 +28,7 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Tools\Password;
 
 /**
@@ -45,12 +47,22 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /** @var MailerFactory */
     protected $mailer;
 
-    public function __construct(SecurityContext $securityContext, MailerFactory $mailer)
+    /** @var RequestStack */
+    protected $requestStack;
+
+    public function __construct(SecurityContext $securityContext, MailerFactory $mailer, RequestStack $requestStack = null)
     {
         $this->securityContext = $securityContext;
         $this->mailer = $mailer;
+        $this->requestStack = $requestStack;
     }
 
+    /**
+     * @param CustomerCreateOrUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $customer = new CustomerModel();
@@ -60,14 +72,38 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
         if ($event->getNotifyCustomerOfAccountCreation()) {
-            $this->mailer->sendEmailToCustomer('customer_account_created', $customer, [ 'password' => $plainPassword ]);
+            $this->mailer->sendEmailToCustomer(
+                'customer_account_created',
+                $customer,
+                [ 'password' => $plainPassword ]
+            );
         }
 
+        $dispatcher->dispatch(
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
+            new CustomerEvent($customer)
+        );
+    }
+
+    public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        $customer = $event->getCustomer();
+
         if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
-            $this->mailer->sendEmailToCustomer('customer_confirmation', $customer, ['customer' => $customer]);
+            $this->mailer->sendEmailToCustomer(
+                'customer_confirmation',
+                $customer,
+                ['customer_id' => $customer->getId()]
+            );
         }
     }
 
+    /**
+     * @param CustomerCreateOrUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $plainPassword = $event->getPassword();
@@ -78,11 +114,17 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
-        if (! empty($plainPassword) || $emailChanged) {
+        if ($event->getNotifyCustomerOfAccountModification() && (! empty($plainPassword) || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
 
+    /**
+     * @param CustomerCreateOrUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $customer = $event->getCustomer();
@@ -121,11 +163,19 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $customer->setDiscount($event->getDiscount());
         }
 
+        if ($event->getLangId() !== null) {
+            $customer->setLangId($event->getLangId());
+        }
+
         $customer->save();
 
         $event->setCustomer($customer);
     }
 
+    /**
+     * @param CustomerEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function delete(CustomerEvent $event)
     {
         if (null !== $customer = $event->getCustomer()) {
@@ -137,6 +187,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param CustomerModel $customer
+     * @param CustomerCreateOrUpdateEvent $event
+     * @param EventDispatcherInterface $dispatcher
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
         $customer->setDispatcher($dispatcher);
@@ -175,7 +231,18 @@ class Customer extends BaseAction implements EventSubscriberInterface
         if (method_exists($customer, 'clearDispatcher')) {
             $customer->clearDispatcher();
         }
+
         $this->securityContext->setCustomerUser($event->getCustomer());
+
+        // Set the preferred customer language
+        if (null !== $this->requestStack
+            &&
+            ! empty($customer->getLangId())
+            &&
+            (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
+        ) {
+            $this->requestStack->getCurrentRequest()->getSession()->setLang($lang);
+        }
     }
 
     /**
@@ -188,6 +255,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->securityContext->clearCustomerUser();
     }
 
+    /**
+     * @param LostPasswordEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function lostPassword(LostPasswordEvent $event)
     {
         if (null !== $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {
@@ -214,7 +285,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
             TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
             TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
-            TheliaEvents::LOST_PASSWORD             => array('lostPassword', 128)
+            TheliaEvents::LOST_PASSWORD             => array('lostPassword', 128),
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL => array('customerConfirmationEmail', 128)
         );
     }
 }

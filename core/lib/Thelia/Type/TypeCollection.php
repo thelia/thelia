@@ -25,14 +25,14 @@ class TypeCollection implements \Iterator
 
     public function __construct()
     {
-        foreach (func_get_args() as $type) {
+        foreach (\func_get_args() as $type) {
             $this->addType($type);
         }
     }
 
     public function isEmpty()
     {
-        return count($this->types) == 0;
+        return \count($this->types) == 0;
     }
 
     /**
@@ -49,7 +49,7 @@ class TypeCollection implements \Iterator
 
     public function getCount()
     {
-        return count($this->types);
+        return \count($this->types);
     }
 
     /**

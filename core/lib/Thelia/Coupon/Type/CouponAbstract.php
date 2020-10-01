@@ -513,7 +513,7 @@ abstract class CouponAbstract implements CouponInterface
 
     public function isInUse()
     {
-        return in_array(
+        return \in_array(
             $this->code,
             $this->facade->getRequest()->getSession()->getConsumedCoupons()
         );

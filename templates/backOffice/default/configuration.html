@@ -36,42 +36,84 @@
                                 {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.template" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/templates'}">{intl l='Product templates'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/templates'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/templates'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.attribute" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/attributes'}">{intl l='Product attributes'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/attributes'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/attributes'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.feature" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/features'}">{intl l='Product features'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/features'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/features'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.message" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/messages'}">{intl l='Mailing templates'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/messages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/messages'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc5" role="ADMIN" resource="admin.configuration.currency" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/currencies'}">{intl l='Currencies'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/currencies'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/currencies'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.tax-rule" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/taxes_rules'}">{intl l='Tax rules'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/taxes_rules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/taxes_rules'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
@@ -92,28 +134,56 @@
                                 {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.contry" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/countries'}">{intl l='Countries'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/countries'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/countries'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.state" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/states'}">{intl l='States / Provinces'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/states'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/states'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping configuration'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/shipping_zones'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping zones management'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/shipping_configuration'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
@@ -133,7 +203,14 @@
                                 {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.order-status" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/order-status'}">{intl l='Order status'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/order-status'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/order-status'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
@@ -155,87 +232,178 @@
                                 {loop type="auth" name="pcc-store" role="ADMIN" resource="admin.configuration.store" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/store'}">{intl l='Store'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/store'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/store'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.variable" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/variables'}">{intl l='System variables'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/variables'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/variables'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.profile" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/profiles'}">{intl l='Administration profiles'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/profiles'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/profiles'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.administrator" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/administrators'}">{intl l='Administrators'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/administrators'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/administrators'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc5" role="ADMIN" resource="admin.configuration.language" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/languages'}">{intl l='Languages &amp; URLs'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/languages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/languages'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc5.1" role="ADMIN" resource="admin.configuration.translations" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/translations'}">{intl l='Translations'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/translations'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/translations'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.mailing-system" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/mailingSystem'}">{intl l='Mailing system'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/mailingSystem'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/mailingSystem'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc7" role="ADMIN" resource="admin.configuration.admin-logs" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/adminLogs'}">{intl l='Administration logs'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/adminLogs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/adminLogs'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc8" role="ADMIN" resource="admin.configuration.system-logs" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/system-logs'}">{intl l='System logs'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system-logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/system-logs'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
                                 {loop type="auth" name="pcc9" role="ADMIN" resource="admin.configuration.api" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/api'}">{intl l='API configuration'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/api'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/api'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
                                 {loop type="auth" name="pcc10" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/advanced'}">{intl l='Advanced configuration'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/advanced'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                        <td>
+                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'href' => {url path='/admin/configuration/advanced'}
+                                                ]
+                                            ]}
+                                        </td>
                                     </tr>
                                 {/loop}
                                 {loop type="auth" name="pcc10" role="ADMIN" resource="admin.hook" access="VIEW"}
                                 <tr>
                                     <td><a href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
-                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/hooks'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    <td>
+                                        {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'href' => {url path='/admin/hooks'}
+                                            ]
+                                        ]}
+                                    </td>
                                 </tr>
                                 {/loop}
                                 {loop type="auth" name="pcc11" role="ADMIN" resource="admin.module-hook" access="VIEW"}
                                 <tr>
                                     <td><a href="{url path='/admin/module-hooks'}">{intl l='Modules attachments'}</a></td>
-                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/module-hooks'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    <td>
+                                        {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'href' => {url path='/admin/module-hooks'}
+                                            ]
+                                        ]}
+                                    </td>
                                 </tr>
                                 {/loop}
                                 {hook name="configuration.system-bottom" location="configuration_system_bottom" }

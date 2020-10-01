@@ -47,14 +47,14 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
+        return $taxCalculator->load($this, $country)->getTaxedPrice($price);
     }
 
     public function getTaxedPromoPrice(Country $country, $price)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this, $country)->getTaxedPrice($price), 2);
+        return $taxCalculator->load($this, $country)->getTaxedPrice($price);
     }
 
     /**
@@ -262,6 +262,8 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEPRODUCT, new ProductEvent($this));
 
         return true;
@@ -272,6 +274,8 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEPRODUCT, new ProductEvent($this));
     }
 
@@ -280,11 +284,13 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         // Delete free_text feature AV for this product (see issue #2061). We have to do this before
         // deleting the product, as the delete is cascaded to the feature_product table.
         $featureAvs = FeatureAvQuery::create()
             ->useFeatureProductQuery()
-            ->filterByFreeTextValue(true)
+            ->filterByIsFreeText(true)
             ->filterByProductId($this->getId())
             ->endUse()
             ->find($con)
@@ -308,6 +314,8 @@ class Product extends BaseProduct implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
@@ -335,7 +343,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew()) {
-            if (isset($this->modifiedColumns[ProductTableMap::POSITION]) && $this->modifiedColumns[ProductTableMap::POSITION]) {
+            if (isset($this->modifiedColumns[ProductTableMap::COL_POSITION]) && $this->modifiedColumns[ProductTableMap::COL_POSITION]) {
                 if (null !== $productCategory = ProductCategoryQuery::create()
                         ->filterByProduct($this)
                         ->filterByDefaultCategory(true)
@@ -345,6 +353,8 @@ class Product extends BaseProduct implements FileModelParentInterface
                 }
             }
         }
+
+        parent::postSave();
     }
 
     /**

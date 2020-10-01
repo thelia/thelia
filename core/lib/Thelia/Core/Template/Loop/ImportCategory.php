@@ -21,6 +21,9 @@ use Thelia\Model\ImportCategoryQuery;
  */
 class ImportCategory extends ImportExportCategory
 {
+    /**
+     * @return ImportCategoryQuery
+     */
     protected function getQueryModel()
     {
         return ImportCategoryQuery::create();

@@ -16,9 +16,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Address;
 
 /**
- * Class AddressEvent
- * @package Thelia\Core\Event
- * @author Manuel Raynaud <manu@raynaud.io>
+ * @deprecated since 2.4, please use \Thelia\Model\Event\AddressEvent
  */
 class AddressEvent extends ActionEvent
 {

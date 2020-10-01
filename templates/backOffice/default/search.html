@@ -113,24 +113,40 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
-                                                <a title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-                                            {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
-                                                <a title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
-                                            {/loop}
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.customer" access="DELETE"}
-                                            {if $hasOrders}
-                                                <a class="disabled" title="{intl l='This customer has orders, and can\'t be deleted.'}"  href="#"><span class="glyphicon glyphicon-question-sign"></span></a>
-                                            {else}
-                                                <a class="customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/if}
-                                            {/loop}
-                                        </div>
+                                          {if $hasOrders}
+                                            {$deleteClass = 'disabled'}
+                                            {$deleteTitle = {intl l='This customer has orders, and can\'t be deleted.'}}
+                                            {$deleteHref = ''}
+                                        {else}
+                                            {$deleteClass = 'customer-delete'}
+                                            {$deleteTitle = {intl l='Delete this customer and all his orders'}}
+                                            {$deleteHref = '#delete_customer_dialog'}
+                                        {/if}
+                                        {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this customer'},
+                                                'href' => {url path='/admin/customer/update' customer_id=$ID page=$page},
+                                                'auth' => ['resource' => 'admin.customer']
+                                            ],
+                                            [
+                                                'title' => {intl l="Send a mail to this customer"},
+                                                'href' => "mailto:$EMAIL",
+                                                'icon' => ['class' => 'glyphicon glyphicon-envelope'],
+                                                'auth' => ['resource' => 'admin.customer']
+                                            ],
+                                            [
+                                                'type' => 'delete',
+                                                'class' => $deleteClass,
+                                                'title' => $deleteTitle,
+                                                'href' => $deleteHref,
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'auth' => ['resource' => 'admin.customer']
+                                            ]
+                                        ]}
                                     </td>
 
                                 </tr>
@@ -187,6 +203,7 @@
                                 {loop type="order-status" name="order-status" id=$STATUS}
                                 {assign "orderStatus" $TITLE}
                                 {assign "orderStatusLabel" "order_$CODE"}
+                                {assign "orderStatusCodeColor" $COLOR}
                                 {/loop}
 
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
@@ -203,18 +220,20 @@
                                     <td>{$orderInvoiceCompany}</td>
                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                     <td>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$currencySymbol}</td>
-                                    <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
-                                    
+                                    <td><span class="label" style="background-color: {$orderStatusCodeColor};">{$orderStatus}</span></td>
+
                                     {hook name="orders.table-row" location="orders_table_row" order_id={$ID}}
                                     <td>
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-                                                <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {$buttons = [
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this order'},
+                                                'href' => {url path="/admin/order/update/%id" id=$ID},
+                                                'auth' => ['resource' => 'admin.order']
+                                            ]
+                                        ]}
+
+                                        {include file='renderer/buttons.html' buttons=$buttons}
                                     </td>
                                 </tr>
                             {else}
@@ -281,20 +300,30 @@
                                     {/elseloop}
                                 </td>
                                  <td class="actions">
-                                     <div class="btn-toolbar btn toolbar-primary">
-                                         <span class="glyphicon glyphicon-cog"></span>
-                                     </div>
-                                     <div class="toolbar-options hidden">
-                                         <a title="{intl l='Browse this category'}" href="{url path='admin/categories' category_id=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
-
-                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
-                                            <a title="{intl l='Edit this category'}" href="{url path='/admin/categories/update' category_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                         {/loop}
-
-                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="DELETE"}
-                                            <a class="category-delete" title="{intl l='Delete this category and all its contents'}"  href="#category_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                         {/loop}
-                                     </div>
+                                     {include file='renderer/buttons.html' buttons=[
+                                        [
+                                            'type' => 'folder-open',
+                                            'title' => {intl l='Browse this category'},
+                                            'href' => {url path='admin/categories' category_id=$ID}
+                                        ],
+                                        [
+                                            'type' => 'edit',
+                                            'title' => {intl l='Edit this category'},
+                                            'href' => {url path='/admin/categories/update' category_id=$ID},
+                                            'auth' => ['resource' => 'admin.category']
+                                        ],
+                                        [
+                                            'type' => 'delete',
+                                            'class' => 'category-delete',
+                                            'title' => {intl l='Delete this category'},
+                                            'href' => '#category_delete_dialog',
+                                            'data' => [
+                                                'id' => $ID,
+                                                'toggle' => 'modal'
+                                            ],
+                                            'auth' => ['resource' => 'admin.category']
+                                        ]
+                                    ]}
                                   </td>
                             </tr>
                             {else}
@@ -380,18 +409,25 @@
 
 
                                      <td class="actions">
-                                         <div class="btn-toolbar btn toolbar-primary">
-                                             <span class="glyphicon glyphicon-cog"></span>
-                                         </div>
-                                         <div class="toolbar-options hidden">
-                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
-                                                <a title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
-                                             {/loop}
-
-                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.product" access="DELETE"}
-                                                   <a class="product-delete" title="{intl l='Delete this product'}"  href="#product_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                             {/loop}
-                                         </div>
+                                        {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this product'},
+                                                'href' => {url path='/admin/products/update' product_id=$ID page=$page},
+                                                'auth' => ['resource' => 'admin.product']
+                                            ],
+                                            [
+                                                'type' => 'delete',
+                                                'class' => 'product-delete',
+                                                'title' => {intl l='Delete this product'},
+                                                'href' => '#product_delete_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'auth' => ['resource' => 'admin.product']
+                                            ]
+                                        ]}
                                       </td>
                                  </tr>
                             {else}
@@ -459,20 +495,30 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            <a title="{intl l='Browse this folder'}" href="{url path='admin/folders' folder_id=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
-
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
-                                                <a class="folder-delete" title="{intl l='Delete this folder'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'folder-open',
+                                                'title' => {intl l='Browse this folder'},
+                                                'href' => {url path='admin/folders' parent=$ID}
+                                            ],
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this folder'},
+                                                'href' => {url path="/admin/folders/update/%id" id=$ID},
+                                                'auth' => ['resource' => 'admin.folder']
+                                            ],
+                                            [
+                                                'type' => 'delete',
+                                                'class' => 'folder-delete',
+                                                'title' => {intl l='Delete this folder and all its contents'},
+                                                'href' => '#folder_delete_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'auth' => ['resource' => 'admin.folder']
+                                            ]
+                                        ]}
                                     </td>
                                 </tr>
                             {else}
@@ -540,18 +586,25 @@
                                     </td>
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a title="{intl l='Edit this content'}" href="{url path="/admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
-                                                <a class="content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
+                                         {include file='renderer/buttons.html' buttons=[
+                                            [
+                                                'type' => 'edit',
+                                                'title' => {intl l='Edit this content'},
+                                                'href' => {url path="/admin/content/update/{$ID}"},
+                                                'auth' => ['resource' => 'admin.content']
+                                            ],
+                                            [
+                                                'type' => 'delete',
+                                                'class' => 'content-delete',
+                                                'title' => {intl l='Delete this content'},
+                                                'href' => '#content_delete_dialog',
+                                                'data' => [
+                                                    'id' => $ID,
+                                                    'toggle' => 'modal'
+                                                ],
+                                                'auth' => ['resource' => 'admin.content']
+                                            ]
+                                        ]}
                                     </td>
                                 </tr>
                             {else}
@@ -570,6 +623,94 @@
                     </div>
                 </div>
                 {* end content search *}
+
+                {* brand search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Brand'}
+                            </caption>
+                            {ifloop rel="brand-search"}
+                                <thead>
+                                <tr>
+                                    <th>{intl l="ID"}</th>
+                                    <th></th>
+                                    <th>{intl l="Brand title"}</th>
+
+                                    {hook name="brands.table-header" }
+
+                                    <th class="text-center">
+                                        {intl l='Online'}
+                                    </th>
+                                    <th class="actions">{intl l="Actions"}</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {loop type="brand" name="brand-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="title,chapo,description,postscriptum" return_url=false  limit=26}
+
+                                {if $LOOP_COUNT < 26}
+                                    <tr>
+                                        <td>{$ID}</td>
+                                        <td></td>
+                                        <td class="object-title"><a href="{url path="/admin/brand/update/$ID"}">{$TITLE}</a></td>
+
+                                        {hook name="brands.table-row" brand_id=$ID}
+
+                                        <td class="text-center">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.brand" access="UPDATE"}
+                                                <div class="make-switch switch-small brandVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" class="brandVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                </div>
+                                            {/loop}
+
+                                            {elseloop rel="can_change"}
+                                                <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                </div>
+                                            {/elseloop}
+                                        </td>
+                                        <td class="actions">
+                                            {include file='renderer/buttons.html' buttons=[
+                                            [
+                                            'type' => 'edit',
+                                            'title' => {intl l='Edit this brand'},
+                                            'href' => {url path="/admin/brand/update/{$ID}"},
+                                            'auth' => ['resource' => 'admin.brand']
+                                            ],
+                                            [
+                                            'type' => 'delete',
+                                            'class' => 'brand-delete',
+                                            'title' => {intl l='Delete this brand'},
+                                            'href' => '#brand_delete_dialog',
+                                            'data' => [
+                                            'id' => $ID,
+                                            'toggle' => 'modal'
+                                            ],
+                                            'auth' => ['resource' => 'admin.brand']
+                                            ]
+                                            ]}
+                                        </td>
+                                    </tr>
+                                {else}
+                                    {$smarty.capture.more_results nofilter}
+                                {/if}
+                                {/loop}
+                                </tbody>
+                            {/ifloop}
+                        </table>
+                        {elseloop rel="brand-search"}
+                            <div class="alert alert-info">
+                                {intl l="No brand found for \"%term\"" term=$searchTerm}
+                            </div>
+                        {/elseloop}
+
+                    </div>
+                </div>
+                {* end brand search *}
+
+
                 {else}
                 <div class="alert alert-warning">
                     {intl l="Your search is too short"}
@@ -621,7 +762,7 @@
     form_content        = {$smarty.capture.product_delete_dialog nofilter}
 }
 
-{* -- Delete category confirmation dialog ----------------------------------- *}
+{* -- Delete folder confirmation dialog ----------------------------------- *}
 
 {capture name="folder_delete_dialog"}
     <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
@@ -640,7 +781,7 @@ form_action         = {token_url path='/admin/folders/delete'}
 form_content        = {$smarty.capture.folder_delete_dialog nofilter}
 }
 
-{* -- Delete category confirmation dialog ----------------------------------- *}
+{* -- Delete content confirmation dialog ----------------------------------- *}
 
 {capture name="content_delete_dialog"}
     <input type="hidden" name="content_id" id="content_delete_id" value="" />
@@ -677,6 +818,26 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     form_action         = {token_url path='/admin/customer/delete'}
     form_content        = {$smarty.capture.customer_delete_dialog nofilter}
     form_id             = "customer_delete_dialog"
+}
+
+
+{* -- Delete brand confirmation dialog ----------------------------------- *}
+
+{capture "brand_delete_dialog"}
+    <input type="hidden" name="brand_id" id="brand_delete_id" value="" />
+
+    {hook name="brand.delete-form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "brand_delete_dialog"
+    dialog_title    = {intl l="Delete brand"}
+    dialog_message  = {intl l="Do you really want to delete this brand ?"}
+
+    form_action         = {token_url path='/admin/brand/delete'}
+    form_content        = {$smarty.capture.brand_delete_dialog nofilter}
 }
 
 {/block}
@@ -720,6 +881,11 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
                 $('#content_delete_id').val($(this).data('id'));
             });
 
+            // Set proper brand ID in delete form
+            $('a.brand-delete').click(function(ev) {
+                $('#brand_delete_id').val($(this).data('id'));
+            });
+
             {* Toggle object visibility *}
 
             $(".categoryVisibleToggle").on('switch-change', function(event, data) {
@@ -761,6 +927,17 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
                     }
                 });
             });
+
+            $(".brandVisibleToggle").on('switch-change', function(event, data) {
+                $.ajax({
+                    url : "{url path='admin/brand/toggle-online'}",
+                    data : {
+                        brand_id : $(this).data('id'),
+                        action : 'visibilityToggle'
+                    }
+                });
+            });
+
         });
     </script>
 {/block}

@@ -7,6 +7,7 @@ use Thelia\Core\Event\Message\MessageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Log\Tlog;
 use Thelia\Model\Base\Message as BaseMessage;
 
 class Message extends BaseMessage
@@ -18,6 +19,8 @@ class Message extends BaseMessage
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEMESSAGE, new MessageEvent($this));
 
         return true;
@@ -28,6 +31,8 @@ class Message extends BaseMessage
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEMESSAGE, new MessageEvent($this));
     }
 
@@ -36,6 +41,8 @@ class Message extends BaseMessage
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEMESSAGE, new MessageEvent($this));
 
         return true;
@@ -46,6 +53,8 @@ class Message extends BaseMessage
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATEMESSAGE, new MessageEvent($this));
     }
 
@@ -54,6 +63,8 @@ class Message extends BaseMessage
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEMESSAGE, new MessageEvent($this));
 
         return true;
@@ -64,17 +75,20 @@ class Message extends BaseMessage
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEMESSAGE, new MessageEvent($this));
     }
 
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template
-
-     * @param  ParserInterface $parser
-     * @param $message
+     * @param ParserInterface $parser
+     * @param string $message
      * @param $layout
      * @param $template
-     * @return bool
+     * @param bool $compressOutput
+     * @return bool|string
+     * @throws \SmartyException
      */
     protected function getMessageBody($parser, $message, $layout, $template, $compressOutput = true)
     {
@@ -85,7 +99,7 @@ class Message extends BaseMessage
             try {
                 $body = $parser->render($template, [], $compressOutput);
             } catch (ResourceNotFoundException $ex) {
-                // Ignore this.
+                Tlog::getInstance()->addError("Failed to get mail message template body $template");
             }
         }
 
@@ -108,6 +122,9 @@ class Message extends BaseMessage
 
     /**
      * Get the HTML message body
+     * @param ParserInterface $parser
+     * @return bool|string
+     * @throws \SmartyException
      */
     public function getHtmlMessageBody(ParserInterface $parser)
     {
@@ -120,17 +137,22 @@ class Message extends BaseMessage
     }
 
     /**
-     * Get the TEXT message body
+     * @param ParserInterface $parser
+     * @return string|string[]|null
+     * @throws \SmartyException
      */
     public function getTextMessageBody(ParserInterface $parser)
     {
-        return $this->getMessageBody(
+        $message = $this->getMessageBody(
             $parser,
             $this->getTextMessage(),
             $this->getTextLayoutFileName(),
             $this->getTextTemplateFileName(),
             true // Do not compress the output, and keep empty lines.
         );
+
+        // Replaced all <br> by newlines.
+        return preg_replace("/<br>/i", "\n", $message);
     }
 
     /**
@@ -144,15 +166,18 @@ class Message extends BaseMessage
      *                                              the template file located in the module under
      *                                              `templates/email/default/' directory is used if
      *                                              `$useFallbackTemplate` is set to `true`.
+     * @return \Swift_Message
+     * @throws \SmartyException
      */
     public function buildMessage(ParserInterface $parser, \Swift_Message $messageInstance, $useFallbackTemplate = true)
     {
-        $parser->setTemplateDefinition(
+        // Set mail template, and save the current template
+        $parser->pushTemplateDefinition(
             $parser->getTemplateHelper()->getActiveMailTemplate(),
             $useFallbackTemplate
         );
 
-        $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
+        $subject     = $parser->renderString($this->getSubject());
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);
 
@@ -171,6 +196,9 @@ class Message extends BaseMessage
                 $messageInstance->addPart($textMessage, 'text/plain');
             }
         }
+
+        // Restore previous template
+        $parser->popTemplateDefinition();
 
         return $messageInstance;
     }

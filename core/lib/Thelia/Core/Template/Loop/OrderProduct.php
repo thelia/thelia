@@ -18,22 +18,21 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- *
  * OrderProduct loop
  *
  * Class OrderProduct
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
  * @method int getOrder()
  * @method int[] getId()
  * @method bool|string getVirtual()
@@ -66,15 +65,15 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
         // new join to get the product id if it exists
         $pseJoin = new Join(
-            OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID,
-            ProductSaleElementsTableMap::ID,
+            OrderProductTableMap::COL_PRODUCT_SALE_ELEMENTS_ID,
+            ProductSaleElementsTableMap::COL_ID,
             Criteria::LEFT_JOIN
         );
         $search
             ->addJoinObject($pseJoin)
             ->addAsColumn(
-                "product_id",
-                ProductSaleElementsTableMap::PRODUCT_ID
+                'product_id',
+                ProductSaleElementsTableMap::COL_PRODUCT_ID
             )
         ;
 
@@ -103,47 +102,95 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         return $search;
     }
 
+    /**
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function parseResults(LoopResult $loopResult)
     {
+        $lastLegacyRoundingOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
+
         /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
-            $taxedPrice = $orderProduct->getPrice() + $orderProduct->getVirtualColumn('TOTAL_TAX');
-            $taxedPromoPrice = $orderProduct->getPromoPrice() + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
+            $tax = $orderProduct->getVirtualColumn('TOTAL_TAX');
+            $promoTax = $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
-            $totalPrice = $orderProduct->getPrice()*$orderProduct->getQuantity();
-            $totalPromoPrice = $orderProduct->getPromoPrice()*$orderProduct->getQuantity();
+            // To prevent price changes in pre-2.4 orders, use the legacy calculation method
+            if ($orderProduct->getOrderId() <= $lastLegacyRoundingOrderId) {
+                $totalTax = round($tax * $orderProduct->getQuantity(), 2);
+                $totalPromoTax = round($promoTax * $orderProduct->getQuantity(), 2);
 
-            $loopResultRow->set("ID", $orderProduct->getId())
-                ->set("REF", $orderProduct->getProductRef())
-                ->set("PRODUCT_ID", $orderProduct->getVirtualColumn('product_id'))
-                ->set("PRODUCT_SALE_ELEMENTS_ID", $orderProduct->getProductSaleElementsId())
-                ->set("PRODUCT_SALE_ELEMENTS_REF", $orderProduct->getProductSaleElementsRef())
-                ->set("WAS_NEW", $orderProduct->getWasNew() === 1 ? 1 : 0)
-                ->set("WAS_IN_PROMO", $orderProduct->getWasInPromo() === 1 ? 1 : 0)
-                ->set("WEIGHT", $orderProduct->getWeight())
-                ->set("TITLE", $orderProduct->getTitle())
-                ->set("CHAPO", $orderProduct->getChapo())
-                ->set("DESCRIPTION", $orderProduct->getDescription())
-                ->set("POSTSCRIPTUM", $orderProduct->getPostscriptum())
-                ->set("VIRTUAL", $orderProduct->getVirtual())
-                ->set("VIRTUAL_DOCUMENT", $orderProduct->getVirtualDocument())
-                ->set("QUANTITY", $orderProduct->getQuantity())
-                ->set("PRICE", $orderProduct->getPrice())
-                ->set("PRICE_TAX", $orderProduct->getVirtualColumn('TOTAL_TAX'))
-                ->set("TAXED_PRICE", $taxedPrice)
-                ->set("PROMO_PRICE", $orderProduct->getPromoPrice())
-                ->set("PROMO_PRICE_TAX", $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX'))
-                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
-                ->set("TOTAL_PRICE", $totalPrice)
-                ->set("TOTAL_TAXED_PRICE", $totalPrice + ($orderProduct->getVirtualColumn('TOTAL_TAX')*$orderProduct->getQuantity()))
-                ->set("TOTAL_PROMO_PRICE", $totalPromoPrice)
-                ->set("TOTAL_TAXED_PROMO_PRICE", $totalPromoPrice + ($orderProduct->getVirtualColumn('TOTAL_PROMO_TAX')*$orderProduct->getQuantity()))
-                ->set("TAX_RULE_TITLE", $orderProduct->getTaxRuleTitle())
-                ->set("TAX_RULE_DESCRIPTION", $orderProduct->getTaxRuledescription())
-                ->set("PARENT", $orderProduct->getParent())
-                ->set("EAN_CODE", $orderProduct->getEanCode())
+                $taxedPrice = (float) $orderProduct->getPrice() + (float) $orderProduct->getVirtualColumn('TOTAL_TAX');
+                $taxedPromoPrice = (float) $orderProduct->getPromoPrice() + (float) $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
+
+                $totalPrice = $orderProduct->getPrice() * $orderProduct->getQuantity();
+                $totalPromoPrice = $orderProduct->getPromoPrice() * $orderProduct->getQuantity();
+
+                $totalTaxedPrice =  round($taxedPrice, 2) * $orderProduct->getQuantity();
+                $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
+            } else {
+                $tax = round($tax, 2);
+                $promoTax = round($promoTax, 2);
+
+                $totalTax = $tax * $orderProduct->getQuantity();
+                $totalPromoTax = $promoTax * $orderProduct->getQuantity();
+
+                $taxedPrice = round((float) $orderProduct->getPrice() + $tax, 2);
+                $taxedPromoPrice = round((float) $orderProduct->getPromoPrice() + $promoTax, 2);
+
+                // Price calculation should use the same rounding method as in CartItem::getTotalTaxedPromoPrice()
+                // For each order line, we first round the taxed price, then we multiply by the quantity.
+                $totalPrice = round($orderProduct->getPrice(), 2) * $orderProduct->getQuantity();
+                $totalPromoPrice = round($orderProduct->getPromoPrice(), 2) * $orderProduct->getQuantity();
+
+                $totalTaxedPrice = $taxedPrice * $orderProduct->getQuantity();
+                $totalTaxedPromoPrice = $taxedPromoPrice * $orderProduct->getQuantity();
+            }
+
+            $loopResultRow->set('ID', $orderProduct->getId())
+                ->set('REF', $orderProduct->getProductRef())
+                ->set('PRODUCT_ID', $orderProduct->getVirtualColumn('product_id'))
+                ->set('PRODUCT_SALE_ELEMENTS_ID', $orderProduct->getProductSaleElementsId())
+                ->set('PRODUCT_SALE_ELEMENTS_REF', $orderProduct->getProductSaleElementsRef())
+                ->set('WAS_NEW', $orderProduct->getWasNew() === 1 ? 1 : 0)
+                ->set('WAS_IN_PROMO', $orderProduct->getWasInPromo() === 1 ? 1 : 0)
+                ->set('WEIGHT', $orderProduct->getWeight())
+                ->set('TITLE', $orderProduct->getTitle())
+                ->set('CHAPO', $orderProduct->getChapo())
+                ->set('DESCRIPTION', $orderProduct->getDescription())
+                ->set('POSTSCRIPTUM', $orderProduct->getPostscriptum())
+                ->set('VIRTUAL', $orderProduct->getVirtual())
+                ->set('VIRTUAL_DOCUMENT', $orderProduct->getVirtualDocument())
+                ->set('QUANTITY', $orderProduct->getQuantity())
+
+                ->set('PRICE', $orderProduct->getPrice())
+                ->set('PRICE_TAX', $tax)
+                ->set('TAXED_PRICE', $taxedPrice)
+                ->set('PROMO_PRICE', $orderProduct->getPromoPrice())
+                ->set('PROMO_PRICE_TAX', $promoTax)
+                ->set('TAXED_PROMO_PRICE', $taxedPromoPrice)
+                ->set('TOTAL_PRICE', $totalPrice)
+                ->set('TOTAL_TAXED_PRICE', $totalTaxedPrice)
+                ->set('TOTAL_PROMO_PRICE', $totalPromoPrice)
+                ->set('TOTAL_TAXED_PROMO_PRICE', $totalTaxedPromoPrice)
+
+                ->set('TAX_RULE_TITLE', $orderProduct->getTaxRuleTitle())
+                ->set('TAX_RULE_DESCRIPTION', $orderProduct->getTaxRuledescription())
+                ->set('PARENT', $orderProduct->getParent())
+                ->set('EAN_CODE', $orderProduct->getEanCode())
+                ->set('CART_ITEM_ID', $orderProduct->getCartItemId())
+
+                ->set('REAL_PRICE', $orderProduct->getWasInPromo() ? $orderProduct->getPromoPrice() : $orderProduct->getPrice())
+                ->set('REAL_TAXED_PRICE', $orderProduct->getWasInPromo() ? $taxedPromoPrice : $taxedPrice)
+                ->set('REAL_PRICE_TAX', $orderProduct->getWasInPromo() ? $promoTax : $tax)
+
+                ->set('REAL_TOTAL_PRICE', $orderProduct->getWasInPromo() ? $totalPromoPrice : $totalPrice)
+                ->set('REAL_TOTAL_TAXED_PRICE', $orderProduct->getWasInPromo() ? $totalTaxedPromoPrice : $totalTaxedPrice)
+                ->set('REAL_TOTAL_PRICE_TAX', $orderProduct->getWasInPromo() ? $totalPromoTax : $totalTax)
+
             ;
             $this->addOutputFields($loopResultRow, $orderProduct);
 

@@ -66,6 +66,7 @@
                 <td style="color:#999;border-bottom:1px solid #000">{intl l="What You Purchased"}</td>
                 <td align="right" style="color:#999;border-bottom:1px solid #000">{intl l="Price in"} {$orderCurrencyIsoCode}</td>
             </tr>
+            {$subtotal = 0}
             {loop type="order_product" name="order-products" order=$ID}
             {if $WAS_IN_PROMO == 1}
                 {assign "realPrice" $PROMO_PRICE}
@@ -87,16 +88,28 @@
                     </td>
                     <td align="right" style="border-bottom:1px solid #000; white-space:nowrap">
                         {$QUANTITY} x {format_money number=$realTaxedPrice currency_id=$CURRENCY}
+                        {$subtotal = $subtotal + $realTaxedPrice * $QUANTITY}
                     </td>
                 </tr>
 
-                {hook name="email-html.order-notification.order-product" order="{$order_id}" order_product="{$ID}"}
+                {hook name="email-html.order-notification.order-product" order={$order_id} order_product={$ID}}
 
             {/loop}
             <tr>
-                <td align="right" style="text-align:right">{intl l="Total"}</td>
-                <td align="right" style="text-align:right">{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY} </td>
+                <td align="right" style="text-align:right">{intl l="Subtotal"}</td>
+                <td align="right" style="text-align:right">{format_money number=$subtotal currency_id=$CURRENCY} </td>
             </tr>
+            {if $DISCOUNT > 0}
+                <tr>
+                    <td align="right" style="text-align:right">{intl l="Discount"}</td>
+                    <td align="right" style="text-align:right">{format_money number=$DISCOUNT currency_id=$CURRENCY} </td>
+                </tr>
+                <tr>
+                    <td align="right" style="text-align:right">{intl l="Total"}</td>
+                    <td align="right" style="text-align:right">{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY} </td>
+                </tr>
+            {/if}
+            <tr>
             <tr>
                 <td align="right" style="text-align:right">{intl l="Shipping:"}</td>
                 <td align="right" style="text-align:right">{format_money number=$POSTAGE currency_id=$CURRENCY}</td>

@@ -37,11 +37,18 @@
 
                                 {hook name="coupon.list-caption" location="coupon_list_caption" }
 
-                                {loop type="auth" name="can_create" role="ADMIN" resource="admin.coupon" access="CREATE"}
-                                    <a class="btn btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
-                                        <span class="glyphicon glyphicon-plus-sign"></span>
-                                    </a>
-                                {/loop}
+                                {include file='renderer/buttons.html' btn_group=false buttons=[
+                                    [
+                                        'type' => 'create',
+                                        'class' => 'action-btn',
+                                        'title' => {intl l='Create a new coupon'},
+                                        'href' => {url path='/admin/coupon/create'},
+                                        'auth' => ['resource' => 'admin.coupon'],
+                                        'data' => [
+                                            'toggle' => 'modal'
+                                        ]
+                                    ]
+                                ]}
                             </caption>
 
                             <thead>
@@ -174,19 +181,26 @@
                                         {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
 
                                         <td class="actions">
-                                            <div class="btn-toolbar btn toolbar-primary">
-                                                <span class="glyphicon glyphicon-cog"></span>
-                                            </div>
-                                            <div class="toolbar-options hidden">
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                    <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                {/loop}
-                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
-                                                    <a title="{intl l='Delete this coupon'}" class="delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
-                                                        <span class="glyphicon glyphicon-trash"></span>
-                                                    </a>
-                                                {/loop}
-                                            </div>
+                                            {include file='renderer/buttons.html' buttons=[
+                                                [
+                                                    'type' => 'edit',
+                                                    'title' => {intl l='Change this coupon'},
+                                                    'href' => {url path="/admin/coupon/update/%id" id=$ID},
+                                                    'auth' => ['resource' => 'admin.coupon']
+                                                ],
+                                                [
+                                                    'type' => 'delete',
+                                                    'class' => 'delete_coupon_btn',
+                                                    'title' => {intl l='Delete this coupon'},
+                                                    'href' => '#delete_coupon',
+                                                    'data' => [
+                                                        'id' => $ID,
+                                                        'toggle' => 'modal',
+                                                        'target' => '#delete_coupon'
+                                                    ],
+                                                    'auth' => ['resource' => 'admin.coupon']
+                                                ]
+                                            ]}
                                         </td>
                                     </tr>
                                 {/loop}
@@ -209,7 +223,7 @@
 
                                         loop_ref       = "list_coupon"
                                         max_page_count = 10
-                                        page_url       = "{url path="/admin/coupon" orders_order=$coupon_order}"
+                                        page_url       = {url path="/admin/coupon" orders_order=$coupon_order}
                                         }
 
                                     </td>

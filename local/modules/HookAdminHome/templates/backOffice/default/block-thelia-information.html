@@ -1,8 +1,9 @@
+{loop type="auth" name="can_view" role="ADMIN" module="HookAdminHome" access="VIEW"}
 <div class="table-responsive">
   <table class="table table-striped">
     <tbody>
     <tr>
-      <th>{intl l="Current version"  d='hookadminhome.bo.default'}</th>
+      <th>{intl l="Current version" d='hookadminhome.bo.default'}</th>
       <td>{$THELIA_VERSION}</td>
     </tr>
     <tr>
@@ -16,3 +17,4 @@
     </tbody>
   </table>
 </div>
+{/loop}

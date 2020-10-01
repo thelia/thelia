@@ -13,10 +13,15 @@
 namespace Thelia\TaxEngine;
 
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
 use Thelia\Model\Country;
+use Thelia\Model\Order;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
 use Thelia\Model\State;
+use Thelia\Model\Tax;
+use Thelia\Model\TaxI18n;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\I18n;
@@ -25,37 +30,144 @@ use Thelia\Tools\I18n;
  * Class Calculator
  * @package Thelia\TaxEngine
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Franck Allimant <fallimant@openstudio.fr>
+ * @author Vincent Lopes <vlopes@openstudio.fr>
  */
 class Calculator
 {
     /**
      * @var TaxRuleQuery
      */
-    protected $taxRuleQuery = null;
+    protected $taxRuleQuery;
 
     /**
      * @var null|\Propel\Runtime\Collection\ObjectCollection
      */
-    protected $taxRulesCollection = null;
+    protected $taxRulesCollection;
 
-    protected $product = null;
-    protected $country = null;
-    protected $state = null;
-
+    protected $product;
+    protected $country;
+    protected $state;
 
     public function __construct()
     {
         $this->taxRuleQuery = new TaxRuleQuery();
     }
 
+    /**
+     * @param Cart $cart
+     * @param Country $country
+     * @param State|null $state
+     *
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public static function getUntaxedCartDiscount(Cart $cart, Country $country, State $state = null)
+    {
+        return $cart->getDiscount() / self::getCartTaxFactor($cart, $country, $state);
+    }
+
+    /**
+     * @param Cart $cart
+     * @param Country $country
+     * @param State|null $state
+     *
+     * @return float|int
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    /**
+     * @param Order $order
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public static function getUntaxedOrderDiscount(Order $order)
+    {
+        return $order->getDiscount() / self::getOrderTaxFactor($order);
+    }
+
+    /**
+     * @param Order $order
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public static function getOrderTaxFactor(Order $order)
+    {
+        // Cache the result in a local variable
+        static $orderTaxFactor;
+
+        if (null === $orderTaxFactor) {
+            if ((float)$order->getDiscount() === 0.0) {
+                return 1;
+            }
+
+            // Find the average Tax rate (see \Thelia\TaxEngine\Calculator::getCartTaxFactor())
+            $orderTaxFactors = [];
+
+            /** @var \Thelia\Model\OrderProduct $orderProduct */
+            foreach ($order->getOrderProducts() as $orderProduct) {
+                /** @var \Thelia\Core\Template\Loop\OrderProductTax $orderProductTax */
+                foreach ($orderProduct->getOrderProductTaxes() as $orderProductTax) {
+                    $orderTaxFactors[] = 1 + $orderProductTax->getAmount() / $orderProduct->getPrice();
+                }
+            }
+
+            if (0 === $orderTaxfactorCount = count($orderTaxFactors)) {
+                return 1;
+            }
+
+            $orderTaxFactor = array_sum($orderTaxFactors) / count($orderTaxFactors);
+        }
+
+        return $orderTaxFactor;
+    }
+
+    /**
+     * @param Cart $cart
+     * @param Country $country
+     * @param State|null $state
+     *
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public static function getCartTaxFactor(Cart $cart, Country $country, State $state = null)
+    {
+        // Cache the result in a local variable
+        static $cartFactor;
+
+        if (null === $cartFactor) {
+            if ((float)$cart->getDiscount() === 0.0) {
+                return 1;
+            }
+
+            $cartItems = $cart->getCartItems();
+
+            // Get the average of tax factor to apply it to the discount
+            $cartTaxFactors = [];
+
+            /** @var CartItem $cartItem */
+            foreach ($cartItems as $cartItem) {
+                $taxRulesCollection = TaxRuleQuery::create()->getTaxCalculatorCollection($cartItem->getProduct()->getTaxRule(), $country, $state);
+                /** @var TaxRule $taxRule */
+                foreach ($taxRulesCollection as $taxRule) {
+                    $cartTaxFactors[] = 1 + $taxRule->getTypeInstance()->pricePercentRetriever();
+                }
+            }
+
+            $cartFactor = array_sum($cartTaxFactors) / count($cartTaxFactors);
+        }
+
+        return $cartFactor;
+    }
+
+    /**
+     * @param Product $product
+     * @param Country $country
+     * @param State|null $state
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function load(Product $product, Country $country, State $state = null)
     {
-        $this->product = null;
-        $this->country = null;
-        $this->state = null;
-
-        $this->taxRulesCollection = null;
-
         if ($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
@@ -72,12 +184,16 @@ class Calculator
         return $this;
     }
 
+    /**
+     * @param TaxRule $taxRule
+     * @param Country $country
+     * @param Product $product
+     * @param State|null $state
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null)
     {
-        $this->product = null;
-        $this->country = null;
-        $this->taxRulesCollection = null;
-
         if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
@@ -97,12 +213,41 @@ class Calculator
         return $this;
     }
 
-    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
+    /**
+     * @param TaxRule $taxRule
+     * @param Product $product
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product)
     {
         $this->product = null;
-        $this->country = null;
         $this->taxRulesCollection = null;
 
+        if ($taxRule->getId() === null) {
+            throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
+        }
+        if ($product->getId() === null) {
+            throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
+        }
+
+        $this->product = $product;
+
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule);
+
+        return $this;
+    }
+
+    /**
+     * @param TaxRule $taxRule
+     * @param Country $country
+     * @param State|null $state
+     * @return $this
+     * @throws \Propel\Runtime\Exception\PropelException
+     * @since 2.4
+    */
+    public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
+    {
         if ($taxRule->getId() === null) {
             throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
         }
@@ -119,23 +264,32 @@ class Calculator
         return $this;
     }
 
+    /**
+     * @param $untaxedPrice
+     * @param null $taxCollection
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null)
     {
         return $this->getTaxedPrice($untaxedPrice, $taxCollection) - $untaxedPrice;
     }
 
+    /**
+     * @param $taxedPrice
+     * @return float
+     */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
     {
         return $taxedPrice - $this->getUntaxedPrice($taxedPrice);
     }
 
     /**
-     * @param      $untaxedPrice
-     * @param null $taxCollection returns OrderProductTaxCollection
-     * @param null $askedLocale
-     *
-     * @return int
-     * @throws \Thelia\Exception\TaxEngineException
+     * @param float $untaxedPrice
+     * @param OrderProductTaxCollection|null $taxCollection returns OrderProductTaxCollection
+     * @param string|null $askedLocale
+     * @return float
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
     {
@@ -158,9 +312,12 @@ class Calculator
         if (null !== $taxCollection) {
             $taxCollection = new OrderProductTaxCollection();
         }
+
+        /** @var Tax $taxRule */
         foreach ($this->taxRulesCollection as $taxRule) {
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
+            /** @var BaseTaxType $taxType */
             $taxType = $taxRule->getTypeInstance();
 
             if ($currentPosition !== $position) {
@@ -173,11 +330,15 @@ class Calculator
             $currentTax += $taxAmount;
 
             if (null !== $taxCollection) {
+                /** @var TaxI18n $taxI18n */
                 $taxI18n = I18n::forceI18nRetrieving($askedLocale, 'Tax', $taxRule->getId());
-                $orderProductTax = new OrderProductTax();
-                $orderProductTax->setTitle($taxI18n->getTitle());
-                $orderProductTax->setDescription($taxI18n->getDescription());
-                $orderProductTax->setAmount($taxAmount);
+
+                $orderProductTax = (new OrderProductTax())
+                    ->setTitle($taxI18n->getTitle())
+                    ->setDescription($taxI18n->getDescription())
+                    ->setAmount($taxAmount)
+                ;
+
                 $taxCollection->addTax($orderProductTax);
             }
         }
@@ -187,6 +348,10 @@ class Calculator
         return $taxedPrice;
     }
 
+    /**
+     * @param $taxedPrice
+     * @return float|int|number
+     */
     public function getUntaxedPrice($taxedPrice)
     {
         if (null === $this->taxRulesCollection) {
@@ -215,11 +380,12 @@ class Calculator
         do {
             $position = (int) $taxRule->getTaxRuleCountryPosition();
 
+            /** @var BaseTaxType $taxType */
             $taxType = $taxRule->getTypeInstance();
 
             if ($currentPosition !== $position) {
                 $untaxedPrice -= $currentFixTax;
-                $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
+                $untaxedPrice /= (1 + $currentTaxFactor);
                 $currentFixTax = 0;
                 $currentTaxFactor = 0;
                 $currentPosition = $position;
@@ -230,7 +396,7 @@ class Calculator
         } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;
-        $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
+        $untaxedPrice /= (1 + $currentTaxFactor);
 
         return $untaxedPrice;
     }

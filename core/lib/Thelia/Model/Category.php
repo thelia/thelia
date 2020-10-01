@@ -2,8 +2,11 @@
 
 namespace Thelia\Model;
 
+use phpDocumentor\Reflection\Types\Parent_;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
 use Thelia\Core\Event\TheliaEvents;
@@ -42,26 +45,27 @@ class Category extends BaseCategory implements FileModelParentInterface
      *
      * /!\ the number of queries is exponential, use it with caution
      *
+     * @param bool|string $productVisibility: true (default) to count only visible products, false to count only hidden
+     *                    products, or * to count all products.
      * @return int
      */
-    public function countAllProducts($visibleOnly = false)
+    public function countAllProducts($productVisibility = true)
     {
         $children = CategoryQuery::findAllChild($this->getId());
         array_push($children, $this);
 
-        $countProduct = 0;
+        $query = ProductQuery::create();
 
-        foreach ($children as $child) {
-            $req = ProductQuery::create();
-            $req->filterByCategory($child);
-            if($visibleOnly) {
-                $req->filterByVisible(true);
-            }
-
-            $countProduct += $req->count();
+        if ($productVisibility !== '*') {
+            $query->filterByVisible($productVisibility);
         }
 
-        return $countProduct;
+        $query
+            ->useProductCategoryQuery()
+                ->filterByCategory(new ObjectCollection($children), Criteria::IN)
+            ->endUse();
+
+        return $query->count();
     }
 
     /**
@@ -76,7 +80,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     {
         return $this->countAllProducts(true);
     }
-    
+
     /**
      * Get the root category
      * @param  int   $categoryId
@@ -99,6 +103,7 @@ class Category extends BaseCategory implements FileModelParentInterface
 
     /**
      * Calculate next position relative to our parent
+     * @param CategoryQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
     {
@@ -113,10 +118,10 @@ class Category extends BaseCategory implements FileModelParentInterface
             ->find($con);
 
         if ($productsCategories) {
+            /** @var ProductCategory $productCategory */
             foreach ($productsCategories as $productCategory) {
-                $product = $productCategory->getProduct();
-                if ($product) {
-                    $product->delete($con);
+                if (null !== $product = $productCategory->getProduct()) {
+                    $this->dispatchEvent(TheliaEvents::PRODUCT_DELETE, new ProductDeleteEvent($product->getId()));
                 }
             }
         }
@@ -127,6 +132,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        parent::preInsert($con);
+
         $this->setPosition($this->getNextPosition());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
@@ -139,6 +146,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY, new CategoryEvent($this));
     }
 
@@ -147,6 +156,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        parent::preUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECATEGORY, new CategoryEvent($this));
 
         return true;
@@ -157,6 +168,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        parent::postUpdate($con);
+
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECATEGORY, new CategoryEvent($this));
     }
 
@@ -165,6 +178,8 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        parent::preDelete($con);
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
         $this->reorderBeforeDelete(
             array(
@@ -181,13 +196,15 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        parent::postDelete($con);
+
         $this->markRewrittenUrlObsolete();
 
         //delete all subcategories
         $subCategories = CategoryQuery::findAllChild($this->getId());
 
         foreach ($subCategories as $category) {
-            if (!is_null($this->dispatcher)) {
+            if (!\is_null($this->dispatcher)) {
                 $category->setDispatcher($this->getDispatcher());
             }
 

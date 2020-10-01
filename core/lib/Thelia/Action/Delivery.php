@@ -10,13 +10,13 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Module\AbstractDeliveryModule;
 
 /**
  * Class Delivery
@@ -32,6 +32,7 @@ class Delivery implements EventSubscriberInterface
      */
     public function getPostage(DeliveryPostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
+        /** @var AbstractDeliveryModule $module */
         $module = $event->getModule();
 
         // dispatch event to target specific module
@@ -48,7 +49,9 @@ class Delivery implements EventSubscriberInterface
         }
 
         // call legacy module method
-        $event->setValidModule($module->isValidDelivery($event->getCountry()));
+        $event->setValidModule($module->isValidDelivery($event->getCountry()))
+            ->setDeliveryMode($module->getDeliveryMode());
+
         if ($event->isValidModule()) {
             $event->setPostage($module->getPostage($event->getCountry()));
         }

@@ -68,7 +68,7 @@ class CouponManager
 
         $coupons = $this->facade->getCurrentCoupons();
 
-        if (count($coupons) > 0) {
+        if (\count($coupons) > 0) {
             $couponsKept = $this->sortCoupons($coupons);
 
             $discount = $this->getEffect($couponsKept);
@@ -81,7 +81,7 @@ class CouponManager
             }
         }
 
-        return $discount;
+        return round($discount, 2);
     }
 
     /**
@@ -104,7 +104,7 @@ class CouponManager
     {
         $coupons = $this->facade->getCurrentCoupons();
 
-        if (count($coupons) == 0) {
+        if (\count($coupons) == 0) {
             return false;
         }
 
@@ -223,7 +223,6 @@ class CouponManager
                 if ($coupon->isMatching()) {
                     $couponsKept[] = $coupon;
                 }
-
             } catch (UnmatchableConditionException $e) {
                 // ignore unmatchable coupon
                 continue;

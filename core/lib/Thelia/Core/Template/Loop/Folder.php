@@ -43,6 +43,9 @@ use Thelia\Type\BooleanOrBothType;
  * @method string getTitle()
  * @method string[] getOrder()
  * @method bool getWithPrevNextInfo()
+ * @method bool getNeedCountChild()
+ * @method bool getNeedContentCount()
+ * @method bool getContentCountVisible()
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -64,6 +67,8 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
+            Argument::createBooleanTypeArgument('need_count_child', true),
+            Argument::createBooleanTypeArgument('need_content_count', true),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -82,7 +87,8 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanTypeArgument('with_prev_next_info', false)
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
+            Argument::createBooleanOrBothTypeArgument('content_count_visible', true)
         );
     }
 
@@ -103,7 +109,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-        
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
@@ -119,7 +124,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -128,7 +133,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         if (null !== $parent) {
             $search->filterByParent($parent);
         }
-    
+
         $current = $this->getCurrent();
 
         if ($current === true) {
@@ -139,7 +144,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -155,7 +160,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $title = $this->getTitle();
 
-        if (!is_null($title)) {
+        if (!\is_null($title)) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
         }
 
@@ -218,6 +223,15 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
     public function parseResults(LoopResult $loopResult)
     {
+        $needCountChild = $this->getNeedCountChild();
+        $needContentCount = $this->getNeedContentCount();
+
+        $contentCountVisiblility = $this->getContentCountVisible();
+
+        if ($contentCountVisiblility !== BooleanOrBothType::ANY) {
+            $contentCountVisiblility = $contentCountVisiblility ? 1 : 0;
+        }
+
         /** @var \Thelia\Model\Folder $folder */
         foreach ($loopResult->getResultDataCollection() as $folder) {
             $loopResultRow = new LoopResultRow($folder);
@@ -236,10 +250,17 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("META_TITLE", $folder->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $folder->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("CHILD_COUNT", $folder->countChild())
-                ->set("CONTENT_COUNT", $folder->countAllContents())
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition());
+
+
+            if ($needCountChild) {
+                $loopResultRow->set("CHILD_COUNT", $folder->countChild());
+            }
+
+            if ($needContentCount) {
+                $loopResultRow->set("CONTENT_COUNT", $folder->countAllContents($contentCountVisiblility));
+            }
 
             $isBackendContext = $this->getBackendContext();
 

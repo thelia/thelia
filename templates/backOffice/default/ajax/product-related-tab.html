@@ -4,572 +4,620 @@
 {loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
 <div class="form-container">
 
-    {include
-        file = "includes/inner-form-toolbar.html"
-        hide_submit_buttons = true
+	{include
+	file = "includes/inner-form-toolbar.html"
+	hide_submit_buttons = true
 
-        page_url  = "{url path='/admin/products/update' product_id=$ID}"
-        close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
-    }
+	page_url  = "{url path='/admin/products/update' product_id=$ID}"
+	close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
+	}
 
-    <div class="row">
+	<div class="row">
 
-        {* -- Begin related content management ------------------------------ *}
+		{* -- Begin related content management ------------------------------ *}
 
-	    <div class="col-md-6">
-	       <div class="well well-sm">
-		        <div class="form-group">
-		            <form method="POST" action="{url path='/admin/products/content/add'}" id="related_content_form">
+		<div class="col-md-6">
+			<div class="well well-sm">
+				<div class="form-group">
+					<form method="POST" action="{url path='/admin/products/content/add'}" id="related_content_form">
 
-		                <p class="title title-without-tabs">{intl l='Related content'}</p>
-		                <p>{intl l='You can attach here some content to this product'}</p>
+						<p class="title title-without-tabs">{intl l='Related content'}</p>
+						<p>{intl l='You can attach here some content to this product'}</p>
 
-		                <input type="hidden" name="product_id" value="{$product_id}" />
-		                <input type="hidden" name="current_tab" value="related" />
+						<input type="hidden" name="product_id" value="{$product_id}" />
+						<input type="hidden" name="current_tab" value="related" />
 
-		                {ifloop rel="folders"}
-		                <div class="form-group">
-		                    <select name="folder_id" id="folder_id" class="form-control">
-		                        <option value="">{intl l='Select a folder...'}</option>
-		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
-		                            <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
-		                        {/loop}
-		                    </select>
+						{ifloop rel="folders"}
+						<div class="form-group">
+							<select name="folder_id" id="folder_id" class="form-control">
+								<option value="">{intl l='Select a folder...'}</option>
+								{loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
+								<option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
+								{/loop}
+							</select>
 
-		                    <span class="help-block">{intl l='Select a folder to get its content'}</span>
-		                </div>
+							<span class="help-block">{intl l='Select a folder to get its content'}</span>
+						</div>
 
-		                <div id="content_selector" class="hide">
-		                    <div class="input-group">
-		                        <select required="required" name="content_id" id="content_id" class="form-control">
-		                            <option value="">{intl l='Select a folder content...'}</option>
-		                        </select>
-		                        <span class="input-group-btn" id="content_add_button">
+						<div id="content_selector" class="hide">
+							<div class="input-group">
+								<select required="required" name="content_id" id="content_id" class="form-control">
+									<option value="">{intl l='Select a folder content...'}</option>
+								</select>
+								<span class="input-group-btn" id="content_add_button">
 		                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
 		                        </span>
-		                    </div>
+							</div>
 
-		                    <span class="help-block">{intl l='Select a content and click (+) to add it to this product'}</span>
-		                </div>
+							<span class="help-block">{intl l='Select a content and click (+) to add it to this product'}</span>
+						</div>
 
-		                <div id="content_selector_empty" class="hide">
-		                   <div class="alert alert-info">
-		                       {intl l="No available content in this folder"}
-		                   </div>
-		                </div>
-		                {/ifloop}
+						<div id="content_selector_empty" class="hide">
+							<div class="alert alert-info">
+								{intl l="No available content in this folder"}
+							</div>
+						</div>
+						{/ifloop}
 
-		                {elseloop rel="folders"}
-		                    <div class="alert alert-info">{intl l="No folders found"}</div>
-		                {/elseloop}
+						{elseloop rel="folders"}
+						<div class="alert alert-info">{intl l="No folders found"}</div>
+						{/elseloop}
 
-		            </form>
-		        </div>
+					</form>
+				</div>
 
-		        <div class="table-responsive">
-		            <table class="table table-striped table-condensed table-left-aligned">
-		                <thead>
-		                    <tr>
-		                        <th>{intl l='ID'}</th>
+				<div class="table-responsive">
+					<table class="table table-striped table-condensed table-left-aligned">
+						<thead>
+						<tr>
+							<th>{intl l='ID'}</th>
 
-		                        <th>{intl l='Content title'}</th>
+							<th>{intl l='Content title'}</th>
 
-		                        <th class="text-center">{intl l='Position'}</th>
+							<th class="text-center">{intl l='Position'}</th>
 
-		                        {hook name="product.contents-table-header" location="product_contents_table_header" }
+							{hook name="product.contents-table-header" location="product_contents_table_header" }
 
-		                        <th class="actions">{intl l="Actions"}</th>
-		                    </tr>
-		                </thead>
+							<th class="actions">{intl l="Actions"}</th>
+						</tr>
+						</thead>
 
-		                <tbody>
-		                    {loop name="assigned_contents" type="associated_content" visible="*" product="$product_id" backend_context="1" lang="$edit_language_id"}
-		                    <tr>
-		                        <td>{$CONTENT_ID}</td>
+						<tbody>
+						{loop name="assigned_contents" type="associated_content" visible="*" product="$product_id" backend_context="1" lang="$edit_language_id"}
+						<tr>
+							<td>{$CONTENT_ID}</td>
 
-		                        <td>
-		                            <a href="{url path="/admin/content/update/%id" id=$CONTENT_ID}">{$TITLE}</a>
-		                        </td>
+							<td>
+								<a href="{url path="/admin/content/update/%id" id=$CONTENT_ID}">{$TITLE}</a>
+							</td>
 
-		                         <td class="text-center">
-		                         {admin_position_block
-		                             resource="admin.product"
-		                             access="UPDATE"
-		                             path={url path='/admin/product/update-content-position' product_id=$product_id current_tab="related"}
-		                             url_parameter="content_id"
-		                             in_place_edit_class="contentPositionChange"
-		                             position=$POSITION
-		                             id=$ID
-		                          }
-		                         </td>
+							<td class="text-center">
+								{admin_position_block
+								resource="admin.product"
+								access="UPDATE"
+								path={url path='/admin/product/update-content-position' product_id=$product_id current_tab="related"}
+								url_parameter="content_id"
+								in_place_edit_class="contentPositionChange"
+								position=$POSITION
+								id=$ID
+								}
+							</td>
 
-                                {hook name="product.contents-table-row" location="product_contents_table_row-bottom" }
+							{hook name="product.contents-table-row" location="product_contents_table_row-bottom" }
 
-		                        <td class="actions">
-                                    {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-                                        <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-trash"></span>
-                                        </a>
-                                    {/loop}
-		                        </td>
-		                    </tr>
-		                     {/loop}
+							<td class="actions">
+								{loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
+								<a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
+									<span class="glyphicon glyphicon-trash"></span>
+								</a>
+								{/loop}
+							</td>
+						</tr>
+						{/loop}
 
-		                     {elseloop rel="assigned_contents"}
-		                         <tr>
-		                             <td colspan="4">
-		                                 <div class="alert alert-info">
-		                                     {intl l="This product contains no contents"}
-		                                 </div>
-		                             </td>
-		                         </tr>
-		                     {/elseloop}
-		                </tbody>
-		            </table>
-		        </div>
-	        </div>
-	    </div>
+						{elseloop rel="assigned_contents"}
+						<tr>
+							<td colspan="4">
+								<div class="alert alert-info">
+									{intl l="This product contains no contents"}
+								</div>
+							</td>
+						</tr>
+						{/elseloop}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
-	    {* -- End related content management -------------------------------- *}
+		{* -- End related content management -------------------------------- *}
 
-	    {* -- Begin accessories management ---------------------------------- *}
+		{* -- Begin accessories management ---------------------------------- *}
 
-	    <div class="col-md-6">
-	        <div class=" well well-sm">
-		        <div class="form-group">
-		            <form method="POST" action="{url path='/admin/products/accessory/add'}" id="accessory_form">
+		<div class="col-md-6">
+			<div class=" well well-sm">
+				<div class="form-group">
+					<form method="POST" action="{url path='/admin/products/accessory/add'}" id="accessory_form">
 
-		                <p class="title title-without-tabs">{intl l='Product accessories'}</p>
-		                <p>{intl l='Define here this product\'s accessories'}</p>
+						<p class="title title-without-tabs">{intl l='Product accessories'}</p>
+						<p>{intl l='Define here this product\'s accessories'}</p>
 
-		                <input type="hidden" name="product_id" value="{$product_id}" />
-		                <input type="hidden" name="current_tab" value="related" />
+						<input type="hidden" name="product_id" value="{$product_id}" />
+						<input type="hidden" name="current_tab" value="related" />
 
-		                {ifloop rel="categories"}
-		                <div class="form-group">
-		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
-		                        <option value="">{intl l='Select a category...'}</option>
-		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
-		                            <option value="{$ID}">{option_offset l=$LEVEL label={$TITLE}}</option>
-		                        {/loop}
-		                    </select>
+						{ifloop rel="categories"}
+						<div class="form-group">
+							<div class="input-group">
+								<select name="accessory_category_id" id="accessory_category_id" class="form-control">
+									<option value="">{intl l='Select a category...'}</option>
+									{loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id" return_url=false}
+									<option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
+									{/loop}
+								</select>
 
-		                    <span class="help-block">{intl l='Select a category to get its products'}</span>
-		                </div>
+								<span class="input-group-btn">
+									<a class="js-btn-accessories-search-category btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
+								</span>
+							</div>
 
-		                <div id="accessory_selector" class="hide">
-		                    <div class="input-group">
-		                        <select required="required" name="accessory_id" id="accessory_id" class="form-control">
-		                            <option value="">{intl l='Select a product...'}</option>
-		                        </select>
-		                        <span class="input-group-btn" id="accessory_add_button">
+							<span class="help-block">{intl l='Select a category to get its products'}</span>
+						</div>
+
+						<div id="accessory_selector" class="hide">
+							<div class="input-group">
+								<select required="required" name="accessory_id" id="accessory_id" class="form-control">
+									<option value="">{intl l='Select a product...'}</option>
+								</select>
+								<span class="input-group-btn" id="accessory_add_button">
 		                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+									<a class="js-btn-accessories-search-product btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
 		                        </span>
-		                    </div>
+							</div>
 
-		                    <span class="help-block">{intl l='Select a product and click (+) to add it as an accessory'}</span>
-		                </div>
+							<span class="help-block">{intl l='Select a product and click (+) to add it as an accessory'}</span>
+						</div>
 
-		                <div id="accessory_selector_empty" class="hide">
-		                   <div class="alert alert-info">
-		                       {intl l="No available product in this category"}
-		                   </div>
-		                </div>
+						<div id="accessory_selector_empty" class="hide">
+							<div class="alert alert-info">
+								{intl l="No available product in this category"}
+							</div>
+						</div>
 
-		                {/ifloop}
+						{/ifloop}
 
-		                {elseloop rel="categories"}
-		                    <div class="alert alert-info">{intl l="No categories found"}</div>
-		                {/elseloop}
+						{elseloop rel="categories"}
+						<div class="alert alert-info">{intl l="No categories found"}</div>
+						{/elseloop}
 
-		            </form>
-		        </div>
+					</form>
+				</div>
 
-		        <div class="table-responsive">
-		            <table class="table table-striped table-condensed table-left-aligned">
-		                <thead>
-		                    <tr>
-		                        <th>{intl l='ID'}</th>
+				<div class="table-responsive">
+					<table class="table table-striped table-condensed table-left-aligned">
+						<thead>
+						<tr>
+							<th>{intl l='ID'}</th>
 
-		                        <th>{intl l='Accessory title'}</th>
+							<th>{intl l='Accessory title'}</th>
 
-		                        <th class="text-center">{intl l='Position'}</th>
+							<th class="text-center">{intl l='Position'}</th>
 
-                                {hook name="product.accessories-table-header" location="product_accessories_table_header-bottom" }
+							{hook name="product.accessories-table-header" location="product_accessories_table_header-bottom" }
 
-		                        <th class="actions">{intl l="Actions"}</th>
-		                    </tr>
-		                </thead>
+							<th class="actions">{intl l="Actions"}</th>
+						</tr>
+						</thead>
 
-		                <tbody>
-		                    {loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id" return_url=false}
-		                    <tr>
-		                        <td>{$ID}</td>
+						<tbody>
+						{loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id" return_url=false}
+						<tr>
+							<td>{$ID}</td>
 
-		                        <td>
-		                            {$TITLE}
-		                        </td>
+							<td>
+								{$TITLE}
+							</td>
 
-		                         <td class="text-center">
-		                         {admin_position_block
-                                     resource="admin.product"
-                                     access="UPDATE"
-		                             path={url path='/admin/product/update-accessory-position' product_id=$product_id current_tab="related"}
-		                             url_parameter="accessory_id"
-		                             in_place_edit_class="accessoryPositionChange"
-		                             position=$POSITION
-		                             id=$ID
-		                          }
-		                         </td>
+							<td class="text-center">
+								{admin_position_block
+								resource="admin.product"
+								access="UPDATE"
+								path={url path='/admin/product/update-accessory-position' product_id=$product_id current_tab="related"}
+								url_parameter="accessory_id"
+								in_place_edit_class="accessoryPositionChange"
+								position=$POSITION
+								id=$ID
+								}
+							</td>
 
-                                {hook name="product.accessories-table-row" location="product_accessories_table_row-bottom" }
+							{hook name="product.accessories-table-row" location="product_accessories_table_row-bottom" }
 
-		                        <td class="actions">
-                                    {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-                                    <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                    </a>
-                                    {/loop}
-		                        </td>
-		                    </tr>
-		                     {/loop}
+							<td class="actions">
+								{loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
+								<a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
+									<span class="glyphicon glyphicon-trash"></span>
+								</a>
+								{/loop}
+							</td>
+						</tr>
+						{/loop}
 
-		                     {elseloop rel="assigned_accessories"}
-		                         <tr>
-		                             <td colspan="4">
-		                                 <div class="alert alert-info">
-		                                     {intl l="This product contains no accessories"}
-		                                 </div>
-		                             </td>
-		                         </tr>
-		                     {/elseloop}
-		                </tbody>
-		            </table>
-		        </div>
-		    </div>
-	    </div>
+						{elseloop rel="assigned_accessories"}
+						<tr>
+							<td colspan="4">
+								<div class="alert alert-info">
+									{intl l="This product contains no accessories"}
+								</div>
+							</td>
+						</tr>
+						{/elseloop}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
-        {* -- End accessories management ------------------------------------ *}
+		{* -- End accessories management ------------------------------------ *}
 
-    </div>
+	</div>
 
-    <div class="row">
+	<div class="row">
 
-        {* -- Begin categories management ----------------------------------- *}
+		{* -- Begin categories management ----------------------------------- *}
 
-        <div class="col-md-6">
-            <div class="well well-sm">
-	            <div class="form-group">
-	                <form method="POST" action="{url path='/admin/products/category/add'}" id="related_content_form">
+		<div class="col-md-6">
+			<div class="well well-sm">
+				<div class="form-group">
+					<form method="POST" action="{url path='/admin/products/category/add'}" id="related_content_form">
 
-	                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
-	                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
-	                    {loop name="default_category" visible="*" type="category" id=$DEFAULT_CATEGORY return_url=false}
-	                        {intl l='You can change the default category (%title) in the "General" tab.' title={$TITLE}}
-	                    {/loop}
+						<p class="title title-without-tabs">{intl l='Additional categories'}</p>
+						<p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
+							{loop name="default_category" visible="*" type="category" id=$DEFAULT_CATEGORY return_url=false}
+							{intl l='You can change the default category (%title) in the "General" tab.' title={$TITLE}}
+							{/loop}
 
-	                    {$exclude_from_tree = "-1"}
-	                    {loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
-	                        {$exclude_from_tree = "$exclude_from_tree,$ID"}
-	                    {/loop}
+							{$exclude_from_tree = "-1"}
+							{loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
+							{$exclude_from_tree = "$exclude_from_tree,$ID"}
+							{/loop}
 
-	                    <input type="hidden" name="product_id" value="{$product_id}" />
-	                    <input type="hidden" name="current_tab" value="related" />
+							<input type="hidden" name="product_id" value="{$product_id}" />
+							<input type="hidden" name="current_tab" value="related" />
 
-	                    {ifloop rel="categories"}
-	                    <div class="input-group">
+							{ifloop rel="categories"}
+						<div class="input-group">
 
-	                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
-	                            <option value="">{intl l='Select a category...'}</option>
-	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id" return_url=false}
-	                                <option value="{$ID}" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
-										{option_offset l=$LEVEL label={$TITLE}}{if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
-	                                </option>
-	                            {/loop}
-	                        </select>
+							<select name="additional_category_id" id="additional_category_id" class="form-control">
+								<option value="">{intl l='Select a category...'}</option>
+								{loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id" return_url=false}
+								<option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
+									{$TITLE} {if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
+								</option>
+								{/loop}
+							</select>
 
-	                        <span class="input-group-btn" id="content_add_button">
+							<span class="input-group-btn" id="content_add_button">
 	                           <button class="btn btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+								<a class="js-btn-additional-search-category btn btn-info" href="#"><span class="glyphicon glyphicon-search"></span></a>
 	                        </span>
 
-	                    </div>
-	                    <span class="help-block">{intl l='Select a category and click (+) to add it to the additional category list'}</span>
-	                    {/ifloop}
+						</div>
+						<span class="help-block">{intl l='Select a category and click (+) to add it to the additional category list'}</span>
+						{/ifloop}
 
-	                    {elseloop rel="categories"}
-	                        <div class="alert alert-info">{intl l="No categories found"}</div>
-	                    {/elseloop}
+						{elseloop rel="categories"}
+						<div class="alert alert-info">{intl l="No categories found"}</div>
+						{/elseloop}
 
-	                </form>
-	            </div>
+					</form>
+				</div>
 
-	            <div class="table-responsive">
-	                <table class="table table-striped table-condensed table-left-aligned">
-	                    <thead>
-	                        <tr>
-	                            <th>{intl l='ID'}</th>
+				<div class="table-responsive">
+					<table class="table table-striped table-condensed table-left-aligned">
+						<thead>
+						<tr>
+							<th>{intl l='ID'}</th>
 
-	                            <th>{intl l='Category title'}</th>
+							<th>{intl l='Category title'}</th>
 
-	                            {hook name="product.categories-table-header" location="product_categories_table_header" }
+							{hook name="product.categories-table-header" location="product_categories_table_header" }
 
-	                            <th class="actions">{intl l="Actions"}</th>
-	                        </tr>
-	                    </thead>
+							<th class="actions">{intl l="Actions"}</th>
+						</tr>
+						</thead>
 
-	                    <tbody>
-	                        {loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
-	                        <tr>
-	                            <td>{$ID}</td>
+						<tbody>
+						{loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id" return_url=false}
+						<tr>
+							<td>{$ID}</td>
 
-	                            <td>
-	                                {$TITLE}
-	                            </td>
+							<td>
+								{$TITLE}
+							</td>
 
-	                            {hook name="product.categories-table-row" location="product_categories_table_row" }
+							{hook name="product.categories-table-row" location="product_categories_table_row" }
 
-	                            <td class="actions">
-                                    {loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
-                                        <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
-                                            <span class="glyphicon glyphicon-trash"></span>
-                                        </a>
-                                    {/loop}
-	                            </td>
-	                        </tr>
-	                        {/loop}
+							<td class="actions">
+								{loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
+								<a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
+									<span class="glyphicon glyphicon-trash"></span>
+								</a>
+								{/loop}
+							</td>
+						</tr>
+						{/loop}
 
-	                        {elseloop rel="additional_categories"}
-	                            <tr>
-	                                <td colspan="3">
-	                                    <div class="alert alert-info">
-	                                        {intl l="This product doesn't belong to any additional category."}
-	                                    </div>
-	                                </td>
-	                            </tr>
-	                        {/elseloop}
-	                    </tbody>
-	                </table>
-	            </div>
-	        </div>
-        </div>
-        {* -- End categories management ------------------------------------- *}
-    </div>
+						{elseloop rel="additional_categories"}
+						<tr>
+							<td colspan="3">
+								<div class="alert alert-info">
+									{intl l="This product doesn't belong to any additional category."}
+								</div>
+							</td>
+						</tr>
+						{/elseloop}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		{* -- End categories management ------------------------------------- *}
+	</div>
 
 </div>
 
 {* Delete related content confirmation dialog *}
 
 {capture "delete_content_dialog"}
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="content_id" id="content_delete_id" value="" />
-    <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
+<input type="hidden" name="product_id" value="{$product_id}" />
+<input type="hidden" name="content_id" id="content_delete_id" value="" />
+<input type="hidden" name="folder_id" id="folder_delete_id" value="" />
 
-    <input type="hidden" name="current_tab" value="related" />
+<input type="hidden" name="current_tab" value="related" />
 {/capture}
 
 {include
-    file = "includes/generic-confirm-dialog.html"
+file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_content_dialog"
-    dialog_title    = {intl l="Remove related content"}
-    dialog_message  = {intl l="Do you really want to remove this related content from the product ?"}
+dialog_id       = "delete_content_dialog"
+dialog_title    = {intl l="Remove related content"}
+dialog_message  = {intl l="Do you really want to remove this related content from the product ?"}
 
-    form_action     = {token_url path='/admin/products/content/delete'}
-    form_content    = {$smarty.capture.delete_content_dialog nofilter}
+form_action     = {token_url path='/admin/products/content/delete'}
+form_content    = {$smarty.capture.delete_content_dialog nofilter}
 }
 
 {* Delete accessory confirmation dialog *}
 
 {capture "delete_accessory_dialog"}
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="accessory_id" id="accessory_delete_id" value="" />
-    <input type="hidden" name="accessory_category_id" id="accessory_category_delete_id" value="" />
+<input type="hidden" name="product_id" value="{$product_id}" />
+<input type="hidden" name="accessory_id" id="accessory_delete_id" value="" />
+<input type="hidden" name="accessory_category_id" id="accessory_category_delete_id" value="" />
 
-    <input type="hidden" name="current_tab" value="related" />
+<input type="hidden" name="current_tab" value="related" />
 {/capture}
 
 {include
-    file = "includes/generic-confirm-dialog.html"
+file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_accessory_dialog"
-    dialog_title    = {intl l="Remove an accessory"}
-    dialog_message  = {intl l="Do you really want to remove this accessory from the product ?"}
+dialog_id       = "delete_accessory_dialog"
+dialog_title    = {intl l="Remove an accessory"}
+dialog_message  = {intl l="Do you really want to remove this accessory from the product ?"}
 
-    form_action     = {token_url path='/admin/products/accessory/delete'}
-    form_content    = {$smarty.capture.delete_accessory_dialog nofilter}
+form_action     = {token_url path='/admin/products/accessory/delete'}
+form_content    = {$smarty.capture.delete_accessory_dialog nofilter}
 }
 
 {* Delete category confirmation dialog *}
 
 {capture "delete_category_dialog"}
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="additional_category_id" id="additional_category_delete_id" value="" />
+<input type="hidden" name="product_id" value="{$product_id}" />
+<input type="hidden" name="additional_category_id" id="additional_category_delete_id" value="" />
 
-    <input type="hidden" name="current_tab" value="related" />
+<input type="hidden" name="current_tab" value="related" />
 {/capture}
 
 {include
-    file = "includes/generic-confirm-dialog.html"
+file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_category_dialog"
-    dialog_title    = {intl l="Remove from category"}
-    dialog_message  = {intl l="Do you really want to remove the product from this category ?"}
+dialog_id       = "delete_category_dialog"
+dialog_title    = {intl l="Remove from category"}
+dialog_message  = {intl l="Do you really want to remove the product from this category ?"}
 
-    form_action     = {token_url path='/admin/products/category/delete'}
-    form_content    = {$smarty.capture.delete_category_dialog nofilter}
+form_action     = {token_url path='/admin/products/category/delete'}
+form_content    = {$smarty.capture.delete_category_dialog nofilter}
 }
 
 <script>
-$(function() {
 
-    // Set proper content ID in delete content from
-    $('a.delete-content').click(function(ev) {
-        $('#content_delete_id').val($(this).data('id'));
-        $('#folder_delete_id').val($('#folder_id').val());
-    });
+	$(function() {
 
-    // Set proper content ID in accessory delete from
-    $('a.delete-accessory').click(function(ev) {
-        $('#accessory_delete_id').val($(this).data('id'));
-        $('#accessory_category_delete_id').val($('#accessory_category_id').val());
-    });
+		// Set proper content ID in delete content from
+		$('a.delete-content').click(function(ev) {
+			$('#content_delete_id').val($(this).data('id'));
+			$('#folder_delete_id').val($('#folder_id').val());
+		});
 
-    // Set proper content ID in accessory delete from
-    $('a.delete-category').click(function(ev) {
-        $('#additional_category_delete_id').val($(this).data('id'));
-    });
+		// Set proper content ID in accessory delete from
+		$('a.delete-accessory').click(function(ev) {
+			$('#accessory_delete_id').val($(this).data('id'));
+			$('#accessory_category_delete_id').val($('#accessory_category_id').val());
+		});
+
+		// Set proper content ID in accessory delete from
+		$('a.delete-category').click(function(ev) {
+			$('#additional_category_delete_id').val($(this).data('id'));
+		});
 
 
-    // Load content on folder selection
-    $('#folder_id').change(function(event) {
-        var val = $(this).val();
+		// Load content on folder selection
+		$('#folder_id').change(function(event) {
+			var val = $(this).val();
 
-        if (val != "") {
-            $.ajax({
-                 url      : '{url path="/admin/product/$product_id/available-content/"}' + $(this).val() + '.xml',
-                 type     : 'get',
-                 dataType : 'json',
-                 success  : function(json) {
-                     $('#content_id :not(:first-child)').remove();
+			if (val != "") {
+				$.ajax({
+					url      : '{url path="/admin/product/$product_id/available-content/"}' + $(this).val() + '.xml',
+					type     : 'get',
+					dataType : 'json',
+					success  : function(json) {
+						$('#content_id :not(:first-child)').remove();
 
-                     var have_content = false;
+						var have_content = false;
 
-                     $.each(json, function(idx, value) {
-                         $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
+						$.each(json, function(idx, value) {
+							$('#content_id').append($('<option>').text(value.title).attr('value', value.id));
 
-                         have_content = true; // Lame...
-                     });
+							have_content = true; // Lame...
+						});
 
-                     if (have_content) {
-                         $('#content_selector_empty').addClass('hide');
-                         $('#content_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#content_selector_empty').removeClass('hide');
-                         $('#content_selector').addClass('hide');
-                     }
+						if (have_content) {
+							$('#content_selector_empty').addClass('hide');
+							$('#content_selector').removeClass('hide');
+						}
+						else {
+							$('#content_selector_empty').removeClass('hide');
+							$('#content_selector').addClass('hide');
+						}
 
-                 }
-            });
-        }
-        else {
-            $('#content_selector_empty').addClass('hide');
-            $('#content_selector').addClass('hide');
-        }
-    });
+					}
+				});
+			}
+			else {
+				$('#content_selector_empty').addClass('hide');
+				$('#content_selector').addClass('hide');
+			}
+		});
 
-    // Load accessory on category selection
-    $('#accessory_category_id').change(function(event) {
-        var val = $(this).val();
+		// Load accessory on category selection
+		$('#accessory_category_id').change(function(event) {
+			var val = $(this).val();
 
-        if (val != "") {
-            $.ajax({
-                 url      : '{url path="/admin/product/$product_id/available-accessories/"}' + $(this).val() + '.xml',
-                 type     : 'get',
-                 dataType : 'json',
-                 success  : function(json) {
-                     $('#accessory_id :not(:first-child)').remove();
+			if (val != "") {
+				$.ajax({
+					url      : '{url path="/admin/product/$product_id/available-accessories/"}' + $(this).val() + '.xml',
+					type     : 'get',
+					dataType : 'json',
+					success  : function(json) {
+						$('#accessory_id :not(:first-child)').remove();
 
-                     var have_content = false;
+						var have_content = false;
 
-                     $.each(json, function(idx, value) {
-                         $('#accessory_id').append($('<option>').text(value.title).attr('value', value.id));
+						$.each(json, function(idx, value) {
+							$('#accessory_id').append($('<option>').text(value.title).attr('value', value.id));
 
-                         have_content = true; // Lame...
-                     });
+							have_content = true; // Lame...
+						});
 
-                     if (have_content) {
-                         $('#accessory_selector_empty').addClass('hide');
-                         $('#accessory_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#accessory_selector_empty').removeClass('hide');
-                         $('#accessory_selector').addClass('hide');
-                     }
+						if (have_content) {
+							$('#accessory_selector_empty').addClass('hide');
+							$('#accessory_selector').removeClass('hide');
+						}
+						else {
+							$('#accessory_selector_empty').removeClass('hide');
+							$('#accessory_selector').addClass('hide');
+						}
 
-                 }
-            });
-        }
-        else {
-            $('#accessory_selector_empty').addClass('hide');
-            $('#accessory_selector').addClass('hide');
-        }
-    });
+					}
+				});
+			}
+			else {
+				$('#accessory_selector_empty').addClass('hide');
+				$('#accessory_selector').addClass('hide');
+			}
+		});
 
-    {* Inline editing of accessory position using bootstrap-editable *}
+		{* Inline editing of accessory position using bootstrap-editable *}
 
-    $('.accessoryPositionChange').editable({
-        type        : 'text',
-        title       : "{intl l="Enter new accessory position"}",
-        mode        : 'popup',
-        inputclass  : 'input-mini',
-        placement   : 'left',
-        success     : function(response, newValue) {
-            // The URL template
-            var url = "{url noamp='1' path='/admin/product/update-accessory-position' accessory_id='__ID__' position='__POS__' product_id=$product_id current_tab='related' }";
+		$('.accessoryPositionChange').editable({
+			type        : 'text',
+			title       : "{intl l="Enter new accessory position"}",
+			mode        : 'popup',
+			inputclass  : 'input-mini',
+			placement   : 'left',
+			success     : function(response, newValue) {
+				// The URL template
+				var url = "{url noamp='1' path='/admin/product/update-accessory-position' accessory_id='__ID__' position='__POS__' product_id=$product_id current_tab='related' }";
 
-            // Perform subtitutions
-            url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
+				// Perform subtitutions
+				url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
 
-            // Reload the page
-            location.href = url;
-        }
-    });
+				// Reload the page
+				location.href = url;
+			}
+		});
 
-    $('.contentPositionChange').editable({
-        type        : 'text',
-        title       : "{intl l="Enter new content position"}",
-        mode        : 'popup',
-        inputclass  : 'input-mini',
-        placement   : 'left',
-        success     : function(response, newValue) {
-            // The URL template
-            var url = "{url noamp='1' path='/admin/product/update-content-position' content_id='__ID__' position='__POS__' product_id=$product_id current_tab='related' }";
+		$('.contentPositionChange').editable({
+			type        : 'text',
+			title       : "{intl l="Enter new content position"}",
+			mode        : 'popup',
+			inputclass  : 'input-mini',
+			placement   : 'left',
+			success     : function(response, newValue) {
+				// The URL template
+				var url = "{url noamp='1' path='/admin/product/update-content-position' content_id='__ID__' position='__POS__' product_id=$product_id current_tab='related' }";
 
-            // Perform subtitutions
-            url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
+				// Perform subtitutions
+				url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
 
-            // Reload the page
-            location.href = url;
-        }
-    });
+				// Reload the page
+				location.href = url;
+			}
+		});
 
-    // Initialize folder select value
-    {if $folder_id != 0}
-        $('#folder_id').val("{$folder_id}").change();
-    {/if}
+		// Initialize folder select value
+		{if $folder_id != 0}
+		$('#folder_id').val("{$folder_id}").change();
+		{/if}
 
-    // Initialize accessory category id select value
-    {if $accessory_category_id != 0}
-        $('#accessory_category_id').val("{$accessory_category_id}").change();
-    {/if}
+			// Initialize accessory category id select value
+			{if $accessory_category_id != 0}
+			$('#accessory_category_id').val("{$accessory_category_id}").change();
+			{/if}
 
-    // Unselect all options in attribute + feature tab
-    $('.clear_feature_value').click(function(event){
-        $('#feature_value_' + $(this).data('id') + ' option').prop('selected', false);
+				// Unselect all options in attribute + feature tab
+				$('.clear_feature_value').click(function(event){
+					$('#feature_value_' + $(this).data('id') + ' option').prop('selected', false);
 
-        event.preventDefault();
-    });
-});
+					event.preventDefault();
+				});
+
+
+
+				// Search categories and products
+
+
+				$('.js-btn-accessories-search-category').on('click', function(event){
+					event.preventDefault();
+
+					$modalSearch.initAndShow(
+							'{intl l="Search category"}',
+							'{url path="/admin/products/related/tab/categories/search"}',
+							'#accessory_category_id',
+							"{intl l='Category title'}"
+					);
+				});
+
+				$('.js-btn-accessories-search-product').on('click', function(event){
+					event.preventDefault();
+
+					$modalSearch.initAndShow(
+							'{intl l="Search product in category %category"}'.replace('%category', $("#accessory_category_id option:selected" ).text().trim()),
+							'{url path="/admin/products/related/tab/products/search"}',
+							'#accessory_id',
+							"{intl l='Product title'}",
+							$('#accessory_category_id').val()
+					);
+				});
+
+				$('.js-btn-additional-search-category').on('click', function(event){
+					event.preventDefault();
+
+					$modalSearch.initAndShow(
+							'{intl l="Search category"}',
+							'{url path="/admin/products/related/tab/categories/search"}',
+							'#additional_category_id',
+							"{intl l='Category title'}"
+					);
+				});
+			});
 </script>
 {/loop}

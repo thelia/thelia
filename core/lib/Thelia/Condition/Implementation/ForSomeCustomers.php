@@ -67,14 +67,14 @@ class ForSomeCustomers extends ConditionAbstract
         }
 
         // Be sure that the value is an array, make one if required
-        if (! is_array($values[self::CUSTOMERS_LIST])) {
+        if (! \is_array($values[self::CUSTOMERS_LIST])) {
             $values[self::CUSTOMERS_LIST] = array($values[self::CUSTOMERS_LIST]);
         }
 
         // Check that at least one product is selected
         if (empty($values[self::CUSTOMERS_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(),
+                \get_class(),
                 self::CUSTOMERS_LIST
             );
         }

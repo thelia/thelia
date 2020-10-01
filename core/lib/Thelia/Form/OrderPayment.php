@@ -80,7 +80,7 @@ class OrderPayment extends FirewallForm
             ->findOne();
 
         if (null === $module) {
-            $context->addViolation("Payment module ID not found");
+            $context->addViolation(Translator::getInstance()->trans("Payment module ID not found"));
         } elseif (! $module->isPayementModule()) {
             $context->addViolation(
                 sprintf(Translator::getInstance()->trans("payment module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())

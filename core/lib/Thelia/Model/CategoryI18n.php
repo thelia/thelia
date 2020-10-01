@@ -10,8 +10,14 @@ class CategoryI18n extends BaseCategoryI18n
 {
     use I18nTimestampableTrait;
 
+    /**
+     * @param ConnectionInterface|null $con
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function postInsert(ConnectionInterface $con = null)
     {
+        parent::postInsert($con);
+
         $category = $this->getCategory();
         $category->generateRewrittenUrl($this->getLocale());
     }

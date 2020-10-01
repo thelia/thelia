@@ -254,7 +254,7 @@
 
                                     <input type="hidden" id="text_{$idx}" name="text[]" value="{$info.text}" />
 
-                                    {$not_translated = empty($info.translation)}
+                                    {$not_translated = empty($info.translation) && empty($info.custom_fallback) && empty($info.global_fallback)}
 
                                     {if $view_missing_traductions_only != 1 || $not_translated }
 
@@ -457,7 +457,7 @@
                 }
 
                 docCookies.setItem('translation_userMode', userMode ? '1' : '0');
-                
+
                 return false;
             };
 

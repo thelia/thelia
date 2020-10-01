@@ -33,7 +33,7 @@ abstract class AbstractTheliaType extends AbstractType
      */
     protected function replaceGroups($groups, array $constraints)
     {
-        if (!is_array($groups)) {
+        if (!\is_array($groups)) {
             $groups = [$groups];
         }
 

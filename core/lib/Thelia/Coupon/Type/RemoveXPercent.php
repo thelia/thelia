@@ -64,7 +64,7 @@ class RemoveXPercent extends AbstractRemove
      */
     public function exec()
     {
-        return round($this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) *  $this->percentage/100, 2);
+        return ($this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) *  $this->percentage/100);
     }
 
     /**

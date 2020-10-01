@@ -60,6 +60,7 @@ use Thelia\Model\Category as CategoryModel;
  * @method bool|string getVisible()
  * @method int[] getExclude()
  * @method string[] getOrder()
+ * @method int[] getTemplateId()
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -87,6 +88,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             Argument::createBooleanTypeArgument('need_product_count', false),
             Argument::createBooleanTypeArgument('product_count_visible_only', false),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntListTypeArgument('template_id'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -95,7 +97,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                         'alpha', 'alpha_reverse',
                         'manual', 'manual_reverse',
                         'visible', 'visible_reverse',
-                        'created','created_reverse',
+                        'created', 'created_reverse',
                         'updated', 'updated_reverse',
                         'random'
                     ])
@@ -136,7 +138,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -151,7 +153,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     
         $excludeParent = $this->getExcludeParent();
 
-        if (!is_null($excludeParent)) {
+        if (!\is_null($excludeParent)) {
             $search->filterByParent($excludeParent, Criteria::NOT_IN);
         }
 
@@ -165,7 +167,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -202,6 +204,11 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->filterByContentId($contentId, Criteria::IN)
                 ->endUse()
             ;
+        }
+        $templateIdList = $this->getTemplateId();
+    
+        if (!\is_null($templateIdList)) {
+            $search->filterByDefaultTemplateId($templateIdList, Criteria::IN);
         }
 
         $orders = $this->getOrder();
@@ -291,8 +298,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             if ($this->getNeedProductCount()) {
                 if ($this->getProductCountVisibleOnly()) {
                     $loopResultRow->set("PRODUCT_COUNT", $category->countAllProductsVisibleOnly());
-                }
-                else {
+                } else {
                     $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
                 }
             }

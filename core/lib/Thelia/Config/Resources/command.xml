@@ -26,6 +26,8 @@
         <command class="Thelia\Command\HookCleanCommand"/>
         <command class="Thelia\Command\ExportCommand"/>
         <command class="Thelia\Command\ImportCommand"/>
+        <command class="Thelia\Command\UpdateCurrenciesRates"/>
+        <command class="Thelia\Command\DiffDatabaseCommand"/>
     </commands>
 
 </config>

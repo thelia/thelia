@@ -14,14 +14,13 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
-
 class CountryModificationForm extends CountryCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
     protected function buildForm()
     {
-        parent::buildForm(true);
+        parent::buildForm();
 
         $this->formBuilder
             ->add('id', 'hidden', ['constraints' => [new GreaterThan(['value' => 0])]])

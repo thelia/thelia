@@ -17,6 +17,9 @@ coverage
 .settings/
 local/media/documents/*
 local/media/images/*
+!local/media/images/store/favicon.png
+!local/media/images/store/logo.png
+!local/media/images/store/banner.jpg
 web/assets/*
 web/cache/*
 web/tinymce
@@ -29,6 +32,8 @@ phpmyadmin
 composer.phar
 web/.htaccess
 local/I18n/*.php
+.docker/mysql-data/*
+!.docker/mysql-data/.gitkeep
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
@@ -64,6 +69,9 @@ templates/pdf/*
 codekit-config.json
 config.codekit
 .codekit-cache
+
+#MacOS
+.DS_Store
 
 # Ignore casperjs screenshots
 tests/functionnal/casperjs/screenshot/

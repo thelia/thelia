@@ -58,7 +58,7 @@ class LoopResult implements \Iterator, \JsonSerializable
 
     public function isEmpty()
     {
-        return count($this->collection) == 0;
+        return \count($this->collection) == 0;
     }
 
     public function addRow(LoopResultRow $row)
@@ -80,7 +80,17 @@ class LoopResult implements \Iterator, \JsonSerializable
 
         $this->collection[] = $row;
     }
-    
+
+    /**
+     * @param int $key
+     */
+    public function remove($key)
+    {
+        if (isset($this->collection[$key])) {
+            unset($this->collection[$key]);
+        }
+    }
+
     /**
      * Adjust the collection once all results have been added.
      */
@@ -97,15 +107,15 @@ class LoopResult implements \Iterator, \JsonSerializable
 
     public function getCount()
     {
-        return count($this->collection);
+        return \count($this->collection);
     }
 
     public function getResultDataCollectionCount()
     {
         if ($this->resultsCollection instanceof ObjectCollection || $this->resultsCollection instanceof PropelModelPager) {
             return $this->resultsCollection->count();
-        } elseif (is_array($this->resultsCollection)) {
-            return count($this->resultsCollection);
+        } elseif (\is_array($this->resultsCollection)) {
+            return \count($this->resultsCollection);
         } else {
             return 0;
         }

@@ -25,7 +25,7 @@ class ProductModificationForm extends ProductCreationForm
 
     protected function buildForm()
     {
-        parent::buildForm(true);
+        parent::doBuildForm(true);
 
         $this->formBuilder
             ->add("id", "integer", array(

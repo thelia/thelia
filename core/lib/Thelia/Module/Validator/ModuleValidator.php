@@ -13,6 +13,7 @@
 namespace Thelia\Module\Validator;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
@@ -34,7 +35,7 @@ class ModuleValidator
 {
     protected $modulePath;
 
-    /** @var ModuleDescriptorValidator */
+    /** @var \SimpleXMLElement */
     protected $moduleDescriptor;
 
     /** @var ModuleDefinition */
@@ -118,16 +119,17 @@ class ModuleValidator
         return $this->errors;
     }
 
-    /**
-     * @return \Thelia\Core\Translation\Translator
-     */
-    public function getTranslator()
+    protected function trans($id, array $parameters = [])
     {
         if (null === $this->translator) {
-            $this->translator = Translator::getInstance();
+            try {
+                $this->translator = Translator::getInstance();
+            } catch (\RuntimeException $e) {
+                return strtr($id, $parameters);
+            }
         }
 
-        return $this->translator;
+        return $this->translator->trans($id, $parameters);
     }
 
     /**
@@ -143,7 +145,7 @@ class ModuleValidator
     {
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
-                $this->getTranslator()->trans(
+                $this->trans(
                     "The %name module definition has not been initialized.",
                     [ '%name' => $this->moduleDirName ]
                 )
@@ -157,13 +159,14 @@ class ModuleValidator
         }
 
         $this->checkModuleDependencies();
+        $this->checkModulePropelSchema();
     }
 
     protected function checkDirectoryStructure()
     {
         if (false === file_exists($this->modulePath)) {
             throw new FileNotFoundException(
-                $this->getTranslator()->trans(
+                $this->trans(
                     "Module %name directory doesn't exists.",
                     [ '%name' => $this->moduleDirName]
                 )
@@ -173,7 +176,7 @@ class ModuleValidator
         $path = sprintf("%s/Config/module.xml", $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
-                $this->getTranslator()->trans(
+                $this->trans(
                     "Module %name should have a module.xml in the Config directory.",
                     [ '%name' => $this->moduleDirName]
                 )
@@ -183,7 +186,7 @@ class ModuleValidator
         $path = sprintf("%s/Config/config.xml", $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
-                $this->getTranslator()->trans(
+                $this->trans(
                     "Module %name should have a config.xml in the Config directory.",
                     [ '%name' => $this->moduleDirName]
                 )
@@ -210,7 +213,7 @@ class ModuleValidator
     {
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
-                $this->getTranslator()->trans(
+                $this->trans(
                     "The %name module descriptor has not been initialized.",
                     [ '%name' => $this->moduleDirName ]
                 )
@@ -226,7 +229,7 @@ class ModuleValidator
 
         if (! isset($namespaceComponents[0]) || empty($namespaceComponents[0])) {
             throw new ModuleException(
-                $this->getTranslator()->trans(
+                $this->trans(
                     "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
                     [
                         '%name' => $this->moduleDirName,
@@ -260,12 +263,28 @@ class ModuleValidator
         $this->moduleDefinition = $moduleDefinition;
     }
 
+    public function checkModulePropelSchema()
+    {
+        $schemaFile = $this->getModulePath() . DS . "Config" . DS . "schema.xml";
+        $fs = new Filesystem();
+
+        if ($fs->exists($schemaFile) === false) {
+            return;
+        }
+
+        if (preg_match('/<behavior.*name="versionable".*\/>/s', preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
+            throw new ModuleException(
+                "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
+            );
+        }
+    }
+
     protected function checkVersion()
     {
         if ($this->moduleDefinition->getTheliaVersion()) {
             if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, ">=")) {
                 throw new ModuleException(
-                    $this->getTranslator()->trans(
+                    $this->trans(
                         "The module %name requires Thelia %version or newer",
                         [
                             '%name' => $this->moduleDirName,
@@ -285,7 +304,7 @@ class ModuleValidator
         if (null !== $module) {
             if (version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
                 throw new ModuleException(
-                    $this->getTranslator()->trans(
+                    $this->trans(
                         "The module %name is already installed in the same or greater version.",
                         [ '%name' => $this->moduleDirName]
                     )
@@ -314,7 +333,7 @@ class ModuleValidator
 
             if (false === $pass) {
                 if ('' !== $dependency[1]) {
-                    $errors[] = $this->getTranslator()->trans(
+                    $errors[] = $this->trans(
                         '%module (version: %version)',
                         [
                             '%module' => $dependency[0],
@@ -327,8 +346,8 @@ class ModuleValidator
             }
         }
 
-        if (count($errors) > 0) {
-            $errorsMessage = $this->getTranslator()->trans(
+        if (\count($errors) > 0) {
+            $errorsMessage = $this->trans(
                 'To activate module %name, the following modules should be activated first: %modules',
                 ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)]
             );
@@ -366,7 +385,7 @@ class ModuleValidator
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
 
-                if (count($dependencies) > 0) {
+                if (\count($dependencies) > 0) {
                     foreach ($dependencies as $dependency) {
                         if ($dependency[0] == $code) {
                             $dependantModules[] = [
@@ -386,15 +405,33 @@ class ModuleValidator
         return $dependantModules;
     }
 
-    public function getCurrentModuleDependencies()
+    /**
+     * Get the dependencies of this module.
+     * @param bool $recursive Whether to also get the dependencies of dependencies, their dependencies, and so on...
+     * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
+     */
+    public function getCurrentModuleDependencies($recursive = false)
     {
+        if (empty($this->moduleDescriptor->required)) {
+            return [];
+        }
+
         $dependencies = [];
-        if (0 !== count($this->moduleDescriptor->required)) {
-            foreach ($this->moduleDescriptor->required->module as $dependency) {
-                $dependencies[] = [
-                   "code" => (string)$dependency,
-                   "version" => (string)$dependency['version'],
-                ];
+        foreach ($this->moduleDescriptor->required->module as $dependency) {
+            $dependencyArray = [
+                "code" => (string)$dependency,
+                "version" => (string)$dependency['version'],
+            ];
+            if (!\in_array($dependencyArray, $dependencies)) {
+                $dependencies[] = $dependencyArray;
+            }
+
+            if ($recursive) {
+                $recursiveModuleValidator = new ModuleValidator(THELIA_MODULE_DIR . '/' . (string)$dependency);
+                array_merge(
+                    $dependencies,
+                    $recursiveModuleValidator->getCurrentModuleDependencies(true)
+                );
             }
         }
 
@@ -438,7 +475,7 @@ class ModuleValidator
     protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
     {
         $dependencies = [];
-        if (0 !== count($this->moduleDescriptor->required)) {
+        if (is_countable($this->moduleDescriptor->required) && 0 !== \count($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {
                 $dependencies[] = [
                     (string)$dependency,
@@ -455,7 +492,8 @@ class ModuleValidator
     protected function getModuleAuthors(ModuleDefinition $moduleDefinition)
     {
         $authors = [];
-        if (0 !== count($this->moduleDescriptor->author)) {
+
+        if (is_countable($this->moduleDescriptor->author) && 0 !== \count($this->moduleDescriptor->author)) {
             foreach ($this->moduleDescriptor->author as $author) {
                 $authors[] = [
                     (string)$author->name,
@@ -474,15 +512,19 @@ class ModuleValidator
     {
         $authors = [];
 
-        if (0 !== count($this->moduleDescriptor->authors->author)) {
-            foreach ($this->moduleDescriptor->authors->author as $author) {
-                $authors[] = [
-                    (string)$author->name,
-                    (string)$author->company,
-                    (string)$author->email,
-                    (string)$author->website
-                ];
-            }
+        if (!is_countable($this->moduleDescriptor->authors->author)
+        || 0 === \count($this->moduleDescriptor->authors->author)
+        ) {
+            return $authors;
+        }
+
+        foreach ($this->moduleDescriptor->authors->author as $author) {
+            $authors[] = [
+                (string)$author->name,
+                (string)$author->company,
+                (string)$author->email,
+                (string)$author->website
+            ];
         }
 
         return $authors;

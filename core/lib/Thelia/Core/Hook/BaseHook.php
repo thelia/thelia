@@ -93,11 +93,15 @@ abstract class BaseHook
         if (array_key_exists($code, $this->templates)) {
             $templates = explode(';', $this->templates[$code]);
 
+            // Concatenate arguments and template variables,
+            // giving the precedence to arguments.
+            $allArguments = $event->getTemplateVars() + $event->getArguments();
+
             foreach ($templates as $template) {
                 list($type, $filepath) = $this->getTemplateParams($template);
 
                 if ("render" === $type) {
-                    $event->add($this->render($filepath, $event->getArguments()));
+                    $event->add($this->render($filepath, $allArguments));
                     continue;
                 }
 
@@ -117,7 +121,7 @@ abstract class BaseHook
                 }
 
                 if (method_exists($this, $type)) {
-                    $this->{$type}($filepath, $event->getArguments());
+                    $this->{$type}($filepath, $allArguments);
                 }
             }
         }
@@ -188,7 +192,7 @@ abstract class BaseHook
             $tags[] = '<link rel="stylesheet" type="text/css" ';
             $tags[] = ' href="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, [ "href", "rel", "type" ])) {
+                if (\is_string($name) && !\in_array($name, [ "href", "rel", "type" ])) {
                     $tags[] = $name . '="' . $val . '" ';
                 }
             }
@@ -219,7 +223,7 @@ abstract class BaseHook
             $tags[] = '<script type="text/javascript" ';
             $tags[] = ' src="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, [ "src", "type" ])) {
+                if (\is_string($name) && !\in_array($name, [ "src", "type" ])) {
                     $tags[] = $name . '="' . $val . '" ';
                 }
             }
@@ -428,7 +432,7 @@ abstract class BaseHook
     {
         $templateParams = explode(':', $template);
 
-        if (count($templateParams) > 1) {
+        if (\count($templateParams) > 1) {
             $type = $templateParams[0];
             $filepath = $templateParams[1];
         } else {

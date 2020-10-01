@@ -15,6 +15,7 @@ namespace Thelia\Core\Hook;
 use Thelia\Core\Template\ParserHelperInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
@@ -39,6 +40,11 @@ class HookHelper
         $this->parserHelper = $parserHelper;
     }
 
+    /**
+     * @param int $templateType
+     * @return array
+     * @throws \Exception
+     */
     public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE)
     {
         switch ($templateType) {
@@ -54,17 +60,31 @@ class HookHelper
             case TemplateDefinition::EMAIL:
                 $tplVar = 'active-mail-template';
                 break;
+            default:
+                throw new TheliaProcessException("Unknown template type: $templateType");
         }
 
         return $this->parseTemplate($templateType, ConfigQuery::read($tplVar, 'default'));
     }
 
+    /**
+     * @param int $templateType
+     * @param string $template
+     * @return array an array of hooks descriptors
+     * @throws \Exception
+     */
     public function parseTemplate($templateType, $template)
     {
         $templateDefinition = new TemplateDefinition($template, $templateType);
 
         $hooks = array();
         $this->walkDir($templateDefinition->getAbsolutePath(), $hooks);
+
+        // Also parse parent templates
+        /** @var TemplateDefinition $parentTemplate */
+        foreach ($templateDefinition->getParentList() as $parentTemplate) {
+            $this->walkDir($parentTemplate->getAbsolutePath(), $hooks);
+        }
 
         // load language message
         $locale = Lang::getDefaultLanguage()->getLocale();
@@ -99,7 +119,6 @@ class HookHelper
      * @internal param string $currentLocale the current locale
      * @internal param string $domain the translation domain (fontoffice, backoffice, module, etc...)
      * @internal param array $strings the list of strings
-     * @return number the total number of translatable texts
      */
     public function walkDir($directory, &$hooks)
     {
@@ -119,7 +138,7 @@ class HookHelper
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (in_array($ext, $allowed_exts)) {
+                    if (\in_array($ext, $allowed_exts)) {
                         if ($content = file_get_contents($fileInfo->getPathName())) {
                             foreach ($this->parserHelper->getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
                                 $hook['file'] = $fileInfo->getFilename();
@@ -149,7 +168,7 @@ class HookHelper
             $ret['code'] = $attributes['name'];
             $params      = explode(".", $attributes['name']);
 
-            if (count($params) != 2) {
+            if (\count($params) != 2) {
                 // the hook does not respect the convention
                 if (false === strpos($attributes['name'], "$")) {
                     $ret['context'] = $attributes['name'];
@@ -199,6 +218,13 @@ class HookHelper
         return ltrim($path, '/');
     }
 
+    /**
+     * Translate Hook labels
+     *
+     * @param $context
+     * @param $key
+     * @return string
+     */
     protected function trans($context, $key)
     {
         $message = "";

@@ -15,6 +15,7 @@ namespace Thelia\Module;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Country;
+use Thelia\Model\State;
 
 abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
 {
@@ -29,7 +30,6 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
         return false;
     }
 
-
     /**
      * Return the first area that matches the given  country for the given module
      * @param Country $country
@@ -41,12 +41,17 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
         $area = null;
 
         if (null !== $areaDeliveryModule = AreaDeliveryModuleQuery::create()->findByCountryAndModule(
-            $country,
-            $this->getModuleModel()
-        )) {
+                $country,
+                $this->getModuleModel()
+            )) {
             $area = $areaDeliveryModule->getArea();
         }
 
         return $area;
+    }
+
+    public function getDeliveryMode()
+    {
+        return "delivery";
     }
 }

@@ -81,6 +81,7 @@ final class AdminForm
 
     const MESSAGE_CREATION = 'thelia.admin.message.creation';
     const MESSAGE_MODIFICATION = 'thelia.admin.message.modification';
+    const MESSAGE_SEND_SAMPLE = 'thelia.admin.message.send-sample';
 
     const CURRENCY_CREATION = 'thelia.admin.currency.creation';
     const CURRENCY_MODIFICATION = 'thelia.admin.currency.modification';

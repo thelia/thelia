@@ -99,6 +99,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.update-title" path="/admin/image/type/{parentType}/{imageId}/update-title" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateImageTitleAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
     <route id="admin.image.toggle.process" path="/admin/image/type/{parentType}/{documentId}/toggle">
         <default key="_controller">Thelia\Controller\Admin\FileController::toggleVisibilityImageAction</default>
         <requirement key="parentType">.*</requirement>
@@ -173,7 +178,7 @@
 
     <route id="admin.customer.update.process" path="/admin/customer/save">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::processUpdateAction</default>
-     </route>
+    </route>
 
     <route id="admin.customer.delete" path="/admin/customer/delete">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
@@ -375,6 +380,14 @@
 
     <route id="admin.products.related.tab" path="/admin/products/related/tab">
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadRelatedAjaxTabAction</default>
+    </route>
+
+    <route id="admin.products.related.tab.categories.search" path="/admin/products/related/tab/categories/search">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::searchCategoryAction</default>
+    </route>
+
+    <route id="admin.products.related.tab.products.search" path="/admin/products/related/tab/products/search">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::searchProductAction</default>
     </route>
 
     <!-- categories -->
@@ -753,6 +766,10 @@
 
     <route id="admin.configuration.templates.delete" path="/admin/configuration/templates/delete">
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.duplicate" path="/admin/configuration/templates/duplicate">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::duplicateAction</default>
     </route>
 
     <route id="admin.configuration.templates.features.list" path="/admin/configuration/templates/features/list">
@@ -1571,6 +1588,11 @@
 
     <route id="admin.email.preview_text" path="/admin/message/preview/text/{messageId}" methods="get">
         <default key="_controller">Thelia:Admin\Message:previewAsText</default>
+        <requirement key="messageId">\d+</requirement>
+    </route>
+
+    <route id="admin.email.test_send" path="/admin/message/send/{messageId}" methods="post">
+        <default key="_controller">Thelia:Admin\Message:sendSampleByEmail</default>
         <requirement key="messageId">\d+</requirement>
     </route>
 

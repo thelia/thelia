@@ -12,9 +12,9 @@
 
 // Check php version
 
-if (version_compare(phpversion(), "5.4", "<")) {
+if (version_compare(phpversion(), "5.6", "<")) {
     die(sprintf(
-        "Thelia needs at least php 5.4, but you are using php %s. Please upgrade before using Thelia.\n",
+        "Thelia needs at least php 5.6, but you are using php %s. Please upgrade before using Thelia.\n",
         phpversion()
     ));
 }
@@ -73,6 +73,16 @@ if (!defined('THELIA_SETUP_DIRECTORY')) {
 
 if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
     define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT . 'web' . DS . 'install' . DS);
+}
+
+// this will be used in our Propel model builders
+if (!defined('THELIA_PROPEL_BUILD_MODEL_PATH')) {
+    define('THELIA_PROPEL_BUILD_MODEL_PATH', THELIA_CACHE_DIR .  'propel' . DS . 'model' . DS);
+}
+
+// this will be used in our Propel model builders
+if (!defined('THELIA_PROPEL_BUILD_DATABASE_PATH')) {
+    define('THELIA_PROPEL_BUILD_DATABASE_PATH', THELIA_CACHE_DIR .  'propel' . DS . 'database' . DS);
 }
 
 if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_MODE')) {

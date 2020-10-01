@@ -55,7 +55,7 @@ class HomeController extends BaseAdminController
 
         // force flush
         if ($this->getRequest()->query->get('flush', "0")) {
-            $cacheAdapter->deleteItem($cacheItem);
+            $cacheAdapter->deleteItem($cacheKey);
         }
 
         if (!$cacheItem->isHit()) {
@@ -71,17 +71,17 @@ class HomeController extends BaseAdminController
 
         return $this->jsonResponse($cacheItem->get());
     }
-    
+
     public function blockMonthSalesStatistics($month, $year)
     {
         $baseDate = sprintf("%04d-%02d", $year, $month);
 
         $startDate = "$baseDate-01";
         $endDate = date("Y-m-t", strtotime($startDate));
-        
+
         $prevMonthStartDate = date('Y-m-01', strtotime("$baseDate -1 month"));
         $prevMonthEndDate = date("Y-m-t", strtotime($prevMonthStartDate));
-        
+
         return $this->render('block-month-sales-statistics', [
             'startDate' => $startDate,
             'endDate' => $endDate,
@@ -151,4 +151,6 @@ class HomeController extends BaseAdminController
 
         return preg_match('/^#[a-f0-9]{6}$/i', $hexColor) ? $hexColor : $default;
     }
+
+
 }

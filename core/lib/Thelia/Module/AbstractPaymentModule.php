@@ -16,7 +16,9 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Model\Country;
 use Thelia\Model\Order;
+use Thelia\Model\State;
 use Thelia\Tools\URL;
 
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
@@ -101,5 +103,15 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     public function manageStockOnCreation()
     {
         return true;
+    }
+
+    public function getMinimumAmount()
+    {
+        return null;
+    }
+
+    public function getMaximumAmount()
+    {
+        return null;
     }
 }

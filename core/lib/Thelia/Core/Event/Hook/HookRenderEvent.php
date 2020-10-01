@@ -24,9 +24,9 @@ class HookRenderEvent extends BaseHookRenderEvent
     /** @var  array $fragments an array of fragments collected during the event dispatch */
     protected $fragments;
 
-    public function __construct($code, array $arguments = array())
+    public function __construct($code, array $arguments = [], array $templateVariables = [])
     {
-        parent::__construct($code, $arguments);
+        parent::__construct($code, $arguments, $templateVariables);
         $this->fragments = array();
     }
 
@@ -64,7 +64,7 @@ class HookRenderEvent extends BaseHookRenderEvent
     public function dump($glue = '', $before = '', $after = '')
     {
         $ret = '';
-        if (0 !== count($this->fragments)) {
+        if (0 !== \count($this->fragments)) {
             $ret = $before . implode($glue, $this->fragments) . $after;
         }
 
