@@ -26,28 +26,26 @@ trait StandardI18nFieldsSearchTrait
         "postscriptum"
     ];
 
-    protected function getStandardI18nSearchFields()
-    {
-        return self::$standardI18nSearchFields;
-    }
-
-    /**
+     /**
      * @param ModelCriteria $search
      * @param $searchTerm
      * @param $searchCriteria
+     * @param string[] $searchIn
      */
-    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = ["title","chapo","description","postscriptum"])
+    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = [ "title", "chapo", "description", "postscriptum" ])
     {
-        foreach (self::$standardI18nSearchFields as $index => $searchInElement) {
-            if ($index > 0) {
+        $firstSearch = true;
+        foreach (self::$standardI18nSearchFields as $searchInElement) {
+            if (!in_array($searchInElement, $searchIn, true)) {
+                continue;
+            }
+
+            if (!$firstSearch) {
                 $search->_or();
             }
 
-            foreach ( $searchIn as $searchInTerm) {
-                if($searchInTerm == $searchInElement) {
-                    $this->addSearchInI18nColumn($search, strtoupper($searchInElement), $searchCriteria, $searchTerm);
-                }
-            }
+            $this->addSearchInI18nColumn($search, strtoupper($searchInElement), $searchCriteria, $searchTerm);
+            $firstSearch = false;
         }
     }
 }
