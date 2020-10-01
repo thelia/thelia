@@ -3411,7 +3411,7 @@ INSERT INTO `tax_i18n` (`id`, `locale`, `title`, `description`) VALUES
 
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`, `description`) VALUES
 {foreach $locales as $locale}
-    (1, '{$locale}', {intl l='Default Tax Rule' locale=$locale}, {intl l='French 20% VAT  for all Europan countries (metropolitan only)' locale=$locale}),
+    (1, '{$locale}', {intl l='Default Tax Rule' locale=$locale}, {intl l='French 20% VAT  for all European countries (metropolitan only)' locale=$locale}),
     (2, '{$locale}', {intl l='French 10% VAT (France only)' locale=$locale}, {intl l='French 10% VAT (for metropolitan France only)' locale=$locale}){if ! $locale@last},{/if}
 
 {/foreach}

@@ -1470,6 +1470,6 @@ return array(
     'Гривна' => 'Гривна',
     'Default Tax Rule' => 'Default Tax Rule',
     'French 10% VAT (France only)' => 'French 10% VAT (France only)',
-    'French 20% VAT  for all Europan countries (metropolitan only)' => 'French 20% VAT  for all Europan countries (metropolitan only)',
+    'French 20% VAT  for all European countries (metropolitan only)' => 'French 20% VAT  for all European countries (metropolitan only)',
     'French 10% VAT (for metropolitan France only)' => 'French 10% VAT (for metropolitan France only)',
 );
