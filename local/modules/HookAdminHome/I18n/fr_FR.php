@@ -3,5 +3,6 @@
 return [
     'Sales statistics' => 'Statistiques de vente',
     'Stats on %month/%year' => 'Statistiques pour %month/%year',
-    'Thelia informations' => 'Informations Thelia',
+    'Thelia Github activity' => 'Thelia sur Github',
+    'Thelia news' => 'Actualité Thelia',
 ];

@@ -126,7 +126,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     {
         $search->_and();
     
-        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
     public function buildModelCriteria()
