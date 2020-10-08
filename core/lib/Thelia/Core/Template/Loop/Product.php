@@ -211,7 +211,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
         }
 
-        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
     /**

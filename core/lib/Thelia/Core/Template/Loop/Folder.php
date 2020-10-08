@@ -109,8 +109,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-
-        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
     public function buildModelCriteria()
