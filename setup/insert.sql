@@ -11667,7 +11667,7 @@ INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`, `description`) VALUES
     (2, 'cs_CZ', NULL, NULL),
     (1, 'de_DE', 'Standardsteuerregel', 'Französische Mehrwertsteuer von 20% für alle Länder in Europa (nur Metropolregion)'),
     (2, 'de_DE', '10% französische Mehrwertsteuer (nur Metropolitan France)', 'Französische Mehrwertsteuer von 10% nur für die französische Metropole'),
-    (1, 'en_US', 'Default Tax Rule', 'French 20% VAT  for all Europan countries (metropolitan only)'),
+    (1, 'en_US', 'Default Tax Rule', 'French 20% VAT  for all European countries (metropolitan only)'),
     (2, 'en_US', 'French 10% VAT (France only)', 'French 10% VAT (for metropolitan France only)'),
     (1, 'es_ES', 'Regla impositiva predeterminada', 'IVA francés al 20% para todos los países de Europa (solo países metropolitanos)'),
     (2, 'es_ES', '10% de IVA francés (solo Francia metropolitana)', 'IVA francés al 10% (solo para Francia metropolitana)'),
