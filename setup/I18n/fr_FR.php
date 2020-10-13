@@ -1454,6 +1454,6 @@ return array(
     'Гривна' => 'Hryvnia Ukrainien',
     'Default Tax Rule' => 'Règle de taxes par défaut',
     'French 10% VAT (France only)' => 'TVA française à 10% (France métropolitaine seulement)',
-    'French 20% VAT  for all Europan countries (metropolitan only)' => 'TVA Française a 20% pour tous les pays en Europe (hors DOM TOM)',
+    'French 20% VAT  for all European countries (metropolitan only)' => 'TVA Française a 20% pour tous les pays en Europe (hors DOM TOM)',
     'French 10% VAT (for metropolitan France only)' => 'TVA Française à 10% (France métropolitaine seulement)',
 );
