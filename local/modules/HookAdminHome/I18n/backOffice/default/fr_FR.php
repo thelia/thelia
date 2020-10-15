@@ -30,4 +30,5 @@ return array(
     'Today' => 'Aujourd\'hui',
     'YYYY-MM' => 'MM/YYYY',
     'Yesterday sales' => 'Ventes de la veille',
+    'Loading Tweeter feed...' => 'Chargement du fil Tweeter...',
 );
