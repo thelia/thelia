@@ -14,6 +14,7 @@ namespace Thelia\Module;
 
 use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
+use Thelia\Model\State;
 use Thelia\Module\Exception\DeliveryException;
 
 interface DeliveryModuleInterface extends BaseModuleInterface
@@ -26,20 +27,22 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      * If you return false, the delivery method will not be displayed
      *
      * @param Country $country the country to deliver to.
+     * @param State|null $state
      *
      * @return boolean
      */
-    public function isValidDelivery(Country $country);
+    public function isValidDelivery(Country $country, State $state = null);
 
     /**
      * Calculate and return delivery price in the shop's default currency
      *
      * @param Country $country the country to deliver to.
+     * @param State|null $state
      *
      * @return OrderPostage|float             the delivery price
      * @throws DeliveryException if the postage price cannot be calculated.
      */
-    public function getPostage(Country $country);
+    public function getPostage(Country $country, State $state = null);
 
     /**
      *

@@ -49,11 +49,11 @@ class Delivery implements EventSubscriberInterface
         }
 
         // call legacy module method
-        $event->setValidModule($module->isValidDelivery($event->getCountry()))
+        $event->setValidModule($module->isValidDelivery($event->getCountry(), $event->getState()))
             ->setDeliveryMode($module->getDeliveryMode());
 
         if ($event->isValidModule()) {
-            $event->setPostage($module->getPostage($event->getCountry()));
+            $event->setPostage($module->getPostage($event->getCountry(), $event->getState()));
         }
     }
 
