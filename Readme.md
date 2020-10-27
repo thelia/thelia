@@ -8,9 +8,9 @@ If you want to download a packaged, ready-to-use distribution of the most recent
 
 Thelia
 ------
-[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia)
-[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia)
+[![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
+[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia)
 
 [Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
 

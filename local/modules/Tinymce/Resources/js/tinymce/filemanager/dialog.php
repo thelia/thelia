@@ -987,7 +987,7 @@ $files=$sorted;
 					}
 					$is_icon_thumb=true;
 				} else {
-					$src_thumb = $base_url.$thumbs_dir.$file;
+					$src_thumb = $base_url.$thumbs_dir.$subdir.$file;
 				}
 				if($mini_src==""){
 					$is_icon_thumb_mini=false;
