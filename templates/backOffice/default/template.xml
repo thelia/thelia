@@ -38,6 +38,6 @@
             <website>thelia.net</website>
         </author>
     </authors>
-    <thelia>2.4.2</thelia>
+    <thelia>2.4.3</thelia>
     <stability>prod</stability>
 </template>
