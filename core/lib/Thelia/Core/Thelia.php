@@ -46,7 +46,7 @@ use Thelia\Module\ModuleManagement;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.4.2';
+    const THELIA_VERSION = '2.4.3';
 
     public function __construct($environment, $debug)
     {
