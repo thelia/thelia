@@ -1,3 +1,18 @@
+# 2.4.3
+- #2792 Add GithubActions
+- #2791 Fix compatibility to composer 2
+- #2790 Fix state not checked in deliveries modules
+- #2788 Fix issue #2787 TinyMce add link to img doesn't work
+- #2785 Add config value to disallow module install by ZIP
+- #2784 Fix TinyMce - display preview thumbs in a subfolder
+- #2783 Fix state tax in product loop
+- #2782 Fix typo in base tax rule names
+- #2781 Improved the readme file
+- #2780 Fix a bug where the path isn't correct if the template is in a directory
+- #2779 Force return to page 1 after changing the limit of displayed products…
+- #2777 The checkbox not appear on the product page - Tab Image
+- #2776 Fix issue #2516 loop search_in param doesn't work
+- #2775 Added tweeter feed to admin home
 # 2.4.2
 - #2773 Add description to module composer skeleton
 - #2772 Update default config values
