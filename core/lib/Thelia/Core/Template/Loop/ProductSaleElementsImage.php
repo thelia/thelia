@@ -117,7 +117,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
         }
 
         if (null !== $productImageId = $this->getProductImageId()) {
-            $query->filterByProductImageId($id);
+            $query->filterByProductImageId($productImageId);
         }
 
         foreach ($this->getOrder() as $order) {
