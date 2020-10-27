@@ -18,10 +18,12 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Install\Database;
 use Thelia\Model\Country;
+use Thelia\Model\State;
 use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\AbstractDeliveryModuleWithState;
 use Thelia\Module\Exception\DeliveryException;
 
-class Colissimo extends AbstractDeliveryModule
+class Colissimo extends AbstractDeliveryModuleWithState
 {
     protected $request;
     protected $dispatcher;
@@ -49,13 +51,14 @@ class Colissimo extends AbstractDeliveryModule
         $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
     }
 
-    public function isValidDelivery(Country $country)
+
+    public function isValidDelivery(Country $country, State $state)
     {
         if (0 == self::getConfigValue(ColissimoConfigValue::ENABLED, 1)) {
             return false;
         }
 
-        if (null !== $area = $this->getAreaForCountry($country)) {
+        if (null !== $area = $this->getAreaForCountry($country, $state)) {
             $areaId = $area->getId();
 
             $prices = self::getPrices();
@@ -141,15 +144,15 @@ class Colissimo extends AbstractDeliveryModule
      * calculate and return delivery price
      *
      * @param Country $country
+     * @param State $state
      * @return mixed
-     * @throws \Thelia\Exception\OrderException
      */
-    public function getPostage(Country $country)
+    public function getPostage(Country $country, State $state)
     {
         $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
         $postage = self::getPostageAmount(
-            $this->getAreaForCountry($country)->getId(),
+            $this->getAreaForCountry($country, $state)->getId(),
             $cartWeight
         );
 
