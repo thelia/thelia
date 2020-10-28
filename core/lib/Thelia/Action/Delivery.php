@@ -17,7 +17,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Module\AbstractDeliveryModule;
-use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\DeliveryModuleWithStateInterface;
 
 /**

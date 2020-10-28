@@ -25,6 +25,7 @@ use Thelia\Model\Module;
 use Thelia\Model\StateQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\DeliveryModuleWithStateInterface;
 use Thelia\Module\Exception\DeliveryException;
 
 /**
@@ -88,7 +89,7 @@ class Delivery extends BaseSpecificModule
                 continue;
             }
 
-            /** @var DeliveryModuleInterface $moduleInstance */
+            /** @var DeliveryModuleInterface|DeliveryModuleWithStateInterface $moduleInstance */
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
             if (true === $virtual
