@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,7 +27,9 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\State;
 use Thelia\Module\BaseModule;
+use Thelia\Module\BaseModuleInterface;
 use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\Exception\DeliveryException;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -111,7 +114,7 @@ class CartPostage extends AbstractSmartyPlugin
         if (null !== $country) {
             $this->countryId = $country->getId();
             // try to get the cheapest delivery for this country
-            $this->getCheapestDelivery($address, $country);
+            $this->getCheapestDelivery($address, $country, $state);
         }
 
         $template->assign('country_id', $this->countryId);
@@ -134,7 +137,6 @@ class CartPostage extends AbstractSmartyPlugin
      *
      *
      * @param  \Thelia\Model\Customer $customer
-     * @return \Thelia\Model\Country
      */
     protected function getDeliveryInformation(Customer $customer = null)
     {
@@ -158,7 +160,7 @@ class CartPostage extends AbstractSmartyPlugin
             if (null !== $address) {
                 $this->isCustomizable = false;
 
-                return [$address, $address->getCountry(), null];
+                return [$address, $address->getCountry(), $address->getState()];
             }
         }
 
@@ -190,10 +192,11 @@ class CartPostage extends AbstractSmartyPlugin
      * Retrieve the cheapest delivery for country
      *
      * @param Address $address
-     * @param \Thelia\Model\Country $country
-     * @return DeliveryModuleInterface
+     * @param Country $country
+     * @param State|null $state
+     * @throws PropelException
      */
-    protected function getCheapestDelivery(Address $address = null, Country $country = null)
+    protected function getCheapestDelivery(Address $address = null, Country $country = null, State $state = null)
     {
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart();
 
