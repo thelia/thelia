@@ -52,7 +52,7 @@ class Colissimo extends AbstractDeliveryModuleWithState
     }
 
 
-    public function isValidDelivery(Country $country, State $state)
+    public function isValidDelivery(Country $country, State $state = null)
     {
         if (0 == self::getConfigValue(ColissimoConfigValue::ENABLED, 1)) {
             return false;
@@ -147,7 +147,7 @@ class Colissimo extends AbstractDeliveryModuleWithState
      * @param State $state
      * @return mixed
      */
-    public function getPostage(Country $country, State $state)
+    public function getPostage(Country $country, State $state = null)
     {
         $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
