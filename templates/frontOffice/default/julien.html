@@ -1,0 +1,10 @@
+<ul>
+{loop type="product" name="truc" limit=12}
+    <li>
+        {$ID} = {$REF} = {$TITLE}
+        {loop type="image" name="produmage" width=200 height=200 resize_mode='crop' product=$ID limit=1}
+            <p><img src="{$IMAGE_URL}" alt="{$TITLE}"></p>
+        {/loop}
+    </li>
+{/loop}
+</ul>
