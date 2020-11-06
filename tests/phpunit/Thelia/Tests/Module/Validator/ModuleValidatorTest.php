@@ -71,7 +71,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($moduleDefinition->getAuthors()));
         $this->assertEquals("", $moduleDefinition->getDocumentation());
         $this->assertEquals("", $moduleDefinition->getLogo());
-        $this->assertEquals("2.4.2", $moduleDefinition->getTheliaVersion());
+        $this->assertEquals("2.4.3", $moduleDefinition->getTheliaVersion());
         $this->assertTrue(
             Version::test(
                 Thelia::THELIA_VERSION,

@@ -50,6 +50,7 @@ return [
     'Allow customers to change their email. 1 for yes, 0 for no' => 'Permitir a los clientes cambiar su correo electrónico. 1 para sí, 0 para no',
     'Allow negative product stock (1) or not (0)' => 'Permitir valores negativos producto (1) o no (0)',
     'Allow negative product stock (1) or not (0, default)' => 'Permite valores negativos producto (1) o no (valor por defecto 0,)',
+    'Allow module installation from ZIP files.' => 'Permitir la instalación del módulo desde archivos ZIP.' ,
     'Allow slash ended uri' => 'Permitir barra de fín de url',
     'An image carousel on your home page' => 'Un carrusel de imágenes en la página de inicio',
     'Andorra' => 'Andorra',
@@ -1065,6 +1066,6 @@ return [
     'tinymce wysiwyg editor' => 'editor tinymce wysiwyg',
     'Default Tax Rule' => 'Regla impositiva predeterminada',
     'French 10% VAT (France only)' => '10% de IVA francés (solo Francia metropolitana)',
-    'French 20% VAT  for all Europan countries (metropolitan only)' => 'IVA francés al 20% para todos los países de Europa (solo países metropolitanos)',
+    'French 20% VAT  for all European countries (metropolitan only)' => 'IVA francés al 20% para todos los países de Europa (solo países metropolitanos)',
     'French 10% VAT (for metropolitan France only)' => 'IVA francés al 10% (solo para Francia metropolitana)',
 ];

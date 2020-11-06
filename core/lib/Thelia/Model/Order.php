@@ -499,7 +499,7 @@ class Order extends BaseOrder
     /**
      * Get an instance of the delivery module
      *
-     * @return \Thelia\Module\DeliveryModuleInterface
+     * @return \Thelia\Module\BaseModuleInterface
      * @throws TheliaProcessException
      */
     public function getDeliveryModuleInstance()

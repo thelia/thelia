@@ -59,6 +59,7 @@ return array(
     'Allow customers to change their email. 1 for yes, 0 for no' => 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non',
     'Allow negative product stock (1) or not (0)' => 'Autoriser un stock négatif sur les produits (1) ou pas (0, défaut)',
     'Allow negative product stock (1) or not (0, default)' => 'Autoriser le stock négatif (1) ou pas (0) (0 par défaut)',
+    'Allow module installation from ZIP files.' => 'Autoriser l\'installation des modules par fichier ZIP.' ,
     'Allow slash ended uri' => 'Autoriser les URI terminées par un slash',
     'An image carousel on your home page' => 'Un carrousel d\'images sur votre page d\'accueil',
     'Ancona' => 'Ancona',
@@ -1454,6 +1455,6 @@ return array(
     'Гривна' => 'Hryvnia Ukrainien',
     'Default Tax Rule' => 'Règle de taxes par défaut',
     'French 10% VAT (France only)' => 'TVA française à 10% (France métropolitaine seulement)',
-    'French 20% VAT  for all Europan countries (metropolitan only)' => 'TVA Française a 20% pour tous les pays en Europe (hors DOM TOM)',
+    'French 20% VAT  for all European countries (metropolitan only)' => 'TVA Française a 20% pour tous les pays en Europe (hors DOM TOM)',
     'French 10% VAT (for metropolitan France only)' => 'TVA Française à 10% (France métropolitaine seulement)',
 );

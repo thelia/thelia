@@ -61,6 +61,7 @@ return array(
     'Allow negative product stock (1) or not (0)' => 'Allow negative product stock (1) or not (0)',
     'Allow negative product stock (1) or not (0, default)' => 'Allow negative product stock (1) or not (0, default)',
     'Allow slash ended uri' => 'Allow slash ended uri',
+    'Allow module installation from ZIP files.' => 'Allow module installation from ZIP files.' ,
     'An image carousel on your home page' => 'An image carousel on your home page',
     'Ancona' => 'Ancona',
     'Andorra' => 'Andorra',
@@ -1470,6 +1471,6 @@ return array(
     'Гривна' => 'Гривна',
     'Default Tax Rule' => 'Default Tax Rule',
     'French 10% VAT (France only)' => 'French 10% VAT (France only)',
-    'French 20% VAT  for all Europan countries (metropolitan only)' => 'French 20% VAT  for all Europan countries (metropolitan only)',
+    'French 20% VAT  for all European countries (metropolitan only)' => 'French 20% VAT  for all European countries (metropolitan only)',
     'French 10% VAT (for metropolitan France only)' => 'French 10% VAT (for metropolitan France only)',
 );

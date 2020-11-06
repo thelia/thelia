@@ -36,6 +36,7 @@ use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
+use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -211,7 +212,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
         }
 
-        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria);
+        $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
     /**
@@ -237,7 +238,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     public function parseSimpleResults(LoopResult $loopResult)
     {
-        $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var TaxEngine $taxEngine */
+        $taxEngine = $this->container->get('thelia.taxEngine');
+        $taxCountry = $taxEngine->getDeliveryCountry();
+        $taxState = $taxEngine->getDeliveryState();
+
         /** @var \Thelia\Core\Security\SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
 
@@ -256,7 +261,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
-                    $price
+                    $price,
+                    $taxState
                 );
             } catch (TaxEngineException $e) {
                 $taxedPrice = null;
@@ -271,7 +277,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
                     $taxCountry,
-                    $promoPrice
+                    $promoPrice,
+                    $taxState
                 );
             } catch (TaxEngineException $e) {
                 $taxedPromoPrice = null;
@@ -314,7 +321,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     public function parseComplexResults(LoopResult $loopResult)
     {
-        $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
+        /** @var TaxEngine $taxEngine */
+        $taxEngine = $this->container->get('thelia.taxEngine');
+        $taxCountry = $taxEngine->getDeliveryCountry();
+        $taxState = $taxEngine->getDeliveryState();
 
         /** @var \Thelia\Core\Security\SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
@@ -332,7 +342,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             try {
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry,
-                    $price
+                    $price,
+                    $taxState
                 );
             } catch (TaxEngineException $e) {
                 $taxedPrice = null;
