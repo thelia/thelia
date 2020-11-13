@@ -36,7 +36,7 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
      * @param State $state
      * @return Area|null
      */
-    public function getAreaForCountry(Country $country, State $state)
+    public function getAreaForCountry(Country $country, State $state = null)
     {
         $area = null;
 

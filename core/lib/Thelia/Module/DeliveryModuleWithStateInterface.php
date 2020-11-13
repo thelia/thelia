@@ -31,7 +31,7 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      *
      * @return boolean
      */
-    public function isValidDelivery(Country $country, State $state);
+    public function isValidDelivery(Country $country, State $state = null);
 
     /**
      * Calculate and return delivery price in the shop's default currency
@@ -42,7 +42,7 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      * @return OrderPostage|float             the delivery price
      * @throws DeliveryException if the postage price cannot be calculated.
      */
-    public function getPostage(Country $country, State $state);
+    public function getPostage(Country $country, State $state = null);
 
     /**
      *
