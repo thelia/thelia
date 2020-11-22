@@ -416,7 +416,11 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getTemplateDefinition($webAssetTemplateName = false)
     {
-        $ret = clone $this->templateDefinition;
+        // Deep cloen of template definition. We could change the template descriptor of template definition,
+        // and we don't want to change the current template definition.
+
+        /** @var TemplateDefinition $ret */
+        $ret = unserialize(serialize($this->templateDefinition));
 
         if (false !== $webAssetTemplateName) {
             $customPath = str_replace($ret->getName(), $webAssetTemplateName, $ret->getPath());
