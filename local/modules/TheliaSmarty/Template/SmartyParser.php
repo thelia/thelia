@@ -416,7 +416,7 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getTemplateDefinition($webAssetTemplateName = false)
     {
-        // Deep cloen of template definition. We could change the template descriptor of template definition,
+        // Deep clone of template definition. We could change the template descriptor of template definition,
         // and we don't want to change the current template definition.
 
         /** @var TemplateDefinition $ret */
