@@ -28,6 +28,7 @@
         <command class="Thelia\Command\ImportCommand"/>
         <command class="Thelia\Command\UpdateCurrenciesRates"/>
         <command class="Thelia\Command\DiffDatabaseCommand"/>
+        <command class="Thelia\Command\FrontTemplate"/>
     </commands>
 
 </config>
