@@ -27,7 +27,6 @@ class FrontTemplate extends ContainerAwareCommand
             InputArgument::REQUIRED,
             "template to activate"
         );
-        ;
     }
 
     /**
