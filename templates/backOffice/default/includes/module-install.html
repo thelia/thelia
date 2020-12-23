@@ -1,3 +1,4 @@
+{if 1 == {config key="allow_module_zip_install" default=1}}
 <div class="col-md-6 install-module-col">
     <div class="general-block-decorator">
 
@@ -39,8 +40,10 @@
         </div>
     </div>
 </div>
+{/if}
 
-<div class="col-md-6 install-module-col">
+
+<div class="{if 1 == {config key="allow_module_zip_install" default=1}}col-md-6{else}col-md-12{/if} install-module-col">
     <div class="general-block-decorator">
 
         <div class="title title-without-tabs">

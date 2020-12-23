@@ -7,14 +7,19 @@
       <td>{$THELIA_VERSION}</td>
     </tr>
     <tr>
-      <th>{intl l="Latest version available"}</th>
-      <td><a href="http://thelia.net/#download" id="latest-thelia-version">{intl l="Loading..."  d='hookadminhome.bo.default'}</a></td>
-    </tr>
-    <tr>
-      <th>{intl l="News"}</th>
-      <td><a href="http://thelia.net/blog" target="_blank">{intl l="Click here" d='hookadminhome.bo.default'}</a></td>
+      <th>{intl l="Latest version available" d='hookadminhome.bo.default'}</th>
+      <td><a href="https://thelia.net/download/thelia.zip" id="latest-thelia-version">{intl l="Loading..."  d='hookadminhome.bo.default'}</a></td>
     </tr>
     </tbody>
   </table>
 </div>
 {/loop}
+<a class="twitter-timeline"
+   href="https://twitter.com/theliaecommerce"
+   data-chrome="noheader nofooter noborders"
+   data-dnt="true"
+   data-height="300"
+>
+  {intl l="Loading Tweeter feed..." d='hookadminhome.bo.default'}
+</a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>

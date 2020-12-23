@@ -79,7 +79,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (69, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW()),
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW()),
 (71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
-(72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW())
+(72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
+(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2016,6 +2017,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'cs_CZ', NULL, NULL, NULL, NULL),
     (71, 'cs_CZ', NULL, NULL, NULL, NULL),
     (72, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (73, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2074,6 +2076,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'de_DE', NULL, NULL, NULL, NULL),
     (71, 'de_DE', NULL, NULL, NULL, NULL),
     (72, 'de_DE', NULL, NULL, NULL, NULL),
+    (73, 'de_DE', 'Modulinstallation aus ZIP-Dateien zulassen.', NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2132,6 +2135,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'en_US', 'Default number of coupons per page on coupon list', NULL, NULL, NULL),
     (71, 'en_US', NULL, NULL, NULL, NULL),
     (72, 'en_US', NULL, NULL, NULL, NULL),
+    (73, 'en_US', 'Allow module installation from ZIP files.', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2190,6 +2194,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'es_ES', NULL, NULL, NULL, NULL),
     (71, 'es_ES', NULL, NULL, NULL, NULL),
     (72, 'es_ES', NULL, NULL, NULL, NULL),
+    (73, 'es_ES', 'Permitir la instalación del módulo desde archivos ZIP.', NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2248,6 +2253,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NULL, NULL, NULL),
     (71, 'fr_FR', NULL, NULL, NULL, NULL),
     (72, 'fr_FR', NULL, NULL, NULL, NULL),
+    (73, 'fr_FR', 'Autoriser l\'installation des modules par fichier ZIP.', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2306,6 +2312,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, 'it_IT', NULL, NULL, NULL, NULL),
     (71, 'it_IT', NULL, NULL, NULL, NULL),
     (72, 'it_IT', NULL, NULL, NULL, NULL),
+    (73, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -2363,7 +2370,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (69, 'ru_RU', NULL, NULL, NULL, NULL),
     (70, 'ru_RU', NULL, NULL, NULL, NULL),
     (71, 'ru_RU', NULL, NULL, NULL, NULL),
-    (72, 'ru_RU', NULL, NULL, NULL, NULL)
+    (72, 'ru_RU', NULL, NULL, NULL, NULL),
+    (73, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
@@ -11667,7 +11675,7 @@ INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`, `description`) VALUES
     (2, 'cs_CZ', NULL, NULL),
     (1, 'de_DE', 'Standardsteuerregel', 'Französische Mehrwertsteuer von 20% für alle Länder in Europa (nur Metropolregion)'),
     (2, 'de_DE', '10% französische Mehrwertsteuer (nur Metropolitan France)', 'Französische Mehrwertsteuer von 10% nur für die französische Metropole'),
-    (1, 'en_US', 'Default Tax Rule', 'French 20% VAT  for all Europan countries (metropolitan only)'),
+    (1, 'en_US', 'Default Tax Rule', 'French 20% VAT  for all European countries (metropolitan only)'),
     (2, 'en_US', 'French 10% VAT (France only)', 'French 10% VAT (for metropolitan France only)'),
     (1, 'es_ES', 'Regla impositiva predeterminada', 'IVA francés al 20% para todos los países de Europa (solo países metropolitanos)'),
     (2, 'es_ES', '10% de IVA francés (solo Francia metropolitana)', 'IVA francés al 10% (solo para Francia metropolitana)'),

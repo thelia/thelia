@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Module\AbstractDeliveryModule;
+use Thelia\Module\DeliveryModuleWithStateInterface;
 
 /**
  * Class Delivery
@@ -48,12 +49,21 @@ class Delivery implements EventSubscriberInterface
             return;
         }
 
-        // call legacy module method
-        $event->setValidModule($module->isValidDelivery($event->getCountry()))
+        // Add state param to isValidDelivery only if module handle state
+        $isValidModule = $module instanceof DeliveryModuleWithStateInterface
+            ? $module->isValidDelivery($event->getCountry(), $event->getState())
+            : $module->isValidDelivery($event->getCountry());
+
+        $event->setValidModule($isValidModule)
             ->setDeliveryMode($module->getDeliveryMode());
 
         if ($event->isValidModule()) {
-            $event->setPostage($module->getPostage($event->getCountry()));
+            // Add state param to getPostage only if module handle state
+            $modulePostage = $module instanceof DeliveryModuleWithStateInterface
+                ? $module->getPostage($event->getCountry(), $event->getState())
+                : $module->getPostage($event->getCountry());
+
+            $event->setPostage($modulePostage);
         }
     }
 

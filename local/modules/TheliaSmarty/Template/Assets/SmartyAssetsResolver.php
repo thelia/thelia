@@ -159,10 +159,11 @@ class SmartyAssetsResolver implements AssetResolverInterface
         static $pathOrigin = ['template', 'module_override', 'module_directory', 'default_fallback'];
 
         $templateName = $templateName ?: $templateDefinition->getName();
+        $templateType = $templateDefinition->getType();
 
         $templateDirectories = $parserInterface->getTemplateDirectories($templateDefinition->getType());
 
-        $hash = "$source|$templateName";
+        $hash = "$source|$templateType|$templateName";
 
         if (! isset($cache[$hash])) {
             // Build a list of all template names, starting with current template
