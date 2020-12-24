@@ -12,9 +12,21 @@
 
 namespace HookAnalytics;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
 use Thelia\Module\BaseModule;
 
 class HookAnalytics extends BaseModule
 {
-
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        if (version_compare($newVersion, $currentVersion, ">")){
+            $langs = LangQuery::create()->filterByActive()->find();
+            $config = ConfigQuery::read("hookanalytics_trackingcode", "");
+            foreach ($langs as $lang){
+                self::setConfigValue('hookanalytics_trackingcode', $config, $lang->getLocale());
+            }
+        }
+    }
 }

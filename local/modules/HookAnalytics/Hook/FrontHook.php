@@ -12,9 +12,9 @@
 
 namespace HookAnalytics\Hook;
 
+use HookAnalytics\HookAnalytics;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Model\ConfigQuery;
 
 /**
  * Class FrontHook
@@ -25,7 +25,8 @@ class FrontHook extends BaseHook {
 
     public function onMainHeadBottom(HookRenderEvent $event)
     {
-        $value = trim(ConfigQuery::read("hookanalytics_trackingcode", ""));
+        $lang = $this->getRequest()->getSession()->get("thelia.current.lang");
+        $value = trim(HookAnalytics::getConfigValue("hookanalytics_trackingcode", "", $lang->getLocale()));
         if ("" != $value){
             $event->add($value);
         }
