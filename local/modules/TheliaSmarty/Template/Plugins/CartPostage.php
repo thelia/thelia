@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\StateQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
@@ -145,7 +146,7 @@ class CartPostage extends AbstractSmartyPlugin
         if (null !== $addressId = $this->getCurrentRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()) {
             if (null !== $address = AddressQuery::create()->findPk($addressId)) {
                 $this->isCustomizable = false;
-                return [$address, $address->getCountry(), null];
+                return [$address, $address->getCountry(), $address->getState()];
             }
         }
 
@@ -180,7 +181,12 @@ class CartPostage extends AbstractSmartyPlugin
         try {
             $country = Country::getDefaultCountry();
 
-            return [null, $country, null];
+            $firstCountryState = StateQuery::create()
+                ->filterByCountryId($country->getId())
+                ->filterByVisible(true)
+                ->findOne();
+
+            return [null, $country, $firstCountryState];
         } catch (\LogicException $e) {
             ;
         }
@@ -203,26 +209,25 @@ class CartPostage extends AbstractSmartyPlugin
         $deliveryModules = ModuleQuery::create()
             ->filterByActivate(1)
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL)
-            ->find()
-        ;
+            ->find();
 
         $virtual = $cart->isVirtual();
 
         /** @var \Thelia\Model\Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
-          $areaDeliveryModule = AreaDeliveryModuleQuery::create()
-              ->findByCountryAndModule($country, $deliveryModule, $state);
-          if (null === $areaDeliveryModule && false === $virtual) {
-              continue;
-          }
+            $areaDeliveryModule = AreaDeliveryModuleQuery::create()
+                ->findByCountryAndModule($country, $deliveryModule, $state);
+            if (null === $areaDeliveryModule && false === $virtual) {
+                continue;
+            }
 
-          $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
+            $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-          if (true === $virtual
-            && false === $moduleInstance->handleVirtualProductDelivery()
+            if (true === $virtual
+                && false === $moduleInstance->handleVirtualProductDelivery()
             ) {
-            continue;
-          }
+                continue;
+            }
 
             try {
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
