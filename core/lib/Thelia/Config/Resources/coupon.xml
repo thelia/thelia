@@ -8,15 +8,25 @@
         <!-- Coupon module -->
 
         <service id="thelia.facade" class="Thelia\Coupon\BaseFacade">
-            <argument type="service" id="service_container" />
+            <argument type="service" id="thelia.securityContext" />
+            <argument type="service" id="thelia.taxEngine" />
+            <argument type="service" id="thelia.translator" />
+            <argument type="service" id="thelia.parser" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="thelia.condition.validator" />
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
-            <argument type="service" id="service_container" />
+            <argument type="service" id="thelia.facade" />
+            <argument type="service" id="thelia.coupon.factory" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="thelia.coupon.factory" class="Thelia\Coupon\CouponFactory">
             <argument type="service" id="service_container" />
+            <argument type="service" id="thelia.facade" />
+            <argument type="service" id="thelia.condition.factory" />
         </service>
 
         <!-- Coupon types -->
@@ -75,6 +85,7 @@
 
         <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory">
             <argument type="service" id="service_container" />
+            <argument type="service" id="thelia.facade" />
         </service>
 
         <service id="thelia.condition.validator" class="Thelia\Condition\ConditionEvaluator">

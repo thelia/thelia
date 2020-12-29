@@ -38,11 +38,14 @@ class ConditionFactory
      * Constructor
      *
      * @param ContainerInterface $container Service container
+     * @param FacadeInterface $facade
      */
-    public function __construct(ContainerInterface $container)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        FacadeInterface $facade
+    ) {
         $this->container = $container;
-        $this->adapter = $container->get('thelia.facade');
+        $this->adapter = $facade;
     }
 
     /**

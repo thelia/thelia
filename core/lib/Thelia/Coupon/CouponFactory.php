@@ -33,20 +33,29 @@ use Thelia\Model\Coupon;
 class CouponFactory
 {
     /** @var ContainerInterface Service Container */
-    protected $container = null;
+    protected $container;
 
-    /** @var  FacadeInterface Provide necessary value from Thelia*/
+    /** @var  FacadeInterface */
     protected $facade;
+
+    /** @var  ConditionFactory Provide necessary value from Thelia*/
+    protected $conditionFactory;
 
     /**
      * Constructor
      *
-     * @param ContainerInterface $container Service container
+     * @param ContainerInterface $container
+     * @param FacadeInterface $facade
+     * @param ConditionFactory $conditionFactory
      */
-    public function __construct(ContainerInterface $container)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        FacadeInterface $facade,
+        ConditionFactory $conditionFactory
+    ) {
         $this->container = $container;
-        $this->facade = $container->get('thelia.facade');
+        $this->facade = $facade;
+        $this->conditionFactory = $conditionFactory;
     }
 
     /**
@@ -58,9 +67,8 @@ class CouponFactory
      * @throws CouponNoUsageLeftException
      * @throws CouponNotReleaseException
      */
-    public function buildCouponFromCode($couponCode)
+    public function buildCouponFromCode(string $couponCode)
     {
-        /** @var Coupon $couponModel */
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
         if ($couponModel === null) {
             return false;
@@ -115,8 +123,8 @@ class CouponFactory
      */
     public function buildCouponFromModel(Coupon $model)
     {
-        $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
-        $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);
+        $isCumulative = $model->getIsCumulative() == 1;
+        $isRemovingPostage = $model->getIsRemovingPostage() == 1;
 
         if (!$this->container->has($model->getType())) {
             return false;
@@ -142,9 +150,7 @@ class CouponFactory
             $model->getPerCustomerUsageCount()
         );
 
-        /** @var ConditionFactory $conditionFactory */
-        $conditionFactory = $this->container->get('thelia.condition.factory');
-        $conditions = $conditionFactory->unserializeConditionCollection(
+        $conditions = $this->conditionFactory->unserializeConditionCollection(
             $model->getSerializedConditions()
         );
 

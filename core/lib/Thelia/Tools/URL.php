@@ -13,6 +13,7 @@
 namespace Thelia\Tools;
 
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -40,15 +41,15 @@ class URL
     /** @var string $baseUrlScheme a cache for the base URL scheme  */
     private $baseUrlScheme = null;
 
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(RouterInterface $router = null)
     {
         // Allow singleton style calls once instantiated.
         // For this to work, the URL service has to be instantiated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
-        if ($container !== null) {
-            $this->requestContext = $container->get('router.admin')->getContext();
+        if ($router !== null) {
+            $this->requestContext = $router->getContext();
         }
 
         $this->retriever = new RewritingRetriever();

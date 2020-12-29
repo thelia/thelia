@@ -15,8 +15,11 @@
 
     <services>
         <service id="thelia.listener.view" class="Thelia\Core\EventListener\ViewListener">
-            <argument type="service" id="service_container"/>
+            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="thelia.template_helper"/>
+            <argument type="service" id="request_stack"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="router.chainRequest"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -27,7 +30,7 @@
         </service>
 
 
-        <service id="request.context" class="%router.request_context.class%" />
+        <service id="request.context" class="%router.request_context.class%" public="true" />
 
 
         <service id="router.fileLocator" class="Symfony\Component\Config\FileLocator">
@@ -73,7 +76,7 @@
             <tag name="router.register" priority="255"/>
         </service>
 
-        <service id="router.chainRequest" class="%router.chainRouter.class%">
+        <service id="router.chainRequest" class="%router.chainrouter.class%">
             <call method="setContext">
                 <argument type="service" id="request.context"/>
             </call>
@@ -82,6 +85,7 @@
         <service id="listener.router" class="Symfony\Component\HttpKernel\EventListener\RouterListener">
             <tag name="kernel.event_subscriber"/>
             <argument type="service" id="router.chainRequest"/>
+            <argument type="service" id="request_stack"/>
         </service>
     </services>
 

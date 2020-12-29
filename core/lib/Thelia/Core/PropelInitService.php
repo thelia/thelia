@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
@@ -139,7 +139,7 @@ class PropelInitService
      */
     public function getPropelModelDir()
     {
-        return THELIA_PROPEL_BUILD_MODEL_PATH;
+        return TheliaMain_BUILD_MODEL_PATH;
     }
 
     /**
@@ -147,7 +147,7 @@ class PropelInitService
      */
     public function getPropelDatabaseDir()
     {
-        return THELIA_PROPEL_BUILD_DATABASE_PATH;
+        return TheliaMain_BUILD_DATABASE_PATH;
     }
 
     /**
@@ -333,7 +333,7 @@ class PropelInitService
             new ModelBuildCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--schema-dir' => $this->getPropelSchemaDir(),
+                '--schema-dir' => $this->getPropelSchemaDir()
             ]
         );
 
@@ -379,21 +379,21 @@ class PropelInitService
      */
     public function registerPropelModelLoader()
     {
-        $loader = new ClassLoader();
-
-        $loader->addPrefix(
-            '', // no prefix, models already define their full namespace
-            $this->getPropelModelDir()
-        );
-
-        $loader->addPrefix(
-            '', // no prefix, models already define their full namespace
-            $this->getPropelDatabaseDir()
-        );
-
-        $loader->register(
-            true // prepend the autoloader to use cached models first
-        );
+//        $loader = new ClassLoader();
+//
+//        $loader->addPrefix(
+//            '', // no prefix, models already define their full namespace
+//            $this->getPropelModelDir()
+//        );
+//
+//        $loader->addPrefix(
+//            '', // no prefix, models already define their full namespace
+//            $this->getPropelDatabaseDir()
+//        );
+//
+//        $loader->register(
+//            true // prepend the autoloader to use cached models first
+//        );
     }
 
     /**
@@ -406,7 +406,7 @@ class PropelInitService
      */
     public function init($force = false, &$cacheRefresh = false)
     {
-        $flockFactory = new Factory(new FlockStore());
+        $flockFactory = new LockFactory(new FlockStore());
 
         $lock = $flockFactory->createLock('propel-cache-generation');
 
@@ -428,7 +428,7 @@ class PropelInitService
 
             require $this->getPropelInitFile();
 
-            $theliaDatabaseConnection = Propel::getConnection('thelia');
+            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
 
             $buildPropelGlobalSchema = $this->buildPropelGlobalSchema();

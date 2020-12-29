@@ -41,7 +41,7 @@ class FormTest extends SmartyPluginTestCase
             $container->get("thelia.parser")
         );
 
-        $this->plugin->setFormDefinition($container->get("thelia.parser.forms"));
+        $this->plugin->setFormDefinition($container->get("Thelia.parser.forms"));
 
         return $this->plugin;
     }

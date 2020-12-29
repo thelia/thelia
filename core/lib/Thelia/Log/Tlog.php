@@ -133,7 +133,7 @@ class Tlog implements LoggerInterface
      * initialize default configuration
      */
     protected function init()
-    {
+    {;
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
         $this->dir_destinations = array(

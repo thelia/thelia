@@ -14,7 +14,7 @@ namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
 /**

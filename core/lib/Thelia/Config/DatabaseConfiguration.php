@@ -26,15 +26,15 @@ class DatabaseConfiguration implements ConfigurationInterface
      * Name of the main database connection used by Thelia.
      * @var string
      */
-    const THELIA_CONNECTION_NAME = 'thelia';
+    const THELIA_CONNECTION_NAME = 'TheliaMain';
 
     /**
      * @inheritDoc
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $databaseNode = $treeBuilder->root('database');
+        $treeBuilder = new TreeBuilder('database');
+        $databaseNode = $treeBuilder->getRootNode();
         $databaseNodeBuilder = $databaseNode->children();
 
         $connectionNode = $this->buildConnectionNode('connection', false);
@@ -75,8 +75,8 @@ class DatabaseConfiguration implements ConfigurationInterface
      */
     public function buildConnectionNode($rootName, $isArray)
     {
-        $treeBuilder = new TreeBuilder();
-        $connectionNode = $treeBuilder->root($rootName);
+        $treeBuilder = new TreeBuilder($rootName);
+        $connectionNode = $treeBuilder->getRootNode();
         if ($isArray) {
             /** @var ArrayNodeDefinition $connectionNodePrototype */
             $connectionNodePrototype = $connectionNode->prototype('array');

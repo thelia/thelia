@@ -26,10 +26,7 @@ use Thelia\Core\HttpFoundation\Request;
  */
 class TheliaContainer extends Container
 {
-    /**
-     * @inheritdoc
-     */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER)
+    public function set(string $id, ?object $service)
     {
         if ($id === 'request'
             && php_sapi_name() === "cli"
@@ -37,17 +34,8 @@ class TheliaContainer extends Container
             if (!isset($this->services['request_stack'])) {
                 $this->services['request_stack'] = new RequestStack();
             }
-
-            /** @var RequestStack $requestStack */
-            $requestStack = $this->services['request_stack'];
-
-            if ($requestStack->getCurrentRequest() === null) {
-                @trigger_error('Request is deprecated as a service since Thelia 2.3. Please inject your Request in the RequestStack service.', E_USER_DEPRECATED);
-                /** @var Request $service */
-                $requestStack->push($service);
-            }
         }
 
-        parent::set($id, $service, $scope);
+        parent::set($id, $service);
     }
 }

@@ -13,7 +13,7 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -39,9 +39,9 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $this->parser = $parser;
     }
 
-    public function checkHttpException(GetResponseForExceptionEvent $event)
+    public function checkHttpException(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
             $this->display404($event);
         }
@@ -55,14 +55,14 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    protected function displayAdminGeneralError(GetResponseForExceptionEvent $event)
+    protected function displayAdminGeneralError(ExceptionEvent $event)
     {
         // Define the template thant shoud be used
         $this->parser->setTemplateDefinition(
             $this->parser->getTemplateHelper()->getActiveAdminTemplate()
         );
 
-        $message = $event->getException()->getMessage();
+        $message = $event->getThrowable()->getMessage();
 
         $response = Response::create(
             $this->parser->render(
@@ -77,7 +77,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    protected function display404(GetResponseForExceptionEvent $event)
+    protected function display404(ExceptionEvent $event)
     {
         // Define the template thant shoud be used
         $this->parser->setTemplateDefinition(
@@ -89,10 +89,10 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    protected function displayException(GetResponseForExceptionEvent $event)
+    protected function displayException(ExceptionEvent $event)
     {
         /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         $event->setResponse(
             new Response(
                 $exception->getMessage(),

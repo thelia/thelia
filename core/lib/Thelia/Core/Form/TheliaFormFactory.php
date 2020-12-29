@@ -12,8 +12,12 @@
 
 namespace Thelia\Core\Form;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
+use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Thelia\Core\EventDispatcher\EventDispatcher;
+use Thelia\Form\BaseForm;
 
 /**
  * Class TheliaFormFactory
@@ -25,16 +29,40 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     /** @var RequestStack  */
     protected $requestStack;
 
-    /** @var ContainerInterface  */
-    protected $container;
+    /** @var EventDispatcher  */
+    protected $eventDispatcher;
+
+    /**
+     * @var ValidatorBuilder
+     */
+    protected $validatorBuilder;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var FormFactoryBuilderInterface
+     */
+    protected $formFactoryBuilder;
 
     /** @var array */
     protected $formDefinition;
 
-    public function __construct(RequestStack $requestStack, ContainerInterface $container, array $formDefinition)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        EventDispatcher $eventDispatcher,
+        TranslatorInterface $translator,
+        FormFactoryBuilderInterface $formFactoryBuilder,
+        ValidatorBuilder $validationBuilder,
+        array $formDefinition
+    ) {
         $this->requestStack = $requestStack;
-        $this->container = $container;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->translator = $translator;
+        $this->formFactoryBuilder = $formFactoryBuilder;
+        $this->validatorBuilder = $validationBuilder;
         $this->formDefinition = $formDefinition;
     }
 
@@ -43,16 +71,29 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
      * @param  string                $type
      * @param  array                 $data
      * @param  array                 $options
-     * @return \Thelia\Form\BaseForm
+     * @return BaseForm
      */
-    public function createForm($name, $type = "form", array $data = array(), array $options = array())
-    {
+    public function createForm(
+        string $name,
+        $type = "form",
+        array $data = array(),
+        array $options = array()
+    ): BaseForm {
         if (!isset($this->formDefinition[$name])) {
             throw new \OutOfBoundsException(
                 sprintf("The form '%s' doesn't exist", $name)
             );
         }
 
-        return new $this->formDefinition[$name]($this->requestStack->getCurrentRequest(), $type, $data, $options, $this->container);
+        return new $this->formDefinition[$name](
+            $this->requestStack->getCurrentRequest(),
+            $this->eventDispatcher,
+            $this->translator,
+            $this->formFactoryBuilder,
+            $this->validatorBuilder,
+            $type,
+            $data,
+            $options
+        );
     }
 }

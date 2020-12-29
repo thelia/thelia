@@ -63,11 +63,6 @@ abstract class AbstractExport implements \Iterator
     private $dataIsJSONFile;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var \Thelia\Model\Lang A language model
      */
     protected $language;
@@ -522,22 +517,6 @@ abstract class AbstractExport implements \Iterator
     public function afterSerialize($data)
     {
         return $data;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
-    {
-        return $this->container;
     }
 
     /**

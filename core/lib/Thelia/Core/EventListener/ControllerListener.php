@@ -13,6 +13,7 @@
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -39,7 +40,7 @@ class ControllerListener implements EventSubscriberInterface
         $this->securityContext = $securityContext;
     }
 
-    public function adminFirewall(FilterControllerEvent $event)
+    public function adminFirewall(ControllerEvent $event)
     {
         $controller = $event->getController();
         //check if an admin is logged in
@@ -54,7 +55,7 @@ class ControllerListener implements EventSubscriberInterface
         }
     }
 
-    public function apiFirewall(FilterControllerEvent $event)
+    public function apiFirewall(ControllerEvent $event)
     {
         $controller = $event->getController();
 

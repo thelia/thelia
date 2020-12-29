@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Translation;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 
@@ -22,23 +22,22 @@ class Translator extends BaseTranslator
 
     const GLOBAL_FALLBACK_KEY = '%s.%s';
 
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
+    /** @var Request */
+    protected $request;
 
     protected static $instance = null;
 
     /**
-     * @param ContainerInterface $container
+     * @param RequestStack $requestStack
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->container = $container;
+        $this->request = $requestStack->getCurrentRequest();
+
         // Allow singleton style calls once intanciated.
         // For this to work, the Translator service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.translator');
-        parent::__construct(null);
+        parent::__construct("");
         self::$instance = $this;
     }
 
@@ -58,15 +57,12 @@ class Translator extends BaseTranslator
 
     public function getLocale()
     {
-        if ($this->container->has('request_stack')) {
-            /** @var RequestStack $requestStack */
-            $requestStack = $this->container->get('request_stack');
-            if (null !== $request = $requestStack->getCurrentRequest()) {
-                return $request->getSession()->getLang()->getLocale();
-            }
+
+        if (null !== $this->request) {
+            return $this->request->getSession()->getLang()->getLocale();
         }
 
-        return $this->locale;
+        return parent::getLocale();
     }
 
     /**
@@ -75,13 +71,15 @@ class Translator extends BaseTranslator
      * @api
      */
     public function trans(
-        $id,
+        ?string $id,
         array $parameters = array(),
-        $domain = 'core',
-        $locale = null,
+        string $domain = null,
+        string $locale = null,
         $return_default_if_not_available = true,
         $useFallback = true
     ) {
+        $domain = $domain?? 'core';
+
         if (null === $locale) {
             $locale = $this->getLocale();
         }

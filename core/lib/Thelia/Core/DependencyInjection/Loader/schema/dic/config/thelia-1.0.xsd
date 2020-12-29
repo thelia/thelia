@@ -150,6 +150,7 @@
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="factory" type="factory" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
@@ -161,9 +162,7 @@
         <xsd:attribute name="public" type="boolean" />
         <xsd:attribute name="synthetic" type="boolean" />
         <xsd:attribute name="abstract" type="boolean" />
-        <xsd:attribute name="factory-class" type="xsd:string" />
-        <xsd:attribute name="factory-method" type="xsd:string" />
-        <xsd:attribute name="factory-service" type="xsd:string" />
+        <xsd:attribute name="factory" type="xsd:string" />
         <xsd:attribute name="alias" type="xsd:string" />
         <xsd:attribute name="parent" type="xsd:string" />
         <xsd:attribute name="shared" type="xsd:boolean" />
@@ -184,9 +183,7 @@
         <xsd:attribute name="public" type="boolean" />
         <xsd:attribute name="synthetic" type="boolean" />
         <xsd:attribute name="abstract" type="boolean" />
-        <xsd:attribute name="factory-class" type="xsd:string" />
-        <xsd:attribute name="factory-method" type="xsd:string" />
-        <xsd:attribute name="factory-service" type="xsd:string" />
+        <xsd:attribute name="factory" type="xsd:string" />
         <xsd:attribute name="alias" type="xsd:string" />
         <xsd:attribute name="parent" type="xsd:string" />
         <xsd:attribute name="event" type="xsd:string" />
@@ -250,6 +247,12 @@
         <xsd:attribute name="index" type="xsd:integer" />
         <xsd:attribute name="on-invalid" type="xsd:string" />
         <xsd:attribute name="strict" type="boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="factory" mixed="true">
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="class" type="xsd:string" />
+        <xsd:attribute name="method" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="call" mixed="true">

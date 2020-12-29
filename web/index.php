@@ -12,7 +12,6 @@
 
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\Dotenv\Dotenv;
 
 $env = 'prod';

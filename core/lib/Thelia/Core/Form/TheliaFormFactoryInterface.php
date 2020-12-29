@@ -11,6 +11,8 @@
 /*************************************************************************************/
 namespace Thelia\Core\Form;
 
+use Thelia\Form\BaseForm;
+
 /**
  * Class TheliaFormFactory
  * @package Thelia\Core\Form
@@ -23,7 +25,12 @@ interface TheliaFormFactoryInterface
      * @param  string                $type
      * @param  array                 $data
      * @param  array                 $options
-     * @return \Thelia\Form\BaseForm
+     * @return BaseForm
      */
-    public function createForm($name, $type = "form", array $data = array(), array $options = array());
+    public function createForm(
+        string $name,
+        $type = "form",
+        array $data = array(),
+        array $options = array()
+    ): BaseForm;
 }

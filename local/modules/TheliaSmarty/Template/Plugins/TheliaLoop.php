@@ -15,6 +15,9 @@ namespace TheliaSmarty\Template\Plugins;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseLoop;
@@ -33,10 +36,10 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     protected $loopDefinition = array();
 
-    /**
-     * @var Request
-     * @deprecated since 2.3, please use requestStack
-     */
+    /** @var RequestStack */
+    protected $requestStack;
+
+    /** @var Request */
     protected $request;
 
     /** @var EventDispatcherInterface */
@@ -48,9 +51,6 @@ class TheliaLoop extends AbstractSmartyPlugin
     /** @var Translator */
     protected $translator;
 
-    /** @var ContainerInterface Service Container */
-    protected $container = null;
-
     /** @var LoopResult[]  */
     protected $loopstack = array();
 
@@ -59,18 +59,34 @@ class TheliaLoop extends AbstractSmartyPlugin
     /** @var bool */
     protected $isDebugActive;
 
+    /** @var array */
+    protected $theliaParserLoops;
+
     /**
      * TheliaLoop constructor.
-     * @param ContainerInterface $container
+     * @param RequestStack $requestStack
+     * @param EventDispatcher $eventDispatcher
+     * @param SecurityContext $securityContext
+     * @param TranslatorInterface $translator
+     * @param bool $kernelDebug
+     * @param array $theliaParserLoops
      */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-        $this->request = $container->get('request_stack')->getCurrentRequest();
-        $this->dispatcher = $container->get('event_dispatcher');
-        $this->securityContext = $container->get('thelia.securityContext');
-        $this->translator = $container->get("thelia.translator");
-        $this->isDebugActive = $container->getParameter("kernel.debug");
+    public function __construct(
+        RequestStack $requestStack,
+        EventDispatcher $eventDispatcher,
+        SecurityContext $securityContext,
+        TranslatorInterface $translator,
+        bool $kernelDebug,
+        array $theliaParserLoops
+    ) {
+        $this->requestStack = $requestStack;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->dispatcher = $eventDispatcher;
+        $this->securityContext = $securityContext;
+        $this->translator = $translator;
+        $this->isDebugActive = $kernelDebug;
+        $this->theliaParserLoops = $theliaParserLoops;
+        $this->setLoopList($theliaParserLoops);
     }
 
     /**
@@ -435,7 +451,11 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         /** @var BaseLoop $loop */
         $loop = $class->newInstance(
-            $this->container
+            $this->requestStack,
+            $this->dispatcher,
+            $this->securityContext,
+            $this->translator,
+            $this->theliaParserLoops
         );
 
         $loop->initializeArgs($smartyParams);

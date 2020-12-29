@@ -33,23 +33,18 @@ use Thelia\Model\Lang;
 class ExportHandler
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface An event dispatcher interface
+     * @var EventDispatcherInterface An event dispatcher interface
      */
     protected $eventDispatcher;
-
-    /** @var ContainerInterface */
-    protected $container;
 
     /**
      * Class constructor
      *
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher An event dispatcher interface
-     * @param ContainerInterface $container
+     * @param EventDispatcherInterface $eventDispatcher An event dispatcher interface
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, ContainerInterface $container)
+    public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
-        $this->container = $container;
     }
 
     /**
@@ -162,7 +157,6 @@ class ExportHandler
 
         /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
         $instance = new $exportHandleClass;
-        $instance->setContainer($this->container);
 
         // Configure handle class
         $instance->setLang($language);

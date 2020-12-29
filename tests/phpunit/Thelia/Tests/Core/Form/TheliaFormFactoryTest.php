@@ -52,7 +52,7 @@ class TheliaFormFactoryTest extends \PHPUnit_Framework_TestCase
         $container->set("thelia.form_factory_builder", $factory);
         $container->set("thelia.translator", new Translator($container));
         $container->setParameter(
-            "thelia.parser.forms",
+            "Thelia.parser.forms",
             $definition = array(
                 "test_form" => "Thelia\\Tests\\Resources\\Form\\TestForm",
             )

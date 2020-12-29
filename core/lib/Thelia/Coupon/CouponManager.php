@@ -12,8 +12,8 @@
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Log\Tlog;
@@ -37,9 +37,6 @@ class CouponManager
     /** @var FacadeInterface Provides necessary value from Thelia */
     protected $facade = null;
 
-    /** @var ContainerInterface Service Container */
-    protected $container = null;
-
     /** @var array Available Coupons (Services) */
     protected $availableCoupons = array();
 
@@ -47,14 +44,22 @@ class CouponManager
     protected $availableConditions = array();
 
     /**
+     * @var Request
+     */
+    private $request;
+    /**
+     * @var CouponFactory
+     */
+    private $couponFactory;
+
+    /**S
      * Constructor
      *
-     * @param ContainerInterface $container Service container
+     * @param FacadeInterface $facade Service container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(FacadeInterface $facade)
     {
-        $this->container = $container;
-        $this->facade = $container->get('thelia.facade');
+        $this->facade = $facade;
     }
 
     /**
@@ -66,7 +71,7 @@ class CouponManager
     {
         $discount = 0.00;
 
-        $coupons = $this->facade->getCurrentCoupons();
+        $coupons = $this->getCurrentCoupons();
 
         if (\count($coupons) > 0) {
             $couponsKept = $this->sortCoupons($coupons);
@@ -82,6 +87,38 @@ class CouponManager
         }
 
         return round($discount, 2);
+    }
+
+    /**
+     * Return all Coupon given during the Checkout
+     *
+     * @return array Array of CouponInterface
+     */
+    public function getCurrentCoupons()
+    {
+        $couponCodes = $this->request->getSession()->getConsumedCoupons();
+
+        if (null === $couponCodes) {
+            return [];
+        }
+
+        $coupons = [];
+
+        foreach ($couponCodes as $couponCode) {
+            // Only valid coupons are returned
+            try {
+                if (false !== $couponInterface = $this->couponFactory->buildCouponFromCode($couponCode)) {
+                    $coupons[] = $couponInterface;
+                }
+            } catch (\Exception $ex) {
+                // Just ignore the coupon and log the problem, just in case someone realize it.
+                Tlog::getInstance()->warning(
+                    sprintf("Coupon %s ignored, exception occurred: %s", $couponCode, $ex->getMessage())
+                );
+            }
+        }
+
+        return $coupons;
     }
 
     /**
@@ -102,7 +139,7 @@ class CouponManager
      */
     public function isCouponRemovingPostage(Order $order)
     {
-        $coupons = $this->facade->getCurrentCoupons();
+        $coupons = $this->getCurrentCoupons();
 
         if (\count($coupons) == 0) {
             return false;
@@ -174,7 +211,7 @@ class CouponManager
      */
     public function getCouponsKept()
     {
-        return $this->sortCoupons($this->facade->getCurrentCoupons());
+        return $this->sortCoupons($this->getCurrentCoupons());
     }
 
     /**
@@ -244,7 +281,7 @@ class CouponManager
         $discount = 0.00;
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            $discount += $coupon->exec($this->facade);
+            $discount += $coupon->exec();
         }
 
         return $discount;
@@ -295,7 +332,7 @@ class CouponManager
      */
     public function clear()
     {
-        $coupons = $this->facade->getCurrentCoupons();
+        $coupons = $this->getCurrentCoupons();
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {

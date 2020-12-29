@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<database defaultIdMethod="native" name="thelia">
+<database defaultIdMethod="native" name="TheliaMain">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
     <parameter name="Charset" value="utf8"/>

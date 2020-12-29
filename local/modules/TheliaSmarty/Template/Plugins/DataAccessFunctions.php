@@ -912,7 +912,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             }
 
             try {
-                $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
+                $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
                 $template->assign('MEDIA_URL', $event->getFileUrl());
             } catch (\Exception $ex) {
                 Tlog::getInstance()->error($ex->getMessage());
