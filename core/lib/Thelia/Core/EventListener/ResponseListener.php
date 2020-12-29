@@ -15,6 +15,7 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Model\ConfigQuery;
 
@@ -25,7 +26,7 @@ use Thelia\Model\ConfigQuery;
  */
 class ResponseListener implements EventSubscriberInterface
 {
-    public function beforeResponse(FilterResponseEvent $event)
+    public function beforeResponse(ResponseEvent $event)
     {
         $session = $event->getRequest()->getSession();
 

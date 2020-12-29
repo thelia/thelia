@@ -15,7 +15,7 @@ namespace Thelia\Core\DependencyInjection\Loader;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
@@ -317,12 +317,12 @@ class XmlFileLoader extends FileLoader
         }
 
         if (isset($service['parent'])) {
-            $definition = new DefinitionDecorator((string) $service['parent']);
+            $definition = new ChildDefinition((string) $service['parent']);
         } else {
             $definition = new Definition();
         }
 
-        foreach (array('class', 'shared', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'abstract') as $key) {
+        foreach (array('class', 'shared', 'scope', 'public', 'factory', 'synthetic', 'abstract') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $this->getAttributeAsPhp($service, $key));

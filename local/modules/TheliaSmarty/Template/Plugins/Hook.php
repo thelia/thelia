@@ -13,8 +13,10 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
 use Thelia\Log\Tlog;
@@ -44,20 +46,23 @@ class Hook extends AbstractSmartyPlugin
     protected $smartyPluginModule = null;
 
     /** @var array */
-    protected $hookResults = array();
+    protected $hookResults = [];
 
     /** @var array */
-    protected $varstack = array();
+    protected $varstack = [];
 
     /** @var bool debug */
     protected $debug = false;
 
-    public function __construct($debug, ContainerAwareEventDispatcher $dispatcher)
-    {
+    public function __construct(
+        $debug,
+        EventDispatcher $dispatcher,
+        TranslatorInterface $translator
+    ) {
         $this->debug       = $debug;
         $this->dispatcher  = $dispatcher;
-        $this->translator  = $dispatcher->getContainer()->get("thelia.translator");
-        $this->hookResults = array();
+        $this->translator  = $translator;
+        $this->hookResults = [];
     }
 
     /**
@@ -104,7 +109,7 @@ class Hook extends AbstractSmartyPlugin
             $eventName .= '.' . $module;
         }
 
-        $this->getDispatcher()->dispatch($eventName, $event);
+        $this->getDispatcher()->dispatch($event, $eventName);
 
         $content = trim($event->dump());
 
@@ -243,7 +248,7 @@ HTML;
             $eventName .= '.' . $module;
         }
 
-        $this->getDispatcher()->dispatch($eventName, $event);
+        $this->getDispatcher()->dispatch($event, $eventName);
 
         // save results so we can use it in forHook block
         $this->hookResults[$hookName] = $event->get();

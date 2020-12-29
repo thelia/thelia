@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request as BaseRequest;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Api\BaseApiController;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -177,6 +178,10 @@ class Request extends BaseRequest
      */
     public function getSession()
     {
+        if (!$this->hasSession()) {
+            $this->session = $session = new Session();
+            $session->start();
+        }
         return parent::getSession();
     }
 }

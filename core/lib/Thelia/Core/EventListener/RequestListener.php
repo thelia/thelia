@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
@@ -61,7 +62,7 @@ class RequestListener implements EventSubscriberInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function registerValidatorTranslator(GetResponseEvent $event)
+    public function registerValidatorTranslator(RequestEvent $event)
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
@@ -84,7 +85,7 @@ class RequestListener implements EventSubscriberInterface
         );
     }
 
-    public function rememberMeLoader(GetResponseEvent $event)
+    public function rememberMeLoader(RequestEvent $event)
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
@@ -103,7 +104,7 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    public function jsonBody(GetResponseEvent $event)
+    public function jsonBody(RequestEvent $event)
     {
         $request = $event->getRequest();
         if (!\count($request->request->all()) && \in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
@@ -159,8 +160,8 @@ class RequestListener implements EventSubscriberInterface
                 $session->setCustomerUser($user);
 
                 $dispatcher->dispatch(
-                    TheliaEvents::CUSTOMER_LOGIN,
-                    new CustomerLoginEvent($user)
+                    new CustomerLoginEvent($user),
+                    TheliaEvents::CUSTOMER_LOGIN
                 );
             } catch (TokenAuthenticationException $ex) {
                 // Clear the cookie
@@ -280,7 +281,7 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    public function checkCurrency(GetResponseEvent $event)
+    public function checkCurrency(RequestEvent $event)
     {
         /** @var Request $request */
         $request = $event->getRequest();
@@ -293,11 +294,11 @@ class RequestListener implements EventSubscriberInterface
                     ->findOne()
             ) {
                 $request->getSession()->setCurrency($find);
-                $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($find, $request));
+                $this->eventDispatcher->dispatch(new CurrencyChangeEvent($find, $request), TheliaEvents::CHANGE_DEFAULT_CURRENCY);
             } else {
                 $defaultCurrency = Currency::getDefaultCurrency();
                 $request->getSession()->setCurrency($defaultCurrency);
-                $this->eventDispatcher->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyChangeEvent($defaultCurrency, $request));
+                $this->eventDispatcher->dispatch(new CurrencyChangeEvent($defaultCurrency, $request), TheliaEvents::CHANGE_DEFAULT_CURRENCY);
             }
         }
     }

@@ -12,20 +12,19 @@
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
-use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
+use Thelia\TaxEngine\TaxEngine;
 
 /**
  * Allow to assist in getting relevant data on the current application state
@@ -36,23 +35,67 @@ use Thelia\Model\CurrencyQuery;
  */
 class BaseFacade implements FacadeInterface
 {
-    /** @var ContainerInterface Service Container */
-    protected $container = null;
-
-    /** @var Translator Service Translator  */
-    protected $translator = null;
-
-    /** @var ParserInterface The thelia parser  */
-    private $parser = null;
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+    /**
+     * @var TaxEngine
+     */
+    protected $taxEngine;
+    /**
+     * @var CouponFactory
+     */
+    protected $couponFactory;
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+    /**
+     * @var ParserInterface
+     */
+    protected $parser;
+    /**
+     * @var Request
+     */
+    protected $request;
+    /**
+     * @var ConditionEvaluator
+     */
+    protected $conditionEvaluator;
+    /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
 
     /**
      * Constructor
      *
-     * @param ContainerInterface $container Service container
+     * @param SecurityContext $securityContext
+     * @param TaxEngine $taxEngine
+     * @param TranslatorInterface $translator
+     * @param ParserInterface $parser
+     * @param RequestStack $requestStack
+     * @param ConditionEvaluator $conditionEvaluator
+     * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(
+        SecurityContext $securityContext,
+        TaxEngine $taxEngine,
+        TranslatorInterface $translator,
+        ParserInterface $parser,
+        RequestStack $requestStack,
+        ConditionEvaluator $conditionEvaluator,
+        EventDispatcher $eventDispatcher
+    )
     {
-        $this->container = $container;
+        $this->securityContext = $securityContext;
+        $this->taxEngine = $taxEngine;
+        $this->translator = $translator;
+        $this->parser = $parser;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->conditionEvaluator = $conditionEvaluator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -88,7 +131,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCustomer()
     {
-        return $this->container->get('thelia.securityContext')->getCustomerUser();
+        return $this->securityContext->getCustomerUser();
     }
 
     /**
@@ -140,7 +183,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCartTotalTaxPrice($withItemsInPromo = true)
     {
-        $taxCountry = $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
+        $taxCountry = $this->taxEngine->getDeliveryCountry();
         $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
 
         $total = 0;
@@ -159,13 +202,13 @@ class BaseFacade implements FacadeInterface
      */
     public function getDeliveryCountry()
     {
-        return $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
+        return $this->taxEngine->getDeliveryCountry();
     }
 
     /**
      * Return the Checkout currency EUR|USD
      *
-     * @return Currency
+     * @return string
      */
     public function getCheckoutCurrency()
     {
@@ -195,40 +238,6 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return all Coupon given during the Checkout
-     *
-     * @return array Array of CouponInterface
-     */
-    public function getCurrentCoupons()
-    {
-        $couponCodes = $this->getRequest()->getSession()->getConsumedCoupons();
-
-        if (null === $couponCodes) {
-            return array();
-        }
-        /** @var CouponFactory $couponFactory */
-        $couponFactory = $this->container->get('thelia.coupon.factory');
-
-        $coupons = [];
-
-        foreach ($couponCodes as $couponCode) {
-            // Only valid coupons are returned
-            try {
-                if (false !== $couponInterface = $couponFactory->buildCouponFromCode($couponCode)) {
-                    $coupons[] = $couponInterface;
-                }
-            } catch (\Exception $ex) {
-                // Just ignore the coupon and log the problem, just in case someone realize it.
-                Tlog::getInstance()->warning(
-                    sprintf("Coupon %s ignored, exception occurred: %s", $couponCode, $ex->getMessage())
-                );
-            }
-        }
-
-        return $coupons;
-    }
-
-    /**
      * Find one Coupon in the database from its code
      *
      * @param string $code Coupon code
@@ -243,23 +252,13 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return platform Container
-     *
-     * @return Container
-     */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
-    /**
      * Return platform TranslatorInterface
      *
      * @return TranslatorInterface
      */
     public function getTranslator()
     {
-        return $this->container->get('thelia.translator');
+        return $this->translator;
     }
 
     /**
@@ -270,8 +269,6 @@ class BaseFacade implements FacadeInterface
     public function getParser()
     {
         if ($this->parser == null) {
-            $this->parser = $this->container->get('thelia.parser');
-
             // Define the current back-office template that should be used
             $this->parser->setTemplateDefinition(
                 $this->parser->getTemplateHelper()->getActiveAdminTemplate()
@@ -299,7 +296,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getRequest()
     {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->request;
     }
 
     /**
@@ -309,7 +306,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getConditionEvaluator()
     {
-        return $this->container->get('thelia.condition.validator');
+        return $this->conditionEvaluator;
     }
 
     /**
@@ -331,7 +328,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getDispatcher()
     {
-        return $this->container->get('event_dispatcher');
+        return $this->eventDispatcher;
     }
 
     /**

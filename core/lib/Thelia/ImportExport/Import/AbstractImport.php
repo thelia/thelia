@@ -44,11 +44,6 @@ abstract class AbstractImport implements \Iterator
     protected $mandatoryColumns = [];
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var integer Imported row count
      */
     protected $importedRows = 0;
@@ -195,22 +190,6 @@ abstract class AbstractImport implements \Iterator
         $this->importedRows = $importedRows;
 
         return $this;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
-    {
-        return $this->container;
     }
 
     /**

@@ -12,14 +12,16 @@
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
+use Thelia\TaxEngine\TaxEngine;
 
 /**
  * Allow to assist in getting relevant data on the current application state
@@ -33,9 +35,23 @@ interface FacadeInterface
     /**
      * Constructor
      *
-     * @param ContainerInterface $container Service container
+     * @param SecurityContext $securityContext
+     * @param TaxEngine $taxEngine
+     * @param TranslatorInterface $translator
+     * @param ParserInterface $parser
+     * @param RequestStack $requestStack
+     * @param ConditionEvaluator $conditionEvaluator
+     * @param EventDispatcher $eventDispatcher
      */
-    public function __construct(ContainerInterface $container);
+    public function __construct(
+        SecurityContext $securityContext,
+        TaxEngine $taxEngine,
+        TranslatorInterface $translator,
+        ParserInterface $parser,
+        RequestStack $requestStack,
+        ConditionEvaluator $conditionEvaluator,
+        EventDispatcher $eventDispatcher
+    );
 
     /**
      * Return a Cart a CouponManager can process
@@ -116,13 +132,6 @@ interface FacadeInterface
     public function getNbArticlesInCartIncludeQuantity();
 
     /**
-     * Return all Coupon given during the Checkout
-     *
-     * @return array Array of CouponInterface
-     */
-    public function getCurrentCoupons();
-
-    /**
      * Find one Coupon in the database from its code
      *
      * @param string $code Coupon code
@@ -130,13 +139,6 @@ interface FacadeInterface
      * @return Coupon
      */
     public function findOneCouponByCode($code);
-
-    /**
-     * Return platform Container
-     *
-     * @return Container
-     */
-    public function getContainer();
 
     /**
      * Return platform TranslatorInterface

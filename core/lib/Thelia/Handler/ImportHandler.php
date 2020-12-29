@@ -50,9 +50,6 @@ class ImportHandler
      */
     protected $archiverManager;
 
-    /** @var ContainerInterface */
-    protected $container;
-
     /**
      * Class constructor
      *
@@ -62,18 +59,15 @@ class ImportHandler
      *  The serializer manager service
      * @param \Thelia\Core\Archiver\ArchiverManager                       $archiverManager
      *  The archiver manager service
-     * @param ContainerInterface                                          $container
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         SerializerManager $serializerManager,
-        ArchiverManager $archiverManager,
-        ContainerInterface $container
+        ArchiverManager $archiverManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->serializerManager = $serializerManager;
         $this->archiverManager = $archiverManager;
-        $this->container = $container;
     }
 
     /**
@@ -194,7 +188,6 @@ class ImportHandler
 
         /** @var \Thelia\ImportExport\Import\AbstractImport $instance */
         $instance = new $importHandleClass;
-        $instance->setContainer($this->container);
 
         // Configure handle class
         $instance->setLang($language);

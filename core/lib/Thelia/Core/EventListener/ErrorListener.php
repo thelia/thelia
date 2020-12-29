@@ -15,7 +15,7 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -59,10 +59,10 @@ class ErrorListener implements EventSubscriberInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function defaultErrorFallback(GetResponseForExceptionEvent $event)
+    public function defaultErrorFallback(ExceptionEvent $event)
     {
         $this->parser->assign("status_code", 500);
-        $this->parser->assign("exception_message", $event->getException()->getMessage());
+        $this->parser->assign("exception_message", $event->getThrowable()->getMessage());
 
         if (!$this->parser->hasTemplateDefinition()) {
             $this->parser->setTemplateDefinition(
@@ -80,43 +80,43 @@ class ErrorListener implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    public function handleException(GetResponseForExceptionEvent $event)
+    public function handleException(ExceptionEvent $event)
     {
         if ("prod" === $this->env && ConfigQuery::isShowingErrorMessage()) {
             $this->eventDispatcher
                 ->dispatch(
-                    TheliaKernelEvents::THELIA_HANDLE_ERROR,
-                    $event
+                    $event,
+                    TheliaKernelEvents::THELIA_HANDLE_ERROR
                 )
             ;
         }
     }
 
-    public function logException(GetResponseForExceptionEvent $event)
+    public function logException(ExceptionEvent $event)
     {
         // Log exception in the Thelia log
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         
         $logMessage = '';
         
         do {
             $logMessage .=
                 ($logMessage ? PHP_EOL . 'Caused by' : 'Uncaught exception')
-                . $event->getException()->getMessage()
+                . $exception->getMessage()
                 . PHP_EOL
-                . "Stack Trace: " . $event->getException()->getTraceAsString()
+                . "Stack Trace: " . $exception->getTraceAsString()
             ;
         } while (null !== $exception = $exception->getPrevious());
         
         Tlog::getInstance()->error($logMessage);
     }
 
-    public function authenticationException(GetResponseForExceptionEvent $event)
+    public function authenticationException(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         if ($exception instanceof AuthenticationException) {
             $event->setResponse(
-                RedirectResponse::create($exception->getLoginTemplate())
+               new RedirectResponse($exception->getLoginTemplate())
             );
         }
     }

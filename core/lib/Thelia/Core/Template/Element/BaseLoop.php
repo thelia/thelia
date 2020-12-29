@@ -16,15 +16,16 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Loop\LoopExtendsArgDefinitionsEvent;
 use Thelia\Core\Event\Loop\LoopExtendsBuildArrayEvent;
 use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
 use Thelia\Core\Event\Loop\LoopExtendsInitializeArgsEvent;
 use Thelia\Core\Event\Loop\LoopExtendsParseResultsEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
@@ -62,21 +63,14 @@ abstract class BaseLoop
 
     /**
      * @var Request
-     * @deprecated since 2.3, please use getCurrentRequest()
      */
     protected $request;
-
-    /** @var RequestStack */
-    protected $requestStack;
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /** @var SecurityContext */
     protected $securityContext;
-
-    /** @var ContainerInterface Service Container */
-    protected $container = null;
 
     /** @var ArgumentCollection */
     protected $args;
@@ -94,24 +88,37 @@ abstract class BaseLoop
 
     /** @var array cache of event to dispatch */
     protected static $dispatchCache = [];
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
+
+    /** @var array */
+    protected $theliaParserLoops;
 
     /**
      * Create a new Loop
      *
-     * @param ContainerInterface $container
+     * @param RequestStack $requestStack
+     * @param EventDispatcher $eventDispatcher
+     * @param SecurityContext $securityContext
+     * @param TranslatorInterface $translator
+     * @param array $theliaParserLoops
      */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-
-        $this->translator = $container->get("thelia.translator");
+    public function __construct(
+        RequestStack $requestStack,
+        EventDispatcher $eventDispatcher,
+        SecurityContext $securityContext,
+        TranslatorInterface $translator,
+        array $theliaParserLoops
+    ) {
+        $this->translator = $translator;
 
         $this->checkInterface();
-
-        $this->requestStack = $container->get('request_stack');
-        $this->request = $this->getCurrentRequest();
-        $this->dispatcher = $container->get('event_dispatcher');
-        $this->securityContext = $container->get('thelia.securityContext');
+        $this->requestStack = $requestStack;
+        $this->dispatcher = $eventDispatcher;
+        $this->securityContext = $securityContext;
+        $this->theliaParserLoops = $theliaParserLoops;
 
         $this->initialize();
     }
@@ -128,7 +135,7 @@ abstract class BaseLoop
         $class = \get_class($this);
 
         if (null === self::$loopDefinitions) {
-            self::$loopDefinitions = \array_flip($this->container->getParameter('thelia.parser.loops'));
+            self::$loopDefinitions = \array_flip($this->theliaParserLoops);
         }
 
         if (isset(self::$loopDefinitions[$class])) {
@@ -141,8 +148,8 @@ abstract class BaseLoop
             $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS);
             if (null !== $eventName) {
                 $this->dispatcher->dispatch(
-                    $eventName,
-                    new LoopExtendsArgDefinitionsEvent($this)
+                    new LoopExtendsArgDefinitionsEvent($this),
+                    $eventName
                 );
             };
 
@@ -236,7 +243,7 @@ abstract class BaseLoop
 
         if (null !== $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_INITIALIZE_ARGS)) {
             $event = new LoopExtendsInitializeArgsEvent($this, $nameValuePairs);
-            $this->dispatcher->dispatch($eventName, $event);
+            $this->dispatcher->dispatch($event, $eventName);
             $nameValuePairs = $event->getLoopParameters();
         }
 
@@ -697,8 +704,8 @@ abstract class BaseLoop
         $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA);
         if (null !== $eventName) {
             $this->dispatcher->dispatch(
-                $eventName,
-                new LoopExtendsBuildModelCriteriaEvent($this, $search)
+                new LoopExtendsBuildModelCriteriaEvent($this, $search),
+                $eventName
             );
         }
 
@@ -721,7 +728,7 @@ abstract class BaseLoop
         if (null !== $eventName) {
             $event = new LoopExtendsBuildArrayEvent($this, $search);
 
-            $this->dispatcher->dispatch($eventName, $event);
+            $this->dispatcher->dispatch($event, $eventName);
 
             $search = $event->getArray();
         }
@@ -740,8 +747,8 @@ abstract class BaseLoop
         $eventName = $this->getDispatchEventName(TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS);
         if (null !== $eventName) {
             $this->dispatcher->dispatch(
-                $eventName,
-                new LoopExtendsParseResultsEvent($this, $loopResult)
+                new LoopExtendsParseResultsEvent($this, $loopResult),
+                $eventName
             );
         }
 
@@ -769,7 +776,7 @@ abstract class BaseLoop
     }
 
     /**
-     * @return null|Request
+     * @return \Symfony\Component\HttpFoundation\Request
      * @since 2.3
      */
     protected function getCurrentRequest()

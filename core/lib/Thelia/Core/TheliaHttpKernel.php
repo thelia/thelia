@@ -40,7 +40,7 @@ class TheliaHttpKernel extends HttpKernel
         RequestStack $requestStack
     ) {
         parent::__construct($dispatcher, $controllerResolver, $requestStack);
-
+        $container->get('thelia.url.manager');
         $this->container = $container;
     }
 
@@ -69,8 +69,6 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        // for backward compatibility
-        $this->container->set('request', $request);
         $this->container->get('request.context')->fromRequest($request);
 
         $response = parent::handle($request, $type, $catch);

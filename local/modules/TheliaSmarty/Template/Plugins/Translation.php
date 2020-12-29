@@ -12,10 +12,10 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class Translation extends AbstractSmartyPlugin
 {

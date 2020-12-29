@@ -13,7 +13,7 @@
 namespace Thelia\Core\Form;
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\FirewallForm;

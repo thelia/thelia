@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Tools\URL;
@@ -35,15 +36,15 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
         $this->urlManager = $urlManager;
     }
 
-    public function checkRedirectException(GetResponseForExceptionEvent $event)
+    public function checkRedirectException(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
         if ($exception instanceof ExceptionRedirectException) {
-            $response = RedirectResponse::create($exception->getUrl(), $exception->getStatusCode());
+            $response = new RedirectResponse($exception->getUrl(), $exception->getStatusCode());
             $event->setResponse($response);
         } elseif ($exception instanceof AuthenticationException) {
             // Redirect to the login template
-            $response = RedirectResponse::create($this->urlManager->viewUrl($exception->getLoginTemplate()));
+            $response = new RedirectResponse($this->urlManager->viewUrl($exception->getLoginTemplate()));
             $event->setResponse($response);
         }
     }

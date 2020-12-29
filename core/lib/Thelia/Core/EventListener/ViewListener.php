@@ -12,12 +12,15 @@
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Cmf\Component\Routing\ChainRouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Router;
@@ -25,6 +28,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ViewCheckEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\OrderException;
 
 /**
@@ -38,20 +43,41 @@ use Thelia\Exception\OrderException;
 
 class ViewListener implements EventSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    /** @var ParserInterface */
+    protected $parser;
+
+    /** @var TemplateHelperInterface */
+    protected $templateHelper;
+
+    /** @var Request */
+    protected $request;
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var ChainRouterInterface */
+    protected $chainRouter;
+
     /**
-     * @param ContainerInterface $container
+     * ViewListener constructor.
+     * @param ParserInterface $parser
+     * @param TemplateHelperInterface $templateHelper
+     * @param RequestStack $requestStack
      * @param EventDispatcherInterface $eventDispatcher
+     * @param ChainRouterInterface $chainRouter
      */
-    public function __construct(ContainerInterface $container, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->container = $container;
+    public function __construct(
+        ParserInterface $parser,
+        TemplateHelperInterface $templateHelper,
+        RequestStack $requestStack,
+        EventDispatcherInterface $eventDispatcher,
+        ChainRouterInterface $chainRouter
+    ) {
+        $this->parser = $parser;
+        $this->templateHelper = $templateHelper;
+        $this->request = $requestStack->getCurrentRequest();
         $this->eventDispatcher = $eventDispatcher;
+        $this->chainRouter = $chainRouter;
     }
 
     /**
@@ -59,28 +85,25 @@ class ViewListener implements EventSubscriberInterface
      *
      * The result is transform id needed into a Response object
      *
-     * @param \Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent $event
+     * @param ViewEvent $event
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(ViewEvent $event)
     {
-        $parser = $this->container->get('thelia.parser');
-        $templateHelper = $this->container->get('thelia.template_helper');
-        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate(), true);
-        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $this->parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
         $response = null;
         try {
-            $view = $request->attributes->get('_view');
+            $view = $this->request->attributes->get('_view');
 
-            $viewId = $request->attributes->get($view . '_id');
+            $viewId = $this->request->attributes->get($view . '_id');
 
-            $this->eventDispatcher->dispatch(TheliaEvents::VIEW_CHECK, new ViewCheckEvent($view, $viewId));
+            $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
 
-            $content = $parser->render($view . '.html');
+            $content = $this->parser->render($view . '.html');
 
             if ($content instanceof Response) {
                 $response = $content;
             } else {
-                $response = new Response($content, $parser->getStatus() ?: 200);
+                $response = new Response($content, $this->parser->getStatus() ?: 200);
             }
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
@@ -88,11 +111,11 @@ class ViewListener implements EventSubscriberInterface
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
                     // Redirect to the cart template
-                    $response = RedirectResponse::create($this->container->get('router.chainRequest')->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));
+                    $response = new RedirectResponse($this->chainRouter->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));
                     break;
                 case OrderException::UNDEFINED_DELIVERY:
                     // Redirect to the delivery choice template
-                    $response = RedirectResponse::create($this->container->get('router.chainRequest')->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
+                    $response = new RedirectResponse($this->chainRouter->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
                     break;
             }
             if (null === $response) {
@@ -103,9 +126,9 @@ class ViewListener implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    public function beforeKernelView(GetResponseForControllerResultEvent $event)
+    public function beforeKernelView(ViewEvent $event)
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $request = $this->request;
 
         if (null === $view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));

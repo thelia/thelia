@@ -26,13 +26,15 @@ use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ErrorHandler\Debug;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Propel\Schema\SchemaLocator;
@@ -156,14 +158,14 @@ class Thelia extends Kernel
         $propelInitService = new PropelInitService(
             $this->getEnvironment(),
             $this->isDebug(),
-            $this->getEnvParameters(),
+            $this->getKernelParameters(),
             $propelSchemaLocator
         );
 
         $propelConnectionAvailable = $this->initializePropelService(false, $cacheRefresh);
 
         if ($propelConnectionAvailable) {
-            $theliaDatabaseConnection = Propel::getConnection('thelia');
+            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $this->checkMySQLConfigurations($theliaDatabaseConnection);
         }
 
@@ -177,12 +179,14 @@ class Thelia extends Kernel
             $moduleManagement->updateModules($this->getContainer());
         }
 
+        $eventDispatcher = new EventDispatcher();
+
         if ($propelConnectionAvailable) {
-            $theliaDatabaseConnection->setEventDispatcher($this->getContainer()->get('event_dispatcher'));
+            $theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
         }
 
         if (self::isInstalled()) {
-            $this->getContainer()->get('event_dispatcher')->dispatch(TheliaEvents::BOOT);
+            $eventDispatcher->dispatch((new Event()), TheliaEvents::BOOT);
         }
     }
 
@@ -205,7 +209,7 @@ class Thelia extends Kernel
         $propelInitService = new PropelInitService(
             $this->getEnvironment(),
             $this->isDebug(),
-            $this->getEnvParameters(),
+            $this->getKernelParameters(),
             $propelSchemaLocator
         );
 

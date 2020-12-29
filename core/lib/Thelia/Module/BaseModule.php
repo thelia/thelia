@@ -664,12 +664,12 @@ class BaseModule implements BaseModuleInterface
          * Dispatch the event
          */
         $dispatcher->dispatch(
+            $event,
             (
             $hookModel === null ?
                 TheliaEvents::HOOK_CREATE_ALL :
                 TheliaEvents::HOOK_UPDATE
-            ),
-            $event
+            )
         );
 
         return [

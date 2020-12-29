@@ -30,7 +30,7 @@ $trustedIp = array(
 
 $request = Request::createFromGlobals();
 
-if (false === in_array($request->getClientIp(), $trustedIp)) {
+if (false && false === in_array($request->getClientIp(), $trustedIp)) {
     header('HTTP/1.0 403 Forbidden');
     exit('You are not allowed to access this file.');
 }
