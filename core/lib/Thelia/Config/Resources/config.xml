@@ -100,7 +100,7 @@
     <services>
 
         <!-- Thelia template helper -->
-        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" />
+        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
 
         <!--  URL maganement -->
         <service id="thelia.url.manager" class="Thelia\Tools\URL" public="true">
@@ -185,11 +185,11 @@
 
 		<!-- Security context for front and back office -->
 
-		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext">
+		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" public="true">
             <argument type="service" id="request_stack" />
 		</service>
 
-        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext">
+        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" public="true">
             <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.form_factory" />
             <argument type="service" id="thelia.form_validator" />
@@ -331,7 +331,7 @@
             <tag name="thelia.forms.extension" />
         </service>
 
-        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory">
+        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory" public="true">
             <argument type="service" id="request_stack" />
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="thelia.translator" />
@@ -340,7 +340,7 @@
             <argument>%Thelia.parser.forms%</argument>
         </service>
 
-        <service id="thelia.form_validator" class="Thelia\Core\Form\TheliaFormValidator">
+        <service id="thelia.form_validator" class="Thelia\Core\Form\TheliaFormValidator" public="true">
             <argument type="service" id="thelia.translator" />
             <argument>%kernel.environment%</argument>
         </service>

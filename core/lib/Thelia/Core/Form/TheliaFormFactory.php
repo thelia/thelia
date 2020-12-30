@@ -75,7 +75,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
      */
     public function createForm(
         string $name,
-        $type = "form",
+        $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
         array $data = array(),
         array $options = array()
     ): BaseForm {

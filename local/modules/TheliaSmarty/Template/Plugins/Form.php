@@ -302,7 +302,7 @@ class Form extends AbstractSmartyPlugin
         $formFieldView = $this->getFormFieldView($params);
         $formFieldConfig = $this->getFormFieldConfig($params);
 
-        $formFieldType = $formFieldConfig->getType()->getName();
+        $formFieldType = $formFieldConfig->getType();
 
         $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
 

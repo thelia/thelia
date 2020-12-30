@@ -49,7 +49,7 @@
             <argument type="service" id="router.module.fileLocator"/>
         </service>
 
-        <service id="router.admin" class="%router.class%">
+        <service id="router.admin" class="%router.class%" public="true">
             <argument type="service" id="router.xmlLoader"/>
             <argument>admin.xml</argument>
             <argument type="collection">

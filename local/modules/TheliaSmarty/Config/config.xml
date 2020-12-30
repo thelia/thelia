@@ -12,7 +12,7 @@
 
         <!-- Parser configuration -->
 
-        <service id="thelia.parser" class="TheliaSmarty\Template\SmartyParser">
+        <service id="thelia.parser" class="TheliaSmarty\Template\SmartyParser" public="true">
             <argument type="service" id="request_stack" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser.context"/>
@@ -142,6 +142,7 @@
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.translator"/>
+            <argument type="service" id="smarty.plugin.module"/>
         </service>
 
         <service id="smarty.plugin.cache" class="TheliaSmarty\Template\Plugins\Cache">

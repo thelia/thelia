@@ -226,7 +226,8 @@ class SessionController extends BaseAdminController
     {
         $request = $this->getRequest();
 
-        $adminLoginForm = new AdminLogin($request);
+        /** @var AdminLogin $adminLoginForm */
+        $adminLoginForm = $this->createForm("thelia.admin.login");
 
         try {
             $form = $this->validateForm($adminLoginForm, "post");
