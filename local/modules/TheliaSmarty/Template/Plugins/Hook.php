@@ -43,7 +43,7 @@ class Hook extends AbstractSmartyPlugin
     protected $translator;
 
     /** @var Module */
-    protected $smartyPluginModule = null;
+    protected $smartyPluginModule;
 
     /** @var array */
     protected $hookResults = [];
@@ -57,11 +57,13 @@ class Hook extends AbstractSmartyPlugin
     public function __construct(
         $debug,
         EventDispatcher $dispatcher,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        Module $smartyPluginModule
     ) {
         $this->debug       = $debug;
         $this->dispatcher  = $dispatcher;
         $this->translator  = $translator;
+        $this->smartyPluginModule = $smartyPluginModule;
         $this->hookResults = [];
     }
 
@@ -158,10 +160,6 @@ class Hook extends AbstractSmartyPlugin
      */
     protected function getSmartyPluginModule()
     {
-        if (null === $this->smartyPluginModule) {
-            $this->smartyPluginModule = $this->dispatcher->getContainer()->get("smarty.plugin.module");
-        }
-
         return $this->smartyPluginModule;
     }
 

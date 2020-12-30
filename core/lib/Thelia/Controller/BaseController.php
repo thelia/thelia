@@ -113,15 +113,15 @@ abstract class BaseController
      * Dispatch a Thelia event
      *
      * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param ActionEvent  $event     the action event, or null (a DefaultActionEvent will be dispatched)
+     * @param ActionEvent|null $event the action event, or null (a DefaultActionEvent will be dispatched)
      */
-    protected function dispatch($eventName, ActionEvent $event = null)
+    protected function dispatch(string $eventName, ActionEvent $event = null)
     {
         if ($event == null) {
             $event = new DefaultActionEvent();
         }
 
-        $this->getDispatcher()->dispatch($eventName, $event);
+        $this->getDispatcher()->dispatch($event, $eventName);
     }
 
     /**
@@ -570,7 +570,7 @@ abstract class BaseController
      *
      * This method builds a thelia form with its name
      */
-    public function createForm($name, $type = "form", array $data = array(), array $options = array())
+    public function createForm($name, $type = "Symfony\Component\Form\Extension\Core\Type\FormType", array $data = array(), array $options = array())
     {
         if (empty($name)) {
             $name = static::EMPTY_FORM_NAME;

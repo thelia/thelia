@@ -18,7 +18,7 @@ namespace TheliaSmarty\Template;
  * The class all Smarty Thelia plugin shoud extend
  *
  * Class AbstractSmartyPlugin
- * @package Thelia\Core\Template\Smarty
+ * @package TheliaSmarty
  */
 abstract class AbstractSmartyPlugin
 {
