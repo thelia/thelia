@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -21,7 +22,7 @@ class AdminLostPassword extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username_or_email", "text", array(
+            ->add("username_or_email", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Length(array("min" => 3)),

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Lang;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
@@ -28,8 +29,8 @@ class LangCreateForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -39,14 +40,14 @@ class LangCreateForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('title', 'text', array(
+            ->add('title', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -55,7 +56,7 @@ class LangCreateForm extends BaseForm
                     'for' => 'title_lang',
                 ),
             ))
-            ->add('code', 'text', array(
+            ->add('code', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -64,7 +65,7 @@ class LangCreateForm extends BaseForm
                     'for' => 'code_lang',
                 ),
             ))
-            ->add('locale', 'text', array(
+            ->add('locale', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -73,7 +74,7 @@ class LangCreateForm extends BaseForm
                     'for' => 'locale_lang',
                 ),
             ))
-            ->add('date_time_format', 'text', array(
+            ->add('date_time_format', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -82,7 +83,7 @@ class LangCreateForm extends BaseForm
                     'for' => 'date_time_format',
                 ),
             ))
-            ->add('date_format', 'text', array(
+            ->add('date_format', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -91,7 +92,7 @@ class LangCreateForm extends BaseForm
                     'for' => 'date_lang',
                 ),
             ))
-            ->add('time_format', 'text', array(
+            ->add('time_format', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -100,7 +101,7 @@ class LangCreateForm extends BaseForm
                     'for' => 'time_lang',
                 ),
             ))
-            ->add('decimal_separator', 'text', array(
+            ->add('decimal_separator', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -109,14 +110,14 @@ class LangCreateForm extends BaseForm
                     'for' => 'decimal_separator',
                 ),
             ))
-            ->add('thousands_separator', 'text', array(
+            ->add('thousands_separator', TextType::class, array(
                 'trim' => false,
                 'label' => Translator::getInstance()->trans('thousands separator'),
                 'label_attr' => array(
                     'for' => 'thousands_separator',
                 ),
             ))
-            ->add('decimals', 'text', array(
+            ->add('decimals', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),

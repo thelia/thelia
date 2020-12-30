@@ -22,7 +22,7 @@ class AdminCreatePassword extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("password", "password", array(
+            ->add("password", PasswordType::class, array(
                 "constraints" => array(),
                 "label" => $this->translator->trans("Password"),
                 "label_attr" => array(
@@ -32,7 +32,7 @@ class AdminCreatePassword extends BruteforceForm
                     'placeholder' => Translator::getInstance()->trans('Enter the new password')
                 ]
             ))
-            ->add("password_confirm", "password", array(
+            ->add("password_confirm", PasswordType::class, array(
                 "constraints" => array(
                     new Callback(array("methods" => array(
                         array($this, "verifyPasswordField"),

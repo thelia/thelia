@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -28,16 +29,16 @@ class ProductModificationForm extends ProductCreationForm
         parent::doBuildForm(true);
 
         $this->formBuilder
-            ->add("id", "integer", array(
+            ->add("id", IntegerType::class, array(
                     "label"       => Translator::getInstance()->trans("Prodcut ID *"),
                     "label_attr"  => array("for" => "product_id_field"),
                     "constraints" => array(new GreaterThan(array('value' => 0))),
             ))
-            ->add("template_id", "integer", array(
+            ->add("template_id", IntegerType::class, array(
                     "label"       => Translator::getInstance()->trans("Product template"),
                     "label_attr"  => array("for" => "product_template_field"),
             ))
-            ->add("brand_id", "integer", [
+            ->add("brand_id", IntegerType::class, [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
                 'label'       => Translator::getInstance()->trans('Brand / Supplier'),
@@ -46,7 +47,7 @@ class ProductModificationForm extends ProductCreationForm
                     'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
                 ],
             ])
-            ->add("virtual_document_id", "integer", array(
+            ->add("virtual_document_id", IntegerType::class, array(
                 "label"      => Translator::getInstance()->trans("Virtual document"),
                 "label_attr" => array("for" => "virtual_document_id_field"),
             ))

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 /**
@@ -28,7 +29,7 @@ class ContentModificationForm extends ContentCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add("id", HiddenType::class, array("constraints" => array(new GreaterThan(array('value' => 0)))))
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class

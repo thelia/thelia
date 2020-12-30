@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
@@ -32,7 +35,7 @@ trait StandardDescriptionFieldsTrait
         if (! \in_array('locale', $exclude)) {
             $this->formBuilder->add(
                 'locale',
-                'hidden',
+                HiddenType::class,
                 [
                     'constraints' => [ new NotBlank() ],
                     'required'    => true,
@@ -43,7 +46,7 @@ trait StandardDescriptionFieldsTrait
         if (! \in_array('title', $exclude)) {
             $this->formBuilder->add(
                 'title',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [ new NotBlank() ],
                     'required'    => true,
@@ -61,7 +64,7 @@ trait StandardDescriptionFieldsTrait
         if (! \in_array('chapo', $exclude)) {
             $this->formBuilder->add(
                 'chapo',
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [ ],
                     'required'    => false,
@@ -81,7 +84,7 @@ trait StandardDescriptionFieldsTrait
         if (! \in_array('description', $exclude)) {
             $this->formBuilder->add(
                 'description',
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [ ],
                     'required'    => false,
@@ -100,7 +103,7 @@ trait StandardDescriptionFieldsTrait
         if (! \in_array('postscriptum', $exclude)) {
             $this->formBuilder->add(
                 'postscriptum',
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [ ],
                     'required'    => false,

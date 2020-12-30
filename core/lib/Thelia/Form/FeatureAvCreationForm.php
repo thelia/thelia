@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -21,7 +23,7 @@ class FeatureAvCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -30,12 +32,12 @@ class FeatureAvCreationForm extends BaseForm
                     "for" => "title",
                 ),
             ))
-            ->add("locale", "text", array(
+            ->add("locale", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
             ))
-            ->add("feature_id", "hidden", array(
+            ->add("feature_id", HiddenType::class, array(
                 "constraints" => array(
                         new NotBlank(),
                 ),

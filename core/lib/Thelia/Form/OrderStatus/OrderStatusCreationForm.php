@@ -13,6 +13,7 @@
 namespace Thelia\Form\OrderStatus;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -37,7 +38,7 @@ class OrderStatusCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'title',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [ new NotBlank() ],
                     'required'    => true,
@@ -56,7 +57,7 @@ class OrderStatusCreationForm extends BaseForm
             )
             ->add(
                 'code',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new Callback([
@@ -80,7 +81,7 @@ class OrderStatusCreationForm extends BaseForm
             )
             ->add(
                 'color',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),

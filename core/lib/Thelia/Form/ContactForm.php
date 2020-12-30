@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -28,8 +30,8 @@ class ContactForm extends FirewallForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -39,14 +41,14 @@ class ContactForm extends FirewallForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('name', 'text', array(
+            ->add('name', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -55,7 +57,7 @@ class ContactForm extends FirewallForm
                     'for' => 'name_contact',
                 ),
             ))
-            ->add('email', 'email', array(
+            ->add('email', EmailType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                     new Email(),
@@ -65,7 +67,7 @@ class ContactForm extends FirewallForm
                     'for' => 'email_contact',
                 ),
             ))
-            ->add('subject', 'text', array(
+            ->add('subject', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),
@@ -74,7 +76,7 @@ class ContactForm extends FirewallForm
                     'for' => 'subject_contact',
                 ),
             ))
-            ->add('message', 'text', array(
+            ->add('message', TextType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                 ),

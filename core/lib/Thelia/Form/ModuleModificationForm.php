@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -26,7 +27,7 @@ class ModuleModificationForm extends BaseForm
         $this->addStandardDescFields();
 
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("id", HiddenType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),

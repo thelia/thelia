@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Api\ProductSaleElements;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -25,8 +26,8 @@ class ProductSaleElementsForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -36,14 +37,14 @@ class ProductSaleElementsForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("pse", "collection", array(
+            ->add("pse", CollectionType::class, array(
                 "type" => "product_sale_elements",
                 "allow_add" => true,
                 "required" => true,

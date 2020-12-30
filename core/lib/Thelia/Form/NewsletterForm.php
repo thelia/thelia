@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,8 +33,8 @@ class NewsletterForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -42,14 +44,14 @@ class NewsletterForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('email', 'email', array(
+            ->add('email', EmailType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                     new Email(),
@@ -65,13 +67,13 @@ class NewsletterForm extends BaseForm
                     'for' => 'email_newsletter',
                 ),
             ))
-            ->add('firstname', 'text', array(
+            ->add('firstname', TextType::class, array(
                 'label' => Translator::getInstance()->trans('Firstname'),
                 'label_attr' => array(
                     'for' => 'firstname_newsletter',
                 ),
             ))
-            ->add('lastname', 'text', array(
+            ->add('lastname', TextType::class, array(
                 'label' => Translator::getInstance()->trans('Lastname'),
                 'label_attr' => array(
                     'for' => 'lastname_newsletter',

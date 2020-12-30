@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Form\Exception\StockNotFoundException;
@@ -33,8 +36,8 @@ class CartAdd extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -44,14 +47,14 @@ class CartAdd extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("product", "text", array(
+            ->add("product", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
@@ -63,7 +66,7 @@ class CartAdd extends BaseForm
                     "for" => "cart_product",
                 ),
             ))
-            ->add("product_sale_elements_id", "text", array(
+            ->add("product_sale_elements_id", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
@@ -73,7 +76,7 @@ class CartAdd extends BaseForm
                 "required" => true,
 
             ))
-            ->add("quantity", "number", array(
+            ->add("quantity", NumberType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
@@ -88,8 +91,8 @@ class CartAdd extends BaseForm
                     "for" => "quantity",
                 ),
             ))
-            ->add("append", "integer")
-            ->add("newness", "integer")
+            ->add("append", IntegerType::class)
+            ->add("newness", IntegerType::class)
         ;
     }
 

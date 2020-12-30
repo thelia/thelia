@@ -12,6 +12,8 @@
 
 namespace Thelia\Form\Brand;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\StandardDescriptionFieldsTrait;
@@ -33,13 +35,13 @@ class BrandModificationForm extends BrandCreationForm
 
         $this->formBuilder->add(
             'id',
-            'hidden',
+            HiddenType::class,
             [
                 'constraints' => [ new GreaterThan(['value' => 0]) ],
                 'required'    => true,
             ]
         )
-        ->add("logo_image_id", "integer", [
+        ->add("logo_image_id", IntegerType::class, [
                 'constraints' => [ ],
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('Select the brand logo'),

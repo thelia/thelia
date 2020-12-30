@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Api\Product;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\ProductCreationForm as BaseProductCreationForm;
 use Thelia\Form\StandardDescriptionFieldsTrait;
@@ -35,7 +36,7 @@ class ProductCreationForm extends BaseProductCreationForm
 
         $this
             ->formBuilder
-            ->add("brand_id", "integer", [
+            ->add("brand_id", IntegerType::class, [
                 'required'    => true,
                 'label'       => $translator->trans('Brand / Supplier'),
                 'label_attr'  => [

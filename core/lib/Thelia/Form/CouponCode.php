@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -36,7 +37,7 @@ class CouponCode extends BaseForm
         $this->formBuilder
             ->add(
                 "coupon-code",
-                "text",
+                TextType::class,
                 [
                     "required"    => true,
                     "constraints" => [

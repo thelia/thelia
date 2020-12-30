@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Model\Lang;
 use Thelia\Model\MessageQuery;
@@ -23,7 +25,7 @@ class MessageCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("name", "text", array(
+            ->add("name", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
@@ -39,7 +41,7 @@ class MessageCreationForm extends BaseForm
                     'placeholder' => Translator::getInstance()->trans("Mail template name"),
                 ],
             ))
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -55,12 +57,12 @@ class MessageCreationForm extends BaseForm
                     'placeholder' => Translator::getInstance()->trans("Mail template purpose"),
                 ],
             ))
-            ->add("locale", "hidden", array(
+            ->add("locale", HiddenType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
             ))
-            ->add("secured", "hidden", array())
+            ->add("secured", HiddenType::class, array())
         ;
     }
 

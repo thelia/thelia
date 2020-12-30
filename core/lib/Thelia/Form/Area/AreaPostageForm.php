@@ -12,6 +12,8 @@
 
 namespace Thelia\Form\Area;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -30,8 +32,8 @@ class AreaPostageForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -41,20 +43,20 @@ class AreaPostageForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('area_id', 'integer', array(
+            ->add('area_id', IntegerType::class, array(
                 'constraints' => array(
                     new GreaterThan(array('value' => 0)),
                     new NotBlank(),
                 ),
             ))
-            ->add('postage', 'number', array(
+            ->add('postage', NumberType::class, array(
                 'constraints' => array(
                     new GreaterThanOrEqual(array('value' => 0)),
                     new NotBlank(),

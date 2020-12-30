@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -55,7 +56,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             $currentOptions["constraints"] = [];
             $currentOptions["required"] = false;
 
-            $this->formBuilder->remove("email")->add("email", "text", $currentOptions);
+            $this->formBuilder->remove("email")->add("email", TextType::class, $currentOptions);
         }
 
         if ($this->formBuilder->has("email_confirm") && ! ($customerCanChangeEmail && $emailConfirmation)) {

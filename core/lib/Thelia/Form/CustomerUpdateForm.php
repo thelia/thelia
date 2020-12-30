@@ -12,6 +12,10 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -33,16 +37,16 @@ class CustomerUpdateForm extends BaseForm
         $this->formBuilder
             ->add(
                 'update_logged_in_user',
-                'integer'// In a front office context, update the in-memory logged-in user data
+                IntegerType::class// In a front office context, update the in-memory logged-in user data
             )
-            ->add("company", "text", array(
+            ->add("company", TextType::class, array(
                 "label" => Translator::getInstance()->trans("Company"),
                 "label_attr" => array(
                     "for" => "company",
                 ),
                 "required" => false,
             ))
-            ->add("firstname", "text", array(
+            ->add("firstname", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -51,7 +55,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "firstname",
                 ),
             ))
-            ->add("lastname", "text", array(
+            ->add("lastname", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -60,7 +64,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "lastname",
                 ),
             ))
-            ->add("email", "email", array(
+            ->add("email", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
@@ -70,7 +74,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "email",
                 ),
             ))
-            ->add("email_confirm", "email", array(
+            ->add("email_confirm", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\Email(),
                     new Constraints\Callback(array(
@@ -84,7 +88,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "email_confirm",
                 ),
             ))
-            ->add("password", "text", array(
+            ->add("password", TextType::class, array(
                 "label" => Translator::getInstance()->trans("Password"),
                 "required" => false,
                 "label_attr" => array(
@@ -92,7 +96,7 @@ class CustomerUpdateForm extends BaseForm
                     "help" => Translator::getInstance()->trans('Leave blank to keep current customer password')
                 ),
             ))
-            ->add("address1", "text", array(
+            ->add("address1", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -101,35 +105,35 @@ class CustomerUpdateForm extends BaseForm
                 ),
                 "label" => Translator::getInstance()->trans("Street Address "),
             ))
-            ->add("address2", "text", array(
+            ->add("address2", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Address Line 2"),
                 "label_attr" => array(
                     "for" => "address2",
                 ),
             ))
-            ->add("address3", "text", array(
+            ->add("address3", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Address Line 3"),
                 "label_attr" => array(
                     "for" => "address3",
                 ),
             ))
-            ->add("phone", "text", array(
+            ->add("phone", TextType::class, array(
                 "label" => Translator::getInstance()->trans("Phone"),
                 "label_attr" => array(
                     "for" => "phone",
                 ),
                 "required" => false,
             ))
-            ->add("cellphone", "text", array(
+            ->add("cellphone", TextType::class, array(
                 "label" => Translator::getInstance()->trans("Cellphone"),
                 "label_attr" => array(
                     "for" => "cellphone",
                 ),
                 "required" => false,
             ))
-            ->add("zipcode", "text", array(
+            ->add("zipcode", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
@@ -143,7 +147,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "zipcode",
                 ),
             ))
-            ->add("city", "text", array(
+            ->add("city", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -152,7 +156,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "city",
                 ),
             ))
-            ->add("country", "text", array(
+            ->add("country", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -161,7 +165,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "country",
                 ),
             ))
-            ->add("state", "text", array(
+            ->add("state", TextType::class, array(
                 "required" => false,
                 "constraints" => array(
                     new Constraints\Callback(array(
@@ -175,7 +179,7 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "state",
                 ),
             ))
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -184,21 +188,21 @@ class CustomerUpdateForm extends BaseForm
                     "for" => "title",
                 ),
             ))
-            ->add('discount', 'text', array(
+            ->add('discount', TextType::class, array(
                 'required' => false,
                 'label' => Translator::getInstance()->trans('permanent discount (in percent)'),
                 'label_attr' => array(
                     'for' => 'discount',
                 ),
             ))
-            ->add('reseller', 'checkbox', array(
+            ->add('reseller', CheckboxType::class, array(
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Reseller'),
                 'label_attr' => array(
                     'for' => 'reseller',
                 ),
             ))
-            ->add('lang_id', 'integer', array(
+            ->add('lang_id', IntegerType::class, array(
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Preferred language'),
                 'label_attr' => array(

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Lang;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
@@ -30,8 +31,8 @@ class LangUrlForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -41,7 +42,7 @@ class LangUrlForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
@@ -50,7 +51,7 @@ class LangUrlForm extends BaseForm
         foreach (LangQuery::create()->find() as $lang) {
             $this->formBuilder->add(
                 self::LANG_PREFIX.$lang->getId(),
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),

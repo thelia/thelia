@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Exception;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -38,7 +39,7 @@ class ModuleInstallForm extends BaseForm
         $this->formBuilder
             ->add(
                 'module',
-                'file',
+                FileType::class,
                 [
                     'required' => true,
                     'constraints' => [

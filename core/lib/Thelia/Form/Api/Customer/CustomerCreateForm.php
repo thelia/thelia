@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Api\Customer;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\CustomerCreateForm as BaseCustomerCreateForm;
 
@@ -30,7 +31,7 @@ class CustomerCreateForm extends BaseCustomerCreateForm
             ->remove('email_confirm')
             ->remove('password_confirm')
             ->remove('agreed')
-            ->add('lang_id', 'integer', [
+            ->add('lang_id', IntegerType::class, [
                 'constraints' => [
                     new NotBlank(),
                 ]

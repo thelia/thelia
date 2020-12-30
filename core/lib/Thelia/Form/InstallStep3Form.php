@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -38,7 +40,7 @@ class InstallStep3Form extends BaseForm
         $this->formBuilder
             ->add(
                 'host',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),
@@ -47,7 +49,7 @@ class InstallStep3Form extends BaseForm
             )
             ->add(
                 'user',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),
@@ -56,7 +58,7 @@ class InstallStep3Form extends BaseForm
             )
             ->add(
                 'password',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),
@@ -65,7 +67,7 @@ class InstallStep3Form extends BaseForm
             )
             ->add(
                 'port',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),
@@ -79,7 +81,7 @@ class InstallStep3Form extends BaseForm
             )
             ->add(
                 'locale',
-                'hidden',
+                HiddenType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),

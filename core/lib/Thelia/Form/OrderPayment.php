@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -29,7 +31,7 @@ class OrderPayment extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("invoice-address", "integer", array(
+            ->add("invoice-address", IntegerType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
@@ -40,7 +42,7 @@ class OrderPayment extends FirewallForm
                     )),
                 ),
             ))
-            ->add("payment-module", "integer", array(
+            ->add("payment-module", IntegerType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
@@ -52,7 +54,7 @@ class OrderPayment extends FirewallForm
                 ),
             ))
             // Add terms & conditions
-            ->add("agreed", "checkbox", array(
+            ->add("agreed", CheckboxType::class, array(
                 "constraints" => array(
                     new Constraints\IsTrue(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register."))),
                 ),

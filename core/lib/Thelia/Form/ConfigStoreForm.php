@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -26,7 +29,7 @@ class ConfigStoreForm extends BaseForm
         $this->formBuilder
             ->add(
                 'store_name',
-                'text',
+                TextType::class,
                 [
                     'data'        => ConfigQuery::getStoreName(),
                     'constraints' => [new Constraints\NotBlank()],
@@ -38,7 +41,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_description',
-                'text',
+                TextType::class,
                 [
                     'data'     => ConfigQuery::getStoreDescription(),
                     'required' => false,
@@ -50,7 +53,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_email',
-                'text',
+                TextType::class,
                 [
                     'data'        => ConfigQuery::getStoreEmail(),
                     'constraints' => [
@@ -68,7 +71,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_notification_emails',
-                'text',
+                TextType::class,
                 [
                     'data'        => ConfigQuery::read('store_notification_emails'),
                     'constraints' => [
@@ -90,7 +93,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_business_id',
-                'text',
+                TextType::class,
                 [
                     'data'     => ConfigQuery::read('store_business_id'),
                     'label'    => $tr->trans('Business ID'),
@@ -102,7 +105,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_phone',
-                'text',
+                TextType::class,
                 [
                     'data'     => ConfigQuery::read('store_phone'),
                     'label'    => $tr->trans('Phone'),
@@ -114,7 +117,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_fax',
-                'text',
+                TextType::class,
                 [
                     'data'     => ConfigQuery::read('store_fax'),
                     'label'    => $tr->trans('Fax'),
@@ -126,7 +129,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_address1',
-                'text',
+                TextType::class,
                 [
                     'data'        => ConfigQuery::read('store_address1'),
                     'constraints' => [
@@ -140,7 +143,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_address2',
-                'text',
+                TextType::class,
                 [
                     'data'     => ConfigQuery::read('store_address2'),
                     'required' => false,
@@ -151,7 +154,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_address3',
-                'text',
+                TextType::class,
                 [
                     'data'     => ConfigQuery::read('store_address3'),
                     'required' => false,
@@ -162,7 +165,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_zipcode',
-                'text',
+                TextType::class,
                 [
                     'data'        => ConfigQuery::read('store_zipcode'),
                     'constraints' => [
@@ -176,7 +179,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_city',
-                'text',
+                TextType::class,
                 [
                     'data'        => ConfigQuery::read('store_city'),
                     'constraints' => [
@@ -190,7 +193,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_country',
-                'integer',
+                IntegerType::class,
                 [
                     'data'        => ConfigQuery::read('store_country'),
                     'constraints' => [
@@ -204,7 +207,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'favicon_file',
-                'file',
+                FileType::class,
                 [
                     'required' => false,
                     'constraints' => [
@@ -221,7 +224,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'logo_file',
-                'file',
+                FileType::class,
                 [
                     'required' => false,
                     'constraints' => [
@@ -235,7 +238,7 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'banner_file',
-                'file',
+                FileType::class,
                 [
                     'required' => false,
                     'constraints' => [

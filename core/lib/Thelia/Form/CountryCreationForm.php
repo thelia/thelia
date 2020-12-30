@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CountryCreationForm extends BaseForm
@@ -21,7 +24,7 @@ class CountryCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'title',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -31,7 +34,7 @@ class CountryCreationForm extends BaseForm
             )
             ->add(
                 'locale',
-                'hidden',
+                HiddenType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -40,7 +43,7 @@ class CountryCreationForm extends BaseForm
             )
             ->add(
                 'visible',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required' => false,
                     'label' => $this->translator->trans('This country is online'),
@@ -51,7 +54,7 @@ class CountryCreationForm extends BaseForm
             )
             ->add(
                 'isocode',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -64,7 +67,7 @@ class CountryCreationForm extends BaseForm
             )
             ->add(
                 'isoalpha2',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -77,7 +80,7 @@ class CountryCreationForm extends BaseForm
             )
             ->add(
                 'isoalpha3',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -90,7 +93,7 @@ class CountryCreationForm extends BaseForm
             )
             ->add(
                 'has_states',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required' => false,
                     'label' => $this->translator->trans('This country has states / provinces'),

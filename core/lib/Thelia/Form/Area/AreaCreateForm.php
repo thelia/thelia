@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Area;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
@@ -28,7 +29,7 @@ class AreaCreateForm extends BaseForm
         $this->formBuilder
             ->add(
                 'name',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),

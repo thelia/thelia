@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
@@ -31,7 +32,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("id", HiddenType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
@@ -49,7 +50,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
         foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
                 self::RESOURCE_ACCESS_FIELD_PREFIX.':'.str_replace(".", ":", $resource->getCode()),
-                "choice",
+                ChoiceType::class,
                 array(
                     "choices" => array(
                         AccessManager::VIEW => AccessManager::VIEW,

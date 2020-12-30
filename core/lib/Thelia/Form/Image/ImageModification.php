@@ -12,6 +12,8 @@
 
 namespace Thelia\Form\Image;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\Image;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -42,7 +44,7 @@ abstract class ImageModification extends BaseForm
         $this->formBuilder
             ->add(
                 'file',
-                'file',
+                FileType::class,
                 [
                     'required' => false,
                     'constraints' => [
@@ -60,7 +62,7 @@ abstract class ImageModification extends BaseForm
             // Is this image online ?
             ->add(
                 'visible',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'constraints' => [ ],
                     'required'    => false,

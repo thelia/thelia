@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -22,7 +24,7 @@ class ConfigCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("name", "text", array(
+            ->add("name", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
@@ -34,7 +36,7 @@ class ConfigCreationForm extends BaseForm
                     "for" => "name",
                 ),
             ))
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -43,19 +45,19 @@ class ConfigCreationForm extends BaseForm
                     "for" => "purpose",
                 ),
             ))
-            ->add("locale", "hidden", array(
+            ->add("locale", HiddenType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
             ))
-            ->add("value", "text", array(
+            ->add("value", TextType::class, array(
                 "label" => Translator::getInstance()->trans('Value *'),
                 "label_attr" => array(
                     "for" => "value",
                 ),
             ))
-            ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array(
+            ->add("hidden", HiddenType::class, array())
+            ->add("secured", HiddenType::class, array(
                 "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ))
         ;

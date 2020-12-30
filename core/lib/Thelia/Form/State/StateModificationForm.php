@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\State;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
@@ -29,7 +30,7 @@ class StateModificationForm extends StateCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add('id', 'hidden', ['constraints' => [new GreaterThan(['value' => 0])]])
+            ->add('id', HiddenType::class, ['constraints' => [new GreaterThan(['value' => 0])]])
         ;
     }
 

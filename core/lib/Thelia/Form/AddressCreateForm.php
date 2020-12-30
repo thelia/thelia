@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -30,8 +32,8 @@ class AddressCreateForm extends FirewallForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -41,14 +43,14 @@ class AddressCreateForm extends FirewallForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("label", "text", array(
+            ->add("label", TextType::class, array(
                     "constraints" => array(
                         new NotBlank(),
                     ),
@@ -57,7 +59,7 @@ class AddressCreateForm extends FirewallForm
                         "for" => "address_label",
                     ),
                 ))
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
@@ -66,7 +68,7 @@ class AddressCreateForm extends FirewallForm
                         "for" => "title",
                     ),
                 ))
-            ->add("firstname", "text", array(
+            ->add("firstname", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
@@ -75,7 +77,7 @@ class AddressCreateForm extends FirewallForm
                         "for" => "firstname",
                     ),
                 ))
-            ->add("lastname", "text", array(
+            ->add("lastname", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
@@ -84,14 +86,14 @@ class AddressCreateForm extends FirewallForm
                         "for" => "lastname",
                     ),
                 ))
-            ->add("company", "text", array(
+            ->add("company", TextType::class, array(
                     "label" => Translator::getInstance()->trans("Company Name"),
                     "label_attr" => array(
                         "for" => "company",
                     ),
                     "required" => false,
                 ))
-            ->add("address1", "text", array(
+            ->add("address1", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
@@ -100,21 +102,21 @@ class AddressCreateForm extends FirewallForm
                         "for" => "address1",
                     ),
                 ))
-            ->add("address2", "text", array(
+            ->add("address2", TextType::class, array(
                     "label" => Translator::getInstance()->trans("Address Line 2"),
                     "label_attr" => array(
                         "for" => "address2",
                     ),
                     "required" => false,
                 ))
-            ->add("address3", "text", array(
+            ->add("address3", TextType::class, array(
                     "label" => Translator::getInstance()->trans("Address Line 3"),
                     "label_attr" => array(
                         "for" => "address3",
                     ),
                     "required" => false,
                 ))
-            ->add("city", "text", array(
+            ->add("city", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
@@ -123,7 +125,7 @@ class AddressCreateForm extends FirewallForm
                         "for" => "city",
                     ),
                 ))
-            ->add("zipcode", "text", array(
+            ->add("zipcode", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                         new Constraints\Callback(array(
@@ -137,7 +139,7 @@ class AddressCreateForm extends FirewallForm
                         "for" => "zipcode",
                     ),
                 ))
-            ->add("country", "text", array(
+            ->add("country", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                     ),
@@ -146,7 +148,7 @@ class AddressCreateForm extends FirewallForm
                         "for" => "country",
                     ),
                 ))
-            ->add("state", "text", array(
+            ->add("state", TextType::class, array(
                 "required" => false,
                 "constraints" => array(
                     new Constraints\Callback(array(
@@ -162,14 +164,14 @@ class AddressCreateForm extends FirewallForm
                 ),
             ))
             // Phone
-            ->add("phone", "text", array(
+            ->add("phone", TextType::class, array(
                     "label" => Translator::getInstance()->trans("Phone"),
                     "label_attr" => array(
                         "for" => "phone",
                     ),
                     "required" => false,
                 ))
-            ->add("cellphone", "text", array(
+            ->add("cellphone", TextType::class, array(
                     "label" => Translator::getInstance()->trans("Cellphone"),
                     "label_attr" => array(
                         "for" => "cellphone",
@@ -177,7 +179,7 @@ class AddressCreateForm extends FirewallForm
                     "required" => false,
                 ))
             // Default address
-            ->add("is_default", "checkbox", array(
+            ->add("is_default", CheckboxType::class, array(
                     "label" => Translator::getInstance()->trans("Make this address as my primary address"),
                     "label_attr" => array(
                         "for" => "default_address",

@@ -12,6 +12,10 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -27,7 +31,7 @@ class AdministratorCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("login", "text", array(
+            ->add("login", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
@@ -42,7 +46,7 @@ class AdministratorCreationForm extends BaseForm
                     'help' => $this->translator->trans("This is the name used on the login screen")
                 ),
             ))
-            ->add("email", "email", array(
+            ->add("email", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
@@ -61,7 +65,7 @@ class AdministratorCreationForm extends BaseForm
                     'placeholder' => $this->translator->trans('Administrator email address'),
                 ]
             ))
-            ->add("firstname", "text", array(
+            ->add("firstname", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -70,7 +74,7 @@ class AdministratorCreationForm extends BaseForm
                     "for" => "firstname",
                 ),
             ))
-            ->add("lastname", "text", array(
+            ->add("lastname", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                 ),
@@ -79,14 +83,14 @@ class AdministratorCreationForm extends BaseForm
                     "for" => "lastname",
                 ),
             ))
-            ->add("password", "password", array(
+            ->add("password", PasswordType::class, array(
                 "constraints" => array(),
                 "label" => $this->translator->trans("Password"),
                 "label_attr" => array(
                     "for" => "password",
                 ),
             ))
-            ->add("password_confirm", "password", array(
+            ->add("password_confirm", PasswordType::class, array(
                 "constraints" => array(
                     new Constraints\Callback(array("methods" => array(
                         array($this, "verifyPasswordField"),
@@ -99,7 +103,7 @@ class AdministratorCreationForm extends BaseForm
             ))
             ->add(
                 'profile',
-                "choice",
+                ChoiceType::class,
                 array(
                     "choices" => ProfileQuery::getProfileList(),
                     "constraints" => array(
@@ -113,7 +117,7 @@ class AdministratorCreationForm extends BaseForm
             )
             ->add(
                 'locale',
-                "choice",
+                ChoiceType::class,
                 array(
                     "choices" => $this->getLocaleList(),
                     "constraints" => array(

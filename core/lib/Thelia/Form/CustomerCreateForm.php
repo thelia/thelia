@@ -12,6 +12,10 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
@@ -35,9 +39,9 @@ class CustomerCreateForm extends AddressCreateForm
             ->remove("is_default")
 
             // Add
-            ->add("auto_login", "integer")
+            ->add("auto_login", IntegerType::class)
             // Add Email address
-            ->add("email", "email", array(
+            ->add("email", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
@@ -54,7 +58,7 @@ class CustomerCreateForm extends AddressCreateForm
                 ),
             ))
             // Add Login Information
-            ->add("password", "password", array(
+            ->add("password", PasswordType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
@@ -64,7 +68,7 @@ class CustomerCreateForm extends AddressCreateForm
                     "for" => "password",
                 ),
             ))
-            ->add("password_confirm", "password", array(
+            ->add("password_confirm", PasswordType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
@@ -78,14 +82,14 @@ class CustomerCreateForm extends AddressCreateForm
                 ),
             ))
             // Add Newsletter
-            ->add("newsletter", "checkbox", array(
+            ->add("newsletter", CheckboxType::class, array(
                 "label" => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
                 "label_attr" => array(
                     "for" => "newsletter",
                 ),
                 "required" => false,
             ))
-            ->add('lang_id', 'integer', array(
+            ->add('lang_id', IntegerType::class, array(
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Preferred language'),
                 'label_attr' => array(
@@ -96,7 +100,7 @@ class CustomerCreateForm extends AddressCreateForm
 
         //confirm email
         if (\intval(ConfigQuery::read("customer_confirm_email", 0))) {
-            $this->formBuilder->add("email_confirm", "email", array(
+            $this->formBuilder->add("email_confirm", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),

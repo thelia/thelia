@@ -12,6 +12,13 @@
 
 namespace Thelia\Form\Sale;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -43,7 +50,7 @@ class SaleModificationForm extends SaleCreationForm
 
         $this->formBuilder->add(
             'id',
-            'hidden',
+            HiddenType::class,
             [
                 'constraints' => [ new GreaterThan(['value' => 0]) ],
                 'required'    => true,
@@ -51,7 +58,7 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'active',
-            'checkbox',
+            CheckboxType::class,
             [
                 'constraints' => [ new Type([ 'type' => 'bool']) ],
                 'required'    => false,
@@ -65,7 +72,7 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'display_initial_price',
-            'checkbox',
+            CheckboxType::class,
             [
                 'constraints' => [ new Type([ 'type' => 'bool']) ],
                 'required'    => false,
@@ -79,7 +86,7 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'start_date',
-            'text',
+            TextType::class,
             [
                 'constraints' => [
                     new Callback([
@@ -101,7 +108,7 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'end_date',
-            'text',
+            TextType::class,
             [
                 'constraints' => [
                     new Callback([
@@ -123,7 +130,7 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'price_offset_type',
-            'choice',
+            ChoiceType::class,
             [
                 'constraints' => [ new NotBlank() ],
                 'choices'     => [
@@ -142,9 +149,9 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'price_offset',
-            'collection',
+            CollectionType::class,
             [
-                'type'         => 'number',
+                'type'         => NumberType::class,
                 'required'     => true,
                 'allow_add'    => true,
                 'allow_delete' => true,
@@ -160,7 +167,7 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'categories',
-            'choice',
+            ChoiceType::class,
             [
                 'required'    => true,
                 'multiple'    => true,
@@ -177,9 +184,9 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'products',
-            'collection',
+            CollectionType::class,
             [
-                'type'         => 'integer',
+                'type'         => IntegerType::class,
                 'required'     => false,
                 'allow_add'    => true,
                 'allow_delete' => true,
@@ -194,9 +201,9 @@ class SaleModificationForm extends SaleCreationForm
         )
         ->add(
             'product_attributes',
-            'collection',
+            CollectionType::class,
             [
-                'type'         => 'text',
+                'type'         => TextType::class,
                 'required'     => false,
                 'allow_add'    => true,
                 'allow_delete' => true,

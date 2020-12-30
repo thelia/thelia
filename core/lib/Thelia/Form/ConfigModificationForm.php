@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
@@ -23,14 +25,14 @@ class ConfigModificationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("id", HiddenType::class, array(
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
                         ),
                     ),
             ))
-            ->add("name", "text", array(
+            ->add("name", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -39,14 +41,14 @@ class ConfigModificationForm extends BaseForm
                     "for" => "name",
                 ),
             ))
-            ->add("value", "text", array(
+            ->add("value", TextType::class, array(
                 "label" => Translator::getInstance()->trans('Value'),
                 "label_attr" => array(
                     "for" => "value",
                 ),
             ))
-            ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array(
+            ->add("hidden", HiddenType::class, array())
+            ->add("secured", HiddenType::class, array(
                 "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ))
          ;

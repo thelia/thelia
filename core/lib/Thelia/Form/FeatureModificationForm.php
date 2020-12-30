@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
@@ -22,7 +23,7 @@ class FeatureModificationForm extends FeatureCreationForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("id", HiddenType::class, array(
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
