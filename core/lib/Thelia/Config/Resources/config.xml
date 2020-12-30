@@ -130,37 +130,37 @@
             <argument type="service" id="request_stack" />
         </service>
 
-<!--        &lt;!&ndash;  The assets manager &ndash;&gt;-->
-<!--        <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >-->
-<!--            <argument>%kernel.debug%</argument>-->
-<!--        </service>-->
+        <!--  The assets manager -->
+        <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
+            <argument>%kernel.debug%</argument>
+        </service>
 
-<!--        &lt;!&ndash; The asset filters &ndash;&gt;-->
-<!--        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">-->
-<!--            <tag name="thelia.asset.filter" key="less" />-->
-<!--            <tag name="kernel.event_subscriber"/>-->
-<!--            <argument>%kernel.environment%</argument>-->
-<!--        </service>-->
+        <!-- The asset filters -->
+        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+            <tag name="thelia.asset.filter" key="less" />
+            <tag name="kernel.event_subscriber"/>
+            <argument>%kernel.environment%</argument>
+        </service>
 
-<!--        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">-->
-<!--            <tag name="thelia.asset.filter" key="sass"  />-->
-<!--        </service>-->
+        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
+            <tag name="thelia.asset.filter" key="sass"  />
+        </service>
 
-<!--        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">-->
-<!--            <tag name="thelia.asset.filter" key="cssembed" />-->
-<!--        </service>-->
+        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">
+            <tag name="thelia.asset.filter" key="cssembed" />
+        </service>
 
-<!--        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">-->
-<!--            <tag name="thelia.asset.filter" key="cssrewrite"/>-->
-<!--        </service>-->
+        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">
+            <tag name="thelia.asset.filter" key="cssrewrite"/>
+        </service>
 
-<!--        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">-->
-<!--            <tag name="thelia.asset.filter" key="cssimport"/>-->
-<!--        </service>-->
+        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">
+            <tag name="thelia.asset.filter" key="cssimport"/>
+        </service>
 
-<!--        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">-->
-<!--            <tag name="thelia.asset.filter" key="compass"/>-->
-<!--        </service>-->
+        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">
+            <tag name="thelia.asset.filter" key="compass"/>
+        </service>
 
         <!--
         A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,

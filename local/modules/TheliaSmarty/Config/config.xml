@@ -28,18 +28,18 @@
 
 
         <!--  The assets resolver -->
-<!--        <service id="thelia.parser.asset.resolver" class="TheliaSmarty\Template\Assets\SmartyAssetsResolver" >-->
-<!--            <argument type="service" id="assetic.asset.manager" />-->
-<!--        </service>-->
+        <service id="thelia.parser.asset.resolver" class="TheliaSmarty\Template\Assets\SmartyAssetsResolver" >
+            <argument type="service" id="assetic.asset.manager" />
+        </service>
 
-        <!-- Smarty parser plugins -->
+        <!--  Smarty parser plugins-->
 
-<!--        <service id="smarty.plugin.assets" class="TheliaSmarty\Template\Plugins\Assets" >-->
-<!--            <tag name="thelia.parser.register_plugin"/>-->
+        <service id="smarty.plugin.assets" class="TheliaSmarty\Template\Plugins\Assets" >
+            <tag name="thelia.parser.register_plugin"/>
 
-<!--            <argument type="service" id="assetic.asset.manager" />-->
-<!--            <argument type="service" id="thelia.parser.asset.resolver" />-->
-<!--        </service>-->
+            <argument type="service" id="assetic.asset.manager" />
+            <argument type="service" id="thelia.parser.asset.resolver" />
+        </service>
 
         <service id="smarty.plugin.format" class="TheliaSmarty\Template\Plugins\Format">
             <argument type="service" id="request_stack"/>
