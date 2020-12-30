@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -23,7 +24,7 @@ class TemplateCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 "name",
-                "text",
+                TextType::class,
                 array(
                 "constraints" => array(
                     new NotBlank(),
@@ -35,7 +36,7 @@ class TemplateCreationForm extends BaseForm
             )
             ->add(
                 "locale",
-                "text",
+                TextType::class,
                 array(
                 "constraints" => array(
                     new NotBlank(),

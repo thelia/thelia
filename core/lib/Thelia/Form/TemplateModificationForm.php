@@ -12,7 +12,7 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class TemplateModificationForm extends TemplateCreationForm
@@ -24,7 +24,7 @@ class TemplateModificationForm extends TemplateCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("id", HiddenType::class, array(
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)

@@ -13,6 +13,8 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -40,7 +42,7 @@ class ModuleHookCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 "module_id",
-                "choice",
+                ChoiceType::class,
                 array(
                     "choices" => $this->getModuleChoices(),
                     "constraints" => array(
@@ -57,7 +59,7 @@ class ModuleHookCreationForm extends BaseForm
             )
             ->add(
                 "hook_id",
-                "choice",
+                ChoiceType::class,
                 array(
                     "choices" => $this->getHookChoices(),
                     "constraints" => array(
@@ -69,7 +71,7 @@ class ModuleHookCreationForm extends BaseForm
             )
             ->add(
                 "classname",
-                "text",
+                TextType::class,
                 array(
                     "constraints" => array(
                         new NotBlank(),
@@ -85,7 +87,7 @@ class ModuleHookCreationForm extends BaseForm
             )
             ->add(
                 "method",
-                "text",
+                TextType::class,
                 array(
                     "label" => $this->trans("Method Name"),
                     "constraints" => array(
@@ -108,7 +110,7 @@ class ModuleHookCreationForm extends BaseForm
             )
             ->add(
                 "templates",
-                "text",
+                TextType::class,
                 array(
                     "label" => $this->trans("Automatic rendered templates"),
                     "constraints" => array(

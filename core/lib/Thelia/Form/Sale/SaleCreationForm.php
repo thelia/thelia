@@ -12,6 +12,8 @@
 
 namespace Thelia\Form\Sale;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -28,7 +30,7 @@ class SaleCreationForm extends BaseForm
     {
         $this->formBuilder->add(
             'title',
-            'text',
+            TextType::class,
             [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
@@ -44,7 +46,7 @@ class SaleCreationForm extends BaseForm
         )
         ->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
@@ -60,7 +62,7 @@ class SaleCreationForm extends BaseForm
         )
         ->add(
             'locale',
-            'hidden',
+            HiddenType::class,
             [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Api\Customer;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Form\CustomerLogin as BaseCustomerLogin;
 use Symfony\Component\Validator\Constraints;
 
@@ -31,7 +32,7 @@ class CustomerLogin extends BaseCustomerLogin
         $this->formBuilder->remove('remember_me');
         $this->formBuilder->remove('account');
 
-        $this->formBuilder->add("account", "text", array(
+        $this->formBuilder->add("account", TextType::class, array(
             "constraints" => array(
                 new Constraints\Callback(array(
                     "methods" => array(

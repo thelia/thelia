@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -21,7 +22,7 @@ class TaxRuleCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("locale", "hidden", array(
+            ->add("locale", HiddenType::class, array(
                 "constraints" => array(new NotBlank()),
             ))
         ;

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -30,13 +31,13 @@ class SeoForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("id", HiddenType::class, array(
                 'required' => true,
                 "constraints" => array(
                     new GreaterThan(array('value' => 0)),
                 ),
             ))
-            ->add("locale", "hidden", array(
+            ->add("locale", HiddenType::class, array(
                 'required' => true,
                 "constraints" => array(
                     new NotBlank(),

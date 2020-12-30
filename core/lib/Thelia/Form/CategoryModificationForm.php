@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Model\TemplateQuery;
 
@@ -45,14 +47,14 @@ class CategoryModificationForm extends CategoryCreationForm
         $this->formBuilder
             ->add(
                 'id',
-                'hidden',
+                HiddenType::class,
                 [
                     'constraints' => [ new GreaterThan(array('value' => 0)) ]
                 ]
             )
             ->add(
                 'default_template_id',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => $templateList,
                     'label'       => $this->translator->trans('Default product template'),

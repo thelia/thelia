@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
 
@@ -27,8 +29,8 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ->add("active", "checkbox", array(
+            ->add("id", HiddenType::class, array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add("active", CheckboxType::class, array(
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
                 "label_attr" => array(

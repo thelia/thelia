@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Log\Tlog;
 use Thelia\Core\Translation\Translator;
@@ -21,7 +24,7 @@ class SystemLogConfigurationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("level", "choice", array(
+            ->add("level", ChoiceType::class, array(
                 'choices' => array(
                     Tlog::MUET      => Translator::getInstance()->trans("Disabled"),
                     Tlog::DEBUG     => Translator::getInstance()->trans("Debug"),
@@ -39,26 +42,26 @@ class SystemLogConfigurationForm extends BaseForm
                     "for" => "level_field",
                 ),
             ))
-            ->add("format", "text", array(
+            ->add("format", TextType::class, array(
                 "label" => Translator::getInstance()->trans('Log format *'),
                 "label_attr" => array(
                     "for" => "format_field",
                 ),
             ))
-            ->add("show_redirections", "integer", array(
+            ->add("show_redirections", IntegerType::class, array(
                     "constraints" => array(new Constraints\NotBlank()),
                     "label" => Translator::getInstance()->trans('Show redirections *'),
                     "label_attr" => array(
                             "for" => "show_redirections_field",
                     ),
             ))
-            ->add("files", "text", array(
+            ->add("files", TextType::class, array(
                     "label" => Translator::getInstance()->trans('Activate logs only for these files'),
                     "label_attr" => array(
                             "for" => "files_field",
                     ),
             ))
-            ->add("ip_addresses", "text", array(
+            ->add("ip_addresses", TextType::class, array(
                     "label" => Translator::getInstance()->trans('Activate logs only for these IP Addresses'),
                     "label_attr" => array(
                             "for" => "files_field",

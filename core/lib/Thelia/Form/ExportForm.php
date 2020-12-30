@@ -12,6 +12,10 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\LangQuery;
@@ -33,7 +37,7 @@ class ExportForm extends BaseForm
             // Todo: use list
             ->add(
                 'serializer',
-                'text',
+                TextType::class,
                 [
                     'required' => true,
                     'label' => $this->translator->trans('File format'),
@@ -45,7 +49,7 @@ class ExportForm extends BaseForm
             // Todo: use list
             ->add(
                 'language',
-                'integer',
+                IntegerType::class,
                 [
                     'required' => true,
                     'label' => $this->translator->trans('Language'),
@@ -61,7 +65,7 @@ class ExportForm extends BaseForm
                     ],
                 ]
             )
-            ->add("do_compress", "checkbox", array(
+            ->add("do_compress", CheckboxType::class, array(
                 "label" => $this->translator->trans("Do compress"),
                 "label_attr" => ["for" => "do_compress"],
                 "required" => false,
@@ -69,7 +73,7 @@ class ExportForm extends BaseForm
             // Todo: use list
             ->add(
                 'archiver',
-                'text',
+                TextType::class,
                 [
                     'required' => false,
                     'label' => $this->translator->trans('Archive Format'),
@@ -78,17 +82,17 @@ class ExportForm extends BaseForm
                     ],
                 ]
             )
-            ->add("images", "checkbox", array(
+            ->add("images", CheckboxType::class, array(
                 "label" => $this->translator->trans("Include images"),
                 "label_attr" => ["for" => "with_images"],
                 "required" => false,
             ))
-            ->add("documents", "checkbox", array(
+            ->add("documents", CheckboxType::class, array(
                 "label" => $this->translator->trans("Include documents"),
                 "label_attr" => ["for" => "with_documents"],
                 "required" => false,
             ))
-            ->add("range_date_start", "date", array(
+            ->add("range_date_start", DateType::class, array(
                 "label" => $this->translator->trans("Range date Start"),
                 "label_attr" => ["for" => "for_range_date_start"],
                 "required" => false,
@@ -98,7 +102,7 @@ class ExportForm extends BaseForm
                 'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
                 'format' => 'yyyy-MM-d',
             ))
-            ->add("range_date_end", "date", array(
+            ->add("range_date_end", DateType::class, array(
                 "label" => $this->translator->trans("Range date End"),
                 "label_attr" => ["for" => "for_range_date_end"],
                 "required" => false,

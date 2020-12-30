@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Lang;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
@@ -28,8 +29,8 @@ class LangDefaultBehaviorForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -39,14 +40,14 @@ class LangDefaultBehaviorForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('behavior', 'choice', array(
+            ->add('behavior', ChoiceType::class, array(
                 'choices' => array(
                     0 => Translator::getInstance()->trans("Strictly use the requested language"),
                     1 => Translator::getInstance()->trans("Replace by the default language"),

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -30,10 +31,10 @@ class ProfileCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("locale", "text", array(
+            ->add("locale", TextType::class, array(
                 "constraints" => array(new NotBlank()),
             ))
-            ->add("code", "text", array(
+            ->add("code", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Constraints\Callback(

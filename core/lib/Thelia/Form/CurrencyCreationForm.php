@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -24,7 +25,7 @@ class CurrencyCreationForm extends BaseForm
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true);
 
         $this->formBuilder
-            ->add("name", "text", [
+            ->add("name", TextType::class, [
                 "required" => true,
                 "constraints" => [
                     new NotBlank(),
@@ -38,13 +39,13 @@ class CurrencyCreationForm extends BaseForm
                     "placeholder" => $this->translator->trans('Currency name')
                 ]
             ])
-            ->add("locale", "text", [
+            ->add("locale", TextType::class, [
                 "required" => true,
                 "constraints" => [
                     new NotBlank(),
                 ]
             ])
-            ->add("symbol", "text", [
+            ->add("symbol", TextType::class, [
                 "required" => true,
                 "constraints" => [
                     new NotBlank(),
@@ -58,7 +59,7 @@ class CurrencyCreationForm extends BaseForm
                     "placeholder" => $this->translator->trans('Symbol'),
                 ]
             ])
-            ->add("format", "text", [
+            ->add("format", TextType::class, [
                 "required" => true,
                 "constraints" => [
                     new NotBlank(),
@@ -72,7 +73,7 @@ class CurrencyCreationForm extends BaseForm
                     "placeholder" => "%n"
                 ]
             ])
-            ->add("rate", "text", [
+            ->add("rate", TextType::class, [
                 "required" => true,
                 "constraints" => [
                     new NotBlank(),
@@ -92,7 +93,7 @@ class CurrencyCreationForm extends BaseForm
                     "placeholder" => $this->translator->trans('Rate'),
                 ]
             ])
-            ->add("code", "text", [
+            ->add("code", TextType::class, [
                 "required" => true,
                 "constraints" => [
                     new NotBlank(),

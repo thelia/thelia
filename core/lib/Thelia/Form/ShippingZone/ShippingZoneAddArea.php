@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\ShippingZone;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -29,8 +30,8 @@ class ShippingZoneAddArea extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -40,14 +41,14 @@ class ShippingZoneAddArea extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('area_id', 'integer', array(
+            ->add('area_id', IntegerType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                     new GreaterThan(array('value' => 0)),
@@ -55,7 +56,7 @@ class ShippingZoneAddArea extends BaseForm
                 'label_attr' => array('for' => 'shipping_area'),
                 'label' => Translator::getInstance()->trans('Available shipping zones'),
             ))
-            ->add('shipping_zone_id', 'integer', array(
+            ->add('shipping_zone_id', IntegerType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                     new GreaterThan(array('value' => 0)),

@@ -12,6 +12,9 @@
 
 namespace Thelia\Form\Area;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -35,7 +38,7 @@ class AreaDeleteCountryForm extends BaseForm
         $this->formBuilder
             ->add(
                 'area_id',
-                'hidden',
+                HiddenType::class,
                 [
                     'required' => true,
 
@@ -47,9 +50,9 @@ class AreaDeleteCountryForm extends BaseForm
             )
             ->add(
                 'country_id',
-                'collection',
+                CollectionType::class,
                 [
-                    'type' => 'text',
+                    'type' => TextType::class,
                     'constraints' => [
                         new NotBlank(),
                         new Callback(["methods" => [[$this, "verifyCountryList"]]])

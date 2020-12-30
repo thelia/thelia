@@ -12,6 +12,8 @@
 
 namespace Thelia\Form\Image;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\StandardDescriptionFieldsTrait;
@@ -41,7 +43,7 @@ abstract class DocumentModification extends BaseForm
         $this->formBuilder
             ->add(
                 'file',
-                'file',
+                FileType::class,
                 [
                     'required' => false,
                     'constraints' => [ ],
@@ -54,7 +56,7 @@ abstract class DocumentModification extends BaseForm
             // Is this document online ?
             ->add(
                 'visible',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'constraints' => [ ],
                     'required'    => false,

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
@@ -27,7 +28,7 @@ class MessageSendSampleForm extends BaseForm
         $this->formBuilder
             ->add(
                 "recipient_email",
-                "email",
+                EmailType::class,
                 [
                     "constraints" => array(new NotBlank()),
                     "label" => Translator::getInstance()->trans('Send test e-mail to:'),

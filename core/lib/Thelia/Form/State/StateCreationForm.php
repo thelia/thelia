@@ -12,6 +12,9 @@
 
 namespace Thelia\Form\State;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 
@@ -27,7 +30,7 @@ class StateCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'title',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -46,7 +49,7 @@ class StateCreationForm extends BaseForm
             ))
             ->add(
                 'locale',
-                'hidden',
+                HiddenType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -55,7 +58,7 @@ class StateCreationForm extends BaseForm
             )
             ->add(
                 'visible',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required' => false,
                     'label' => $this->translator->trans('This state is online'),
@@ -66,7 +69,7 @@ class StateCreationForm extends BaseForm
             )
             ->add(
                 'isocode',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),

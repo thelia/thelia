@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Model\Lang;
 
@@ -22,7 +25,7 @@ class CategoryCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'title',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [ new NotBlank() ],
                     'label' => $this->translator->trans('Category title'),
@@ -33,7 +36,7 @@ class CategoryCreationForm extends BaseForm
             )
             ->add(
                 'parent',
-                'integer',
+                IntegerType::class,
                 [
                     'label' => $this->translator->trans('Parent category'),
                     'constraints' => [ new NotBlank() ],
@@ -44,14 +47,14 @@ class CategoryCreationForm extends BaseForm
             )
             ->add(
                 'locale',
-                'hidden',
+                HiddenType::class,
                 [
                     'constraints' =>  [ new NotBlank() ],
                 ]
             )
             ->add(
                 'visible',
-                'integer', // Should be checkbox, but this is not API compatible, see #1199
+                IntegerType::class, // Should be checkbox, but this is not API compatible, see #1199
                 [
                     'required' => false,
                     'label' => $this->translator->trans('This category is online')

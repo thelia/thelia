@@ -13,6 +13,11 @@
 namespace Thelia\Form;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -88,7 +93,7 @@ class CouponCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'code',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -113,7 +118,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'title',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -122,15 +127,15 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'shortDescription',
-                'text'
+                TextType::class
             )
             ->add(
                 'description',
-                'textarea'
+                TextareaType::class
             )
             ->add(
                 'type',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -144,12 +149,12 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isEnabled',
-                'text',
+                TextType::class,
                 []
             )
             ->add(
                 'startDate',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new Callback(
@@ -164,7 +169,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'expirationDate',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -181,17 +186,17 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isCumulative',
-                'text',
+                TextType::class,
                 []
             )
             ->add(
                 'isRemovingPostage',
-                'text',
+                TextType::class,
                 []
             )
             ->add(
                 'freeShippingForCountries',
-                'choice',
+                ChoiceType::class,
                 [
                     'multiple' => true,
                     'choices'  => $countries
@@ -199,7 +204,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'freeShippingForModules',
-                'choice',
+                ChoiceType::class,
                 [
                     'multiple' => true,
                     'choices'  => $modules
@@ -207,12 +212,12 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isAvailableOnSpecialOffers',
-                'text',
+                TextType::class,
                 []
             )
             ->add(
                 'maxUsage',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -222,7 +227,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'perCustomerUsageCount',
-                'choice',
+                ChoiceType::class,
                 [
                     'multiple' => false,
                     'required' => true,
@@ -234,7 +239,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'locale',
-                'hidden',
+                HiddenType::class,
                 [
                     'constraints' => [
                         new NotBlank(),
@@ -243,7 +248,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'coupon_specific',
-                'collection',
+                CollectionType::class,
                 [
                     'allow_add'    => true,
                     'allow_delete' => true,

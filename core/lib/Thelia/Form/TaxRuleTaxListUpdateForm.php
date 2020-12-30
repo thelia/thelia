@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -27,7 +28,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         $this->formBuilder
             ->add(
                 "id",
-                "hidden",
+                HiddenType::class,
                 [
                     "required" => true,
                     "constraints" => [
@@ -44,7 +45,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             )
             ->add(
                 "tax_list",
-                "hidden",
+                HiddenType::class,
                 [
                     "required" => true,
                     "attr" => [
@@ -63,7 +64,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             )
             ->add(
                 "country_list",
-                "hidden",
+                HiddenType::class,
                 [
                     "required" => true,
                     "attr" => [
@@ -82,7 +83,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             )
             ->add(
                 "country_deleted_list",
-                "hidden",
+                HiddenType::class,
                 [
                     "required" => true,
                     "attr" => [

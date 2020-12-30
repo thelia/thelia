@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\LangQuery;
@@ -26,7 +28,7 @@ class ImportForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("file_upload", "file", array(
+            ->add("file_upload", FileType::class, array(
             "label" => $this->translator->trans("File to upload"),
             "label_attr" => ["for" => "file_to_upload"],
             "required" => true,
@@ -34,7 +36,7 @@ class ImportForm extends BaseForm
                     new Assert\NotNull
                 ]
             ))
-            ->add("language", "integer", array(
+            ->add("language", IntegerType::class, array(
                 "label" => $this->translator->trans("Language"),
                 "label_attr" => ["for" => "language"],
                 "required" => true,

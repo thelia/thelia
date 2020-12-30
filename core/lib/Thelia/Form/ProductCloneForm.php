@@ -13,6 +13,8 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -28,10 +30,10 @@ class ProductCloneForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('productId', 'integer', [
+            ->add('productId', IntegerType::class, [
                 'constraints' => [new NotBlank()]
             ])
-            ->add('newRef', 'text', [
+            ->add('newRef', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
                     new Callback([

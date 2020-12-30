@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
@@ -20,7 +22,7 @@ class ContentCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -29,19 +31,19 @@ class ContentCreationForm extends BaseForm
                     "for" => "title",
                 ),
             ))
-            ->add("default_folder", "integer", array(
+            ->add("default_folder", IntegerType::class, array(
                 "label" => Translator::getInstance()->trans("Default folder *"),
                 "constraints" => array(
                     new NotBlank(),
                 ),
                 "label_attr" => array("for" => "default_folder"),
             ))
-            ->add("locale", "text", array(
+            ->add("locale", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
             ))
-            ->add("visible", "integer", array(
+            ->add("visible", IntegerType::class, array(
                 "label" => Translator::getInstance()->trans("This content is online."),
                 "label_attr" => array("for" => "visible_create"),
             ))

@@ -12,6 +12,8 @@
 
 namespace Thelia\Form\Api;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -29,8 +31,8 @@ class ApiCreateForm extends BaseForm
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
+     * $this->formBuilder->add("name", TextType::class)
+     *   ->add("email", EmailType::class, array(
      *           "attr" => array(
      *               "class" => "field"
      *           ),
@@ -40,14 +42,14 @@ class ApiCreateForm extends BaseForm
      *           )
      *       )
      *   )
-     *   ->add('age', 'integer');
+     *   ->add('age', IntegerType::class);
      *
      * @return null
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('label', 'text', [
+            ->add('label', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
                 ],
@@ -56,7 +58,7 @@ class ApiCreateForm extends BaseForm
             ])
             ->add(
                 'profile',
-                "choice",
+                ChoiceType::class,
                 array(
                     "choices" => ProfileQuery::getProfileList(),
                     "constraints" => array(

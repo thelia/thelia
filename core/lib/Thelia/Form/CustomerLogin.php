@@ -12,6 +12,10 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -28,7 +32,7 @@ class CustomerLogin extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("email", "email", array(
+            ->add("email", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
@@ -43,7 +47,7 @@ class CustomerLogin extends BruteforceForm
                     "for" => "email",
                 ),
             ))
-            ->add("account", "choice", array(
+            ->add("account", ChoiceType::class, array(
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
@@ -60,7 +64,7 @@ class CustomerLogin extends BruteforceForm
                 ),
                 "data" => 0,
             ))
-            ->add("password", "password", array(
+            ->add("password", PasswordType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(array(
                         'groups' => array('existing_customer'),
@@ -72,7 +76,7 @@ class CustomerLogin extends BruteforceForm
                 ),
                 "required"    => false,
             ))
-            ->add("remember_me", "checkbox", array(
+            ->add("remember_me", CheckboxType::class, array(
                 'value' => 'yes',
                 "label" => Translator::getInstance()->trans("Remember me ?"),
                 "label_attr" => array(

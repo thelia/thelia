@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -62,14 +64,14 @@ class TaxCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 "locale",
-                "hidden",
+                HiddenType::class,
                 [
                     "constraints" => [new NotBlank()],
                 ]
             )
             ->add(
                 "type",
-                "choice",
+                ChoiceType::class,
                 [
                     "choices" => $typeList,
                     "required" => true,

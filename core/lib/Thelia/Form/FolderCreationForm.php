@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
@@ -20,7 +21,7 @@ class FolderCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -29,20 +30,20 @@ class FolderCreationForm extends BaseForm
                     "for" => "title",
                 ),
             ))
-            ->add("parent", "text", array(
+            ->add("parent", TextType::class, array(
                 "label" => Translator::getInstance()->trans("Parent folder *"),
                 "constraints" => array(
                     new NotBlank(),
                 ),
                 "label_attr" => array("for" => "parent_create"),
             ))
-            ->add("locale", "text", array(
+            ->add("locale", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
                 "label_attr" => array("for" => "locale_create"),
             ))
-            ->add("visible", "integer", array(
+            ->add("visible", IntegerType::class, array(
                 "label" => Translator::getInstance()->trans("This folder is online."),
                 "label_attr" => array("for" => "visible_create"),
             ))

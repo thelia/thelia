@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -21,7 +24,7 @@ class AdminLogin extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", "text", array(
+            ->add("username", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Length(array("min" => 3)),
@@ -31,7 +34,7 @@ class AdminLogin extends BruteforceForm
                     "for" => "username",
                 ),
             ))
-            ->add("password", "password", array(
+            ->add("password", PasswordType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -40,7 +43,7 @@ class AdminLogin extends BruteforceForm
                     "for" => "password",
                 ),
             ))
-            ->add("remember_me", "checkbox", array(
+            ->add("remember_me", CheckboxType::class, array(
                     'value' => 'yes',
                     "label" => Translator::getInstance()->trans("Remember me ?"),
                     "label_attr" => array(

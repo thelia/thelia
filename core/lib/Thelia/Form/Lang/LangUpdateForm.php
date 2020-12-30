@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Lang;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -27,7 +28,7 @@ class LangUpdateForm extends LangCreateForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add('id', 'hidden', array(
+            ->add('id', HiddenType::class, array(
                 'constraints' => array(
                     new NotBlank(),
                     new GreaterThan(array('value' => 0)),

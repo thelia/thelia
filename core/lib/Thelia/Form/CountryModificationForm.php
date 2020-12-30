@@ -12,6 +12,9 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class CountryModificationForm extends CountryCreationForm
@@ -23,10 +26,10 @@ class CountryModificationForm extends CountryCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add('id', 'hidden', ['constraints' => [new GreaterThan(['value' => 0])]])
+            ->add('id', HiddenType::class, ['constraints' => [new GreaterThan(['value' => 0])]])
             ->add(
                 'need_zip_code',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required'    => false,
                     'label'       => $this->translator->trans('Addresses for this country need a zip code'),
@@ -37,7 +40,7 @@ class CountryModificationForm extends CountryCreationForm
             )
             ->add(
                 'zip_code_format',
-                'text',
+                TextType::class,
                 [
                     'required'    => false,
                     'constraints' => [],

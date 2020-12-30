@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -29,7 +30,7 @@ class OrderDelivery extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("delivery-address", "integer", array(
+            ->add("delivery-address", IntegerType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
@@ -40,7 +41,7 @@ class OrderDelivery extends BaseForm
                     )),
                 ),
             ))
-            ->add("delivery-module", "integer", array(
+            ->add("delivery-module", IntegerType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),

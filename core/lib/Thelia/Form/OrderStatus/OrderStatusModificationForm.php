@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\OrderStatus;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 /**
@@ -24,7 +25,7 @@ class OrderStatusModificationForm extends OrderStatusCreationForm
 {
     protected function buildForm()
     {
-        $this->formBuilder->add("id", "hidden", [
+        $this->formBuilder->add("id", HiddenType::class, [
             'required'    => true,
             "constraints" => [
                 new GreaterThan(['value' => 0])

@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -23,7 +25,7 @@ class FeatureCreationForm extends BaseForm
         $this->formBuilder
             ->add(
                 "title",
-                "text",
+                TextType::class,
                 array(
                 "constraints" => array(
                     new NotBlank(),
@@ -35,7 +37,7 @@ class FeatureCreationForm extends BaseForm
             )
             ->add(
                 "locale",
-                "text",
+                TextType::class,
                 array(
                 "constraints" => array(
                     new NotBlank(),
@@ -43,7 +45,7 @@ class FeatureCreationForm extends BaseForm
             )
             ->add(
                 "add_to_all",
-                "checkbox",
+                CheckboxType::class,
                 array(
                 "label" => Translator::getInstance()->trans("Add to all product templates"),
                 "label_attr" => array(

@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
@@ -30,7 +31,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         $this->formBuilder
 
             // Login Information
-            ->add("password_old", "password", array(
+            ->add("password_old", PasswordType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
                         new Constraints\Callback(array("methods" => array(
@@ -42,7 +43,7 @@ class CustomerPasswordUpdateForm extends BaseForm
                         "for" => "password_old",
                     ),
                 ))
-            ->add("password", "password", array(
+            ->add("password", PasswordType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
@@ -52,7 +53,7 @@ class CustomerPasswordUpdateForm extends BaseForm
                     "for" => "password",
                 ),
             ))
-            ->add("password_confirm", "password", array(
+            ->add("password_confirm", PasswordType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),

@@ -31,7 +31,7 @@ trait SeoFieldsTrait
         if (! \in_array('url', $exclude)) {
             $this->formBuilder->add(
                 'url',
-                'text',
+                TextType::class,
                 [
                     'required'   => false,
                     'label'      => Translator::getInstance()->trans('Rewriten URL'),
@@ -48,7 +48,7 @@ trait SeoFieldsTrait
         if (! \in_array('meta_title', $exclude)) {
             $this->formBuilder->add(
                 'meta_title',
-                'text',
+                TextType::class,
                 [
                     'required'   => false,
                     'label'      => Translator::getInstance()->trans('Page Title'),
@@ -66,7 +66,7 @@ trait SeoFieldsTrait
         if (! \in_array('meta_description', $exclude)) {
             $this->formBuilder->add(
                 'meta_description',
-                'textarea',
+                TextareaType::class,
                 [
                     'required'   => false,
                     'label'      => Translator::getInstance()->trans('Meta Description'),
@@ -85,7 +85,7 @@ trait SeoFieldsTrait
         if (! \in_array('meta_keywords', $exclude)) {
             $this->formBuilder->add(
                 'meta_keywords',
-                'textarea',
+                TextareaType::class,
                 [
                     'required'   => false,
                     'label'      => Translator::getInstance()->trans('Meta Keywords'),

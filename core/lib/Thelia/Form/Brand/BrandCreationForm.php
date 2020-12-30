@@ -12,6 +12,9 @@
 
 namespace Thelia\Form\Brand;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -28,7 +31,7 @@ class BrandCreationForm extends BaseForm
     {
         $this->formBuilder->add(
             'title',
-            'text',
+            TextType::class,
             [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
@@ -44,7 +47,7 @@ class BrandCreationForm extends BaseForm
         )
         ->add(
             'locale',
-            'hidden',
+            HiddenType::class,
             [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
@@ -53,7 +56,7 @@ class BrandCreationForm extends BaseForm
         // Is this brand online ?
         ->add(
             'visible',
-            'checkbox',
+            CheckboxType::class,
             [
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('This brand is online'),

@@ -12,6 +12,8 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -32,7 +34,7 @@ class OrderUpdateAddress extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", "integer", array(
+            ->add("id", IntegerType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Callback(array(
@@ -43,7 +45,7 @@ class OrderUpdateAddress extends BaseForm
                 ),
                 "required" => true,
             ))
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Callback(array(
@@ -57,7 +59,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "title_update",
                 ),
             ))
-            ->add("firstname", "text", array(
+            ->add("firstname", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -66,7 +68,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "firstname_update",
                 ),
             ))
-            ->add("lastname", "text", array(
+            ->add("lastname", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -75,7 +77,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "lastname_update",
                 ),
             ))
-            ->add("address1", "text", array(
+            ->add("address1", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -84,21 +86,21 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "address1_update",
                 ),
             ))
-            ->add("address2", "text", array(
+            ->add("address2", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address2_update",
                 ),
             ))
-            ->add("address3", "text", array(
+            ->add("address3", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address3_update",
                 ),
             ))
-            ->add("zipcode", "text", array(
+            ->add("zipcode", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Callback(array(
@@ -112,7 +114,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "zipcode_update",
                 ),
             ))
-            ->add("city", "text", array(
+            ->add("city", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
@@ -121,7 +123,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "city_update",
                 ),
             ))
-            ->add("country", "text", array(
+            ->add("country", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Callback(array(
@@ -135,7 +137,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "country_update",
                 ),
             ))
-            ->add("state", "text", array(
+            ->add("state", TextType::class, array(
                 "required" => false,
                 "constraints" => array(
                     new Callback(array(
@@ -149,21 +151,21 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "state",
                 ),
             ))
-            ->add("phone", "text", array(
+            ->add("phone", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Phone"),
                 "label_attr" => array(
                     "for" => "phone_update",
                 ),
             ))
-            ->add("cellphone", "text", array(
+            ->add("cellphone", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Cellphone"),
                 "label_attr" => array(
                     "for" => "cellphone_update",
                 ),
             ))
-            ->add("company", "text", array(
+            ->add("company", TextType::class, array(
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Compagny"),
                 "label_attr" => array(

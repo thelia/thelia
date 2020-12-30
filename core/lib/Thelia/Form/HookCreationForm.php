@@ -13,6 +13,10 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -30,7 +34,7 @@ class HookCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("code", "text", array(
+            ->add("code", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                     new Callback(array(
@@ -42,12 +46,12 @@ class HookCreationForm extends BaseForm
                     "for" => "code",
                 ),
             ))
-            ->add("locale", "hidden", array(
+            ->add("locale", HiddenType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),
             ))
-            ->add("type", "choice", array(
+            ->add("type", ChoiceType::class, array(
                 "choices" => array(
                     TemplateDefinition::FRONT_OFFICE => Translator::getInstance()->trans("Front Office"),
                     TemplateDefinition::BACK_OFFICE => Translator::getInstance()->trans("Back Office"),
@@ -62,21 +66,21 @@ class HookCreationForm extends BaseForm
                     "for" => "type",
                 ),
             ))
-            ->add("native", "hidden", array(
+            ->add("native", HiddenType::class, array(
                 "label" => Translator::getInstance()->trans("Native"),
                 "label_attr" => array(
                     "for" => "native",
                     "help" => Translator::getInstance()->trans("Core hook of Thelia."),
                 ),
             ))
-            ->add("active", "checkbox", array(
+            ->add("active", CheckboxType::class, array(
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
                 "label_attr" => array(
                     "for" => "active",
                 ),
             ))
-            ->add("title", "text", array(
+            ->add("title", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
                 ),

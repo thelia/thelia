@@ -12,6 +12,7 @@
 
 namespace Thelia\Form\Area;
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 /**
@@ -28,7 +29,7 @@ class AreaModificationForm extends AreaCreateForm
         $this->formBuilder
             ->add(
                 "area_id",
-                "hidden",
+                HiddenType::class,
                 [
                     "constraints" => [
                         new GreaterThan([ 'value' => 0 ])
