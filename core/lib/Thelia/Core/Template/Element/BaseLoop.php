@@ -16,6 +16,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -62,6 +63,11 @@ abstract class BaseLoop
     protected static $loopDefinitionsArgs = [];
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var Request
      */
     protected $request;
@@ -99,6 +105,7 @@ abstract class BaseLoop
     /**
      * Create a new Loop
      *
+     * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @param EventDispatcher $eventDispatcher
      * @param SecurityContext $securityContext
@@ -106,6 +113,7 @@ abstract class BaseLoop
      * @param array $theliaParserLoops
      */
     public function __construct(
+        ContainerInterface $container,
         RequestStack $requestStack,
         EventDispatcher $eventDispatcher,
         SecurityContext $securityContext,
@@ -115,6 +123,7 @@ abstract class BaseLoop
         $this->translator = $translator;
 
         $this->checkInterface();
+        $this->container = $container;
         $this->requestStack = $requestStack;
         $this->dispatcher = $eventDispatcher;
         $this->securityContext = $securityContext;

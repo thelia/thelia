@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
@@ -82,7 +83,7 @@ class AreaController extends AbstractCrudController
             'name' => $object->getName()
         );
 
-        return $this->createForm(AdminForm::AREA_MODIFICATION, 'form', $data);
+        return $this->createForm(AdminForm::AREA_MODIFICATION, FormType::class, $data);
     }
 
     /**

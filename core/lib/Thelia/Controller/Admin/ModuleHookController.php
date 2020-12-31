@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
@@ -134,7 +135,7 @@ class ModuleHookController extends AbstractCrudController
             'templates' => $object->getTemplates(),
         ];
 
-        return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION, 'form', $data);
+        return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION, FormType::class, $data);
     }
 
     /**

@@ -12,7 +12,7 @@
 
 
     <services>
-        <service id="router.front" class="%router.class%">
+        <service id="router.front" class="%router.class%" public="true">
             <argument type="service" id="router.module.xmlLoader"/>
             <argument>Front/Config/front.xml</argument>
             <argument type="collection">

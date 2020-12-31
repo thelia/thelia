@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\State\StateCreateEvent;
 use Thelia\Core\Event\State\StateDeleteEvent;
 use Thelia\Core\Event\State\StateToggleVisibilityEvent;
@@ -74,7 +75,7 @@ class StateController extends AbstractCrudController
             'isocode' => $object->getIsocode(),
         );
 
-        return $this->createForm(AdminForm::STATE_MODIFICATION, 'form', $data);
+        return $this->createForm(AdminForm::STATE_MODIFICATION, FormType::class, $data);
     }
 
     /**

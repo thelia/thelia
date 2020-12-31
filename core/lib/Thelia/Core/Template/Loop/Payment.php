@@ -46,8 +46,8 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 
             $isValidPaymentEvent = new IsValidPaymentEvent($moduleInstance, $cart);
             $this->dispatcher->dispatch(
-                TheliaEvents::MODULE_PAYMENT_IS_VALID,
-                $isValidPaymentEvent
+                $isValidPaymentEvent,
+                TheliaEvents::MODULE_PAYMENT_IS_VALID
             );
 
             if (false === $isValidPaymentEvent->isValidModule()) {

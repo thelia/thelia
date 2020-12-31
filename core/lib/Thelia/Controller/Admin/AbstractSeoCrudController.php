@@ -12,12 +12,12 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\SeoForm;
 
 /**
  * Extend abstract CRUD controller to manage basic CRUD + SEO operations on a given object.
@@ -134,7 +134,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             'meta_keywords'     => $object->getMetaKeywords()
         );
 
-        $seoForm = $this->createForm(AdminForm::SEO, "form", $data);
+        $seoForm = $this->createForm(AdminForm::SEO, FormType::class, $data);
         $this->getParserContext()->addForm($seoForm);
 
         // URL based on the language

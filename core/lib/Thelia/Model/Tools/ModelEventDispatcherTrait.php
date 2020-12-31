@@ -48,10 +48,11 @@ trait ModelEventDispatcherTrait
         $this->dispatcher = null;
     }
 
+    // TODO change parametrs position to fit symfony position
     protected function dispatchEvent($eventName, ActionEvent $event)
     {
         if (!\is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch($eventName, $event);
+            $this->dispatcher->dispatch($event, $eventName);
         }
     }
 

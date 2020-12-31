@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
@@ -57,7 +58,7 @@ class CategoryController extends AbstractCrudApiController
      */
     protected function getCreationForm(array $data = array())
     {
-        return $this->createForm(ApiForm::CATEGORY_CREATION, "form", $data);
+        return $this->createForm(ApiForm::CATEGORY_CREATION, FormType::class, $data);
     }
 
     /**
@@ -66,7 +67,7 @@ class CategoryController extends AbstractCrudApiController
      */
     protected function getUpdateForm(array $data = array())
     {
-        return $this->createForm(ApiForm::CATEGORY_MODIFICATION, "form", $data, [
+        return $this->createForm(ApiForm::CATEGORY_MODIFICATION, FormType::class, $data, [
             'method' => 'PUT',
         ]);
     }

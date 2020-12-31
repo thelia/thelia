@@ -108,8 +108,8 @@ class Delivery extends BaseSpecificModule
                 $cart->getAddressDeliveryId();
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
                 $this->dispatcher->dispatch(
-                    TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                    $deliveryPostageEvent
+                    $deliveryPostageEvent,
+                    TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
                 );
 
                 if ($deliveryPostageEvent->isValidModule()) {

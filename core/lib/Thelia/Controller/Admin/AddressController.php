@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -126,7 +127,7 @@ class AddressController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        return $this->createForm(AdminForm::ADDRESS_UPDATE, "form", $this->createFormDataArray($object));
+        return $this->createForm(AdminForm::ADDRESS_UPDATE, FormType::class, $this->createFormDataArray($object));
     }
 
     /**

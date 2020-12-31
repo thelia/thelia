@@ -36,11 +36,11 @@ class Payment implements EventSubscriberInterface
 
         // dispatch event to target specific module
         $dispatcher->dispatch(
+            $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_IS_VALID,
                 $module->getCode()
-            ),
-            $event
+            )
         );
 
         if ($event->isPropagationStopped()) {

@@ -434,7 +434,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $this->securityContext->getCustomerUser()
         );
 
-        $dispatcher->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
+        $dispatcher->dispatch(new OrderEvent($placedOrder), TheliaEvents::ORDER_BEFORE_PAYMENT);
 
         /* but memorize placed order */
         $event->setOrder(new OrderModel());
@@ -443,7 +443,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         /* call pay method */
         $payEvent = new OrderPaymentEvent($placedOrder);
 
-        $dispatcher->dispatch(TheliaEvents::MODULE_PAY, $payEvent);
+        $dispatcher->dispatch($payEvent, TheliaEvents::MODULE_PAY);
 
         if ($payEvent->hasResponse()) {
             $event->setResponse($payEvent->getResponse());
@@ -457,9 +457,9 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
+        $dispatcher->dispatch(clone $event, TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL);
 
-        $dispatcher->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, clone $event);
+        $dispatcher->dispatch(clone $event, TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL);
     }
 
     /**
@@ -621,8 +621,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
 
                 $dispatcher->dispatch(
-                    TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE,
-                    $operationEvent
+                    $operationEvent,
+                    TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE
                 );
 
                 if ($operationEvent->getOperation() !== $operationEvent::DO_NOTHING) {

@@ -24,6 +24,7 @@ namespace Front\Controller;
 
 use Front\Front;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Controller\Front\BaseFrontController;
@@ -55,7 +56,7 @@ class CartController extends BaseFrontController
 
             $cartEvent->bindForm($form);
 
-            $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
+            $this->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
 
             $this->afterModifyCart();
 
@@ -189,7 +190,7 @@ class CartController extends BaseFrontController
         } else {
             $cartAdd = $this->createForm(
                 FrontForm::CART_ADD,
-                "form",
+                FormType::class,
                 array(),
                 array(
                     'csrf_protection'   => false,

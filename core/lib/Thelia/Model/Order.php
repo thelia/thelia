@@ -525,11 +525,11 @@ class Order extends BaseOrder
         $event = new ManageStockOnCreationEvent($paymentModule);
 
         $dispatcher->dispatch(
+            $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK,
                 $paymentModule->getCode()
-            ),
-            $event
+            )
         );
 
         return (null !== $event->getManageStock())

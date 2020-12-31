@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Product\ProductCreateEvent;
@@ -91,7 +92,7 @@ class ProductController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::CREATE);
 
-        $form = $this->createForm(ApiForm::PRODUCT_CREATION, 'form', [], ['csrf_protection' => false]);
+        $form = $this->createForm(ApiForm::PRODUCT_CREATION, FormType::class, [], ['csrf_protection' => false]);
 
         try {
             $creationForm = $this->validateForm($form);
@@ -127,7 +128,7 @@ class ProductController extends BaseApiController
 
         $form = $this->createForm(
             ApiForm::PRODUCT_MODIFICATION,
-            'form',
+            FormType::class,
             ['id' => $productId],
             [
                 'csrf_protection' => false,

@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
@@ -140,7 +141,7 @@ class FeatureController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::FEATURE_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::FEATURE_MODIFICATION, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

@@ -36,6 +36,11 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     protected $loopDefinition = array();
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -72,6 +77,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      * @param array $theliaParserLoops
      */
     public function __construct(
+        ContainerInterface $container,
         RequestStack $requestStack,
         EventDispatcher $eventDispatcher,
         SecurityContext $securityContext,
@@ -79,6 +85,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         bool $kernelDebug,
         array $theliaParserLoops
     ) {
+        $this->container = $container;
         $this->requestStack = $requestStack;
         $this->request = $requestStack->getCurrentRequest();
         $this->dispatcher = $eventDispatcher;
@@ -451,6 +458,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         /** @var BaseLoop $loop */
         $loop = $class->newInstance(
+            $this->container,
             $this->requestStack,
             $this->dispatcher,
             $this->securityContext,

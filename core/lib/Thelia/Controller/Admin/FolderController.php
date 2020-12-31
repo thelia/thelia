@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
@@ -89,7 +90,7 @@ class FolderController extends AbstractSeoCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::FOLDER_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::FOLDER_MODIFICATION, FormType::class, $data);
     }
 
     /**

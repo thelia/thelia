@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusEvent;
@@ -84,7 +85,7 @@ class OrderStatusController extends AbstractCrudController
             'code'          => $object->getCode()
         ];
 
-        $form = $this->createForm(AdminForm::ORDER_STATUS_MODIFICATION, "form", $data);
+        $form = $this->createForm(AdminForm::ORDER_STATUS_MODIFICATION, FormType::class, $data);
 
         // Setup the object form
         return $form;

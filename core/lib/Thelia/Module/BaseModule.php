@@ -448,7 +448,7 @@ class BaseModule implements BaseModuleInterface
         $order = $session->getOrder();
 
         /** @var TaxEngine $taxEngine */
-        $taxEngine = $this->getContainer()->get("thelia.taxengine");
+        $taxEngine = $this->getContainer()->get("thelia.taxEngine");
 
         /** @var Country $country */
         $country = $taxEngine->getDeliveryCountry();

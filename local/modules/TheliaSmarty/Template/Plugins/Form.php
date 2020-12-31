@@ -19,6 +19,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form as SymfonyForm;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormErrorIterator;
@@ -111,7 +113,7 @@ class Form extends AbstractSmartyPlugin
     {
         if ($repeat) {
             $name = $this->getParam($params, 'name');
-            $formType = $this->getParam($params, 'type', 'form');
+            $formType = $this->getParam($params, 'type', FormType::class);
 
             if (null == $name) {
                 $name = "thelia.empty";
@@ -343,7 +345,7 @@ class Form extends AbstractSmartyPlugin
                 $template,
                 $formFieldView->vars["full_name"],
                 $formFieldView->vars["value"],
-                $formFieldType,
+                $formFieldType->getBlockPrefix(),
                 $formFieldView->vars
             );
         }

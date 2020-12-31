@@ -126,7 +126,7 @@
         </service>
 
         <!-- Tax engine -->
-        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine">
+        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine" public="true">
             <argument type="service" id="request_stack" />
         </service>
 

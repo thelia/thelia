@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -204,7 +205,7 @@ class CouponController extends BaseAdminController
             $args['conditions'] = $this->cleanConditionForTemplate($conditions);
 
             // Setup the object form
-            $changeForm = $this->createForm(AdminForm::COUPON_CREATION, 'form', $data);
+            $changeForm = $this->createForm(AdminForm::COUPON_CREATION, FormType::class, $data);
 
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
@@ -831,7 +832,7 @@ class CouponController extends BaseAdminController
             $data["code"] = $coupon->getCode();
         }
 
-        return $this->createForm(AdminForm::COUPON_CREATION, "form", $data, [
+        return $this->createForm(AdminForm::COUPON_CREATION, FormType::class, $data, [
             'validation_groups' => ["Default", $action]
         ]);
     }

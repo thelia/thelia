@@ -42,11 +42,7 @@ abstract class AbstractIdType extends AbstractType
             "required" => true,
             "constraints" => array(
                 new NotBlank(),
-                new Callback([
-                    "methods" => array(
-                        [$this, "checkId"],
-                    ),
-                ]),
+                new Callback([$this, "checkId"]),
             ),
             "cascade_validation" => true,
         ]);

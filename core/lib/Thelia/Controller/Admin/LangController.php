@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,7 +57,7 @@ class LangController extends BaseAdminController
         foreach (LangQuery::create()->find() as $lang) {
             $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
-        $langUrlForm = $this->createForm(AdminForm::LANG_URL, 'form', $data);
+        $langUrlForm = $this->createForm(AdminForm::LANG_URL, FormType::class, $data);
         $this->getParserContext()->addForm($langUrlForm);
 
         return $this->render('languages', array_merge($param, array(
@@ -75,7 +76,7 @@ class LangController extends BaseAdminController
 
         $lang = LangQuery::create()->findPk($lang_id);
 
-        $langForm = $this->createForm(AdminForm::LANG_UPDATE, 'form', array(
+        $langForm = $this->createForm(AdminForm::LANG_UPDATE, FormType::class, array(
             'id' => $lang->getId(),
             'title' => $lang->getTitle(),
             'code' => $lang->getCode(),

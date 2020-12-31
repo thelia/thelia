@@ -116,7 +116,6 @@ GNU General Public License : http://www.gnu.org/licenses/
     <a class="sr-only" href="#content">{intl l="Skip to content"}</a>
 
     <div class="page" role="document">
-
         <div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
             {hook name="main.header-top"}
             <div class="navbar navbar-default navbar-secondary" itemscope itemtype="http://schema.org/SiteNavigationElement">

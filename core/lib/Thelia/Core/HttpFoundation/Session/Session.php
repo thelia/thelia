@@ -270,7 +270,7 @@ class Session extends BaseSession
                 $cartEvent->setCart($cart);
             }
 
-            $dispatcher->dispatch(TheliaEvents::CART_RESTORE_CURRENT, $cartEvent);
+            $dispatcher->dispatch($cartEvent, TheliaEvents::CART_RESTORE_CURRENT);
 
             if (null === $cart = $cartEvent->getCart()) {
                 throw new \LogicException(
@@ -294,7 +294,7 @@ class Session extends BaseSession
     {
         $event = new CartCreateEvent();
 
-        $dispatcher->dispatch(TheliaEvents::CART_CREATE_NEW, $event);
+        $dispatcher->dispatch($event, TheliaEvents::CART_CREATE_NEW);
 
         if (null === $cart = $event->getCart()) {
             throw new \LogicException(

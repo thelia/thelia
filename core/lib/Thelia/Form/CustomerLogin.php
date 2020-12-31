@@ -49,8 +49,8 @@ class CustomerLogin extends BruteforceForm
                             array($this, "verifyAccount")),
                     ),
                 "choices" => array(
-                    0 => Translator::getInstance()->trans("No, I am a new customer."),
-                    1 => Translator::getInstance()->trans("Yes, I have a password :"),
+                    Translator::getInstance()->trans("No, I am a new customer.") => 0,
+                    Translator::getInstance()->trans("Yes, I have a password :") => 1,
                 ),
                 "label_attr" => array(
                     "for" => "account",

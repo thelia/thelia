@@ -154,10 +154,12 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             // Join with feature_template table to get position, if a manual order position is required
             if (\count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
                 $search
-                    ->filterByTemplate(
-                        TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
-                        Criteria::IN
+                    ->useFeatureTemplateQuery()
+                        ->filterByTemplate(
+                            TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
+                            Criteria::IN
                     )
+                    ->endUse()
                     ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
 
                 $this->useFeaturePosition = false;

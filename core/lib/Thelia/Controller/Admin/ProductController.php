@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
@@ -142,7 +143,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getUpdateForm()
     {
-        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", [], []);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, [], []);
     }
 
     protected function getCreationEvent($formData)
@@ -333,10 +334,10 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, "form", $defaultPseData);
+        $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, FormType::class, $defaultPseData);
         $this->getParserContext()->addForm($defaultPseForm);
 
-        $combinationPseForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE, "form", $combinationPseData);
+        $combinationPseForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE, FormType::class, $combinationPseData);
         $this->getParserContext()->addForm($combinationPseForm);
 
         // Hydrate the "SEO" tab form
@@ -366,7 +367,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Setup the object form
-        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", $data, []);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, FormType::class, $data, []);
     }
 
     /**

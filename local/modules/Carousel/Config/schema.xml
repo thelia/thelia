@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database defaultIdMethod="native" name="thelia" namespace="Carousel\Model">
+<database defaultIdMethod="native" name="TheliaMain" namespace="Carousel\Model">
     <!--
     See propel documentation on http://propelorm.org for all information about schema file
     -->

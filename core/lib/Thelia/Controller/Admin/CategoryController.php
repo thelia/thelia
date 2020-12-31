@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
@@ -138,7 +139,7 @@ class CategoryController extends AbstractSeoCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::CATEGORY_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::CATEGORY_MODIFICATION, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)
