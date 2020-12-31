@@ -68,7 +68,7 @@ class SessionMiddleware implements HttpKernelInterface
             if (null === $session = self::$session) {
                 $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
 
-                $this->eventDispatcher->dispatch(TheliaKernelEvents::SESSION, $event);
+                $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
 
                 self::$session = $session = $event->getSession();
             }
