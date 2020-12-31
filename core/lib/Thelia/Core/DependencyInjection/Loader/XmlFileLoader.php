@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -336,6 +337,9 @@ class XmlFileLoader extends FileLoader
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
+        if (!empty($this->getArgumentsAsPhp($service, 'factory'))) {
+            $definition->setFactory($this->getServiceFactory($service->factory));
+        }
 
         if (isset($service->configurator)) {
             if (isset($service->configurator['function'])) {
@@ -770,6 +774,31 @@ EOF
         }
 
         return $arguments;
+    }
+
+    protected function getServiceFactory($factoryXml)
+    {
+        $factoryMethod = $this->getAttributeAsPhp($factoryXml, 'method');
+
+        if ("" === $factoryMethod) {
+            $factoryMethod = "__invoke";
+        }
+
+        if ("" !== $this->getAttributeAsPhp($factoryXml, 'service')) {
+            return [
+                (new Reference($this->getAttributeAsPhp($factoryXml, 'service'))),
+                $factoryMethod
+            ];
+        }
+
+        if ("" !== $this->getAttributeAsPhp($factoryXml, 'class')) {
+            return [
+                $this->getAttributeAsPhp($factoryXml, 'class'),
+                $factoryMethod
+            ];
+        }
+
+        throw new \ErrorException("You must specify either a class or a service in factory");
     }
 
     /**

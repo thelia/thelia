@@ -209,16 +209,9 @@
             <argument type="service" id="request_stack" />
         </service>
 
-        <service
-                id="http_kernel"
-                class="Thelia\Core\TheliaHttpKernel"
-                public="true"
-        >
-            <factory class="Stack\Builder" method="resolve" />
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="service_container" />
-            <argument type="service" id="controller_resolver" />
-            <argument type="service" id="request_stack" />
+        <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
+            <factory service="stack_factory" method="resolve" />
+            <argument type="service" id="base_http_kernel" />
         </service>
 
         <service id="request" class="Thelia\Core\HttpFoundation\Request" />
