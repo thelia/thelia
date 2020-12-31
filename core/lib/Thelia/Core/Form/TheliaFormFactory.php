@@ -79,13 +79,22 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
         array $data = array(),
         array $options = array()
     ): BaseForm {
-        if (!isset($this->formDefinition[$name])) {
+        $formClass = null;
+        if (isset($this->formDefinition[$name])) {
+            $formClass = $this->formDefinition[$name];
+        }
+
+        if (false !== array_search($name, $this->formDefinition, true)) {
+            $formClass = $name;
+        }
+
+        if (null === $formClass) {
             throw new \OutOfBoundsException(
                 sprintf("The form '%s' doesn't exist", $name)
             );
         }
 
-        return new $this->formDefinition[$name](
+        return new $formClass(
             $this->requestStack->getCurrentRequest(),
             $this->eventDispatcher,
             $this->translator,
