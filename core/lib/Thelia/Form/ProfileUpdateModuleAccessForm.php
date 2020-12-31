@@ -37,12 +37,8 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyProfileId"),
-                            ),
-                        )
-                    ),
+                        array($this, "verifyProfileId")
+                    )
                 ),
             ))
         ;

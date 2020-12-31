@@ -69,15 +69,13 @@ class ProductCombinationGenerationForm extends BaseForm
                 'label_attr' => array('for' => 'combination_builder_ean_code_field'),
         ))
         ->add('attribute_av', CollectionType::class, array(
-                'type'         => TextType::class,
+                'entry_type'         => TextType::class,
                 'label'        => Translator::getInstance()->trans('Attribute ID:Attribute AV ID'),
                 'label_attr'   => array('for' => 'combination_builder_attribute_av_id'),
                 'allow_add'    => true,
                 'allow_delete' => true,
                 "constraints" => array(
-                    new Callback(array(
-                        "methods" => array(array($this, "checkAttributeAv")),
-                    )),
+                    new Callback(array($this, "checkAttributeAv"))
                 )
         ))
         ;

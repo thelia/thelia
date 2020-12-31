@@ -29,11 +29,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "verifyTaxRuleId"),
-                                ),
-                            )
+                                    array($this, "verifyTaxRuleId")
                         ),
                     ),
             ))

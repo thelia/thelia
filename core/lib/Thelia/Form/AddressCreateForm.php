@@ -128,11 +128,9 @@ class AddressCreateForm extends FirewallForm
             ->add("zipcode", TextType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
-                        new Constraints\Callback(array(
-                            "methods" => array(
+                        new Constraints\Callback(
                                 array($this, "verifyZipCode")
-                            ),
-                        )),
+                        ),
                     ),
                     "label" => Translator::getInstance()->trans("Zip code"),
                     "label_attr" => array(
@@ -151,11 +149,9 @@ class AddressCreateForm extends FirewallForm
             ->add("state", TextType::class, array(
                 "required" => false,
                 "constraints" => array(
-                    new Constraints\Callback(array(
-                        "methods" => array(
+                    new Constraints\Callback(
                             array($this, "verifyState")
-                        ),
-                    )),
+                     ),
                 ),
 
                 "label" => Translator::getInstance()->trans("State *"),

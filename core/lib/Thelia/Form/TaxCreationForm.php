@@ -99,13 +99,7 @@ class TaxCreationForm extends BaseForm
                         new TheliaType(),
                         [
                             "constraints" => [
-                                new Constraints\Callback(
-                                    [
-                                        "methods" => [
-                                            [$this, "checkRequirementField"],
-                                        ],
-                                    ]
-                                ),
+                                new Constraints\Callback([$this, "checkRequirementField"]),
                             ],
                             "attr" => [
                                 "tag" => "requirements",

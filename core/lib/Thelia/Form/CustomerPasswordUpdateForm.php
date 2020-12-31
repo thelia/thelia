@@ -34,9 +34,7 @@ class CustomerPasswordUpdateForm extends BaseForm
             ->add("password_old", PasswordType::class, array(
                     "constraints" => array(
                         new Constraints\NotBlank(),
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "verifyCurrentPasswordField"),
-                        ))),
+                        new Constraints\Callback(array($this, "verifyCurrentPasswordField")),
                     ),
                     "label" => Translator::getInstance()->trans("Current Password"),
                     "label_attr" => array(
@@ -57,9 +55,7 @@ class CustomerPasswordUpdateForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
-                    new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyPasswordField"),
-                    ))),
+                    new Constraints\Callback(array($this, "verifyPasswordField")),
                 ),
                 "label" => Translator::getInstance()->trans('Password confirmation'),
                 "label_attr" => array(

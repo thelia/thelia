@@ -34,13 +34,7 @@ class ProfileModificationForm extends ProfileCreationForm
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyProfileId"),
-                            ),
-                        )
-                    ),
+                    new Constraints\Callback([$this, "verifyProfileId"]),
                 ),
             ))
         ;

@@ -37,22 +37,18 @@ class OrderUpdateAddress extends BaseForm
             ->add("id", IntegerType::class, array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(
-                            array($this, "verifyId"),
-                        ),
-                    )),
+                    new Callback(
+                            array($this, "verifyId")
+                    ),
                 ),
                 "required" => true,
             ))
             ->add("title", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(
-                            array($this, "verifyTitle"),
-                        ),
-                    )),
+                    new Callback(
+                            array($this, "verifyTitle")
+                    ),
                 ),
                 "label" => Translator::getInstance()->trans("Title"),
                 "label_attr" => array(
@@ -103,11 +99,9 @@ class OrderUpdateAddress extends BaseForm
             ->add("zipcode", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(
+                    new Callback(
                             array($this, "verifyZipCode")
                         ),
-                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Zip code"),
                 "label_attr" => array(
@@ -126,11 +120,9 @@ class OrderUpdateAddress extends BaseForm
             ->add("country", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(
-                            array($this, "verifyCountry"),
-                        ),
-                    )),
+                    new Callback(
+                            array($this, "verifyCountry")
+                    ),
                 ),
                 "label" => Translator::getInstance()->trans("Country"),
                 "label_attr" => array(
@@ -140,11 +132,9 @@ class OrderUpdateAddress extends BaseForm
             ->add("state", TextType::class, array(
                 "required" => false,
                 "constraints" => array(
-                    new Callback(array(
-                        "methods" => array(
+                    new Callback(
                             array($this, "verifyState")
                         ),
-                    )),
                 ),
                 "label" => Translator::getInstance()->trans("State *"),
                 "label_attr" => array(

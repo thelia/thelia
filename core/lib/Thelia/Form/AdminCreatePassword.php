@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -34,9 +35,9 @@ class AdminCreatePassword extends BruteforceForm
             ))
             ->add("password_confirm", PasswordType::class, array(
                 "constraints" => array(
-                    new Callback(array("methods" => array(
-                        array($this, "verifyPasswordField"),
-                    ))),
+                    new Callback(
+                        array($this, "verifyPasswordField")
+                    ),
                 ),
                 "label" => $this->translator->trans('Password confirmation'),
                 "label_attr" => array(

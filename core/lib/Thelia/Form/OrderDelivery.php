@@ -34,22 +34,18 @@ class OrderDelivery extends BaseForm
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyDeliveryAddress"),
-                        ),
-                    )),
+                    new Constraints\Callback(
+                            array($this, "verifyDeliveryAddress")
+                    ),
                 ),
             ))
             ->add("delivery-module", IntegerType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyDeliveryModule"),
-                        ),
-                    )),
+                    new Constraints\Callback(
+                            array($this, "verifyDeliveryModule")
+                    ),
                 ),
             ));
     }

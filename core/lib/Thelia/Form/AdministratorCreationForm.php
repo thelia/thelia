@@ -34,11 +34,8 @@ class AdministratorCreationForm extends BaseForm
             ->add("login", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyExistingLogin"),
-                        ),
-                    )),
+                    new Constraints\Callback(
+                            array($this, "verifyExistingLogin")),
                 ),
                 "label" => $this->translator->trans("Login name"),
                 "label_attr" => array(
@@ -50,11 +47,9 @@ class AdministratorCreationForm extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyExistingEmail"),
+                    new Constraints\Callback(
+                            array($this, "verifyExistingEmail")
                         ),
-                    )),
                 ),
                 "label" => $this->translator->trans("Email address"),
                 "label_attr" => array(
@@ -92,9 +87,7 @@ class AdministratorCreationForm extends BaseForm
             ))
             ->add("password_confirm", PasswordType::class, array(
                 "constraints" => array(
-                    new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyPasswordField"),
-                    ))),
+                    new Constraints\Callback(array($this, "verifyPasswordField")),
                 ),
                 "label" => $this->translator->trans('Password confirmation'),
                 "label_attr" => array(

@@ -51,11 +51,9 @@ class ModuleInstallForm extends BaseForm
                                 'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file'),
                             ]
                         ),
-                        new Constraints\Callback([
-                            "methods" => [
-                                [$this, "checkModuleValidity"],
-                            ],
-                        ]),
+                        new Constraints\Callback(
+                                [$this, "checkModuleValidity"]
+                        ),
                     ],
                     'label' => Translator::getInstance()->trans('The module zip file'),
                     'label_attr' => [

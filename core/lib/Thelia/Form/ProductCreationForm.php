@@ -34,9 +34,7 @@ class ProductCreationForm extends BaseForm
             ->add("ref", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(array($this, "checkDuplicateRef")),
-                    )),
+                    new Callback([$this, "checkDuplicateRef"]),
                 ),
                 "label"       => Translator::getInstance()->trans('Product reference *'),
                 "label_attr"  => array("for" => "ref"),

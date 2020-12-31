@@ -15,6 +15,7 @@ namespace Thelia\Form;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -46,7 +47,7 @@ class CouponCreationForm extends BaseForm
 
     public function __construct(
         Request $request,
-        $type = "form",
+        $type = FormType::class,
         $data = array(),
         $options = array(),
         ContainerInterface $container = null
@@ -99,18 +100,14 @@ class CouponCreationForm extends BaseForm
                         new NotBlank(),
                         new Callback(
                             [
-                                "methods" => [
-                                    [$this, "checkDuplicateCouponCode"],
-                                ],
-                                "groups" => "creation",
+                                "callback" => [$this, "checkDuplicateCouponCode"],
+                                "groups" => "creation"
                             ]
                         ),
                         new Callback(
                             [
-                                "methods" => [
-                                    [$this, "checkCouponCodeChangedAndDoesntExists"],
-                                ],
-                                "groups" => "update",
+                                "callback" => [$this, "checkCouponCodeChangedAndDoesntExists"],
+                                "groups" => "update"
                             ]
                         ),
                     ]
@@ -158,11 +155,7 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new Callback(
-                            [
-                                "methods" => [
-                                    [$this, "checkLocalizedDate"],
-                                ],
-                            ]
+                            [$this, "checkLocalizedDate"]
                         ),
                     ]
                 ]
@@ -173,14 +166,8 @@ class CouponCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                        new Callback(
-                            [
-                                "methods" => [
-                                    [$this, "checkLocalizedDate"],
-                                    [$this, "checkConsistencyDates"],
-                                ],
-                            ]
-                        ),
+                        new Callback([$this, "checkLocalizedDate"]),
+                        new Callback([$this, "checkConsistencyDates"]),
                     ]
                 ]
             )
