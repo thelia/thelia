@@ -48,6 +48,7 @@
 
         <service id="smarty.plugin.thelialoop" class="TheliaSmarty\Template\Plugins\TheliaLoop">
             <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="service_container" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="thelia.securityContext" />

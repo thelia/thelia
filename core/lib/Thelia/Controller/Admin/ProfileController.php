@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -112,7 +113,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::PROFILE_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::PROFILE_MODIFICATION, FormType::class, $data);
     }
 
     /**
@@ -126,7 +127,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, "form", $data);
+        return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, FormType::class, $data);
     }
 
     /**
@@ -140,7 +141,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, "form", $data);
+        return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
@@ -260,7 +261,7 @@ class HookController extends AbstractCrudController
             'description' => $object->getDescription(),
         ];
 
-        return $this->createForm(AdminForm::HOOK_MODIFICATION, 'form', $data);
+        return $this->createForm(AdminForm::HOOK_MODIFICATION, FormType::class, $data);
     }
 
     /**

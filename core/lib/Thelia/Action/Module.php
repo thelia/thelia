@@ -177,7 +177,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if ($submodule && $submodule->getActivate() != BaseModule::IS_ACTIVATED) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
-                    $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
+                    $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
                 }
             }
         }
@@ -201,7 +201,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if ($submodule && $submodule->getActivate() == BaseModule::IS_ACTIVATED) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
-                    $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
+                    $dispatcher->dispatch($subevent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
                 }
             }
         }
@@ -345,7 +345,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 // disable the check of the module because it's already done
                 $toggleEvent->setNoCheck(true);
 
-                $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
+                $dispatcher->dispatch($toggleEvent,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             }
 
             // delete
@@ -354,7 +354,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $deleteEvent = new ModuleDeleteEvent($oldModule);
 
             try {
-                $dispatcher->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
+                $dispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
             } catch (Exception $ex) {
                 // if module has not been deleted
                 if ($fs->exists($modulePath)) {
@@ -385,7 +385,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $toggleEvent = new ModuleToggleActivationEvent($module->getId());
             $toggleEvent->setNoCheck(true);
 
-            $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
+            $dispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         }
 
         $event->setModule($module);
@@ -444,7 +444,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $this->container->getParameter('kernel.cache_dir')
         );
 
-        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
     /**

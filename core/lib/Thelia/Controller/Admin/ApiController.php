@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\Api\ApiCreateEvent;
 use Thelia\Core\Event\Api\ApiDeleteEvent;
@@ -130,7 +131,7 @@ class ApiController extends BaseAdminController
     public function updateAction($api_id)
     {
         if (null === $response = $this->checkApiAccess($api_id, AccessManager::UPDATE)) {
-            $form = $this->createForm(AdminForm::API_UPDATE, 'form', ['profile' => $this->api->getProfileId()]);
+            $form = $this->createForm(AdminForm::API_UPDATE, FormType::class, ['profile' => $this->api->getProfileId()]);
 
             $this->getParserContext()->addForm($form);
 

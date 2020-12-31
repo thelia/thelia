@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
 use Thelia\Core\Event\Brand\BrandEvent;
@@ -89,7 +90,7 @@ class BrandController extends AbstractSeoCrudController
         ];
 
         // Setup the object form
-        return $this->createForm(AdminForm::BRAND_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::BRAND_MODIFICATION, FormType::class, $data);
     }
 
     /**

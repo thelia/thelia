@@ -13,10 +13,10 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -377,7 +377,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         }
 
         // Clear all coupons.
-        $dispatcher->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
+        $dispatcher->dispatch((new Event()), TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**

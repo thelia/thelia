@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Front\Front;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -262,7 +263,7 @@ class CustomerController extends BaseFrontController
             'newsletter'    => $newsletter instanceof Newsletter ? !$newsletter->getUnsubscribed() : false,
         );
 
-        $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE, 'form', $data);
+        $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE, FormType::class, $data);
 
         // Pass it to the parser
         $this->getParserContext()->addForm($customerProfileUpdateForm);
@@ -422,7 +423,7 @@ class CustomerController extends BaseFrontController
     {
         if (!$this->getSecurityContext()->hasCustomerUser()) {
             $request = $this->getRequest();
-            $customerLoginForm = new CustomerLogin($request);
+            $customerLoginForm = $this->createForm(CustomerLogin::class);
 
             try {
                 $form = $this->validateForm($customerLoginForm, "post");

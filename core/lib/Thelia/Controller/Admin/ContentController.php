@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
@@ -149,7 +150,7 @@ class ContentController extends AbstractSeoCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::CONTENT_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::CONTENT_MODIFICATION, FormType::class, $data);
     }
 
     /**

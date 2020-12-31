@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -127,7 +128,7 @@ class TaxRuleController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::TAX_RULE_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::TAX_RULE_MODIFICATION, FormType::class, $data);
     }
 
     /**
@@ -141,7 +142,7 @@ class TaxRuleController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE, "form", $data);
+        return $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

@@ -44,7 +44,7 @@ class MailingSystemController extends BaseAdminController
         );
 
         // Setup the object form
-        $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION, "form", $data);
+        $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION, FormType::class, $data);
 
         // Pass it to the parser
         $this->getParserContext()->addForm($form);

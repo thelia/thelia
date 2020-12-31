@@ -50,7 +50,7 @@ class Database
             $connection = $connection->getWrappedConnection();
         }
 
-        if (!$connection instanceof \PDO) {
+        if (!$connection instanceof \PDO && !$connection instanceof ConnectionInterface) {
             throw new \InvalidArgumentException("A PDO connection should be provided");
         }
 

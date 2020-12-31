@@ -107,8 +107,8 @@ class OrderController extends BaseFrontController
         $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress);
 
         $this->getDispatcher()->dispatch(
-            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-            $deliveryPostageEvent
+            $deliveryPostageEvent,
+            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
         );
 
         $postage = $deliveryPostageEvent->getPostage();
@@ -120,9 +120,9 @@ class OrderController extends BaseFrontController
         $orderEvent->setPostageTax($postage->getAmountTax());
         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
+        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
         return $this->generateRedirectFromRoute("order.invoice");
     }
@@ -181,8 +181,8 @@ class OrderController extends BaseFrontController
             $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress);
 
             $this->getDispatcher()->dispatch(
-                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                $deliveryPostageEvent
+                $deliveryPostageEvent,
+                TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
             );
 
             if (!$deliveryPostageEvent->isValidModule() || null === $deliveryPostageEvent->getPostage()) {
@@ -200,9 +200,9 @@ class OrderController extends BaseFrontController
             $orderEvent->setPostageTax($postage->getAmountTax());
             $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
+            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
             return $this->generateRedirectFromRoute("order.invoice");
 
@@ -272,8 +272,8 @@ class OrderController extends BaseFrontController
             $orderEvent->setInvoiceAddress($invoiceAddressId);
             $orderEvent->setPaymentModule($paymentModuleId);
 
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_INVOICE_ADDRESS, $orderEvent);
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_PAYMENT_MODULE, $orderEvent);
+            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_INVOICE_ADDRESS);
+            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_PAYMENT_MODULE);
 
             return $this->generateRedirectFromRoute("order.payment.process");
 
@@ -332,7 +332,7 @@ class OrderController extends BaseFrontController
 
         $orderEvent = $this->getOrderEvent();
 
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_PAY, $orderEvent);
+        $this->getDispatcher()->dispatch($orderEvent,TheliaEvents::ORDER_PAY);
 
         $placedOrder = $orderEvent->getPlacedOrder();
 
@@ -386,7 +386,7 @@ class OrderController extends BaseFrontController
             );
         }
 
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_CART_CLEAR, $this->getOrderEvent());
+        $this->getDispatcher()->dispatch($this->getOrderEvent(),TheliaEvents::ORDER_CART_CLEAR);
 
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
@@ -481,8 +481,8 @@ class OrderController extends BaseFrontController
 
                 $virtualProductEvent = new VirtualProductOrderDownloadResponseEvent($orderProduct);
                 $this->getDispatcher()->dispatch(
-                    TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE,
-                    $virtualProductEvent
+                    $virtualProductEvent,
+                    TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE
                 );
 
                 $response = $virtualProductEvent->getResponse();

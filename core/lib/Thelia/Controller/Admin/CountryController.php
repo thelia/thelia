@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
@@ -90,7 +91,7 @@ class CountryController extends AbstractCrudController
             'zip_code_format' => $object->getZipCodeFormat(),
         );
 
-        return $this->createForm(AdminForm::COUNTRY_MODIFICATION, 'form', $data);
+        return $this->createForm(AdminForm::COUNTRY_MODIFICATION, FormType::class, $data);
     }
 
     /**

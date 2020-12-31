@@ -58,11 +58,11 @@
                         {form_field field="account"}
                         <legend>{intl l="Do you have an account?"}</legend>
                             {foreach $choices as $choice}
-                            <div class="radio radio-account{$choice->value}">
-                                <label for="{$label_attr.for}{$choice->value}">
-                                    <input type="radio" name="{$name}" id="{$label_attr.for}{$choice->value}" data-toggle="password" value="{$choice->value}"{if $value === {$choice->value}} checked{/if}> {$choice->label}
-                                </label>
-                            </div>
+                                <div class="radio radio-account{$choice->value}">
+                                    <label for="{$label_attr.for}{$choice->value}">
+                                        <input type="radio" name="{$name}" id="{$label_attr.for}{$choice->value}" data-toggle="password" value="{$choice->value}"{if $value === {$choice->value}} checked{/if}> {$choice->label}
+                                    </label>
+                                </div>
                             {/foreach}
                         {/form_field}
                         <div class="group-password">

@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
@@ -117,7 +118,7 @@ class SaleController extends AbstractCrudController
         ];
 
         // Setup the object form
-        return $this->createForm(AdminForm::SALE_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::SALE_MODIFICATION, FormType::class, $data);
     }
 
     /**

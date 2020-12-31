@@ -38,11 +38,11 @@ class Delivery implements EventSubscriberInterface
 
         // dispatch event to target specific module
         $dispatcher->dispatch(
+            $event,
             TheliaEvents::getModuleEvent(
                 TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
                 $module->getCode()
-            ),
-            $event
+            )
         );
 
         if ($event->isPropagationStopped()) {

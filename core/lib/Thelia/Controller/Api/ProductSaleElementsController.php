@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -132,7 +133,7 @@ class ProductSaleElementsController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::CREATE);
 
-        $baseForm = $this->createForm(ApiForm::PRODUCT_SALE_ELEMENTS, "form", [], [
+        $baseForm = $this->createForm(ApiForm::PRODUCT_SALE_ELEMENTS, FormType::class, [], [
             "validation_groups" => ["create", "Default"],
             'csrf_protection' => false,
             "cascade_validation" => true,
@@ -195,7 +196,7 @@ class ProductSaleElementsController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE);
 
-        $baseForm = $this->createForm(ApiForm::PRODUCT_SALE_ELEMENTS, "form", [], [
+        $baseForm = $this->createForm(ApiForm::PRODUCT_SALE_ELEMENTS, FormType::class, [], [
             "validation_groups" => ["update", "Default"],
             'csrf_protection' => false,
             "cascade_validation" => true,

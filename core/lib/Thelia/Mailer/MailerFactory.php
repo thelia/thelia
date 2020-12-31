@@ -49,7 +49,7 @@ class MailerFactory
         $this->parser    = $parser;
 
         $transporterEvent = new MailTransporterEvent();
-        $this->dispatcher->dispatch(TheliaEvents::MAILTRANSPORTER_CONFIG, $transporterEvent);
+        $this->dispatcher->dispatch($transporterEvent, TheliaEvents::MAILTRANSPORTER_CONFIG);
 
         if ($transporterEvent->hasTransporter()) {
             $transporter = $transporterEvent->getTransporter();

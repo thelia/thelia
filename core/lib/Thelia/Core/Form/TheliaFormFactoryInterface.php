@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Core\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -29,7 +30,7 @@ interface TheliaFormFactoryInterface
      */
     public function createForm(
         string $name,
-        $type = "form",
+        $type = FormType::class,
         array $data = array(),
         array $options = array()
     ): BaseForm;

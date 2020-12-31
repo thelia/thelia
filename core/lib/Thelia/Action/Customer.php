@@ -17,7 +17,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -28,6 +27,7 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\Password;
 
@@ -80,14 +80,14 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
 
         $dispatcher->dispatch(
-            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
-            new CustomerEvent($customer)
+            new CustomerEvent($customer),
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL
         );
     }
 
     public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $customer = $event->getCustomer();
+        $customer = $event->getModel();
 
         if (ConfigQuery::isCustomerEmailConfirmationEnable() && $customer->getConfirmationToken() !== null) {
             $this->mailer->sendEmailToCustomer(
@@ -178,7 +178,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function delete(CustomerEvent $event)
     {
-        if (null !== $customer = $event->getCustomer()) {
+        if (null !== $customer = $event->getModel()) {
             if (true === $customer->hasOrder()) {
                 throw new CustomerException(Translator::getInstance()->trans("Impossible to delete a customer who already have orders"));
             }

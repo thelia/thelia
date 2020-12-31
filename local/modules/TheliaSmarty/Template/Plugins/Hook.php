@@ -12,7 +12,6 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
@@ -20,10 +19,9 @@ use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
 use Thelia\Log\Tlog;
-use TheliaSmarty\Template\Plugins\Module;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\SmartyParser;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
+use TheliaSmarty\Template\Plugins\Module;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ModuleQuery;
@@ -160,6 +158,10 @@ class Hook extends AbstractSmartyPlugin
      */
     protected function getSmartyPluginModule()
     {
+        if (null === $this->smartyPluginModule) {
+            $this->smartyPluginModule = $this->dispatcher->getContainer()->get("smarty.plugin.module");
+        }
+
         return $this->smartyPluginModule;
     }
 

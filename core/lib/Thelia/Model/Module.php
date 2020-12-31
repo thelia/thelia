@@ -14,7 +14,7 @@ use Thelia\Module\PaymentModuleInterface;
 
 class Module extends BaseModule
 {
-    use ModelEventDispatcherTrait;
+//    use ModelEventDispatcherTrait;
 
     use PositionManagementTrait;
 

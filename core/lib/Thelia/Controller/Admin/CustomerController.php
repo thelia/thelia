@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -122,7 +123,7 @@ class CustomerController extends AbstractCrudController
         }
 
         // A loop is used in the template
-        return $this->createForm(AdminForm::CUSTOMER_UPDATE, 'form', $data);
+        return $this->createForm(AdminForm::CUSTOMER_UPDATE, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Api;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\a;
 use Thelia\Controller\BaseController;
@@ -103,7 +104,7 @@ class BaseApiController extends BaseController
      *
      * Deactivate csrf token by default on API
      */
-    public function createForm($name, $type = "form", array $data = array(), array $options = array())
+    public function createForm($name, $type = FormType::class, array $data = array(), array $options = array())
     {
         $options = array_merge(
             [

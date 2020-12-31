@@ -301,6 +301,7 @@ class Thelia extends Kernel
                     $definition = new Definition();
                     $definition->setClass($module->getFullNamespace());
                     $definition->addMethodCall("setContainer", array(new Reference('service_container')));
+                    $definition->setPublic(true);
 
                     $container->setDefinition(
                         "module." . $module->getCode(),

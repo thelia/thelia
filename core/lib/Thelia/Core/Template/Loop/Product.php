@@ -243,8 +243,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $taxCountry = $taxEngine->getDeliveryCountry();
         $taxState = $taxEngine->getDeliveryState();
 
-        /** @var \Thelia\Core\Security\SecurityContext $securityContext */
-        $securityContext = $this->container->get('thelia.securityContext');
+        $securityContext = $this->securityContext;
 
         /** @var \Thelia\Model\Product $product */
         foreach ($loopResult->getResultDataCollection() as $product) {

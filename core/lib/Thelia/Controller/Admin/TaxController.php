@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -103,7 +104,7 @@ class TaxController extends AbstractCrudController
         // Setup the object form
         return $this->createForm(
             AdminForm::TAX_MODIFICATION,
-            "form",
+            FormType::class,
             $data
         );
     }

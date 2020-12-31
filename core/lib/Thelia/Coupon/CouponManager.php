@@ -96,7 +96,7 @@ class CouponManager
      */
     public function getCurrentCoupons()
     {
-        $couponCodes = $this->request->getSession()->getConsumedCoupons();
+        $couponCodes = $this->facade->getRequest()->getSession()->getConsumedCoupons();
 
         if (null === $couponCodes) {
             return [];

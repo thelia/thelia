@@ -140,7 +140,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 if ($image) {
                     // Allow image pre-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
-                    $dispatcher->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
+                    $dispatcher->dispatch($event, TheliaEvents::IMAGE_PREPROCESSING);
                     $image = $event->getImageObject();
 
                     $background_color = $event->getBackgroundColor();
@@ -236,7 +236,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     // Allow image post-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
-                    $dispatcher->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
+                    $dispatcher->dispatch($event, TheliaEvents::IMAGE_POSTPROCESSING);
                     $image = $event->getImageObject();
 
                     $image->save(

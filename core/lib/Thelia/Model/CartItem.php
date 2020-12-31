@@ -33,7 +33,7 @@ class CartItem extends BaseCartItem
 
         if ($this->dispatcher) {
             $cartItemEvent = new CartItemEvent($this);
-            $this->dispatcher->dispatch(TheliaEvents::CART_ITEM_CREATE_BEFORE, $cartItemEvent);
+            $this->dispatcher->dispatch($cartItemEvent, TheliaEvents::CART_ITEM_CREATE_BEFORE);
         }
         return true;
     }
@@ -48,7 +48,7 @@ class CartItem extends BaseCartItem
 
         if ($this->dispatcher) {
             $cartItemEvent = new CartItemEvent($this);
-            $this->dispatcher->dispatch(TheliaEvents::CART_ITEM_UPDATE_BEFORE, $cartItemEvent);
+            $this->dispatcher->dispatch($cartItemEvent, TheliaEvents::CART_ITEM_UPDATE_BEFORE);
         }
         return true;
     }
@@ -64,7 +64,7 @@ class CartItem extends BaseCartItem
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
-            $this->dispatcher->dispatch(TheliaEvents::AFTER_CARTADDITEM, $cartEvent);
+            $this->dispatcher->dispatch($cartEvent,TheliaEvents::AFTER_CARTADDITEM);
         }
     }
 
@@ -79,7 +79,7 @@ class CartItem extends BaseCartItem
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
-            $this->dispatcher->dispatch(TheliaEvents::AFTER_CARTUPDATEITEM, $cartEvent);
+            $this->dispatcher->dispatch($cartEvent, TheliaEvents::AFTER_CARTUPDATEITEM);
         }
     }
 

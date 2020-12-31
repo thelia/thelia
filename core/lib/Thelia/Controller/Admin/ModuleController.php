@@ -16,6 +16,7 @@ use Michelf\Markdown;
 use Michelf\MarkdownExtra;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
@@ -119,7 +120,7 @@ class ModuleController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::MODULE_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::MODULE_MODIFICATION, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

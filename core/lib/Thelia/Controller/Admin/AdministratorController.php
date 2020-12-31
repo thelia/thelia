@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -127,7 +128,7 @@ class AdministratorController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

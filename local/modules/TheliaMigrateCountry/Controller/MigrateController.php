@@ -12,6 +12,7 @@
 
 namespace TheliaMigrateCountry\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -72,7 +73,7 @@ class MigrateController extends BaseAdminController
         }
 
         // prepare form
-        $form = $this->createForm('thelia.admin.country.state.migration', 'form', ['migrations' => $dataForm]);
+        $form = $this->createForm('thelia.admin.country.state.migration', FormType::class, ['migrations' => $dataForm]);
         $this->getParserContext()->addForm($form);
 
         return $this->render(
@@ -91,7 +92,7 @@ class MigrateController extends BaseAdminController
             return $response;
         }
 
-        $changeForm = $this->createForm('thelia.admin.country.state.migration', 'form');
+        $changeForm = $this->createForm('thelia.admin.country.state.migration');
 
         try {
             // Check the form against constraints violations

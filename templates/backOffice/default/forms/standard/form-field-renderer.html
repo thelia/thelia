@@ -64,7 +64,7 @@ Use the optionnal $field_value parameter if no value is defined
         {/if}
     </div>
 
-{elseif $type == 'radio'}
+{elseif $type == Symfony\Component\Form\Extension\Core\Type\RadioType}
 
     <div class="radio {if $error}has-error{/if}">
         <label>
@@ -109,7 +109,7 @@ Use the optionnal $field_value parameter if no value is defined
 
         {if $content == ''}
 
-            {if $type == 'choice'}
+            {if $type == "Symfony\Component\Form\Extension\Core\Type\ChoiceType"}
 
                 <select {$attributes nofilter}>
                     {foreach $choices as $choice}
@@ -117,7 +117,7 @@ Use the optionnal $field_value parameter if no value is defined
                     {/foreach}
                 </select>
 
-            {elseif $type == 'textarea'}
+            {elseif $type == Symfony\Component\Form\Extension\Core\Type\TextareaType}
 
                 <textarea {$attributes nofilter}>{$value}</textarea>
 

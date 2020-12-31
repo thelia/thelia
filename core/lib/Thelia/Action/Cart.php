@@ -89,7 +89,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         if ($cart->isNew()) {
             $persistEvent = new CartPersistEvent($cart);
-            $dispatcher->dispatch(TheliaEvents::CART_PERSIST, $persistEvent);
+            $dispatcher->dispatch($persistEvent, TheliaEvents::CART_PERSIST);
         }
 
         if (null !== $customer && $customer->getDiscount() > 0) {
@@ -102,7 +102,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         // Search for an identical item in the cart
         $findItemEvent = clone $event;
 
-        $dispatcher->dispatch(TheliaEvents::CART_FINDITEM, $findItemEvent);
+        $dispatcher->dispatch($findItemEvent, TheliaEvents::CART_FINDITEM);
 
         $cartItem = $findItemEvent->getCartItem();
 
@@ -443,7 +443,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cartCreateEvent = new CartCreateEvent();
 
-        $dispatcher->dispatch(TheliaEvents::CART_CREATE_NEW, $cartCreateEvent);
+        $dispatcher->dispatch($cartCreateEvent, TheliaEvents::CART_CREATE_NEW);
 
         return $cartCreateEvent->getCart();
     }
@@ -493,7 +493,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         );
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
-        $dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
+        $dispatcher->dispatch($cartEvent, TheliaEvents::CART_DUPLICATE);
 
         return $cartEvent->getDuplicatedCart();
     }

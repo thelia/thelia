@@ -130,7 +130,12 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             // Join with feature_template table to get position
             $search
                 ->withColumn(AttributeTemplateTableMap::COL_POSITION, 'position')
-                ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
+                ->useAttributeTemplateQuery()
+                    ->filterByTemplate(
+                        TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
+                        Criteria::IN
+                    )
+                ->endUse()
             ;
 
             $this->useAttributePosistion = false;

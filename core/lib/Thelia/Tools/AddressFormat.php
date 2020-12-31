@@ -13,13 +13,13 @@
 
 namespace Thelia\Tools;
 
+use CommerceGuys\Addressing\Address;
+use CommerceGuys\Addressing\AddressFormat\AddressFormatRepository;
+use CommerceGuys\Addressing\AddressInterface;
+use CommerceGuys\Addressing\Country\CountryRepository;
 use CommerceGuys\Addressing\Formatter\DefaultFormatter;
 use CommerceGuys\Addressing\Formatter\PostalLabelFormatter;
-use CommerceGuys\Addressing\Model\Address;
-use CommerceGuys\Addressing\Model\AddressInterface;
-use CommerceGuys\Addressing\Repository\AddressFormatRepository;
-use CommerceGuys\Addressing\Repository\CountryRepository;
-use CommerceGuys\Addressing\Repository\SubdivisionRepository;
+use CommerceGuys\Addressing\Subdivision\SubdivisionRepository;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Lang;
@@ -78,17 +78,10 @@ class AddressFormat
             $addressFormatRepository,
             $countryRepository,
             $subdivisionRepository,
-            $locale
+            ["locale" => $locale]
         );
 
-        $formatter->setOption('html', $html);
-        $formatter->setOption('html_tag', $htmlTag);
-        $formatter->setOption('html_attributes', $htmlAttributes);
-
-
-        $addressFormatted = $formatter->format($address);
-
-        return $addressFormatted;
+        return $formatter->format($address, ["html" => $html, "html_tag" => $htmlTag, "html_attributes" => $htmlAttributes]);
     }
 
     /**
@@ -133,18 +126,16 @@ class AddressFormat
             $originCountry = $country->getIsoalpha2();
         }
 
+        $options = array_merge($options, ["locale" => $locale, "origin_country" => $originCountry]);
+
         $formatter = new PostalLabelFormatter(
             $addressFormatRepository,
             $countryRepository,
             $subdivisionRepository,
-            $originCountry,
-            $locale,
             $options
         );
 
-        $addressFormatted = $formatter->format($address);
-
-        return $addressFormatted;
+        return $formatter->format($address);
     }
 
     /**
@@ -166,7 +157,6 @@ class AddressFormat
      * Convert a Thelia address (Address or OrderAddress) to ImmutableAddressInterface
      *
      * @param \Thelia\Model\OrderAddress|OrderAddress $address
-     * @return Address|\CommerceGuys\Addressing\Model\ImmutableAddressInterface
      */
     protected function mapTheliaAddress($address, $locale = null)
     {
@@ -174,10 +164,6 @@ class AddressFormat
         if (null === $locale) {
             $locale = Lang::getDefaultLanguage()->getLocale();
         }
-        $customerTitle = $address->getCustomerTitle()
-            ->setLocale($this->denormalizeLocale($locale))
-            ->getShort()
-        ;
 
         $addressModel = new Address();
         $addressModel = $addressModel
@@ -187,14 +173,8 @@ class AddressFormat
             ->withPostalCode($address->getZipcode())
             ->withLocality($address->getCity())
             ->withOrganization($address->getCompany())
-            ->withRecipient(
-                sprintf(
-                    '%s %s %s',
-                    $customerTitle,
-                    $address->getLastname(),
-                    $address->getFirstname()
-                )
-            )
+            ->withGivenName($address->getFirstname())
+            ->withFamilyName($address->getLastname())
         ;
 
 

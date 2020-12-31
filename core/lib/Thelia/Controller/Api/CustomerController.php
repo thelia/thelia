@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
@@ -82,7 +83,7 @@ class CustomerController extends AbstractCrudApiController
     {
         return $this->createForm(
             ApiForm::CUSTOMER_UPDATE,
-            "form",
+            FormType::class,
             [],
             ['method' => 'PUT']
         );

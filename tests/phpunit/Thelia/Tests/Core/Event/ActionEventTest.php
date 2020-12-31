@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Event;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Forms;
 
 /**
@@ -32,7 +33,7 @@ class ActionEventTest extends \PHPUnit_Framework_TestCase
             ->getFormFactory()
             ->createNamedBuilder(
                 'test',
-                'form',
+                FormType::class,
                 null,
                 ['attr' =>[
                     'thelia_name' => 'test'

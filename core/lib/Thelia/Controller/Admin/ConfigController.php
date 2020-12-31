@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
@@ -117,7 +118,7 @@ class ConfigController extends AbstractCrudController
         );
 
         // Setup the object form
-        return $this->createForm(AdminForm::CONFIG_MODIFICATION, "form", $data);
+        return $this->createForm(AdminForm::CONFIG_MODIFICATION, FormType::class, $data);
     }
 
     protected function getObjectFromEvent($event)

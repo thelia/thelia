@@ -15,9 +15,11 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Propel\Runtime\Propel;
 use ReflectionException;
 use ReflectionMethod;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Hook\HookDefinition;
 use Thelia\Core\Template\TemplateDefinition;
@@ -50,7 +52,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         // We have to check if Propel is initialized before registering hooks
         $managers = Propel::getServiceContainer()->getConnectionManagers();
-        if (! array_key_exists('thelia', $managers)) {
+        if (! array_key_exists('TheliaMain', $managers)) {
             return;
         }
 
@@ -83,10 +85,23 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             // retrieve the module id
             $properties = $container->getDefinition($id)->getProperties();
+
+            $moduleCode = null;
             $module = null;
             if (array_key_exists('module', $properties)) {
-                $moduleCode = explode(".", $properties['module'])[1];
-                $module = ModuleQuery::create()->findOneByCode($moduleCode);
+                $moduleProperty = $properties['module'];
+
+                if ($moduleProperty instanceof Definition) {
+                    $moduleCode = explode("\\", $moduleProperty->getClass())[1];
+                }
+
+                if ($moduleProperty instanceof Reference) {
+                    $moduleCode = explode(".", $moduleProperty)[1];
+                }
+
+                if (null !== $moduleCode) {
+                    $module = ModuleQuery::create()->findOneByCode($moduleCode);
+                }
             }
 
             foreach ($events as $hookAttributes) {
@@ -268,12 +283,15 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 }
 
                 $definition->addMethodCall(
-                    'addListenerService',
-                    array(
+                    'addListener',
+                    [
                         $eventName,
-                        array($moduleHook->getClassname(), $moduleHook->getMethod()),
+                        [
+                            (new ServiceClosureArgument(new Reference($moduleHook->getClassname()))),
+                            $moduleHook->getMethod()
+                        ],
                         ModuleHook::MAX_POSITION - $moduleHook->getPosition()
-                    )
+                    ]
                 );
 
                 if ($moduleHook->getTemplates()) {
