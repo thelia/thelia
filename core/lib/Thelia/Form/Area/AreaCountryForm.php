@@ -50,11 +50,11 @@ class AreaCountryForm extends BaseForm
                 'country_id',
                 CollectionType::class,
                 [
-                    'type' => TextType::class,
+                    'entry_type' => TextType::class,
                     'required' => true,
                     'constraints' => [
                         new NotBlank(),
-                        new Callback(["methods" => [[$this, "verifyCountryList"]]])
+                        new Callback([$this, "verifyCountryList"])
                     ],
                     'allow_add' => true,
                     'allow_delete' => true,

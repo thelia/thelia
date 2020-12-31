@@ -57,11 +57,9 @@ class ExportForm extends BaseForm
                         'for' => 'language'
                     ],
                     'constraints' => [
-                        new Callback([
-                            'methods' => [
-                                [$this, 'checkLanguage'],
-                            ],
-                        ]),
+                        new Callback(
+                                [$this, 'checkLanguage']
+                         ),
                     ],
                 ]
             )

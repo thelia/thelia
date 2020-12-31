@@ -34,12 +34,7 @@ class CustomerLogin extends BaseCustomerLogin
 
         $this->formBuilder->add("account", TextType::class, array(
             "constraints" => array(
-                new Constraints\Callback(array(
-                    "methods" => array(
-                        array($this, "verifyAccount"),
-                    ),
-                )),
-            ),
+                new Constraints\Callback(array($this, "verifyAccount"))),
             "label_attr" => array(
                 "for" => "account",
             ),

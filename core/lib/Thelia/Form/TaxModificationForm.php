@@ -34,11 +34,7 @@ class TaxModificationForm extends TaxCreationForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "verifyTaxId"),
-                                ),
-                            )
+                            array($this, "verifyTaxId")
                         ),
                     ),
             ))

@@ -28,9 +28,7 @@ class MessageCreationForm extends BaseForm
             ->add("name", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(array($this, "checkDuplicateName")),
-                    ))
+                    new Constraints\Callback(array($this, "checkDuplicateName"))
                 ),
                 "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(

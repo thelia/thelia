@@ -30,11 +30,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyAdministratorId"),
-                            ),
-                        )
+                                array($this, "verifyAdministratorId")
                     ),
                 ),
                 "attr" => array(

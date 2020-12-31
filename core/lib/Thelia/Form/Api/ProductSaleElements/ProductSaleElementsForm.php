@@ -45,7 +45,7 @@ class ProductSaleElementsForm extends BaseForm
     {
         $this->formBuilder
             ->add("pse", CollectionType::class, array(
-                "type" => "product_sale_elements",
+                "entry_type" => "product_sale_elements",
                 "allow_add" => true,
                 "required" => true,
             ))

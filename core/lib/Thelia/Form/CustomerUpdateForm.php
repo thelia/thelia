@@ -77,11 +77,7 @@ class CustomerUpdateForm extends BaseForm
             ->add("email_confirm", EmailType::class, array(
                 "constraints" => array(
                     new Constraints\Email(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyEmailField"),
-                        )
-                    )),
+                    new Constraints\Callback(array($this, "verifyEmailField")),
                 ),
                 "label" => Translator::getInstance()->trans("Confirm Email address"),
                 "label_attr" => array(
@@ -136,12 +132,9 @@ class CustomerUpdateForm extends BaseForm
             ->add("zipcode", TextType::class, array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyZipCode")
-                        ),
-                    )),
-                ),
+                    new Constraints\Callback(
+                            array($this, "verifyZipCode")),
+                    ),
                 "label" => Translator::getInstance()->trans("Zip code"),
                 "label_attr" => array(
                     "for" => "zipcode",
@@ -168,11 +161,9 @@ class CustomerUpdateForm extends BaseForm
             ->add("state", TextType::class, array(
                 "required" => false,
                 "constraints" => array(
-                    new Constraints\Callback(array(
-                        "methods" => array(
+                    new Constraints\Callback(
                             array($this, "verifyState")
                         ),
-                    )),
                 ),
                 "label" => Translator::getInstance()->trans("State *"),
                 "label_attr" => array(

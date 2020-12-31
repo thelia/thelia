@@ -93,12 +93,8 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank(),
                         new Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "verifyMethod"),
+                                    array($this, "verifyMethod")
                                 ),
-                            )
-                        ),
                     ),
                     "label_attr" => array(
                         "for" => "method",
@@ -115,11 +111,7 @@ class ModuleHookCreationForm extends BaseForm
                     "label" => $this->trans("Automatic rendered templates"),
                     "constraints" => array(
                         new Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "verifyTemplates"),
-                                ),
-                            )
+                            array($this, "verifyTemplates")
                         ),
                     ),
                     "label_attr" => array(

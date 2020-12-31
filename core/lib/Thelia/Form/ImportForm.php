@@ -41,12 +41,10 @@ class ImportForm extends BaseForm
                 "label_attr" => ["for" => "language"],
                 "required" => true,
                 "constraints" => [
-                    new Assert\Callback([
-                        "methods" => [
-                            [$this, "checkLanguage"],
-                        ],
-                    ]),
-                ],
+                    new Assert\Callback(
+                            [$this, "checkLanguage"]
+                    )
+                ]
             ))
         ;
     }

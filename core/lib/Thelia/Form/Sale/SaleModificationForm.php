@@ -89,11 +89,7 @@ class SaleModificationForm extends SaleCreationForm
             TextType::class,
             [
                 'constraints' => [
-                    new Callback([
-                        "methods" => [
-                            [ $this, "checkDate" ],
-                        ],
-                    ]),
+                    new Callback([ $this, "checkDate" ]),
                 ],
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('Start date of sales'),
@@ -111,11 +107,7 @@ class SaleModificationForm extends SaleCreationForm
             TextType::class,
             [
                 'constraints' => [
-                    new Callback([
-                        "methods" => [
-                            [ $this, "checkDate" ],
-                        ],
-                    ]),
+                    new Callback([ $this, "checkDate" ]),
                 ],
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('End date of sales'),
@@ -151,11 +143,11 @@ class SaleModificationForm extends SaleCreationForm
             'price_offset',
             CollectionType::class,
             [
-                'type'         => NumberType::class,
+                'entry_type'         => NumberType::class,
                 'required'     => true,
                 'allow_add'    => true,
                 'allow_delete' => true,
-                'options'      => [
+                'entry_options'      => [
                     'constraints' => array(new NotBlank()),
                 ],
 
@@ -186,7 +178,7 @@ class SaleModificationForm extends SaleCreationForm
             'products',
             CollectionType::class,
             [
-                'type'         => IntegerType::class,
+                'entry_type'         => IntegerType::class,
                 'required'     => false,
                 'allow_add'    => true,
                 'allow_delete' => true,
@@ -203,7 +195,7 @@ class SaleModificationForm extends SaleCreationForm
             'product_attributes',
             CollectionType::class,
             [
-                'type'         => TextType::class,
+                'entry_type'         => TextType::class,
                 'required'     => false,
                 'allow_add'    => true,
                 'allow_delete' => true,

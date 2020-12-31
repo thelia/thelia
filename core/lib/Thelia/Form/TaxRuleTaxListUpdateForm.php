@@ -34,11 +34,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     "constraints" => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            [
-                                "methods" => [
-                                    [$this, "verifyTaxRuleId"],
-                                ],
-                            ]
+                            [$this, "verifyTaxRuleId"]
                         ),
                     ],
                 ]
@@ -53,11 +49,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     "constraints" => [
                         new Constraints\Callback(
-                            [
-                                "methods" => [
-                                    [$this, "verifyTaxList"],
-                                ],
-                            ]
+                            [$this, "verifyTaxList"]
                         ),
                     ],
                 ]
@@ -72,11 +64,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     "constraints" => [
                         new Constraints\Callback(
-                            [
-                                "methods" => [
-                                    [$this, "verifyCountryList"],
-                                ],
-                            ]
+                                [$this, "verifyCountryList"]
                         ),
                     ],
                 ]
@@ -91,11 +79,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     "constraints" => [
                         new Constraints\Callback(
-                            [
-                                "methods" => [
-                                    [$this, "verifyCountryList"],
-                                ],
-                            ]
+                            [$this, "verifyCountryList"]
                         ),
                     ],
                 ]

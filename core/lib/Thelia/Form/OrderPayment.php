@@ -35,22 +35,18 @@ class OrderPayment extends FirewallForm
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyInvoiceAddress"),
-                        ),
-                    )),
+                    new Constraints\Callback(
+                            array($this, "verifyInvoiceAddress")
+                    ),
                 ),
             ))
             ->add("payment-module", IntegerType::class, array(
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyPaymentModule"),
-                        ),
-                    )),
+                    new Constraints\Callback(
+                            array($this, "verifyPaymentModule")
+                    )
                 ),
             ))
             // Add terms & conditions

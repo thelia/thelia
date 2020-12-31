@@ -36,11 +36,7 @@ class CustomerLogin extends BruteforceForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyExistingEmail"),
-                        ),
-                    )),
+                    new Constraints\Callback(array($this, "verifyExistingEmail")),
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
                 "label_attr" => array(
@@ -49,12 +45,9 @@ class CustomerLogin extends BruteforceForm
             ))
             ->add("account", ChoiceType::class, array(
                 "constraints" => array(
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this, "verifyAccount"),
-                        ),
-                    )),
-                ),
+                    new Constraints\Callback(
+                            array($this, "verifyAccount")),
+                    ),
                 "choices" => array(
                     0 => Translator::getInstance()->trans("No, I am a new customer."),
                     1 => Translator::getInstance()->trans("Yes, I have a password :"),

@@ -37,9 +37,7 @@ class HookCreationForm extends BaseForm
             ->add("code", TextType::class, array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Callback(array(
-                        "methods" => array(array($this, "checkCodeUnicity"))
-                    )),
+                    new Callback(array($this, "checkCodeUnicity")),
                 ),
                 "label" => Translator::getInstance()->trans("Hook code"),
                 "label_attr" => array(
