@@ -57,7 +57,6 @@ class Translator extends BaseTranslator
 
     public function getLocale()
     {
-
         if (null !== $this->request) {
             return $this->request->getSession()->getLang()->getLocale();
         }
@@ -65,21 +64,16 @@ class Translator extends BaseTranslator
         return parent::getLocale();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function trans(
+    public function translate(
         ?string $id,
         array $parameters = array(),
         string $domain = null,
         string $locale = null,
-        $return_default_if_not_available = true,
+        $returnDefaultIfNotAvailable = true,
         $useFallback = true
-    ) {
-        $domain = $domain?? 'core';
-
+    ): string
+    {
+        $domain = $domain ?? 'core';
         if (null === $locale) {
             $locale = $this->getLocale();
         }
@@ -104,12 +98,29 @@ class Translator extends BaseTranslator
 
         if ($this->catalogues[$locale]->has((string) $id, $domain)) {
             return parent::trans($id, $parameters, $domain, $locale);
-        } else {
-            if ($return_default_if_not_available) {
-                return strtr($id, $parameters);
-            } else {
-                return '';
-            }
         }
+
+        if ($returnDefaultIfNotAvailable) {
+            return strtr($id, $parameters);
+        }
+
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated use translate instead
+     */
+    public function trans(
+        ?string $id,
+        array $parameters = array(),
+        string $domain = null,
+        string $locale = null,
+        $returnDefaultIfNotAvailable = true,
+        $useFallback = true
+    ): string
+    {
+        return $this->translate($id, $parameters, $domain, $locale, $returnDefaultIfNotAvailable, $useFallback);
     }
 }

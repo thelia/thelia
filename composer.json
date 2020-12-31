@@ -97,7 +97,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Thelia\\Tests\\" : "tests/phpunit/Thelia/Tests"
+            "Thelia\\Tests\\": "tests/phpunit/Thelia/Tests"
         }
     },
     "extra": {

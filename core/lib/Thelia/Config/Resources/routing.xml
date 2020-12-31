@@ -23,7 +23,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="controller.default" class="Thelia\Controller\DefaultController"/>
+        <service id="controller.default" class="Thelia\Controller\DefaultController" public="true"/>
 
         <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController">
        		<argument type="service" id="thelia.parser"/>
