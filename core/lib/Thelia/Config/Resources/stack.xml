@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <services>
-        <service id="session.middleware" class="Thelia\Core\Stack\SessionMiddleware">
+        <service id="session.middleware" class="Thelia\Core\Stack\SessionMiddleware" public="true">
             <argument type="service" id="event_dispatcher" />
             <argument>%kernel.cache_dir%</argument>
             <argument>%kernel.debug%</argument>
@@ -13,7 +13,7 @@
 
             <tag name="stack_middleware" priority="1000" />
         </service>
-        <service id="initParam.middleware" class="Thelia\Core\Stack\ParamInitMiddleware">
+        <service id="initParam.middleware" class="Thelia\Core\Stack\ParamInitMiddleware" public="true">
             <argument type="service" id="thelia.url.manager" />
             <argument type="service" id="thelia.translator" />
             <argument type="service" id="event_dispatcher" />

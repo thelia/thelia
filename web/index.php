@@ -25,10 +25,6 @@ $request = Request::createFromGlobals();
 
 $thelia = new Thelia("prod", false);
 
-if (PHP_VERSION_ID < 70000) {
-    $thelia->loadClassCache();
-}
-
 //$thelia = new HttpCache($thelia);
 
 // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter

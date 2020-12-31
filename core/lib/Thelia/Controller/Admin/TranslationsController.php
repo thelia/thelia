@@ -263,7 +263,7 @@ class TranslationsController extends BaseAdminController
                                 ->setCustomFallbackStrings($this->getRequest()->get('translation_custom', []))
                                 ->setGlobalFallbackStrings($this->getRequest()->get('translation_global', []));
 
-                            $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_WRITE_FILE, $event);
+                            $this->getDispatcher()->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
 
                             if ($save_mode == 'stay') {
                                 return $this->generateRedirectFromRoute(
@@ -285,7 +285,7 @@ class TranslationsController extends BaseAdminController
                     $domain
                 );
 
-                $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_GET_STRINGS, $event);
+                $this->getDispatcher()->dispatch($event, TheliaEvents::TRANSLATION_GET_STRINGS);
 
                 // Estimate number of fields, and compare to php ini max_input_vars
                 $stringsCount = $event->getTranslatableStringCount() * 4 + 6;

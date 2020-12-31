@@ -37,9 +37,5 @@ if (false && false === in_array($request->getClientIp(), $trustedIp)) {
 
 $thelia = new Thelia("dev", true);
 
-if (PHP_VERSION_ID < 70000) {
-    $thelia->loadClassCache();
-}
-
 $response = $thelia->handle($request)->prepare($request)->send();
 $thelia->terminate($request, $response);

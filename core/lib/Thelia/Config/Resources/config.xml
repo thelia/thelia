@@ -195,29 +195,30 @@
             <argument type="service" id="thelia.form_validator" />
         </service>
 
-
-
         <!-- The file manager -->
         <service id="thelia.file_manager" class="Thelia\Files\FileManager">
             <argument>%file_model.classes%</argument>
         </service>
 
-        <service id="base_http_kernel" class="Thelia\Core\TheliaHttpKernel">
+        <service id="stack_factory" class="Stack\Builder" public="true" />
+
+        <service id="base_http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
         </service>
 
-        <service id="stack_factory" class="Stack\Builder" />
-
         <service
                 id="http_kernel"
                 class="Thelia\Core\TheliaHttpKernel"
                 public="true"
-                parent="base_http_kernel"
         >
-            <factory service="stack_factory" method="resolve" />
+            <factory class="Stack\Builder" method="resolve" />
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="request" class="Thelia\Core\HttpFoundation\Request" />

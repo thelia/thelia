@@ -43,11 +43,9 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default translation domain
      *
-     * @param  array                     $params
-     * @param  \Smarty_Internal_Template $smarty
-     * @return string
+     * @param array $params
      */
-    public function setDefaultTranslationDomain($params, &$smarty)
+    public function setDefaultTranslationDomain(array $params)
     {
         $this->defaultTranslationDomain = $this->getParam($params, 'domain');
     }
@@ -55,11 +53,9 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default locale
      *
-     * @param  array                     $params
-     * @param  \Smarty_Internal_Template $smarty
-     * @return string
+     * @param array $params
      */
-    public function setDefaultLocale($params, &$smarty)
+    public function setDefaultLocale(array $params): string
     {
         $this->defaultLocale = $this->getParam($params, 'locale');
     }
@@ -67,25 +63,24 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Process translate function
      *
-     * @param  array                     $params
-     * @param  \Smarty_Internal_Template $smarty
+     * @param array $params
      * @return string
      */
-    public function translate($params, &$smarty)
+    public function translate(array $params): string
     {
         // All parameters other than 'l' and 'd' and 'js' are supposed to be variables. Build an array of var => value pairs
         // and pass it to the translator
-        $vars = array();
+        $variables = [];
 
         foreach ($params as $name => $value) {
             if (!in_array($name, $this->protectedParams)) {
-                $vars["%$name"] = $value;
+                $variables["%$name"] = $value;
             }
         }
 
-        $str = $this->translator->trans(
+        $string = $this->translator->translate(
             $this->getParam($params, 'l'),
-            $vars,
+            $variables,
             $this->getParam($params, 'd', $this->defaultTranslationDomain),
             $this->getParam($params, 'locale', $this->defaultLocale),
             $this->getBoolean($this->getParam($params, 'default', true), true),
@@ -93,10 +88,10 @@ class Translation extends AbstractSmartyPlugin
         );
 
         if ($this->getParam($params, 'js', 0)) {
-            $str = preg_replace("/(['\"])/", "\\\\$1", $str);
+            $string = preg_replace("/(['\"])/", "\\\\$1", $string);
         }
 
-        return $str;
+        return $string;
     }
 
     protected function getBoolean($value, $default = false)
