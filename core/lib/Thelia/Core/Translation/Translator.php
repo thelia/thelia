@@ -22,8 +22,8 @@ class Translator extends BaseTranslator
 
     const GLOBAL_FALLBACK_KEY = '%s.%s';
 
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     protected static $instance = null;
 
@@ -32,13 +32,12 @@ class Translator extends BaseTranslator
      */
     public function __construct(RequestStack $requestStack)
     {
-        $this->request = $requestStack->getCurrentRequest();
-
         // Allow singleton style calls once intanciated.
         // For this to work, the Translator service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.translator');
         parent::__construct("");
         self::$instance = $this;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -55,10 +54,11 @@ class Translator extends BaseTranslator
         return self::$instance;
     }
 
-    public function getLocale()
+    public function getLocale(): string
     {
-        if (null !== $this->request) {
-            return $this->request->getSession()->getLang()->getLocale();
+        $currentRequest = $this->requestStack->getCurrentRequest();
+        if (null !== $currentRequest) {
+            return $currentRequest->getSession()->getLang()->getLocale();
         }
 
         return parent::getLocale();
