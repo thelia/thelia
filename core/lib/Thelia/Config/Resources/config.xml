@@ -365,7 +365,7 @@
         </service>
 
         <!-- Cache -->
-        <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
+        <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true">
             <argument>%thelia.cache.namespace%</argument>
             <argument>600</argument>
             <argument>%kernel.cache_dir%</argument>

@@ -118,11 +118,11 @@
 
                                 <div class="tab-pane fade" id="seo">
                                     {include file="includes/seo-tab.html"
-                                        formAction  = "{url path='/admin/products/seo/save'}"
-                                        pageUrl     = "{url path='/admin/products/update' product_id=$ID}"
+                                        formAction  = {url path='/admin/products/seo/save'}
+                                        pageUrl     = {url path='/admin/products/update' product_id=$ID}
                                         closeUrl    = $close_url
                                         current_id  = $product_id
-                                        success_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}"
+                                        success_url = {url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}
                                         seoType     = 'product'
                                     }
                                 </div>
@@ -154,13 +154,13 @@
                                         {include
                                         file = "includes/inner-form-toolbar.html"
                                         hide_submit_buttons = true
-                                        page_url  = {$pageUrl}
-                                        close_url = {$closeUrl}
+                                        page_url=$pageUrl
+                                        close_url=$closeUrl
                                         current_tab = "modules"
                                         }
                                     </div>
                                     {* ugly fix : {hook name="product.tab-content" id="{$product_id}" view="product"} *}
-                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit" id="{$product_id}" view="product"}
+                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit" id=$product_id view="product"}
                                 </div>
 
                              </div>
