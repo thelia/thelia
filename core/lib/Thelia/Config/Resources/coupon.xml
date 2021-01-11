@@ -83,7 +83,7 @@
 
         <!-- Condition module -->
 
-        <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory">
+        <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory" public="true">
             <argument type="service" id="service_container" />
             <argument type="service" id="thelia.facade" />
         </service>
