@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -282,6 +283,9 @@ class Thelia extends Kernel
         $phpLoader = new PhpFileLoader($container, $fileLocator);
         $phpLoader->load('services.php');
 
+        $container->registerForAutoconfiguration(EventSubscriberInterface::class)
+            ->addTag("kernel.event_subscriber");
+
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()
             ->name('*.xml')
@@ -454,7 +458,7 @@ class Thelia extends Kernel
 
     private function loadTranslation(ContainerBuilder $container, array $dirs)
     {
-        $translator = $container->getDefinition('thelia.translator');
+        $translator = $container->getDefinition(Translator::class);
 
         foreach ($dirs as $domain => $dir) {
             try {

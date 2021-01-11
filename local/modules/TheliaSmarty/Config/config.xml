@@ -20,6 +20,7 @@
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>
+        <service id="Thelia\Core\Template\ParserInterface" alias="thelia.parser"/>
 
         <service id="thelia.parser.helper" alias="TheliaSmarty\Template\SmartyHelper" />
         <service id="Thelia\Core\Template\ParserHelperInterface" alias="TheliaSmarty\Template\SmartyHelper" />

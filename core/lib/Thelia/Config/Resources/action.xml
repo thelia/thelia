@@ -11,15 +11,17 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.hook" class="Thelia\Action\Hook">
+        <service id="Thelia\Action\Hook">
             <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="thelia.action.hook" alias="Thelia\Action\Hook"/>
 
-        <service id="thelia.action.moduleHook" class="Thelia\Action\ModuleHook">
+        <service id="Thelia\Action\ModuleHook">
             <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="thelia.action.moduleHook" class="Thelia\Action\ModuleHook"/>
 
         <service id="thelia.action.order" class="Thelia\Action\Order">
             <argument type="service" id="request_stack"/>
