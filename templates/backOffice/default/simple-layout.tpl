@@ -10,7 +10,7 @@
 {config_load file='variables.conf'}
 
 {* -- Declare assets directory, relative to template base directory --------- *}
-{*{declare_assets directory='assets'}*}
+{declare_assets directory='assets'}
 
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='bo.default'}
@@ -22,7 +22,7 @@
 
     <title>{block name="page-title"}Default Page Title{/block} - {intl l='Thelia Back Office'}</title>
 
-{*    <link rel="shortcut icon" href="{image file='assets/img/favicon.ico'}" />*}
+    <link rel="shortcut icon" href="{image file='assets/img/favicon.ico'}" />
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -33,7 +33,7 @@
 
     {block name="before-bootstrap-css"}{/block}
 
-{*    <link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">*}
+    <link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">
 
     {block name="after-bootstrap-css"}{/block}
 
@@ -48,12 +48,12 @@
     {hook name="main.head-css" location="head_css" }
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
-{*    <!--[if lt IE 9]>*}
-{*    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>*}
-{*    {javascripts file='assets/js/libs/respond.min.js'}*}
-{*    <script src="{$asset_url}"></script>*}
-{*    {/javascripts}*}
-{*    <![endif]-->*}
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    {javascripts file='assets/js/libs/respond.min.js'}
+    <script src="{$asset_url}"></script>
+    {/javascripts}
+    <![endif]-->
 </head>
 
 <body class="login-page">
@@ -64,17 +64,17 @@
         {* -- Main page content section ----------------------------------------- *}
         {hook name="main.before-content" location="before_content"}
 
-{*        {images file='assets/img/logo-dark.png'}*}
-{*            <div id="logo">*}
-{*                <img src="{$asset_url}" alt="Thelia">*}
-{*            </div>*}
-{*        {/images}*}
+        {images file='assets/img/logo-dark.png'}
+            <div id="logo">
+                <img src="{$asset_url}" alt="Thelia">
+            </div>
+        {/images}
 
         <p class="text-center">{block name="main-title"}{intl l="Welcome to Thelia administration !"}{/block}</p>
 
         <p class="text-center">
             {loop type="lang" name="ui-lang" backend_context="1"}
-{*                <a href="{url path="{navigate to="current"}" lang={$CODE}}" title="{intl l="View this page in %langname" langname=$TITLE}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></a>*}
+                <a href="{url path="{navigate to="current"}" lang={$CODE}}" title="{intl l="View this page in %langname" langname=$TITLE}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></a>
             {/loop}
         </p>
 
@@ -108,17 +108,17 @@
 <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
 <script>
     if (typeof jQuery == 'undefined') {
-{*        {javascripts file='assets/js/libs/jquery.js'}*}
-{*        document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));*}
-{*        {/javascripts}*}
+        {javascripts file='assets/js/libs/jquery.js'}
+        document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));
+        {/javascripts}
     }
 </script>
 
 {block name="after-javascript-include"}{/block}
 
-{*{javascripts file='assets/js/bootstrap/bootstrap.js'}*}
-{*    <script src="{$asset_url}"></script>*}
-{*{/javascripts}*}
+{javascripts file='assets/js/bootstrap/bootstrap.js'}
+    <script src="{$asset_url}"></script>
+{/javascripts}
 
 {block name="javascript-initialization"}{/block}
 

@@ -106,7 +106,7 @@ class File extends BaseAction implements EventSubscriberInterface
 
                     switch ($type) {
                         case 'images':
-                            $dispatcher->dispatch(TheliaEvents::IMAGE_SAVE, $clonedProductCreateFileEvent);
+                            $dispatcher->dispatch($clonedProductCreateFileEvent,TheliaEvents::IMAGE_SAVE);
 
                             // Get original product image I18n
                             $originalProductFileI18ns = ProductImageI18nQuery::create()
@@ -114,7 +114,7 @@ class File extends BaseAction implements EventSubscriberInterface
                             break;
 
                         case 'documents':
-                            $dispatcher->dispatch(TheliaEvents::DOCUMENT_SAVE, $clonedProductCreateFileEvent);
+                            $dispatcher->dispatch($clonedProductCreateFileEvent,TheliaEvents::DOCUMENT_SAVE);
 
                             // Get original product document I18n
                             $originalProductFileI18ns = ProductDocumentI18nQuery::create()
@@ -153,11 +153,11 @@ class File extends BaseAction implements EventSubscriberInterface
 
             switch ($type) {
                 case 'images':
-                    $dispatcher->dispatch(TheliaEvents::IMAGE_UPDATE, $clonedProductUpdateFileEvent);
+                    $dispatcher->dispatch($clonedProductUpdateFileEvent,TheliaEvents::IMAGE_UPDATE);
                     break;
 
                 case 'documents':
-                    $dispatcher->dispatch(TheliaEvents::DOCUMENT_UPDATE, $clonedProductUpdateFileEvent);
+                    $dispatcher->dispatch($clonedProductUpdateFileEvent,TheliaEvents::DOCUMENT_UPDATE);
                     break;
             }
         }

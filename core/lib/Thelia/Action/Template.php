@@ -80,7 +80,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                     Translator::getInstance()->trans("Copy of %tpl", ["%tpl" => $source->getName() ])
                 );
             
-            $dispatcher->dispatch(TheliaEvents::TEMPLATE_CREATE, $createEvent);
+            $dispatcher->dispatch($createEvent,TheliaEvents::TEMPLATE_CREATE);
             
             $clone = $createEvent->getTemplate();
             
@@ -89,8 +89,8 @@ class Template extends BaseAction implements EventSubscriberInterface
             /** @var  $feat AttributeTemplate */
             foreach ($attrList as $feat) {
                 $dispatcher->dispatch(
-                    TheliaEvents::TEMPLATE_ADD_ATTRIBUTE,
-                    new TemplateAddAttributeEvent($clone, $feat->getAttributeId())
+                    new TemplateAddAttributeEvent($clone, $feat->getAttributeId()),
+                    TheliaEvents::TEMPLATE_ADD_ATTRIBUTE
                 );
             }
             
@@ -99,8 +99,8 @@ class Template extends BaseAction implements EventSubscriberInterface
             /** @var  $feat FeatureTemplate */
             foreach ($featList as $feat) {
                 $dispatcher->dispatch(
-                    TheliaEvents::TEMPLATE_ADD_FEATURE,
-                    new TemplateAddFeatureEvent($clone, $feat->getFeatureId())
+                    new TemplateAddFeatureEvent($clone, $feat->getFeatureId()),
+                    TheliaEvents::TEMPLATE_ADD_FEATURE
                 );
             }
             
@@ -120,7 +120,6 @@ class Template extends BaseAction implements EventSubscriberInterface
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
             $template
                 ->setDispatcher($dispatcher)
-                
                 ->setLocale($event->getLocale())
                 ->setName($event->getTemplateName())
                 ->save();
