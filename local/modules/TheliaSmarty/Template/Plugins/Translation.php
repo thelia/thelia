@@ -55,7 +55,7 @@ class Translation extends AbstractSmartyPlugin
      *
      * @param array $params
      */
-    public function setDefaultLocale(array $params): string
+    public function setDefaultLocale(array $params)
     {
         $this->defaultLocale = $this->getParam($params, 'locale');
     }
