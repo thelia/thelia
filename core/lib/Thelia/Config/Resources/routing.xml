@@ -14,7 +14,7 @@
     </parameters>
 
     <services>
-        <service id="thelia.listener.view" class="Thelia\Core\EventListener\ViewListener">
+        <service id="Thelia\Core\EventListener\ViewListener">
             <argument type="service" id="thelia.parser"/>
             <argument type="service" id="thelia.template_helper"/>
             <argument type="service" id="request_stack"/>
@@ -22,6 +22,7 @@
             <argument type="service" id="router.chainRequest"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="thelia.listener.view" alias="Thelia\Core\EventListener\ViewListener"/>
 
         <service id="controller.default" class="Thelia\Controller\DefaultController" public="true"/>
 

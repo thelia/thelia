@@ -20,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
@@ -69,7 +70,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         RequestStack $requestStack,
         CouponFactory $couponFactory,
         CouponManager $couponManager,
-        ConditionInterface $noConditionRule,
+        MatchForEveryone $noConditionRule,
         ConditionFactory $conditionFactory
     ) {
         $this->requestStack = $requestStack;

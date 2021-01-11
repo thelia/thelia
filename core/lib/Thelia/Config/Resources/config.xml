@@ -107,8 +107,8 @@
             <argument type="service" id="router.admin" />
         </service>
 
-        <service id="event_dispatcher" class="Thelia\Core\EventDispatcher\EventDispatcher" public="true">
-        </service>
+        <service id="event_dispatcher" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
+        <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
 
         <service id="esi" class="%esi.class%" />
 
@@ -173,9 +173,11 @@
 
 		<!--  Translation and internationalisation -->
 
-		<service id="thelia.translator" class="Thelia\Core\Translation\Translator" public="true">
+		<service id="Thelia\Core\Translation\Translator" public="true">
 			<argument type="service" id="request_stack"/>
 		</service>
+        <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="Thelia\Core\Translation\Translator" />
+        <service id="thelia.translator" alias="Thelia\Core\Translation\Translator" />
 
         <!--  Hook Helper -->
 
@@ -194,9 +196,10 @@
         </service>
 
         <!-- The file manager -->
-        <service id="thelia.file_manager" class="Thelia\Files\FileManager">
+        <service id="Thelia\Files\FileManager">
             <argument>%file_model.classes%</argument>
         </service>
+        <service id="thelia.file_manager" alias="Thelia\Files\FileManager"/>
 
         <service id="stack_factory" class="Stack\Builder" public="true" />
 
@@ -215,6 +218,7 @@
         <service id="request" class="Thelia\Core\HttpFoundation\Request" />
 
         <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" public="true" />
+        <service id="Symfony\Component\HttpFoundation\RequestStack" alias="request_stack"/>
 
 <!--        <service id="kernel" synthetic="true" />-->
 
@@ -227,26 +231,20 @@
             <argument type="service" id="thelia.parser"/>
         </service>
 
-        <service id="response.listener" class="Thelia\Core\EventListener\ResponseListener">
-            <tag name="kernel.event_subscriber"/>
-        </service>
+        <service id="response.listener" alias="Thelia\Core\EventListener\ResponseListener"/>
 
-        <service id="session.listener" class="Thelia\Core\EventListener\SessionListener">
-            <tag name="kernel.event_subscriber"/>
-        </service>
+        <service id="session.listener" alias="Thelia\Core\EventListener\SessionListener"/>
 
-        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener">
-            <argument type="service" id="thelia.securityContext"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
+        <service id="controller.listener" alias="Thelia\Core\EventListener\ControllerListener"/>
 
-        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener">
+        <service id="Thelia\Core\EventListener\ErrorListener">
             <argument>%kernel.environment%</argument>
             <argument type="service" id="thelia.parser"/>
             <argument type="service" id="thelia.securityContext"/>
             <argument type="service" id="event_dispatcher" />
             <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="error.listener" alias="Thelia\Core\EventListener\ErrorListener" />
 
         <!-- Serializers -->
         <service id="thelia.serializer.manager" class="Thelia\Core\Serializer\SerializerManager" />
@@ -297,11 +295,13 @@
 
 
         <!-- Thelia simple token provider -->
-        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider">
+        <service id="Thelia\Tools\TokenProvider">
             <argument type="service" id="request_stack" />
             <argument type="service" id="thelia.translator" />
             <argument>%thelia.token_id%</argument>
         </service>
+        <service id="thelia.token_provider" alias="Thelia\Tools\TokenProvider"/>
+
 
         <!-- Forms services ( factory builder, Thelia form types ) -->
         <service id="thelia.forms.validator_builder" class="Symfony\Component\Validator\ValidatorBuilder">
@@ -338,6 +338,7 @@
         </service>
 
         <service id="currency.converter" class="Thelia\CurrencyConverter\CurrencyConverter" />
+        <service id="Thelia\CurrencyConverter\CurrencyConverter" alias="currency.converter" />
 
         <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">
             <tag name="currency.converter.provider" priority="0" />
@@ -368,5 +369,6 @@
             <argument>600</argument>
             <argument>%kernel.cache_dir%</argument>
         </service>
+        <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="thelia.cache"/>
     </services>
 </config>
