@@ -480,7 +480,7 @@ abstract class AbstractCrudApiController extends BaseApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      *
      * Hydrates an event object to dispatch on creation.
      */
@@ -489,7 +489,7 @@ abstract class AbstractCrudApiController extends BaseApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      *
      * Hydrates an event object to dispatch on update.
      */
@@ -497,7 +497,7 @@ abstract class AbstractCrudApiController extends BaseApiController
 
     /**
      * @param mixed $entityId
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      *
      * Hydrates an event object to dispatch on entity deletion.
      */

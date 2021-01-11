@@ -28,6 +28,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
@@ -277,7 +278,11 @@ class Thelia extends Kernel
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . "/../Config/Resources"));
+        $fileLocator = new FileLocator(__DIR__ . "/../Config/Resources");
+        $phpLoader = new PhpFileLoader($container, $fileLocator);
+        $phpLoader->load('services.php');
+
+        $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()
             ->name('*.xml')
             ->depth(0)
@@ -292,8 +297,6 @@ class Thelia extends Kernel
             $modules = ModuleQuery::getActivated();
 
             $translationDirs = array();
-
-
 
             /** @var Module $module */
             foreach ($modules as $module) {
