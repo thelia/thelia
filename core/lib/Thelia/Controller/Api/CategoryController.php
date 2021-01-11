@@ -12,9 +12,9 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
@@ -88,7 +88,7 @@ class CategoryController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getCreationEvent(array &$data)
     {
@@ -108,7 +108,7 @@ class CategoryController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getUpdateEvent(array &$data)
     {
@@ -132,7 +132,7 @@ class CategoryController extends AbstractCrudApiController
 
     /**
      * @param mixed $entityId
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getDeleteEvent($entityId)
     {

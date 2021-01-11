@@ -21,7 +21,8 @@
             <argument >%kernel.debug%</argument>
         </service>
 
-        <service id="thelia.parser.helper" class="TheliaSmarty\Template\SmartyHelper" />
+        <service id="thelia.parser.helper" alias="TheliaSmarty\Template\SmartyHelper" />
+        <service id="Thelia\Core\Template\ParserHelperInterface" alias="TheliaSmarty\Template\SmartyHelper" />
 
         <!--  URL maganement -->
 

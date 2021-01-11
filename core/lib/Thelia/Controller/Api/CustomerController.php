@@ -12,7 +12,7 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -104,7 +104,7 @@ class CustomerController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getCreationEvent(array &$data)
     {
@@ -113,7 +113,7 @@ class CustomerController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getUpdateEvent(array &$data)
     {
@@ -122,7 +122,7 @@ class CustomerController extends AbstractCrudApiController
 
     /**
      * @param mixed $entityId
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getDeleteEvent($entityId)
     {

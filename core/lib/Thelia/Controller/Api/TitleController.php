@@ -12,7 +12,7 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\Form\FormEvent;
 use Thelia\Core\Event\CustomerTitle\CustomerTitleEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -95,7 +95,7 @@ class TitleController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getCreationEvent(array &$data)
     {
@@ -104,7 +104,7 @@ class TitleController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getUpdateEvent(array &$data)
     {
@@ -113,7 +113,7 @@ class TitleController extends AbstractCrudApiController
 
     /**
      * @param mixed $entityId
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getDeleteEvent($entityId)
     {

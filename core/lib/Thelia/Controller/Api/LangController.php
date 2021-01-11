@@ -12,7 +12,7 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Lang;
 
@@ -82,7 +82,7 @@ class LangController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      *
      * Hydrates an event object to dispatch on creation.
      */
@@ -92,7 +92,7 @@ class LangController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      *
      * Hydrates an event object to dispatch on update.
      */
@@ -102,7 +102,7 @@ class LangController extends AbstractCrudApiController
 
     /**
      * @param mixed $entityId
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      *
      * Hydrates an event object to dispatch on entity deletion.
      */
