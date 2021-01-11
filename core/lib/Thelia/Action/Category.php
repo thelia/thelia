@@ -140,7 +140,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $dispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
                     }
                 }
 
@@ -230,7 +230,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->count();
 
             if ($category == 0) {
-                $dispatcher->dispatch(TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE, $event);
+                $dispatcher->dispatch($event, TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE);
             }
         }
     }

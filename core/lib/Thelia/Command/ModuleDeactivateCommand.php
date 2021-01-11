@@ -88,7 +88,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             if ($input->getOption("with-dependencies")) {
                 $event->setRecursive(true);
             }
-            $this->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
+            $this->getDispatcher()->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf("Deactivation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
         }

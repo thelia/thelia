@@ -12,15 +12,14 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\TaxRule;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
-use Thelia\Model\ProductQuery;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleI18nQuery;
 use Thelia\Model\TaxRuleQuery;
@@ -91,7 +90,7 @@ class TaxRuleController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getCreationEvent(array &$data)
     {
@@ -100,7 +99,7 @@ class TaxRuleController extends AbstractCrudApiController
 
     /**
      * @param array $data
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getUpdateEvent(array &$data)
     {
@@ -109,7 +108,7 @@ class TaxRuleController extends AbstractCrudApiController
 
     /**
      * @param mixed $entityId
-     * @return \Symfony\Component\EventDispatcher\Event
+     * @return Event
      */
     protected function getDeleteEvent($entityId)
     {
@@ -123,7 +122,7 @@ class TaxRuleController extends AbstractCrudApiController
         $dispatcher = $this->getDispatcher();
 
         if ($data["default"]) {
-            $dispatcher->dispatch(TheliaEvents::TAX_RULE_SET_DEFAULT, $event);
+            $dispatcher->dispatch($event, TheliaEvents::TAX_RULE_SET_DEFAULT);
         }
 
         foreach ($data["i18n"] as $i18nRow) {

@@ -116,7 +116,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             if ($event->getIsDefault()) {
                 $updateRateEvent = new CurrencyUpdateRateEvent();
 
-                $dispatcher->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $updateRateEvent);
+                $dispatcher->dispatch($updateRateEvent, TheliaEvents::CURRENCY_UPDATE_RATES);
             }
 
             $event->setCurrency($currency);
