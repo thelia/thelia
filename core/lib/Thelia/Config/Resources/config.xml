@@ -103,9 +103,10 @@
         <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
 
         <!--  URL maganement -->
-        <service id="thelia.url.manager" class="Thelia\Tools\URL" public="true">
+        <service id="Thelia\Tools\URL" >
             <argument type="service" id="router.admin" />
         </service>
+        <service id="thelia.url.manager" alias="Thelia\Tools\URL"/>
 
         <service id="event_dispatcher" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
@@ -126,9 +127,7 @@
         </service>
 
         <!-- Tax engine -->
-        <service id="thelia.taxEngine" class="Thelia\TaxEngine\TaxEngine" public="true">
-            <argument type="service" id="request_stack" />
-        </service>
+        <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>
 
         <!--  The assets manager -->
         <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
@@ -136,40 +135,43 @@
         </service>
 
         <!-- The asset filters -->
-        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+        <service id="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
             <tag name="thelia.asset.filter" key="less" />
             <tag name="kernel.event_subscriber"/>
             <argument>%kernel.environment%</argument>
         </service>
+        <service id="less.assetic.filter" alias="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter"/>
 
-        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
-            <tag name="thelia.asset.filter" key="sass"  />
+        <service id="Assetic\Filter\ScssphpFilter">
+            <tag name="thelia.asset.filter" key="scss"  />
         </service>
+        <service id="scss.assetic.filter" alias="Assetic\Filter\ScssphpFilter"/>
 
-        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">
+        <service id="Assetic\Filter\PhpCssEmbedFilter">
             <tag name="thelia.asset.filter" key="cssembed" />
         </service>
+        <service id="cssembed.assetic.filter" alias="Assetic\Filter\PhpCssEmbedFilter"/>
 
-        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">
+        <service id="Assetic\Filter\CssRewriteFilter">
             <tag name="thelia.asset.filter" key="cssrewrite"/>
         </service>
+        <service id="cssrewrite.assetic.filter" alias="Assetic\Filter\CssRewriteFilter"/>
 
-        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">
+        <service id="Assetic\Filter\CssImportFilter">
             <tag name="thelia.asset.filter" key="cssimport"/>
         </service>
-
-        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">
-            <tag name="thelia.asset.filter" key="compass"/>
-        </service>
+        <service id="cssimport.assetic.filter" alias="Assetic\Filter\CssImportFilter"/>
 
         <!--
         A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
         thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
         We use it here to inject the service container in the admin base controller.
         -->
-        <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
+        <service id="Thelia\Core\Controller\ControllerResolver">
         	<argument type="service" id="service_container"/>
         </service>
+        <service id="controller_resolver" alias="Thelia\Core\Controller\ControllerResolver"/>
+        <service id="Symfony\Component\HttpKernel\Controller\ControllerResolverInterface" alias="Thelia\Core\Controller\ControllerResolver"/>
 
 		<!--  Translation and internationalisation -->
 
@@ -184,16 +186,10 @@
         <service id="thelia.hookHelper" alias="Thelia\Core\Hook\HookHelper" />
 
 		<!-- Security context for front and back office -->
+        <service id="thelia.securityContext" alias="Thelia\Core\Security\SecurityContext" public="true"/>
 
-		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" public="true">
-            <argument type="service" id="request_stack" />
-		</service>
 
-        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" public="true">
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="thelia.form_factory" />
-            <argument type="service" id="thelia.form_validator" />
-        </service>
+        <service id="thelia.parser.context" alias="Thelia\Core\Template\ParserContext" public="true"/>
 
         <!-- The file manager -->
         <service id="Thelia\Files\FileManager">
@@ -201,24 +197,20 @@
         </service>
         <service id="thelia.file_manager" alias="Thelia\Files\FileManager"/>
 
-        <service id="stack_factory" class="Stack\Builder" public="true" />
+        <service id="Stack\Builder" class="Stack\Builder"/>
+        <service id="stack_factory" alias="Stack\Builder" public="true" />
 
-        <service id="base_http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="service_container" />
-            <argument type="service" id="controller_resolver" />
-            <argument type="service" id="request_stack" />
-        </service>
+        <service id="base_http_kernel" alias="Thelia\Core\TheliaHttpKernel" public="true"/>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
             <factory service="stack_factory" method="resolve" />
             <argument type="service" id="base_http_kernel" />
         </service>
 
-        <service id="request" class="Thelia\Core\HttpFoundation\Request" />
+        <service id="request" alias="Thelia\Core\HttpFoundation\Request" />
 
-        <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" public="true" />
-        <service id="Symfony\Component\HttpFoundation\RequestStack" alias="request_stack"/>
+        <service id="Symfony\Component\HttpFoundation\RequestStack" class="Symfony\Component\HttpFoundation\RequestStack"/>
+        <service id="request_stack" alias="Symfony\Component\HttpFoundation\RequestStack" public="true"/>
 
 <!--        <service id="kernel" synthetic="true" />-->
 
@@ -226,10 +218,7 @@
 <!--        <service id="thelia.propel.schema.locator" synthetic="true"/>-->
 <!--        <service id="thelia.propel.init" synthetic="true"/>-->
 
-        <service id="mailer" class="Thelia\Mailer\MailerFactory">
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.parser"/>
-        </service>
+        <service id="mailer" alias="Thelia\Mailer\MailerFactory"/>
 
         <service id="response.listener" alias="Thelia\Core\EventListener\ResponseListener"/>
 
@@ -247,22 +236,11 @@
         <service id="error.listener" alias="Thelia\Core\EventListener\ErrorListener" />
 
         <!-- Serializers -->
-        <service id="thelia.serializer.manager" class="Thelia\Core\Serializer\SerializerManager" />
-
-        <!-- csv -->
-        <service id="thelia.serializer.csv" class="Thelia\Core\Serializer\Serializer\CSVSerializer">
-            <tag name="thelia.serializer" />
-        </service>
-
-        <!-- xml -->
-        <service id="thelia.serializer.xml" class="Thelia\Core\Serializer\Serializer\XMLSerializer">
-            <tag name="thelia.serializer" />
-        </service>
-
-        <!-- json -->
-        <service id="thelia.serializer.json" class="Thelia\Core\Serializer\Serializer\JSONSerializer">
-            <tag name="thelia.serializer" />
-        </service>
+        <service id="Thelia\Core\Serializer\SerializerManager" public="true" />
+        <service id="thelia.serializer.manager" alias="Thelia\Core\Serializer\SerializerManager" />
+        <service id="thelia.serializer.csv" alias="Thelia\Core\Serializer\Serializer\CSVSerializer"/>
+        <service id="thelia.serializer.xml" alias="Thelia\Core\Serializer\Serializer\XMLSerializer"/>
+        <service id="thelia.serializer.json" alias="Thelia\Core\Serializer\Serializer\JSONSerializer"/>
 
         <!-- yaml -->
         <!--<service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">-->
@@ -270,28 +248,13 @@
         <!--</service>-->
 
 
-        <!-- Archiver -->
-        <service id="thelia.archiver.manager" class="Thelia\Core\Archiver\ArchiverManager" />
-
-        <!-- zip -->
-        <service id="thelia.archiver.zip" class="Thelia\Core\Archiver\Archiver\ZipArchiver">
-            <tag name="thelia.archiver" />
-        </service>
-
-        <!-- tar -->
-        <service id="thelia.archiver.tar" class="Thelia\Core\Archiver\Archiver\TarArchiver">
-            <tag name="thelia.archiver" />
-        </service>
-
-        <!-- tar.gz -->
-        <service id="thelia.archiver.tgz" class="Thelia\Core\Archiver\Archiver\TarGzArchiver">
-            <tag name="thelia.archiver" />
-        </service>
-
-        <!-- tar.bz2 -->
-        <service id="thelia.archiver.bz2" class="Thelia\Core\Archiver\Archiver\TarBz2Archiver">
-            <tag name="thelia.archiver" />
-        </service>
+        <!-- Archivers -->
+        <service id="Thelia\Core\Archiver\ArchiverManager" public="true"/>
+        <service id="thelia.archiver.manager" alias="Thelia\Core\Archiver\ArchiverManager" />
+        <service id="thelia.archiver.zip" alias="Thelia\Core\Archiver\Archiver\ZipArchiver"/>
+        <service id="thelia.archiver.tar" alias="Thelia\Core\Archiver\Archiver\TarArchiver"/>
+        <service id="thelia.archiver.tgz" alias="Thelia\Core\Archiver\Archiver\TarGzArchiver"/>
+        <service id="thelia.archiver.bz2" alias="Thelia\Core\Archiver\Archiver\TarBz2Archiver"/>
 
 
         <!-- Thelia simple token provider -->
@@ -304,7 +267,7 @@
 
 
         <!-- Forms services ( factory builder, Thelia form types ) -->
-        <service id="thelia.forms.validator_builder" class="Symfony\Component\Validator\ValidatorBuilder">
+        <service id="Symfony\Component\Validator\ValidatorBuilder">
             <call method="setTranslationDomain">
                 <argument>%thelia.validator.translation_domain%</argument>
             </call>
@@ -312,18 +275,18 @@
                 <argument type="service" id="thelia.translator" />
             </call>
         </service>
+        <service id="thelia.forms.validator_builder" alias="Symfony\Component\Validator\ValidatorBuilder"/>
 
-        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" />
+        <service id="Symfony\Component\Form\FormFactoryBuilderInterface" class="Symfony\Component\Form\FormFactoryBuilder" />
+        <service id="thelia.form_factory_builder" alias="Symfony\Component\Form\FormFactoryBuilderInterface" />
 
-        <service id="thelia.forms.extension.http_foundation_extension" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension">
-            <tag name="thelia.forms.extension" />
-        </service>
+        <service id="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension"/>
+        <service id="thelia.forms.extension.http_foundation_extension" alias="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension"/>
 
-        <service id="thelia.forms.extension.core_extension" class="Symfony\Component\Form\Extension\Core\CoreExtension">
-            <tag name="thelia.forms.extension" />
-        </service>
+        <service id="Symfony\Component\Form\Extension\Core\CoreExtension" class="Symfony\Component\Form\Extension\Core\CoreExtension"/>
+        <service id="thelia.forms.extension.core_extension" alias="Symfony\Component\Form\Extension\Core\CoreExtension"/>
 
-        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory" public="true">
+        <service id="Thelia\Core\Form\TheliaFormFactory">
             <argument type="service" id="request_stack" />
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="thelia.translator" />
@@ -331,11 +294,13 @@
             <argument type="service" id="thelia.forms.validator_builder" />
             <argument>%Thelia.parser.forms%</argument>
         </service>
+        <service id="thelia.form_factory" alias="Thelia\Core\Form\TheliaFormFactory" public="true"/>
 
-        <service id="thelia.form_validator" class="Thelia\Core\Form\TheliaFormValidator" public="true">
+        <service id="Thelia\Core\Form\TheliaFormValidator">
             <argument type="service" id="thelia.translator" />
             <argument>%kernel.environment%</argument>
         </service>
+        <service id="thelia.form_validator" alias="Thelia\Core\Form\TheliaFormValidator" public="true"/>
 
         <service id="currency.converter" class="Thelia\CurrencyConverter\CurrencyConverter" />
         <service id="Thelia\CurrencyConverter\CurrencyConverter" alias="currency.converter" />
@@ -353,15 +318,9 @@
         </service>
 
         <!-- Handlers -->
-        <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
-            <argument type="service" id="event_dispatcher" />
-        </service>
+        <service id="thelia.export.handler" alias="Thelia\Handler\ExportHandler" public="true"/>
 
-        <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="thelia.serializer.manager" />
-            <argument type="service" id="thelia.archiver.manager" />
-        </service>
+        <service id="thelia.import.handler" alias="Thelia\Handler\ImportHandler" public="true"/>
 
         <!-- Cache -->
         <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true">

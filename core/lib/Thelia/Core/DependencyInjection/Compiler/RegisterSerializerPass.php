@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Thelia\Core\Serializer\SerializerManager;
 
 /**
  * Class RegisterSerializerPass
@@ -27,7 +28,7 @@ class RegisterSerializerPass implements CompilerPassInterface
     /**
      * @var string Serializer manager service ID
      */
-    const MANAGER_SERVICE_ID = 'thelia.serializer.manager';
+    const MANAGER_SERVICE_ID = SerializerManager::class;
 
     /**
      * @var string Serializer tag name

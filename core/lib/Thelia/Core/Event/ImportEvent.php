@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\ImportExport\Import\AbstractImport;
 

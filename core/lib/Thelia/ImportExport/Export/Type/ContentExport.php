@@ -94,16 +94,6 @@ class ContentExport extends JsonFileAbstractExport
         $stmt->bindValue('locale', $locale);
         $stmt->execute();
 
-        $filename = THELIA_CACHE_DIR . '/export/' . 'content.json';
-
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
-        }
-
-        return $filename;
+        return $this->getDataJsonCache($stmt, 'content');
     }
 }

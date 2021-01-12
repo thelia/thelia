@@ -196,15 +196,15 @@ class ImportHandler
         // Process import
         $event = new ImportEvent($instance, $serializer);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::IMPORT_BEGIN, $event);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::IMPORT_BEGIN);
 
         $errors = $this->processImport($event->getImport(), $event->getSerializer());
 
         $event->setErrors($errors);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::IMPORT_FINISHED, $event);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::IMPORT_FINISHED);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::IMPORT_SUCCESS, $event);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::IMPORT_SUCCESS);
 
         return $event;
     }

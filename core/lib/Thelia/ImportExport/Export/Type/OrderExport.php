@@ -13,7 +13,9 @@
 namespace Thelia\ImportExport\Export\Type;
 
 use PDO;
+use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
+use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
@@ -165,16 +167,6 @@ class OrderExport extends JsonFileAbstractExport
         $stmt->bindValue('end', $this->rangeDate['end']->format('Y-m-d H:i:s'));
         $stmt->execute();
 
-        $filename = THELIA_CACHE_DIR . '/export/' . 'order.json';
-
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
-        }
-
-        return $filename;
+        return $this->getDataJsonCache($stmt, 'order');
     }
 }

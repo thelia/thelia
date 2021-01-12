@@ -190,14 +190,13 @@ class ExportHandler
         // Process export
         $event = new ExportEvent($instance, $serializer, $archiver);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEGIN, $event);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
 
         $filePath = $this->processExport($event->getExport(), $event->getSerializer());
 
         $event->setFilePath($filePath);
 
-        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_FINISHED, $event);
-
+        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_FINISHED);
 
         if ($event->getArchiver() !== null) {
             // Create archive
@@ -220,7 +219,7 @@ class ExportHandler
             $event->setFilePath($event->getArchiver()->getArchivePath());
         }
 
-        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_SUCCESS, $event);
+        $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_SUCCESS);
 
         return $event;
     }

@@ -72,13 +72,6 @@ class TarArchiver extends AbstractArchiver
 
     public function save()
     {
-        /** @var \PharData $newArchive */
-        $newArchive = $this->archive->compress(static::COMPRESSION_METHOD, $this->getExtension());
 
-        $fileSystem = new Filesystem;
-        $fileSystem->remove($this->archivePath);
-        $fileSystem->rename($newArchive->getPath(), $this->archivePath);
-
-        $this->archive = new \PharData($this->archivePath);
     }
 }
