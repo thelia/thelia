@@ -267,8 +267,8 @@ class DeliveryPostageEvent extends ActionEvent
      */
     public function setDeliveryMode($deliveryMode)
     {
-        if (!in_array($deliveryMode, ['pickup', 'delivery'])) {
-            throw new \Exception(Translator::getInstance()->trans('A delivery module can only de of type pickup or delivery'));
+        if (!in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'])) {
+            throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
         }
 
         $this->deliveryMode = $deliveryMode;
