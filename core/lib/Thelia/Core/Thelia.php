@@ -21,6 +21,7 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
+use Assetic\Contracts\Filter\FilterInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
@@ -35,11 +36,14 @@ use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Contracts\EventDispatcher\Event;
+use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -285,6 +289,18 @@ class Thelia extends Kernel
 
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag("kernel.event_subscriber");
+
+//        $container->registerForAutoconfiguration(FilterInterface::class)
+//            ->addTag("thelia.asset.filter");
+
+        $container->registerForAutoconfiguration(SerializerInterface::class)
+            ->addTag("thelia.serializer");
+
+        $container->registerForAutoconfiguration(ArchiverInterface::class)
+            ->addTag("thelia.archiver");
+
+        $container->registerForAutoconfiguration(FormExtensionInterface::class)
+            ->addTag("thelia.forms.extension");
 
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()

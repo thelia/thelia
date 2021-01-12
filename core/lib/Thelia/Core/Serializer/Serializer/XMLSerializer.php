@@ -46,8 +46,11 @@ class XMLSerializer extends AbstractSerializer
      */
     public function __construct()
     {
-        $this->xmlEncoder = new XmlEncoder;
-        $this->xmlEncoder->setRootNodeName($this->dataNodeName);
+        $this->xmlEncoder = new XmlEncoder(
+            [
+                XmlEncoder::ROOT_NODE_NAME => 'data'
+            ]
+        );
     }
 
     public function getId()
@@ -71,30 +74,6 @@ class XMLSerializer extends AbstractSerializer
     }
 
     /**
-     * Get root node name
-     *
-     * @return string Root node name
-     */
-    public function getRootNodeName()
-    {
-        return $this->rootNodeName;
-    }
-
-    /**
-     * Set root node name
-     *
-     * @param string $rootNodeName Root node name
-     *
-     * @return $this Return $this, allow chaining
-     */
-    public function setRootNodeName($rootNodeName)
-    {
-        $this->rootNodeName = $rootNodeName;
-
-        return $this;
-    }
-
-    /**
      * Get data node name
      *
      * @return string Root node name
@@ -114,7 +93,6 @@ class XMLSerializer extends AbstractSerializer
     public function setDataNodeName($dataNodeName)
     {
         $this->dataNodeName = $dataNodeName;
-        $this->xmlEncoder->setRootNodeName($this->dataNodeName);
 
         return $this;
     }

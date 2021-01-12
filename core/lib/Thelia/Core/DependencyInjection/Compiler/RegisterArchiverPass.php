@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Thelia\Core\Archiver\ArchiverManager;
 
 /**
  * Class RegisterArchiverPass
@@ -27,7 +28,7 @@ class RegisterArchiverPass implements CompilerPassInterface
     /**
      * @var string Archiver manager service ID
      */
-    const MANAGER_SERVICE_ID = 'thelia.archiver.manager';
+    const MANAGER_SERVICE_ID = ArchiverManager::class;
 
     /**
      * @var string Archiver tag name

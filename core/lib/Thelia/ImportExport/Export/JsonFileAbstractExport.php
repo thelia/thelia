@@ -12,7 +12,9 @@
 
 namespace Thelia\ImportExport\Export;
 
+use Propel\Runtime\Connection\StatementInterface;
 use SplFileObject;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class JsonFileAbstractExport
@@ -67,7 +69,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
             }
 
             throw new \DomainException(
-                'Data shoul de a JSON file, ending with .json'
+                'Data should be a JSON file, ending with .json'
             );
         }
 
@@ -110,5 +112,24 @@ abstract class JsonFileAbstractExport extends AbstractExport
         }
 
         return $processedData;
+    }
+
+    protected function getDataJsonCache(StatementInterface $statement, $exportName)
+    {
+        $filename = THELIA_CACHE_DIR . '/export/' . $exportName .'.json';
+
+        if ($statement->rowCount() === 0) {
+            throw new \Exception(Translator::getInstance()->translate("No data found for your export."));
+        }
+
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+        }
+
+        return $filename;
     }
 }

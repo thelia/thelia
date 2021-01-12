@@ -49,7 +49,6 @@
         </service>
 
         <service id="thelia.action.RedirectException" class="Thelia\Action\RedirectException">
-            <argument type="service" id="thelia.url.manager" />
             <tag name="kernel.event_subscriber"/>
         </service>
 

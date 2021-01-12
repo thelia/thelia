@@ -43,11 +43,6 @@ class ParamInitMiddleware implements HttpKernelInterface
     protected $app;
 
     /**
-     * @var URL
-     */
-    protected $urlManager;
-
-    /**
      * @var Translator
      */
     protected $translator;
@@ -59,14 +54,12 @@ class ParamInitMiddleware implements HttpKernelInterface
 
     /**
      * @param HttpKernelInterface $app
-     * @param URL $urlManager
      * @param Translator $translator
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(HttpKernelInterface $app, URL $urlManager, Translator $translator, EventDispatcherInterface $eventDispatcher)
+    public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher)
     {
         $this->app = $app;
-        $this->urlManager = $urlManager;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
     }

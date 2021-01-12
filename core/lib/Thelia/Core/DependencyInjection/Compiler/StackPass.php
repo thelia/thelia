@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\DependencyInjection\Compiler;
 
+use Stack\Builder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -32,11 +33,11 @@ class StackPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('stack_factory')) {
+        if (!$container->hasDefinition(Builder::class)) {
             return;
         }
 
-        $stackFactory = $container->getDefinition('stack_factory');
+        $stackFactory = $container->getDefinition(Builder::class);
         $stackPriority = [];
 
         foreach ($container->findTaggedServiceIds('stack_middleware') as $id => $attributes) {

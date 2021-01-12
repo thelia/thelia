@@ -36,38 +36,38 @@ class RegisterAssetFilterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-//        if (!$container->hasDefinition(static::MANAGER_DEFINITION)) {
-//            return;
-//        }
-//
-//        $manager = $container->getDefinition(static::MANAGER_DEFINITION);
-//        $services = $container->findTaggedServiceIds(static::SERVICE_TAG);
-//
-//        foreach ($services as $id => $attributes) {
-//            if (! isset($attributes[0]['key']) || empty($attributes[0]['key'])) {
-//                throw new \InvalidArgumentException(
-//                    sprintf(
-//                        'Service "%s" must define the "key" attribute on "thelia.asset.filter" tag.',
-//                        $id
-//                    )
-//                );
-//            }
-//
-//            $class = $container->getDefinition($id)->getClass();
-//
-//            if (! is_subclass_of($class, '\Assetic\Filter\FilterInterface')) {
-//                throw new \InvalidArgumentException(
-//                    sprintf(
-//                        'Service "%s" should implement the \Assetic\Filter\FilterInterface interface',
-//                        $id
-//                    )
-//                );
-//            }
-//
-//            $manager->addMethodCall(
-//                'registerAssetFilter',
-//                [ $attributes[0]['key'], new Reference($id) ]
-//            );
-//        }
+        if (!$container->hasDefinition(static::MANAGER_DEFINITION)) {
+            return;
+        }
+
+        $manager = $container->getDefinition(static::MANAGER_DEFINITION);
+        $services = $container->findTaggedServiceIds(static::SERVICE_TAG);
+
+        foreach ($services as $id => $attributes) {
+            if (! isset($attributes[0]['key']) || empty($attributes[0]['key'])) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Service "%s" must define the "key" attribute on "thelia.asset.filter" tag.',
+                        $id
+                    )
+                );
+            }
+
+            $class = $container->getDefinition($id)->getClass();
+
+            if (! is_subclass_of($class, '\Assetic\Contracts\Filter\FilterInterface')) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Service "%s" should implement the \Assetic\Contracts\Filter\FilterInterface interface',
+                        $id
+                    )
+                );
+            }
+
+            $manager->addMethodCall(
+                'registerAssetFilter',
+                [ $attributes[0]['key'], new Reference($id) ]
+            );
+        }
     }
 }

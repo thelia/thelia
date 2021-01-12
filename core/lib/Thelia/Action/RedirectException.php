@@ -28,14 +28,6 @@ use Thelia\Core\HttpKernel\Exception\RedirectException as ExceptionRedirectExcep
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {
-    /** @var URL */
-    protected $urlManager;
-
-    public function __construct(URL $urlManager)
-    {
-        $this->urlManager = $urlManager;
-    }
-
     public function checkRedirectException(ExceptionEvent $event)
     {
         $exception = $event->getThrowable();
@@ -44,7 +36,7 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
             $event->setResponse($response);
         } elseif ($exception instanceof AuthenticationException) {
             // Redirect to the login template
-            $response = new RedirectResponse($this->urlManager->viewUrl($exception->getLoginTemplate()));
+            $response = new RedirectResponse(URL::getInstance()->viewUrl($exception->getLoginTemplate()));
             $event->setResponse($response);
         }
     }

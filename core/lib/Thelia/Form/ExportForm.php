@@ -97,7 +97,6 @@ class ExportForm extends BaseForm
                 'years' => range(date('Y'), date('Y') - 5),
                 'input' => 'array',
                 'widget' => 'choice',
-                'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
                 'format' => 'yyyy-MM-d',
             ))
             ->add("range_date_end", DateType::class, array(
@@ -107,7 +106,6 @@ class ExportForm extends BaseForm
                 'years' => range(date('Y'), date('Y') - 5),
                 'input' => 'array',
                 'widget' => 'choice',
-                'empty_value' => array('year' => 'Year', 'month' => 'Month', 'day' => 'Day'),
                 'format' => 'yyyy-MM-d',
             ));
     }
