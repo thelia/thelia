@@ -35,6 +35,7 @@ use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\RememberMeTrait;
@@ -106,7 +107,7 @@ class RequestListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
         if (!\count($request->request->all()) && \in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
-            if ('json' == $request->getFormat($request->headers->get('Content-Type'))) {
+            if ('json' === $request->getFormat($request->headers->get('Content-Type'))) {
                 $content = $request->getContent();
                 if (!empty($content)) {
                     $data = json_decode($content, true);
@@ -119,7 +120,9 @@ class RequestListener implements EventSubscriberInterface
                         $event->stopPropagation();
 
                         return;
-                    } elseif (!\is_array($data)) {
+                    }
+
+                    if (!\is_array($data)) {
                         // This case happens for string like: "Foo", that json_decode returns as valid json
                         $data = [$data];
                     }
@@ -150,6 +153,7 @@ class RequestListener implements EventSubscriberInterface
 
             try {
                 // If have found a user, store it in the security context
+                /** @var Customer $user */
                 $user = $authenticator->getAuthentifiedUser();
 
                 $session->setCustomerUser($user);
@@ -208,7 +212,7 @@ class RequestListener implements EventSubscriberInterface
         if (null === $lang = LangQuery::create()
                 ->filterByActive(true)
                 ->filterByLocale($locale)
-                ->findOne($locale)) {
+                ->findOne()) {
             $lang = Lang::getDefaultLanguage();
         }
 
@@ -236,7 +240,7 @@ class RequestListener implements EventSubscriberInterface
 
             if (null !== $referrer) {
                 // A previous URL (or the keyword 'dont-save') has been specified.
-                if ('dont-save' == $referrer) {
+                if ('dont-save' === $referrer) {
                     // We should not save the current URL as the previous URL
                     $referrer = null;
                 }
