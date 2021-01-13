@@ -476,6 +476,16 @@ class BaseModule implements BaseModuleInterface
         return array();
     }
 
+    public static function serviceLoaderConfig()
+    {
+        return [
+            "autoload" => false,
+            "autoloadExclude" => [],
+            "autowire" => false,
+            "autoconfigure" => false
+        ];
+    }
+
     /**
      * @inheritdoc
      */
