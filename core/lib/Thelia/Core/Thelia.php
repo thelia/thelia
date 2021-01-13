@@ -287,20 +287,17 @@ class Thelia extends Kernel
         $phpLoader = new PhpFileLoader($container, $fileLocator);
         $phpLoader->load('services.php');
 
-        $container->registerForAutoconfiguration(EventSubscriberInterface::class)
-            ->addTag("kernel.event_subscriber");
+        $autoconfiguredInterfaces = [
+            EventSubscriberInterface::class => "kernel.event_subscriber",
+            SerializerInterface::class => "thelia.serializer",
+            ArchiverInterface::class => "thelia.archiver",
+            FormExtensionInterface::class => "thelia.forms.extension",
+        ];
 
-//        $container->registerForAutoconfiguration(FilterInterface::class)
-//            ->addTag("thelia.asset.filter");
-
-        $container->registerForAutoconfiguration(SerializerInterface::class)
-            ->addTag("thelia.serializer");
-
-        $container->registerForAutoconfiguration(ArchiverInterface::class)
-            ->addTag("thelia.archiver");
-
-        $container->registerForAutoconfiguration(FormExtensionInterface::class)
-            ->addTag("thelia.forms.extension");
+        foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
+            $container->registerForAutoconfiguration($interfaceClass)
+                ->addTag($tag);
+        }
 
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()
