@@ -121,18 +121,16 @@
             <argument type="service" id="http_kernel" />
         </service>
 
-        <service id="fragment.renderer.esi" class="%fragment.renderer.esi.class%">
+        <service id="Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer" class="%fragment.renderer.esi.class%">
             <argument type="service" id="esi" />
             <argument type="service" id="fragment.renderer.inline" />
         </service>
+        <service id="fragment.renderer.esi" alias="Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer"/>
 
         <!-- Tax engine -->
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>
 
         <!--  The assets manager -->
-        <service id="Thelia\Core\Template\Assets\AsseticAssetManager">
-            <argument>%kernel.debug%</argument>
-        </service>
         <service id="assetic.asset.manager" alias="Thelia\Core\Template\Assets\AsseticAssetManager"/>
 
         <!-- The asset filters -->
@@ -221,13 +219,6 @@
 
         <service id="controller.listener" alias="Thelia\Core\EventListener\ControllerListener"/>
 
-        <service id="Thelia\Core\EventListener\ErrorListener">
-            <argument>%kernel.environment%</argument>
-            <argument type="service" id="thelia.parser"/>
-            <argument type="service" id="thelia.securityContext"/>
-            <argument type="service" id="event_dispatcher" />
-            <tag name="kernel.event_subscriber"/>
-        </service>
         <service id="error.listener" alias="Thelia\Core\EventListener\ErrorListener" />
 
         <!-- Serializers -->
@@ -283,10 +274,6 @@
         </service>
         <service id="thelia.form_factory" alias="Thelia\Core\Form\TheliaFormFactory" public="true"/>
 
-        <service id="Thelia\Core\Form\TheliaFormValidator">
-            <argument type="service" id="thelia.translator" />
-            <argument>%kernel.environment%</argument>
-        </service>
         <service id="thelia.form_validator" alias="Thelia\Core\Form\TheliaFormValidator" public="true"/>
 
         <service id="currency.converter" class="Thelia\CurrencyConverter\CurrencyConverter" />

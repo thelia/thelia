@@ -45,14 +45,14 @@ class Cache extends AbstractSmartyPlugin
      * @param AdapterInterface $esiFragmentRenderer
      * @param RequestStack $requestStack
      * @param TaxEngine $taxEngine
-     * @param $debug
+     * @param $kernelDebug
      */
-    public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, TaxEngine $taxEngine, $debug)
+    public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, TaxEngine $taxEngine, $kernelDebug)
     {
         $this->adapter = $esiFragmentRenderer;
         $this->requestStack = $requestStack;
         $this->taxEngine = $taxEngine;
-        $this->debug = $debug;
+        $this->debug = $kernelDebug;
     }
 
     public function cache(array $params, $content, $template, &$repeat)

@@ -60,15 +60,11 @@
                 <argument>%Thelia.parser.forms%</argument>
             </call>
         </service>
+
         <service id="smart.plugin.form" alias="TheliaSmarty\Template\Plugins\Form"/>
 
         <service id="smarty.plugin.translation" alias="TheliaSmarty\Template\Plugins\Translation"/>
 
-        <service id="TheliaSmarty\Template\Plugins\Module">
-            <argument>%kernel.debug%</argument>
-            <argument type="service" id="request_stack"/>
-            <tag name="thelia.parser.register_plugin"/>
-        </service>
         <service id="smarty.plugin.module" alias="TheliaSmarty\Template\Plugins\Module"/>
 
         <service id="smarty.url.module" alias="TheliaSmarty\Template\Plugins\UrlGenerator"/>
@@ -81,29 +77,10 @@
 
         <service id="smarty.plugin.flashMessage" alias="TheliaSmarty\Template\Plugins\FlashMessage"/>
 
-        <service id="TheliaSmarty\Template\Plugins\Esi">
-            <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="fragment.renderer.esi" />
-            <argument type="service" id="request_stack" />
-        </service>
         <service id="smarty.plugin.esi" alias="TheliaSmarty\Template\Plugins\Esi"/>
 
-        <service id="TheliaSmarty\Template\Plugins\Hook">
-            <argument>%kernel.debug%</argument>
-            <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.translator"/>
-            <argument type="service" id="smarty.plugin.module"/>
-        </service>
         <service id="smarty.plugin.hook" alias="TheliaSmarty\Template\Plugins\Hook"/>
 
-        <service id="TheliaSmarty\Template\Plugins\Cache">
-            <argument type="service" id="thelia.cache"/>
-            <argument type="service" id="request_stack"/>
-            <argument type="service" id="thelia.taxEngine"/>
-            <argument>%kernel.debug%</argument>
-            <tag name="thelia.parser.register_plugin"/>
-        </service>
         <service id="smarty.plugin.cache" alias="TheliaSmarty\Template\Plugins\Cache"/>
 
         <service id="TheliaSmarty\Template\Plugins\VarDumper">
