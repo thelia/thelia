@@ -482,7 +482,8 @@ class BaseModule implements BaseModuleInterface
             "autoload" => false,
             "autoloadExclude" => [],
             "autowire" => false,
-            "autoconfigure" => false
+            "autoconfigure" => false,
+            "autoconfigureInterface" => []
         ];
     }
 

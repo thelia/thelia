@@ -217,7 +217,7 @@ interface BaseModuleInterface
      *      "autoload" => true,
      *      "autoloadExclude" => [THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"],
      *      "autowire" => true,
-     *      "autoconfigure" => true
+     *      "autoconfigure" => true,
      *  ];
      */
     public static function serviceLoaderConfig();

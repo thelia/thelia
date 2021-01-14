@@ -36,7 +36,6 @@ return function(ContainerConfigurator $configurator) {
                     ->exclude($serviceLoaderConfig['autoloadExclude'])
                     ->autowire($serviceLoaderConfig['autowire'])
                     ->autoconfigure($serviceLoaderConfig['autoconfigure']);
-
             } catch (\Exception $e) {
                 Tlog::getInstance()->addError(
                     sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),

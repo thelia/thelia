@@ -14,6 +14,7 @@ namespace TheliaSmarty;
 
 use Thelia\Module\BaseModule;
 use TheliaSmarty\Compiler\RegisterParserPluginPass;
+use TheliaSmarty\Template\SmartyPluginInterface;
 
 class TheliaSmarty extends BaseModule
 {
@@ -50,7 +51,8 @@ class TheliaSmarty extends BaseModule
             "autoload" => true,
             "autoloadExclude" => [THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"],
             "autowire" => true,
-            "autoconfigure" => true
+            "autoconfigure" => true,
+            "autoconfigureInterface" => [SmartyPluginInterface::class => "thelia.parser.register_plugin"]
         ];
     }
 }

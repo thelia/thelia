@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,10 +40,10 @@ class Render extends AbstractSmartyPlugin
 
     /**
      * @param ControllerResolver $controllerResolver
-     * @param RequestStack       $requestStack
-     * @param Container          $container
+     * @param RequestStack $requestStack
+     * @param ContainerInterface $container
      */
-    public function __construct(ControllerResolver $controllerResolver, RequestStack $requestStack, Container $container)
+    public function __construct(ControllerResolver $controllerResolver, RequestStack $requestStack, ContainerInterface $container)
     {
         $this->controllerResolver = $controllerResolver;
         $this->requestStack = $requestStack;

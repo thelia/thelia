@@ -130,9 +130,10 @@
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>
 
         <!--  The assets manager -->
-        <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
+        <service id="Thelia\Core\Template\Assets\AsseticAssetManager">
             <argument>%kernel.debug%</argument>
         </service>
+        <service id="assetic.asset.manager" alias="Thelia\Core\Template\Assets\AsseticAssetManager"/>
 
         <!-- The asset filters -->
         <service id="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
@@ -168,16 +169,16 @@
         We use it here to inject the service container in the admin base controller.
         -->
         <service id="Thelia\Core\Controller\ControllerResolver">
-        	<argument type="service" id="service_container"/>
+            <argument type="service" id="service_container"/>
         </service>
         <service id="controller_resolver" alias="Thelia\Core\Controller\ControllerResolver"/>
         <service id="Symfony\Component\HttpKernel\Controller\ControllerResolverInterface" alias="Thelia\Core\Controller\ControllerResolver"/>
 
-		<!--  Translation and internationalisation -->
+        <!--  Translation and internationalisation -->
 
-		<service id="Thelia\Core\Translation\Translator" public="true">
-			<argument type="service" id="request_stack"/>
-		</service>
+        <service id="Thelia\Core\Translation\Translator" public="true">
+            <argument type="service" id="request_stack"/>
+        </service>
         <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="Thelia\Core\Translation\Translator" />
         <service id="thelia.translator" alias="Thelia\Core\Translation\Translator" />
 
@@ -185,7 +186,7 @@
 
         <service id="thelia.hookHelper" alias="Thelia\Core\Hook\HookHelper" />
 
-		<!-- Security context for front and back office -->
+        <!-- Security context for front and back office -->
         <service id="thelia.securityContext" alias="Thelia\Core\Security\SecurityContext" public="true"/>
 
 
@@ -212,12 +213,6 @@
         <service id="Symfony\Component\HttpFoundation\RequestStack" class="Symfony\Component\HttpFoundation\RequestStack"/>
         <service id="request_stack" alias="Symfony\Component\HttpFoundation\RequestStack" public="true"/>
 
-<!--        <service id="kernel" synthetic="true" />-->
-
-        <!-- Propel services -->
-<!--        <service id="thelia.propel.schema.locator" synthetic="true"/>-->
-<!--        <service id="thelia.propel.init" synthetic="true"/>-->
-
         <service id="mailer" alias="Thelia\Mailer\MailerFactory"/>
 
         <service id="response.listener" alias="Thelia\Core\EventListener\ResponseListener"/>
@@ -236,26 +231,19 @@
         <service id="error.listener" alias="Thelia\Core\EventListener\ErrorListener" />
 
         <!-- Serializers -->
-        <service id="Thelia\Core\Serializer\SerializerManager" public="true" />
-        <service id="thelia.serializer.manager" alias="Thelia\Core\Serializer\SerializerManager" />
+        <service id="Thelia\Core\Serializer\SerializerManager" />
+        <service id="thelia.serializer.manager" alias="Thelia\Core\Serializer\SerializerManager" public="true" />
         <service id="thelia.serializer.csv" alias="Thelia\Core\Serializer\Serializer\CSVSerializer"/>
         <service id="thelia.serializer.xml" alias="Thelia\Core\Serializer\Serializer\XMLSerializer"/>
         <service id="thelia.serializer.json" alias="Thelia\Core\Serializer\Serializer\JSONSerializer"/>
 
-        <!-- yaml -->
-        <!--<service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">-->
-            <!--<tag name="thelia.serializer" />-->
-        <!--</service>-->
-
-
         <!-- Archivers -->
-        <service id="Thelia\Core\Archiver\ArchiverManager" public="true"/>
-        <service id="thelia.archiver.manager" alias="Thelia\Core\Archiver\ArchiverManager" />
+        <service id="Thelia\Core\Archiver\ArchiverManager" />
+        <service id="thelia.archiver.manager" alias="Thelia\Core\Archiver\ArchiverManager" public="true"/>
         <service id="thelia.archiver.zip" alias="Thelia\Core\Archiver\Archiver\ZipArchiver"/>
         <service id="thelia.archiver.tar" alias="Thelia\Core\Archiver\Archiver\TarArchiver"/>
         <service id="thelia.archiver.tgz" alias="Thelia\Core\Archiver\Archiver\TarGzArchiver"/>
         <service id="thelia.archiver.bz2" alias="Thelia\Core\Archiver\Archiver\TarBz2Archiver"/>
-
 
         <!-- Thelia simple token provider -->
         <service id="Thelia\Tools\TokenProvider">
@@ -264,7 +252,6 @@
             <argument>%thelia.token_id%</argument>
         </service>
         <service id="thelia.token_provider" alias="Thelia\Tools\TokenProvider"/>
-
 
         <!-- Forms services ( factory builder, Thelia form types ) -->
         <service id="Symfony\Component\Validator\ValidatorBuilder">
@@ -319,15 +306,15 @@
 
         <!-- Handlers -->
         <service id="thelia.export.handler" alias="Thelia\Handler\ExportHandler" public="true"/>
-
         <service id="thelia.import.handler" alias="Thelia\Handler\ImportHandler" public="true"/>
 
         <!-- Cache -->
-        <service id="thelia.cache" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true">
+        <service id="Symfony\Component\Cache\Adapter\FilesystemAdapter" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
             <argument>%thelia.cache.namespace%</argument>
             <argument>600</argument>
             <argument>%kernel.cache_dir%</argument>
         </service>
-        <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="thelia.cache"/>
+        <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="Symfony\Component\Cache\Adapter\FilesystemAdapter"/>
+        <service id="thelia.cache" alias="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true"/>
     </services>
 </config>
