@@ -31,10 +31,10 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
     /** @var string */
     protected $environment;
 
-    public function __construct(TranslatorInterface $translator, $environment)
+    public function __construct(TranslatorInterface $translator, $kernelEnvironment)
     {
         $this->translator = $translator;
-        $this->environment = $environment;
+        $this->environment = $kernelEnvironment;
     }
 
     /**

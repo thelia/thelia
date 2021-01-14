@@ -33,9 +33,9 @@ class AsseticAssetManager implements AssetManagerInterface
 
     protected $assetFilters = [];
 
-    public function __construct($debugMode)
+    public function __construct($kernelDebug)
     {
-        $this->debugMode = $debugMode;
+        $this->debugMode = $kernelDebug;
     }
 
     /**

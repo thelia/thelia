@@ -10,7 +10,10 @@ return function(ContainerConfigurator $configurator) {
     $services = $configurator->services()
         ->defaults()
         ->autowire(false)
-        ->autoconfigure(false);
+        ->autoconfigure(false)
+        ->bind('$kernelDebug', '%kernel.debug%')
+        ->bind('$kernelEnvironment', '%kernel.environment%')
+        ;
 
     $services->load('Thelia\\',THELIA_LIB )
         ->exclude(

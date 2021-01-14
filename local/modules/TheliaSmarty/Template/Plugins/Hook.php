@@ -53,12 +53,12 @@ class Hook extends AbstractSmartyPlugin
     protected $debug = false;
 
     public function __construct(
-        $debug,
+        $kernelDebug,
         EventDispatcher $dispatcher,
         TranslatorInterface $translator,
         Module $smartyPluginModule
     ) {
-        $this->debug       = $debug;
+        $this->debug       = $kernelDebug;
         $this->dispatcher  = $dispatcher;
         $this->translator  = $translator;
         $this->smartyPluginModule = $smartyPluginModule;

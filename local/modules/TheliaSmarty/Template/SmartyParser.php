@@ -76,12 +76,12 @@ class SmartyParser extends Smarty implements ParserInterface
     protected $useMethodCallWrapper = false;
 
     /**
-     * @param RequestStack             $requestStack
+     * @param RequestStack $requestStack
      * @param EventDispatcherInterface $dispatcher
-     * @param ParserContext            $parserContext
-     * @param TemplateHelperInterface  $templateHelper
-     * @param string                   $env
-     * @param bool                     $debug
+     * @param ParserContext $parserContext
+     * @param TemplateHelperInterface $templateHelper
+     * @param string $kernelEnvironment
+     * @param bool $kernelDebug
      * @throws \SmartyException
      */
     public function __construct(
@@ -89,8 +89,8 @@ class SmartyParser extends Smarty implements ParserInterface
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
         TemplateHelperInterface $templateHelper,
-        $env = "prod",
-        $debug = false
+        $kernelEnvironment = "prod",
+        $kernelDebug = false
     ) {
         parent::__construct();
 
@@ -98,20 +98,20 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->dispatcher = $dispatcher;
         $this->parserContext = $parserContext;
         $this->templateHelper = $templateHelper;
-        $this->env = $env;
-        $this->debug = $debug;
+        $this->env = $kernelEnvironment;
+        $this->debug = $kernelDebug;
 
         // Use method call compatibility wrapper ?
         $this->useMethodCallWrapper = version_compare(self::SMARTY_VERSION, "3.1.33", '>=');
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'compile';
+        $compile_dir = THELIA_ROOT . 'cache'. DS . $kernelEnvironment . DS . 'smarty' . DS . 'compile';
         if (! is_dir($compile_dir)) {
             @mkdir($compile_dir, 0777, true);
         }
 
-        $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty' . DS . 'cache';
+        $cache_dir = THELIA_ROOT . 'cache'. DS . $kernelEnvironment . DS . 'smarty' . DS . 'cache';
         if (! is_dir($cache_dir)) {
             @mkdir($cache_dir, 0777, true);
         }

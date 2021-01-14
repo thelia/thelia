@@ -26,11 +26,11 @@ class VarDumper extends AbstractSmartyPlugin
 
     /**
      * VarDumper constructor.
-     * @param bool $debug
+     * @param bool $kernelDebug
      */
-    public function __construct($debug)
+    public function __construct($kernelDebug)
     {
-        $this->debug = $debug;
+        $this->debug = $kernelDebug;
     }
 
     public function dump($params, $template = null)

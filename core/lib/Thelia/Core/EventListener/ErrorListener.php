@@ -45,12 +45,12 @@ class ErrorListener implements EventSubscriberInterface
     protected $env;
 
     public function __construct(
-        $env,
+        $kernelEnvironment,
         ParserInterface $parser,
         SecurityContext $securityContext,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->env = $env;
+        $this->env = $kernelEnvironment;
 
         $this->parser = $parser;
 

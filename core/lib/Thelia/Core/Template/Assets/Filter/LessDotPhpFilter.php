@@ -33,10 +33,10 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
     /** @var string the compiler cache directory */
     private $cacheDir;
 
-    public function __construct($environment = 'prod')
+    public function __construct($kernelEnvironment = 'prod')
     {
         // Assign and create the cache directory, if required.
-        $this->cacheDir = THELIA_CACHE_DIR . $environment . DS . 'less.php';
+        $this->cacheDir = THELIA_CACHE_DIR . $kernelEnvironment . DS . 'less.php';
 
         if (! is_dir($this->cacheDir)) {
             $fs = new Filesystem();

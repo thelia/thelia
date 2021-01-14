@@ -25,11 +25,12 @@ class Module extends AbstractSmartyPlugin
     /** @var RequestStack */
     protected $requestStack;
 
-    public function __construct($debug, RequestStack $requestStack)
+    public function __construct($kernelDebug, RequestStack $requestStack)
     {
-        $this->debug = $debug;
+        $this->debug = $kernelDebug;
         $this->requestStack = $requestStack;
     }
+
     /**
      * Process theliaModule template inclusion function
      *
