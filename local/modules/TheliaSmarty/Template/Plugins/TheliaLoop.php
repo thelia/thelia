@@ -69,6 +69,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     /**
      * TheliaLoop constructor.
+     * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @param EventDispatcher $eventDispatcher
      * @param SecurityContext $securityContext

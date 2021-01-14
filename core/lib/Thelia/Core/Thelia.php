@@ -318,6 +318,12 @@ class Thelia extends Kernel
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
+                    $serviceLoaderConfig = \call_user_func(array($module->getFullNamespace(), 'serviceLoaderConfig'));
+                    foreach ($serviceLoaderConfig['autoconfigureInterface'] as $interfaceClass => $tag) {
+                        $container->registerForAutoconfiguration($interfaceClass)
+                            ->addTag($tag);
+                    }
+
                     $definition = new Definition();
                     $definition->setClass($module->getFullNamespace());
                     $definition->addMethodCall("setContainer", array(new Reference('service_container')));

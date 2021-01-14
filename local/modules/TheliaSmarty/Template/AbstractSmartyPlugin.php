@@ -15,12 +15,12 @@ namespace TheliaSmarty\Template;
 
 /**
  *
- * The class all Smarty Thelia plugin shoud extend
+ * The class all Smarty Thelia plugin should extend
  *
  * Class AbstractSmartyPlugin
  * @package TheliaSmarty
  */
-abstract class AbstractSmartyPlugin
+abstract class AbstractSmartyPlugin implements SmartyPluginInterface
 {
     const WRAPPED_METHOD_PREFIX = '__wrap__';
 
