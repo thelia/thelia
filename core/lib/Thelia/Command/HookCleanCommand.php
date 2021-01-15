@@ -60,7 +60,7 @@ class HookCleanCommand extends ContainerAwareCommand
             $module = $this->getModule($input);
 
             if (!$this->askConfirmation($input, $output)) {
-                return;
+                return 1;
             }
 
             $this->deleteHooks($module);
@@ -70,7 +70,10 @@ class HookCleanCommand extends ContainerAwareCommand
             $this->clearCache($output);
         } catch (\Exception $ex) {
             $output->writeln(sprintf("<error>%s</error>", $ex->getMessage()));
+            return 1;
         }
+
+        return 0;
     }
 
     private function getModule(InputInterface $input)
@@ -149,7 +152,7 @@ class HookCleanCommand extends ContainerAwareCommand
         try {
             $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
             $cacheEvent = new CacheEvent($cacheDir);
-            $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+            $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $ex) {
             throw new \Exception(sprintf("Error during clearing of cache : %s", $ex->getMessage()));
         }

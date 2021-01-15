@@ -86,19 +86,19 @@ class ExportCommand extends ContainerAwareCommand
         if ($input->getOption('list-export')) {
             $this->listExport($output);
 
-            return;
+            return 0;
         }
 
         if ($input->getOption('list-serializer')) {
             $this->listSerializer($output);
 
-            return;
+            return 0;
         }
 
         if ($input->getOption('list-archiver')) {
             $this->listArchiver($output);
 
-            return;
+            return 0;
         }
 
         $exportRef = $input->getArgument('ref');
@@ -144,6 +144,8 @@ class ExportCommand extends ContainerAwareCommand
         $output->writeln($formattedLine);
         $output->writeln('<info>Export available at path:</info>');
         $output->writeln('<comment>' . $exportEvent->getFilePath() . '</comment>');
+
+        return 0;
     }
 
     /**

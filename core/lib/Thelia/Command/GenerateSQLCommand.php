@@ -91,6 +91,8 @@ class GenerateSQLCommand extends ContainerAwareCommand
                 $output->writeln("File " . $destination . ' generated successfully.');
             }
         }
+
+        return 0;
     }
 
     protected function init(InputInterface $input)

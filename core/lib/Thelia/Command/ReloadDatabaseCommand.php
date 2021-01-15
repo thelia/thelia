@@ -57,5 +57,7 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
             '<info>Database reloaded with success</info>',
             ''
         ));
+
+        return 0;
     }
 }

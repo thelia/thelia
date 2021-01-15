@@ -82,5 +82,7 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
             'bg=green;fg=black'
         );
         $output->writeln($formattedBlock);
+
+        return 0;
     }
 }

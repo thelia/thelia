@@ -48,6 +48,8 @@ class ModuleListCommand extends ContainerAwareCommand
             ->setHeaders(["Code", "Active", "Type", "Version"])
             ->render()
         ;
+
+        return 0;
     }
 
     protected function getModulesData()

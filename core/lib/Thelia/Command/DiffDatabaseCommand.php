@@ -61,7 +61,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
 
         if ($finder->count() != 1) {
             $output->writeln('Could not find the generated migration class.');
-            return;
+            return 1;
         }
 
         // get the first (and only) found file
@@ -84,5 +84,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
             $output->writeln("-- DATABASE {$databaseName}, DOWN");
             $output->writeln($downSQL);
         }
+
+        return 0;
     }
 }

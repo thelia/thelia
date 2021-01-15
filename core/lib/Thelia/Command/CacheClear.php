@@ -85,6 +85,8 @@ class CacheClear extends ContainerAwareCommand
                 $output
             );
         }
+
+        return 0;
     }
 
     protected function clearCache($dir, OutputInterface $output)
@@ -93,7 +95,7 @@ class CacheClear extends ContainerAwareCommand
 
         try {
             $cacheEvent = new CacheEvent($dir, false);
-            $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+            $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {

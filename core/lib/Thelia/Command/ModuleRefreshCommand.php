@@ -58,5 +58,7 @@ class ModuleRefreshCommand extends ContainerAwareCommand
                 'bg=green;fg=black'
             );
         }
+
+        return 0;
     }
 }
