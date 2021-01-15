@@ -58,7 +58,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         $event->setNewsletter($newsletter);
 
         if (ConfigQuery::getNotifyNewsletterSubscription()) {
-            $this->dispatcher->dispatch(TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION, $event);
+            $this->dispatcher->dispatch($event, TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION);
         }
     }
 

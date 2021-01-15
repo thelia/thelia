@@ -409,7 +409,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->find();
 
         $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($event->getClonedProduct(), $attributeCombinationList, $currencyId);
-        $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $clonedProductCreatePSEEvent);
+        $this->eventDispatcher->dispatch($clonedProductCreatePSEEvent,TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, );
 
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
@@ -436,7 +436,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setSalePrice($originalProductPSEPrice->getPromoPrice())
             ->setCurrencyId($originalProductPSEPrice->getCurrencyId());
 
-        $this->eventDispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
+        $this->eventDispatcher->dispatch($clonedProductUpdatePSEEvent, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
     }
 
     /**

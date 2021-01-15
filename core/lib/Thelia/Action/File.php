@@ -93,7 +93,7 @@ class File extends BaseAction implements EventSubscriberInterface
                         ->setLocale($clonedProduct->getLocale())
                         ->setTitle($clonedProduct->getTitle());
 
-                    $clonedProductCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType, filesize($srcPath), null, true);
+                    $clonedProductCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType);
 
                     // Create and dispatch event
                     $clonedProductCreateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());

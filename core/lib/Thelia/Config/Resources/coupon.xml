@@ -7,15 +7,7 @@
     <services>
         <!-- Coupon module -->
 
-        <service id="thelia.facade" class="Thelia\Coupon\BaseFacade">
-            <argument type="service" id="thelia.securityContext" />
-            <argument type="service" id="thelia.taxEngine" />
-            <argument type="service" id="thelia.translator" />
-            <argument type="service" id="thelia.parser" />
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="thelia.condition.validator" />
-            <argument type="service" id="event_dispatcher" />
-        </service>
+        <service id="thelia.facade" alias="Thelia\Coupon\BaseFacade" public="true"/>
 
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
             <argument type="service" id="thelia.facade" />

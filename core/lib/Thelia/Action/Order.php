@@ -283,7 +283,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             // if the product is virtual, dispatch an event to collect information
             if ($product->getVirtual() === 1) {
-                $dispatcher->dispatch(TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE, $virtualDocumentEvent);
+                $dispatcher->dispatch($virtualDocumentEvent, TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE);
                 $useStock = $virtualDocumentEvent->isUseStock();
                 $virtual = $virtualDocumentEvent->isVirtual() ? 1 : 0;
             }
