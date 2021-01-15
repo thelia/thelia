@@ -229,8 +229,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 $sale->setActive(false);
 
                 $dispatcher->dispatch(
-                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                    new ProductSaleStatusUpdateEvent($sale)
+                    new ProductSaleStatusUpdateEvent($sale),
+                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
                 );
 
                 $sale
@@ -297,8 +297,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 // not active, as we de-activated promotion for this sale at the beginning ofd this method
                 if ($sale->getActive()) {
                     $dispatcher->dispatch(
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                        new ProductSaleStatusUpdateEvent($sale)
+                        new ProductSaleStatusUpdateEvent($sale),
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
                     );
                 }
 
@@ -334,8 +334,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
             // Update related products sale status
             $dispatcher->dispatch(
-                TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                new ProductSaleStatusUpdateEvent($sale)
+                new ProductSaleStatusUpdateEvent($sale),
+                TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
             );
 
             $event->setSale($sale);
@@ -369,8 +369,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                     // Update related products sale status
                     $dispatcher->dispatch(
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                        new ProductSaleStatusUpdateEvent($sale)
+                        new ProductSaleStatusUpdateEvent($sale),
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
                     );
                 }
 
@@ -445,8 +445,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                     // Update related products sale status
                     $dispatcher->dispatch(
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                        new ProductSaleStatusUpdateEvent($sale)
+                        new ProductSaleStatusUpdateEvent($sale),
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
                     );
                 }
             }
@@ -463,8 +463,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                     // Update related products sale status
                     $dispatcher->dispatch(
-                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                        new ProductSaleStatusUpdateEvent($sale)
+                        new ProductSaleStatusUpdateEvent($sale),
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS
                     );
                 }
             }

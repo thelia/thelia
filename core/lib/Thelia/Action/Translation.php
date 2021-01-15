@@ -353,7 +353,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             $this->container->getParameter('kernel.cache_dir')
         );
 
-        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
     /**

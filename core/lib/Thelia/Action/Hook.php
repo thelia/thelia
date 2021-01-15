@@ -146,7 +146,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
     {
         $cacheEvent = new CacheEvent($this->cacheDir);
 
-        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
     /**
