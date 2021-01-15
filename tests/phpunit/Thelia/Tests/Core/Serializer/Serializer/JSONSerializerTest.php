@@ -12,13 +12,14 @@
 
 namespace Tests\Core\Serializer\Serializer;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Core\Serializer\Serializer\JSONSerializer as SUT;
 
 /**
  * Class JSONSerializerTest
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class JSONSerializerTest extends \PHPUnit_Framework_TestCase
+class JSONSerializerTest extends TestCase
 {
     /**
      * @var \Thelia\Core\Serializer\Serializer\JSONSerializer
@@ -30,7 +31,7 @@ class JSONSerializerTest extends \PHPUnit_Framework_TestCase
      */
     protected $stubArchiver;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->sut = new SUT;
     }

@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -32,16 +33,8 @@ use Thelia\Model\Customer;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponFactoryTest extends \PHPUnit_Framework_TestCase
+class CouponFactoryTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
-
     /**
      * Generate adapter stub
      *
@@ -161,14 +154,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $coupon1->setIsAvailableOnSpecialOffers(true);
 
         return $coupon1;
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 
     /**

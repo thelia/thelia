@@ -37,7 +37,7 @@ class AdministratorTest extends BaseAction
     protected $mailerFactory;
     protected $tokenProvider;
 
-    public function setUp()
+    public function setUp(): void
     {
         $session = new Session(new MockArraySessionStorage());
 
@@ -51,7 +51,7 @@ class AdministratorTest extends BaseAction
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $translator = new Translator(new Container());
+        $translator = new Translator($requestStack);
 
         $this->tokenProvider = new TokenProvider($requestStack, $translator, 'test');
     }
@@ -101,9 +101,7 @@ class AdministratorTest extends BaseAction
             ->setLogin($login)
             ->setPassword('azertyuiop')
             ->setLocale($locale)
-            ->setEmail(uniqid().'@example.com')
-            ->setDispatcher($this->getMockEventDispatcher())
-        ;
+            ->setEmail(uniqid().'@example.com');
 
         $actionAdmin = new Administrator($this->mailerFactory, $this->tokenProvider);
 

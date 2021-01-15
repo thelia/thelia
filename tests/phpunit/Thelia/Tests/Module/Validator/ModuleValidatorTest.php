@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Module\Validator;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Module\Validator\ModuleValidator;
@@ -22,11 +23,8 @@ use Thelia\Tools\Version\Version;
  * @package Thelia\Tests\Module\Validator
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
+class ModuleValidatorTest extends TestCase
 {
-    /**
-     * @expectedException \Thelia\Exception\ModuleException
-     */
     public function testCheque()
     {
         $moduleChequePath = THELIA_MODULE_DIR . "Cheque";
@@ -46,6 +44,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("Cheque\\Cheque", $moduleDefinition->getNamespace());
 
         // validate
+        $this->expectException(\Thelia\Exception\ModuleException::class);
         $moduleValidator->validate();
     }
 
@@ -166,13 +165,11 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @expectedException \Thelia\Exception\FileNotFoundException
-     */
     public function testNonExistentModule()
     {
         $moduleChuckNorrisPath = THELIA_MODULE_DIR . "ChuckNorris";
 
+        $this->expectException(\Thelia\Exception\FileNotFoundException::class);
         new ModuleValidator($moduleChuckNorrisPath, $this->getStubTranslator());
     }
 

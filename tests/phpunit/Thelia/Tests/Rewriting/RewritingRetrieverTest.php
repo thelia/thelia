@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Rewriting;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Model\RewritingUrl;
 use Thelia\Rewriting\RewritingRetriever;
@@ -22,11 +23,11 @@ use Thelia\Tools\URL;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
+class RewritingRetrieverTest extends TestCase
 {
     protected $container = null;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->container = new ContainerBuilder();
 
@@ -77,7 +78,7 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
 
-        $retrieverQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\RewritingUrlQuery', array('getViewUrlQuery'));
+        $retrieverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getViewUrlQuery'));
         $retrieverQuery->expects($this->any())
             ->method('getViewUrlQuery')
             ->with('view', 'fr_FR', 1)
@@ -99,7 +100,7 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
 
-        $retrieverQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\RewritingUrlQuery', array('getSpecificUrlQuery'));
+        $retrieverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getSpecificUrlQuery'));
         $retrieverQuery->expects($this->any())
             ->method('getSpecificUrlQuery')
             ->with('view', 'fr_FR', 1, array('foo0' => 'bar0', 'foo1' => 'bar1'))

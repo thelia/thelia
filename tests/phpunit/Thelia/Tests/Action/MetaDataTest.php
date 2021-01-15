@@ -26,7 +26,7 @@ use Thelia\Model\ProductQuery;
  */
 class MetaDataTest extends BaseAction
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $boom = MetaDataQuery::create()
             ->deleteAll();

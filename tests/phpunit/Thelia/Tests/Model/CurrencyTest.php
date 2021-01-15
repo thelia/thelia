@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
@@ -20,7 +21,7 @@ use Thelia\Model\CurrencyQuery;
  * @package Thelia\Tests\Model
  * @author Gilles Bourgeat <gilles@thelia.net>
  */
-class CurrencyTest extends \PHPUnit_Framework_TestCase
+class CurrencyTest extends TestCase
 {
     public function testGetDefaultCurrency()
     {

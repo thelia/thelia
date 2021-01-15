@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Condition;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\ConditionCollection;
@@ -23,16 +24,8 @@ use Thelia\Condition\ConditionCollection;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
+class ConditionEvaluatorTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    public function setUp()
-    {
-    }
-
     /**
      * Test variable comparison
      *
@@ -110,15 +103,14 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test variable comparison
      *
-     * @expectedException \Exception
      * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
     public function testVariableOpComparisonException()
     {
         $conditionEvaluator = new ConditionEvaluator();
-        $expected = true;
+        $this->expectException(\Exception::class);
         $actual = $conditionEvaluator->variableOpComparison(1, 'bad', 1);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals(true, $actual);
     }
 
     /**
@@ -181,13 +173,5 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
         $actual = $conditionEvaluator->isMatching($collection);
 
         $this->assertFalse($actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }

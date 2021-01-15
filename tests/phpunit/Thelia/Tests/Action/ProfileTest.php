@@ -25,7 +25,7 @@ use Thelia\Model\ProfileQuery;
  */
 class ProfileTest extends BaseAction
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         ProfileQuery::create()
             ->filterByCode('Test')

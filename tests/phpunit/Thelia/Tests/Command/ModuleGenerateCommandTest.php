@@ -42,17 +42,17 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         }
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::clearTest();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::clearTest();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $application = new Application($this->getKernel());
 
@@ -80,12 +80,12 @@ class ModuleGenerateCommandTest extends BaseCommandTest
 
     /**
      * @depends testGenerateModule
-     * @expectedException \RuntimeException
      */
     public function testGenerateDuplicateModule()
     {
         $tester = $this->commandTester;
 
+        $this->expectException(\RuntimeException::class);
         $tester->execute(array(
             "command" => $this->command->getName(),
             "name" => "test"
@@ -116,13 +116,11 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         $this->assertTrue($fs->exists($configFile));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGenerateWithReservedKeyWord()
     {
         $tester = $this->commandTester;
 
+        $this->expectException(\RuntimeException::class);
         $tester->execute(array(
            "command" => $this->command->getName(),
             "name" => "thelia"

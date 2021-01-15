@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Model\CurrencyQuery;
 
@@ -23,20 +24,12 @@ use Thelia\Model\CurrencyQuery;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
+class ConditionCollectionTest extends TestCase
 {
     /**
      * @var ConditionCollection
      */
     protected $object;
-
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
 
     /**
      * Generate adapter stub
@@ -83,14 +76,6 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($stubTranslator));
 
         return $stubFacade;
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 
     /**

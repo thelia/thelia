@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Form;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
@@ -30,12 +31,12 @@ use Thelia\Tests\Resources\Form\Type\TestType;
  * @package Thelia\Tests\Controller
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class TheliaFormFactoryTest extends \PHPUnit_Framework_TestCase
+class TheliaFormFactoryTest extends TestCase
 {
     /** @var \Thelia\Core\Form\TheliaFormFactory */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /**
          * Add the test type to the factory and

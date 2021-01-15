@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Condition;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForEveryone;
@@ -28,16 +29,8 @@ use Thelia\Model\CurrencyQuery;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
+class ConditionFactoryTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    public function setUp()
-    {
-    }
-
     /**
      * Check the Rules serialization module
      */
@@ -427,13 +420,5 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $actual = $conditionFactory->serializeConditionCollection($conditions);
 
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }

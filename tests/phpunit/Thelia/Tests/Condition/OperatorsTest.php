@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -21,16 +22,8 @@ use Thelia\Core\Translation\Translator;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class OperatorsTest extends \PHPUnit_Framework_TestCase
+class OperatorsTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
-
     public function testOperatorI18n()
     {
         /** @var Translator $stubTranslator */
@@ -77,14 +70,6 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $actual = Operators::getI18n($stubTranslator, 'unexpected operator');
         $expected = 'unexpected operator';
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 
     public function callbackI18n()

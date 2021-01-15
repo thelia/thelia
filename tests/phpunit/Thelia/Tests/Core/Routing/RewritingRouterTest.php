@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\RequestContext;
 use Thelia\Core\HttpFoundation\Request;
@@ -29,36 +30,37 @@ use Thelia\Tools\URL;
  * @package Thelia\Tests\Core\Routing
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class RewritingRouterTest extends \PHPUnit_Framework_TestCase
+class RewritingRouterTest extends TestCase
 {
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $url = new URL();
     }
 
     /**
-     * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
      * @covers RewritingRouter::generate
      */
     public function testGenerate()
     {
         $rewritingRouter = new RewritingRouter();
+
+        $this->expectException(\Symfony\Component\Routing\Exception\RouteNotFoundException::class);
         $rewritingRouter->generate('foo');
     }
 
     /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      * @covers RewritingRouter::match
      */
     public function testMatch()
     {
         $rewritingRouter = new RewritingRouter();
+
+        $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $rewritingRouter->match('foo');
     }
 
     /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      * covers RewritingRouter::matchRequest
      */
     public function testMatchRequestWithNoRewriting()
@@ -67,11 +69,12 @@ class RewritingRouterTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
 
         $rewritingRouter = new RewritingRouter();
+
+        $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $rewritingRouter->matchRequest($request);
     }
 
     /**
-     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      * covers RewritingRouter::matchRequest
      */
     public function testMatchRequestWithNonExistingUrl()
@@ -80,6 +83,8 @@ class RewritingRouterTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('http://test.com/foo');
 
         $rewritingRouter = new RewritingRouter();
+
+        $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $rewritingRouter->matchRequest($request);
     }
 

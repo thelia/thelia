@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -20,7 +21,7 @@ use Thelia\Type\TypeCollection;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class TypeCollectionTest extends \PHPUnit_Framework_TestCase
+class TypeCollectionTest extends TestCase
 {
     public function testTypeCollectionConstruction()
     {

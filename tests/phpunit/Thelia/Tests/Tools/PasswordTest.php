@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Tools;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Tools\Password;
 
 /**
@@ -19,7 +20,7 @@ use Thelia\Tools\Password;
  * @package Thelia\Tests\Type
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class PasswordTest extends \PHPUnit_Framework_TestCase
+class PasswordTest extends TestCase
 {
     public function testGenerateRandom()
     {

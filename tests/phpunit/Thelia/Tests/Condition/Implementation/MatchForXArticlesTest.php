@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition\Implementation;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
@@ -24,21 +25,12 @@ use Thelia\Coupon\FacadeInterface;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
+class MatchForXArticlesTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
-
     /**
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\MatchForXArticles::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -62,6 +54,8 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForXArticles::CART_QUANTITY => 5
         );
+
+        $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -75,7 +69,6 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\MatchForXArticles::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -98,6 +91,8 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForXArticles::CART_QUANTITY => 'X'
         );
+
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -704,13 +699,5 @@ class MatchForXArticlesTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }

@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Template\Element;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,7 +29,7 @@ use Thelia\TaxEngine\TaxEngine;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
+abstract class BaseLoopTestor extends TestCase
 {
     protected $container;
 
@@ -47,7 +48,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
         return $method;
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->container = new ContainerBuilder();
 

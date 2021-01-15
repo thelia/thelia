@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\AnyType;
 
 /**
@@ -19,7 +20,7 @@ use Thelia\Type\AnyType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class AnyTypeTest extends \PHPUnit_Framework_TestCase
+class AnyTypeTest extends TestCase
 {
     public function testAnyType()
     {

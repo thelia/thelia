@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\AlphaNumStringListType;
 
 /**
@@ -19,7 +20,7 @@ use Thelia\Type\AlphaNumStringListType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class AlphaNumStringListTypeTest extends \PHPUnit_Framework_TestCase
+class AlphaNumStringListTypeTest extends TestCase
 {
     public function testAlphaNumStringListType()
     {

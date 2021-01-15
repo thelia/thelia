@@ -13,6 +13,7 @@
 
 namespace Thelia\Tests\Tools\Version;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Tools\Version\Version as Tester;
 
 /**
@@ -20,7 +21,7 @@ use Thelia\Tools\Version\Version as Tester;
  * @package Thelia\Tests\Tools\Version
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Version extends \PHPUnit_Framework_TestCase
+class Version extends TestCase
 {
     public function compareProvider()
     {
@@ -154,10 +155,10 @@ class Version extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider exceptionParseProvider
-     * @expectedException InvalidArgumentException
      */
     public function testExceptionParse($version)
     {
+        $this->expectException(\InvalidArgumentException::class);
         Tester::parse($version);
     }
 }

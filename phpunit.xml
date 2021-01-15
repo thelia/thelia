@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit
-    colors="false"
-    convertErrorsToExceptions= "true"
-    convertNoticesToExceptions= "true"
-    convertWarningsToExceptions= "true"
-    bootstrap="tests/phpunit/Thelia/Tests/bootstrap.php"
-    verbose="true"
-    backupGlobals="false"
->
-    <testsuites>
-	    <testsuite name="Thelia">
-	        <directory>tests/phpunit/Thelia/Tests</directory>
-            <directory>local/modules/*/Tests</directory>
-	    </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory>core/lib</directory>
-            <exclude>
-                <directory>core/lib/Thelia/Model/map</directory>
-                <directory>core/lib/Thelia/Model/om</directory>
-                <directory>core/lib/Thelia/Tests</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" bootstrap="tests/phpunit/Thelia/Tests/bootstrap.php" verbose="true" backupGlobals="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory>core/lib</directory>
+    </include>
+    <exclude>
+      <directory>core/lib/Thelia/Model/map</directory>
+      <directory>core/lib/Thelia/Model/om</directory>
+      <directory>core/lib/Thelia/Tests</directory>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="Thelia">
+      <directory>tests/phpunit/Thelia/Tests</directory>
+      <directory>local/modules/*/Tests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

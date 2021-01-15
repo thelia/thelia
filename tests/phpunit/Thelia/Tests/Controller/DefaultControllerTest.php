@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Controller;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Controller\Front\DefaultController;
 
@@ -20,7 +21,7 @@ use Thelia\Controller\Front\DefaultController;
  * @package Thelia\Tests\Controller
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class DefaultControllerTest extends \PHPUnit_Framework_TestCase
+class DefaultControllerTest extends TestCase
 {
     public function testNoAction()
     {

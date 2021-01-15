@@ -39,7 +39,7 @@ class ModuleHookTest extends BaseAction
     /** @var HookModel */
     protected $hook;
 
-    public function setUp()
+    public function setUp(): void
     {
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()

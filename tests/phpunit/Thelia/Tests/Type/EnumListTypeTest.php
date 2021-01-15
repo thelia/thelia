@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\EnumListType;
 
 /**
@@ -19,7 +20,7 @@ use Thelia\Type\EnumListType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class EnumListTypeTest extends \PHPUnit_Framework_TestCase
+class EnumListTypeTest extends TestCase
 {
     public function testEnumListType()
     {

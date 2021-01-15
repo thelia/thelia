@@ -12,6 +12,7 @@
 
 namespace Tests\Core\Archiver;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\Archiver\ArchiverManager as SUT;
@@ -20,7 +21,7 @@ use Thelia\Core\Archiver\ArchiverManager as SUT;
  * Class ArchiverManagerTest
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ArchiverManagerTest extends \PHPUnit_Framework_TestCase
+class ArchiverManagerTest extends TestCase
 {
     /**
      * @var \Thelia\Core\Archiver\ArchiverManager
@@ -32,7 +33,7 @@ class ArchiverManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $stubArchiver;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->sut = new SUT;
         $this->stubArchiver = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');

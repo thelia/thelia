@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop\Argument;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Type;
@@ -22,7 +23,7 @@ use Thelia\Type\TypeCollection;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ArgumentCollectionTest extends \PHPUnit_Framework_TestCase
+class ArgumentCollectionTest extends TestCase
 {
     public function testArgumentCollectionCreateAndWalk()
     {

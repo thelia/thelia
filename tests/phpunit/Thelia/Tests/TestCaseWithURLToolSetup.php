@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Thelia\Tools\URL;
@@ -21,13 +22,14 @@ use Thelia\Tools\URL;
  *
  * @package Thelia\Tests\TestCaseWithURLSetup
  */
-class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
+class TestCaseWithURLToolSetup extends TestCase
 {
     private $container = null;
     private $dispatcher = null;
 
     public function __construct()
     {
+        parent::__construct();
         $this->container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
         $this->dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
@@ -59,7 +61,7 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
 
         $this->container->set("router.admin", $router);
 
-        new URL($this->container);
+        new URL($router);
     }
 
     public function getContainer()

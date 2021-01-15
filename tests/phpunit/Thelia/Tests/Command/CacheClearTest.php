@@ -33,7 +33,7 @@ class CacheClearTest extends ContainerAwareTestCase
 {
     public $cache_dir;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->cache_dir = THELIA_CACHE_DIR . 'test_cache';
 
@@ -43,7 +43,7 @@ class CacheClearTest extends ContainerAwareTestCase
         $fs->mkdir(THELIA_WEB_DIR . "/assets");
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $fs = new Filesystem();
 
@@ -79,9 +79,6 @@ class CacheClearTest extends ContainerAwareTestCase
         $this->assertFalse($fs->exists($this->cache_dir));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testCacheClearWithoutWritePermission()
     {
         // Fails on windows - mock this test on windows
@@ -101,6 +98,8 @@ class CacheClearTest extends ContainerAwareTestCase
 
         $command = $application->find("cache:clear");
         $commandTester = new CommandTester($command);
+
+        $this->expectException(\RuntimeException::class);
         $commandTester->execute(array(
             "command" => $command->getName(),
             "--env" => "test"

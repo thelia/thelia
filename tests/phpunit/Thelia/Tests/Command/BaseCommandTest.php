@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Command;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @package Thelia\Tests\Command
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
+abstract class BaseCommandTest extends TestCase
 {
     /**
      * @return KernelInterface

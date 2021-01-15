@@ -12,12 +12,14 @@
 
 namespace Thelia\Tests\Rewriting;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Class BaseRewritingObject
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-abstract class BaseRewritingObject extends \PHPUnit_Framework_TestCase
+abstract class BaseRewritingObject extends TestCase
 {
     /**
      * @return mixed an instance of Product, Folder, Content or Category Model
@@ -69,11 +71,11 @@ abstract class BaseRewritingObject extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Impossible to create an url if title is null
      */
     public function testRewrittenWithoutTitle()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Impossible to create an url if title is null");
         $object = $this->getObject();
         $object->setVisible(1)
             ->setPosition(1)
@@ -84,12 +86,12 @@ abstract class BaseRewritingObject extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     * @expectedException \RuntimeException
      */
     public function testOnNotSavedObject()
     {
         $object = $this->getObject();
 
+        $this->expectException(\RuntimeException::class);
         $object->generateRewrittenUrl('fr_FR');
     }
 }

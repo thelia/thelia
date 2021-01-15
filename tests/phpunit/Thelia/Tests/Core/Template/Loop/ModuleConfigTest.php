@@ -110,11 +110,10 @@ class ModuleConfigTest extends BaseLoopTestor
         $this->assertEquals('test-value-i18n', $substitutions['VALUE']);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testNonExistentModule()
     {
+        $this->expectException(\LogicException::class);
+
         $this->instance->initializeArgs(
             array(
                 "type" => "foo",
@@ -127,6 +126,6 @@ class ModuleConfigTest extends BaseLoopTestor
 
         $dummy = null;
 
-        $loopResults = $this->instance->exec($dummy);
+        $this->instance->exec($dummy);
     }
 }

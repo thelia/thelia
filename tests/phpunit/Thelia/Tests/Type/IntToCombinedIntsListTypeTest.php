@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\IntToCombinedIntsListType;
 
 /**
@@ -19,7 +20,7 @@ use Thelia\Type\IntToCombinedIntsListType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class IntToCombinedIntsListTypeTest extends \PHPUnit_Framework_TestCase
+class IntToCombinedIntsListTypeTest extends TestCase
 {
     public function testIntToCombinedIntsListType()
     {

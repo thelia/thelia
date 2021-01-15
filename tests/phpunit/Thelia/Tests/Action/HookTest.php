@@ -35,7 +35,7 @@ class HookTest extends BaseAction
 
     protected $locale;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->locale = LangQuery::create()->findOne()->getLocale();
 
@@ -112,7 +112,6 @@ class HookTest extends BaseAction
     /**
      * @param HookModel $hook
      * @depends testCreate
-     * @expectedException \Propel\Runtime\Exception\PropelException
      */
     public function testCreateDuplicate(HookModel $hook)
     {
@@ -124,6 +123,8 @@ class HookTest extends BaseAction
             ->setActive(true)
             ->setNative(true)
             ->setTitle("Hook Test");
+
+        $this->expectException(\Propel\Runtime\Exception\PropelException::class);
 
         $this->action->create($event, null, $this->getMockEventDispatcher());
 

@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -31,24 +32,8 @@ use Thelia\Model\Order;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponManagerTest extends \PHPUnit_Framework_TestCase
+class CouponManagerTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
-
     /**
      * Generate a valid Coupon model
      */

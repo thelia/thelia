@@ -205,14 +205,14 @@ class HookTest extends WebTestCase
         $this->assertStringContains(file_get_contents(THELIA_WEB_DIR . $matches[1]), "/* style3 in template/hooktest */");
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$cache_dir = THELIA_ROOT . "cache/test";
         self::$templateBackupPath = ConfigQuery::read('active-front-template', 'default');
         ConfigQuery::write('active-front-template', 'hooktest');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         ConfigQuery::write('active-front-template', self::$templateBackupPath);
     }

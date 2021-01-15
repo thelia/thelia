@@ -29,7 +29,7 @@ class TaxRuleControllerTest extends ApiTestCase
 {
     protected static $defaultId;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $taxRule = TaxRuleQuery::create()
             ->filterByIsDefault(1)
@@ -298,7 +298,7 @@ class TaxRuleControllerTest extends ApiTestCase
         $this->assertEquals(500, $response->getStatusCode());
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         TaxRuleQuery::create()
             ->filterById(self::$defaultId)

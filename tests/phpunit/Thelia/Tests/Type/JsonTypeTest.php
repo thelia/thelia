@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\JsonType;
 
 /**
@@ -18,7 +19,7 @@ use Thelia\Type\JsonType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class JsonTypeTest extends \PHPUnit_Framework_TestCase
+class JsonTypeTest extends TestCase
 {
     public function testJsonType()
     {

@@ -24,7 +24,7 @@ use Thelia\Tests\ApiTestCase;
  */
 class CategoryControllerTest extends ApiTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (CategoryQuery::create()->count() === 0) {
             $category = new Category();
