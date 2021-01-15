@@ -80,25 +80,16 @@ class ConfigCommand extends ContainerAwareCommand
 
         switch ($command) {
             case "list":
-                $this->listConfig($input, $output);
-                break;
-
+                return $this->listConfig($input, $output);
             case "get":
-                $this->getConfig($input, $output);
-                break;
-
+                return $this->getConfig($input, $output);
             case "set":
-                $this->setConfig($input, $output);
-                break;
-
+                return $this->setConfig($input, $output);
             case "delete":
-                $this->deleteConfig($input, $output);
-                break;
-
+                return $this->deleteConfig($input, $output);
             default:
-                $output->writeln(
-                    "<error>Unknown argument 'COMMAND' : list, get, set, delete</error>"
-                );
+                $output->writeln("<error>Unknown argument 'COMMAND' : list, get, set, delete</error>");
+                return 1;
         }
     }
 
@@ -133,6 +124,8 @@ class ConfigCommand extends ContainerAwareCommand
             ->setRows($rows)
         ;
         $table->render();
+
+        return 0;
     }
 
     private function getConfig(InputInterface $input, OutputInterface $output)
@@ -143,7 +136,7 @@ class ConfigCommand extends ContainerAwareCommand
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
-            return;
+            return 1;
         }
 
         $var = ConfigQuery::create()->findOneByName($varName);
@@ -167,6 +160,8 @@ class ConfigCommand extends ContainerAwareCommand
         }
 
         $output->writeln($out);
+
+        return 0;
     }
 
 
@@ -179,7 +174,7 @@ class ConfigCommand extends ContainerAwareCommand
             $output->writeln(
                 "<error>Need argument 'name' and 'value' for set command</error>"
             );
-            return;
+            return 1;
         }
 
         ConfigQuery::write(
@@ -190,6 +185,8 @@ class ConfigCommand extends ContainerAwareCommand
         );
 
         $output->writeln("<info>Variable has been set</info>");
+
+        return 0;
     }
 
     private function deleteConfig(InputInterface $input, OutputInterface $output)
@@ -200,7 +197,7 @@ class ConfigCommand extends ContainerAwareCommand
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
-            return;
+            return 1;
         }
 
         $var = ConfigQuery::create()->findOneByName($varName);
@@ -221,5 +218,7 @@ class ConfigCommand extends ContainerAwareCommand
                 )
             );
         }
+
+        return 0;
     }
 }

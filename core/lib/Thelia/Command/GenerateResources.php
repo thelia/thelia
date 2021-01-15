@@ -97,5 +97,7 @@ class GenerateResources extends ContainerAwareCommand
                 }
                 break;
         }
+
+        return 0;
     }
 }

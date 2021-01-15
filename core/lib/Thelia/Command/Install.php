@@ -137,6 +137,8 @@ class Install extends ContainerAwareCommand
             "<info>Config file created with success. Your thelia is installed</info>",
             ""
         ));
+
+        return 0;
     }
 
     protected function manageSecret(Database $database)

@@ -42,6 +42,9 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
             $output->writeln("<info>Sale verification processed successfully</info>");
         } catch (\Exception $ex) {
             $output->writeln(sprintf("<error>Error : %s</error>", $ex->getMessage()));
+            return 1;
         }
+
+        return 0;
     }
 }

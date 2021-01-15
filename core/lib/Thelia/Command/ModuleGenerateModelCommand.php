@@ -81,6 +81,8 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
             $output->writeln(' ');
             $this->generateSql($output);
         }
+
+        return 0;
     }
 
     protected function generateSql(OutputInterface $output)

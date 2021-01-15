@@ -73,7 +73,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         array_walk($argsList, [$this, 'checkModuleArgument']);
 
         if (!$this->checkPositions($input, $output, $isAbsolute)) {
-            return;
+            return 1;
         }
 
         if ($isAbsolute) {
@@ -108,13 +108,15 @@ class ModulePositionCommand extends ContainerAwareCommand
                 $event = new UpdatePositionEvent($module->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, $position);
             }
 
-            $this->getDispatcher()->dispatch(TheliaEvents::MODULE_UPDATE_POSITION, $event);
+            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_UPDATE_POSITION);
         }
 
         /** @var FormatterHelper $formatter */
         $formatter = $this->getHelper('formatter');
         $formattedBlock = $formatter->formatBlock('Module position(s) updated', 'bg=green;fg=black', true);
         $output->writeln($formattedBlock);
+
+        return 0;
     }
 
     /**

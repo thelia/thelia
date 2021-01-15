@@ -41,7 +41,7 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
         try {
             $event = new CurrencyUpdateRateEvent();
 
-            $this->getDispatcher()->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $event);
+            $this->getDispatcher()->dispatch($event, TheliaEvents::CURRENCY_UPDATE_RATES);
 
             if ($event->hasUndefinedRates()) {
                 $output->writeln("<comment>Rate was not found for the following currencies:");
@@ -56,18 +56,16 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
                 }
 
                 $output->writeln("Update done with errors</comment>");
-            } else {
-                $output->writeln("<info>Update done withour errors</info>");
-
                 return 1;
             }
         } catch (\Exception $ex) {
             // Any error
             $output->writeln("<error>Update failed: " . $ex->getMessage() . "</error>");
 
-            return 2;
+            return 1;
         }
 
+        $output->writeln("<info>Update done withourt errors</info>");
         return 0;
     }
 }

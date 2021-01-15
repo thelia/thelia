@@ -64,7 +64,7 @@ class ImportCommand extends ContainerAwareCommand
         if ($input->getOption('list')) {
             $this->listImport($output);
 
-            return;
+            return 0;
         }
 
         $importRef = $input->getArgument('ref');
@@ -110,6 +110,8 @@ class ImportCommand extends ContainerAwareCommand
                 $output->writeln('<comment>' . $error . '</comment>');
             }
         }
+
+        return 0;
     }
 
     /**

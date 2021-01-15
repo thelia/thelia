@@ -72,6 +72,8 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 ''
             ), "bg=green;fg=black");
         }
+
+        return 0;
     }
 
     private function createDirectories()

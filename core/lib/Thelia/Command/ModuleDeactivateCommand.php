@@ -80,7 +80,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             $module = ModuleQuery::create()->findPk($module->getId());
             if ($module->getMandatory() == BaseModule::IS_MANDATORY) {
                 if (!$this->askConfirmation($input, $output)) {
-                    return;
+                    return 1;
                 }
                 $event->setAssumeDeactivate(true);
             }
@@ -101,6 +101,8 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
                 ''
             ), "bg=green;fg=black");
         }
+
+        return 0;
     }
 
     private function askConfirmation(InputInterface $input, OutputInterface $output)

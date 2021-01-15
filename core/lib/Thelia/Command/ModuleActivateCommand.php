@@ -70,7 +70,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 $event->setRecursive(true);
             }
 
-            $this->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
+            $this->getDispatcher()->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         } catch (\Exception $e) {
             throw new \RuntimeException(
                 sprintf(
@@ -89,5 +89,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 ''
             ), "bg=green;fg=black");
         }
+
+        return 0;
     }
 }
