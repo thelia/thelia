@@ -38,7 +38,7 @@ class LangTest extends ContainerAwareTestCase
 
     protected $requestStack;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $lang = LangQuery::create()
             ->filterByByDefault(1)
@@ -47,7 +47,7 @@ class LangTest extends ContainerAwareTestCase
         self::$defaultId = $lang->getId();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -193,10 +193,6 @@ class LangTest extends ContainerAwareTestCase
         $this->assertTrue($deletedLang->isDeleted());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage It is not allowed to delete the default language
-     */
     public function testDeleteDefault()
     {
         $lang = LangQuery::create()->findOneByByDefault(1);
@@ -204,17 +200,20 @@ class LangTest extends ContainerAwareTestCase
         $event = new LangDeleteEvent($lang->getId());
 
         $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("It is not allowed to delete the default language");
         $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         LangQuery::create()
             ->filterById(self::$defaultId)
             ->update(array('ByDefault' => true));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TEST.png");
         @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TES.png");

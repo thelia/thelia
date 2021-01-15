@@ -26,7 +26,7 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigTest extends BaseAction
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass():void
     {
         ConfigQuery::create()
             ->filterByName('foo')

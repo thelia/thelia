@@ -63,10 +63,6 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
         }
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage module Letshopethismoduledoesnotexists not found
-     */
     public function testModuleActivateCommandUnknownModule()
     {
         $testedModule = ModuleQuery::create()->findOneByCode('Letshopethismoduledoesnotexists');
@@ -81,12 +77,13 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
 
             $command = $application->find("module:activate");
             $commandTester = new CommandTester($command);
+
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage("module Letshopethismoduledoesnotexists not found");
             $commandTester->execute(array(
                 "command" => $command->getName(),
                 "module" => "letshopethismoduledoesnotexists",
             ));
-
-            $out = true;
         }
     }
 

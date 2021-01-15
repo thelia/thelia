@@ -94,7 +94,7 @@ class OrderTest extends BaseAction
     /** @var RequestStack */
     protected $requestStack;
 
-    public function setUp()
+    public function setUp(): void
     {
         $session = new Session(new MockArraySessionStorage());
 

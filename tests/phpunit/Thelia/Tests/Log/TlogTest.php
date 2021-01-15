@@ -12,15 +12,16 @@
 
 namespace Thelia\Tests\Log;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Log\Tlog;
 
-class TlogTest extends \PHPUnit_Framework_TestCase
+class TlogTest extends TestCase
 {
     protected static $logger;
 
     protected $regex = "/[0-9]+:[\s](%s)+[\s]\[[a-zA-Z\.]+:[a-zA-Z]+\(\)\][\s]\{[0-9]+\}[\s][0-9]{4}-[0-9]{2}-[0-9]{2}[\s][0-9]{1,2}:[0-9]{2}:[0-9]{2}:[\s](%s).*$/is";
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$logger = Tlog::getInstance();
 

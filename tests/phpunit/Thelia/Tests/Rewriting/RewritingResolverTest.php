@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Rewriting;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Model\RewritingArgument;
 use Thelia\Rewriting\RewritingResolver;
 use Propel\Runtime\Collection\ObjectCollection;
@@ -21,7 +22,7 @@ use Propel\Runtime\Collection\ObjectCollection;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class RewritingResolverTest extends \PHPUnit_Framework_TestCase
+class RewritingResolverTest extends TestCase
 {
     protected function getMethod($name)
     {
@@ -41,14 +42,12 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         return $property;
     }
 
-    /**
-     * @expectedException \Thelia\Exception\UrlRewritingException
-     * @expectedExceptionCode 800
-     */
     public function testGetOtherParametersException()
     {
         $resolver = new RewritingResolver();
 
+        $this->expectException(\Thelia\Exception\UrlRewritingException::class);
+        $this->expectExceptionCode(800);
         $method = $this->getMethod('getOtherParameters');
         $method->invoke($resolver);
     }
@@ -81,17 +80,12 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @expectedException \Thelia\Exception\UrlRewritingException
-     * @expectedExceptionCode 404
-     */
     public function testLoadException()
     {
         $collection = new ObjectCollection();
         $collection->setModel('\Thelia\Model\RewritingArgument');
 
-        $resolverQuery = $this->getMockObjectGenerator()
-            ->getMock('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
+        $resolverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
         $resolverQuery->expects($this->any())
             ->method('getResolverSearch')
             ->with('foo.html')
@@ -102,6 +96,8 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         $rewritingUrlQuery = $this->getProperty('rewritingUrlQuery');
         $rewritingUrlQuery->setValue($resolver, $resolverQuery);
 
+        $this->expectException(\Thelia\Exception\UrlRewritingException::class);
+        $this->expectExceptionCode(404);
         $resolver->load('foo.html');
     }
 
@@ -122,8 +118,7 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
             $collection->append($ra);
         }
 
-        $resolverQuery = $this->getMockObjectGenerator()
-            ->getMock('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
+        $resolverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
         $resolverQuery->expects($this->any())
             ->method('getResolverSearch')
             ->with('foo.html')

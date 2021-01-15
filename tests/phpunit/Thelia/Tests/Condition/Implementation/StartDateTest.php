@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition\Implementation;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
@@ -23,14 +24,14 @@ use Thelia\Model\Lang;
  * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class StartDateTest extends \PHPUnit_Framework_TestCase
+class StartDateTest extends TestCase
 {
     public $startDate;
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->startDate = time() - 2000;
     }
@@ -102,7 +103,6 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\StartDate::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -117,6 +117,8 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
         $values = array(
             StartDate::START_DATE => $this->startDate
         );
+
+        $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -130,7 +132,6 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\StartDate::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -145,6 +146,7 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
             StartDate::START_DATE => 'petit poney'
         );
 
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
     }
 
@@ -313,13 +315,5 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }

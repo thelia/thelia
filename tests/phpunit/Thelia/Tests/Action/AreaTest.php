@@ -102,7 +102,12 @@ class AreaTest extends BaseAction
      */
     public function testRemoveCountry(AreaModel $area)
     {
-        $country = CountryQuery::create()->filterByArea($area)->find()->getFirst();
+        $country = CountryQuery::create()
+            ->useCountryAreaQuery()
+                ->filterByArea($area)
+            ->endUse()
+            ->find()
+            ->getFirst();
 
         $event = new AreaRemoveCountryEvent($area->getId(), $country->getId());
 

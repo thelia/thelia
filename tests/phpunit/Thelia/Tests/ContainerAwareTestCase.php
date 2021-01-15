@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,7 +32,7 @@ use Thelia\Log\Tlog;
  * @package Thelia\Tests
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
+abstract class ContainerAwareTestCase extends TestCase
 {
     protected $import;
 
@@ -44,8 +45,6 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
     public function getContainer()
     {
         $container = new ContainerBuilder();
-        $container->set("thelia.translator", new Translator(new Container()));
-
         $dispatcher = $this->getMockEventDispatcher();
 
         $container->set("event_dispatcher", $dispatcher);
@@ -67,7 +66,6 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
         $container->set("kernel", $this->getKernel());
 
-        new Translator($container);
         $container->set("thelia.securitycontext", new SecurityContext($requestStack));
 
         $this->buildContainer($container);
@@ -80,7 +78,7 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
         return new Session(new MockArraySessionStorage());
     }
 
-    public function setUp()
+    public function setUp():void
     {
         Tlog::getNewInstance();
 

@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Event;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Forms;
 
@@ -20,14 +21,14 @@ use Symfony\Component\Form\Forms;
  * @package Thelia\Tests\Core\Event
  * @author manuel raynaud <manu@raynaud.io>
  */
-class ActionEventTest extends \PHPUnit_Framework_TestCase
+class ActionEventTest extends TestCase
 {
     /**
      * @var \Symfony\Component\Form\Form $form
      */
     protected static $form;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $formBuilder = Forms::createFormFactoryBuilder()
             ->getFormFactory()

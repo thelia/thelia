@@ -38,14 +38,14 @@ class CustomerTest extends BaseAction
 
     protected $customerAction;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         CustomerQuery::create()
             ->filterByRef('testRef')
             ->delete();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $session = new Session(new MockArraySessionStorage());
 

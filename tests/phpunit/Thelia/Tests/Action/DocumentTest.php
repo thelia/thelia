@@ -84,7 +84,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         return $fileManager;
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->request = new Request();
@@ -103,7 +103,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         }
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $dir = THELIA_WEB_DIR . "/cache/tests";
         if ($dh = @opendir($dir)) {
@@ -119,7 +119,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         // restore cache configuration.
         $config = ConfigQuery::create()->filterByName('document_cache_dir_from_web_root')->findOne();
@@ -133,7 +133,6 @@ class DocumentTest extends TestCaseWithURLToolSetup
      *
      * Documentevent is empty, mandatory parameters not specified.
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessEmptyDocumentEvent()
     {
@@ -141,6 +140,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
 
         $document = new Document($this->getFileManager());
 
+        $this->expectException(\InvalidArgumentException::class);
         $document->processDocument($event);
     }
 
@@ -148,7 +148,6 @@ class DocumentTest extends TestCaseWithURLToolSetup
      *
      * Try to process a non-existent file
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessNonExistentDocument()
     {
@@ -159,6 +158,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         $event->setCacheFilepath("blablabla.txt");
         $event->setCacheSubdirectory("tests");
 
+        $this->expectException(\InvalidArgumentException::class);
         $document->processDocument($event);
     }
 
@@ -166,7 +166,6 @@ class DocumentTest extends TestCaseWithURLToolSetup
      *
      * Try to process a file outside of the cache
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessDocumentOutsideValidPath()
     {
@@ -177,6 +176,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         $event->setCacheFilepath("blablabla.pdf");
         $event->setCacheSubdirectory("../../../");
 
+        $this->expectException(\InvalidArgumentException::class);
         $document->processDocument($event);
     }
 
@@ -244,28 +244,43 @@ class DocumentTest extends TestCaseWithURLToolSetup
 
     public function testClearTestsCache()
     {
-        $event = new DocumentEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setCacheSubdirectory('tests');
+        try {
+            $event = new DocumentEvent($this->request);
 
-        $document = new Document($this->getFileManager());
+            $event->setCacheSubdirectory('tests');
 
-        $document->clearCache($event);
+            $document = new Document($this->getFileManager());
+
+            $document->clearCache($event);
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     public function testClearWholeCache()
     {
-        $event = new DocumentEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $document = new Document($this->getFileManager());
+        try {
+            $event = new DocumentEvent($this->request);
 
-        $document->clearCache($event);
+            $document = new Document($this->getFileManager());
+
+            $document->clearCache($event);
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
      * Try to clear directory ouside of the cache
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testClearUnallowedPathCache()
     {
@@ -275,6 +290,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
 
         $document = new Document($this->getFileManager());
 
+        $this->expectException(\InvalidArgumentException::class);
         $document->clearCache($event);
     }
 }

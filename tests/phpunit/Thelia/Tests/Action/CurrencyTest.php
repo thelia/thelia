@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use http\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Currency;
@@ -149,10 +150,6 @@ class CurrencyTest extends ContainerAwareTestCase
         $this->assertTrue($deletedCurrency->isDeleted());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage It is not allowed to delete the default currency
-     */
     public function testDeleteDefault()
     {
         CurrencyQuery::create()
@@ -165,10 +162,13 @@ class CurrencyTest extends ContainerAwareTestCase
         $event = new CurrencyDeleteEvent($currency->getId());
 
         $action = new Currency($this->getCurrencyConverter());
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("It is not allowed to delete the default currency");
         $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass():void
     {
         CurrencyQuery::create()
             ->addAscendingOrderByColumn('RAND()')

@@ -34,17 +34,17 @@ class ConfigCommandTest extends BaseCommandTest
 
     const PREFIX_NAME = "config_command_test_";
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::clearTest();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::clearTest();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         if (null === $this->commandTester) {
             $application   = new Application($this->getKernel());

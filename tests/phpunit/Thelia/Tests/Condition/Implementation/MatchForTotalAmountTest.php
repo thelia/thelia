@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Condition\Implementation;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
@@ -28,7 +29,7 @@ use Thelia\Model\CurrencyQuery;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
+class MatchForTotalAmountTest extends TestCase
 {
     /** @var FacadeInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
@@ -71,18 +72,9 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
-
-    /**
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      *
      */
     public function testInValidBackOfficeInputOperator()
@@ -98,6 +90,8 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => '400',
             MatchForTotalAmount::CART_CURRENCY => 'EUR');
+
+        $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -111,7 +105,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      *
      */
     public function testInValidBackOfficeInputOperator2()
@@ -127,6 +120,8 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => '400',
             MatchForTotalAmount::CART_CURRENCY => 'EUR');
+
+        $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -140,7 +135,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testInValidBackOfficeInputValue()
@@ -156,6 +150,8 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => 'X',
             MatchForTotalAmount::CART_CURRENCY => 'EUR');
+
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -169,7 +165,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testInValidBackOfficeInputValue2()
@@ -185,6 +180,7 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => 400,
             MatchForTotalAmount::CART_CURRENCY => 'FLA');
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -590,7 +586,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      * Check unknown currency
      *
      * @covers Thelia\Condition\Implementation\ConditionAbstract::isCurrencyValid
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testUnknownCurrencyCode()
@@ -625,6 +620,8 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'UNK');
+
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
@@ -655,7 +652,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      * Check invalid currency
      *
      * @covers Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testInvalidCurrencyValue()
@@ -690,6 +686,8 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => 'notfloat',
             MatchForTotalAmount::CART_CURRENCY => 'EUR');
+
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
@@ -720,7 +718,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      * Check invalid currency
      *
      * @covers Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testPriceAsZero()
@@ -755,6 +752,8 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $values = array(
             MatchForTotalAmount::CART_TOTAL => 0.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR');
+
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
@@ -934,13 +933,5 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }

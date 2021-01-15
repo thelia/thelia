@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Propel\Schema;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Tests\Core\Propel\Schema\Fixtures\Expectation\SchemaCombineExpectation as CombineExpectation;
@@ -19,7 +20,7 @@ use Thelia\Tests\Core\Propel\Schema\Fixtures\Expectation\SchemaCombineExpectatio
 /**
  * @covers \Thelia\Core\Propel\Schema\SchemaCombiner
  */
-class SchemaCombinerTest extends \PHPUnit_Framework_TestCase
+class SchemaCombinerTest extends TestCase
 {
     /**
      * Path of the XML Schema Definition (XSD) for Propel schema files.
@@ -39,7 +40,7 @@ class SchemaCombinerTest extends \PHPUnit_Framework_TestCase
      */
     protected static $FIXTURES_PATH;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $fs = new Filesystem();
 

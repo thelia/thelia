@@ -26,7 +26,7 @@ use Thelia\Model\MessageQuery;
  */
 class MessageTest extends BaseAction
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $lang = MessageQuery::create()
             ->filterByName('test')

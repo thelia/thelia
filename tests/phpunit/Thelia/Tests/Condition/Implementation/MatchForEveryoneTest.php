@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition\Implementation;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
@@ -23,7 +24,7 @@ use Thelia\Model\Currency;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class MatchForEveryoneTest extends \PHPUnit_Framework_TestCase
+class MatchForEveryoneTest extends TestCase
 {
     /** @var FacadeInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;

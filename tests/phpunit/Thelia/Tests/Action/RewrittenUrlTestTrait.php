@@ -35,10 +35,6 @@ trait RewrittenUrlTestTrait
     abstract public function processUpdateAction($event);
     abstract public function processUpdateSeoAction($event);
 
-    /**
-     * @expectedException \Thelia\Form\Exception\FormValidationException
-     * @expectedExceptionCode 100
-     */
     public function testUpdateExistingUrl()
     {
         $object = null;
@@ -57,6 +53,8 @@ trait RewrittenUrlTestTrait
 
         $event->setUrl($existingUrl->getUrl());
 
+        $this->expectException(\Thelia\Form\Exception\FormValidationException::class);
+        $this->expectExceptionCode(100);
         $this->processUpdateSeoAction($event);
     }
 

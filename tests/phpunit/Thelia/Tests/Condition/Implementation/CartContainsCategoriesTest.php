@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition\Implementation;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
@@ -23,16 +24,8 @@ use Thelia\Model\Product;
  * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CartContainsCategoriesTest extends \PHPUnit_Framework_TestCase
+class CartContainsCategoriesTest extends TestCase
 {
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-    }
-
     /**
      * Generate adapter stub
      *
@@ -137,7 +130,6 @@ class CartContainsCategoriesTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\CartContainsCategories::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -153,6 +145,7 @@ class CartContainsCategoriesTest extends \PHPUnit_Framework_TestCase
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
+        $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $isValid = $condition1->isMatching();
 
         $expected = true;
@@ -164,7 +157,6 @@ class CartContainsCategoriesTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Condition\Implementation\CartContainsCategories::setValidators
-     * @expectedException \Thelia\Exception\InvalidConditionValueException
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -179,6 +171,7 @@ class CartContainsCategoriesTest extends \PHPUnit_Framework_TestCase
             CartContainsCategories::CATEGORIES_LIST => array()
         );
 
+        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
     }
 
@@ -348,13 +341,5 @@ class CartContainsCategoriesTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
     }
 }

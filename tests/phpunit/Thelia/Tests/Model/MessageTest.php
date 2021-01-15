@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,7 +33,7 @@ use TheliaSmarty\Template\SmartyParser;
  * @package Thelia\Tests\Model
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class MessageTest extends \PHPUnit_Framework_TestCase
+class MessageTest extends TestCase
 {
     /** @var ContainerBuilder */
     protected $container;
@@ -45,7 +46,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     private $backup_mail_template = 'undefined';
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->backup_mail_template = ConfigQuery::read('active-mail-template', 'default');
 
@@ -325,7 +326,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("TEXT Layout 6: TEXT <template> & content v=my-value", $instance->getChildren()[0]->getBody());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $dir = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 

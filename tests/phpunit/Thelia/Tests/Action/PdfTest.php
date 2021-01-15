@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Action\Pdf;
 use Thelia\Core\Event\PdfEvent;
 
@@ -20,7 +21,7 @@ use Thelia\Core\Event\PdfEvent;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class PdfTest extends \PHPUnit_Framework_TestCase
+class PdfTest extends TestCase
 {
     public function testGeneratePdf()
     {

@@ -25,7 +25,7 @@ abstract class ControllerTestBase extends ContainerAwareTestCase
     /** @var BaseController  */
     protected $controller;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

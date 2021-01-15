@@ -12,6 +12,7 @@
 
 namespace Tests\Core\Serializer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\Serializer\SerializerManager as SUT;
@@ -20,7 +21,7 @@ use Thelia\Core\Serializer\SerializerManager as SUT;
  * Class SerializerManagerTest
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class SerializerManagerTest extends \PHPUnit_Framework_TestCase
+class SerializerManagerTest extends TestCase
 {
     /**
      * @var \Thelia\Core\Serializer\SerializerManager
@@ -32,7 +33,7 @@ class SerializerManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $stubSerializer;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->sut = new SUT;
         $this->stubSerializer = $this->createMock('Thelia\\Core\\Serializer\\SerializerInterface');

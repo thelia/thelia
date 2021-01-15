@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Model\Base\ModuleQuery;
 use Thelia\Model\ModuleConfig;
 use Thelia\Model\ModuleConfigQuery;
@@ -21,7 +22,7 @@ use Thelia\Model\ModuleConfigQuery;
  * @package Thelia\Tests\Model
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ModuleConfigTest extends \PHPUnit_Framework_TestCase
+class ModuleConfigTest extends TestCase
 {
     public function testGetWithDefault()
     {
@@ -111,14 +112,12 @@ class ModuleConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($val1);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetNotExists()
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
-        $moduleConfig = ModuleConfigQuery::create()->setConfigValue(
+        $this->expectException(\LogicException::class);
+        ModuleConfigQuery::create()->setConfigValue(
             $moduleModel->getId(),
             'test-name-4',
             'test-value',

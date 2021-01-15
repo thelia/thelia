@@ -76,7 +76,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
     {
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$routingXSDPath
             = THELIA_VENDOR
@@ -108,7 +108,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
         ];
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         foreach (static::$routingFiles as $filePath => $fileNames) {
             $this->routerFileLocators[$filePath] = new FileLocator($filePath);

@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
@@ -30,7 +31,7 @@ use Thelia\Model\ProductQuery;
  * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class FreeProductTest extends \PHPUnit_Framework_TestCase
+class FreeProductTest extends TestCase
 {
     /** @var  Product $freeProduct */
     public $freeProduct;
@@ -41,7 +42,7 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $currency = CurrencyQuery::create()->filterByCode('EUR')->findOne();
 
@@ -457,7 +458,7 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (null !== $this->freeProduct) {
             $this->freeProduct->getDefaultSaleElements()->setPromo($this->originalPromo)->save();

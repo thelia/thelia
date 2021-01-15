@@ -26,7 +26,7 @@ class BrandControllerTest extends ApiTestCase
 {
     protected $created = false;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!$this->created) {
             if (BrandQuery::create()->count() === 0) {

@@ -67,7 +67,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         return $fileManager;
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->request = new Request();
@@ -86,7 +86,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         }
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $dir = THELIA_WEB_DIR . "/cache/tests";
         if ($dh = @opendir($dir)) {
@@ -102,7 +102,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         // restore cache configuration.
         $config = ConfigQuery::create()->filterByName('image_cache_dir_from_web_root')->findOne();
@@ -116,14 +116,14 @@ class ImageTest extends TestCaseWithURLToolSetup
      *
      * Imageevent is empty, mandatory parameters not specified.
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessEmptyImageEvent()
     {
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         $image = new Image($this->getFileManager());
 
+        $this->expectException(\InvalidArgumentException::class);
         $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
@@ -131,17 +131,17 @@ class ImageTest extends TestCaseWithURLToolSetup
      *
      * Try to process a non-existent file
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessNonExistentImage()
     {
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         $image = new Image($this->getFileManager());
 
         $event->setCacheFilepath("blablabla.png");
         $event->setCacheSubdirectory("tests");
 
+        $this->expectException(\InvalidArgumentException::class);
         $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
@@ -149,17 +149,17 @@ class ImageTest extends TestCaseWithURLToolSetup
      *
      * Try to process a file outside of the cache
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testProcessImageOutsideValidPath()
     {
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         $image = new Image($this->getFileManager());
 
         $event->setCacheFilepath("blablabla.png");
         $event->setCacheSubdirectory("../../../");
 
+        $this->expectException(\InvalidArgumentException::class);
         $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
@@ -168,7 +168,7 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageWithoutAnyTransformationsCopy()
     {
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-1.png");
         $event->setCacheSubdirectory("tests");
@@ -199,7 +199,7 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageWithoutAnyTransformationsSymlink()
     {
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-9.png");
         $event->setCacheSubdirectory("tests");
@@ -230,19 +230,27 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageResizeHorizWithBands()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-2.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setBackgroundColor('#ff0000');
-        $event->setWidth(100);
-        $event->setHeight(100);
-        $event->setResizeMode(Image::EXACT_RATIO_WITH_BORDERS);
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-2.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setBackgroundColor('#ff0000');
+            $event->setWidth(100);
+            $event->setHeight(100);
+            $event->setResizeMode(Image::EXACT_RATIO_WITH_BORDERS);
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
@@ -250,19 +258,27 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageResizeVertWithBands()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-3.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setBackgroundColor('#ff0000');
-        $event->setWidth(100);
-        $event->setHeight(100);
-        $event->setResizeMode(Image::EXACT_RATIO_WITH_BORDERS);
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-3.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setBackgroundColor('#ff0000');
+            $event->setWidth(100);
+            $event->setHeight(100);
+            $event->setResizeMode(Image::EXACT_RATIO_WITH_BORDERS);
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
@@ -270,16 +286,24 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageWithTransformations()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-4.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setEffects(array("grayscale", "vertical_flip", "horizontal_flip", 'colorize:#00ff00', 'gamma: 0.2'));
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-4.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setEffects(array("grayscale", "vertical_flip", "horizontal_flip", 'colorize:#00ff00', 'gamma: 0.2'));
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
@@ -287,19 +311,27 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageResizeHorizWithCrop()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-5.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setBackgroundColor('#ff0000');
-        $event->setWidth(180);
-        $event->setHeight(100);
-        $event->setResizeMode(Image::EXACT_RATIO_WITH_CROP);
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-5.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setBackgroundColor('#ff0000');
+            $event->setWidth(180);
+            $event->setHeight(100);
+            $event->setResizeMode(Image::EXACT_RATIO_WITH_CROP);
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
@@ -307,19 +339,27 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageResizeVertWithCrop()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-6.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setBackgroundColor('#ff0000');
-        $event->setWidth(100);
-        $event->setHeight(150);
-        $event->setResizeMode(Image::EXACT_RATIO_WITH_CROP);
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-6.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setBackgroundColor('#ff0000');
+            $event->setWidth(100);
+            $event->setHeight(150);
+            $event->setResizeMode(Image::EXACT_RATIO_WITH_CROP);
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
@@ -327,17 +367,25 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageResizeHorizKeepRatio()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-7.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setWidth(100);
-        $event->setHeight(100);
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-7.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setWidth(100);
+            $event->setHeight(100);
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
@@ -345,52 +393,76 @@ class ImageTest extends TestCaseWithURLToolSetup
      */
     public function testProcessImageResizeVertKeepRatio()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-8.png");
-        $event->setCacheSubdirectory("tests");
+        try {
+            $event = new ImageEvent();
 
-        $event->setWidth(100);
-        $event->setHeight(100);
+            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-8.png");
+            $event->setCacheSubdirectory("tests");
 
-        $image = new Image($this->getFileManager());
+            $event->setWidth(100);
+            $event->setHeight(100);
 
-        $image->processImage($event, null, $this->getMockEventDispatcher());
+            $image = new Image($this->getFileManager());
+
+            $image->processImage($event, null, $this->getMockEventDispatcher());
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     public function testClearTestsCache()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $event->setCacheSubdirectory('tests');
+        try {
+            $event = new ImageEvent();
 
-        $image = new Image($this->getFileManager());
+            $event->setCacheSubdirectory('tests');
 
-        $image->clearCache($event);
+            $image = new Image($this->getFileManager());
+
+            $image->clearCache($event);
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     public function testClearWholeCache()
     {
-        $event = new ImageEvent($this->request);
+        $anExceptionWasThrown = false;
 
-        $image = new Image($this->getFileManager());
+        try {
+            $event = new ImageEvent();
 
-        $image->clearCache($event);
+            $image = new Image($this->getFileManager());
+
+            $image->clearCache($event);
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**
      * Try to clear directory ouside of the cache
      *
-     * @expectedException \InvalidArgumentException
      */
     public function testClearUnallowedPathCache()
     {
-        $event = new ImageEvent($this->request);
+        $event = new ImageEvent();
 
         $event->setCacheSubdirectory('../../../..');
 
         $image = new Image($this->getFileManager());
 
+        $this->expectException(\InvalidArgumentException::class);
         $image->clearCache($event);
     }
 }

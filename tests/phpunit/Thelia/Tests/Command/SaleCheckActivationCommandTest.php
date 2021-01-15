@@ -36,7 +36,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
     /**
      * in this method two sales are created. The first must be activated and the second one must be deactivated
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         /** @var \Thelia\Model\Sale $sale */
         $sale = SaleQuery::create()

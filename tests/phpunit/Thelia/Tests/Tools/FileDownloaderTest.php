@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Tools;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -22,12 +23,12 @@ use Thelia\Tools\FileDownload\FileDownloader;
  * @package Thelia\Tests\Type
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class FileDownloaderTest extends \PHPUnit_Framework_TestCase
+class FileDownloaderTest extends TestCase
 {
     /** @var  FileDownloader */
     protected $downloader;
 
-    public function setUp()
+    public function setUp(): void
     {
         $logger = Tlog::getNewInstance();
         $translator = new Translator(
@@ -40,20 +41,16 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Thelia\Exception\HttpUrlException
-     * @expectedExceptionMessage Tried to download a file, but the URL was not valid: foo
-     */
     public function testFileDownloadInvalidURL()
     {
+        $this->expectException(\Thelia\Exception\HttpUrlException::class);
+        $this->expectExceptionMessage("Tried to download a file, but the URL was not valid: foo");
         $this->downloader->download("foo", "bar");
     }
 
-    /**
-     * @expectedException \Thelia\Exception\FileNotFoundException
-     */
     public function testFileDownloadNonExistingFile()
     {
+        $this->expectException(\Thelia\Exception\FileNotFoundException::class);
         $this->downloader->download("https://github.com/foo/bar/baz", "baz");
     }
     

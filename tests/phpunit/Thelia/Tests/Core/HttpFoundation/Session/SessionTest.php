@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\HttpFoundation\Session;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -32,7 +33,7 @@ use Thelia\Tools\TokenProvider;
  * @package Thelia\Tests\Core\HttpFoundation\Session
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class SessionTest extends \PHPUnit_Framework_TestCase
+class SessionTest extends TestCase
 {
     /** @var  Session */
     protected $session;
@@ -49,7 +50,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     protected $cartAction;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->requestStack = new RequestStack();
 
@@ -81,7 +82,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcherNull = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->dispatcher = $this->getMockObjectGenerator()->getMock(
+        $this->dispatcher = $this->getMockClass(
             'Symfony\Component\EventDispatcher\EventDispatcherInterface',
             array(),
             array(),
@@ -108,33 +109,27 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetCartWithoutExistingCartAndNoDispatcher()
     {
         $session = $this->session;
 
-        $cart = $session->getSessionCart();
+        $this->expectException(\InvalidArgumentException::class);
+        $session->getSessionCart();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetCartWithoutExistingCartAndDeprecatedMethod()
     {
         $session = $this->session;
 
+        $this->expectException(\InvalidArgumentException::class);
         @$session->getSessionCart();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetCartUnableToCreateCart()
     {
         $session = $this->session;
 
+        $this->expectException(\LogicException::class);
         $session->getSessionCart($this->dispatcherNull);
     }
 

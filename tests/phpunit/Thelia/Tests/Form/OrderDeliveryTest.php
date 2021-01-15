@@ -12,7 +12,9 @@
 
 namespace Thelia\Tests\Form;
 
-class OrderDeliveryTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class OrderDeliveryTest extends TestCase
 {
     public function testOrderDelivery()
     {

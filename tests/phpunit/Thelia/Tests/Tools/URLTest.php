@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Tools;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Tools\URL;
 
 /**
@@ -20,11 +21,11 @@ use Thelia\Tools\URL;
  * @author Franck Allimant <eroudeix@openstudio.fr>
  *
  */
-class URLTest extends \PHPUnit_Framework_TestCase
+class URLTest extends TestCase
 {
     protected $context;
 
-    public function setUp()
+    public function setUp(): void
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 

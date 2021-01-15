@@ -12,7 +12,7 @@
 
 namespace Thelia\Tests\Command;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,7 +33,7 @@ use Thelia\Module\ModuleManagement;
  * Date: 2014-06-06
  * Time: 17:29
  */
-class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
+class ModuleRefreshCommandTest extends TestCase
 {
     /**
      * Test ModuleRefreshCommand

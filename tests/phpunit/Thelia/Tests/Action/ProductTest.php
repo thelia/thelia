@@ -73,7 +73,7 @@ use Thelia\Model\Category;
  */
 class ProductTest extends TestCaseWithURLToolSetup
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         ProductQuery::create()
             ->filterByRef('testCreation')

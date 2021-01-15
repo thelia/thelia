@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Action\Cache;
@@ -23,12 +24,12 @@ use Thelia\Core\Event\Cache\CacheEvent;
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
-class CacheTest extends \PHPUnit_Framework_TestCase
+class CacheTest extends TestCase
 {
     protected $dir;
     protected $dir2;
 
-    public function setUp()
+    public function setUp():void
     {
         $this->dir = __DIR__ . '/test';
         $this->dir2 = __DIR__ . '/test2';

@@ -79,7 +79,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         ;
 
         $brandAction = new Brand();
-        $brandAction->create($event, null, $this->getMockEventDispatcher());
+        $brandAction->create($event);
 
         $createdBrand = $event->getBrand();
 

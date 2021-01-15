@@ -11,7 +11,9 @@
 /*************************************************************************************/
 namespace Thelia\Tests\Form;
 
-class CartAddTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class CartAddTest extends TestCase
 {
     public function testSimpleAddingToCart()
     {

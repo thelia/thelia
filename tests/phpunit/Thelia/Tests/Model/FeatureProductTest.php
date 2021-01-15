@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Action\Product;
@@ -25,7 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Class ProductTest
  * @package Thelia\Tests\Model
  */
-class FeatureProductTest extends \PHPUnit_Framework_TestCase
+class FeatureProductTest extends TestCase
 {
     public function getContainer()
     {

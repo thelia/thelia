@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\AnyListType;
 use Thelia\Type\IntListType;
 
@@ -20,7 +21,7 @@ use Thelia\Type\IntListType;
  * @package Thelia\Tests\Type
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
-class AnyListTypeTest extends \PHPUnit_Framework_TestCase
+class AnyListTypeTest extends TestCase
 {
     public function testAnyListType()
     {

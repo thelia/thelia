@@ -12,6 +12,8 @@
 
 namespace Thelia\Tests\Core\HttpFoundation;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * the the helpers addinf in Request class
  *
@@ -19,11 +21,11 @@ namespace Thelia\Tests\Core\HttpFoundation;
  * @package Thelia\Tests\Core\HttpFoundation
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class RequestTest extends \PHPUnit_Framework_TestCase
+class RequestTest extends TestCase
 {
     public function testGetUriAddingParameters()
     {
-        $request = $this->getMockObjectGenerator()->getMock(
+        $request = $this->getMockClass(
             "Thelia\Core\HttpFoundation\Request",
             array("getUri", "getQueryString")
         );

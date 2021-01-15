@@ -26,7 +26,7 @@ use Thelia\Tests\ApiTestCase;
  */
 class ProductImageControllerTest extends ApiTestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $fs = new Filesystem();
 

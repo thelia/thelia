@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Type;
 
+use PHPUnit\Framework\TestCase;
 use Thelia\Type\BooleanType;
 
 /**
@@ -19,7 +20,7 @@ use Thelia\Type\BooleanType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class BooleanTypeTest extends \PHPUnit_Framework_TestCase
+class BooleanTypeTest extends TestCase
 {
     public function testBooleanType()
     {

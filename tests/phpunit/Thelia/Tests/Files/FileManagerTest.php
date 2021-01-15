@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Files;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Files\FileManager;
@@ -46,12 +47,12 @@ use Thelia\Model\ProductQuery;
  *
  * @package Thelia\Tests\Files
  */
-class FileManagerTest extends \PHPUnit_Framework_TestCase
+class FileManagerTest extends TestCase
 {
     /** @var  FileManager */
     protected $fileManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
 
@@ -108,28 +109,22 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf("Thelia\\Model\\BrandImage", $obj);
     }
 
-    /**
-     * @expectedException \Thelia\Exception\FileException
-     */
     public function testGetFileTypeIdentifierWrongType()
     {
-        $obj = $this->fileManager->getModelInstance('docment', 'product');
+        $this->expectException(\Thelia\Exception\FileException::class);
+        $this->fileManager->getModelInstance('docment', 'product');
     }
 
-    /**
-     * @expectedException \Thelia\Exception\FileException
-     */
     public function testGetFileTypeIdentifierWrongObject()
     {
-        $obj = $this->fileManager->getModelInstance('document', 'poney');
+        $this->expectException(\Thelia\Exception\FileException::class);
+        $this->fileManager->getModelInstance('document', 'poney');
     }
 
-    /**
-     * @expectedException \Thelia\Exception\FileException
-     */
     public function testGetFileTypeIdentifierWrongTypeAndObject()
     {
-        $obj = $this->fileManager->getModelInstance('licorne', 'poney');
+        $this->expectException(\Thelia\Exception\FileException::class);
+        $this->fileManager->getModelInstance('licorne', 'poney');
     }
 
     public function testAddFileModel()
@@ -141,14 +136,12 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf("Thelia\\Model\\ProductDocument", $obj);
     }
 
-    /**
-     * @expectedException \Thelia\Exception\FileException
-     */
     public function addFileModelWrongClassTest()
     {
         $this->fileManager->addFileModel("licorne", "poney", "Thelia\\Model\\Product");
 
-        $obj = $this->fileManager->getModelInstance('licorne', 'poney');
+        $this->expectException(\Thelia\Exception\FileException::class);
+        $this->fileManager->getModelInstance('licorne', 'poney');
     }
 
     public function dotTestImageUpload($model, $type)

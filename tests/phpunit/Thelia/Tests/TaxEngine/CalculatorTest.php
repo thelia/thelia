@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\TaxEngine;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
@@ -27,7 +28,7 @@ use Thelia\TaxEngine\Calculator;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class CalculatorTest extends \PHPUnit_Framework_TestCase
+class CalculatorTest extends TestCase
 {
     protected function getMethod($name)
     {
@@ -47,23 +48,21 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         return $property;
     }
 
-    /**
-     * @expectedException \Thelia\Exception\TaxEngineException
-     * @expectedExceptionCode 501
-     */
     public function testLoadEmptyProductException()
     {
         $calculator = new Calculator();
+
+        $this->expectException(\Thelia\Exception\TaxEngineException::class);
+        $this->expectExceptionCode(501);
         $calculator->load(new Product(), CountryQuery::create()->findOne());
     }
 
-    /**
-     * @expectedException \Thelia\Exception\TaxEngineException
-     * @expectedExceptionCode 502
-     */
     public function testLoadEmptyCountryException()
     {
         $calculator = new Calculator();
+
+        $this->expectException(\Thelia\Exception\TaxEngineException::class);
+        $this->expectExceptionCode(502);
         $calculator->load(ProductQuery::create()->findOne(), new Country());
     }
 
@@ -74,7 +73,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $taxRuleQuery = $this->getMockObjectGenerator()->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
+        $taxRuleQuery = $this->getMockClass('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
             ->with($productQuery->getTaxRule(), $countryQuery)
@@ -99,20 +98,15 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Thelia\Exception\TaxEngineException
-     * @expectedExceptionCode 503
-     */
     public function testGetTaxedPriceBadTaxRulesCollection()
     {
         $calculator = new Calculator();
+
+        $this->expectException(\Thelia\Exception\TaxEngineException::class);
+        $this->expectExceptionCode(503);
         $calculator->getTaxedPrice(500);
     }
 
-    /**
-     * @expectedException \Thelia\Exception\TaxEngineException
-     * @expectedExceptionCode 601
-     */
     public function testGetTaxedPriceBadAmount()
     {
         $taxRulesCollection = new ObjectCollection();
@@ -130,13 +124,11 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
 
+        $this->expectException(\Thelia\Exception\TaxEngineException::class);
+        $this->expectExceptionCode(601);
         $calculator->getTaxedPrice('foo');
     }
 
-    /**
-     * @expectedException \Thelia\Exception\TaxEngineException
-     * @expectedExceptionCode 501
-     */
     public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithNoProductLoaded()
     {
         $taxRulesCollection = new ObjectCollection();
@@ -147,13 +139,11 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRulesCollectionReflectedProperty = $this->getProperty('taxRulesCollection');
         $taxRulesCollectionReflectedProperty->setValue($calculator, $taxRulesCollection);
 
+        $this->expectException(\Thelia\Exception\TaxEngineException::class);
+        $this->expectExceptionCode(501);
         $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
 
-    /**
-     * @expectedException \Thelia\Exception\TaxEngineException
-     * @expectedExceptionCode 507
-     */
     public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithEmptyTaxRuleCollection()
     {
         $taxRulesCollection = new ObjectCollection();
@@ -172,6 +162,8 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $product = $this->getProperty('product');
         $product->setValue($calculator, $aProduct);
 
+        $this->expectException(\Thelia\Exception\TaxEngineException::class);
+        $this->expectExceptionCode(507);
         $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
 
