@@ -28,11 +28,6 @@ class SaleTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Sale';
     }
 
-    public function getTestedInstance()
-    {
-        return new Sale($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return ["active" => "*"];

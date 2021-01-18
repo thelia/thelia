@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
@@ -38,7 +39,7 @@ class RemoveXAmountTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {

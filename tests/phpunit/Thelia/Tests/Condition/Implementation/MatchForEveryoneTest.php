@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition\Implementation;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Coupon\FacadeInterface;
@@ -36,7 +37,7 @@ class MatchForEveryoneTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {

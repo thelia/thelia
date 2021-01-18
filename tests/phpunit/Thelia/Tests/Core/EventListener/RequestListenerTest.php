@@ -13,10 +13,10 @@
 namespace Thelia\Tests\Core\EventListener;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\EventListener\RequestListener;
 use Thelia\Core\HttpFoundation\Request;
@@ -36,7 +36,7 @@ class RequestListenerTest extends WebTestCase
     {
         $listener = $this->getRequestListener();
 
-        $event = $this->getGetResponseEvent();
+        $event = $this->getRequestEvent();
         /** @var Session $session */
         $session = $event->getRequest()->getSession();
 
@@ -52,7 +52,7 @@ class RequestListenerTest extends WebTestCase
         $this->assertEquals($session->getCurrency()->getId(), $newCurrency->getId());
     }
 
-    protected function getGetResponseEvent()
+    protected function getRequestEvent(): RequestEvent
     {
         $request = new Request();
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -62,12 +62,17 @@ class RequestListenerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        return new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
     }
 
     protected function getRequestListener()
     {
-        $translator = new Translator(new Container());
+        $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $translator = new Translator($requestStack);
         $eventDispatcher = new EventDispatcher();
 
         return new RequestListener($translator, $eventDispatcher);

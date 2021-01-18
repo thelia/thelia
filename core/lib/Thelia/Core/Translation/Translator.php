@@ -64,7 +64,7 @@ class Translator extends BaseTranslator
         return parent::getLocale();
     }
 
-    public function translate(
+    public function trans(
         ?string $id,
         array $parameters = array(),
         string $domain = null,
@@ -105,22 +105,5 @@ class Translator extends BaseTranslator
         }
 
         return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated use translate instead
-     */
-    public function trans(
-        ?string $id,
-        array $parameters = array(),
-        string $domain = null,
-        string $locale = null,
-        $returnDefaultIfNotAvailable = true,
-        $useFallback = true
-    ): string
-    {
-        return $this->translate($id, $parameters, $domain, $locale, $returnDefaultIfNotAvailable, $useFallback);
     }
 }

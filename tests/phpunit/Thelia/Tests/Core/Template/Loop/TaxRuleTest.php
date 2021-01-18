@@ -28,11 +28,6 @@ class TaxRuleTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\TaxRule';
     }
 
-    public function getTestedInstance()
-    {
-        return new TaxRule($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

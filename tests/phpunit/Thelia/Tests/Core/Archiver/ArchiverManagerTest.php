@@ -12,16 +12,20 @@
 
 namespace Tests\Core\Archiver;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\Archiver\ArchiverManager as SUT;
+use Thelia\Tests\ContainerAwareTestCase;
 
 /**
  * Class ArchiverManagerTest
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ArchiverManagerTest extends TestCase
+class ArchiverManagerTest extends ContainerAwareTestCase
 {
     /**
      * @var \Thelia\Core\Archiver\ArchiverManager
@@ -29,7 +33,7 @@ class ArchiverManagerTest extends TestCase
     protected $sut;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $stubArchiver;
 
@@ -38,24 +42,24 @@ class ArchiverManagerTest extends TestCase
         $this->sut = new SUT;
         $this->stubArchiver = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');
 
-        new Translator(new Container);
+        new Translator($this->getContainer()->get("request_stack"));
     }
 
     public function testGetArchivers()
     {
         $archivers = $this->sut->getArchivers();
 
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(0, $archivers);
 
         $archivers = $this->sut->getArchivers(true);
 
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(0, $archivers);
 
         $archivers = $this->sut->getArchivers(false);
 
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(0, $archivers);
     }
 
@@ -84,14 +88,14 @@ class ArchiverManagerTest extends TestCase
             $this->sut->add($this->stubArchiver);
 
             $archivers = $this->sut->getArchivers();
-            $this->assertInternalType('array', $archivers);
+            $this->assertIsArray($archivers);
             $this->assertCount($i, $archivers);
         }
 
         $this->sut->add($this->stubArchiver);
 
         $archivers = $this->sut->getArchivers();
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(3, $archivers);
     }
 
@@ -118,7 +122,7 @@ class ArchiverManagerTest extends TestCase
         }
 
         $archivers = $this->sut->getArchivers();
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(3, $archivers);
         $this->assertTrue($this->sut->has('archiver1'));
         $this->assertTrue($this->sut->has('archiver2'));
@@ -129,7 +133,7 @@ class ArchiverManagerTest extends TestCase
         $this->sut->setArchivers([$this->stubArchiver, $this->stubArchiver]);
 
         $archivers = $this->sut->getArchivers();
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(2, $archivers);
         $this->assertFalse($this->sut->has('archiver1'));
         $this->assertFalse($this->sut->has('archiver2'));
@@ -137,7 +141,7 @@ class ArchiverManagerTest extends TestCase
         $this->assertTrue($this->sut->has('archiver4'));
         $this->assertTrue($this->sut->has('archiver5'));
 
-        $this->setExpectedException('Exception');
+        $this->expectException(\Exception::class);
 
         $this->sut->setArchivers(['notAnArchiverInterface']);
     }
@@ -147,7 +151,7 @@ class ArchiverManagerTest extends TestCase
         $this->sut->reset();
 
         $archivers = $this->sut->getArchivers();
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(0, $archivers);
 
         $this->stubArchiver
@@ -161,13 +165,13 @@ class ArchiverManagerTest extends TestCase
         }
 
         $archivers = $this->sut->getArchivers();
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(3, $archivers);
 
         $this->sut->reset();
 
         $archivers = $this->sut->getArchivers();
-        $this->assertInternalType('array', $archivers);
+        $this->assertIsArray($archivers);
         $this->assertCount(0, $archivers);
     }
 
@@ -212,7 +216,7 @@ class ArchiverManagerTest extends TestCase
 
         $this->assertTrue($this->sut->has('archiver1', true));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->sut->has('archiver2', true);
     }
@@ -246,7 +250,7 @@ class ArchiverManagerTest extends TestCase
         $this->assertInstanceOf('Thelia\\Core\\Archiver\\ArchiverInterface', $this->sut->get('archiver2', false));
         $this->isNull('Thelia\\Core\\Archiver\\ArchiverInterface', $this->sut->get('archiver3', false));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->sut->get('archiver4');
     }
@@ -288,8 +292,13 @@ class ArchiverManagerTest extends TestCase
         $this->assertFalse($this->sut->has('archiver3'));
         $this->assertFalse($this->sut->has('archiver4'));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->sut->remove('archiver4');
+    }
+
+    protected function buildContainer(ContainerBuilder $container)
+    {
+        // TODO: Implement buildContainer() method.
     }
 }

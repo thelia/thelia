@@ -119,7 +119,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         $filename = THELIA_CACHE_DIR . '/export/' . $exportName .'.json';
 
         if ($statement->rowCount() === 0) {
-            throw new \Exception(Translator::getInstance()->translate("No data found for your export."));
+            throw new \Exception(Translator::getInstance()->trans("No data found for your export."));
         }
 
         if (file_exists($filename)) {

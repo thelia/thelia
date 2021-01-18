@@ -13,6 +13,8 @@
 namespace Thelia\Tests\Resources\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,8 +27,8 @@ class TestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("test_a", "text")
-            ->add("test_b", "integer")
+            ->add("test_a", TextType::class)
+            ->add("test_b", IntegerType::class)
         ;
     }
 

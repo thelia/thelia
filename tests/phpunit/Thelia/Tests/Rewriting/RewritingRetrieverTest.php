@@ -52,7 +52,7 @@ class RewritingRetrieverTest extends TestCase
             ));
 
         $this->container->set('router.admin', $stubRouterAdmin);
-        $this->container->set('thelia.url.manager', new URL($this->container));
+        $this->container->set('thelia.url.manager', new URL($stubRouterAdmin));
     }
 
     protected function getMethod($name)
@@ -78,7 +78,7 @@ class RewritingRetrieverTest extends TestCase
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
 
-        $retrieverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getViewUrlQuery'));
+        $retrieverQuery = $this->createMock('\Thelia\Model\RewritingUrlQuery');
         $retrieverQuery->expects($this->any())
             ->method('getViewUrlQuery')
             ->with('view', 'fr_FR', 1)
@@ -100,7 +100,7 @@ class RewritingRetrieverTest extends TestCase
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
 
-        $retrieverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getSpecificUrlQuery'));
+        $retrieverQuery = $this->createMock('\Thelia\Model\RewritingUrlQuery');
         $retrieverQuery->expects($this->any())
             ->method('getSpecificUrlQuery')
             ->with('view', 'fr_FR', 1, array('foo0' => 'bar0', 'foo1' => 'bar1'))

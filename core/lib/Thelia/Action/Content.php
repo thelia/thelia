@@ -161,7 +161,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $dispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $dispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
                     }
                 }
 

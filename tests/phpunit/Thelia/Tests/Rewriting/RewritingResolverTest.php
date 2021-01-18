@@ -85,7 +85,7 @@ class RewritingResolverTest extends TestCase
         $collection = new ObjectCollection();
         $collection->setModel('\Thelia\Model\RewritingArgument');
 
-        $resolverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
+        $resolverQuery = $this->createMock('\Thelia\Model\RewritingUrlQuery');
         $resolverQuery->expects($this->any())
             ->method('getResolverSearch')
             ->with('foo.html')
@@ -118,7 +118,7 @@ class RewritingResolverTest extends TestCase
             $collection->append($ra);
         }
 
-        $resolverQuery = $this->getMockClass('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
+        $resolverQuery = $this->createMock('\Thelia\Model\RewritingUrlQuery');
         $resolverQuery->expects($this->any())
             ->method('getResolverSearch')
             ->with('foo.html')

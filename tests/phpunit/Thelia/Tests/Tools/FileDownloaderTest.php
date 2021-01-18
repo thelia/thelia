@@ -14,6 +14,10 @@ namespace Thelia\Tests\Tools;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Tools\FileDownload\FileDownloader;
@@ -31,9 +35,14 @@ class FileDownloaderTest extends TestCase
     public function setUp(): void
     {
         $logger = Tlog::getNewInstance();
-        $translator = new Translator(
-            new Container()
-        );
+
+        $request = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $translator = new Translator($requestStack);
 
         $this->downloader = new FileDownloader(
             $logger,

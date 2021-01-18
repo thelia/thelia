@@ -73,7 +73,7 @@ class CalculatorTest extends TestCase
 
         $calculator = new Calculator();
 
-        $taxRuleQuery = $this->getMockClass('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
+        $taxRuleQuery = $this->createMock('\Thelia\Model\TaxRuleQuery');
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
             ->with($productQuery->getTaxRule(), $countryQuery)

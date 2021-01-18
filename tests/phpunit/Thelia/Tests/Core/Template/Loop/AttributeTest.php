@@ -27,11 +27,6 @@ class AttributeTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Attribute';
     }
 
-    public function getTestedInstance()
-    {
-        return new Attribute($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

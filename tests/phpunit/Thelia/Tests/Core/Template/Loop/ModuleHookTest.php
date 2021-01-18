@@ -28,11 +28,6 @@ class ModuleHookTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\ModuleHook';
     }
 
-    public function getTestedInstance()
-    {
-        return new ModuleHook($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array("backend_context" => 1);

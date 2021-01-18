@@ -12,11 +12,14 @@
 
 namespace Thelia\Condition\Implementation;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
 use Thelia\Coupon\FacadeInterface;
+use Thelia\Exception\InvalidConditionOperatorException;
+use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Category;
 use Thelia\Model\Product;
 
@@ -33,7 +36,7 @@ class CartContainsCategoriesTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {
@@ -143,9 +146,9 @@ class CartContainsCategoriesTest extends TestCase
         $values = array(
             CartContainsCategories::CATEGORIES_LIST => array()
         );
+        $this->expectException(InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $isValid = $condition1->isMatching();
 
         $expected = true;
@@ -171,7 +174,7 @@ class CartContainsCategoriesTest extends TestCase
             CartContainsCategories::CATEGORIES_LIST => array()
         );
 
-        $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
+        $this->expectException(InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
     }
 

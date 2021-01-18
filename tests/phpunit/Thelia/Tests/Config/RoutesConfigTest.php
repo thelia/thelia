@@ -22,10 +22,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Router;
+use Thelia\Action\Sale;
 use Thelia\Core\Controller\ControllerResolver;
+use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TheliaTemplateHelper;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tests\ContainerAwareTestCase;
 use TheliaSmarty\Template\SmartyParser;
 
@@ -210,25 +213,33 @@ class RoutesConfigTest extends ContainerAwareTestCase
      */
     public function testTargetControllerMethodsAreCallable()
     {
-        $controllerResolver = new ControllerResolver($this->getContainer());
+        $anExceptionWasThrown = false;
 
-        foreach (static::$routingFiles as $filePath => $fileNames) {
-            $routerFileLoader = $this->routerFileLoaders[$filePath];
+        try {
+            $controllerResolver = new ControllerResolver($this->getContainer());
 
-            foreach ($fileNames as $fileName) {
-                $router = new Router($routerFileLoader, $fileName);
+            foreach (static::$routingFiles as $filePath => $fileNames) {
+                $routerFileLoader = $this->routerFileLoaders[$filePath];
 
-                /** @var Route $route */
-                foreach ($router->getRouteCollection() as $route) {
-                    // prepare a dummy request to the controller so that we can check it using the ControllerResolver
-                    $request = new Request();
-                    $request->attributes->set('_controller', $route->getDefault('_controller'));
+                foreach ($fileNames as $fileName) {
+                    $router = new Router($routerFileLoader, $fileName);
 
-                    // will throw an exception if the controller method is not callable
-                    $controllerResolver->getController($request);
+                    /** @var Route $route */
+                    foreach ($router->getRouteCollection() as $route) {
+                        // prepare a dummy request to the controller so that we can check it using the ControllerResolver
+                        $request = new Request();
+                        $request->attributes->set('_controller', $route->getDefault('_controller'));
+
+                        // will throw an exception if the controller method is not callable
+                        $controllerResolver->getController($request);
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
         }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**

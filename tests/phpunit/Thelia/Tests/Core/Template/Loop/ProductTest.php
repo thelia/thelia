@@ -29,11 +29,6 @@ class ProductTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Product';
     }
 
-    public function getTestedInstance()
-    {
-        return new Product($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

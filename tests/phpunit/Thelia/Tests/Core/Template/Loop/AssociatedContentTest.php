@@ -27,11 +27,6 @@ class AssociatedContentTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\AssociatedContent';
     }
 
-    public function getTestedInstance()
-    {
-        return new AssociatedContent($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array('product' => 1);

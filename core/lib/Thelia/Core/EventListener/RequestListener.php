@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
@@ -224,9 +225,9 @@ class RequestListener implements EventSubscriberInterface
      *
      * If the value of _previous_url is "dont-save", the current referrer is not saved.
      *
-     * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
+     * @param TerminateEvent $event
      */
-    public function registerPreviousUrl(PostResponseEvent  $event)
+    public function registerPreviousUrl(TerminateEvent  $event)
     {
         $request = $event->getRequest();
 

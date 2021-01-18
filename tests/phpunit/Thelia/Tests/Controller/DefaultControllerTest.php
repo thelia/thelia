@@ -13,6 +13,8 @@
 namespace Thelia\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Thelia\Controller\Admin\ProductController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Controller\Front\DefaultController;
 
@@ -21,81 +23,110 @@ use Thelia\Controller\Front\DefaultController;
  * @package Thelia\Tests\Controller
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-class DefaultControllerTest extends TestCase
+class DefaultControllerTest extends ControllerTestBase
 {
     public function testNoAction()
     {
-        $defaultController = new DefaultController();
-        $request = new Request();
-        $defaultController->noAction($request);
+        $request = $this->buildRequest();
+        $this->getController()->noAction($request);
 
         $this->assertEquals($request->attributes->get('_view'), "index");
     }
 
     public function testNoActionWithGetParam()
     {
-        $defaultController = new DefaultController();
-        $request = new Request(array(
-            "view" => "foo"
-        ));
+        $request = $this->buildRequest(
+            ["view" => "foo"]
+        );
 
-        $defaultController->noAction($request);
+        $this->getController()->noAction($request);
+
 
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
     public function testNoActionWithPostParam()
     {
-        $defaultController = new DefaultController();
-        $request = new Request(
-            array(),
-            array("view" => "foo")
+        $request = $this->buildRequest(
+            [],
+            ["view" => "foo"]
         );
 
-        $defaultController->noAction($request);
+        $this->getController()->noAction($request);
 
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
     public function testNoActionWithAttribute()
     {
-        $defaultController = new DefaultController();
-        $request = new Request(
-            array(),
-            array(),
-            array("_view" => "foo")
+        $request = $this->buildRequest(
+            [],
+            [],
+            ["_view" => "foo"]
         );
 
-        $defaultController->noAction($request);
+        $this->getController()->noAction($request);
 
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
     public function testNoActionWithAttributeAndQuery()
     {
-        $defaultController = new DefaultController();
-        $request = new Request(
-            array("view" => "bar"),
-            array(),
-            array("_view" => "foo")
+        $request = $this->buildRequest(
+            ["view" => "bar"],
+            [],
+            ["_view" => "foo"]
         );
 
-        $defaultController->noAction($request);
+        $this->getController()->noAction($request);
 
         $this->assertEquals($request->attributes->get('_view'), 'bar');
     }
 
     public function testNoActionWithAttributeAndRequest()
     {
-        $defaultController = new DefaultController();
-        $request = new Request(
-            array(),
-            array("view" => "bar"),
-            array("_view" => "foo")
+        $request = $this->buildRequest(
+            [],
+            ["view" => "bar"],
+            ["_view" => "foo"]
         );
 
-        $defaultController->noAction($request);
+        $this->getController()->noAction($request);
 
         $this->assertEquals($request->attributes->get('_view'), 'bar');
+    }
+
+    protected function buildRequest($query = [], $request = [], $attributes = []): Request
+    {
+        $request = new Request(
+            $query, $request, $attributes
+        );
+
+        $request->setSession($this->getSession());
+
+        return $request;
+    }
+
+    /**
+     * Use this method to build the container with the services that you need.
+     */
+    protected function buildContainer(ContainerBuilder $container)
+    {
+        $parser = $this->getMockBuilder("Thelia\\Core\\Template\\ParserInterface")
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $container->set("thelia.parser", $parser);
+    }
+
+    /**
+     * @return \Thelia\Controller\Front\DefaultController The controller you want to test
+     */
+    protected function getController(): DefaultController
+    {
+        $controller = new DefaultController();
+
+        return $controller;
     }
 }

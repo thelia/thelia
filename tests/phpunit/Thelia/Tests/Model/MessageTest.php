@@ -15,8 +15,11 @@ namespace Thelia\Tests\Model;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Validator\ValidatorBuilder;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\TheliaFormValidator;
 use Thelia\Core\HttpFoundation\Request;
@@ -63,17 +66,29 @@ class MessageTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $dispatcher = new EventDispatcher();
+        $container->set("event_dispatcher", $dispatcher);
 
         $request->setSession($session);
 
+        $translator = new Translator($requestStack);
+
+        $formFactoryBuilder = new FormFactoryBuilder();
+        $validatorBuilder = new ValidatorBuilder();
+
         $parserContext = new ParserContext(
             $requestStack,
-            new TheliaFormFactory($requestStack, $container, []),
-            new TheliaFormValidator(new Translator($container), 'dev')
+            new TheliaFormFactory(
+                $requestStack,
+                $container->get("event_dispatcher"),
+                $translator,
+                $formFactoryBuilder,
+                $validatorBuilder,
+                []
+            ),
+            new TheliaFormValidator($translator, 'dev')
         );
 
-        $container->set("event_dispatcher", $dispatcher);
         $container->set('request', $request);
 
         $this->parser = new SmartyParser($requestStack, $dispatcher, $parserContext, $this->templateHelper, 'dev', true);

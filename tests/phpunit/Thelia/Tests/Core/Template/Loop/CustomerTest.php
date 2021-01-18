@@ -27,11 +27,6 @@ class CustomerTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Customer';
     }
 
-    public function getTestedInstance()
-    {
-        return new Customer($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

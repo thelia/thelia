@@ -15,9 +15,14 @@ namespace Thelia\Tests\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Module;
 use Thelia\Command\ModuleActivateCommand;
 use Thelia\Core\Application;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Tests\ContainerAwareTestCase;
@@ -42,8 +47,17 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
             $module->setActivate(BaseModule::IS_NOT_ACTIVATED);
             $module->save();
 
+            $request = new Request();
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+            $request->setSession(new Session(new MockArraySessionStorage()));
+
+            $container = $this->getContainer();
+            $tanslator = new Translator($requestStack);
+            $container->set("thelia.translator", $tanslator);
+
             $moduleActivate = new ModuleActivateCommand();
-            $moduleActivate->setContainer($this->getContainer());
+            $moduleActivate->setContainer($container);
 
             $application->add($moduleActivate);
 

@@ -25,9 +25,8 @@ class RequestTest extends TestCase
 {
     public function testGetUriAddingParameters()
     {
-        $request = $this->getMockClass(
-            "Thelia\Core\HttpFoundation\Request",
-            array("getUri", "getQueryString")
+        $request = $this->createMock(
+            "Thelia\Core\HttpFoundation\Request"
         );
 
         $request->expects($this->any())

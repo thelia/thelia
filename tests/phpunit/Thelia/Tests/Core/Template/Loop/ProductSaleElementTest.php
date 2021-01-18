@@ -27,11 +27,6 @@ class ProductSaleElementTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\ProductSaleElements';
     }
 
-    public function getTestedInstance()
-    {
-        return new ProductSaleElements($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array('product' => 1);

@@ -69,10 +69,6 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
@@ -84,7 +80,10 @@ class ConditionFactoryTest extends TestCase
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionFactory = new ConditionFactory(
+            $stubContainer,
+            $stubFacade
+        );
         $ruleManager1 = $conditionFactory->build($condition1->getServiceId(), $operators, $values);
 
         $expected = $condition1;
@@ -133,10 +132,6 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValueMap(array('unset.service', false)));
 
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
@@ -148,7 +143,10 @@ class ConditionFactoryTest extends TestCase
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionFactory = new ConditionFactory(
+            $stubContainer,
+            $stubFacade
+        );
         $conditionManager1 = $conditionFactory->build('unset.service', $operators, $values);
 
         $expected = false;
@@ -195,10 +193,6 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = array(
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
@@ -225,7 +219,10 @@ class ConditionFactoryTest extends TestCase
         $conditions[] = $condition1;
         $conditions[] = $condition2;
 
-        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionFactory = new ConditionFactory(
+            $stubContainer,
+            $stubFacade
+        );
 
         $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
         $unserializedConditions = $conditionFactory->unserializeConditionCollection($serializedConditions);
@@ -275,10 +272,6 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-
         $operators = array(
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
@@ -292,7 +285,10 @@ class ConditionFactoryTest extends TestCase
         $conditions = new ConditionCollection();
         $conditions[] = $condition1;
 
-        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionFactory = new ConditionFactory(
+            $stubContainer,
+            $stubFacade
+        );
 
         $expected = $condition1->getValidators();
         $actual = $conditionFactory->getInputsFromServiceId('thelia.condition.match_for_x_articles');
@@ -339,10 +335,6 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(false));
 
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-
         $operators = array(
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
@@ -356,7 +348,10 @@ class ConditionFactoryTest extends TestCase
         $conditions = new ConditionCollection();
         $conditions[] = $condition1;
 
-        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionFactory = new ConditionFactory(
+            $stubContainer,
+            $stubFacade
+        );
 
         $expected = false;
         $actual = $conditionFactory->getInputsFromServiceId('thelia.condition.unknown');
@@ -404,13 +399,12 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $stubFacade->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
-
         $conditions = new ConditionCollection();
 
-        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionFactory = new ConditionFactory(
+            $stubContainer,
+            $stubFacade
+        );
 
         $conditionNone = new MatchForEveryone($stubFacade);
         $expectedCollection = new ConditionCollection();

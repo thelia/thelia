@@ -57,13 +57,26 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
             "thelia.empty.2" => "Thelia\\Form\\EmptyForm",
             "thelia.api.empty" => "Thelia\\Form\\Api\\ApiEmptyForm",
         ]);
+        $translator = new Translator($requestStack);
 
-        $container->set("thelia.form_factory_builder", (new FormFactoryBuilder())->addExtension(new CoreExtension()));
-        $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
+        $dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+        $formFactoryBuilder = (new FormFactoryBuilder())->addExtension(new CoreExtension());
+        $validatorBuilder = new ValidatorBuilder();
+
+        $container->set("thelia.form_factory_builder", $formFactoryBuilder);
+        $container->set("thelia.forms.validator_builder", $validatorBuilder);
 
         $container->set(
             "thelia.form_factory",
-            new TheliaFormFactory($requestStack, $container, $container->get("Thelia.parser.forms"))
+            new TheliaFormFactory(
+                $requestStack,
+                $dispatcher,
+                $translator,
+                $formFactoryBuilder,
+                $validatorBuilder,
+                []
+            )
         );
 
         $container->set("thelia.parser.context", new ParserContext(

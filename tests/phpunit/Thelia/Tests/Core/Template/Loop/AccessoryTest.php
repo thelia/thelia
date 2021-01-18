@@ -27,11 +27,6 @@ class AccessoryTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Accessory';
     }
 
-    public function getTestedInstance()
-    {
-        return new Accessory($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array('product' => 1);

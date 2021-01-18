@@ -36,9 +36,7 @@ class ProductCloneForm extends BaseForm
             ->add('newRef', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
-                    new Callback([
-                        'methods' => [[$this, 'checkRefDifferent']]
-                    ])
+                    new Callback([$this, 'checkRefDifferent'])
                 ],
                 'label' => $this->translator->trans('Product reference (must be unique)'),
                 'label_attr'  => array('for' => 'newRef')

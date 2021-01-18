@@ -14,12 +14,12 @@ namespace Thelia\Tests\Core\Form;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Validator\ValidatorBuilder;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -51,24 +51,37 @@ class TheliaFormFactoryTest extends TestCase
          */
         $container = new Container();
         $container->set("thelia.form_factory_builder", $factory);
-        $container->set("thelia.translator", new Translator($container));
+        $formDefinitions = ["test_form" => "Thelia\\Tests\\Resources\\Form\\TestForm"];
         $container->setParameter(
             "Thelia.parser.forms",
-            $definition = array(
-                "test_form" => "Thelia\\Tests\\Resources\\Form\\TestForm",
-            )
+            $formDefinitions
         );
+
+        $dispatcher = new EventDispatcher();
 
         $request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($request);
+        $translator = new Translator($requestStack);
+
+        $formFactoryBuilder = new FormFactoryBuilder();
+        $validatorBuilder = new ValidatorBuilder();
+
         $request->setSession(new Session(new MockArraySessionStorage()));
+        $container->set("thelia.translator", $translator);
         $container->set("request", $request);
         $container->set("request_stack", $requestStack);
-        $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
-        $container->set("event_dispatcher", new EventDispatcher());
+        $container->set("thelia.forms.validator_builder", $validatorBuilder);
+        $container->set("event_dispatcher", $dispatcher);
 
-        $this->factory = new TheliaFormFactory($requestStack, $container, $definition);
+        $this->factory = new TheliaFormFactory(
+            $requestStack,
+            $dispatcher,
+            $translator,
+            $formFactoryBuilder,
+            $validatorBuilder,
+            $formDefinitions
+        );
     }
 
     public function testCreateFormWithoutType()
@@ -98,7 +111,7 @@ class TheliaFormFactoryTest extends TestCase
          * If we use a type, we have that type's fields.
          * -> The implementation is correct.
          */
-        $form = $this->factory->createForm("test_form", "test_type");
+        $form = $this->factory->createForm("test_form", TestType::class);
 
         $this->assertTrue(
             $form->getForm()->has("test_field")

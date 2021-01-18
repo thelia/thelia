@@ -14,7 +14,9 @@ namespace Thelia\Tests\Core\Event;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Forms;
+use Thelia\Core\HttpFoundation\Request;
 
 /**
  * Class ActionEventTest
@@ -33,7 +35,7 @@ class ActionEventTest extends TestCase
         $formBuilder = Forms::createFormFactoryBuilder()
             ->getFormFactory()
             ->createNamedBuilder(
-                'test',
+                'text',
                 FormType::class,
                 null,
                 ['attr' =>[
@@ -42,8 +44,8 @@ class ActionEventTest extends TestCase
             );
 
         $formBuilder
-            ->add('foo', 'text')
-            ->add('bar', 'text');
+            ->add('foo', TextType::class)
+            ->add('bar', TextType::class);
 
         self::$form = $formBuilder->getForm();
     }
@@ -52,7 +54,7 @@ class ActionEventTest extends TestCase
     {
         $form = self::$form;
 
-        $form->bind([
+        $form->submit([
             'foo' => 'fooValue',
             'bar' => 'barValue'
         ]);

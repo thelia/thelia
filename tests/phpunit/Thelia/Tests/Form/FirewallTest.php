@@ -12,8 +12,10 @@
 
 namespace Thelia\Tests\Form;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -30,14 +32,12 @@ class FirewallTest extends TestCase
     /** @var \Thelia\Core\HttpFoundation\Request */
     protected $request;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  MockObject */
     protected $form;
 
     public function setUp(): void
     {
         $session = new Session();
-
-        new Translator(new Container());
 
         $this->request = $this->createMock("\Thelia\Core\HttpFoundation\Request");
         $this->request
@@ -51,6 +51,11 @@ class FirewallTest extends TestCase
                 ->method("getSession")
                     ->willReturn($session)
         ;
+
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+        new Translator($requestStack);
+
 
         /**
          * Get an example form. We

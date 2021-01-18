@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
@@ -35,7 +36,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {
@@ -83,7 +84,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count)
+    public function generateMatchingCart(MockObject $stubFacade, $count)
     {
         $attrCombination1 = $this->getMockBuilder('\Thelia\Model\AttributeCombination')
             ->disableOriginalConstructor()
@@ -195,7 +196,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    public function generateNoMatchingCart(MockObject $stubFacade)
     {
         $attrCombination1 = $this->getMockBuilder('\Thelia\Model\AttributeCombination')
             ->disableOriginalConstructor()
