@@ -28,11 +28,6 @@ class ContentTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Content';
     }
 
-    public function getTestedInstance()
-    {
-        return new Content($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

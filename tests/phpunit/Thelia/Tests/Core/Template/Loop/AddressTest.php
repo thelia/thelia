@@ -27,11 +27,6 @@ class AddressTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Address';
     }
 
-    public function getTestedInstance()
-    {
-        return new Address($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

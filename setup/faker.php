@@ -1,10 +1,14 @@
 <?php
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Implementation\MatchForXArticles;
 use Thelia\Condition\Operators;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\RemoveXAmount;
@@ -100,6 +104,12 @@ $con->beginTransaction();
 $url = new Thelia\Tools\URL();
 
 $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
+
+$container = $thelia->getContainer();
+
+$request = Request::create("localhost");
+$request->setSession(new Session(new MockArraySessionStorage()));
+$container->get('request_stack')->push($request);
 
 //\Thelia\Log\Tlog::getInstance()->setLevel(\Thelia\Log\Tlog::ERROR);
 

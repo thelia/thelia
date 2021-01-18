@@ -28,11 +28,6 @@ class CategoryTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Category';
     }
 
-    public function getTestedInstance()
-    {
-        return new Category($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

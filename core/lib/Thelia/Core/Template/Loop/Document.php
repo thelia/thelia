@@ -262,7 +262,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
             try {
                 // Dispatch document processing event
-                $this->dispatcher->dispatch(TheliaEvents::DOCUMENT_PROCESS, $event);
+                $this->dispatcher->dispatch($event, TheliaEvents::DOCUMENT_PROCESS);
 
                 $loopResultRow = new LoopResultRow($result);
 

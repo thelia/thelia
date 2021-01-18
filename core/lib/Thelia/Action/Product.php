@@ -431,7 +431,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 foreach ($fileList as $fileTypeList) {
                     foreach ($fileTypeList['list'] as $fileToDelete) {
                         $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
-                        $this->eventDispatcher->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                        $this->eventDispatcher->dispatch($fileDeleteEvent, $fileTypeList['type']);
                     }
                 }
 

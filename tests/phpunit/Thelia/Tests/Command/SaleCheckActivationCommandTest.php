@@ -108,7 +108,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
     protected function buildContainer(ContainerBuilder $container)
     {
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addSubscriber(new Sale($eventDispatcher));
+        $eventDispatcher->addSubscriber(new Sale());
 
         $container->set("event_dispatcher", $eventDispatcher);
     }

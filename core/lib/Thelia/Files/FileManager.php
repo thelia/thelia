@@ -13,6 +13,7 @@
 namespace Thelia\Files;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Exception\FileException;
@@ -117,7 +118,9 @@ class FileManager
 
             $fileName = $this->renameFile($model->getId(), $uploadedFile);
 
-            $newUploadedFile = $uploadedFile->move($directory, $fileName);
+            $fileSystem = new Filesystem();
+            $fileSystem->rename($uploadedFile->getPathname(), $directory. DS .$fileName);
+            $newUploadedFile = new UploadedFile($directory. DS .$fileName, $fileName);
             $model->setFile($fileName);
 
             if (!$model->save($con)) {

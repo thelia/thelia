@@ -27,11 +27,6 @@ class CurrencyTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Currency';
     }
 
-    public function getTestedInstance()
-    {
-        return new Currency($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

@@ -28,11 +28,6 @@ class FolderTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Folder';
     }
 
-    public function getTestedInstance()
-    {
-        return new Folder($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

@@ -78,7 +78,7 @@ class Translation extends AbstractSmartyPlugin
             }
         }
 
-        $string = $this->translator->translate(
+        $string = $this->translator->trans(
             $this->getParam($params, 'l'),
             $variables,
             $this->getParam($params, 'd', $this->defaultTranslationDomain),

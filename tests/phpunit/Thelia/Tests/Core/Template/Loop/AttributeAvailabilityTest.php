@@ -27,11 +27,6 @@ class AttributeAvailabilityTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\AttributeAvailability';
     }
 
-    public function getTestedInstance()
-    {
-        return new AttributeAvailability($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

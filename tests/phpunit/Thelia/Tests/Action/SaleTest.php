@@ -12,7 +12,9 @@
 
 namespace Thelia\Tests\Action;
 
+use Thelia\Action\Document;
 use Thelia\Action\Sale;
+use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
@@ -200,16 +202,24 @@ class SaleTest extends TestCaseWithURLToolSetup
 
     public function testClearAllSales()
     {
-        // Store current promo statuses
-        $promoList = ProductSaleElementsQuery::create()->filterByPromo(true)->select('Id')->find()->toArray();
+        $anExceptionWasThrown = false;
 
-        $event = new SaleClearStatusEvent();
+        try {
+            // Store current promo statuses
+            $promoList = ProductSaleElementsQuery::create()->filterByPromo(true)->select('Id')->find()->toArray();
 
-        $saleAction = new Sale();
-        $saleAction->clearStatus($event);
+            $event = new SaleClearStatusEvent();
 
-        // Restore promo status
-        ProductSaleElementsQuery::create()->filterById($promoList)->update(['Promo' => true]);
+            $saleAction = new Sale();
+            $saleAction->clearStatus($event);
+
+            // Restore promo status
+            ProductSaleElementsQuery::create()->filterById($promoList)->update(['Promo' => true]);
+        } catch (\Exception $e) {
+            $anExceptionWasThrown = true;
+        }
+
+        $this->assertFalse($anExceptionWasThrown);
     }
 
     /**

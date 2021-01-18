@@ -27,11 +27,6 @@ class TitleTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Title';
     }
 
-    public function getTestedInstance()
-    {
-        return new Title($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

@@ -12,10 +12,16 @@
 
 namespace Tests\Core\Serializer;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\Serializer\SerializerManager as SUT;
+use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
  * Class SerializerManagerTest
@@ -29,7 +35,7 @@ class SerializerManagerTest extends TestCase
     protected $sut;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $stubSerializer;
 
@@ -38,14 +44,18 @@ class SerializerManagerTest extends TestCase
         $this->sut = new SUT;
         $this->stubSerializer = $this->createMock('Thelia\\Core\\Serializer\\SerializerInterface');
 
-        new Translator(new Container);
+        $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        new Translator($requestStack);
     }
 
     public function testGetSerializers()
     {
         $serializers = $this->sut->getSerializers();
 
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(0, $serializers);
     }
 
@@ -74,14 +84,14 @@ class SerializerManagerTest extends TestCase
             $this->sut->add($this->stubSerializer);
 
             $serializers = $this->sut->getSerializers();
-            $this->assertInternalType('array', $serializers);
+            $this->assertIsArray($serializers);
             $this->assertCount($i, $serializers);
         }
 
         $this->sut->add($this->stubSerializer);
 
         $serializers = $this->sut->getSerializers();
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(3, $serializers);
     }
 
@@ -108,7 +118,7 @@ class SerializerManagerTest extends TestCase
         }
 
         $serializers = $this->sut->getSerializers();
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(3, $serializers);
         $this->assertTrue($this->sut->has('serializer1'));
         $this->assertTrue($this->sut->has('serializer2'));
@@ -119,7 +129,7 @@ class SerializerManagerTest extends TestCase
         $this->sut->setSerializers([$this->stubSerializer, $this->stubSerializer]);
 
         $serializers = $this->sut->getSerializers();
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(2, $serializers);
         $this->assertFalse($this->sut->has('serializer1'));
         $this->assertFalse($this->sut->has('serializer2'));
@@ -127,7 +137,7 @@ class SerializerManagerTest extends TestCase
         $this->assertTrue($this->sut->has('serializer4'));
         $this->assertTrue($this->sut->has('serializer5'));
 
-        $this->setExpectedException('Exception');
+        $this->expectException(\Exception::class);
 
         $this->sut->setSerializers(['notASerializerInterface']);
     }
@@ -137,7 +147,7 @@ class SerializerManagerTest extends TestCase
         $this->sut->reset();
 
         $serializers = $this->sut->getSerializers();
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(0, $serializers);
 
         $this->stubSerializer
@@ -151,13 +161,13 @@ class SerializerManagerTest extends TestCase
         }
 
         $serializers = $this->sut->getSerializers();
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(3, $serializers);
 
         $this->sut->reset();
 
         $serializers = $this->sut->getSerializers();
-        $this->assertInternalType('array', $serializers);
+        $this->assertIsArray($serializers);
         $this->assertCount(0, $serializers);
     }
 
@@ -202,7 +212,7 @@ class SerializerManagerTest extends TestCase
 
         $this->assertTrue($this->sut->has('serializer1', true));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->sut->has('serializer2', true);
     }
@@ -223,7 +233,7 @@ class SerializerManagerTest extends TestCase
         $this->assertInstanceOf('Thelia\\Core\\Serializer\\SerializerInterface', $this->sut->get('serializer2'));
         $this->assertInstanceOf('Thelia\\Core\\Serializer\\SerializerInterface', $this->sut->get('serializer3'));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->sut->get('serializer4');
     }
@@ -265,7 +275,7 @@ class SerializerManagerTest extends TestCase
         $this->assertFalse($this->sut->has('serializer3'));
         $this->assertFalse($this->sut->has('serializer4'));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->sut->remove('serializer4');
     }

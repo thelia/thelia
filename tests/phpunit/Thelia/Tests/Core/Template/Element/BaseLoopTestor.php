@@ -14,8 +14,8 @@ namespace Thelia\Tests\Core\Template\Element;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -35,8 +35,6 @@ abstract class BaseLoopTestor extends TestCase
 
     protected $instance;
 
-    abstract public function getTestedClassName();
-    abstract public function getTestedInstance();
     abstract public function getMandatoryArguments();
 
     protected function getMethod($name)
@@ -108,10 +106,10 @@ abstract class BaseLoopTestor extends TestCase
         $this->container->set('request', $request);
         $this->container->set('request_stack', $requestStack);
         $this->container->set('event_dispatcher', new EventDispatcher());
-        $this->container->set('thelia.translator', new Translator($this->container));
+        $this->container->set('thelia.translator', new Translator($requestStack));
         $this->container->set('thelia.securityContext', new SecurityContext($requestStack));
         $this->container->set('router.admin', $stubRouterAdmin);
-        $this->container->set('thelia.url.manager', new URL($this->container));
+        $this->container->set('thelia.url.manager', new URL($stubRouterAdmin));
         $this->container->set('thelia.taxEngine', new TaxEngine($requestStack));
 
         $this->instance = $this->getTestedInstance();
@@ -173,5 +171,19 @@ abstract class BaseLoopTestor extends TestCase
         $loopResults = $this->instance->exec($dummy);
 
         $this->assertEquals($limit, $loopResults->getCount());
+    }
+
+    protected function getTestedInstance()
+    {
+        $className = $this->getTestedClassName();
+
+        return new $className(
+            $this->container,
+            $this->container->get("request_stack"),
+            $this->container->get("event_dispatcher"),
+            $this->container->get("thelia.securityContext"),
+            $this->container->get("thelia.translator"),
+            []
+        );
     }
 }

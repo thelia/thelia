@@ -31,11 +31,6 @@ class ImageTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Image';
     }
 
-    public function getTestedInstance()
-    {
-        return new Image($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array('source' => 'product', 'id' => 1);

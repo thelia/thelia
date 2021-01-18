@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop\Argument;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -64,38 +65,5 @@ class ArgumentCollectionTest extends TestCase
 
         $collection->rewind();
         $this->assertTrue($collection->key() == 'arg0');
-    }
-
-    public function testArgumentCollectionFetch()
-    {
-        $collection = new ArgumentCollection(
-            new Argument(
-                'arg0',
-                new TypeCollection(
-                    new Type\AnyType()
-                )
-            ),
-            new Argument(
-                'arg1',
-                new TypeCollection(
-                    new Type\AnyType()
-                )
-            ),
-            new Argument(
-                'arg2',
-                new TypeCollection(
-                    new Type\AnyType()
-                )
-            )
-        );
-
-        $arguments = \PHPUnit_Framework_Assert::readAttribute($collection, 'arguments');
-
-        foreach ($collection as $key => $argument) {
-            $this->assertEquals(
-                $argument,
-                $arguments[$key]
-            );
-        }
     }
 }

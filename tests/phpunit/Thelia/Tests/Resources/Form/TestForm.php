@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Resources\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -44,7 +45,7 @@ class TestForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("test_field", "text")
+            ->add("test_field", TextType::class)
         ;
     }
 

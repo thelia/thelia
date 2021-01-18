@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -64,7 +65,7 @@ class SessionTest extends TestCase
 
         $this->dispatcher = new EventDispatcher();
 
-        $translator = new Translator($this->createMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
+        $translator = new Translator($this->requestStack);
 
         $token = new TokenProvider($this->requestStack, $translator, 'test');
 
@@ -81,28 +82,19 @@ class SessionTest extends TestCase
         );
 
         $this->dispatcherNull = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
-        $this->dispatcher = $this->getMockClass(
-            'Symfony\Component\EventDispatcher\EventDispatcherInterface',
-            array(),
-            array(),
-            '',
-            true,
-            true,
-            true,
-            false
-        );
+        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->dispatcher
             ->expects($this->any())
             ->method('dispatch')
-            ->will(
+            ->willReturn(
                 $this->returnCallback(
                     function ($type, $event) {
                         if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
                             $this->cartAction->restoreCurrentCart($event, null, $this->dispatcher);
-                        } elseif ($type == TheliaEvents::CART_CREATE_NEW) {
-                            $this->cartAction->createEmptyCart($event, null, $this->dispatcher);
+                        } else {
+                            $cartEvent = new CartCreateEvent();
+                            $this->cartAction->createEmptyCart($cartEvent);
                         }
                     }
                 )

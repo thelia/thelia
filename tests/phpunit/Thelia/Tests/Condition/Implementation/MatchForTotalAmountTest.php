@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Condition\Implementation;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -40,7 +41,7 @@ class MatchForTotalAmountTest extends TestCase
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateAdapterStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR')
     {
@@ -787,7 +788,7 @@ class MatchForTotalAmountTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {

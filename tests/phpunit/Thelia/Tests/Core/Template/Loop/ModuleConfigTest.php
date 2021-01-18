@@ -28,11 +28,6 @@ class ModuleConfigTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\ModuleConfig';
     }
 
-    public function getTestedInstance()
-    {
-        return new ModuleConfig($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return [

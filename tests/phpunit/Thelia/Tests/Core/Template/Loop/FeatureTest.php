@@ -27,11 +27,6 @@ class FeatureTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Feature';
     }
 
-    public function getTestedInstance()
-    {
-        return new Feature($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

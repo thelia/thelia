@@ -31,11 +31,6 @@ class DocumentTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Document';
     }
 
-    public function getTestedInstance()
-    {
-        return new Document($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array('source' => 'product', 'id' => 1);

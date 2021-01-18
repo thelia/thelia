@@ -27,11 +27,6 @@ class CountryTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Country';
     }
 
-    public function getTestedInstance()
-    {
-        return new Country($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

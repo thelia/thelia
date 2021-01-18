@@ -49,7 +49,7 @@ class URLTest extends TestCase
 
         $container->set("router.admin", $router);
 
-        new URL($container);
+        new URL($router);
     }
 
     public function testGetIndexPage()

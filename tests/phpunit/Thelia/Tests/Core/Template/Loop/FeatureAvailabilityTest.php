@@ -27,11 +27,6 @@ class FeatureAvailabilityTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\FeatureAvailability';
     }
 
-    public function getTestedInstance()
-    {
-        return new FeatureAvailability($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

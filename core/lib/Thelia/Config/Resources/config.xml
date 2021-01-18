@@ -287,7 +287,7 @@
         <service factory="%thelia.logger.class%::getInstance" id="thelia.logger" class="%thelia.logger.class%" />
 
         <!-- The AdminRessources manager -->
-        <service id="thelia.admin.resources" class="Thelia\Core\Security\Resource\AdminResources">
+        <service id="thelia.admin.resources" class="Thelia\Core\Security\Resource\AdminResources" public="true">
             <argument>%admin.resources%</argument>
         </service>
 

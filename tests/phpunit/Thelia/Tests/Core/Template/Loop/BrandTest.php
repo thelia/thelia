@@ -28,11 +28,6 @@ class BrandTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\Brand';
     }
 
-    public function getTestedInstance()
-    {
-        return new Brand($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array();

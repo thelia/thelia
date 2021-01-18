@@ -27,11 +27,6 @@ class AttributeCombinationTest extends BaseLoopTestor
         return 'Thelia\Core\Template\Loop\AttributeCombination';
     }
 
-    public function getTestedInstance()
-    {
-        return new AttributeCombination($this->container);
-    }
-
     public function getMandatoryArguments()
     {
         return array('product_sale_elements' => 1);

@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
@@ -70,7 +71,7 @@ class FreeProductTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {
@@ -113,7 +114,7 @@ class FreeProductTest extends TestCase
 
         $stubDispatcher->expects($this->any())
             ->method('dispatch')
-            ->will($this->returnCallback(function ($dummy, $cartEvent) {
+            ->will($this->returnCallback(function ($cartEvent, $dummy) {
                 $ci = new CartItem();
                 $ci
                     ->setId(3)
@@ -159,7 +160,7 @@ class FreeProductTest extends TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count)
+    public function generateMatchingCart(MockObject $stubFacade, $count)
     {
         $product1 = ProductQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
 
@@ -228,7 +229,7 @@ class FreeProductTest extends TestCase
         return [$product1->getId(), $product2->getId()];
     }
 
-    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    public function generateNoMatchingCart(MockObject $stubFacade)
     {
         $product2 = new Product();
         $product2->setId(30);

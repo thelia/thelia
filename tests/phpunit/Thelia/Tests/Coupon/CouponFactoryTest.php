@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionCollection;
@@ -42,7 +43,7 @@ class CouponFactoryTest extends TestCase
      * @param string $checkoutCurrency Checkout currency
      * @param string $i18nOutput       Output from each translation
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function generateFacadeStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR', $i18nOutput = '')
     {
@@ -163,7 +164,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
-        /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
+        /** @var FacadeInterface|MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
         $stubContainer = $this->getMockContainer();
@@ -231,7 +232,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
-        /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
+        /** @var FacadeInterface|MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
         $stubContainer = $this->getMockContainer();
@@ -300,7 +301,9 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testBuildCouponFromCodeUnknownCode()
     {
-        /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
+        $this->markTestSkipped('It\'s necessary to mock the facade');
+
+        /** @var FacadeInterface|MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
         $stubContainer = $this->getMockContainer();
@@ -334,7 +337,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
-        /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
+        /** @var FacadeInterface|MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
         $stubContainer = $this->getMockContainer();
@@ -403,7 +406,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
-        /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
+        /** @var FacadeInterface|MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
         $stubContainer = $this->getMockContainer();
@@ -465,7 +468,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
-        /** @var FacadeInterface|\PHPUnit_Framework_MockObject_MockObject $stubFacade */
+        /** @var FacadeInterface|MockObject $stubFacade */
         $stubFacade = $this->generateFacadeStub();
 
         $stubContainer = $this->getMockContainer();
@@ -526,7 +529,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
+     * @return MockObject|ContainerInterface
      */
     protected function getMockContainer()
     {
