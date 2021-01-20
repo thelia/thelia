@@ -339,10 +339,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     private function findNextPrev(LoopResultRow $loopResultRow, ContentModel $content, $defaultFolderId)
     {
         if ($this->getWithPrevNextInfo()) {
-            $currentPosition = ContentFolderQuery::create()
+            $contentFolder = ContentFolderQuery::create()
                 ->filterByFolderId($defaultFolderId)
                 ->filterByContentId($content->getId())
-                ->findOne()->getPosition();
+                ->findOne();
+
+            $currentPosition = $contentFolder !== null ? $contentFolder->getPosition() : 0;
 
             // Find previous and next content
             $previousQuery = ContentFolderQuery::create()

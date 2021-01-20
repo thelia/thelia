@@ -12,6 +12,8 @@
 
 namespace TheliaSmarty;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 use TheliaSmarty\Compiler\RegisterParserPluginPass;
 use TheliaSmarty\Template\SmartyPluginInterface;
@@ -33,26 +35,21 @@ class TheliaSmarty extends BaseModule
     }
 
     /**
-     * Define how module services are loaded
+     * Defines how services are loaded in your modules
      *
-     * @return array
-     *
-     * autoload => if true all php file in you module directory will be loaded as services
-     * autoloadExclude => to exclude some path of service autoloading (like I18n folders)
-     * autowire => if true all your services parameters will be autowired with good services
-     * autoconfigure => if true all your service that extend an interface will be tagged if this interface need specific tag (like EventSubscriberInterface => kernel.event_subscriber)
-     *
-     * @inheritdoc
-     *
+     * @param ServicesConfigurator $servicesConfigurator
      */
-    public static function serviceLoaderConfig(): array
+    public static function configureServices(ServicesConfigurator $servicesConfigurator)
     {
-        return [
-            "autoload" => true,
-            "autoloadExclude" => [THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"],
-            "autowire" => true,
-            "autoconfigure" => true,
-            "autoconfigureInterface" => [SmartyPluginInterface::class => "thelia.parser.register_plugin"]
-        ];
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
+    }
+
+    public static function loadConfiguration(ContainerBuilder $containerBuilder)
+    {
+        $containerBuilder->registerForAutoconfiguration(SmartyPluginInterface::class)
+            ->addTag("thelia.parser.register_plugin");
     }
 }

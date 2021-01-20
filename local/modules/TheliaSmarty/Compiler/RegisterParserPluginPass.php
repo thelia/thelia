@@ -15,6 +15,7 @@ namespace TheliaSmarty\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use TheliaSmarty\Template\SmartyParser;
 
 /**
  * Register parser plugins. These plugins shouild be tagged thelia.parser.register_plugin
@@ -33,11 +34,11 @@ class RegisterParserPluginPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition("thelia.parser")) {
+        if (!$container->hasDefinition(SmartyParser::class)) {
             return;
         }
 
-        $smarty = $container->getDefinition("thelia.parser");
+        $smarty = $container->getDefinition(SmartyParser::class);
 
         foreach ($container->findTaggedServiceIds("thelia.parser.register_plugin") as $id => $plugin) {
             $smarty->addMethodCall("addPlugins", array(new Reference($id)));
