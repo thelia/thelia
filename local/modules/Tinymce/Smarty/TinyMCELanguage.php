@@ -14,6 +14,7 @@ namespace Tinymce\Smarty;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Lang;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -28,8 +29,9 @@ class TinyMCELanguage extends AbstractSmartyPlugin
     /** @var  string $locale */
     private $locale;
 
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
+        $request = $requestStack->getCurrentRequest();
         if ($request->getSession() != null) {
             $this->locale = $request->getSession()->getLang()->getLocale();
         } else {

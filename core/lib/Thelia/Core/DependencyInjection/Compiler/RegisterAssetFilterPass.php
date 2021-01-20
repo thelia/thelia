@@ -15,6 +15,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Thelia\Core\Template\Assets\AsseticAssetManager;
 
 /**
  * Class RegisterAssetFilterPass
@@ -23,8 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterAssetFilterPass implements CompilerPassInterface
 {
-    const MANAGER_DEFINITION = "assetic.asset.manager";
-
     const SERVICE_TAG = "thelia.asset.filter";
 
     /**
@@ -36,11 +35,11 @@ class RegisterAssetFilterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(static::MANAGER_DEFINITION)) {
+        if (!$container->hasDefinition(AsseticAssetManager::class)) {
             return;
         }
 
-        $manager = $container->getDefinition(static::MANAGER_DEFINITION);
+        $manager = $container->getDefinition(AsseticAssetManager::class);
         $services = $container->findTaggedServiceIds(static::SERVICE_TAG);
 
         foreach ($services as $id => $attributes) {

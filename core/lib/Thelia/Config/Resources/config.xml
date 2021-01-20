@@ -131,7 +131,7 @@
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>
 
         <!--  The assets manager -->
-        <service id="assetic.asset.manager" alias="Thelia\Core\Template\Assets\AsseticAssetManager"/>
+        <service id="assetic.asset.manager" alias="Thelia\Core\Template\Assets\AsseticAssetManager" public="true"/>
 
         <!-- The asset filters -->
         <service id="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
@@ -174,9 +174,7 @@
 
         <!--  Translation and internationalisation -->
 
-        <service id="Thelia\Core\Translation\Translator" public="true">
-            <argument type="service" id="request_stack"/>
-        </service>
+<!--        <service id="Thelia\Core\Translation\Translator" public="true"/>-->
         <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="Thelia\Core\Translation\Translator" />
         <service id="thelia.translator" alias="Thelia\Core\Translation\Translator" />
 

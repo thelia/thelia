@@ -7,15 +7,15 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 return function(ContainerConfigurator $configurator) {
-    $services = $configurator->services()
-        ->defaults()
+    $serviceConfigurator = $configurator->services();
+
+    $serviceConfigurator->defaults()
         ->autowire(false)
         ->autoconfigure(false)
         ->bind('$kernelDebug', '%kernel.debug%')
-        ->bind('$kernelEnvironment', '%kernel.environment%')
-        ;
+        ->bind('$kernelEnvironment', '%kernel.environment%');
 
-    $services->load('Thelia\\',THELIA_LIB )
+    $serviceConfigurator->load('Thelia\\',THELIA_LIB )
         ->exclude(
             [
                 THELIA_LIB."/Command/Skeleton/Module/I18n/*.php",
@@ -29,16 +29,8 @@ return function(ContainerConfigurator $configurator) {
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
-                $serviceLoaderConfig = \call_user_func(array($module->getFullNamespace(), 'serviceLoaderConfig'));
-
-                if (!$serviceLoaderConfig['autoload']) {
-                    continue;
-                }
-
-                $services->load($module->getCode().'\\', $module->getAbsoluteBaseDir())
-                    ->exclude($serviceLoaderConfig['autoloadExclude'])
-                    ->autowire($serviceLoaderConfig['autowire'])
-                    ->autoconfigure($serviceLoaderConfig['autoconfigure']);
+                \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
+                \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
             } catch (\Exception $e) {
                 Tlog::getInstance()->addError(
                     sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),

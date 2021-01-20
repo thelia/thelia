@@ -15,6 +15,9 @@ namespace Thelia\Module;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -476,15 +479,19 @@ class BaseModule implements BaseModuleInterface
         return array();
     }
 
-    public static function serviceLoaderConfig()
+    public static function configureContainer(ContainerConfigurator $containerConfigurator)
     {
-        return [
-            "autoload" => false,
-            "autoloadExclude" => [],
-            "autowire" => false,
-            "autoconfigure" => false,
-            "autoconfigureInterface" => []
-        ];
+        // Override this method to configure the container for your module
+    }
+
+    public static function configureServices(ServicesConfigurator $servicesConfigurator)
+    {
+        // Override this method to configure the services for your module
+    }
+
+    public static function loadConfiguration(ContainerBuilder $containerBuilder)
+    {
+        // Override this method load more configuration for your module
     }
 
     /**

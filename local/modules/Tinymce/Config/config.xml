@@ -7,7 +7,7 @@
     <services>
         <service id="smarty.plugin.tinymce_lang" class="Tinymce\Smarty\TinyMCELanguage">
             <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="request"/>
+            <argument type="service" id="request_stack"/>
         </service>
     </services>
 

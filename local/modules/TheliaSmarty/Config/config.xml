@@ -7,14 +7,7 @@
 
     <services>
         <!-- Parser configuration -->
-        <service id="thelia.parser" class="TheliaSmarty\Template\SmartyParser" public="true">
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.parser.context"/>
-            <argument type="service" id="thelia.template_helper"/>
-            <argument >%kernel.environment%</argument>
-            <argument >%kernel.debug%</argument>
-        </service>
+        <service id="thelia.parser" alias="TheliaSmarty\Template\SmartyParser" public="true"/>
         <service id="Thelia\Core\Template\ParserInterface" alias="TheliaSmarty\Template\SmartyParser"/>
 <!--        <service id="thelia.parser" alias="TheliaSmarty\Template\SmartyParser" public="true"/>-->
 

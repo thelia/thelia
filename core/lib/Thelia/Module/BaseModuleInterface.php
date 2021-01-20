@@ -13,6 +13,9 @@
 namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Model\Module;
 
 interface BaseModuleInterface
@@ -200,27 +203,25 @@ interface BaseModuleInterface
     public static function getCompilers();
 
     /**
-     * Define how module services are loaded
+     * Called on Thelia container configurator to allow module to add their configuration
      *
-     * @return array
-     *
-     * All keys are needed
-     *
-     * autoload => if true all php file in you module directory will be loaded as services
-     * autoloadExclude => to exclude some path of service autoloading (like I18n folders)
-     * autowire => if true all your services parameters will be autowired with good services
-     * autoconfigure => if true all your service that extend an interface will be tagged if this interface need specific tag (like EventSubscriberInterface => kernel.event_subscriber)
-     *
-     * Example :
-     *
-     * return [
-     *      "autoload" => true,
-     *      "autoloadExclude" => [THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"],
-     *      "autowire" => true,
-     *      "autoconfigure" => true,
-     *  ];
+     * @param ContainerConfigurator $containerConfigurator
      */
-    public static function serviceLoaderConfig();
+    public static function configureContainer(ContainerConfigurator $containerConfigurator);
+
+    /**
+     * Called on Thelia services configurator to allow module to add their configuration
+     *
+     * @param ServicesConfigurator $servicesConfigurator
+     */
+    public static function configureServices(ServicesConfigurator $servicesConfigurator);
+
+    /**
+     * Allow modules to add their configuration to the container
+     *
+     * @param ContainerBuilder $containerBuilder
+     */
+    public static function loadConfiguration(ContainerBuilder $containerBuilder);
 
     /**
      * @return array

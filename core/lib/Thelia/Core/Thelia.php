@@ -51,6 +51,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
+use TheliaSmarty\Template\SmartyParser;
 
 class Thelia extends Kernel
 {
@@ -318,11 +319,8 @@ class Thelia extends Kernel
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
-                    $serviceLoaderConfig = \call_user_func(array($module->getFullNamespace(), 'serviceLoaderConfig'));
-                    foreach ($serviceLoaderConfig['autoconfigureInterface'] as $interfaceClass => $tag) {
-                        $container->registerForAutoconfiguration($interfaceClass)
-                            ->addTag($tag);
-                    }
+                    //In case modules want add configuration
+                    \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
 
                     $definition = new Definition();
                     $definition->setClass($module->getFullNamespace());
@@ -361,7 +359,7 @@ class Thelia extends Kernel
                 }
             }
 
-            $parser = $container->getDefinition('thelia.parser');
+            $parser = $container->getDefinition(SmartyParser::class);
 
             /** @var \Thelia\Core\Template\TemplateHelperInterface $templateHelper */
             $templateHelper = $container->get('thelia.template_helper');
