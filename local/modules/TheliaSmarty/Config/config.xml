@@ -24,7 +24,7 @@
 
         <service id="smarty.plugin.format" alias="TheliaSmarty\Template\Plugins\Format"/>
 
-        <service id="TheliaSmarty\Template\Plugins\TheliaLoop">
+        <service id="TheliaSmarty\Template\Plugins\TheliaLoop" public="true">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="service_container" />
             <argument type="service" id="request_stack" />

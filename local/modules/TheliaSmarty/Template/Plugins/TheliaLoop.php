@@ -493,17 +493,31 @@ class TheliaLoop extends AbstractSmartyPlugin
     public function setLoopList(array $loopDefinition)
     {
         foreach ($loopDefinition as $name => $className) {
-            if (array_key_exists($name, $this->loopDefinition)) {
-                throw new \InvalidArgumentException(
-                    $this->translator->trans("The loop name '%name' is already defined in %className class", [
-                            '%name' => $name,
-                            '%className' => $className
-                        ])
-                );
-            }
-
-            $this->loopDefinition[$name] = $className;
+            $this->registerLoop($className, $name);
         }
+    }
+
+    public function getLoopList()
+    {
+        return $this->loopDefinition;
+    }
+
+    public function registerLoop($className, $name = null)
+    {
+        if (null === $name) {
+            $classParts = explode('\\', $className);
+            $name = strtolower(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($classParts))));
+        }
+        if (array_key_exists($name, $this->loopDefinition)) {
+            throw new \InvalidArgumentException(
+                $this->translator->trans("The loop name '%name' is already defined in %className class", [
+                    '%name' => $name,
+                    '%className' => $className
+                ])
+            );
+        }
+
+        $this->loopDefinition[$name] = $className;
     }
 
     /**
