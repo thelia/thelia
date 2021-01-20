@@ -5,16 +5,7 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <services>
-        <service id="Thelia\Action\Hook">
-            <argument>%kernel.cache_dir%</argument>
-            <tag name="kernel.event_subscriber"/>
-        </service>
         <service id="thelia.action.hook" alias="Thelia\Action\Hook"/>
-
-        <service id="Thelia\Action\ModuleHook">
-            <argument>%kernel.cache_dir%</argument>
-            <tag name="kernel.event_subscriber"/>
-        </service>
 
         <service id="thelia.action.module" alias="Thelia\Action\Module"/>
 

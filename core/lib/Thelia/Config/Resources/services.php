@@ -12,6 +12,7 @@ return function(ContainerConfigurator $configurator) {
     $serviceConfigurator->defaults()
         ->autowire(false)
         ->autoconfigure(false)
+        ->bind('$kernelCacheDir', '%kernel.cache_dir%')
         ->bind('$kernelDebug', '%kernel.debug%')
         ->bind('$kernelEnvironment', '%kernel.environment%');
 
