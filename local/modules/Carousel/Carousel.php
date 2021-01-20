@@ -13,6 +13,7 @@
 namespace Carousel;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -105,5 +106,18 @@ class Carousel extends BaseModule
                 $database->insertSql(null, [$updateSQLFile->getPathname()]);
             }
         }
+    }
+
+    /**
+     * Defines how services are loaded in your modules
+     *
+     * @param ServicesConfigurator $servicesConfigurator
+     */
+    public static function configureServices(ServicesConfigurator $servicesConfigurator)
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
     }
 }

@@ -44,6 +44,7 @@ use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Template\Element\BaseLoopInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -293,6 +294,7 @@ class Thelia extends Kernel
             SerializerInterface::class => "thelia.serializer",
             ArchiverInterface::class => "thelia.archiver",
             FormExtensionInterface::class => "thelia.forms.extension",
+            BaseLoopInterface::class => "thelia.loop"
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {

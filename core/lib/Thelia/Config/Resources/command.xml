@@ -29,6 +29,7 @@
         <command class="Thelia\Command\UpdateCurrenciesRates"/>
         <command class="Thelia\Command\DiffDatabaseCommand"/>
         <command class="Thelia\Command\FrontTemplate"/>
+        <command class="Thelia\Command\LoopListCommand"/>
     </commands>
 
 </config>

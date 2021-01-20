@@ -31,10 +31,8 @@ use Thelia\Log\Tlog;
  * @package Carousel\Loop
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class CarouselLoop extends Image
+class Carousel extends Image
 {
-
-
     /**
      * @inheritdoc
      */

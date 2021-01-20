@@ -51,7 +51,7 @@ use Thelia\Type\TypeCollection;
  * @method ModelCriteria buildModelCriteria()
  * @method array buildArray()
  */
-abstract class BaseLoop
+abstract class BaseLoop implements BaseLoopInterface
 {
     /** @var String|null The loop name  */
     protected $loopName = null;
