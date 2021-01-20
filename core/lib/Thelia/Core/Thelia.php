@@ -27,6 +27,7 @@ use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -294,7 +295,8 @@ class Thelia extends Kernel
             SerializerInterface::class => "thelia.serializer",
             ArchiverInterface::class => "thelia.archiver",
             FormExtensionInterface::class => "thelia.forms.extension",
-            BaseLoopInterface::class => "thelia.loop"
+            BaseLoopInterface::class => "thelia.loop",
+            ContainerAwareInterface::class => "thelia.command"
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {

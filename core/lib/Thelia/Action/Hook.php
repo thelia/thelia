@@ -36,9 +36,9 @@ class Hook extends BaseAction implements EventSubscriberInterface
     /** @var string */
     protected $cacheDir;
 
-    public function __construct($cacheDir)
+    public function __construct($kernelCacheDir)
     {
-        $this->cacheDir = $cacheDir;
+        $this->cacheDir = $kernelCacheDir;
     }
 
     public function create(HookCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)

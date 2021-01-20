@@ -74,9 +74,19 @@ class Application extends BaseApplication
         foreach ($container->getParameter("command.definition") as $command) {
             $r = new \ReflectionClass($command);
 
-            if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
-                $this->add($r->newInstance());
+            if (!$r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command')) {
+                continue;
             }
+
+            if ($r->isAbstract()) {
+                continue;
+            }
+
+            if (!$r->hasMethod("configure")) {
+                continue;
+            }
+
+            $this->add($r->newInstance());
         }
     }
 }
