@@ -59,7 +59,8 @@ class ShippingZoneController extends BaseAdminController
             return $response;
         }
 
-        $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
+//        $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
+        $shippingAreaForm = $this->createForm("thelia.shipping_zone_area");
         $error_msg = null;
 
         try {

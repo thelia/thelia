@@ -72,6 +72,10 @@
             <tag name="router.register" priority="0"/>
         </service>
 
+        <service id="router.annotation" class="Thelia\Core\Routing\AnnotationRouter">
+            <argument type="service" id="router.fileLocator"/>
+            <tag name="router.register" priority="255"/>
+        </service>
 
         <service id="router.rewrite" class="Thelia\Core\Routing\RewritingRouter">
             <tag name="router.register" priority="255"/>
