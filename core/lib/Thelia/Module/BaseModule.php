@@ -619,7 +619,7 @@ class BaseModule implements BaseModuleInterface
                         ->setDescription($data["description"])
                     ;
 
-                    $dispatcher->dispatch(TheliaEvents::HOOK_UPDATE, $event);
+                    $dispatcher->dispatch($event, TheliaEvents::HOOK_UPDATE);
                 }
             }
         }

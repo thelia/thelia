@@ -43,6 +43,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
@@ -58,6 +59,16 @@ use TheliaSmarty\Template\SmartyParser;
 class Thelia extends Kernel
 {
     const THELIA_VERSION = '2.4.4';
+
+    protected $propelSchemaLocator;
+
+    protected $propelInitService;
+
+    protected $propelConnectionAvailable;
+
+    protected $theliaDatabaseConnection;
+
+    protected $cacheRefresh;
 
     public function __construct($environment, $debug)
     {
@@ -153,45 +164,50 @@ class Thelia extends Kernel
         return '\Thelia\Core\DependencyInjection\TheliaContainer';
     }
 
+    protected function initializeContainer()
+    {
+        // initialize Propel, building its cache if necessary
+        $this->propelSchemaLocator = new SchemaLocator(
+            THELIA_CONF_DIR,
+            THELIA_MODULE_DIR
+        );
+        $this->propelInitService = new PropelInitService(
+            $this->getEnvironment(),
+            $this->isDebug(),
+            $this->getKernelParameters(),
+            $this->propelSchemaLocator
+        );
+
+        $this->propelConnectionAvailable = $this->initializePropelService(false, $this->cacheRefresh);
+
+        if ($this->propelConnectionAvailable) {
+            $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
+            $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
+        }
+
+        parent::initializeContainer();
+    }
+
     /**
      * @inheritDoc
      * @throws \Exception
      */
     public function boot()
     {
-        // initialize Propel, building its cache if necessary
-        $propelSchemaLocator = new SchemaLocator(
-            THELIA_CONF_DIR,
-            THELIA_MODULE_DIR
-        );
-        $propelInitService = new PropelInitService(
-            $this->getEnvironment(),
-            $this->isDebug(),
-            $this->getKernelParameters(),
-            $propelSchemaLocator
-        );
-
-        $propelConnectionAvailable = $this->initializePropelService(false, $cacheRefresh);
-
-        if ($propelConnectionAvailable) {
-            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
-            $this->checkMySQLConfigurations($theliaDatabaseConnection);
-        }
-
         parent::boot();
 
-        $this->getContainer()->set('thelia.propel.schema.locator', $propelSchemaLocator);
-        $this->getContainer()->set('thelia.propel.init', $propelInitService);
+        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
 
-        if ($cacheRefresh) {
+        if ($this->cacheRefresh) {
             $moduleManagement = new ModuleManagement($this->getContainer());
             $moduleManagement->updateModules($this->getContainer());
         }
 
         $eventDispatcher = new EventDispatcher();
 
-        if ($propelConnectionAvailable) {
-            $theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
+        if ($this->propelConnectionAvailable) {
+            $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
         }
 
         if (self::isInstalled()) {
@@ -577,6 +593,9 @@ class Thelia extends Kernel
     protected function getKernelParameters()
     {
         $parameters = parent::getKernelParameters();
+
+        //Todo replace this by real runtime env
+        $parameters["kernel.runtime_environment"] = $this->environment;
 
         $parameters["thelia.root_dir"] = THELIA_ROOT;
         $parameters["thelia.core_dir"] = dirname(__DIR__); // This class is in core/lib/Thelia/Core.

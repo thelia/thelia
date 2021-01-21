@@ -13,11 +13,13 @@
 namespace Thelia\Core\Form\Type\Field;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class AbstractIdType
@@ -26,16 +28,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractIdType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -50,14 +42,14 @@ abstract class AbstractIdType extends AbstractType
 
     public function getParent()
     {
-        return "integer";
+        return IntegerType::class;
     }
 
     public function checkId($value, ExecutionContextInterface $context)
     {
         if (null === $this->getQuery()->findPk($value)) {
             $context->addViolation(
-                $this->translator->trans(
+                Translator::getInstance()->trans(
                     "The %obj_name id '%id' doesn't exist",
                     [
                         "%obj_name" => $this->getObjName(),
