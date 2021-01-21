@@ -5,104 +5,56 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <services>
+        <!-- Only aliases for compatibility -->
         <service id="thelia.action.hook" alias="Thelia\Action\Hook"/>
-
         <service id="thelia.action.module" alias="Thelia\Action\Module"/>
-
         <service id="thelia.action.moduleHook" alias="Thelia\Action\ModuleHook"/>
-
         <service id="thelia.action.order" alias="Thelia\Action\Order"/>
-
         <service id="thelia.action.order_status" alias="Thelia\Action\OrderStatus"/>
-
         <service id="thelia.action.coupon" alias="Thelia\Action\Coupon"/>
-
         <service id="thelia.action.httpException" alias="Thelia\Action\HttpException"/>
-
         <service id="thelia.action.RedirectException" alias="Thelia\Action\RedirectException"/>
-
         <service id="thelia.action.customer" alias="Thelia\Action\Customer"/>
-
         <service id="thelia.action.address" alias="Thelia\Action\Address"/>
-
         <service id="thelia.action.administrator" alias="Thelia\Action\Administrator"/>
-
         <service id="thelia.action.cart" alias="Thelia\Action\Cart"/>
-
         <service id="thelia.action.file" alias="Thelia\Action\File"/>
-
         <service id="thelia.action.image" alias="Thelia\Action\Image"/>
-
         <service id="thelia.action.document" alias="Thelia\Action\Document"/>
-
         <service id="thelia.action.category" alias="Thelia\Action\Category"/>
-
         <service id="thelia.action.product" alias="Thelia\Action\Product"/>
-
         <service id="thelia.action.product_sale_element" alias="Thelia\Action\ProductSaleElement"/>
-
         <service id="thelia.action.config" alias="Thelia\Action\Config"/>
-
         <service id="thelia.action.message" alias="Thelia\Action\Message"/>
-
         <service id="thelia.action.currency" alias="Thelia\Action\Currency"/>
-
         <service id="thelia.action.template" alias="Thelia\Action\Template"/>
-
         <service id="thelia.action.attribute" alias="Thelia\Action\Attribute"/>
-
         <service id="thelia.action.feature" alias="Thelia\Action\Feature"/>
-
         <service id="thelia.action.attributeav" alias="Thelia\Action\AttributeAv"/>
-
         <service id="thelia.action.featureav" alias="Thelia\Action\FeatureAv"/>
-
         <service id="thelia.action.folder" alias="Thelia\Action\Folder"/>
-
         <service id="thelia.action.taxrule" alias="Thelia\Action\TaxRule"/>
-
         <service id="thelia.action.tax" alias="Thelia\Action\Tax"/>
-
         <service id="thelia.action.content" alias="Thelia\Action\Content"/>
-
         <service id="thelia.action.brand" alias="Thelia\Action\Brand"/>
-
         <service id="thelia.action.pdf" alias="Thelia\Action\Pdf"/>
-
         <service id="thelia.action.country" alias="Thelia\Action\Country"/>
-
         <service id="thelia.action.state" alias="Thelia\Action\State"/>
-
         <service id="thelia.action.area" alias="Thelia\Action\Area"/>
-
         <service id="thelia.action.shippingZone" alias="Thelia\Action\ShippingZone"/>
-
         <service id="thelia.action.cache" alias="Thelia\Action\Cache"/>
-
         <service id="thelia.action.profile" alias="Thelia\Action\Profile"/>
-
         <service id="thelia.action.mailing_system" alias="Thelia\Action\MailingSystem"/>
-
         <service id="thelia.action.newsletter" alias="Thelia\Action\Newsletter"/>
-
         <service id="thelia.action.lang" alias="Thelia\Action\Lang"/>
-
         <service id="thelia.action.export" alias="Thelia\Action\Export"/>
-
         <service id="thelia.action.import" alias="Thelia\Action\Import"/>
-
         <service id="thelia.action.sale" alias="Thelia\Action\Sale"/>
-
         <service id="thelia.metadata" alias="Thelia\Action\MetaData"/>
-
         <service id="thelia.action.api" alias="Thelia\Action\Api"/>
-
         <service id="thelia.action.customer_title" alias="Thelia\Action\CustomerTitle"/>
-
         <service id="thelia.action.translation" alias="Thelia\Action\Translation"/>
-
         <service id="thelia.action.module.delivery" alias="Thelia\Action\Delivery"/>
-
         <service id="thelia.action.module.payment" alias="Thelia\Action\Payment"/>
     </services>
 </config>

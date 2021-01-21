@@ -5,133 +5,35 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <services>
-        <!-- Coupon module -->
-
+        <!-- Base services -->
         <service id="thelia.facade" alias="Thelia\Coupon\BaseFacade" public="true"/>
+        <service id="thelia.coupon.manager" alias="Thelia\Coupon\CouponManager"/>
+        <service id="thelia.coupon.factory" alias="Thelia\Coupon\CouponFactory"/>
+        <service id="thelia.condition.factory" alias="Thelia\Condition\ConditionFactory" public="true"/>
 
-        <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
-            <argument type="service" id="thelia.facade" />
-            <argument type="service" id="thelia.coupon.factory" />
-            <argument type="service" id="request_stack" />
-        </service>
+        <!-- Coupon types only aliases fo BC (autoconfigured by CouponInterface) -->
+        <service id="thelia.coupon.type.remove_x_amount" alias="Thelia\Coupon\Type\RemoveXAmount"/>
+        <service id="thelia.coupon.type.remove_x_percent" alias="Thelia\Coupon\Type\RemoveXPercent"/>
+        <service id="thelia.coupon.type.remove_amount_on_categories" alias="Thelia\Coupon\Type\RemoveAmountOnCategories"/>
+        <service id="thelia.coupon.type.remove_percentage_on_categories" alias="Thelia\Coupon\Type\RemovePercentageOnCategories"/>
+        <service id="thelia.coupon.type.remove_amount_on_products" alias="Thelia\Coupon\Type\RemoveAmountOnProducts"/>
+        <service id="thelia.coupon.type.remove_percentage_on_products" alias="Thelia\Coupon\Type\RemovePercentageOnProducts"/>
+        <service id="thelia.coupon.type.remove_percentage_on_products" alias="Thelia\Coupon\Type\RemovePercentageOnProducts"/>
+        <service id="thelia.coupon.type.remove_amount_on_attribute_av" alias="Thelia\Coupon\Type\RemoveAmountOnAttributeValues"/>
+        <service id="thelia.coupon.type.remove_percentage_on_attribute_av" alias="Thelia\Coupon\Type\RemovePercentageOnAttributeValues"/>
+        <service id="thelia.coupon.type.free_product" alias="Thelia\Coupon\Type\FreeProduct"/>
 
-        <service id="thelia.coupon.factory" class="Thelia\Coupon\CouponFactory">
-            <argument type="service" id="service_container" />
-            <argument type="service" id="thelia.facade" />
-            <argument type="service" id="thelia.condition.factory" />
-        </service>
-
-        <!-- Coupon types -->
-
-        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmount">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercent">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_amount_on_categories" class="Thelia\Coupon\Type\RemoveAmountOnCategories">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_percentage_on_categories" class="Thelia\Coupon\Type\RemovePercentageOnCategories">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_amount_on_products" class="Thelia\Coupon\Type\RemoveAmountOnProducts">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_percentage_on_products" class="Thelia\Coupon\Type\RemovePercentageOnProducts">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_percentage_on_products" class="Thelia\Coupon\Type\RemovePercentageOnProducts">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_amount_on_attribute_av" class="Thelia\Coupon\Type\RemoveAmountOnAttributeValues">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.remove_percentage_on_attribute_av" class="Thelia\Coupon\Type\RemovePercentageOnAttributeValues">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <service id="thelia.coupon.type.free_product" class="Thelia\Coupon\Type\FreeProduct">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCoupon"/>
-        </service>
-
-        <!-- Condition module -->
-
-        <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory" public="true">
-            <argument type="service" id="service_container" />
-            <argument type="service" id="thelia.facade" />
-        </service>
-
-        <service id="thelia.condition.validator" class="Thelia\Condition\ConditionEvaluator">
-        </service>
-
-        <service id="thelia.condition.match_for_everyone" class="Thelia\Condition\Implementation\MatchForEveryone">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.match_for_total_amount" class="Thelia\Condition\Implementation\MatchForTotalAmount">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.match_for_x_articles" class="Thelia\Condition\Implementation\MatchForXArticles">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.match_for_x_articles_include_quantity" class="Thelia\Condition\Implementation\MatchForXArticlesIncludeQuantity">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.match_delivery_countries" class="Thelia\Condition\Implementation\MatchDeliveryCountries">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.match_billing_countries" class="Thelia\Condition\Implementation\MatchBillingCountries">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.start_date" class="Thelia\Condition\Implementation\StartDate">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.cart_contains_categories" class="Thelia\Condition\Implementation\CartContainsCategories">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.cart_contains_products" class="Thelia\Condition\Implementation\CartContainsProducts">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
-        <service id="thelia.condition.for_some_customers" class="Thelia\Condition\Implementation\ForSomeCustomers">
-            <argument type="service" id="thelia.facade" />
-            <tag name="thelia.coupon.addCondition"/>
-        </service>
-
+        <!-- Conditions only aliases fo BC (autoconfigured by ConditionInterface) -->
+        <service id="thelia.condition.validator" alias="Thelia\Condition\ConditionEvaluator"/>
+        <service id="thelia.condition.match_for_everyone" alias="Thelia\Condition\Implementation\MatchForEveryone"/>
+        <service id="thelia.condition.match_for_total_amount" alias="Thelia\Condition\Implementation\MatchForTotalAmount"/>
+        <service id="thelia.condition.match_for_x_articles" alias="Thelia\Condition\Implementation\MatchForXArticles"/>
+        <service id="thelia.condition.match_for_x_articles_include_quantity" alias="Thelia\Condition\Implementation\MatchForXArticlesIncludeQuantity"/>
+        <service id="thelia.condition.match_delivery_countries" alias="Thelia\Condition\Implementation\MatchDeliveryCountries"/>
+        <service id="thelia.condition.match_billing_countries" alias="Thelia\Condition\Implementation\MatchBillingCountries"/>
+        <service id="thelia.condition.start_date" alias="Thelia\Condition\Implementation\StartDate"/>
+        <service id="thelia.condition.cart_contains_categories" alias="Thelia\Condition\Implementation\CartContainsCategories"/>
+        <service id="thelia.condition.cart_contains_products" alias="Thelia\Condition\Implementation\CartContainsProducts"/>
+        <service id="thelia.condition.for_some_customers" alias="Thelia\Condition\Implementation\ForSomeCustomers"/>
     </services>
 </config>

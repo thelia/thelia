@@ -15,6 +15,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Thelia\Coupon\CouponManager;
 
 /**
  * Class RegisterListenersPass
@@ -37,11 +38,11 @@ class RegisterCouponConditionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('thelia.coupon.manager')) {
+        if (!$container->hasDefinition(CouponManager::class)) {
             return;
         }
 
-        $couponManager = $container->getDefinition('thelia.coupon.manager');
+        $couponManager = $container->getDefinition(CouponManager::class);
         $services = $container->findTaggedServiceIds("thelia.coupon.addCondition");
 
         foreach ($services as $id => $condition) {

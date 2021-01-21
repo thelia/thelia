@@ -268,7 +268,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getParser()
     {
-        if ($this->parser == null) {
+        if ($this->parser !== null) {
             // Define the current back-office template that should be used
             $this->parser->setTemplateDefinition(
                 $this->parser->getTemplateHelper()->getActiveAdminTemplate()

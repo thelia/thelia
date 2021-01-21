@@ -96,9 +96,7 @@
         <parameter key="thelia.cache.namespace">thelia_cache</parameter>
     </parameters>
 
-
     <services>
-
         <!-- Thelia template helper -->
         <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
 

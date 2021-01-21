@@ -40,6 +40,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Contracts\EventDispatcher\Event;
+use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
@@ -50,6 +51,7 @@ use Thelia\Core\Template\Element\BaseLoopInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -312,7 +314,9 @@ class Thelia extends Kernel
             ArchiverInterface::class => "thelia.archiver",
             FormExtensionInterface::class => "thelia.forms.extension",
             BaseLoopInterface::class => "thelia.loop",
-            ContainerAwareInterface::class => "thelia.command"
+            ContainerAwareInterface::class => "thelia.command",
+            CouponInterface::class => "thelia.coupon.addCoupon",
+            ConditionInterface::class => "thelia.coupon.addCondition"
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
