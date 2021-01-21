@@ -17,7 +17,10 @@ use Carousel\Model\CarouselQuery;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -42,7 +45,7 @@ class CarouselUpdateForm extends BaseForm
 
             $formBuilder->add(
                 'position' . $id,
-                'text',
+                TextType::class,
                 [
                     'label' => $this->translator->trans('Image position in carousel', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
@@ -59,7 +62,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'alt' . $id,
-                'text',
+                TextType::class,
                 [
                     'label' => $this->translator->trans('Alternative image text', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
@@ -76,7 +79,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'group' . $id,
-                'text',
+                TextType::class,
                 [
                     'label' => $this->translator->trans('Group image', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
@@ -93,7 +96,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'url' . $id,
-                'url',
+                UrlType::class,
                 [
                     'label' => $this->translator->trans('Image URL', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
@@ -110,7 +113,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'title' . $id,
-                'text',
+                TextType::class,
                 [
                     'constraints' => [],
                     'required' => false,
@@ -124,7 +127,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'chapo' . $id,
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [],
                     'required' => false,
@@ -144,7 +147,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'description' . $id,
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [],
                     'required' => false,
@@ -196,7 +199,7 @@ class CarouselUpdateForm extends BaseForm
                 ]
             )->add(
                 'postscriptum' . $id,
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [],
                     'required' => false,
