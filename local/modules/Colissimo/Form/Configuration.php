@@ -10,40 +10,43 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Carousel\Form;
+namespace Colissimo\Form;
 
-use Carousel\Carousel;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Validator\Constraints\Image;
+use Colissimo\Colissimo;
+use Colissimo\Model\Config\Base\ColissimoConfigValue;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class CarouselImageForm
- * @package Carousel\Form
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * Class Configuration
+ * @package Colissimo\Form
+ * @author Thomas Arnaud <tarnaud@openstudio.fr>
  */
-class CarouselImageForm extends BaseForm
+class Configuration extends BaseForm
 {
-    /**
-     * @inheritdoc
-     */
+
     protected function buildForm()
     {
-        $translator = Translator::getInstance();
         $this->formBuilder
             ->add(
-                'file',
-                FileType::class,
-                [
-                    'constraints' => [
-                        new Image()
+                "enabled",
+                CheckboxType::class,
+                array(
+                    "label" => "Enabled",
+                    "label_attr" => [
+                        "for" => "enabled",
+                        "help" => Translator::getInstance()->trans(
+                            'Check if you want to activate Colissimo',
+                            [],
+                            Colissimo::DOMAIN_NAME
+                        )
                     ],
-                    'label' => $translator->trans('Carousel image', [], Carousel::DOMAIN_NAME),
-                    'label_attr' => [
-                        'for' => 'file'
-                    ]
-                ]
+                    "required" => false,
+                    "constraints" => array(
+                    ),
+                    "value" => Colissimo::getConfigValue(ColissimoConfigValue::ENABLED, 1),
+                )
             );
     }
 
@@ -52,6 +55,6 @@ class CarouselImageForm extends BaseForm
      */
     public function getName()
     {
-        return 'carousel_image';
+        return "colissimo_enable";
     }
 }
