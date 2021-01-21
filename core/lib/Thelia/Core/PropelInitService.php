@@ -379,21 +379,21 @@ class PropelInitService
      */
     public function registerPropelModelLoader()
     {
-//        $loader = new ClassLoader();
-//
-//        $loader->addPrefix(
-//            '', // no prefix, models already define their full namespace
-//            $this->getPropelModelDir()
-//        );
-//
-//        $loader->addPrefix(
-//            '', // no prefix, models already define their full namespace
-//            $this->getPropelDatabaseDir()
-//        );
-//
-//        $loader->register(
-//            true // prepend the autoloader to use cached models first
-//        );
+        $loader = new \Composer\Autoload\ClassLoader();
+
+        $loader->add(
+            '', // no prefix, models already define their full namespace
+            $this->getPropelModelDir()
+        );
+
+        $loader->add(
+            '', // no prefix, models already define their full namespace
+            $this->getPropelDatabaseDir()
+        );
+
+        $loader->register(
+            true // prepend the autoloader to use cached models first
+        );
     }
 
     /**
