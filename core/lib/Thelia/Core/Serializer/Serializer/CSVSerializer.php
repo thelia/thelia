@@ -134,24 +134,31 @@ class CSVSerializer extends AbstractSerializer
 
         clearstatcache(true, $fileObject->getPathname());
     }
-
+    
+    
     public function unserialize(\SplFileObject $fileObject)
     {
         $data = [];
 
-        foreach ($fileObject as $index => $row) {
+        $index = 0;
+        while(null !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
+            $index++;
             if (empty($row)) {
                 continue;
             }
 
-            if ($index === 0) {
-                $this->headers = str_getcsv($row, $this->delimiter, $this->enclosure);
+            if ($index === 1) {
+                $this->headers = $row;
+                continue;
+            }
+
+            if (count($row) !== count($this->headers)) {
                 continue;
             }
 
             $data[] = array_combine(
                 $this->headers,
-                str_getcsv($row, $this->delimiter, $this->enclosure)
+                $row
             );
         }
 
