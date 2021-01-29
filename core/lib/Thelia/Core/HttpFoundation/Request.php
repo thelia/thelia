@@ -14,7 +14,6 @@ namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Controller\Api\BaseApiController;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\ConfigQuery;
@@ -129,8 +128,7 @@ class Request extends BaseRequest
      * Detects where does the request
      *
      * <code>
-     * // Detect if the request comes from the api
-     * if ($request->fromControllerType(BaseApiController::CONTROLLER_TYPE)) {...}
+     * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
      * </code>
      *
      * @param $controllerType
@@ -139,16 +137,6 @@ class Request extends BaseRequest
     public function fromControllerType($controllerType)
     {
         return $this->controllerType === $controllerType;
-    }
-
-    /**
-     * Detect if the request comes from the api
-     *
-     * @return bool
-     */
-    public function fromApi()
-    {
-        return $this->controllerType === BaseApiController::CONTROLLER_TYPE;
     }
 
     /**

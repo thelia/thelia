@@ -19,12 +19,10 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Controller\Api\BaseApiController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\AdminAccessDenied;
-use Thelia\Model\ApiQuery;
 
 /**
  * Class ControllerListener
@@ -55,43 +53,6 @@ class ControllerListener implements EventSubscriberInterface
         }
     }
 
-    public function apiFirewall(ControllerEvent $event)
-    {
-        $controller = $event->getController();
-
-        if ($controller[0] instanceof BaseApiController && $event->getRequest()->attributes->get('not-logged') != 1) {
-            $apiAccount = $this->checkApiAccess(
-                $event->getRequest()
-            );
-
-            $controller[0]->setApiUser($apiAccount);
-        }
-    }
-
-    private function checkApiAccess(Request $request)
-    {
-        $key = $request->headers->get('authorization');
-        if (null !== $key) {
-            $key = substr($key, 6);
-        }
-
-        $apiAccount = ApiQuery::create()->findOneByApiKey($key);
-
-        if (null === $apiAccount) {
-            throw new UnauthorizedHttpException('Token');
-        }
-
-        $secureKey = pack('H*', $apiAccount->getSecureKey());
-
-        $sign = hash_hmac('sha1', $request->getContent(), $secureKey);
-
-        if ($sign != $request->query->get('sign')) {
-            throw new PreconditionFailedHttpException('wrong body request signature');
-        }
-
-        return $apiAccount;
-    }
-
     /**
      * {@inheritdoc}
      * @api
@@ -100,8 +61,7 @@ class ControllerListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::CONTROLLER => [
-                ['adminFirewall', 128],
-                ['apiFirewall', 128]
+                ['adminFirewall', 128]
             ]
         ];
     }

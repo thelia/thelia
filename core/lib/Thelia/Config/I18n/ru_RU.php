@@ -687,7 +687,6 @@ return array(
     'after the order summary' => 'после итогов заказа',
     'after top bar' => 'после верхней панели',
     'after top menu' => 'после верхнего меню',
-    'api id %id does not exists' => 'api с id %id не существует',
     'at the bottom' => 'внизу',
     'at the bottom of column 1' => 'внизу столбца 1',
     'at the bottom of information area' => 'внизу зоны информации',

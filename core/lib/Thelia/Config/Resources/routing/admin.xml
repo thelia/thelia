@@ -1158,30 +1158,6 @@
         <default key="_controller">Thelia\Controller\Admin\AdvancedConfigurationController::flushImagesAndDocumentsAction</default>
     </route>
 
-    <route id="admin.configuration.api" path="/admin/configuration/api" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ApiController::indexAction</default>
-    </route>
-
-    <route id="admin.configuration.api.create" path="/admin/configuration/api" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ApiController::createAction</default>
-    </route>
-
-    <route id="admin.configuration.api.downloadSecure" path="/admin/configuration/api/secure_key/{api_id}">
-        <default key="_controller">Thelia\Controller\Admin\ApiController::downloadAction</default>
-    </route>
-
-    <route id="admin.configuration.api.delete" path="/admin/configuration/api/delete">
-        <default key="_controller">Thelia\Controller\Admin\ApiController::deleteAction</default>
-    </route>
-
-    <route id="admin.configuration.api.update" path="/admin/configuration/api/update/{api_id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ApiController::updateAction</default>
-    </route>
-
-    <route id="admin.configuration.api.update.process" path="/admin/configuration/api/update/{api_id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ApiController::processUpdateAction</default>
-    </route>
-
     <!-- and cache route management -->
 
     <!-- Modules rule management -->

@@ -61,17 +61,6 @@
             <tag name="router.register" priority="0"/>
         </service>
 
-        <service id="router.api" class="%router.class%">
-            <argument type="service" id="router.xmlLoader"/>
-            <argument>api.xml</argument>
-            <argument type="collection">
-                <argument key="cache_dir">%kernel.cache_dir%</argument>
-                <argument key="debug">%kernel.debug%</argument>
-            </argument>
-            <argument type="service" id="request.context"/>
-            <tag name="router.register" priority="0"/>
-        </service>
-
         <service id="router.annotation" class="Thelia\Core\Routing\AnnotationRouter">
             <argument type="service" id="router.fileLocator"/>
             <tag name="router.register" priority="255"/>

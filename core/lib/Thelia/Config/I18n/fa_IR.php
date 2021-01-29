@@ -621,7 +621,6 @@ return [
     'after the order summary' => 'بعد از خلاصه سفارش',
     'after top bar' => 'بعد از نوار بالا',
     'after top menu' => 'بعد از منوی بالا',
-    'api id %id does not exists' => 'شناسه api %id وجود ندارد',
     'at the bottom' => 'در پایین',
     'at the bottom of column 1' => 'در پایین ستون 1',
     'at the bottom of information area' => 'در پایین منطقه اطلاعات',

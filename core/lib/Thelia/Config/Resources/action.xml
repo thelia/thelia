@@ -51,7 +51,6 @@
         <service id="thelia.action.import" alias="Thelia\Action\Import"/>
         <service id="thelia.action.sale" alias="Thelia\Action\Sale"/>
         <service id="thelia.metadata" alias="Thelia\Action\MetaData"/>
-        <service id="thelia.action.api" alias="Thelia\Action\Api"/>
         <service id="thelia.action.customer_title" alias="Thelia\Action\CustomerTitle"/>
         <service id="thelia.action.translation" alias="Thelia\Action\Translation"/>
         <service id="thelia.action.module.delivery" alias="Thelia\Action\Delivery"/>

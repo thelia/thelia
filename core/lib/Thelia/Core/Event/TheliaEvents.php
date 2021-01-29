@@ -789,12 +789,6 @@ final class TheliaEvents
     const ADMINISTRATOR_UPDATEPASSWORD            = 'action.generatePassword';
     const ADMINISTRATOR_CREATEPASSWORD            = 'action.createPassword';
 
-    // -- Api management ---------------------------------------------
-
-    const API_CREATE                            = 'action.createApi';
-    const API_DELETE                            = 'action.deleteApi';
-    const API_UPDATE                            = 'action.updateApi';
-
     // -- Mailing System management ---------------------------------------------
 
     const MAILING_SYSTEM_UPDATE                    = "action.updateMailingSystem";

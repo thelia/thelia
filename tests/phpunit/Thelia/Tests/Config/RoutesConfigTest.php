@@ -46,7 +46,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
     protected static $routingXSDPath;
 
     /**
-     * Path to the core (admin + api) routing files.
+     * Path to the core (admin) routing files.
      * @var string
      */
     protected static $routingFilesPathCore;
@@ -96,8 +96,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
             . DS . 'routing';
 
         self::$routingFiles[self::$routingFilesPathCore] = [
-            'admin.xml',
-            'api.xml',
+            'admin.xml'
         ];
 
         // front files
