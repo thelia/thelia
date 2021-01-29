@@ -12,6 +12,9 @@
 
 namespace Thelia\Core\Event\Area;
 
+use Thelia\Model\Area;
+use Thelia\Model\Event\AreaEvent;
+
 /**
  * Class AreaAddCountryEvent
  * @package Thelia\Core\Event\Area
@@ -22,32 +25,11 @@ class AreaAddCountryEvent extends AreaEvent
     protected $areaId;
     protected $countryId;
 
-    public function __construct($areaId, $countryId)
+    public function __construct(Area $area, $countryId)
     {
-        parent::__construct();
+        parent::__construct($area);
 
-        $this->areaId = $areaId;
         $this->countryId = $countryId;
-    }
-
-    /**
-     * @param mixed $areaId
-     *
-     * @return $this
-     */
-    public function setAreaId($areaId)
-    {
-        $this->areaId = $areaId;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAreaId()
-    {
-        return $this->areaId;
     }
 
     /**

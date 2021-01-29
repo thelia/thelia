@@ -15,16 +15,13 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
-use Thelia\Core\Event\Area\AreaCreateEvent;
-use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
-use Thelia\Core\Event\Area\AreaUpdateEvent;
-use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Area as AreaModel;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryArea;
 use Thelia\Model\CountryAreaQuery;
+use Thelia\Model\Event\AreaEvent;
 
 /**
  * Class Area
@@ -37,7 +34,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     {
         $countryIds = $event->getCountryId();
 
-        $areaId = $event->getAreaId();
+        $area = $event->getModel();
 
         foreach ($countryIds as $countryId) {
             $countryArea = new CountryArea();
@@ -51,69 +48,37 @@ class Area extends BaseAction implements EventSubscriberInterface
             }
 
             $countryArea
-                ->setAreaId($areaId)
+                ->setAreaId($area->getId())
                 ->setCountryId($country[0])
                 ->setStateId($country[1])
                 ->save()
             ;
         }
-
-        $event->setArea(AreaQuery::create()->findPk($areaId));
     }
 
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
+        $area = $event->getModel();
+
         CountryAreaQuery::create()
                 ->filterByCountryId($event->getCountryId())
                 ->filterByStateId($event->getStateId())
-                ->filterByAreaId($event->getAreaId())
+                ->filterByAreaId($area->getId())
                 ->delete();
 
-        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $event->setArea($area);
-        }
+        return $area;
     }
 
-    public function updatePostage(AreaUpdatePostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area
-                ->setPostage($event->getPostage())
-                ->save();
-
-            $event->setArea($area);
-        }
+        $event->getModel()
+            ->delete();
     }
 
-    public function delete(AreaDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function save(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->delete();
-
-            $event->setArea($area);
-        }
-    }
-
-    public function create(AreaCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
-    {
-        $area = new AreaModel();
-
-        $area
-            ->setName($event->getAreaName())
+        $event->getModel()
             ->save();
-
-        $event->setArea($area);
-    }
-
-    public function update(AreaUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
-    {
-        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area
-                ->setName($event->getAreaName())
-                ->save();
-
-            $event->setArea($area);
-        }
     }
 
     /**
@@ -126,8 +91,8 @@ class Area extends BaseAction implements EventSubscriberInterface
             TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128),
             TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128),
             TheliaEvents::AREA_DELETE => array('delete', 128),
-            TheliaEvents::AREA_CREATE => array('create', 128),
-            TheliaEvents::AREA_UPDATE => array('update', 128)
+            TheliaEvents::AREA_CREATE => array('save', 128),
+            TheliaEvents::AREA_UPDATE => array('save', 128)
         );
     }
 }
