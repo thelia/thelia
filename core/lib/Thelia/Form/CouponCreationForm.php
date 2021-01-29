@@ -20,6 +20,8 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -30,6 +32,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\EventDispatcher\EventDispatcher;
+use Thelia\Core\Form\Type\Field\CouponSpecificType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CouponQuery;
@@ -227,13 +230,24 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'coupon_specific',
-                CollectionType::class,
+                // Data will be json encoded on pre-submit because it can contains array or string...
+                TextType::class,
                 [
-                    'allow_add'    => true,
-                    'allow_delete' => true,
+                    // Value can be array or string so no validation possible here...
+                    'validation_groups' => false,
                 ]
             )
         ;
+
+        $this->formBuilder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+
+            if (isset($data['coupon_specific'])) {
+                $data['coupon_specific'] = json_encode($data['coupon_specific']);
+            }
+
+            $event->setData($data);
+        }, 256);
     }
 
     /**
