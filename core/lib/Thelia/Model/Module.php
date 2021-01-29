@@ -6,7 +6,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\Base\Module as BaseModule;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Module\BaseModuleInterface;
 use Thelia\Module\DeliveryModuleInterface;
@@ -14,7 +14,7 @@ use Thelia\Module\PaymentModuleInterface;
 
 class Module extends BaseModule
 {
-//    use ModelEventDispatcherTrait;
+//
 
     use PositionManagementTrait;
 

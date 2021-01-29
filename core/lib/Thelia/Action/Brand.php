@@ -58,8 +58,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
     public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-            $brand->setDispatcher($dispatcher);
-
             $brand
                 ->setVisible($event->getVisible())
                 ->setLogoImageId(\intval($event->getLogoImageId()) == 0 ? null : $event->getLogoImageId())
@@ -89,7 +87,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
         $brand = $event->getBrand();
 
         $brand
-            ->setDispatcher($dispatcher)
             ->setVisible(!$brand->getVisible())
             ->save();
 
@@ -112,7 +109,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     public function delete(BrandDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-            $brand->setDispatcher($dispatcher)->delete();
+            $brand->delete();
 
             $event->setBrand($brand);
         }

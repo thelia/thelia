@@ -15,12 +15,12 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ContentDocument as BaseContentDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class ContentDocument extends BaseContentDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use ModelEventDispatcherTrait;
+
     use PositionManagementTrait;
     use FolderBreadcrumbTrait;
 

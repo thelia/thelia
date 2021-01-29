@@ -36,8 +36,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         $attribute = new AttributeAvModel();
 
         $attribute
-            ->setDispatcher($dispatcher)
-
             ->setAttributeId($event->getAttributeId())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -59,8 +57,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
             $attribute
-                ->setDispatcher($dispatcher)
-
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -84,7 +80,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
             $attribute
-                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 

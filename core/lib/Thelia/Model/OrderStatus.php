@@ -3,12 +3,12 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatus as BaseOrderStatus;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class OrderStatus extends BaseOrderStatus
 {
-    use ModelEventDispatcherTrait;
+
     use PositionManagementTrait;
 
     const CODE_NOT_PAID = "not_paid";

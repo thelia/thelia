@@ -27,13 +27,13 @@ use Front\Front;
 use Symfony\Component\Form\Form;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
-use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Event\AddressEvent;
 
 /**
  * Class AddressController

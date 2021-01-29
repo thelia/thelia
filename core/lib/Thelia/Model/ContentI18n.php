@@ -19,6 +19,6 @@ class ContentI18n extends BaseContentI18n
         parent::postInsert($con);
 
         $content = $this->getContent();
-        $content->generateRewrittenUrl($this->getLocale());
+        $content->generateRewrittenUrl($this->getLocale(), $con);
     }
 }

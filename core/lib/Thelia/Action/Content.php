@@ -46,7 +46,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     public function create(ContentCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $content = (new ContentModel)
-            ->setDispatcher($dispatcher)
+
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -70,8 +70,6 @@ class Content extends BaseAction implements EventSubscriberInterface
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
             $con->beginTransaction();
-
-            $content->setDispatcher($dispatcher);
             try {
                 $content
                     ->setVisible($event->getVisible())
@@ -123,7 +121,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         $content = $event->getContent();
 
         $content
-            ->setDispatcher($dispatcher)
+
             ->setVisible(!$content->getVisible())
             ->save();
 
@@ -151,7 +149,7 @@ class Content extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
 
                 // Delete content
-                $content->setDispatcher($dispatcher)
+                $content
                     ->delete($con);
 
                 $event->setDefaultFolderId($defaultFolderId);

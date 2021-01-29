@@ -52,7 +52,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         $isDefault = CurrencyQuery::create()->count() === 0;
 
         $currency
-            ->setDispatcher($dispatcher)
+
             ->setLocale($event->getLocale())
             ->setName($event->getCurrencyName())
             ->setSymbol($event->getSymbol())
@@ -77,7 +77,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             $currency
-                ->setDispatcher($dispatcher)
+
 
                 ->setLocale($event->getLocale())
                 ->setName($event->getCurrencyName())
@@ -106,7 +106,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
             $currency
-                ->setDispatcher($dispatcher)
+
                 ->setVisible($event->getVisible())
                 ->setByDefault($event->getIsDefault())
                 ->save()
@@ -152,7 +152,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             }
 
             $currency
-                ->setDispatcher($dispatcher)
+
                 ->delete()
             ;
 

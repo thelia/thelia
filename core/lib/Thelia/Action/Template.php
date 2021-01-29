@@ -50,7 +50,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         $template = new TemplateModel();
         
         $template
-            ->setDispatcher($dispatcher)
+
             
             ->setLocale($event->getLocale())
             ->setName($event->getTemplateName())
@@ -119,7 +119,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
             $template
-                ->setDispatcher($dispatcher)
+
                 ->setLocale($event->getLocale())
                 ->setName($event->getTemplateName())
                 ->save();
@@ -148,7 +148,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                 
                 try {
                     $template
-                        ->setDispatcher($dispatcher)
+
                         ->delete($con);
                     
                     // We have to also delete any reference of this template in category tables
@@ -221,7 +221,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         
         if ($attributeTemplate !== null) {
             $attributeTemplate
-                ->setDispatcher($dispatcher)
+
                 ->delete();
         } else {
             // Prevent event propagation
@@ -255,7 +255,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         
         if ($featureTemplate !== null) {
             $featureTemplate
-                ->setDispatcher($dispatcher)
+
                 ->delete();
         } else {
             // Prevent event propagation

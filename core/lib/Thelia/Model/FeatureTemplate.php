@@ -7,7 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class FeatureTemplate extends BaseFeatureTemplate
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
     use \Thelia\Model\Tools\PositionManagementTrait;
 

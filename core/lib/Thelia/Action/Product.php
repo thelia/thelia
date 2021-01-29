@@ -98,7 +98,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product = new ProductModel();
 
         $product
-            ->setDispatcher($this->eventDispatcher)
 
             ->setRef($event->getRef())
             ->setLocale($event->getLocale())
@@ -350,7 +349,6 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $prevRef = $product->getRef();
 
                 $product
-                    ->setDispatcher($this->eventDispatcher)
                     ->setRef($event->getRef())
                     ->setLocale($event->getLocale())
                     ->setTitle($event->getTitle())
@@ -421,7 +419,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 // Delete product
                 $product
-                    ->setDispatcher($this->eventDispatcher)
                     ->delete($con)
                 ;
 
@@ -453,7 +450,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product = $event->getProduct();
 
         $product
-            ->setDispatcher($this->eventDispatcher)
             ->setVisible($product->getVisible() ? false : true)
             ->save()
             ;

@@ -41,8 +41,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function update(FolderUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
-            $folder->setDispatcher($dispatcher);
-
             $folder
                 ->setParent($event->getParent())
                 ->setVisible($event->getVisible())
@@ -90,7 +88,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
 
                 // Delete folder
-                $folder->setDispatcher($dispatcher)
+                $folder
                     ->delete($con);
 
                 $event->setFolder($folder);
@@ -114,7 +112,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function create(FolderCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $folder = new FolderModel();
-        $folder->setDispatcher($dispatcher);
 
         $folder
             ->setParent($event->getParent())
@@ -131,7 +128,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
         $folder = $event->getFolder();
 
         $folder
-            ->setDispatcher($dispatcher)
+
             ->setVisible(!$folder->getVisible())
             ->save();
 
@@ -141,7 +138,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
-            $folder->setDispatcher($dispatcher);
 
             switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:

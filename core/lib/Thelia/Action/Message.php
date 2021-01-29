@@ -35,7 +35,7 @@ class Message extends BaseAction implements EventSubscriberInterface
         $message = new MessageModel();
 
         $message
-            ->setDispatcher($dispatcher)
+
 
             ->setName($event->getMessageName())
             ->setLocale($event->getLocale())
@@ -59,7 +59,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
             $message
-                ->setDispatcher($dispatcher)
+
 
                 ->setName($event->getMessageName())
                 ->setSecured($event->getSecured())
@@ -94,7 +94,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
             $message
-                ->setDispatcher($dispatcher)
+
                 ->delete()
             ;
 

@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\PdfEvent;
@@ -116,7 +117,7 @@ abstract class BaseController
      * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
      * @param ActionEvent|null $event the action event, or null (a DefaultActionEvent will be dispatched)
      */
-    protected function dispatch(string $eventName, ActionEvent $event = null)
+    protected function dispatch(string $eventName, Event $event = null)
     {
         if ($event == null) {
             $event = new DefaultActionEvent();

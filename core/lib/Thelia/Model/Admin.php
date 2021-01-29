@@ -7,7 +7,7 @@ use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
@@ -22,7 +22,7 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
  */
 class Admin extends BaseAdmin implements UserInterface
 {
-    use ModelEventDispatcherTrait;
+
     use UserPermissionsTrait;
 
     /**

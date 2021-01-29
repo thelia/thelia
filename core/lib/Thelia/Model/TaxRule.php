@@ -3,13 +3,13 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxRule as BaseTaxRule;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\TaxEngine\Calculator;
 use Thelia\TaxEngine\OrderProductTaxCollection;
 
 class TaxRule extends BaseTaxRule
 {
-    use ModelEventDispatcherTrait;
+
 
     /**
      * @param Product $product

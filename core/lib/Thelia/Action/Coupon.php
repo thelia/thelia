@@ -219,8 +219,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
-        $coupon->setDispatcher($dispatcher);
-
         // Set default condition if none found
         /** @var ConditionInterface $noConditionRule */
         $noConditionRule = $this->noConditionRule;
@@ -266,8 +264,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
-        $coupon->setDispatcher($dispatcher);
-
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->conditionFactory;
 

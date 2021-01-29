@@ -14,7 +14,7 @@ use Thelia\Core\Translation\Translator;
 
 class Country extends BaseCountry
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
     protected static $defaultCountry = null;
 
@@ -104,38 +104,6 @@ class Country extends BaseCountry
         }
     }
 
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        parent::preInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECOUNTRY, new CountryEvent($this));
-
-        return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECOUNTRY, new CountryEvent($this));
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECOUNTRY, new CountryEvent($this));
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECOUNTRY, new CountryEvent($this));
-    }
-
     public function preDelete(ConnectionInterface $con = null)
     {
         parent::preDelete($con);
@@ -144,16 +112,7 @@ class Country extends BaseCountry
             return false;
         }
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECOUNTRY, new CountryEvent($this));
-
         return true;
-    }
-
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        parent::postDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECOUNTRY, new CountryEvent($this));
     }
 
     /**

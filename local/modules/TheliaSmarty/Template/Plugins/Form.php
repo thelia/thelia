@@ -474,7 +474,7 @@ class Form extends AbstractSmartyPlugin
                 $template,
                 $field['view']->vars["full_name"],
                 $field['view']->vars["value"],
-                $field['config']->getType()->getName(),
+                $field['config']->getType()->getInnerType(),
                 $field['view']->vars
             );
 

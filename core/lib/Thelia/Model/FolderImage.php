@@ -18,7 +18,6 @@ use Thelia\Files\FileModelInterface;
 
 class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileModelInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
     use FolderBreadcrumbTrait;
 

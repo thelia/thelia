@@ -11,13 +11,13 @@ use Thelia\Model\Base\Content as BaseContent;
 use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentTableMap;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Content extends BaseContent implements FileModelParentInterface
 {
-    use ModelEventDispatcherTrait;
+
 
     use PositionManagementTrait;
 
@@ -136,16 +136,12 @@ class Content extends BaseContent implements FileModelParentInterface
 
         $con->beginTransaction();
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONTENT, new ContentEvent($this));
-
         try {
             $this->save($con);
 
             $this->setDefaultFolder($defaultFolderId)->save($con);
 
             $con->commit();
-
-            $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT, new ContentEvent($this));
         } catch (\Exception $ex) {
             $con->rollback();
 
@@ -155,38 +151,11 @@ class Content extends BaseContent implements FileModelParentInterface
         return $this;
     }
 
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECONTENT, new ContentEvent($this));
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECONTENT, new ContentEvent($this));
-    }
-
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONTENT, new ContentEvent($this));
-
-        return true;
-    }
-
     public function postDelete(ConnectionInterface $con = null)
     {
         parent::postDelete($con);
 
         $this->markRewrittenUrlObsolete();
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONTENT, new ContentEvent($this));
     }
 
     /**

@@ -14,13 +14,13 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
-use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Event\AddressEvent;
 
 /**
  * Class AddressController
@@ -288,7 +288,7 @@ class AddressController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param  \Thelia\Core\Event\AddressEvent $deleteEvent the delete event
+     * @param  AddressEvent $deleteEvent the delete event
      * @return Response                        a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)

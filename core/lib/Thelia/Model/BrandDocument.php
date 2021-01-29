@@ -13,12 +13,12 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandDocument as BaseBrandDocument;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use ModelEventDispatcherTrait;
+
     use PositionManagementTrait;
     use BrandBreadcrumbTrait;
 

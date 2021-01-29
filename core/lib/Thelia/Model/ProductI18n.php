@@ -19,6 +19,6 @@ class ProductI18n extends BaseProductI18n
         parent::postInsert($con);
 
         $product = $this->getProduct();
-        $product->generateRewrittenUrl($this->getLocale());
+        $product->generateRewrittenUrl($this->getLocale(), $con);
     }
 }

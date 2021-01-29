@@ -19,6 +19,6 @@ class CategoryI18n extends BaseCategoryI18n
         parent::postInsert($con);
 
         $category = $this->getCategory();
-        $category->generateRewrittenUrl($this->getLocale());
+        $category->generateRewrittenUrl($this->getLocale(), $con);
     }
 }

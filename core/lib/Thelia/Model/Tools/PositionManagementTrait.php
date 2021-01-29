@@ -108,11 +108,6 @@ trait PositionManagementTrait
                     ->save($cnx)
                 ;
 
-                // For BC
-                if (method_exists($result, 'setDispatcher') && method_exists($this, 'getDispatcher')) {
-                    $result->setDispatcher($this->getDispatcher());
-                }
-
                 $result->setPosition($myPosition)->save($cnx);
 
                 $cnx->commit();
@@ -170,11 +165,6 @@ trait PositionManagementTrait
             try {
                 foreach ($results as $result) {
                     $objNewPosition = $result->getPosition() + $delta;
-
-                    // For BC
-                    if (method_exists($result, 'setDispatcher') && method_exists($this, 'getDispatcher')) {
-                        $result->setDispatcher($this->getDispatcher());
-                    }
 
                     $result->setPosition($objNewPosition)->save($cnx);
                 }

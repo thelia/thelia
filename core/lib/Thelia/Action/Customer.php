@@ -129,8 +129,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $customer = $event->getCustomer();
 
-        $customer->setDispatcher($dispatcher);
-
         if ($event->getTitle() !== null) {
             $customer->setTitleId($event->getTitle());
         }
@@ -195,8 +193,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
-        $customer->setDispatcher($dispatcher);
-
         $customer->createOrUpdate(
             $event->getTitle(),
             $event->getFirstname(),

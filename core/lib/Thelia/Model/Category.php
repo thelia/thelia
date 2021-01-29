@@ -11,13 +11,13 @@ use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Category extends BaseCategory implements FileModelParentInterface
 {
-    use ModelEventDispatcherTrait;
+
 
     use PositionManagementTrait;
 
@@ -117,11 +117,15 @@ class Category extends BaseCategory implements FileModelParentInterface
             ->filterByDefaultCategory(1)
             ->find($con);
 
-        if ($productsCategories) {
-            /** @var ProductCategory $productCategory */
+        if (
+            null !== $con
+            && method_exists($con, 'getEventDispatcher')
+            && null !== $con->getEventDispatcher()
+        ) {
+            $eventDispatcher = $con->getEventDispatcher();
             foreach ($productsCategories as $productCategory) {
                 if (null !== $product = $productCategory->getProduct()) {
-                    $this->dispatchEvent(TheliaEvents::PRODUCT_DELETE, new ProductDeleteEvent($product->getId()));
+                    $eventDispatcher->dispatch(new ProductDeleteEvent($product->getId()), TheliaEvents::PRODUCT_DELETE);
                 }
             }
         }
@@ -132,45 +136,11 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        parent::preInsert($con);
-
         $this->setPosition($this->getNextPosition());
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
+        parent::preInsert($con);
 
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY, new CategoryEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECATEGORY, new CategoryEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECATEGORY, new CategoryEvent($this));
     }
 
     /**
@@ -180,7 +150,6 @@ class Category extends BaseCategory implements FileModelParentInterface
     {
         parent::preDelete($con);
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
         $this->reorderBeforeDelete(
             array(
                 "parent" => $this->getParent(),
@@ -204,14 +173,8 @@ class Category extends BaseCategory implements FileModelParentInterface
         $subCategories = CategoryQuery::findAllChild($this->getId());
 
         foreach ($subCategories as $category) {
-            if (!\is_null($this->dispatcher)) {
-                $category->setDispatcher($this->getDispatcher());
-            }
-
             $category->delete();
         }
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
     }
 
     /**
