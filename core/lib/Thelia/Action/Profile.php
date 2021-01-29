@@ -38,7 +38,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
         $profile = new ProfileModel();
 
         $profile
-            ->setDispatcher($dispatcher)
+
             ->setCode($event->getCode())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -61,7 +61,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             $profile
-                ->setDispatcher($dispatcher)
+
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())

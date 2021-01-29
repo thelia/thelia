@@ -9,7 +9,6 @@ use Thelia\Core\Event\Feature\FeatureEvent;
 
 class Feature extends BaseFeature
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
@@ -19,65 +18,9 @@ class Feature extends BaseFeature
     {
         parent::preInsert($con);
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFEATURE, new FeatureEvent($this));
-
         // Set the current position for the new object
         $this->setPosition($this->getNextPosition());
 
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATEFEATURE, new FeatureEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFEATURE, new FeatureEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFEATURE, new FeatureEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFEATURE, new FeatureEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        parent::postDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETEFEATURE, new FeatureEvent($this));
     }
 }

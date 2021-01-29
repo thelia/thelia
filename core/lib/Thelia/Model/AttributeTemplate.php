@@ -7,7 +7,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 class AttributeTemplate extends BaseAttributeTemplate
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
     use \Thelia\Model\Tools\PositionManagementTrait;
 

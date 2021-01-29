@@ -40,7 +40,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         $attribute = new AttributeModel();
 
         $attribute
-            ->setDispatcher($dispatcher)
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->save()
@@ -65,8 +64,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
             $attribute
-                ->setDispatcher($dispatcher)
-
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -90,7 +87,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
             $attribute
-                ->setDispatcher($dispatcher)
                 ->delete()
             ;
 

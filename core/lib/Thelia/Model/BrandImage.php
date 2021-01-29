@@ -13,12 +13,12 @@ use Thelia\Model\Base\BrandImage as BaseBrandImage;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Files\FileModelInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class BrandImage extends BaseBrandImage implements FileModelInterface, BreadcrumbInterface
 {
-    use ModelEventDispatcherTrait;
+
     use PositionManagementTrait;
     use BrandBreadcrumbTrait;
 

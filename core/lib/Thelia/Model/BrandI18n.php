@@ -20,6 +20,6 @@ class BrandI18n extends BaseBrandI18n
 
         $brand = $this->getBrand();
 
-        $brand->generateRewrittenUrl($this->getLocale());
+        $brand->generateRewrittenUrl($this->getLocale(), $con);
     }
 }

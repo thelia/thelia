@@ -16,11 +16,11 @@ use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
 use Thelia\Files\FileModelInterface;
 use Thelia\Model\Tools\PositionManagementTrait;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
 class ProductDocument extends BaseProductDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use ModelEventDispatcherTrait;
+
     use PositionManagementTrait;
     use CatalogBreadcrumbTrait;
 

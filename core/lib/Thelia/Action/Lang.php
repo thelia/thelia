@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
-use Thelia\Core\Event\Lang\LangEvent;
 use Thelia\Core\Event\Lang\LangToggleActiveEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangToggleVisibleEvent;
@@ -31,6 +30,7 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Event\LangEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 
@@ -62,7 +62,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
-            $lang->setDispatcher($dispatcher);
 
             $lang->setTitle($event->getTitle())
                 ->setLocale($event->getLocale())
@@ -88,7 +87,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-            $lang->setDispatcher($dispatcher);
 
             $lang->toggleDefault();
 
@@ -157,7 +155,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $lang = new LangModel();
 
         $lang
-            ->setDispatcher($dispatcher)
             ->setTitle($event->getTitle())
             ->setCode($event->getCode())
             ->setLocale($event->getLocale())
@@ -187,7 +184,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 );
             }
 
-            $lang->setDispatcher($dispatcher)
+            $lang
                 ->delete();
 
             /** @var Session $session */
@@ -277,7 +274,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
             TheliaEvents::LANG_DELETE => array('delete', 128),
             TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128),
             TheliaEvents::LANG_URL => array('langUrl', 128),
-            TheliaEvents::LANG_FIX_MISSING_FLAG => array('fixMissingFlag', 128)
+            LangEvent::POST_INSERT => array('fixMissingFlag', 128),
+            LangEvent::POST_UPDATE => array('fixMissingFlag', 128)
         );
     }
 }

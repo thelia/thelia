@@ -49,8 +49,6 @@ class Category extends BaseAction implements EventSubscriberInterface
         $category = new CategoryModel();
 
         $category
-            ->setDispatcher($dispatcher)
-
             ->setLocale($event->getLocale())
             ->setParent($event->getParent())
             ->setVisible($event->getVisible())
@@ -73,7 +71,6 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $category
-                ->setDispatcher($dispatcher)
                 ->setDefaultTemplateId($event->getDefaultTemplateId() == 0 ? null : $event->getDefaultTemplateId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -131,7 +128,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
                 // Delete category
                 $category
-                    ->setDispatcher($dispatcher)
                     ->delete($con);
 
                 $event->setCategory($category);
@@ -164,7 +160,6 @@ class Category extends BaseAction implements EventSubscriberInterface
         $category = $event->getCategory();
 
         $category
-            ->setDispatcher($dispatcher)
             ->setVisible($category->getVisible() ? false : true)
             ->save()
             ;
@@ -192,7 +187,6 @@ class Category extends BaseAction implements EventSubscriberInterface
             $content = new CategoryAssociatedContent();
 
             $content
-                ->setDispatcher($dispatcher)
                 ->setCategory($event->getCategory())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -209,7 +203,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
         if ($content !== null) {
             $content
-                ->setDispatcher($dispatcher)
                 ->delete();
         }
     }

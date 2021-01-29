@@ -98,7 +98,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         $country = $event->getCountry();
 
         $country
-            ->setDispatcher($dispatcher)
+
             ->setVisible(!$country->getVisible())
             ->save();
 

@@ -19,6 +19,6 @@ class FolderI18n extends BaseFolderI18n
         parent::postInsert($con);
 
         $folder = $this->getFolder();
-        $folder->generateRewrittenUrl($this->getLocale());
+        $folder->generateRewrittenUrl($this->getLocale(), $con);
     }
 }

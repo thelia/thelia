@@ -5,12 +5,12 @@ namespace Thelia\Model;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\TaxEngine\BaseTaxType;
 
 class Tax extends BaseTax
 {
-    use ModelEventDispatcherTrait;
+
 
     /**
      * Provides a form-and-javascript-safe version of the type, which is a fully qualified classname, with \

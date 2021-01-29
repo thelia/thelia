@@ -9,13 +9,13 @@ use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Folder extends BaseFolder implements FileModelParentInterface
 {
-    use ModelEventDispatcherTrait;
+
 
     use PositionManagementTrait;
 
@@ -98,39 +98,13 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
         $this->setPosition($this->getNextPosition());
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFOLDER, new FolderEvent($this));
-
         return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATEFOLDER, new FolderEvent($this));
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFOLDER, new FolderEvent($this));
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFOLDER, new FolderEvent($this));
     }
 
     public function preDelete(ConnectionInterface $con = null)
     {
         parent::preDelete($con);
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFOLDER, new FolderEvent($this));
         $this->reorderBeforeDelete(
             array(
                 "parent" => $this->getParent(),
@@ -145,8 +119,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
         parent::postDelete($con);
 
         $this->markRewrittenUrlObsolete();
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }
 
     /**

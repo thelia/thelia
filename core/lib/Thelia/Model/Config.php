@@ -30,42 +30,6 @@ use Thelia\Core\Event\Config\ConfigEvent;
 
 class Config extends BaseConfig
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        parent::preInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECONFIG, new ConfigEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -74,19 +38,6 @@ class Config extends BaseConfig
         parent::postUpdate($con);
 
         $this->resetQueryCache();
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECONFIG, new ConfigEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
-
-        return true;
     }
 
     /**
@@ -97,7 +48,6 @@ class Config extends BaseConfig
         parent::postDelete($con);
 
         $this->resetQueryCache();
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
     }
 
     public function resetQueryCache()

@@ -12,7 +12,10 @@
 
 namespace Thelia\Model\Tools;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
+use Thelia\Core\Event\Order\OrderProductEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
@@ -51,8 +54,11 @@ trait UrlRewritingTrait
      * Generate a rewritten URL from the object title, and store it in the rewriting table
      *
      * @param string $locale a valid locale (e.g. en_US)
+     * @param ConnectionInterface|null $con
+     * @return string
+     * @throws PropelException
      */
-    public function generateRewrittenUrl($locale)
+    public function generateRewrittenUrl(string $locale, ConnectionInterface $con): string
     {
         if ($this->isNew()) {
             throw new \RuntimeException(sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
@@ -63,7 +69,10 @@ trait UrlRewritingTrait
 
         $generateEvent = new GenerateRewrittenUrlEvent($this, $locale);
 
-        $this->dispatchEvent(TheliaEvents::GENERATE_REWRITTENURL, $generateEvent);
+        $con->getEventDispatcher()->dispatch(
+            $generateEvent,
+            TheliaEvents::GENERATE_REWRITTENURL
+        );
 
         if ($generateEvent->isRewritten()) {
             return $generateEvent->getUrl();

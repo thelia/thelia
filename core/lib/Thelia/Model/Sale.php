@@ -6,11 +6,11 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Sale as BaseSale;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
 class Sale extends BaseSale
 {
-    use ModelEventDispatcherTrait;
+
 
     /**
      * The price offsets types, either amount or percentage
@@ -90,71 +90,5 @@ class Sale extends BaseSale
         }
 
         return $selectedAttributes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        parent::preInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATESALE, new SaleEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATESALE, new SaleEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATESALE, new SaleEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATESALE, new SaleEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETESALE, new SaleEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        parent::postDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETESALE, new SaleEvent($this));
     }
 }

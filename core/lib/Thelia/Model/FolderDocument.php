@@ -18,7 +18,7 @@ use Thelia\Files\FileModelInterface;
 
 class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
     use \Thelia\Model\Tools\PositionManagementTrait;
     use FolderBreadcrumbTrait;
 

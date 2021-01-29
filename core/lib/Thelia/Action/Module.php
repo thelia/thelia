@@ -303,7 +303,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
             $module
-                ->setDispatcher($dispatcher)
+
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())

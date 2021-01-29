@@ -7,14 +7,12 @@ use Thelia\Core\Event\Brand\BrandEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Brand as BaseBrand;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Brand extends BaseBrand implements FileModelParentInterface
 {
-    use ModelEventDispatcherTrait;
-
     use PositionManagementTrait;
 
     use UrlRewritingTrait;
@@ -34,54 +32,8 @@ class Brand extends BaseBrand implements FileModelParentInterface
     {
         parent::preInsert($con);
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEBRAND, new BrandEvent($this));
-
         // Set the current position for the new object
         $this->setPosition($this->getNextPosition());
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATEBRAND, new BrandEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEBRAND, new BrandEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEBRAND, new BrandEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEBRAND, new BrandEvent($this));
 
         return true;
     }
@@ -94,7 +46,5 @@ class Brand extends BaseBrand implements FileModelParentInterface
         parent::postDelete($con);
 
         $this->markRewrittenUrlObsolete();
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETEBRAND, new BrandEvent($this));
     }
 }

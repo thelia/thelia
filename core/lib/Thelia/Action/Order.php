@@ -187,8 +187,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $placedOrder->resetModified(OrderTableMap::COL_UPDATED_AT);
         $placedOrder->resetModified(OrderTableMap::COL_VERSION_CREATED_AT);
 
-        $placedOrder->setDispatcher($dispatcher);
-
         $cartItems = $cart->getCartItems();
 
         /* fulfill order */
@@ -344,7 +342,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
                 ->setEanCode($pse->getEanCode())
                 ->setCartItemId($cartItem->getId())
-                ->setDispatcher($dispatcher)
+
                 ->save($con)
             ;
 

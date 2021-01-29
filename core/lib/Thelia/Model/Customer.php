@@ -14,7 +14,7 @@ use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -29,8 +29,6 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
  */
 class Customer extends BaseCustomer implements UserInterface
 {
-    use ModelEventDispatcherTrait;
-
     /**
      * @param  int                                       $titleId          customer title id (from customer_title table)
      * @param  string                                    $firstname        customer first name
@@ -384,62 +382,6 @@ class Customer extends BaseCustomer implements UserInterface
             $this->setRef($this->generateRef());
         }
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
-
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, new CustomerEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECUSTOMER, new CustomerEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECUSTOMER, new CustomerEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        parent::postDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECUSTOMER, new CustomerEvent($this));
     }
 }

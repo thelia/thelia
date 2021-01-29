@@ -14,12 +14,12 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
 use Thelia\Files\FileModelInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class ProductImage extends BaseProductImage implements BreadcrumbInterface, FileModelInterface
 {
-    use ModelEventDispatcherTrait;
+
     use PositionManagementTrait;
     use CatalogBreadcrumbTrait;
 

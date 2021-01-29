@@ -4,12 +4,13 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Order\OrderProductEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
 class OrderProduct extends BaseOrderProduct
 {
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
     /** @var int */
     protected $cartItemId;
@@ -40,11 +41,18 @@ class OrderProduct extends BaseOrderProduct
     {
         parent::preInsert($con);
 
-        $this->dispatchEvent(
-            TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE,
-            (new OrderProductEvent($this->getOrder(), null))
-                ->setCartItemId($this->cartItemId)
-        );
+        if (
+            null !== $con
+            && method_exists($con, 'getEventDispatcher')
+            && null !== $con->getEventDispatcher()
+        ) {
+            $con->getEventDispatcher()->dispatch(
+                (new OrderProductEvent($this->getOrder(), null))
+                    ->setCartItemId($this->cartItemId),
+                TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE
+
+            );
+        }
 
         return true;
     }
@@ -56,10 +64,17 @@ class OrderProduct extends BaseOrderProduct
     {
         parent::postInsert($con);
 
-        $this->dispatchEvent(
-            TheliaEvents::ORDER_PRODUCT_AFTER_CREATE,
-            (new OrderProductEvent($this->getOrder(), $this->getId()))
-                ->setCartItemId($this->cartItemId)
-        );
+        if (
+            null !== $con
+            && method_exists($con, 'getEventDispatcher')
+            && null !== $con->getEventDispatcher()
+        ) {
+            $con->getEventDispatcher()->dispatch(
+                (new OrderProductEvent($this->getOrder(), $this->getId()))
+                    ->setCartItemId($this->cartItemId),
+                TheliaEvents::ORDER_PRODUCT_AFTER_CREATE
+
+            );
+        }
     }
 }

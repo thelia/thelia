@@ -16,8 +16,6 @@ class Lang extends BaseLang
     const STRICTLY_USE_REQUESTED_LANGUAGE = 0;
     const REPLACE_BY_DEFAULT_LANGUAGE = 1;
 
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-
     protected static $defaultLanguage;
 
     /**
@@ -63,58 +61,6 @@ class Lang extends BaseLang
                 throw $e;
             }
         }
-    }
-
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        parent::preInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATELANG, new LangEvent($this));
-
-        return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        parent::postInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATELANG, new LangEvent($this));
-
-        $this->dispatchEvent(TheliaEvents::LANG_FIX_MISSING_FLAG, new LangEvent($this));
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATELANG, new LangEvent($this));
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATELANG, new LangEvent($this));
-
-        $this->dispatchEvent(TheliaEvents::LANG_FIX_MISSING_FLAG, new LangEvent($this));
-    }
-
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        parent::preDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETELANG, new LangEvent($this));
-
-        return true;
-    }
-
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        parent::postDelete($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETELANG, new LangEvent($this));
     }
 
     public function preSave(ConnectionInterface $con = null)

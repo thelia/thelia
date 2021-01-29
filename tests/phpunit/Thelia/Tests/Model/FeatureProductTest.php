@@ -55,7 +55,6 @@ class FeatureProductTest extends TestCase
 
         $featureProduct
             ->getProduct()
-            ->setDispatcher($this->getEventDispatcher())
             ->delete($con);
 
         $featureAv = FeatureAvQuery::create($con)->findPk($featureAvId);
@@ -75,7 +74,6 @@ class FeatureProductTest extends TestCase
 
         CategoryQuery::create()
             ->findPk($featureProduct->getProduct()->getDefaultCategoryId())
-            ->setDispatcher($this->getEventDispatcher())
             ->delete($con);
 
         $featureAv = FeatureAvQuery::create($con)->findPk($featureAvId);

@@ -31,7 +31,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
         $tax = new TaxModel();
 
         $tax
-            ->setDispatcher($dispatcher)
+
             ->setRequirements($event->getRequirements())
             ->setType($event->getType())
             ->setLocale($event->getLocale())
@@ -53,7 +53,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
             $tax
-                ->setDispatcher($dispatcher)
+
                 ->setRequirements($event->getRequirements())
                 ->setType($event->getType())
                 ->setLocale($event->getLocale())

@@ -13,12 +13,12 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
-    use ModelEventDispatcherTrait;
+
 
     /** @var int|null  */
     protected $choosenDeliveryAddress = null;
@@ -105,18 +105,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        parent::preInsert($con);
-
-        $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
-
-        return true;
-    }
-
-    /**
      * @param ConnectionInterface|null $con
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -127,7 +115,6 @@ class Order extends BaseOrder
         $this->setRef($this->generateRef())
             ->setDisableVersioning(true)
             ->save($con);
-        $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
     }
 
     public function generateRef()

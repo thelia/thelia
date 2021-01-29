@@ -6,13 +6,13 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\Model\Base\Export as BaseExport;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class Export extends BaseExport
 {
     use PositionManagementTrait;
-    use ModelEventDispatcherTrait;
+
 
     /**
      * @var \Thelia\ImportExport\Export\AbstractExport

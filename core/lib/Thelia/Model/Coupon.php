@@ -27,7 +27,7 @@ use Propel\Runtime\Propel;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 
 /**
  * Used to provide an effect (mostly a discount)
@@ -43,7 +43,7 @@ class Coupon extends BaseCoupon
     // Define the value of an unlimited coupon usage.
     const UNLIMITED_COUPON_USE = -1;
 
-    use ModelEventDispatcherTrait;
+
 
     /**
      * Create or Update this Coupon

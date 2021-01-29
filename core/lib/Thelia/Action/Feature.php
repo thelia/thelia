@@ -40,7 +40,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
         $feature = new FeatureModel();
 
         $feature
-            ->setDispatcher($dispatcher)
+
 
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
@@ -67,7 +67,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
             $feature
-                ->setDispatcher($dispatcher)
+
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -92,7 +92,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
     {
         if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
             $feature
-                ->setDispatcher($dispatcher)
+
                 ->delete()
             ;
 

@@ -217,8 +217,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
-            $sale->setDispatcher($dispatcher);
-
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
 
             $con->beginTransaction();
@@ -328,7 +326,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
         try {
             $sale
-            ->setDispatcher($dispatcher)
             ->setActive(!$sale->getActive())
             ->save($con);
 
@@ -374,7 +371,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     );
                 }
 
-                $sale->setDispatcher($dispatcher)->delete($con);
+                $sale->delete($con);
 
                 $event->setSale($sale);
 

@@ -77,7 +77,6 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function updatePostage(AreaUpdatePostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->setDispatcher($dispatcher);
             $area
                 ->setPostage($event->getPostage())
                 ->save();
@@ -89,7 +88,6 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function delete(AreaDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
-            $area->setDispatcher($dispatcher);
             $area->delete();
 
             $event->setArea($area);
@@ -101,7 +99,6 @@ class Area extends BaseAction implements EventSubscriberInterface
         $area = new AreaModel();
 
         $area
-            ->setDispatcher($dispatcher)
             ->setName($event->getAreaName())
             ->save();
 
@@ -112,7 +109,6 @@ class Area extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
             $area
-                ->setDispatcher($dispatcher)
                 ->setName($event->getAreaName())
                 ->save();
 

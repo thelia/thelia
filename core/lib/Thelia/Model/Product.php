@@ -13,12 +13,12 @@ use Thelia\Core\Event\Product\ProductEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\Tools\ModelEventDispatcherTrait;
+
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class Product extends BaseProduct implements FileModelParentInterface
 {
-    use ModelEventDispatcherTrait;
+
 
     use PositionManagementTrait;
 
@@ -165,7 +165,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 
         try {
             // Create the product
@@ -181,8 +180,6 @@ class Product extends BaseProduct implements FileModelParentInterface
 
             // Store all the stuff !
             $con->commit();
-
-            $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
         } catch (\Exception $ex) {
             $con->rollback();
 
@@ -260,25 +257,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         }
     }
 
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        parent::preUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEPRODUCT, new ProductEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        parent::postUpdate($con);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEPRODUCT, new ProductEvent($this));
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -304,8 +282,6 @@ class Product extends BaseProduct implements FileModelParentInterface
             ;
         }
 
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEPRODUCT, new ProductEvent($this));
-
         return true;
     }
 
@@ -317,8 +293,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         parent::postDelete($con);
 
         $this->markRewrittenUrlObsolete();
-
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
 
     /**

@@ -80,7 +80,7 @@ class State extends BaseAction implements EventSubscriberInterface
         $state = $event->getState();
 
         $state
-            ->setDispatcher($dispatcher)
+
             ->setVisible(!$state->getVisible())
             ->save()
         ;
