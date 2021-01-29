@@ -14,19 +14,17 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
-use Thelia\Core\Event\Area\AreaCreateEvent;
-use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
-use Thelia\Core\Event\Area\AreaUpdateEvent;
-use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Area;
 use Thelia\Model\AreaQuery;
+use Thelia\Model\Event\AreaEvent;
 
 /**
  * Class AreaController
@@ -91,11 +89,11 @@ class AreaController extends AbstractCrudController
      *
      * @param array $formData
      *
-     * @return \Thelia\Core\Event\Area\AreaCreateEvent
      */
     protected function getCreationEvent($formData)
     {
-        $event = new AreaCreateEvent();
+        $area = new Area();
+        $event = new AreaEvent($area);
 
         return $this->hydrateEvent($event, $formData);
     }
@@ -104,27 +102,21 @@ class AreaController extends AbstractCrudController
      * Creates the update event with the provided form data
      *
      * @param array $formData
-     * @return \Thelia\Core\Event\Area\AreaUpdateEvent
+     * @return AreaEvent
      */
-    protected function getUpdateEvent($formData)
+    protected function getUpdateEvent($formData): AreaEvent
     {
-        $event = new AreaUpdateEvent();
+        $area = $this->findAreaOrFail($formData['area_id']);
+        $event = new AreaEvent($area);
 
         $this->hydrateEvent($event, $formData);
-
-        $event->setAreaId($formData['area_id']);
 
         return $event;
     }
 
-    /**
-     * @param \Thelia\Core\Event\Area\AreaCreateEvent $event
-     * @param array $formData
-     * @return \Thelia\Core\Event\Area\AreaCreateEvent
-     */
-    private function hydrateEvent($event, $formData)
+    private function hydrateEvent(AreaEvent $event, $formData): AreaEvent
     {
-        $event->setAreaName($formData['name']);
+        $event->getModel()->setName($formData['name']);
 
         return $event;
     }
@@ -132,33 +124,12 @@ class AreaController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data
      *
-     * @return AreaDeleteEvent
+     * @return AreaEvent
      */
-    protected function getDeleteEvent()
+    protected function getDeleteEvent(): AreaEvent
     {
-        return new AreaDeleteEvent($this->getAreaId());
-    }
-
-    /**
-     * Return true if the event contains the object, e.g. the action has updated the object in the event.
-     *
-     * @param \Thelia\Core\Event\Area\AreaEvent $event
-     * @return bool
-     */
-    protected function eventContainsObject($event)
-    {
-        return $event->hasArea();
-    }
-
-    /**
-     * Get the created object from an event.
-     *
-     * @param \Thelia\Core\Event\Area\AreaEvent $event
-     * @return Area
-     */
-    protected function getObjectFromEvent($event)
-    {
-        return $event->getArea();
+        $area = $this->findAreaOrFail($this->getAreaId());
+        return new AreaEvent($area);
     }
 
     /**
@@ -252,18 +223,14 @@ class AreaController extends AbstractCrudController
         try {
             $form = $this->validateForm($areaCountryForm);
 
-            $event = new AreaAddCountryEvent($form->get('area_id')->getData(), $form->get('country_id')->getData());
+            $area = $this->findAreaOrFail($form->get('area_id')->getData());
+
+            $event = new AreaAddCountryEvent($area, $form->get('country_id')->getData());
 
             $this->dispatch(TheliaEvents::AREA_ADD_COUNTRY, $event);
 
-            if (! $this->eventContainsObject($event)) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
-                );
-            }
-
             // Log object modification
-            if (null !== $changedObject = $this->getObjectFromEvent($event)) {
+            if (null !== $changedObject = $event->getModel()) {
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::UPDATE,
@@ -313,10 +280,11 @@ class AreaController extends AbstractCrudController
             $form = $this->validateForm($areaDeleteCountriesForm);
 
             $data = $form->getData();
+            $area = $this->findAreaOrFail($form->get('area_id')->getData());
 
             foreach ($data['country_id'] as $countryId) {
                 $country = explode('-', $countryId);
-                $this->removeOneCountryFromArea($data['area_id'], $country[0], $country[1]);
+                $this->removeOneCountryFromArea($area, $country[0], $country[1]);
             }
             // Redirect to the success URL
             return $this->generateSuccessRedirect($areaDeleteCountriesForm);
@@ -338,17 +306,17 @@ class AreaController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    protected function removeOneCountryFromArea($areaId, $countryId, $stateId)
+    protected function removeOneCountryFromArea(Area $area, $countryId, $stateId)
     {
         if (\intval($stateId) === 0) {
             $stateId = null;
         }
 
-        $removeCountryEvent = new AreaRemoveCountryEvent($areaId, $countryId, $stateId);
+        $removeCountryEvent = new AreaRemoveCountryEvent($area, $countryId, $stateId);
 
         $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
 
-        if (null !== $changedObject = $this->getObjectFromEvent($removeCountryEvent)) {
+        if (null !== $changedObject = $removeCountryEvent->getModel()) {
             $this->adminLogAppend(
                 $this->resourceCode,
                 AccessManager::UPDATE,
@@ -358,7 +326,7 @@ class AreaController extends AbstractCrudController
                     $this->getObjectLabel($changedObject),
                     $this->getObjectId($changedObject),
                     $countryId,
-                    $areaId
+                    $area->getId()
                 ),
                 $this->getObjectId($changedObject)
             );
@@ -381,61 +349,18 @@ class AreaController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function updatePostageAction()
+    protected function findAreaOrFail($areaId): Area
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
-            return $response;
+        $area = AreaQuery::create()
+            ->filterById($areaId)
+            ->findOne();
+
+        if (null === $area) {
+            throw new ElementNotFoundException(
+                $this->getTranslator()->trans("Area not found")
+            );
         }
 
-        $areaUpdateForm = $this->createForm(AdminForm::AREA_POSTAGE);
-        $error_msg = null;
-
-        try {
-            $form = $this->validateForm($areaUpdateForm);
-
-            $event = new AreaUpdatePostageEvent($form->get('area_id')->getData());
-            $event->setPostage($form->get('postage')->getData());
-
-            $this->dispatch(TheliaEvents::AREA_POSTAGE_UPDATE, $event);
-
-            if (! $this->eventContainsObject($event)) {
-                throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
-                );
-            }
-
-            // Log object modification
-            if (null !== $changedObject = $this->getObjectFromEvent($event)) {
-                $this->adminLogAppend(
-                    $this->resourceCode,
-                    AccessManager::UPDATE,
-                    sprintf(
-                        "%s %s (ID %s) modified, country remove",
-                        ucfirst($this->objectName),
-                        $this->getObjectLabel($changedObject),
-                        $this->getObjectId($changedObject)
-                    ),
-                    $this->getObjectId($changedObject)
-                );
-            }
-
-            // Redirect to the success URL
-            return $this->generateSuccessRedirect($areaUpdateForm);
-        } catch (FormValidationException $ex) {
-            // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            // Any other error
-            $error_msg = $ex->getMessage();
-        }
-
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
-            $error_msg,
-            $areaUpdateForm
-        );
-
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->renderEditionTemplate();
+        return $area;
     }
 }

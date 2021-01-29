@@ -12,11 +12,15 @@
 
 namespace Thelia\Controller\Admin;
 
+use Propel\Runtime\Event\ActiveRecordEvent;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Form\Form;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 
@@ -135,14 +139,29 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @param mixed $event
      */
-    abstract protected function eventContainsObject($event);
+    protected function eventContainsObject($event)
+    {
+        if (method_exists($event, 'getModel')) {
+            return null !== $event->getModel();
+        }
+
+        // If event doesn't have "getModel" method this function must be overrided
+        return false;
+    }
 
     /**
      * Get the created object from an event.
      *
      * @param mixed $event
      */
-    abstract protected function getObjectFromEvent($event);
+    protected function getObjectFromEvent($event)
+    {
+        if (method_exists($event, 'getModel')) {
+            return $event->getModel();
+        }
+
+        throw new \Exception("If your event doesn't have  \"getModel\" method you must override \"getObjectFromEvent\" function.");
+    }
 
     /**
      * Load an existing object from the database
@@ -313,7 +332,7 @@ abstract class AbstractCrudController extends BaseAdminController
         $error_msg = false;
 
         // Create the Creation Form
-        $creationForm = $this->getCreationForm($this->getRequest());
+        $creationForm = $this->getCreationForm();
 
         try {
             // Check the form against constraints violations
@@ -324,7 +343,11 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $createEvent = $this->getCreationEvent($data);
-            $createEvent->bindForm($form);
+            if (method_exists($createEvent, 'bindForm')) {
+                $createEvent->bindForm($form);
+            } elseif ($createEvent instanceof ActiveRecordEvent) {
+                $this->bindFormToPropelEvent($createEvent, $form);
+            }
 
             // Dispatch Create Event
             $this->dispatch($this->createEventIdentifier, $createEvent);
@@ -436,7 +459,11 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $changeEvent = $this->getUpdateEvent($data);
-            $changeEvent->bindForm($form);
+            if (method_exists($changeEvent, 'bindForm')) {
+                $changeEvent->bindForm($form);
+            } elseif ($changeEvent instanceof ActiveRecordEvent) {
+                $this->bindFormToPropelEvent($changeEvent, $form);
+            }
 
             // Dispatch Update Event
             $this->dispatch($this->updateEventIdentifier, $changeEvent);
@@ -672,5 +699,27 @@ abstract class AbstractCrudController extends BaseAdminController
     protected function getRequest()
     {
         return $this->container->get('request_stack')->getCurrentRequest();
+    }
+
+    protected function bindFormToPropelEvent(ActiveRecordEvent $propelEvent, Form $form)
+    {
+        $fields = $form->getIterator();
+
+        /** @var \Symfony\Component\Form\Form $field */
+        foreach ($fields as $field) {
+            $functionName = sprintf("set%s", Container::camelize($field->getName()));
+            if (method_exists($propelEvent, $functionName)) {
+                $getFunctionName = sprintf("get%s", Container::camelize($field->getName()));
+                if (method_exists($propelEvent, $getFunctionName)) {
+                    if (null === $propelEvent->{$getFunctionName}()) {
+                        $propelEvent->{$functionName}($field->getData());
+                    }
+                } else {
+                    $propelEvent->{$functionName}($field->getData());
+                }
+            } else {
+                $propelEvent->{$field->getName()} = $field->getData();
+            }
+        }
     }
 }

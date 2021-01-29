@@ -321,6 +321,11 @@ class BaseAdminController extends BaseController
     {
         $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
 
+        if (null === $requestParameterName || null === $defaultListOrder)
+        {
+            return null;
+        }
+
         // Find the current order
         $order = $this->getRequest()->get(
             $requestParameterName,
