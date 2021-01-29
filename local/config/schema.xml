@@ -1865,19 +1865,6 @@
     </behavior>
     <behavior name="timestampable" />
   </table>
-  <table name="api" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="label" size="255" type="VARCHAR" />
-    <column name="api_key" size="100" type="VARCHAR" />
-    <column name="profile_id" type="INTEGER" />
-    <foreign-key foreignTable="profile" name="fk_api_profile_id">
-      <reference foreign="id" local="profile_id" />
-    </foreign-key>
-    <index name="idx_api_profile_id">
-      <index-column name="profile_id" />
-    </index>
-    <behavior name="timestampable" />
-  </table>
   <table isCrossRef="true" name="country_area" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="country_id" required="true" type="INTEGER" />

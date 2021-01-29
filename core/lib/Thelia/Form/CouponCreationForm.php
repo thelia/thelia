@@ -229,7 +229,6 @@ class CouponCreationForm extends BaseForm
                 'coupon_specific',
                 CollectionType::class,
                 [
-                    'entry_type' => Type
                     'allow_add'    => true,
                     'allow_delete' => true,
                 ]

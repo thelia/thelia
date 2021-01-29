@@ -651,7 +651,6 @@ return [
     'after the order summary' => 'Nach der Bestellzusammenfassung',
     'after top bar' => 'Nach dem Top-Bar',
     'after top menu' => 'Nach dem Top-Menü',
-    'api id %id does not exists' => 'Api ID %id existiert nicht',
     'at the bottom' => 'Unten',
     'at the bottom of column 1' => 'Unten der Spalte 1',
     'at the bottom of information area' => 'Unten am Informationsbereich',

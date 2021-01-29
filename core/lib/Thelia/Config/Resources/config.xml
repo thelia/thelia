@@ -78,7 +78,6 @@
                 <parameter key="IMPORT">admin.import</parameter>
                 <parameter key="TOOLS">admin.tools</parameter>
                 <parameter key="SALES">admin.sales</parameter>
-                <parameter key="API">admin.configuration.api</parameter>
                 <parameter key="TITLE">admin.customer.title</parameter>
             </parameter>
         </parameter>

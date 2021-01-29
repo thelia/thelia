@@ -162,7 +162,4 @@ final class AdminForm
     const SALE_MODIFICATION = 'thelia.admin.sale.modification';
 
     const EMPTY_FORM = 'thelia.empty';
-
-    const API_CREATE = 'thelia_api_create';
-    const API_UPDATE = 'thelia_api_update';
 }

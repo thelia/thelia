@@ -181,25 +181,6 @@ try {
     Model\ConfigQuery::write('store_city', "Clermont-Ferrand");
     Model\ConfigQuery::write('store_country', $defaultCountry[0]);
 
-    $api = new Thelia\Model\Api();
-
-    $api
-        ->setProfileId(null)
-        ->setApiKey('79E95BD784CADA0C9A578282E')
-        ->setLabel("test")
-        ->save();
-
-    // API
-    echo "Creating API key\n";
-
-    $api = new Thelia\Model\Api();
-
-    $api
-        ->setProfileId(null)
-        ->setApiKey('79E95BD784CADA0C9A578282E')
-        ->setLabel("test")
-        ->save();
-
     // Customer
     echo "Creating customers\n";
     $customer = new Thelia\Model\Customer();

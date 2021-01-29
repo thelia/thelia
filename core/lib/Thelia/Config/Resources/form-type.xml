@@ -135,11 +135,6 @@
             <tag name="thelia.form.type" />
         </service>
 
-        <service id="thelia.form.type.field.api_id" class="Thelia\Core\Form\Type\Field\ApiIdType">
-            <argument type="service" id="thelia.translator" />
-            <tag name="thelia.form.type" />
-        </service>
-
         <service id="thelia.form.type.field.area_delivery_module_id" class="Thelia\Core\Form\Type\Field\AreaDeliveryModuleIdType">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.form.type" />
