@@ -225,9 +225,15 @@ class CheckPermission extends BaseInstall
             $sentence = '%extension% php extension is not loaded.';
         }
 
-        return $this->translator->trans($sentence, array(
-            '%extension%' => $extension
-        ));
+        if ($this->translator !== null) {
+            $translatedText = $this->translator->trans($sentence, array(
+                '%extension%' => $extension
+            ));
+        } else {
+            $translatedText = $sentence;
+        }
+
+        return $translatedText;
     }
 
     /**
@@ -249,22 +255,36 @@ class CheckPermission extends BaseInstall
             $sentence = 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
         }
 
-        $translatedText = $this->translator->trans(
-            $sentence,
-            array(
-                '%key%' => $key,
-                '%expectedValue%' => $expectedValue,
-                '%currentValue%' => $currentValue,
-            ),
-            'install-wizard'
-        );
+        if ($this->translator !== null) {
+            $translatedText = $this->translator->trans(
+                $sentence,
+                array(
+                    '%key%' => $key,
+                    '%expectedValue%' => $expectedValue,
+                    '%currentValue%' => $currentValue,
+                ),
+                'install-wizard'
+            );
+        } else {
+            $translatedText = $sentence;
+        }
 
         return $translatedText;
     }
 
     protected function getI18nExtensionHint()
     {
-        return $this->translator->trans('This PHP extension should be installed and loaded.');
+        $sentence = 'This PHP extension should be installed and loaded.';
+        if ($this->translator !== null) {
+
+            $translatedText = $this->translator->trans(
+                $sentence
+            );
+        } else {
+            $translatedText = $sentence;
+        }
+
+        return $translatedText;
     }
 
     /**
@@ -275,9 +295,14 @@ class CheckPermission extends BaseInstall
     protected function getI18nConfigHint()
     {
         $sentence = 'Change this value in the php.ini configuration file.';
-        $translatedText = $this->translator->trans(
-            $sentence
-        );
+        if ($this->translator !== null) {
+
+            $translatedText = $this->translator->trans(
+                $sentence
+            );
+        } else {
+            $translatedText = $sentence;
+        }
 
         return $translatedText;
     }
@@ -323,10 +348,15 @@ class CheckPermission extends BaseInstall
     protected function getI18nPhpVersionHint()
     {
         $sentence = 'You should change the installed PHP version to continue Thelia 2 installation.';
-        $translatedText = $this->translator->trans(
-            $sentence,
-            array()
-        );
+        if ($this->translator !== null) {
+
+            $translatedText = $this->translator->trans(
+                $sentence,
+                array()
+            );
+        } else {
+            $translatedText = $sentence;
+        }
 
         return $translatedText;
     }

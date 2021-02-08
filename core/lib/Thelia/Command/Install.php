@@ -159,10 +159,10 @@ class Install extends ContainerAwareCommand
             "Checking some permissions"
         ));
 
-        /** @var Translator $translator */
-        $translator = $this->getContainer()->get('thelia.translator');
+//        /** @var Translator $translator */
+//        $translator = $this->getContainer()->get('thelia.translator');
 
-        $permissions = new CheckPermission(false, $translator);
+        $permissions = new CheckPermission(false);
         $isValid = $permissions->exec();
 
         foreach ($permissions->getValidationMessages() as $item => $data) {
