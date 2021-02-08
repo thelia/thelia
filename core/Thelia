@@ -52,6 +52,57 @@ $input = new ArgvInput();
 $env = $input->getParameterOption(array('--env', '-e'), getenv('THELIA_ENV') ?: 'dev');
 $debug = getenv('THELIA_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', '')) && $env !== 'prod';
 
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Thelia\Command\Install;
+
+function getTheliaDatabaseConfigFile(string $env)
+{
+    $fs = new Filesystem();
+
+    $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $env . '.yml';
+    if (!$fs->exists($databaseConfigFile)) {
+        $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
+    }
+
+    return $databaseConfigFile;
+}
+
+if (!file_exists(getTheliaDatabaseConfigFile($env))) {
+    $kernel = new class($env, true) extends Kernel {
+        use MicroKernelTrait;
+
+        public function getCacheDir()
+        {
+            if (\defined('THELIA_ROOT')) {
+                return THELIA_CACHE_DIR . $this->environment;
+            }
+
+            return parent::getCacheDir();
+        }
+
+        public function registerBundles(): array
+        {
+            return [
+                new Symfony\Bundle\FrameworkBundle\FrameworkBundle()
+            ];
+        }
+
+        public function registerContainerConfiguration(LoaderInterface $loader)
+        {
+            // TODO: Implement registerContainerConfiguration() method.
+        }
+    };
+
+    $application = new Application($kernel);
+    $application->run($input, new TheliaConsoleOutput());
+
+    echo 'test';
+    exit;
+}
+
 $thelia = new Thelia($env, $debug);
 $application = new Application($thelia);
 $application->getContainer()->get('thelia.translator');
