@@ -70,11 +70,6 @@ class FirewallTest extends TestCase
                 $this->request,
             ]
         );
-        $this->form
-            ->expects($this->any())
-                ->method('getName')
-                    ->will($this->returnValue("test_form_firewall"))
-        ;
 
         /**
          * Be sure that the firewall is active

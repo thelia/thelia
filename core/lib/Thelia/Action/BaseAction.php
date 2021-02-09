@@ -38,8 +38,6 @@ class BaseAction
                 throw new \InvalidArgumentException("Your model does not implement the PositionManagementTrait trait");
             }
 
-            $object->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher());
-
             $mode = $event->getMode();
 
             if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE) {
@@ -65,8 +63,6 @@ class BaseAction
             if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
                 throw new \InvalidArgumentException("Your model does not implement the PositionManagementTrait trait");
             }
-
-            //$object->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher());
 
             $mode = $event->getMode();
 
@@ -94,14 +90,10 @@ class BaseAction
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $object
-                //for backward compatibility
-                ->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher())
-
                 ->setLocale($event->getLocale())
                 ->setMetaTitle($event->getMetaTitle())
                 ->setMetaDescription($event->getMetaDescription())
                 ->setMetaKeywords($event->getMetaKeywords())
-
                 ->save()
             ;
 
@@ -132,8 +124,6 @@ class BaseAction
         if (null !== $object = $query->findPk($event->getObjectId())) {
             $newVisibility = !$object->getVisible();
             $object
-                //for backward compatibility
-                ->setDispatcher($dispatcher !== null ? $dispatcher : $event->getDispatcher())
                 ->setVisible($newVisibility)
                 ->save()
             ;

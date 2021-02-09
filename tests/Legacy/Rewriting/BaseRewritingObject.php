@@ -13,6 +13,9 @@
 namespace Thelia\Tests\Rewriting;
 
 use PHPUnit\Framework\TestCase;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Propel;
+use Thelia\Model\Tools\UrlRewritingTrait;
 
 /**
  * Class BaseRewritingObject
@@ -31,6 +34,7 @@ abstract class BaseRewritingObject extends TestCase
      */
     public function testSimpleFrenchRewrittenUrl()
     {
+        /** @var UrlRewritingTrait $object */
         $object = $this->getObject();
         $object->setVisible(1)
             ->setPosition(1)
@@ -38,11 +42,12 @@ abstract class BaseRewritingObject extends TestCase
             ->setTitle('Mon super titre en français')
             ->save();
 
-        $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $object->getRewrittenUrl('fr_FR'));
+        $this->assertMatchesRegularExpression('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $object->getRewrittenUrl('fr_FR'));
 
-        $rewrittenUrl = $object->generateRewrittenUrl('fr_FR');
+        $con = Propel::getConnection();
+        $rewrittenUrl = $object->generateRewrittenUrl('fr_FR', $con);
         $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
-        $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
+        $this->assertMatchesRegularExpression('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
         //mon-super-titre-en-français-2.html
 
         $object->delete();
@@ -53,6 +58,7 @@ abstract class BaseRewritingObject extends TestCase
      */
     public function testSimpleEnglishRewrittenUrl()
     {
+        /** @var UrlRewritingTrait $object */
         $object = $this->getObject();
         $object->setVisible(1)
             ->setPosition(1)
@@ -60,11 +66,12 @@ abstract class BaseRewritingObject extends TestCase
             ->setTitle('My english super Title')
             ->save();
 
-        $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $object->getRewrittenUrl('en_US'));
+        $this->assertMatchesRegularExpression('/^my-english-super-title(-[0-9]+)?\.html$/', $object->getRewrittenUrl('en_US'));
 
-        $rewrittenUrl = $object->generateRewrittenUrl('en_US');
+        $con = Propel::getConnection();
+        $rewrittenUrl = $object->generateRewrittenUrl('en_US', $con);
         $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
-        $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $rewrittenUrl);
+        $this->assertMatchesRegularExpression('/^my-english-super-title(-[0-9]+)?\.html$/', $rewrittenUrl);
 
         $object->delete();
     }
@@ -89,9 +96,11 @@ abstract class BaseRewritingObject extends TestCase
      */
     public function testOnNotSavedObject()
     {
+        /** @var UrlRewritingTrait $object */
         $object = $this->getObject();
 
         $this->expectException(\RuntimeException::class);
-        $object->generateRewrittenUrl('fr_FR');
+        $con = Propel::getConnection();
+        $object->generateRewrittenUrl('fr_FR', $con);
     }
 }

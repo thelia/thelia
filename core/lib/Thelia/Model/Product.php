@@ -277,7 +277,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         /** @var FeatureAv $featureAv */
         foreach ($featureAvs as $featureAv) {
             $featureAv
-                ->setDispatcher($this->dispatcher)
                 ->delete($con)
             ;
         }

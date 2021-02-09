@@ -49,7 +49,7 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__ . '/../core/vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__ . '/../vendor/autoload.php')) {
         require $file;
     } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project

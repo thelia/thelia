@@ -205,7 +205,7 @@ class RewritingRouterTest extends TestCase
             $rewritingRouter = new RewritingRouter();
             $parameters = $rewritingRouter->matchRequest($request);
         } catch (RedirectException $e) {
-            $this->assertRegExp("/http:\/\/test\.com\/.*/", $e->getUrl());
+            $this->assertMatchesRegularExpression("/http:\/\/test\.com\/.*/", $e->getUrl());
             return;
         }
 

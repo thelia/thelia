@@ -150,13 +150,13 @@ class FileManagerTest extends TestCase
 
         $model->setFile(null)->save();
 
-        $testFile = __DIR__ . DS .DS. 'move-test.gif';
+        $testFile = __DIR__ .DS. 'fixtures'  .DS. 'move-test.gif';
         $targetFile = THELIA_LOCAL_DIR . 'media'.DS.'images'.DS.$type.DS."original-".$model->getId().".gif";
 
         @unlink($testFile);
         @unlink($targetFile);
 
-        copy(__DIR__ . DS, $testFile);
+        copy(__DIR__ .DS. 'fixtures' .DS. 'test.gif', $testFile);
 
         $uploadedFile = new UploadedFile(
             $testFile,
@@ -190,13 +190,13 @@ class FileManagerTest extends TestCase
 
         $model->setFile(null)->save();
 
-        $testFile = __DIR__ . DS .DS. 'move-test.txt';
+        $testFile = __DIR__ .DS. 'fixtures' .DS. 'move-test.txt';
         $targetFile = THELIA_LOCAL_DIR . 'media'.DS.'documents'.DS.$type.DS."original-".$model->getId().".txt";
 
         @unlink($testFile);
         @unlink($targetFile);
 
-        copy(__DIR__ . DS, $testFile);
+        copy(__DIR__ .DS. 'fixtures' .DS. 'test.txt', $testFile);
 
         $uploadedFile = new UploadedFile(
             $testFile,
@@ -323,13 +323,13 @@ class FileManagerTest extends TestCase
 
         @unlink($targetFile);
 
-        copy(__DIR__ . DS, $targetFile);
+        copy(__DIR__ .DS. 'fixtures' .DS. 'test.txt', $targetFile);
 
         $this->assertFileExists($targetFile);
 
         $this->fileManager->deleteFile($model);
 
-        $this->assertFileNotExists($targetFile);
+        $this->assertFileDoesNotExist($targetFile);
     }
 
     public function testDeleteFileProductDocument()
