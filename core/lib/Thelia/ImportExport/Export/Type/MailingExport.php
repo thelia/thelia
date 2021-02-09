@@ -29,7 +29,8 @@ class MailingExport extends JsonFileAbstractExport
         'newsletter_id' => 'Identifier',
         'newsletter_email' => 'Email',
         'newsletter_firstname' => 'FirstName',
-        'newsletter_lastname' => 'LastName'
+        'newsletter_lastname' => 'LastName',
+        'newsletter_locale' => 'Locale'
     ];
 
     protected function getData()
@@ -39,7 +40,8 @@ class MailingExport extends JsonFileAbstractExport
                         newsletter.id as "newsletter_id",
                         newsletter.email as "newsletter_email", 
                         newsletter.firstname as "newsletter_firstname", 
-                        newsletter.lastname as "newsletter_lastname"
+                        newsletter.lastname as "newsletter_lastname",
+                        newsletter.locale as "newsletter_locale"
                     FROM newsletter
                     WHERE newsletter.unsubscribed = 0'
         ;
